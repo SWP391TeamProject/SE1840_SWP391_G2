@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.exception;
 
 import java.util.Date;
+
+import jdk.jfr.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,6 +19,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(), new Date());
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
+
 
   @ExceptionHandler(value = InvalidInputException.class)
   public ResponseEntity<Object> handleBadRequestException(Exception ex) {
