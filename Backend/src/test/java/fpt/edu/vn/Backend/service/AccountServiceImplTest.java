@@ -57,22 +57,22 @@ public class AccountServiceImplTest {
     @Test
     @DisplayName("Should return account by username")
     public void shouldReturnAccountByUsername() {
-        when(accountService.getAccountByUsername("test")).thenReturn(account);
-        assertEquals(account, accountService.getAccountByUsername("test"));
+        when(accountService.getAccountByEmail("test")).thenReturn(account);
+        assertEquals(account, accountService.getAccountByEmail("test"));
     }
 
     @Test
     @DisplayName("Should return account by username and password")
     public void shouldReturnAccountByUsernameAndPassword() {
-        when(accountService.getAccountByUsernameAndPassword("test", "test")).thenReturn(account);
-        assertEquals(account, accountService.getAccountByUsernameAndPassword("test", "test"));
+        when(accountService.getAccountByEmailAndPassword("test", "test")).thenReturn(account);
+        assertEquals(account, accountService.getAccountByEmailAndPassword("test", "test"));
     }
 
     @Test
     @DisplayName("Should return account by email and password")
     public void shouldReturnAccountByEmailAndPassword() {
-        when(accountService.getAccountByEmailAndPassword("test@test.com")).thenReturn(account);
-        assertEquals(account, accountService.getAccountByEmailAndPassword("test@test.com"));
+        when(accountService.getAccountByEmail("test@test.com")).thenReturn(account);
+        assertEquals(account, accountService.getAccountByEmail("test@test.com"));
     }
 
     @Test
