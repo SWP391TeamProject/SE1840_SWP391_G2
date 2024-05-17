@@ -5,9 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -27,10 +25,9 @@ public class Consignment {
     @JoinColumn(name = "staff_id")
     private Account staff;
 
-    private BigDecimal initialPrice;
-    private String initialEvaluation;
-    private BigDecimal finalPrice;
-    private String finalEvaluation;
+    @OneToOne
+    @JoinColumn(name = "support_ticket")
+    private SupportTicket supportTicket;
 
     @Column(length = 30)
     private String status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.

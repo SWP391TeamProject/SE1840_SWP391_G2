@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface AccountService {
     Page<Account> getAllAccounts(Pageable pageable);
     Account createAccount(Account account);
     Account getAccountById(int id);
     Account editProfiles(Account account);
     void deleteAccount(int id);
-
     Account getAccountByUsername(String username);
 
 }

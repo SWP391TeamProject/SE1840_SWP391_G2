@@ -40,14 +40,21 @@ public class Item {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
+    //Relationships
+    @OneToMany(mappedBy = "item")
+    private List<TransactionAuction> transactionAuctions;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private ItemCategory category;
+    @ManyToMany
+    @JoinTable(
+            name = "category_of_item",
+            joinColumns = @JoinColumn(name = "item_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<ItemCategory> categories;
 
-    @OneToMany
-    @JoinColumn(name = "item_id")
+    @OneToMany(mappedBy = "item")
     private List<AuctionItem> auctionItems;
 
+    @OneToMany(mappedBy = "item")
+    private List<AuctionBid> auctionBids;
 
 }

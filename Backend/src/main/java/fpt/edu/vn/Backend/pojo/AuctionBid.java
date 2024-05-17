@@ -18,16 +18,19 @@ public class AuctionBid {
     private int bidId;
 
     @ManyToOne
-    @JoinColumn(name = "bidder_id")
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    @ManyToOne
+    @JoinColumn(name = "auction_id")
+    private AuctionSession auctionSession; // Assuming this is AuctionSession
+
+    @ManyToOne
+    @JoinColumn(name = "bidder")
     private Account bidder;
 
     private BigDecimal price;
 
     @CreationTimestamp
     private LocalDateTime createDate;
-
-    @ManyToOne
-    @JoinColumn(name = "auction_item_id")
-    private AuctionItem auctionItem;
-
 }

@@ -27,8 +27,7 @@ public class BlogCategory {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
-    @OneToMany
-    @JoinColumn(name = "category_id")
+    @OneToMany(mappedBy = "category")
     private List<BlogPost> blogPosts;
 }
 

@@ -32,10 +32,13 @@ public class AuctionSession {
     private LocalDateTime updateDate;
 
     //Relationships
-    @OneToMany
-    @JoinColumn(name = "auction_session_id")
+    @OneToMany(mappedBy = "auctionSession")
+    private List<TransactionAuction> transactionAuctions;
+
+    @OneToMany(mappedBy = "auctionSession")
     private List<AuctionItem> auctionItems;
 
-
+    @OneToMany(mappedBy = "auctionSession")
+    private List<AuctionBid> auctionBids;
 }
 

@@ -5,43 +5,42 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CitizenCard {
+public class SupportTicket {
     @Id
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int ticketId;
 
-    @OneToOne
-    @MapsId
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private SupportTicketCategory category;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Account user;
 
-    @Column(unique = true)
-    private int cardId;
-
-    @Column(length = 100)
-    private String fullname;
-
-    private LocalDate birthday;
-
-    @Column(length = 20)
-    private String gender;
-
     @Column(length = 200)
-    private String address;
+    private String title;
 
-    @Column(length = 30)
-    private String city;
+    @Column(length = 2000)
+    private String content;
 
     @CreationTimestamp
     private LocalDateTime createDate;
 
     @UpdateTimestamp
     private LocalDateTime updateDate;
+
+    @OneToOne(mappedBy = "supportTicket")
+    private Consignment consignment;
+
+    @OneToMany(mappedBy = "ticket")
+    private List<SupportTicketReply> replies;
 }

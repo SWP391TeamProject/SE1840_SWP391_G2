@@ -3,48 +3,38 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController("/accounts")
 public class AccountController {
-    private final AccountService accountService;
-
+    private  final AccountService accountService;
     @Autowired
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
-
     @GetMapping("/")
-    public ResponseEntity<List<Account>> getAllAccounts(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "") String sort) {
-        return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
+    public ResponseEntity<Account> getAllAccounts(@RequestParam int page, @RequestParam int size, @RequestParam String sort) {
+        return null;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountById(@PathVariable int id) {
-        return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
+    public ResponseEntity<Account> getAccountById(@PathVariable String id) {
+        return null;
     }
-
     @PostMapping("/create")
     public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        return new ResponseEntity<>(accountService.createAccount(account), HttpStatus.CREATED);
+        return null;
     }
 
     @PutMapping("/update")
     public ResponseEntity<Account> updateAccount(@RequestBody Account account) {
-        return new ResponseEntity<>(accountService.updateAccount(account), HttpStatus.OK);
+        return null;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Account> deleteAccount(@PathVariable int id) {
-        if (accountService.getAccountById(id) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            accountService.deleteAccount(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
+    public ResponseEntity<Account> deleteAccount(@PathVariable String id) {
+        return null;
     }
+
 }

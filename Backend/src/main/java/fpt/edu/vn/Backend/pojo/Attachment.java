@@ -18,7 +18,7 @@ public class Attachment {
     private int attachmentId;
 
     @Column(length = 20)
-    private String objectType; // consignment, blog, item
+    private String objectType; // ticket, ticket_reply, item
 
     private int objectId;
 

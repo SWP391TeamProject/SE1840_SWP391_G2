@@ -1,10 +1,12 @@
 package fpt.edu.vn.Backend.pojo;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Getter
@@ -12,22 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuctionItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int auctionItemId;
+    @EmbeddedId
+    private AuctionItemId id;
 
     @ManyToOne
-    @JoinColumn(name = "auction_session_id")
+    @MapsId("auctionSessionId")
     private AuctionSession auctionSession;
 
     @ManyToOne
-    @JoinColumn(name = "item_id")
+    @MapsId("itemId")
     private Item item;
 
-    private BigDecimal currentPrice;
-
-    @OneToMany
-    @JoinColumn(name = "auction_item_id")
-    private List<AuctionBid> auctionBids;
+    private BigDecimal bidIncrement;
+    private BigDecimal initialPrice;
     // Consider adding currentPrice to track the highest bid during the auction
 }
