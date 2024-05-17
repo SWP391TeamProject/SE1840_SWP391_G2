@@ -22,8 +22,8 @@ public class CitizenCard {
     @JoinColumn(name = "user_id")
     private Account user;
 
-    @Column(unique = true)
-    private int cardId;
+    @Column(unique = true , length = 12)
+    private String cardId;
 
     @Column(length = 100)
     private String fullname;
@@ -31,7 +31,7 @@ public class CitizenCard {
     private LocalDate birthday;
 
     @Column(length = 20)
-    private String gender;
+    private boolean gender;
 
     @Column(length = 200)
     private String address;
