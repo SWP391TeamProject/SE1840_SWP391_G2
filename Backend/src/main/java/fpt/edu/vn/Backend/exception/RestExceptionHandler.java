@@ -1,4 +1,4 @@
-package com.fptgang.auctionhouse.exception;
+package fpt.edu.vn.Backend.exception;
 
 import java.util.Date;
 import org.springframework.http.HttpStatus;
