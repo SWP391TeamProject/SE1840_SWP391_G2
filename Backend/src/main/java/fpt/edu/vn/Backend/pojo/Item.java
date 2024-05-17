@@ -19,6 +19,11 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int itemId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_category_id") // This matches the column in the database
+    private ItemCategory itemCategory;
+
+
     @Column(length = 300)
     private String name;
 
@@ -41,9 +46,6 @@ public class Item {
     private LocalDateTime updateDate;
 
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private ItemCategory category;
 
     @OneToMany
     @JoinColumn(name = "item_id")

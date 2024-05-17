@@ -2,9 +2,11 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+@Service
 
 public class AuthServiceImpl implements AuthService{
     private final AccountRepos accountRepos;

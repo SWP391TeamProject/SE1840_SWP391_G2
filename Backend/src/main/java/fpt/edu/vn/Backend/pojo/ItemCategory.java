@@ -27,7 +27,6 @@ public class ItemCategory {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
-    @OneToMany
-    @JoinColumn(name = "category_id")
+    @OneToMany(mappedBy = "itemCategory") // Corrected to match the field name in Item
     private List<Item> items;
 }

@@ -1,5 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
+import org.springframework.stereotype.Service;
+
 public interface AuthService {
     String login(String username, String password);
     String register(String username, String password, String email);
