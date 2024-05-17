@@ -22,11 +22,11 @@ public class CitizenCard {
     @JoinColumn(name = "user_id")
     private Account user;
 
-    @Column(unique = true , length = 12)
+    @Column(unique = true , length = 12,name = "card_id")
     private String cardId;
 
-    @Column(length = 100)
-    private String fullname;
+    @Column(length = 100,name = "full_name")
+    private String fullName;
 
     private LocalDate birthday;
 
@@ -40,8 +40,10 @@ public class CitizenCard {
     private String city;
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 }

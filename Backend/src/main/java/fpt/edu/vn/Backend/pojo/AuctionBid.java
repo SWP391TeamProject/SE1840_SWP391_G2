@@ -15,15 +15,18 @@ import java.time.LocalDateTime;
 public class AuctionBid {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "bid_id")
     private int bidId;
 
     @ManyToOne
     @JoinColumn(name = "bidder_id")
     private Account bidder;
 
+    @Column(name = "price")
     private BigDecimal price;
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @ManyToOne

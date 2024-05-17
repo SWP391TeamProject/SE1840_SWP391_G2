@@ -26,11 +26,12 @@ public class AuctionSession {
     private String status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
-
     //Relationships
     @OneToMany
     @JoinColumn(name = "auction_session_id")

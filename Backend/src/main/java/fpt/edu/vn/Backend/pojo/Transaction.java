@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trans_id")
     private int transId;
 
     @Column(length = 30)
@@ -31,18 +32,21 @@ public class Transaction {
     @Column(length = 2000)
     private String content;
 
+    @Column(name = "reference_num")
     private Integer referenceNum; // Consider changing to Integer for null values
 
-    @Column(length = 20)
+    @Column(length = 20, name = "payment_method")
     private String paymentMethod; // INTERNAL, MOMO, PAYPAL, BANK
 
     @Column(length = 30)
     private String status; // SUCCESS, PAYMENT_ERROR, INSUFFICIENT_BALANCE
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
 
