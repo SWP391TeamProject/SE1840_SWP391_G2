@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "transactions")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,7 @@ public class Transaction {
     @Column(length = 2000)
     private String content;
 
-    private int referenceNum; // Consider changing to Integer for null values
+    private Integer referenceNum; // Consider changing to Integer for null values
 
     @Column(length = 20)
     private String paymentMethod; // INTERNAL, MOMO, PAYPAL, BANK
@@ -44,8 +45,6 @@ public class Transaction {
     @UpdateTimestamp
     private LocalDateTime updateDate;
 
-    @OneToOne(mappedBy = "transaction")
-    private TransactionAuction transactionAuction;
 
     // ... (relationships to other entities like TransactionAuction will be added later)
 }

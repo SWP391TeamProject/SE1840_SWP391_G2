@@ -1,19 +1,17 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.pojo.Account;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface AccountService {
-    Page<Account> getAllAccounts(Pageable pageable);
+    List<Account> getAllAccounts();
     Account createAccount(Account account);
     Account getAccountById(int id);
-    Account editProfiles(Account account);
+    Account updateAccount(Account account);
     void deleteAccount(int id);
-    Account getAccountByUsername(String username);
+    Account getAccountByEmail(String username);
+    Account getAccountByEmailAndPassword(String email, String password);
 
 }
