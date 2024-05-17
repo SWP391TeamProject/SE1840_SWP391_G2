@@ -1,4 +1,4 @@
-package com.fptgang.auctionhouse.exception;
+package fpt.edu.vn.Backend.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 
