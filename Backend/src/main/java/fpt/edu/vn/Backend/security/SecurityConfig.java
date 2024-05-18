@@ -15,6 +15,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,23 +42,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
-                .csrf(authorize -> authorize.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-//            .requestMatchers("/api/products")
-//            .permitAll()
-//            .requestMatchers("/api/users")
-//            .permitAll()
-//            .requestMatchers("/api/users/*")
-//            .permitAll()
-//            .requestMatchers("/auth/*")
-//            .permitAll()
-//            .requestMatchers("/api/products/*")
-//            .permitAll()
-//            .requestMatchers("/api/categories/*")
-                                .anyRequest()
-                                .permitAll()
+                                .requestMatchers("/auth/login").permitAll()
+                .anyRequest().authenticated()
+
                 )
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
@@ -71,6 +62,21 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence charSequence) {
+                return charSequence.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence charSequence, String s) {
+                return true;
+            }
+        };
     }
 
     @Bean

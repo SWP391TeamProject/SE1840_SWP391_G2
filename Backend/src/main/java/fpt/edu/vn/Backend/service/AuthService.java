@@ -8,7 +8,7 @@ public interface AuthService {
     public AuthResponseDTO login(LoginDTO loginDTO);
 
     public AuthResponseDTO logout();
-    String register(String username, String password, String email);
+    AuthResponseDTO register( String email,String password);
     String refreshToken(String token);
     String forgotPassword(String email);
     String loginWithGoogle(String token);
