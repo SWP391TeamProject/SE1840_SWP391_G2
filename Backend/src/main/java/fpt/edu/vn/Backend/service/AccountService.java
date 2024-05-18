@@ -1,4 +1,18 @@
 package fpt.edu.vn.Backend.service;
 
-public class AccountService {
+import fpt.edu.vn.Backend.dto.AccountAdminDTO;
+import fpt.edu.vn.Backend.pojo.Account;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+public interface AccountService {
+    List<AccountAdminDTO> getAllAccounts(Pageable pageable);
+    Account createAccount(Account account);
+    Account getAccountById(int id);
+    Account updateAccount(Account account);
+    void deleteAccount(int id);
+    Account getAccountByEmail(String username);
+    Account getAccountByEmailAndPassword(String email, String password);
+
 }

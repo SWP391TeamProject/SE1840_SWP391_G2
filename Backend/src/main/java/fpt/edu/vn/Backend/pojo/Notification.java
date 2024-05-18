@@ -27,11 +27,14 @@ public class Notification {
     @Column(length = 20)
     private String type; // news, system, support, etc.
 
-    private boolean read; // Use boolean for read/unread status
+    @Column(name = "is_read")
+    private boolean isRead; // Use boolean for read/unread status
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 }

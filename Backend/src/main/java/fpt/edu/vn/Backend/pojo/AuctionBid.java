@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,22 +16,23 @@ import java.time.LocalDateTime;
 public class AuctionBid {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "bid_id")
     private int bidId;
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
-
-    @ManyToOne
-    @JoinColumn(name = "auction_id")
-    private AuctionSession auctionSession; // Assuming this is AuctionSession
-
-    @ManyToOne
-    @JoinColumn(name = "bidder")
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bidder_id")
     private Account bidder;
 
+    @Column(name = "price")
     private BigDecimal price;
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
+
+    @ManyToOne
+    @JoinColumn(name = "auction_item_id")
+    private AuctionItem auctionItem;
+
 }

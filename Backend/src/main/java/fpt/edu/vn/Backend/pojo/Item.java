@@ -17,7 +17,13 @@ import java.util.List;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id")
     private int itemId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_category_id") // This matches the column in the database
+    private ItemCategory itemCategory;
+
 
     @Column(length = 300)
     private String name;
@@ -25,36 +31,33 @@ public class Item {
     @Column(length = 5000)
     private String description;
 
+    @Column(name = "reserve_price")
     private BigDecimal reservePrice;
 
-    private BigDecimal sellerCommission;
-
+    @Column(name = "buy_in_price")
     private BigDecimal buyInPrice;
 
     @Column(length = 30)
     private String status; // VALUATING, QUEUE, IN_AUCTION, etc.
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    //Relationships
-    @OneToMany(mappedBy = "item")
-    private List<TransactionAuction> transactionAuctions;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private Account owner;
 
-    @ManyToMany
-    @JoinTable(
-            name = "category_of_item",
-            joinColumns = @JoinColumn(name = "item_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<ItemCategory> categories;
-
-    @OneToMany(mappedBy = "item")
+    @OneToMany
+    @JoinColumn(name = "item_id")
     private List<AuctionItem> auctionItems;
 
-    @OneToMany(mappedBy = "item")
-    private List<AuctionBid> auctionBids;
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
 }

@@ -16,18 +16,22 @@ import java.util.List;
 public class BlogCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "blog_category_id")
     private int blogCategoryId;
 
-    @Column(length = 100)
+    @Column(length = 100,name = "name")
     private String name;
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany
+    @JoinColumn(name = "category_id")
     private List<BlogPost> blogPosts;
 }
 

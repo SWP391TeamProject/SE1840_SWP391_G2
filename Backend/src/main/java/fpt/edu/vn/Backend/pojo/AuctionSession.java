@@ -26,19 +26,17 @@ public class AuctionSession {
     private String status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
-
     //Relationships
-    @OneToMany(mappedBy = "auctionSession")
-    private List<TransactionAuction> transactionAuctions;
-
-    @OneToMany(mappedBy = "auctionSession")
+    @OneToMany
+    @JoinColumn(name = "auction_session_id")
     private List<AuctionItem> auctionItems;
 
-    @OneToMany(mappedBy = "auctionSession")
-    private List<AuctionBid> auctionBids;
+
 }
 
