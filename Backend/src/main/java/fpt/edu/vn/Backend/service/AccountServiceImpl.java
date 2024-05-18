@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class AccountServiceImpl implements AccountService{
     @Autowired
     private AccountRepos accountRepos;
     @Override
-    public List<Account> getAllAccounts() {
+    public List<Account> getAllAccounts(Pageable pageable) {
         return accountRepos.findAll();
     }
 

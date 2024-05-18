@@ -73,7 +73,7 @@ public class Account {
 
     @OneToMany
     @JoinColumn(name = "user_id")
-    private List<Transaction> transactions;
+    private List<Transactions> transactions;
 
 
 
