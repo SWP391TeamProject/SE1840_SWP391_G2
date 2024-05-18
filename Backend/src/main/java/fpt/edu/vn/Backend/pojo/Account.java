@@ -9,24 +9,31 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts") // Optional table name customization
-public class Account {
+public class Account  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private int userId;
+    @Column(name = "account_id")
+    private int accountId;
 
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @Column(name = "role", length = 20)
-    private String role;
+    @Column(name = "avatar_url", length = 100)
+    private  String avatarUrl;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "account_role",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> authorities;
 
     @Column(name = "email", length = 100, unique = true)
     private String email;
@@ -55,20 +62,22 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "author",cascade = CascadeType.ALL)
     private List<BlogPost> blogPosts;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "bidder",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account")
     private List<AuctionBid> auctionBids;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "staff",cascade = CascadeType.ALL)
-    private List<Consignment> staffConsignments;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "account_consignments",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "consignment_id")
+    )
+    private List<Consignment> consignments;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "requester",cascade = CascadeType.ALL)
-    private List<Consignment> requesterConsignments;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "buyer",cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private List<Transactions> transactions;
 
 

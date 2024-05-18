@@ -1,24 +1,34 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.dto.AuthResponseDTO;
+import fpt.edu.vn.Backend.dto.LoginDTO;
+import fpt.edu.vn.Backend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/auth")
+@RestController
+@RequestMapping("/auth")
 public class AuthController {
+
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     /**
      * Handles the login request.
      *
-     * @param username The username of the user trying to log in.
-     * @param password The password of the user trying to log in.
+     * @param loginDTO The password of the user trying to log in.
      * @return A ResponseEntity with the login status.
      * @author Vi LE
      */
     @PostMapping("/login")
-    public ResponseEntity<String> loginWithUserNameAndPassword(@RequestBody String username, @RequestBody String password) {
-        return ResponseEntity.ok("Login successful");
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) {
+        return ResponseEntity.ok(authService.login(loginDTO));
     }
 
     @PostMapping("/logout")

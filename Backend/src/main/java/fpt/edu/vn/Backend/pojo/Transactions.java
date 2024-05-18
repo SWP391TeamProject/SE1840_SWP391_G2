@@ -13,19 +13,17 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "[transaction]")
 public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trans_id")
-    private int transId;
+    private int transactionsId;
 
     @Column(length = 30)
     private String type; // DEPOSIT_BALANCE, WITHDRAW_BALANCE, etc.
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
-    private Account buyer;
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     private BigDecimal amount;
 
