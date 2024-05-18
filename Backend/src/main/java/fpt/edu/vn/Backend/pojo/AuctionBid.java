@@ -8,21 +8,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class AuctionBid {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bid_id")
-    private int bidId;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bidder_id")
-    private Account bidder;
+    @EmbeddedId
+    AuctionBidKey id;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -31,8 +24,13 @@ public class AuctionBid {
     @Column(name = "create_date")
     private LocalDateTime createDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("auctionItemId")
     @JoinColumn(name = "auction_item_id")
     private AuctionItem auctionItem;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("accountId")
+    @JoinColumn(name = "account_id")
+    private Account account;
 }
