@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "[transaction]")
 public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trans_id")
     private int transId;
 
     @Column(length = 30)
@@ -30,19 +32,23 @@ public class Transactions {
     @Column(length = 2000)
     private String content;
 
-    private int referenceNum; // Consider changing to Integer for null values
+    @Column(name = "reference_num")
+    private Integer referenceNum; // Consider changing to Integer for null values
 
-    @Column(length = 20)
+    @Column(length = 20, name = "payment_method")
     private String paymentMethod; // INTERNAL, MOMO, PAYPAL, BANK
 
     @Column(length = 30)
     private String status; // SUCCESS, PAYMENT_ERROR, INSUFFICIENT_BALANCE
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
+
 
     // ... (relationships to other entities like TransactionAuction will be added later)
 }

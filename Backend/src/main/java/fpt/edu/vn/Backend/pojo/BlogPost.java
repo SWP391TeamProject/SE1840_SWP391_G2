@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class BlogPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
     private int postId;
 
     @ManyToOne
@@ -33,9 +34,11 @@ public class BlogPost {
     private String content;
 
     @CreationTimestamp
+    @Column(name = "create_date")
     private LocalDateTime createDate;
 
     @UpdateTimestamp
+    @Column(name = "update_date")
     private LocalDateTime updateDate;
 }
 

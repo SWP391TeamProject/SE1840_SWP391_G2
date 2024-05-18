@@ -14,6 +14,7 @@ import java.util.List;
 public class AuctionItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "auction_item_id")
     private int auctionItemId;
 
     @ManyToOne
@@ -24,6 +25,7 @@ public class AuctionItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    @Column(name = "current_price")
     private BigDecimal currentPrice;
 
     @OneToMany

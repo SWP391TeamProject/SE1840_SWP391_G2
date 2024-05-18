@@ -21,7 +21,7 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<Account>> getAllAccounts(@PathVariable Pageable pageable) {
+    public ResponseEntity<List<Account>> getAllAccounts(@PathVariable Pageable pageable) {
         return new ResponseEntity<>(accountService.getAllAccounts(pageable), HttpStatus.OK);
     }
 
