@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class AuctionItem {
     @Column(name = "auction_item_id")
     private int auctionItemId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;

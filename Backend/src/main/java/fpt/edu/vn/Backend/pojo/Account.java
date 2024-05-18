@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -47,32 +48,27 @@ public class Account {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private List<Notification> notifications;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "author",cascade = CascadeType.ALL)
     private List<BlogPost> blogPosts;
 
-    @OneToMany
-    @JoinColumn(name = "bidder_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "bidder",cascade = CascadeType.ALL)
     private List<AuctionBid> auctionBids;
 
-    @OneToMany
-    @JoinColumn(name = "seller_id")
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
-    @OneToMany
-    @JoinColumn(name = "staff_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "staff",cascade = CascadeType.ALL)
     private List<Consignment> staffConsignments;
 
-    @OneToMany
-    @JoinColumn(name = "requester_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "requester",cascade = CascadeType.ALL)
     private List<Consignment> requesterConsignments;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "buyer",cascade = CascadeType.ALL)
     private List<Transactions> transactions;
 
 

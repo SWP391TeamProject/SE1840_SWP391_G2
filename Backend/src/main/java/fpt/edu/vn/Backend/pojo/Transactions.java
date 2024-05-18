@@ -23,9 +23,9 @@ public class Transactions {
     @Column(length = 30)
     private String type; // DEPOSIT_BALANCE, WITHDRAW_BALANCE, etc.
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Account user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id")
+    private Account buyer;
 
     private BigDecimal amount;
 

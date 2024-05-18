@@ -48,7 +48,9 @@ public class Item {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private Account owner;
 
     @OneToMany
     @JoinColumn(name = "item_id")

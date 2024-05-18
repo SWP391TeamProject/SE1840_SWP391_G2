@@ -23,9 +23,9 @@ public class BlogPost {
     @JoinColumn(name = "category_id")
     private BlogCategory category;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Account user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private Account author;
 
     @Column(length = 300)
     private String title;
