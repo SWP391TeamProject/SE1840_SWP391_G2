@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.dto.AccountAdminDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +8,34 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService{
     @Autowired
     private AccountRepos accountRepos;
+
+    public AccountServiceImpl(AccountRepos accountRepos) {
+        this.accountRepos = accountRepos;
+    }
+
     @Override
-    public List<Account> getAllAccounts(Pageable pageable) {
-        return accountRepos.findAll();
+    public List<AccountAdminDTO> getAllAccounts(Pageable pageable) {
+        List<Account> accounts = accountRepos.findAll(pageable).getContent();
+        return accounts.stream()
+                .map(account -> {
+                    AccountAdminDTO dto = new AccountAdminDTO();
+                    dto.setUserId(account.getUserId());
+                    dto.setNickname(account.getNickname());
+                    dto.setRole(account.getRole());
+                    dto.setEmail(account.getEmail());
+                    dto.setPhone(account.getPhone());
+                    dto.setBalance(account.getBalance());
+                    dto.setCreateDate(account.getCreateDate());
+                    dto.setUpdateDate(account.getUpdateDate());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

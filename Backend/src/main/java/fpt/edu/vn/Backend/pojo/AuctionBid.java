@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +19,8 @@ public class AuctionBid {
     @Column(name = "bid_id")
     private int bidId;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bidder_id")
     private Account bidder;
 
