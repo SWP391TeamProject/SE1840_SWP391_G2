@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -54,7 +55,7 @@ public class Item {
 
     @OneToMany
     @JoinColumn(name = "item_id")
-    private List<AuctionItem> auctionItems;
+    private Set<AuctionItem> auctionItems;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

@@ -20,13 +20,8 @@ public class Consignment {
     @Column(name = "consignment_id")
     private int consignmentId;
 
-    @ManyToOne
-    @JoinColumn(name = "requester_id")
-    private Account requester;
-
-    @ManyToOne
-    @JoinColumn(name = "staff_id")
-    private Account staff;
+    @ManyToMany(mappedBy = "consignments")
+    private List<Account> accounts;
 
     @Column(name = "initial_price")
     private BigDecimal initialPrice;

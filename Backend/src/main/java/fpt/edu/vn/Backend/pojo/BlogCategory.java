@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,7 +32,7 @@ public class BlogCategory {
     private LocalDateTime updateDate;
 
     @OneToMany
-    @JoinColumn(name = "category_id")
-    private List<BlogPost> blogPosts;
+    @JoinColumn(name = "blog_category_id")
+    private Set<BlogPost> blogPosts;
 }
 

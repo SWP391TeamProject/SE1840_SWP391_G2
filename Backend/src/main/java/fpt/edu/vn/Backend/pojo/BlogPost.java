@@ -20,7 +20,7 @@ public class BlogPost {
     private int postId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "blog_category_id")
     private BlogCategory category;
 
     @ManyToOne(fetch = FetchType.LAZY)
