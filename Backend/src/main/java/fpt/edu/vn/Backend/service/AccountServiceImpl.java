@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AccountServiceImpl implements AccountService{
+public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepos accountRepos;
 
@@ -64,7 +64,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public Account getAccountByEmailAndPassword(String email,String password) {
+    public Account getAccountByEmailAndPassword(String email, String password) {
         return accountRepos.findAll().stream().filter(account -> account.getEmail().equals(email) && account.getPassword().equals(password)).findFirst().orElse(null);
     }
 }

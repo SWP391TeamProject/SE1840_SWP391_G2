@@ -2,7 +2,10 @@ package fpt.edu.vn.Backend.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,7 +19,8 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account  {
+@Table(name = "[account]") // Optional table name customization
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
@@ -44,6 +48,9 @@ public class Account  {
     @Column(name = "phone", length = 15, unique = true)
     private String phone;
 
+    @Column(name = "status", columnDefinition = "boolean default true")
+    private boolean status;
+
     @Column(name = "balance")
     private BigDecimal balance;
 
@@ -65,7 +72,6 @@ public class Account  {
     @OneToMany(mappedBy = "account")
     private List<AuctionBid> auctionBids;
 
-    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 

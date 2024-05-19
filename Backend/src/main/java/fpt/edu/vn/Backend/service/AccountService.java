@@ -15,4 +15,5 @@ public interface AccountService {
     Account getAccountByEmail(String username);
     Account getAccountByEmailAndPassword(String email, String password);
 
+    Account saveAccount(Account account);
 }

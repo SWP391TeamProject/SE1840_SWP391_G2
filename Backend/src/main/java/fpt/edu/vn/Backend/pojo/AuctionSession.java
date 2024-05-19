@@ -1,5 +1,7 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,6 +15,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "auctionSessionId")
+@Table(name = "auction_session")
 public class AuctionSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +38,7 @@ public class AuctionSession {
     private LocalDateTime updateDate;
     //Relationships
     @OneToMany
+
     @JoinColumn(name = "auction_session_id")
     private List<AuctionItem> auctionItems;
 

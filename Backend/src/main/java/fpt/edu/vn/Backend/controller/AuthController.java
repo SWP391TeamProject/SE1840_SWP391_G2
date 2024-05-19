@@ -5,6 +5,9 @@ import fpt.edu.vn.Backend.dto.LoginDTO;
 import fpt.edu.vn.Backend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin("*")
@@ -54,5 +57,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register() {
         return null;
+    }
+    @GetMapping("/auction-item/{id}")
+    public String joinAuction(Model model, HttpSession session, @PathVariable int id) {
+        if(session.getAttribute("account") == null) {
+            return "login failed!";
+        }
+        model.addAttribute("auction_item", id);
+        model.addAttribute("user_id", ((Account)session.getAttribute("account")).getUserId());
+        return "index";
     }
 }
