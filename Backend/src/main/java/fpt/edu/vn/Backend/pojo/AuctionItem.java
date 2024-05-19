@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,13 +11,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "auction_item")
 public class AuctionItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auction_item_id")
     private int auctionItemId;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;

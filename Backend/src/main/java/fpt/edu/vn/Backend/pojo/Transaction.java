@@ -13,10 +13,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transactions {
+@Table(name = "[transaction]")
+public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int transactionsId;
+    private int transactionId;
 
     @Column(length = 30)
     private String type; // DEPOSIT_BALANCE, WITHDRAW_BALANCE, etc.

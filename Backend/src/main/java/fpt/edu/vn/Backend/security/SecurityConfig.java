@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/auth/login").permitAll()
+                                .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
 
                 )

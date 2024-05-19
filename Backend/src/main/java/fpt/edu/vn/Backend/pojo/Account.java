@@ -2,7 +2,11 @@ package fpt.edu.vn.Backend.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,7 +20,8 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account  {
+@Table(name = "account")
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
@@ -27,22 +32,27 @@ public class Account  {
 
     @Column(name = "avatar_url", length = 100)
     private  String avatarUrl;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "account_role",
+            name = "role_account",
             joinColumns = @JoinColumn(name = "account_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> authorities;
 
-    @Column(name = "email", length = 100, unique = true)
+    @Column(name = "email", length = 100)
     private String email;
 
     @Column(name = "password", length = 50) // Consider hashing passwords for security
     private String password;
 
-    @Column(name = "phone", length = 15, unique = true)
+    @Column(name = "phone", length = 15)
     private String phone;
+
+    @Column(name = "status")
+    @ColumnDefault("1") // 1 for true, 0 for false
+    private boolean status;
+
 
     @Column(name = "balance")
     private BigDecimal balance;
@@ -65,7 +75,6 @@ public class Account  {
     @OneToMany(mappedBy = "account")
     private List<AuctionBid> auctionBids;
 
-    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
@@ -78,7 +87,7 @@ public class Account  {
     private List<Consignment> consignments;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
-    private List<Transactions> transactions;
+    private List<Transaction> transactions;
 
 
 

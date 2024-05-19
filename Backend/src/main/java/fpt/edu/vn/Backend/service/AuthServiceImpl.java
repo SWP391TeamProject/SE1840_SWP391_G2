@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.dto.AuthResponseDTO;
 import fpt.edu.vn.Backend.dto.LoginDTO;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,9 @@ public class AuthServiceImpl implements AuthService{
         return AuthResponseDTO
                 .builder()
                 .accessToken(token)
-                .username(user.getEmail())
+                .username(user.getNickname())
+                .email(user.getEmail())
+                .role(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName())
                 .build();
     }
 

@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "item_category")
 public class ItemCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,8 +1,15 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.dto.AccountAdminDTO;
+import fpt.edu.vn.Backend.dto.AccountDTO;
+import fpt.edu.vn.Backend.exception.ErrorResponse;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
+import lombok.extern.java.Log;
+import org.apache.coyote.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,13 +19,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
     private final AccountService accountService;
-
+    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
     @Autowired
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
@@ -31,8 +40,14 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Account> getAccountById(@PathVariable int id) {
-        return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
+    public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
+//        try {
+////            return new ResponseEntity<>(accountDTO, HttpStatus.OK);
+////        } catch (ResourceNotFoundException e) {
+////            log.error("User Not Found : " + e.getMessage());
+////            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+////        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/create")
