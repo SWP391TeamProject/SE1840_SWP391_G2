@@ -22,9 +22,9 @@ public class AccountDTO {
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private List<RoleDTO> role;
+    private List<String> role;
 
-    public AccountDTO(int userId, String nickname, String email, String phone, BigDecimal balance, LocalDateTime createDate, LocalDateTime updateDate, List<RoleDTO> role) {
+    public AccountDTO(int userId, String nickname, String email, String phone, BigDecimal balance, LocalDateTime createDate, LocalDateTime updateDate, List<String> role) {
         this.userId = userId;
         this.nickname = nickname;
         this.email = email;

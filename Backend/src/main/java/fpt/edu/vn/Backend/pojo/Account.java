@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts") // Optional table name customization
+@Table(name = "account")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,21 +31,21 @@ public class Account {
 
     @Column(name = "avatar_url", length = 100)
     private  String avatarUrl;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
-            name = "account_role",
+            name = "role_account",
             joinColumns = @JoinColumn(name = "account_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> authorities;
 
-    @Column(name = "email", length = 100, unique = true)
+    @Column(name = "email", length = 100)
     private String email;
 
     @Column(name = "password", length = 50) // Consider hashing passwords for security
     private String password;
 
-    @Column(name = "phone", length = 15, unique = true)
+    @Column(name = "phone", length = 15)
     private String phone;
 
     @Column(name = "status", columnDefinition = "boolean default true")

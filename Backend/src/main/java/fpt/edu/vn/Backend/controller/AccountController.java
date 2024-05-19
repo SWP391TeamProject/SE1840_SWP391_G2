@@ -41,13 +41,13 @@ public class AccountController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
-        try {
-            AccountDTO accountDTO = accountService.getAccountById(id);
-            return new ResponseEntity<>(accountDTO, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            log.error("User Not Found : " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+//        try {
+////            return new ResponseEntity<>(accountDTO, HttpStatus.OK);
+////        } catch (ResourceNotFoundException e) {
+////            log.error("User Not Found : " + e.getMessage());
+////            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+////        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/create")

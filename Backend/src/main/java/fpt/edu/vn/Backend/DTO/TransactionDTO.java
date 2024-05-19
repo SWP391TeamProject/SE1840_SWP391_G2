@@ -21,7 +21,8 @@ public class TransactionDTO {
     TransactionDTO(Transaction transaction) {
         this.transId = transaction.getTransactionId();
         this.type = transaction.getType();
-        this.userId = transaction.getAccount().getAccountId();
+        this.userId = 1;
+//        this.userId = transaction.getAccount().getAccountId();
         this.amount = transaction.getAmount();
         this.content = transaction.getContent();
         this.referenceNum = transaction.getReferenceNum();

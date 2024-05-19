@@ -47,22 +47,28 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDTO getAccountById(int id) {
-        return accountRepos.findById(id)
-                .map(account -> new AccountDTO(
-                        account.getAccountId(),
-                        account.getNickname(),
-                        account.getEmail(),
-                        account.getPhone(),
-                        account.getBalance(),
-                        account.getCreateDate(),
-                        account.getUpdateDate(),
-                        account.getAuthorities().stream()
-                                .map(role -> new RoleDTO(role.getRoleName()))
-                                .collect(Collectors.toList())
-                ))
-                .orElse(null);
+    public Account getAccountById(int id) {
+        return null;
     }
+
+//    @Override
+//    public AccountDTO getAccountById(int id) {
+//        return null;
+////        return accountRepos.findById(id)
+////                .map(account -> new AccountDTO(
+////                        account.getAccountId(),
+////                        account.getNickname(),
+////                        account.getEmail(),
+////                        account.getPhone(),
+////                        account.getBalance(),
+////                        account.getCreateDate(),
+////                        account.getUpdateDate(),
+////                        account.getAuthorities().stream()
+////                                .map(role -> new RoleDTO(role.getRoleName()))
+////                                .collect(Collectors.toList())
+////                ))
+////                .orElse(null);
+//    }
 
 
     @Override

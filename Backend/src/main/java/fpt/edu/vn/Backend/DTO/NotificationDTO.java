@@ -17,7 +17,7 @@ public class NotificationDTO {
     NotificationDTO(Notification notification)
     {
         this.notificationId = notification.getNotificationId();
-        this.userId = notification.getUser().getAccountId();
+        this.userId = notification.getAccount().getAccountId();
         this.message = notification.getMessage();
         this.type = notification.getType();
         this.isRead = notification.isRead();
