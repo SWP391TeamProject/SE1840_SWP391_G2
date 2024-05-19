@@ -1,7 +1,5 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,20 +13,18 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "transId")
 @Table(name = "[transaction]")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "trans_id")
-    private int transId;
+    private int transactionId;
 
     @Column(length = 30)
     private String type; // DEPOSIT_BALANCE, WITHDRAW_BALANCE, etc.
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Account user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     private BigDecimal amount;
 

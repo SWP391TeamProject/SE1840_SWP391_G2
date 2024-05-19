@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -20,19 +20,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "[account]") // Optional table name customization
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
-
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private int userId;
+    @Column(name = "account_id")
+    private int accountId;
 
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @Column(name = "role", length = 20)
-    private String role;
+    @Column(name = "avatar_url", length = 100)
+    private  String avatarUrl;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "account_role",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> authorities;
 
     @Column(name = "email", length = 100, unique = true)
     private String email;
@@ -57,39 +62,34 @@ public class Account {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private List<Notification> notifications;
 
-    @OneToMany
-
-    @JoinColumn(name = "user_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "author",cascade = CascadeType.ALL)
     private List<BlogPost> blogPosts;
 
-    @OneToMany
-    @JoinColumn(name = "bidder_id")
+    @OneToMany(mappedBy = "account")
     private List<AuctionBid> auctionBids;
 
-    @OneToMany
-    @JoinColumn(name = "seller_id")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
-    @OneToMany
-    @JoinColumn(name = "staff_id")
-    private List<Consignment> staffConsignments;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "account_consignments",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "consignment_id")
+    )
+    private List<Consignment> consignments;
 
-    @OneToMany
-    @JoinColumn(name = "requester_id")
-    private List<Consignment> requesterConsignments;
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
+    private List<Transactions> transactions;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
-    private List<Transaction> transactions;
 
-    public Account(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
+
+
+
 
     // ... (relationships)
 }

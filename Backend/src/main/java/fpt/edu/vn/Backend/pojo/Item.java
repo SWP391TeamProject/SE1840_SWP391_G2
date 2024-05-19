@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,6 +24,11 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
     private int itemId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_category_id") // This matches the column in the database
+    private ItemCategory itemCategory;
+
 
     @Column(length = 300)
     private String name;
@@ -47,15 +53,14 @@ public class Item {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private ItemCategory category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private Account owner;
 
     @OneToMany
 
     @JoinColumn(name = "item_id")
-    private List<AuctionItem> auctionItems;
+    private Set<AuctionItem> auctionItems;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

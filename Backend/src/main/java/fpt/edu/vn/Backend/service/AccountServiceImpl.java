@@ -1,21 +1,41 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.dto.AccountAdminDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepos accountRepos;
 
+    public AccountServiceImpl(AccountRepos accountRepos) {
+        this.accountRepos = accountRepos;
+    }
+
     @Override
-    public List<Account> getAllAccounts() {
-        return accountRepos.findAll();
+    public List<AccountAdminDTO> getAllAccounts(Pageable pageable) {
+        List<Account> accounts = accountRepos.findAll(pageable).getContent();
+        return accounts.stream()
+                .map(account -> {
+                    AccountAdminDTO dto = new AccountAdminDTO();
+                    dto.setUserId(account.getAccountId());
+                    dto.setNickname(account.getNickname());
+                    dto.setRole(account.getAuthorities().stream().findFirst().get().getRoleName());
+                    dto.setEmail(account.getEmail());
+                    dto.setPhone(account.getPhone());
+                    dto.setBalance(account.getBalance());
+                    dto.setCreateDate(account.getCreateDate());
+                    dto.setUpdateDate(account.getUpdateDate());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -24,7 +44,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public Account getAccountById(int id) {
         return accountRepos.findById(id).orElse(null);
     }
@@ -47,10 +66,5 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account getAccountByEmailAndPassword(String email, String password) {
         return accountRepos.findAll().stream().filter(account -> account.getEmail().equals(email) && account.getPassword().equals(password)).findFirst().orElse(null);
-    }
-
-    @Override
-    public Account saveAccount(Account account) {
-        return accountRepos.save(account);
     }
 }

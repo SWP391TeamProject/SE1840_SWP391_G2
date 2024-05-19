@@ -23,8 +23,8 @@ public class CitizenCard {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "user_id")
-    private Account user;
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     @Column(unique = true , length = 12,name = "card_id")
     private String cardId;

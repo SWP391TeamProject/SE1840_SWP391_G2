@@ -1,9 +1,14 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.dto.AuthResponseDTO;
+import fpt.edu.vn.Backend.dto.LoginDTO;
+import org.springframework.stereotype.Service;
+
 public interface AuthService {
-    String login(String username, String password);
-    String register(String username, String password, String email);
-    String logout(String token);
+    public AuthResponseDTO login(LoginDTO loginDTO);
+
+    public AuthResponseDTO logout();
+    AuthResponseDTO register( String email,String password);
     String refreshToken(String token);
     String forgotPassword(String email);
     String loginWithGoogle(String token);

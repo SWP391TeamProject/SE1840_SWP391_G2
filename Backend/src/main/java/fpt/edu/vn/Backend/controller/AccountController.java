@@ -1,15 +1,21 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.dto.AccountAdminDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/accounts")
+@RestController
+@RequestMapping("/api/accounts")
 public class AccountController {
     private final AccountService accountService;
 
@@ -19,8 +25,9 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Account>> getAllAccounts() {
-        return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
+    public ResponseEntity<List<AccountAdminDTO>> getAllAccounts(@RequestParam int pageNumb, @RequestParam int pageSize, @RequestParam String sortBy) {
+        Pageable pageable = PageRequest.of(pageNumb, pageSize, Sort.by(sortBy).ascending());
+        return new ResponseEntity<>(accountService.getAllAccounts(pageable), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

@@ -23,12 +23,12 @@ public class BlogPost {
     private int postId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "blog_category_id")
     private BlogCategory category;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Account user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private Account author;
 
     @Column(length = 300)
     private String title;

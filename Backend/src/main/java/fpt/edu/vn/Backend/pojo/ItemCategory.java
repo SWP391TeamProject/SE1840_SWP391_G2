@@ -1,7 +1,5 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +13,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "itemCategoryId")
 @Table(name = "item_category")
 public class ItemCategory {
     @Id
@@ -34,8 +31,6 @@ public class ItemCategory {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-    @OneToMany
-
-    @JoinColumn(name = "category_id")
+    @OneToMany(mappedBy = "itemCategory") // Corrected to match the field name in Item
     private List<Item> items;
 }
