@@ -4,13 +4,15 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class AccountServiceImpl implements AccountService{
+public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepos accountRepos;
+
     @Override
     public List<Account> getAllAccounts() {
         return accountRepos.findAll();
@@ -22,6 +24,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
+    @Transactional
     public Account getAccountById(int id) {
         return accountRepos.findById(id).orElse(null);
     }
@@ -42,7 +45,12 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public Account getAccountByEmailAndPassword(String email,String password) {
+    public Account getAccountByEmailAndPassword(String email, String password) {
         return accountRepos.findAll().stream().filter(account -> account.getEmail().equals(email) && account.getPassword().equals(password)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Account saveAccount(Account account) {
+        return accountRepos.save(account);
     }
 }

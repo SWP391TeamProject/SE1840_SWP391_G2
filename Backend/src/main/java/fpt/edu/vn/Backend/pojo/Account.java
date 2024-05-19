@@ -1,7 +1,12 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,7 +19,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts") // Optional table name customization
+@Table(name = "[account]") // Optional table name customization
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
+
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +43,9 @@ public class Account {
     @Column(name = "phone", length = 15, unique = true)
     private String phone;
 
+    @Column(name = "status", columnDefinition = "boolean default true")
+    private boolean status;
+
     @Column(name = "balance")
     private BigDecimal balance;
 
@@ -52,6 +62,7 @@ public class Account {
     private List<Notification> notifications;
 
     @OneToMany
+
     @JoinColumn(name = "user_id")
     private List<BlogPost> blogPosts;
 
@@ -75,10 +86,10 @@ public class Account {
     @JoinColumn(name = "user_id")
     private List<Transaction> transactions;
 
-
-
-
-
+    public Account(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     // ... (relationships)
 }

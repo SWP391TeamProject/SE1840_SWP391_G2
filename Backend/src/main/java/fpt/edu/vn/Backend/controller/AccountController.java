@@ -19,7 +19,7 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Account>> getAllAccounts(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "") String sort) {
+    public ResponseEntity<List<Account>> getAllAccounts() {
         return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
     }
 

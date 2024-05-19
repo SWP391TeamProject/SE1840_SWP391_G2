@@ -1,5 +1,7 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "auctionItemId")
+@Table(name = "auction_item")
 public class AuctionItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +33,7 @@ public class AuctionItem {
     private BigDecimal currentPrice;
 
     @OneToMany
+
     @JoinColumn(name = "auction_item_id")
     private List<AuctionBid> auctionBids;
     // Consider adding currentPrice to track the highest bid during the auction
