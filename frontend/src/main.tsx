@@ -8,8 +8,9 @@ import { store } from "./redux/store.tsx";
 import { TooltipProvider } from "./components/ui/tooltip.tsx";
 import HomeLayout from "./layout/HomeLayout/HomeLayout.tsx";
 import Administration from "./layout/Administration/Administration.tsx";
-import AccountsList from "./pages/accounts/AccountsList.tsx";
+import AccountsList from "./pages/Administration/AccountsList.tsx";
 import DashBoard from "./pages/dashboard/DashBoard.tsx";
+import Home from "./pages/Home/Home.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -20,7 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomeLayout/>}>
-            
+            <Route path="/" element={<Home/>}></Route>
           </Route>
           <Route path="/admin" element={<Administration/>}>
             <Route path="/admin" element={<DashBoard/>}></Route>

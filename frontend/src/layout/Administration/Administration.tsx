@@ -2,7 +2,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import Accounts from '@/pages/accounts/AccountsList'
+import Accounts from '@/pages/Administration/AccountsList'
 import { Bell, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2 } from 'lucide-react'
 import { Link, Outlet } from 'react-router-dom'
 
