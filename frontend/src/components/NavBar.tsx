@@ -1,13 +1,5 @@
 import React, { useEffect } from "react";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,9 +10,11 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Col, Container, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar() {
   const [isLogin, setIsLogin] = React.useState(false);
+  const nav = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -42,7 +36,7 @@ export default function NavBar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
-              <a href="#">Profiles</a>
+              <a href="">Profiles</a>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <a href="#">Notification</a>
@@ -52,7 +46,11 @@ export default function NavBar() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              {isLogin ? <a href="#">Signout</a> : <a href="#">Signin</a>}
+              {isLogin ? (
+                <a href="#">Signout</a>
+              ) : (
+                <a onClick={() => nav("/login")}>Signin</a>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
