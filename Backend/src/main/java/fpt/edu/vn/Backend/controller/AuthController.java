@@ -2,14 +2,17 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.dto.AuthResponseDTO;
 import fpt.edu.vn.Backend.dto.LoginDTO;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -56,5 +59,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register() {
         return null;
+    }
+    @GetMapping("/auction-item/{id}")
+    public String joinAuction(Model model, HttpSession session, @PathVariable int id) {
+        if(session.getAttribute("account") == null) {
+            return "login failed!";
+        }
+        model.addAttribute("auction_item", id);
+        model.addAttribute("user_id", ((Account)session.getAttribute("account")).getAccountId());
+        return "index";
     }
 }

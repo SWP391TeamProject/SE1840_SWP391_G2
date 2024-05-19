@@ -14,6 +14,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "blog_category")
 public class BlogCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
