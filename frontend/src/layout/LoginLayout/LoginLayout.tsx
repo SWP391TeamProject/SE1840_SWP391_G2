@@ -8,6 +8,7 @@ export default function LoginLayout() {
         <Suspense fallback={<div>Loading...</div>}>
           <LoginForm />
           <Rectangle />
+          <div>hehehe</div>
         </Suspense>
       </div>
     </>
