@@ -1,6 +1,9 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.dto.AccountAdminDTO;
+import fpt.edu.vn.Backend.dto.AccountDTO;
+import fpt.edu.vn.Backend.dto.RoleDTO;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +47,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountById(int id) {
-        return accountRepos.findById(id).orElse(null);
+    public AccountDTO getAccountById(int id) {
+        return accountRepos.findById(id)
+                .map(account -> new AccountDTO(
+                        account.getAccountId(),
+                        account.getNickname(),
+                        account.getEmail(),
+                        account.getPhone(),
+                        account.getBalance(),
+                        account.getCreateDate(),
+                        account.getUpdateDate(),
+                        account.getAuthorities().stream()
+                                .map(role -> new RoleDTO(role.getRoleName()))
+                                .collect(Collectors.toList())
+                ))
+                .orElse(null);
     }
+
 
     @Override
     public Account updateAccount(Account account) {
