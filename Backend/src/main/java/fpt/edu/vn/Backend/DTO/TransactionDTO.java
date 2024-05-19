@@ -19,9 +19,9 @@ public class TransactionDTO {
     private LocalDateTime updateDate;
 
     TransactionDTO(Transaction transaction) {
-        this.transId = transaction.getTransId();
+        this.transId = transaction.getTransactionId();
         this.type = transaction.getType();
-        this.userId = transaction.getUser().getUserId();
+        this.userId = transaction.getAccount().getAccountId();
         this.amount = transaction.getAmount();
         this.content = transaction.getContent();
         this.referenceNum = transaction.getReferenceNum();

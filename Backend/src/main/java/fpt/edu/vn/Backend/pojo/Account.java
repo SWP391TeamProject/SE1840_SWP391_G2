@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "[account]") // Optional table name customization
+@Table(name = "accounts") // Optional table name customization
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,7 +84,7 @@ public class Account {
     private List<Consignment> consignments;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
-    private List<Transactions> transactions;
+    private List<Transaction> transactions;
 
 
 
