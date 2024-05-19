@@ -27,7 +27,7 @@ public class Account  {
 
     @Column(name = "avatar_url", length = 100)
     private  String avatarUrl;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "account_role",
             joinColumns = @JoinColumn(name = "account_id"),

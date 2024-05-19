@@ -1,4 +1,5 @@
 import HomeLayout from "@/layout/HomeLayout/HomeLayout";
+import LoginLayout from "@/layout/LoginLayout/LoginLayout";
 import path from "path";
 
 const routes = [
@@ -7,9 +8,13 @@ const routes = [
     element: <HomeLayout />,
   },
   {
-    path:"/login"
-    Element: <LoginLayout />
-  }
+    path: "/login",
+    element: <LoginLayout />,
+  },
+  {
+    path: "/sign-up",
+    element: <LoginLayout />,
+  },
 ];
 
 export default routes;
