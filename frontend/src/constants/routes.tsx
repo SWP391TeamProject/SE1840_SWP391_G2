@@ -1,5 +1,7 @@
+import Administration from "@/layout/Administration/Administration";
 import HomeLayout from "@/layout/HomeLayout/HomeLayout";
-import path from "path";
+import LoginLayout from "@/layout/LoginLayout/LoginLayout";
+import AccountsList from "@/pages/accounts/AccountsList";
 
 const routes = [
   {
@@ -7,9 +9,18 @@ const routes = [
     element: <HomeLayout />,
   },
   {
-    path:"/login"
-    Element: <LoginLayout />
-  }
+    path: "/login",
+    element: <LoginLayout />,
+  },
+  {
+    path: "/admin",
+    element: <Administration />,
+    children: [{
+      path: "accounts",
+      element: <AccountsList />,
+    },
+    ]
+  },
 ];
 
 export default routes;

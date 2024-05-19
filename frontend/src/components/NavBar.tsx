@@ -18,6 +18,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Col, Container, Row } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export default function NavBar() {
   const [isLogin, setIsLogin] = React.useState(false);
@@ -49,6 +50,9 @@ export default function NavBar() {
             </DropdownMenuItem>
             <DropdownMenuItem>
               <a href="#">Switch to seller account</a>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to='./admin'>Administration</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
