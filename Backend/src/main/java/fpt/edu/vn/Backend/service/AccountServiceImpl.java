@@ -30,7 +30,7 @@ public class AccountServiceImpl implements AccountService {
                     AccountAdminDTO dto = new AccountAdminDTO();
                     dto.setUserId(account.getAccountId());
                     dto.setNickname(account.getNickname());
-                    dto.setRole(account.getAuthorities().stream().findFirst().get().getRoleName());
+                    dto.setRole("MEMBER");
                     dto.setEmail(account.getEmail());
                     dto.setPhone(account.getPhone());
                     dto.setBalance(account.getBalance());

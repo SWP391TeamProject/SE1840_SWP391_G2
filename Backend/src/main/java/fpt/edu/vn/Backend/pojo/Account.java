@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -31,7 +32,7 @@ public class Account {
 
     @Column(name = "avatar_url", length = 100)
     private  String avatarUrl;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_account",
             joinColumns = @JoinColumn(name = "account_id"),
@@ -48,8 +49,10 @@ public class Account {
     @Column(name = "phone", length = 15)
     private String phone;
 
-    @Column(name = "status", columnDefinition = "boolean default true")
+    @Column(name = "status")
+    @ColumnDefault("1") // 1 for true, 0 for false
     private boolean status;
+
 
     @Column(name = "balance")
     private BigDecimal balance;
