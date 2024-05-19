@@ -77,7 +77,8 @@ public class AuthServiceImpl implements AuthService{
         return AuthResponseDTO
                 .builder()
                 .accessToken(token)
-                .username(user.getEmail())
+                .username(user.getNickname())
+                .email(user.getEmail())
                 .role(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName())
                 .build();
     }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,7 +20,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts") // Optional table name customization
+@Table(name = "account")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,23 +34,25 @@ public class Account {
     private  String avatarUrl;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "account_role",
+            name = "role_account",
             joinColumns = @JoinColumn(name = "account_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> authorities;
 
-    @Column(name = "email", length = 100, unique = true)
+    @Column(name = "email", length = 100)
     private String email;
 
     @Column(name = "password", length = 50) // Consider hashing passwords for security
     private String password;
 
-    @Column(name = "phone", length = 15, unique = true)
+    @Column(name = "phone", length = 15)
     private String phone;
 
-    @Column(name = "status", columnDefinition = "boolean default true")
+    @Column(name = "status")
+    @ColumnDefault("1") // 1 for true, 0 for false
     private boolean status;
+
 
     @Column(name = "balance")
     private BigDecimal balance;
