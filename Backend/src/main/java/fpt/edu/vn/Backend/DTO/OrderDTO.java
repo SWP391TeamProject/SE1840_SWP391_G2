@@ -13,7 +13,7 @@ public class OrderDTO {
 
     OrderDTO(Order order){
         this.orderId = order.getOrderId();
-        this.userId = order.getUser().getUserId();
+        this.userId = order.getAccount().getAccountId();
         this.orderDate = order.getOrderDate();
         this.shipAddress = order.getShipAddress();
 

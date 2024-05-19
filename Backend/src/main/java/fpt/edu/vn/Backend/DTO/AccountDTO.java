@@ -19,9 +19,8 @@ public class AccountDTO {
     // getters and setters
 
     public AccountDTO(Account account) {
-        this.userId = account.getUserId();
+        this.userId = account.getAccountId();
         this.nickname = account.getNickname();
-        this.role = account.getRole();
         this.email = account.getEmail();
         this.phone = account.getPhone();
         this.status = account.isStatus();

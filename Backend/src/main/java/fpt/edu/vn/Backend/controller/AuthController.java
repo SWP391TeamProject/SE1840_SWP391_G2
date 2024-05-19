@@ -2,7 +2,9 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.dto.AuthResponseDTO;
 import fpt.edu.vn.Backend.dto.LoginDTO;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -64,7 +66,7 @@ public class AuthController {
             return "login failed!";
         }
         model.addAttribute("auction_item", id);
-        model.addAttribute("user_id", ((Account)session.getAttribute("account")).getUserId());
+        model.addAttribute("user_id", ((Account)session.getAttribute("account")).getAccountId());
         return "index";
     }
 }

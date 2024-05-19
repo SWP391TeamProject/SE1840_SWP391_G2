@@ -17,7 +17,7 @@ public class BlogPostDTO {
     BlogPostDTO(BlogPost blogPost) {
         this.postId = blogPost.getPostId();
         this.categoryId = blogPost.getCategory().getBlogCategoryId();
-        this.userId = blogPost.getUser().getUserId();
+        this.userId = blogPost.getAuthor().getAccountId();
         this.title = blogPost.getTitle();
         this.content = blogPost.getContent();
         this.createDate = blogPost.getCreateDate();

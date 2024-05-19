@@ -20,12 +20,7 @@ public class ConsignmentDTO {
 
     ConsignmentDTO(Consignment consignment) {
         this.consignmentId = consignment.getConsignmentId();
-        this.requesterId = consignment.getRequester().getUserId();
-        this.staffId = consignment.getStaff().getUserId();
-        this.initialPrice = consignment.getInitialPrice();
-        this.initialEvaluation = consignment.getInitialEvaluation();
-        this.finalPrice = consignment.getFinalPrice();
-        this.finalEvaluation = consignment.getFinalEvaluation();
+
         this.status = consignment.getStatus();
         this.createDate = consignment.getCreateDate();
         this.updateDate = consignment.getUpdateDate();

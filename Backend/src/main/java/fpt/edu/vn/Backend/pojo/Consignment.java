@@ -34,6 +34,9 @@ public class Consignment {
     @Enumerated(EnumType.STRING)
     private preferContact preferContact;
 
+    @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
+    private List<ConsignmentDetail> consignmentDetails;
+
     @CreationTimestamp
     @Column(name = "create_date")
     private LocalDateTime createDate;

@@ -27,7 +27,7 @@ public class ItemDTO {
         this.status = item.getStatus();
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
-        this.categoryId = item.getCategory().getItemCategoryId();
+        this.categoryId = item.getItemCategory().getItemCategoryId();
         this.orderId = item.getOrder().getOrderId();
     }
     // getters and setters
