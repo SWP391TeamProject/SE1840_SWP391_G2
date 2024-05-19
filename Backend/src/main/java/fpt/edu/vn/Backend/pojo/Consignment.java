@@ -20,20 +20,15 @@ public class Consignment {
     @Column(name = "consignment_id")
     private int consignmentId;
 
-    @ManyToMany(mappedBy = "consignments")
-    private List<Account> accounts;
-
-    @Column(name = "initial_price")
-    private BigDecimal initialPrice;
-    @Column(name = "initial_evaluation")
-    private String initialEvaluation;
-    @Column(name = "final_price")
-    private BigDecimal finalPrice;
-    @Column(name = "final_evaluation")
-    private String finalEvaluation;
-
     @Column(length = 30)
     private String status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
+
+    public enum preferContact {
+        EMAIL, PHONE
+    }
+    @Column(name = "prefer_contact")
+    @Enumerated(EnumType.STRING)
+    private preferContact preferContact;
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -42,5 +37,7 @@ public class Consignment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
+
+
 }
 

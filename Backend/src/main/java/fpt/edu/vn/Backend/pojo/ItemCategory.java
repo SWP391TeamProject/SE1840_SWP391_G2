@@ -32,4 +32,5 @@ public class ItemCategory {
 
     @OneToMany(mappedBy = "itemCategory") // Corrected to match the field name in Item
     private List<Item> items;
+
 }
