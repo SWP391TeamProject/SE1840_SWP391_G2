@@ -1,38 +1,105 @@
-package fpt.edu.vn.Backend.dto;
+package fpt.edu.vn.Backend.DTO;
 
-import fpt.edu.vn.Backend.pojo.Role;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import fpt.edu.vn.Backend.pojo.Account;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
+@Data
 public class AccountDTO {
-    private long userId;
+    private int userId;
     private String nickname;
+    private String role;
     private String email;
     private String phone;
+    private boolean status;
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private List<String> role;
 
-    public AccountDTO(int userId, String nickname, String email, String phone, BigDecimal balance, LocalDateTime createDate, LocalDateTime updateDate, List<String> role) {
+    // getters and setters
+
+    public AccountDTO(Account account) {
+        this.userId = account.getAccountId();
+        this.nickname = account.getNickname();
+        this.email = account.getEmail();
+        this.phone = account.getPhone();
+        this.status = account.isStatus();
+        this.balance = account.getBalance();
+        this.createDate = account.getCreateDate();
+        this.updateDate = account.getUpdateDate();
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
         this.nickname = nickname;
-        this.email = email;
-        this.phone = phone;
-        this.balance = balance;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
         this.role = role;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
 }
