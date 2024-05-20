@@ -1,7 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.dto.AccountAdminDTO;
-import fpt.edu.vn.Backend.dto.AccountDTO;
 import fpt.edu.vn.Backend.exception.ErrorResponse;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -25,6 +25,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
+@CrossOrigin("*")
+
 public class AccountController {
     private final AccountService accountService;
     private static final Logger log = LoggerFactory.getLogger(AccountController.class);
