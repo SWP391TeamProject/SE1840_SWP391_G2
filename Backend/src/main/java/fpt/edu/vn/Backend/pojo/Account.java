@@ -66,7 +66,7 @@ public class Account {
     private LocalDateTime updateDate;
 
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "account_id")
     private List<Notification> notifications;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "author",cascade = CascadeType.ALL)
