@@ -78,14 +78,6 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "account_consignments",
-            joinColumns = @JoinColumn(name = "account_id"),
-            inverseJoinColumns = @JoinColumn(name = "consignment_id")
-    )
-    private List<Consignment> consignments;
-
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private List<Transaction> transactions;
 

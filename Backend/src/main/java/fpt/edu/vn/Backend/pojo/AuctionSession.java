@@ -21,12 +21,18 @@ public class AuctionSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int auctionSessionId;
 
+    private String title;
+
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
 
     @Column(length = 30)
-    private String status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
+    private Status status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
+
+    enum Status {
+        SCHEDULED, PROGRESSING, FINISHED, TERMINATED
+    }
 
     @CreationTimestamp
     @Column(name = "create_date")

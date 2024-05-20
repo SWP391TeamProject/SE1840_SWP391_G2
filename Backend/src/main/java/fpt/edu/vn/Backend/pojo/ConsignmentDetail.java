@@ -17,14 +17,16 @@ import java.util.List;
 @AllArgsConstructor
 
 public class ConsignmentDetail {
-    @EmbeddedId
-    private ConsignmentDetailKey id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "consignment_detail_id")
+    private int consignmentDetailId;
 
     @Column(name = "description")
     private String description;
 
     public enum ConsignmentStatus {
-        REQUEST, INITIAL_EVALUATION, FINAL_EVALUATION
+        REQUEST, INITIAL_EVALUATION, FINAL_EVALUATION, MANAGER_ACCEPTED, MANAGER_REJECTED
     }
     @Column(name = "type",nullable = false)
     @Enumerated(EnumType.STRING)
@@ -35,12 +37,10 @@ public class ConsignmentDetail {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("consignmentId")
     @JoinColumn(name = "consignment_id")
     private Consignment consignment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("accountId")
     @JoinColumn(name = "account_id")
     private Account account;
 }

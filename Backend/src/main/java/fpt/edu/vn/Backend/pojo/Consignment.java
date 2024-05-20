@@ -25,7 +25,11 @@ public class Consignment {
     private int consignmentId;
 
     @Column(length = 30)
-    private String status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
+    private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
+
+    enum Status {
+        WAITING_STAFF, IN_INITIAL_EVALUATION,SENDING, IN_FINAL_EVALUATION, FINISHED, TERMINATED
+    }
 
     public enum preferContact {
         EMAIL, PHONE

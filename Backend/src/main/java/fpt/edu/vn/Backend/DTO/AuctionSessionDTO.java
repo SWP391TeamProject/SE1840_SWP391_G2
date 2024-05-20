@@ -18,7 +18,7 @@ public class AuctionSessionDTO {
         this.auctionSessionId = auctionSession.getAuctionSessionId();
         this.startDate = auctionSession.getStartDate();
         this.endDate = auctionSession.getEndDate();
-        this.status = auctionSession.getStatus();
+//        this.status = auctionSession.getStatus();
         this.createDate = auctionSession.getCreateDate();
         this.updateDate = auctionSession.getUpdateDate();
     }
