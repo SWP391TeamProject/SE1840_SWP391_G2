@@ -18,6 +18,9 @@ import AccountsList from "./pages/Administration/AccountsList.tsx";
 import DashBoard from "./pages/dashboard/DashBoard.tsx";
 import Home from "./pages/Home/Home.tsx";
 import LoginLayout from "./layout/LoginLayout/LoginLayout.tsx";
+import LoginForm from "./pages/authentication/LoginForm.tsx";
+import RegisterForm from "./pages/authentication/RegisterForm.tsx";
+import RegisterLayout from "./layout/RegisterLayout/RegisterLayout.tsx";
 
 const router = createBrowserRouter(routes);
 
@@ -33,7 +36,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/admin" element={<DashBoard />}></Route>
             <Route path="accounts" element={<AccountsList />}></Route>
           </Route>
-          <Route path="/login" element={<LoginLayout />}></Route>
+          <Route path="/auth">
+            <Route path="/auth/login" element={<LoginLayout />}></Route>
+            <Route path="/auth/register" element={<RegisterLayout />}></Route>
+          </Route>
         </Routes>
       </BrowserRouter>
       {/* <RouterProvider router={router} /> */}
