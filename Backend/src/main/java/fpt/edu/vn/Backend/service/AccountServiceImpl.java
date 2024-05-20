@@ -1,8 +1,8 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.dto.AccountAdminDTO;
-import fpt.edu.vn.Backend.dto.AccountDTO;
-import fpt.edu.vn.Backend.dto.RoleDTO;
+import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
+
+import fpt.edu.vn.Backend.DTO.RoleDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -30,7 +30,7 @@ public class AccountServiceImpl implements AccountService {
                     AccountAdminDTO dto = new AccountAdminDTO();
                     dto.setUserId(account.getAccountId());
                     dto.setNickname(account.getNickname());
-                    dto.setRole("MEMBER");
+                    dto.setRole(String.valueOf(account.getAuthorities().stream().findFirst().get()));
                     dto.setEmail(account.getEmail());
                     dto.setPhone(account.getPhone());
                     dto.setBalance(account.getBalance());

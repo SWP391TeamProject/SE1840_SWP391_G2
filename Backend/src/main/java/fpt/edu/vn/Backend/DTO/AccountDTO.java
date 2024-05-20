@@ -1,10 +1,15 @@
 package fpt.edu.vn.Backend.dto;
 
+
 import fpt.edu.vn.Backend.pojo.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import fpt.edu.vn.Backend.pojo.Account;
+import lombok.Data;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Setter
 @Getter
+@Data
 public class AccountDTO {
     private long userId;
     private String nickname;
