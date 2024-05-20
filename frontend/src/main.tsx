@@ -1,6 +1,12 @@
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { BrowserRouter, Route, RouterProvider, Routes, createBrowserRouter } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  RouterProvider,
+  Routes,
+  createBrowserRouter,
+} from "react-router-dom";
 import routes from "./constants/routes.tsx";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -11,7 +17,7 @@ import Administration from "./layout/Administration/Administration.tsx";
 import AccountsList from "./pages/Administration/AccountsList.tsx";
 import DashBoard from "./pages/dashboard/DashBoard.tsx";
 import Home from "./pages/Home/Home.tsx";
-
+import LoginLayout from "./layout/LoginLayout/LoginLayout.tsx";
 
 const router = createBrowserRouter(routes);
 
@@ -20,13 +26,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <TooltipProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomeLayout/>}>
-            <Route path="/" element={<Home/>}></Route>
+          <Route path="/" element={<HomeLayout />}>
+            <Route path="/" element={<Home />}></Route>
           </Route>
-          <Route path="/admin" element={<Administration/>}>
-            <Route path="/admin" element={<DashBoard/>}></Route>
-            <Route path="accounts" element={<AccountsList/>}></Route>
+          <Route path="/admin" element={<Administration />}>
+            <Route path="/admin" element={<DashBoard />}></Route>
+            <Route path="accounts" element={<AccountsList />}></Route>
           </Route>
+          <Route path="/login" element={<LoginLayout />}></Route>
         </Routes>
       </BrowserRouter>
       {/* <RouterProvider router={router} /> */}

@@ -1,8 +1,8 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.dto.AccountAdminDTO;
+import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 
-import fpt.edu.vn.Backend.dto.RoleDTO;
+import fpt.edu.vn.Backend.DTO.RoleDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;

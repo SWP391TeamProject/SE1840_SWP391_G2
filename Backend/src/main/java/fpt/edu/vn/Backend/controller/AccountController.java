@@ -1,7 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.dto.AccountAdminDTO;
 import fpt.edu.vn.Backend.exception.ErrorResponse;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -36,7 +36,7 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<AccountAdminDTO>> getAllAccounts(@RequestParam int pageNumb, @RequestParam int pageSize, @RequestParam String sortBy) {
+    public ResponseEntity<List<AccountAdminDTO>> getAllAccounts(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50")int pageSize, @RequestParam(defaultValue = "accountId") String sortBy) {
         Pageable pageable = PageRequest.of(pageNumb, pageSize, Sort.by(sortBy).ascending());
         return new ResponseEntity<>(accountService.getAllAccounts(pageable), HttpStatus.OK);
     }
