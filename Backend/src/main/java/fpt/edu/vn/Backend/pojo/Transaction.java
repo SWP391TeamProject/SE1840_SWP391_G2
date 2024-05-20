@@ -22,6 +22,9 @@ public class Transaction {
     @Column(length = 30)
     private String type; // DEPOSIT_BALANCE, WITHDRAW_BALANCE, etc.
 
+    enum Type{
+        DEPOSIT_BALANCE, WITHDRAW_BALANCE
+    }
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
@@ -35,10 +38,18 @@ public class Transaction {
     private Integer referenceNum; // Consider changing to Integer for null values
 
     @Column(length = 20, name = "payment_method")
-    private String paymentMethod; // INTERNAL, MOMO, PAYPAL, BANK
+    private PaymentMethod paymentMethod; // INTERNAL, MOMO, PAYPAL, BANK
+
+    enum PaymentMethod{
+        INTERNAL, MOMO
+    }
 
     @Column(length = 30)
     private String status; // SUCCESS, PAYMENT_ERROR, INSUFFICIENT_BALANCE
+
+    enum Status{
+        SUCCESS, PAYMENT_ERROR, INSUFFICIENT_BALANCE
+    }
 
     @CreationTimestamp
     @Column(name = "create_date")
