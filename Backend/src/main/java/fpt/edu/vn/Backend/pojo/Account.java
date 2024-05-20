@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -73,16 +72,18 @@ public class Account {
     private List<BlogPost> blogPosts;
 
     @OneToMany(mappedBy = "account")
-    private List<AuctionBid> auctionBids;
+    private List<Bid> bids;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
+
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
+    private Set<Payment> payments;
 
-
-
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
+    private Set<Deposit> deposits;
 
 
 

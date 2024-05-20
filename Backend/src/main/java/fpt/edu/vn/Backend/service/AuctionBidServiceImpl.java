@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.DTO.AuctionBidDTO;
-import fpt.edu.vn.Backend.pojo.AuctionBid;
+import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.repository.AuctionBidRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,22 +18,22 @@ public class AuctionBidServiceImpl implements AuctionBidService {
     }
 
     @Override
-    public List<AuctionBid> getAllAuctionBids() {
+    public List<Bid> getAllAuctionBids() {
         return auctionBidRepository.findAll();
     }
 
     @Override
-    public AuctionBid createAuctionBid(AuctionBid auctionBid) {
-        return auctionBidRepository.save(auctionBid);
+    public Bid createAuctionBid(Bid bid) {
+        return auctionBidRepository.save(bid);
     }
 
     @Override
-    public AuctionBid getAuctionBidById(int id) {
+    public Bid getAuctionBidById(int id) {
         return auctionBidRepository.findById(id).orElse(null);
     }
 
     @Override
-    public AuctionBid getHighestAuctionBid(int auctionId) throws IndexOutOfBoundsException{
+    public Bid getHighestAuctionBid(int auctionId) throws IndexOutOfBoundsException{
         // This method requires a custom query to be implemented in the repository
         return auctionBidRepository.findAllBidByAuctionItemId(auctionId).get(0);
     }

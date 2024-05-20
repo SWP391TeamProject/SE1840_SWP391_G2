@@ -1,6 +1,6 @@
 package fpt.edu.vn.Backend.DTO;
 
-import fpt.edu.vn.Backend.pojo.AuctionBid;
+import fpt.edu.vn.Backend.pojo.Bid;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,10 +16,10 @@ public class AuctionBidDTO {
     // getters and setters
 
 
-    public AuctionBidDTO(AuctionBid auctionBid) {
-        this.bidId =  auctionBid.getAuctionBidId();
-        this.price = auctionBid.getPrice();
-        this.createDate = auctionBid.getCreateDate();
+    public AuctionBidDTO(Bid bid) {
+        this.bidId =  bid.getBidId();
+        this.price = bid.getPrice();
+        this.createDate = bid.getCreateDate();
     }
 
 }

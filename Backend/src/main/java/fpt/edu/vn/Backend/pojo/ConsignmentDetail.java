@@ -43,4 +43,8 @@ public class ConsignmentDetail {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
+
+    @OneToMany( fetch = FetchType.LAZY)
+    @JoinColumn(name = "consignment_detail_id")
+    private List<Attachment> attachments;
 }

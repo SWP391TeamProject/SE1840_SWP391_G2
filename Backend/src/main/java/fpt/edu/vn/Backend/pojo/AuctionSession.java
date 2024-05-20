@@ -43,9 +43,16 @@ public class AuctionSession {
     private LocalDateTime updateDate;
     //Relationships
     @OneToMany
-
     @JoinColumn(name = "auction_session_id")
     private List<AuctionItem> auctionItems;
+
+    @OneToMany(mappedBy = "auctionSession")
+    private List<Deposit> deposits;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "auction_session_id")
+    private List<Attachment> attachments;
+
 
 
 }

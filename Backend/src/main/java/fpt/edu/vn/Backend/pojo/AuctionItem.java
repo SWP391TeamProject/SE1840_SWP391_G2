@@ -31,6 +31,6 @@ public class AuctionItem {
 
     @OneToMany
     @JoinColumn(name = "auction_item_id")
-    private List<AuctionBid> auctionBids;
+    private List<Bid> bids;
     // Consider adding currentPrice to track the highest bid during the auction
 }

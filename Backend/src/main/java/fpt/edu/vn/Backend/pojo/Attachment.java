@@ -17,16 +17,6 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int attachmentId;
 
-    @Column(length = 20, nullable = false,name = "object_type")
-    private ObjectType objectType; // consignment, blog, item
-
-    enum ObjectType {
-        CONSIGNMENT, BLOG, ITEM
-    }
-
-    @Column(nullable = false,name = "object_id")
-    private int objectId;
-
     @Column(length = 300,name = "link")
     private String link;
 
@@ -35,6 +25,13 @@ public class Attachment {
 
     enum FileType {
         IMAGE,VIDEO
+    }
+
+    @Enumerated
+    @Column(name = "attachment_type")
+    private type attachmentType;
+    enum type{
+        BANNER,AVATAR,PROFILE
     }
 
     @CreationTimestamp

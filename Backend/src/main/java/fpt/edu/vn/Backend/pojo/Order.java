@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -37,5 +38,9 @@ public class Order {
 
     @JoinColumn(name = "order_id")
     private List<Item> items;
+
+    @OneToMany
+    @JoinColumn(name = "order_id")
+    private Set<Payment> payments;
 
 }

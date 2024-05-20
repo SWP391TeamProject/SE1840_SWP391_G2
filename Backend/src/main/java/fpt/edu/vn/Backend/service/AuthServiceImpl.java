@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
-import java.util.List;
+
 @Service
 
 public class AuthServiceImpl implements AuthService{
@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .role(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName())
+                .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
                 .build();
     }
 

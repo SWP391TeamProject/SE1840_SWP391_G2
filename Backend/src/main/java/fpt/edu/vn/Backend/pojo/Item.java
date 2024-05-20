@@ -65,4 +65,8 @@ public class Item {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id")
+    private List<Attachment> attachments;
+
 }
