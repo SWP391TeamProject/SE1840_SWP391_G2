@@ -90,7 +90,7 @@ function LoginForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
-            <a href="/signup" className="underline">
+            <a href="/auth/register" className="underline">
               Sign up
             </a>
           </div>
