@@ -1,7 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.dto.AuthResponseDTO;
-import fpt.edu.vn.Backend.dto.LoginDTO;
+import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
+import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
