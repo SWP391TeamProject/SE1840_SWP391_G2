@@ -2,10 +2,12 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class ConsignmentServiceImpl implements ConsignmentService{
+    
     @Override
     public ConsignmentDTO requestConsignmentCreate(Long userId, Long auctionItemId, ConsignmentDetailDTO consignmentDetails) {
         return null;

@@ -18,6 +18,7 @@ public interface ConsignmentService {
     void confirmJewelryReceived(Long consignmentId);
     void approveFinalEvaluation(Long consignmentId);
     void rejectFinalEvaluation(Long consignmentId, String rejectionReason);
+
     void confirmAuctionParticipation(Long consignmentId);
     void assignAuctionSession(Long consignmentId, Long auctionSessionId);
 
