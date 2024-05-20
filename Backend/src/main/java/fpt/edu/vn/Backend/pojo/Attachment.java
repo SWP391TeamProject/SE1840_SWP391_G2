@@ -18,7 +18,11 @@ public class Attachment {
     private int attachmentId;
 
     @Column(length = 20, nullable = false,name = "object_type")
-    private String objectType; // consignment, blog, item
+    private ObjectType objectType; // consignment, blog, item
+
+    enum ObjectType {
+        CONSIGNMENT, BLOG, ITEM
+    }
 
     @Column(nullable = false,name = "object_id")
     private int objectId;
@@ -27,7 +31,11 @@ public class Attachment {
     private String link;
 
     @Column(length = 10)
-    private String type; // jpg, png, mp4, etc.
+    private FileType type; // jpg, png, mp4, etc.
+
+    enum FileType {
+        IMAGE,VIDEO
+    }
 
     @CreationTimestamp
     @Column(name = "create_date")
