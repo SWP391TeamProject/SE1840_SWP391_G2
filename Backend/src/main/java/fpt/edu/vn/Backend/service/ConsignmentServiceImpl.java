@@ -2,14 +2,32 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.pojo.Consignment;
+import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.ConsignmentRepos;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
 public class ConsignmentServiceImpl implements ConsignmentService{
-    
+
+    ConsignmentRepos consignmentRepos;
+    AccountRepos accountRepos;
+
+@Autowired
+    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos) {
+        this.consignmentRepos = consignmentRepos;
+        this.accountRepos = accountRepos;
+    }
+
     @Override
     public ConsignmentDTO requestConsignmentCreate(Long userId, Long auctionItemId, ConsignmentDetailDTO consignmentDetails) {
+
+
+
+
+
         return null;
     }
 
