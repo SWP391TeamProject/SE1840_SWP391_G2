@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.pojo;
 
 import jakarta.persistence.*;
 
+@Embeddable
 public class ConsignmentDetailKey {
 
     @Column(name = "consignment_id")
