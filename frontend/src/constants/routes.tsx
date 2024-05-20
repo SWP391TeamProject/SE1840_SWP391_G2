@@ -1,5 +1,7 @@
+import Administration from "@/layout/Administration/Administration";
 import HomeLayout from "@/layout/HomeLayout/HomeLayout";
 import LoginLayout from "@/layout/LoginLayout/LoginLayout";
+import AccountsList from "@/pages/Administration/AccountsList";
 import path from "path";
 
 const routes = [
@@ -10,6 +12,15 @@ const routes = [
   {
     path: "/login",
     element: <LoginLayout />,
+  },
+  {
+    path: "/admin",
+    element: <Administration />,
+    children: [{
+      path: "accounts",
+      element: <AccountsList />,
+    },
+    ]
   },
   {
     path: "/sign-up",

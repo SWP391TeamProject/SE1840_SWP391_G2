@@ -1,7 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.dto.AuthResponseDTO;
-import fpt.edu.vn.Backend.dto.LoginDTO;
+import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
+import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
-import java.util.List;
+
 @Service
 
 public class AuthServiceImpl implements AuthService{
@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .role(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName())
+                .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
                 .build();
     }
 

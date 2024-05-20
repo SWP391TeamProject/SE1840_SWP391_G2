@@ -17,17 +17,22 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int attachmentId;
 
-    @Column(length = 20, nullable = false,name = "object_type")
-    private String objectType; // consignment, blog, item
-
-    @Column(nullable = false,name = "object_id")
-    private int objectId;
-
     @Column(length = 300,name = "link")
     private String link;
 
     @Column(length = 10)
-    private String type; // jpg, png, mp4, etc.
+    private FileType type; // jpg, png, mp4, etc.
+
+    enum FileType {
+        IMAGE,VIDEO
+    }
+
+    @Enumerated
+    @Column(name = "attachment_type")
+    private type attachmentType;
+    enum type{
+        BANNER,AVATAR,PROFILE
+    }
 
     @CreationTimestamp
     @Column(name = "create_date")

@@ -21,7 +21,7 @@ public class ConsignmentDTO {
     ConsignmentDTO(Consignment consignment) {
         this.consignmentId = consignment.getConsignmentId();
 
-        this.status = consignment.getStatus();
+//        this.status = consignment.getStatus();
         this.createDate = consignment.getCreateDate();
         this.updateDate = consignment.getUpdateDate();
     }

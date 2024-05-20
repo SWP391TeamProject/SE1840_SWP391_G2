@@ -10,13 +10,13 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "orderId")
 @Table(name = "[order]")
 public class Order {
     @Id
@@ -38,5 +38,9 @@ public class Order {
 
     @JoinColumn(name = "order_id")
     private List<Item> items;
+
+    @OneToMany
+    @JoinColumn(name = "order_id")
+    private Set<Payment> payments;
 
 }
