@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.RoleDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -46,30 +47,13 @@ public class AccountServiceImpl implements AccountService {
         return accountRepos.save(account);
     }
 
+
     @Override
-    public Account getAccountById(int id) {
-        return null;
+    public AccountDTO getAccountById(int id) {
+        return accountRepos.findById(id)
+                .map(AccountDTO::new)
+                .orElse(null);
     }
-
-//    @Override
-//    public AccountDTO getAccountById(int id) {
-//        return null;
-////        return accountRepos.findById(id)
-////                .map(account -> new AccountDTO(
-////                        account.getAccountId(),
-////                        account.getNickname(),
-////                        account.getEmail(),
-////                        account.getPhone(),
-////                        account.getBalance(),
-////                        account.getCreateDate(),
-////                        account.getUpdateDate(),
-////                        account.getAuthorities().stream()
-////                                .map(role -> new RoleDTO(role.getRoleName()))
-////                                .collect(Collectors.toList())
-////                ))
-////                .orElse(null);
-//    }
-
 
     @Override
     public Account updateAccount(Account account) {

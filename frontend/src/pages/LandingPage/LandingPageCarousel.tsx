@@ -14,8 +14,8 @@ export default function LandingPageCarousel() {
       <Carousel className="w-full flex justify-center content-center bg-red-600">
         <CarouselContent>
           <CarouselItem>
-            <section className="w-full pt-12 md:pt-24 lg:pt-32 border-y">
-              <div className="px-4 md:px-6 space-y-10 xl:space-y-16">
+            <section className="w-full flex justify-center items-center p-3 ">
+              <div className="px-4 md:px-6 space-y-10 xl:space-y-3">
                 <div className="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:gap-16">
                   <div>
                     <h1 className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
@@ -67,7 +67,7 @@ export default function LandingPageCarousel() {
             </section>
           </CarouselItem>
           <CarouselItem>
-            <section className="w-full pt-12 md:pt-24 lg:pt-32 border-y">
+            <section className=" w-full flex justify-center items-center p-3">
               <div className="px-4 md:px-6 space-y-10 xl:space-y-16">
                 <div className="mx-auto grid max-w-[1300px] gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:gap-16">
                   <div>

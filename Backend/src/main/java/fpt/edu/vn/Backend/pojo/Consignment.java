@@ -27,7 +27,7 @@ public class Consignment {
     @Column(length = 30)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
-    enum Status {
+    public enum Status {
         WAITING_STAFF, IN_INITIAL_EVALUATION,SENDING, IN_FINAL_EVALUATION, FINISHED, TERMINATED
     }
 

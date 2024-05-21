@@ -6,7 +6,7 @@ export default function HomeLayout() {
   return (
     <div>
       {/* <NavBar /> */}
-      <LandingPageLayout />
+      {/* <LandingPageLayout /> */}
       <Outlet></Outlet>
     </div>
   );
