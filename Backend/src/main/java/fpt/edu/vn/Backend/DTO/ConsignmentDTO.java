@@ -18,10 +18,9 @@ public class ConsignmentDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    ConsignmentDTO(Consignment consignment) {
+    public ConsignmentDTO(Consignment consignment) {
         this.consignmentId = consignment.getConsignmentId();
-
-//        this.status = consignment.getStatus();
+        this.status = consignment.getStatus().name();
         this.createDate = consignment.getCreateDate();
         this.updateDate = consignment.getUpdateDate();
     }

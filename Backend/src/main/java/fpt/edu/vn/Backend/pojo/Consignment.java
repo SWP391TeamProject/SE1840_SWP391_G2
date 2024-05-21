@@ -24,6 +24,7 @@ public class Consignment {
     @Column(name = "consignment_id")
     private int consignmentId;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 30)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 

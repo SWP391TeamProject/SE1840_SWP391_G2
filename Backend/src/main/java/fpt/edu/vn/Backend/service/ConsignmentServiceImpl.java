@@ -9,11 +9,15 @@ import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ConsignmentServiceImpl implements ConsignmentService{
@@ -125,17 +129,39 @@ public class ConsignmentServiceImpl implements ConsignmentService{
 
     @Override
     public List<ConsignmentDTO> getAllConsignments(int page, int size) {
-        return List.of();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
+        List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
+                .map(consignment -> new ConsignmentDTO(consignment))
+                .collect(Collectors.toList());
+        return consignmentDTOs;
     }
 
     @Override
     public List<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size) {
-        return List.of();
+        Pageable pageable = PageRequest.of(page, size);
+
+        try {
+            Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
+            Page<Consignment> consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
+
+            return consignmentPage.getContent().stream()
+                    .map(ConsignmentDTO::new)
+                    .collect(Collectors.toList());
+        } catch (IllegalArgumentException e) {
+            throw new ConsignmentServiceException("Invalid status value: " + status, e);
+        }
     }
 
     @Override
     public List<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
-        return List.of();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
+        List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
+                .map(consignment -> new ConsignmentDTO(consignment))
+                .collect(Collectors.toList());
+
+        return consignmentDTOs;
     }
 
     @Override
