@@ -39,6 +39,8 @@ public class Consignment {
     @Enumerated(EnumType.STRING)
     private preferContact preferContact;
 
+//    @Collumn(name ="assignedStaff")
+
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;
 

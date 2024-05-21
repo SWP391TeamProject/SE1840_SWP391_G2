@@ -42,7 +42,7 @@ public class ConsignmentController {
         }
     }
 
-    @GetMapping("/by-id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<List<ConsignmentDTO>> getConsignmentByID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
             List<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
@@ -59,8 +59,8 @@ public class ConsignmentController {
         }
     }
 
-    @GetMapping("/by-status/{status}")
-    public ResponseEntity<List<ConsignmentDTO>> getConsignmentByStatus(@PathVariable String status, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    @GetMapping("/filter-by-status")
+    public ResponseEntity<List<ConsignmentDTO>> getConsignmentByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
             List<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageNumb, pageSize);
             if (consignments == null || consignments.isEmpty()) {

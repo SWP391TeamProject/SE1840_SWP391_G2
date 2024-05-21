@@ -41,8 +41,12 @@ public class Item {
     @Column(name = "buy_in_price")
     private BigDecimal buyInPrice;
 
+    enum itemStatus{
+        VALUATING, QUEUE, IN_AUCTION, SOLD, UNSOLD
+    }
+
     @Column(length = 30)
-    private String status; // VALUATING, QUEUE, IN_AUCTION, etc.
+    private itemStatus status; // VALUATING, QUEUE, IN_AUCTION, etc.
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -57,7 +61,6 @@ public class Item {
     private Account owner;
 
     @OneToMany
-
     @JoinColumn(name = "item_id")
     private Set<AuctionItem> auctionItems;
 

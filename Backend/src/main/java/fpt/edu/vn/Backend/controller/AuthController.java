@@ -52,7 +52,6 @@ public class AuthController {
 
     @PostMapping("login-with-facebook")
     public ResponseEntity<String> loginWithFacebook(@RequestBody String token) {
-
         return null;
     }
 

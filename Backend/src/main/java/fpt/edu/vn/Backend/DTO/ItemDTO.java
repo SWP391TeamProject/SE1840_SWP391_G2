@@ -24,11 +24,10 @@ public class ItemDTO {
         this.description = item.getDescription();
         this.reservePrice = item.getReservePrice();
         this.buyInPrice = item.getBuyInPrice();
-        this.status = item.getStatus();
+        this.status = String.valueOf(item.getStatus());
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
         this.categoryId = item.getItemCategory().getItemCategoryId();
-        this.orderId = item.getOrder().getOrderId();
     }
     // getters and setters
     // ...
