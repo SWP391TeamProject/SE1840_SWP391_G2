@@ -39,25 +39,35 @@ public class ConsignmentServiceImpl implements ConsignmentService{
 
     @Override
     public void submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments) {
-        consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
-            if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
-                    detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
-                throw new ConsignmentServiceException("Initial Evaluation already submitted");
-            }
-            ConsignmentDetail detail = new ConsignmentDetail();
-            detail.setType(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION);
-            detail.setAccount(accountRepos.findById(accountId).orElseThrow());
-            detail.setPrice(price);
-            detail.setDescription(evaluation);
-            detail.setAttachments(attachments);
-            consignment.getConsignmentDetails().add(detail);
-            consignmentRepos.save(consignment);
-        });
+        try {
+            consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
+                if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
+                        detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
+                    throw new ConsignmentServiceException("Initial Evaluation already submitted");
+                }
+                ConsignmentDetail detail = new ConsignmentDetail();
+                detail.setType(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION);
+                detail.setAccount(accountRepos.findById(accountId).orElseThrow());
+                detail.setPrice(price);
+                detail.setDescription(evaluation);
+                detail.setAttachments(attachments);
+                consignment.getConsignmentDetails().add(detail);
+                consignmentRepos.save(consignment);
+            });
+        } catch (Exception e) {
+            throw new ConsignmentServiceException("Error submitting initial evaluation");
+        }
     }
 
     @Override
     public void submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments) {
+
+    try {
         consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
+            if (consignment.getConsignmentDetails().stream().noneMatch(detail ->
+                    detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
+                throw new ConsignmentServiceException("Initial Evaluation not submitted");
+            }
             if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
                     detail.getType().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION))) {
                 throw new ConsignmentServiceException("Final Evaluation already submitted");
@@ -71,6 +81,10 @@ public class ConsignmentServiceImpl implements ConsignmentService{
             consignment.getConsignmentDetails().add(detail);
             consignmentRepos.save(consignment);
         });
+    } catch (Exception e) {
+        throw new ConsignmentServiceException("Error submitting final evaluation");
+    }
+
 
     }
 
@@ -126,7 +140,20 @@ public class ConsignmentServiceImpl implements ConsignmentService{
 
     @Override
     public List<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId) {
-        return List.of();
+        Consignment consignment= consignmentRepos.findById(consignmentId).orElseThrow();
+        List<ConsignmentDetailDTO> consignmentDetailDTOs = new java.util.ArrayList<>();
+        for(ConsignmentDetail detail: consignment.getConsignmentDetails()){
+            consignmentDetailDTOs.add(ConsignmentDetailDTO.builder()
+                    .consignmentDetailId(detail.getConsignmentDetailId())
+                    .description(detail.getDescription())
+                    .type(detail.getType().toString())
+                    .price(detail.getPrice())
+                    .consignmentId(detail.getConsignment().getConsignmentId())
+                    .accountId(detail.getAccount().getAccountId())
+                    .attachmentIds(List.of(detail.getAttachments().stream().map(Attachment::getAttachmentId).toArray(Integer[]::new)))
+                    .build());
+        }
+        return consignmentDetailDTOs;
     }
 
     @Override
