@@ -15,17 +15,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class ConsignmentServiceImpl implements ConsignmentService{
+public class ConsignmentServiceImpl implements ConsignmentService {
 
     ConsignmentRepos consignmentRepos;
     AccountRepos accountRepos;
 
-@Autowired
+
+    @Autowired
     public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos) {
         this.consignmentRepos = consignmentRepos;
         this.accountRepos = accountRepos;
@@ -33,9 +35,6 @@ public class ConsignmentServiceImpl implements ConsignmentService{
 
     @Override
     public ConsignmentDTO requestConsignmentCreate(int userId, int auctionItemId, ConsignmentDetailDTO consignmentDetails) {
-
-
-
 
 
         return null;
@@ -66,35 +65,46 @@ public class ConsignmentServiceImpl implements ConsignmentService{
     @Override
     public void submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments) {
 
-    try {
-        consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
-            if (consignment.getConsignmentDetails().stream().noneMatch(detail ->
-                    detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
-                throw new ConsignmentServiceException("Initial Evaluation not submitted");
-            }
-            if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
-                    detail.getType().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION))) {
-                throw new ConsignmentServiceException("Final Evaluation already submitted");
-            }
-            ConsignmentDetail detail = new ConsignmentDetail();
-            detail.setType(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
-            detail.setAccount(accountRepos.findById(accountId).orElseThrow());
-            detail.setPrice(price);
-            detail.setDescription(evaluation);
-            detail.setAttachments(attachments);
-            consignment.getConsignmentDetails().add(detail);
-            consignmentRepos.save(consignment);
-        });
-    } catch (Exception e) {
-        throw new ConsignmentServiceException("Error submitting final evaluation");
-    }
+        try {
+            consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
+                if (consignment.getConsignmentDetails().stream().noneMatch(detail ->
+                        detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
+                    throw new ConsignmentServiceException("Initial Evaluation not submitted");
+                }
+                if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
+                        detail.getType().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION))) {
+                    throw new ConsignmentServiceException("Final Evaluation already submitted");
+                }
+                ConsignmentDetail detail = new ConsignmentDetail();
+                detail.setType(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+                detail.setAccount(accountRepos.findById(accountId).orElseThrow());
+                detail.setPrice(price);
+                detail.setDescription(evaluation);
+                detail.setAttachments(attachments);
+                consignment.getConsignmentDetails().add(detail);
+                consignmentRepos.save(consignment);
+            });
+        } catch (Exception e) {
+            throw new ConsignmentServiceException("Error submitting final evaluation");
+        }
 
 
     }
 
     @Override
     public void confirmJewelryReceived(int consignmentId) {
-
+        try {
+            Consignment consignment = consignmentRepos.findById(consignmentId)
+                    .orElse(null);
+            if (consignment.getStatus() == Consignment.Status.SENDING) {
+                consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+                consignmentRepos.save(consignment);
+            } else {
+                throw new ConsignmentServiceException("Consignment is not SENDING");
+            }
+        } catch (Exception e) {
+            throw new ConsignmentServiceException("Consignment NOT FOUND");
+        }
     }
 
     @Override
@@ -166,9 +176,9 @@ public class ConsignmentServiceImpl implements ConsignmentService{
 
     @Override
     public List<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId) {
-        Consignment consignment= consignmentRepos.findById(consignmentId).orElseThrow();
-        List<ConsignmentDetailDTO> consignmentDetailDTOs = new java.util.ArrayList<>();
-        for(ConsignmentDetail detail: consignment.getConsignmentDetails()){
+        Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow();
+        List<ConsignmentDetailDTO> consignmentDetailDTOs = new ArrayList<>();
+        for (ConsignmentDetail detail : consignment.getConsignmentDetails()) {
             consignmentDetailDTOs.add(ConsignmentDetailDTO.builder()
                     .consignmentDetailId(detail.getConsignmentDetailId())
                     .description(detail.getDescription())

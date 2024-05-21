@@ -76,5 +76,15 @@ public class ConsignmentController {
         }
     }
 
+    @PostMapping("/{consignmentId}")
+    public ResponseEntity<String> confirmJewelryReceived(@PathVariable int consignmentId) {
+        try {
+            consignmentService.confirmJewelryReceived(consignmentId);
+            return ResponseEntity.ok("Jewelry received confirmed.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }
