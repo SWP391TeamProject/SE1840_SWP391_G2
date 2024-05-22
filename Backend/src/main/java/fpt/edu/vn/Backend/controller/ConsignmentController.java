@@ -86,5 +86,23 @@ public class ConsignmentController {
         }
     }
 
+    @PostMapping("/approve/{consignmentId}")
+    public ResponseEntity<String> approveFinalEvaluation(@PathVariable int consignmentId, @RequestParam int accountId, @RequestParam(defaultValue = "Approved By Manager") String description) {
+        try {
+            consignmentService.approveFinalEvaluation(consignmentId, accountId, description);
+            return ResponseEntity.ok("Consignment approved successfully");
+        } catch (ConsignmentServiceException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing consignment");
+        }
+    }
+    @PostMapping("/rejected/{consignmentId}")
+    public ResponseEntity<String> rejectFinalEvaluation(@PathVariable int consignmentId, @RequestParam int accountId, @RequestParam(defaultValue = "Rejected By Manager") String rejectReason) {
+        try {
+            consignmentService.rejectFinalEvaluation(consignmentId, accountId, rejectReason);
+            return ResponseEntity.ok("Consignment rejected successfully");
+        } catch (ConsignmentServiceException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing consignment");
+        }
+    }
 
 }

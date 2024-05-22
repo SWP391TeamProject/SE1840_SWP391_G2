@@ -8,13 +8,8 @@ import java.time.LocalDateTime;
 @Data
 public class ConsignmentDTO {
     private int consignmentId;
-    private int requesterId;
-    private int staffId;
-    private BigDecimal initialPrice;
-    private String initialEvaluation;
-    private BigDecimal finalPrice;
-    private String finalEvaluation;
     private String status;
+    private String preferContact; // Use String for the enum representation in DTO
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
@@ -23,6 +18,7 @@ public class ConsignmentDTO {
         this.status = consignment.getStatus().name();
         this.createDate = consignment.getCreateDate();
         this.updateDate = consignment.getUpdateDate();
+        this.preferContact = consignment.getPreferContact().name();
     }
     // getters and setters
     // ...
