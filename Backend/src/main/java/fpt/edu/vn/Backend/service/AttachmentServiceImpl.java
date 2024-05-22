@@ -1,36 +1,37 @@
 package fpt.edu.vn.Backend.service;
 
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobServiceClient;
+import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.WritableResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepos attachmentRepository;
-    private final ResourceLoader resourceLoader;
+    private final BlobContainerClient blobContainerClient;
 
     @Autowired
-    public AttachmentServiceImpl(AttachmentRepos attachmentRepository, @Qualifier("azureStorageFileProtocolResolver") ResourceLoader resourceLoader) {
+    public AttachmentServiceImpl(AttachmentRepos attachmentRepository) {
         this.attachmentRepository = attachmentRepository;
-        this.resourceLoader = resourceLoader;
-    }
 
-    public String getResourcePath(String containerName, String blobId) {
-        return String.format("azure-blob://%s/%s", containerName, blobId);
+        String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
+        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                .connectionString(connectStr)
+                .buildClient();
+        blobContainerClient = blobServiceClient.getBlobContainerClient("attachments");
+        blobContainerClient.createIfNotExists();
     }
 
     @Override
@@ -43,12 +44,9 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new IOException(e);
         }
         String blobId = UUID.randomUUID() + mimeType.getExtension();
-        String resourcePath = getResourcePath(entityType.toString(), blobId);
-        Resource blobResource = resourceLoader.getResource(resourcePath);
-        try (OutputStream os = ((WritableResource) blobResource).getOutputStream()) {
-            os.write(file.getBytes());
-        }
-        String directLink = blobResource.getURI().toString();
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+        blobClient.upload(file.getInputStream(), file.getSize(), true);
+        String directLink = blobClient.getBlobUrl();
         Attachment.FileType fileType = Attachment.FileType.UNKNOWN;
         if (file.getContentType() != null) {
             if (file.getContentType().startsWith("image")) {
@@ -59,6 +57,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         Attachment attachment = new Attachment(
                 null,
+                blobId,
                 directLink, fileType,
                 entityId, entityType,
                 null, null);
@@ -82,12 +81,22 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public void deleteAttachment(int id) {
-        attachmentRepository.deleteByAttachmentId(id);
+    public boolean deleteAttachmentByAttachmentId(int attachmentId) {
+        Attachment attachment = attachmentRepository.deleteByAttachmentId(attachmentId);
+        if (attachment != null) {
+            BlockBlobClient blobClient = blobContainerClient.getBlobClient(attachment.getBlobId()).getBlockBlobClient();
+            return blobClient.deleteIfExists();
+        }
+        return false;
     }
 
     @Override
-    public void deleteAttachmentsByEntity(int entityId, Attachment.EntityType entityType) {
-        attachmentRepository.deleteByEntityIdAndEntityType(entityId, entityType);
+    public boolean deleteAttachmentsByEntity(int entityId, Attachment.EntityType entityType) {
+        Attachment attachment = attachmentRepository.deleteByEntityIdAndEntityType(entityId, entityType);
+        if (attachment != null) {
+            BlockBlobClient blobClient = blobContainerClient.getBlobClient(attachment.getBlobId()).getBlockBlobClient();
+            return blobClient.deleteIfExists();
+        }
+        return false;
     }
 }

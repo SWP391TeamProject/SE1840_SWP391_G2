@@ -10,6 +10,6 @@ import java.util.List;
 public interface AttachmentRepos extends JpaRepository<Attachment, Integer> {
     Attachment findByAttachmentId(int id);
     List<Attachment> findByEntityIdAndEntityType(int entityId, Attachment.EntityType entityType);
-    void deleteByAttachmentId(int id);
-    void deleteByEntityIdAndEntityType(int entityId, Attachment.EntityType entityType);
+    Attachment deleteByAttachmentId(int id);
+    Attachment deleteByEntityIdAndEntityType(int entityId, Attachment.EntityType entityType);
 }

@@ -15,7 +15,7 @@ public interface AttachmentService {
 
     List<Attachment> getAllAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
 
-    void deleteAttachment(int id);
+    boolean deleteAttachmentByAttachmentId(int attachmentId);
 
-    void deleteAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
+    boolean deleteAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
 }
