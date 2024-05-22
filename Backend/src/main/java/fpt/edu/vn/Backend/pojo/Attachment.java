@@ -27,10 +27,11 @@ public class Attachment {
         IMAGE,VIDEO,UNKNOWN
     }
 
+    @Column(name = "entity_id")
     private int entityId;
 
     @Enumerated
-    @Column(name = "attachment_category")
+    @Column(name = "entity_type")
     private EntityType entityType;
 
     public enum EntityType {
