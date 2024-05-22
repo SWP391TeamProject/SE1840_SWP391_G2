@@ -15,22 +15,25 @@ import java.time.LocalDateTime;
 public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int attachmentId;
+    private Integer attachmentId;
 
     @Column(length = 300,name = "link")
     private String link;
 
     @Column(length = 10)
-    private FileType type; // jpg, png, mp4, etc.
+    private FileType fileType; // jpg, png, mp4, etc.
 
-    enum FileType {
-        IMAGE,VIDEO
+    public enum FileType {
+        IMAGE,VIDEO,UNKNOWN
     }
 
+    private int entityId;
+
     @Enumerated
-    @Column(name = "attachment_type")
-    private type attachmentType;
-    enum type{
+    @Column(name = "attachment_category")
+    private EntityType entityType;
+
+    public enum EntityType {
         BANNER,AVATAR,PROFILE
     }
 
