@@ -129,7 +129,16 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment) {
-
+        try {
+            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow( () -> new ConsignmentServiceException("Consignment not found"));
+            consignment.setPreferContact(Consignment.preferContact.valueOf(updatedConsignment.getPreferContact().toUpperCase()));
+            consignment.setCreateDate(updatedConsignment.getCreateDate());
+            consignment.setUpdateDate(updatedConsignment.getUpdateDate());
+            consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
+            consignmentRepos.save(consignment);
+        } catch (Exception e) {
+            throw new ConsignmentServiceException("Error updating consignment", e);
+        }
     }
 
     @Override
@@ -194,6 +203,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public void deleteConsignment(int id) {
-
+        try {
+            consignmentRepos.deleteById(id);
+        } catch (Exception e) {
+            throw new ConsignmentServiceException("Error deleting consignment", e);
+        }
     }
 }
