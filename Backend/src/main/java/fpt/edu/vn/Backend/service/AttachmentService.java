@@ -3,21 +3,19 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface AttachmentService {
-    Attachment uploadAttachment(MultipartFile file);
-
-    List<Attachment> uploadBulkAttachments(MultipartFile[] files);
+    Attachment uploadAttachment(MultipartFile file, int entityId, Attachment.EntityType entityType) throws IOException;
 
     Attachment getAttachmentById(int id);
 
     List<Attachment> getAllAttachments();
 
-    List<Attachment> getAllAttachmentsByObjectIdAndObjectType(int objectId , String objectType);
+    List<Attachment> getAllAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
 
+    boolean deleteAttachmentByAttachmentId(int attachmentId);
 
-    Attachment updateAttachment(Attachment attachment);
-
-    void deleteAttachment(int id);
+    boolean deleteAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
 }
