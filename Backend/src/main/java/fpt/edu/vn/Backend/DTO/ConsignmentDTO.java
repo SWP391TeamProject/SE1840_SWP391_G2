@@ -1,11 +1,13 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Consignment;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Data
+@Builder
 public class ConsignmentDTO {
     private int consignmentId;
     private String status;
@@ -13,13 +15,14 @@ public class ConsignmentDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    public ConsignmentDTO(Consignment consignment) {
-        this.consignmentId = consignment.getConsignmentId();
-        this.status = consignment.getStatus().name();
-        this.createDate = consignment.getCreateDate();
-        this.updateDate = consignment.getUpdateDate();
-        this.preferContact = consignment.getPreferContact().name();
+    public ConsignmentDTO(int consignmentId, String status, String preferContact, LocalDateTime createDate, LocalDateTime updateDate) {
+        this.consignmentId = consignmentId;
+        this.status = status;
+        this.preferContact = preferContact;
+        this.createDate = createDate;
+        this.updateDate = updateDate;
     }
+
     // getters and setters
     // ...
 }

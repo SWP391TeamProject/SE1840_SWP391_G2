@@ -15,7 +15,7 @@ public class AccountDTO {
     private String role;
     private String email;
     private String phone;
-    private boolean status;
+    private int status;
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
@@ -27,7 +27,7 @@ public class AccountDTO {
         this.nickname = account.getNickname();
         this.email = account.getEmail();
         this.phone = account.getPhone();
-        this.status = account.isStatus();
+        this.status = 1;
         this.balance = account.getBalance();
         this.createDate = account.getCreateDate();
         this.updateDate = account.getUpdateDate();
@@ -73,14 +73,13 @@ public class AccountDTO {
         this.phone = phone;
     }
 
-    public boolean isStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(int status) {
         this.status = status;
     }
-
     public BigDecimal getBalance() {
         return balance;
     }

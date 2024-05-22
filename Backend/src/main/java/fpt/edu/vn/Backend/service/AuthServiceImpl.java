@@ -87,6 +87,10 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
+        if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
+            throw new IllegalStateException("Email or password is empty!");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDTO.getEmail(),
