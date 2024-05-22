@@ -2,7 +2,13 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.exception.ItemServiceException;
+
 import fpt.edu.vn.Backend.pojo.Item;
+import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
+import fpt.edu.vn.Backend.repository.ItemRepos;
+import org.springframework.beans.factory.annotation.Autowired;
+pojo.Item;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
@@ -10,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements IItemService {
@@ -22,6 +29,13 @@ public class ItemServiceImpl implements IItemService {
 
     @Autowired
     private ItemCategoryRepos itemCategoryRepos;
+
+
+    @Autowired
+    public ItemServiceImpl (ItemRepos itemRepos){
+        this.itemRepos = itemRepos;
+    }
+
 
     @Override
     public ItemDTO createItem(ItemDTO item) {
@@ -45,7 +59,14 @@ public class ItemServiceImpl implements IItemService {
 
     @Override
     public List<ItemDTO> getAllItems() {
-        return List.of();
+        try {
+            List<Item> items = itemRepos.findAll();
+            return items.stream()
+                    .map(ItemDTO::new)
+                    .collect(Collectors.toList());
+        }catch(Exception e){
+            throw new ItemServiceException("Failed to retrieve items", e);
+        }
     }
 
     @Override
@@ -65,6 +86,8 @@ public class ItemServiceImpl implements IItemService {
 
     @Override
     public List<ItemDTO> getItemsByCategoryId(int categoryId) {
+        return null;
+
         try {
 
             return itemRepos.findItemByItemCategory(itemCategoryRepos.findById(categoryId).orElseThrow()).stream().map(ItemDTO::new).toList();
