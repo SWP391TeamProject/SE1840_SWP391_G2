@@ -4,10 +4,9 @@ import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.service.IItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/items")
@@ -18,13 +17,17 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @RequestMapping("/")
+    @GetMapping("/")
     public ResponseEntity<ItemDTO> getALlItems() {
         return new ResponseEntity( itemService.getAllItems(), HttpStatus.OK);
     }
 
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<ItemDTO>> getItemsByCategoryId(@PathVariable int categoryId) {
+        return new ResponseEntity<>(itemService.getItemsByCategoryId(categoryId), HttpStatus.OK);
+    }
 
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> getItemById(int id) {
         return new ResponseEntity<>(itemService.getItemById(id), HttpStatus.OK);
     }
