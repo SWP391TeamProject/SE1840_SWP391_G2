@@ -2,6 +2,9 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -32,7 +35,14 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public Attachment uploadAttachment(MultipartFile file, int entityId, Attachment.EntityType entityType) throws IOException {
-        String blobId = UUID.randomUUID().toString();
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new IOException(e);
+        }
+        String blobId = UUID.randomUUID() + mimeType.getExtension();
         String resourcePath = getResourcePath(entityType.toString(), blobId);
         Resource blobResource = resourceLoader.getResource(resourcePath);
         try (OutputStream os = ((WritableResource) blobResource).getOutputStream()) {

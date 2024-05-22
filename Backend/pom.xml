@@ -64,6 +64,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.azure.spring</groupId>
 			<artifactId>spring-cloud-azure-starter-storage-blob</artifactId>
 		</dependency>
