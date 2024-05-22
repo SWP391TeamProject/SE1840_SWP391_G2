@@ -2,9 +2,11 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
+import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.RoleRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 
@@ -23,25 +27,43 @@ public class AuthServiceImpl implements AuthService{
     private final AccountRepos accountRepos;
     private final JWTGenerator jwtGenerator;
     private final AuthenticationManager authenticationManager;
+    private final RoleRepos roleRepos;
+
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, RoleRepos roleRepos) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
+        this.roleRepos = roleRepos;
     }
 
 
 
     @Override
-    public AuthResponseDTO register(String email, String password) {
+    public AuthResponseDTO register(RegisterDTO registerDTO) {
         Account newAccount ;
         try {
-            accountRepos.findByEmail(email).ifPresent(account -> {
+            if(registerDTO.getEmail().isEmpty() || registerDTO.getPassword().isEmpty()){
+                throw new IllegalStateException("Email or password is empty!");
+            }
+
+            if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
+                throw new IllegalStateException("Password and confirm password do not match!");
+            }
+
+            if (registerDTO.getPassword().length() < 6) {
+                throw new IllegalStateException("Password is too short!");
+            }
+
+            accountRepos.findByEmail(registerDTO.getEmail()).ifPresent(account -> {
                 throw new IllegalStateException("Email already exists! try login instead.");
             });
+            Set<Role> roles = new HashSet<>();
+            roleRepos.findById(1).ifPresent(roles::add);
             newAccount = new Account();
-            newAccount.setEmail(email);
-            newAccount.setPassword(password); // Consider hashing the password before saving
+            newAccount.setEmail(registerDTO.getEmail());
+            newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
+            newAccount.setAuthorities(roles);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -50,8 +72,8 @@ public class AuthServiceImpl implements AuthService{
         // After successful registration, log the user in and generate a token
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        email,
-                        password
+                        registerDTO.getEmail(),
+                        registerDTO.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
