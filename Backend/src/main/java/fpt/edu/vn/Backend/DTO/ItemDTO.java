@@ -18,7 +18,7 @@ public class ItemDTO {
     private int categoryId;
     private Integer orderId;
 
-    ItemDTO(Item item) {
+    public ItemDTO(Item item) {
         this.itemId = item.getItemId();
         this.name = item.getName();
         this.description = item.getDescription();
