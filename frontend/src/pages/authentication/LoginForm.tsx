@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import AuthContext from "@/AuthProvider";
+import { useLocation, useNavigate } from "react-router-dom";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -13,7 +15,12 @@ type FormValues = {
 };
 
 function LoginForm() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
   const loginForm = useRef<HTMLDivElement>(null);
+  // const {authenticated, role} = useContext(AuthContext);
+  const {user, setUser} = useContext(AuthContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     fetch("http://localhost:8080/auth/login", {
@@ -28,6 +35,8 @@ function LoginForm() {
       .then((data) => {
         console.log(data);
         localStorage.setItem("token", data.accessToken);
+        setUser(data)
+        navigate(from, { replace: true });
       });
   };
 

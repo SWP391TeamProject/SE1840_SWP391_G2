@@ -38,7 +38,6 @@ export default function NavBar() {
             Put your item for auction
           </div>
           <DropdownMenu>
-
             <DropdownMenuTrigger>
               <Avatar>
                 <AvatarImage src="https://avatars.githubusercontent.com/u/139426" />

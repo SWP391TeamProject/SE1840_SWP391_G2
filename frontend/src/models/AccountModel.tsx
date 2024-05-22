@@ -1,3 +1,5 @@
+import { Roles } from "@/constants/enums";
+
 export interface Account {
   userId: number;
   username: string;
@@ -6,5 +8,5 @@ export interface Account {
   phone: string;
   avatar?: string;
   accessToken?: string;
-  role: string;
+  role: Roles;
 }
