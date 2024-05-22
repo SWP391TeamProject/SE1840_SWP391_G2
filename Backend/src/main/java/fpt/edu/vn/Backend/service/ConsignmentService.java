@@ -19,8 +19,8 @@ public interface ConsignmentService {
 
     // Status Updates
     void confirmJewelryReceived(int consignmentId);
-    void approveFinalEvaluation(int consignmentId);
-    void rejectFinalEvaluation(int consignmentId, String rejectionReason);
+    void approveFinalEvaluation(int consignmentId, int accountId,String description);
+    void rejectFinalEvaluation(int consignmentId,int accountId, String rejectionReason);
 
     void confirmAuctionParticipation(int consignmentId);
     void assignAuctionSession(int consignmentId, int auctionSessionId);
