@@ -2,12 +2,17 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.exception.ItemServiceException;
+
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
 import org.springframework.beans.factory.annotation.Autowired;
-import fpt.edu.vn.Backend.pojo.Item;
+pojo.Item;
+import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
+import fpt.edu.vn.Backend.repository.ItemRepos;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +30,12 @@ public class ItemServiceImpl implements IItemService {
     @Autowired
     private ItemCategoryRepos itemCategoryRepos;
 
+
     @Autowired
     public ItemServiceImpl (ItemRepos itemRepos){
         this.itemRepos = itemRepos;
     }
+
 
     @Override
     public ItemDTO createItem(ItemDTO item) {
@@ -80,5 +87,12 @@ public class ItemServiceImpl implements IItemService {
     @Override
     public List<ItemDTO> getItemsByCategoryId(int categoryId) {
         return null;
+
+        try {
+
+            return itemRepos.findItemByItemCategory(itemCategoryRepos.findById(categoryId).orElseThrow()).stream().map(ItemDTO::new).toList();
+        } catch (Exception e) {
+            throw new ItemServiceException("Category not found");
+        }
     }
 }

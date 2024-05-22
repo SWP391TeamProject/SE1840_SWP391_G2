@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
+import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -56,8 +57,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register() {
-        return null;
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterDTO registerDTO) {
+        return ResponseEntity.ok(authService.register(registerDTO));
     }
     @GetMapping("/auction-item/{id}")
     public String joinAuction(Model model, HttpSession session, @PathVariable int id) {

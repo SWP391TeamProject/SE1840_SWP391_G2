@@ -9,15 +9,9 @@ import java.util.List;
 
 @Data
 public class ConsignmentRequestDTO {
-    private Consignment.Status status;
-    private Consignment.preferContact preferContact;
-    private List<ConsignmentDetail> consignmentDetails;
-
-    public Consignment toConsignment() {
-        Consignment consignment = new Consignment();
-        consignment.setStatus(this.status);
-        consignment.setPreferContact(this.preferContact);
-        consignment.setConsignmentDetails(this.consignmentDetails);
-        return consignment;
-    }
+    private String accountId;
+    private String contactName;
+    private String phone;
+    private String email;
+    private String preferContact;
 }

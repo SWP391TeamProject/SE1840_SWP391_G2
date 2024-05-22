@@ -8,7 +8,7 @@ export default function HomeLayout() {
     <div>
       {/* <NavBar /> */}
       {/* <LandingPageLayout /> */}
-      <AuctionSession />
+      {/* <AuctionSession /> */}
       <Outlet></Outlet>
     </div>
   );
