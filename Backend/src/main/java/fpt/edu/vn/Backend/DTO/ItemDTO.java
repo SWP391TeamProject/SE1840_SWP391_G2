@@ -1,34 +1,37 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Item;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-@Data
-public class ItemDTO {
-    private int itemId;
-    private String name;
-    private String description;
-    private BigDecimal reservePrice;
-    private BigDecimal buyInPrice;
-    private String status;
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
-    private int categoryId;
-    private Integer orderId;
 
-    public ItemDTO(Item item) {
-        this.itemId = item.getItemId();
-        this.name = item.getName();
-        this.description = item.getDescription();
-        this.reservePrice = item.getReservePrice();
-        this.buyInPrice = item.getBuyInPrice();
-        this.status = String.valueOf(item.getStatus());
-        this.createDate = item.getCreateDate();
-        this.updateDate = item.getUpdateDate();
-        this.categoryId = item.getItemCategory().getItemCategoryId();
-    }
-    // getters and setters
-    // ...
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ItemDTO {
+    @Nullable
+    private Integer itemId;
+    private int categoryId;
+    @NotNull
+    private String name;
+    @NotNull
+    private String description;
+    @NotNull
+    private BigDecimal reservePrice;
+    @NotNull
+    private BigDecimal buyInPrice;
+    @NotNull
+    private Item.Status status;
+    @NotNull
+    private LocalDateTime createDate;
+    @NotNull
+    private LocalDateTime updateDate;
+    private int ownerId;
+    @Nullable
+    private Integer orderId;
 }
