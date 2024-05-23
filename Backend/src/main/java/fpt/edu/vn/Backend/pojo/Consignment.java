@@ -26,6 +26,7 @@ public class Consignment {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
+    @Enumerated(EnumType.STRING)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
     public enum Status {

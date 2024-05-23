@@ -35,7 +35,7 @@ public class AuctionBidServiceImpl implements AuctionBidService {
     @Override
     public Bid getHighestAuctionBid(int auctionId) throws IndexOutOfBoundsException{
         // This method requires a custom query to be implemented in the repository
-        return auctionBidRepository.findAllBidByAuctionItemId(auctionId).get(0);
+        return auctionBidRepository.findAllBidByAuctionItemId(auctionId)!=null?auctionBidRepository.findAllBidByAuctionItemId(auctionId).get(0):null;
     }
 
     @Override

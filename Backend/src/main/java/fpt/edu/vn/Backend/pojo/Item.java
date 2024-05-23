@@ -1,17 +1,16 @@
 package fpt.edu.vn.Backend.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,56 +22,54 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
-    @Nullable
-    private Integer itemId;
+    private int itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_category_id")
-    @NotNull
+    @JoinColumn(name = "item_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
 
+
     @Column(length = 300)
-    @NotNull
     private String name;
 
     @Column(length = 5000)
-    @NotNull
     private String description;
 
     @Column(name = "reserve_price")
-    @NotNull
     private BigDecimal reservePrice;
 
     @Column(name = "buy_in_price")
-    @NotNull
     private BigDecimal buyInPrice;
 
-    @Enumerated(EnumType.STRING)
+    enum itemStatus{
+        VALUATING, QUEUE, IN_AUCTION, SOLD, UNSOLD
+    }
+
     @Column(length = 30)
-    @NotNull
-    private Status status;
+    private itemStatus status; // VALUATING, QUEUE, IN_AUCTION, etc.
 
     @CreationTimestamp
     @Column(name = "create_date")
-    @NotNull
     private LocalDateTime createDate;
 
     @UpdateTimestamp
     @Column(name = "update_date")
-    @NotNull
     private LocalDateTime updateDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
-    @NotNull
     private Account owner;
+
+    @OneToMany
+    @JoinColumn(name = "item_id")
+    private Set<AuctionItem> auctionItems;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @Nullable
     private Order order;
 
-    public enum Status {
-        VALUATING, QUEUE, IN_AUCTION, SOLD, UNSOLD
-    }
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id")
+    private List<Attachment> attachments;
+
 }

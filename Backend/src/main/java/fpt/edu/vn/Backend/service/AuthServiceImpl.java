@@ -8,6 +8,7 @@ import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.RoleRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-
+@Slf4j
 public class AuthServiceImpl implements AuthService{
 
 
@@ -81,7 +82,8 @@ public class AuthServiceImpl implements AuthService{
 
         return AuthResponseDTO.builder()
                 .accessToken(token)
-                .username(newAccount.getEmail())
+                .email(newAccount.getEmail())
+                .role(String.valueOf(newAccount.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
                 .build();
     }
 
@@ -99,7 +101,9 @@ public class AuthServiceImpl implements AuthService{
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-        Account user = accountRepos.findByEmail(loginDTO.getEmail()).get();
+
+        Account user = accountRepos.findByEmailAndPassword(loginDTO.getEmail(),loginDTO.getPassword());
+
         return AuthResponseDTO
                 .builder()
                 .accessToken(token)
@@ -107,6 +111,7 @@ public class AuthServiceImpl implements AuthService{
                 .email(user.getEmail())
                 .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
                 .build();
+
     }
 
     @Override
