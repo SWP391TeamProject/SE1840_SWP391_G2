@@ -21,14 +21,15 @@ public class Attachment {
     private String link;
 
     @Column(length = 10)
+    @Enumerated(EnumType.STRING)
     private FileType type; // jpg, png, mp4, etc.
 
     enum FileType {
         IMAGE,VIDEO
     }
 
-    @Enumerated
     @Column(name = "attachment_type")
+    @Enumerated(EnumType.STRING)
     private type attachmentType;
     enum type{
         BANNER,AVATAR,PROFILE

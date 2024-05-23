@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -29,19 +30,19 @@ public class BidController {
     private AccountService accountService;
     @Autowired
     private AuctionItemService auctionItemService;
-    @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
-    public ResponseEntity<String> sendMessage(@Payload BidDTO bidDTO,
+    @MessageMapping("/chat.sendMessage/{auctionItemId}")
+    @SendTo("/topic/public/{auctionItemId}")
+    public ResponseEntity<BidDTO> sendMessage(@Payload BidDTO bidDTO, @DestinationVariable int auctionItemId,
                                               SimpMessageHeaderAccessor headerAccessor) {
-        Bid bid = new Bid();
-        BigDecimal amount = bidDTO.getPrice()==null?new BigDecimal(0):bidDTO.getPrice();
-        bid.setAccount((Account) headerAccessor.getSessionAttributes().get("user"));
-        bid.setPrice(amount);
-        bid.setAuctionItem(auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId()));
-        BigDecimal currentBid = bidService.getHighestAuctionBid(bid.getAuctionItem().getAuctionItemId()) != null ? bidService.getHighestAuctionBid(bid.getAuctionItem().getAuctionItemId()).getPrice() : new BigDecimal(0);
-        log.info(bid.getAccount().getEmail() + " bid " + bid.getPrice() + " on " + bid.getAuctionItem().getAuctionItemId());
-
         try {
+            Bid bid = new Bid();
+            BigDecimal amount = bidDTO.getPrice();
+            bid.setAccount((Account) headerAccessor.getSessionAttributes().get("user"));
+            bid.setPrice(amount);
+            bid.setAuctionItem(auctionItemService.getAuctionItemById(auctionItemId));
+            BigDecimal currentBid = bidService.getHighestAuctionBid(auctionItemId) != null ? bidService.getHighestAuctionBid(auctionItemId).getPrice() : new BigDecimal(0);
+            log.info(bid.getAccount().getEmail() + " bid " + bid.getPrice() + " on " + bid.getAuctionItem().getAuctionItemId());
+
             if (bid.getPrice().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
                 Account account = (Account) headerAccessor.getSessionAttributes().get("user");
                 Account persistedAccount = accountService.getAccountByEmail(bid.getAccount().getEmail());
@@ -50,20 +51,23 @@ public class BidController {
                 }
                 bid.setAccount(persistedAccount);
                 bidService.createAuctionBid(bid);
-                return ResponseEntity.ok(bid.getAccount().getNickname() + " : " + bid.getPrice() +":BID");
+                BidDTO response = new BidDTO();
+                response.setBidId(bid.getBidId());
+                response.setAccountId(persistedAccount.getAccountId());
+                response.setPrice(bid.getPrice());
+                response.setAuctionItemId(bid.getAuctionItem().getAuctionItemId());
+                return ResponseEntity.ok(response);
             } else {
-                return new ResponseEntity<>(headerAccessor.getSessionId() + " : Bid must be higher than " + currentBid.add(new BigDecimal(5))+":ERROR"
-                        , HttpStatus.BAD_REQUEST);
+                throw new Exception("Bid must be higher than current bid by at least 5");
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
-            return new ResponseEntity<>(headerAccessor.getSessionId()+": Please input number:ERROR",HttpStatus.NOT_ACCEPTABLE);
+            throw new RuntimeException(e);
         }
     }
 
-    @MessageMapping("/chat.addUser")
-    @SendTo("/topic/public")
-    public ResponseEntity<String> addUser(@Payload BidDTO bidDTO, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("/chat.addUser/{auctionItemId}")
+    @SendTo("/topic/public/{auctionItemId}")
+    public ResponseEntity<String> addUser(@Payload BidDTO bidDTO,@DestinationVariable int auctionItemId, SimpMessageHeaderAccessor headerAccessor) {
         // Add username in web socket session
         Account persistedAccount = accountService.getAccountById(bidDTO.getAccountId());
         if (persistedAccount != null) {
@@ -71,7 +75,7 @@ public class BidController {
             headerAccessor.getSessionAttributes().put("user", persistedAccount);
             // Create a new bid
 //            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestAuctionBid(bidDTO.getAuctionItemId()) == null ? 0 : bidService.getHighestAuctionBid(bidDTO.getAuctionItemId()).getPrice())+":JOIN");
+            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestAuctionBid(auctionItemId) == null ? 0 : bidService.getHighestAuctionBid(auctionItemId).getPrice())+":JOIN");
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

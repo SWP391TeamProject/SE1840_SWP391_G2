@@ -14,7 +14,7 @@ public class Role {
         ADMIN, MEMBER,MANAGER,STAFF
     }
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "role_name")
     private role roleName;
 

@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService{
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-        Account user = accountRepos.findByEmail(loginDTO.getEmail()).get();
+        Account user = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
         return AuthResponseDTO
                 .builder()
                 .accessToken(token)
