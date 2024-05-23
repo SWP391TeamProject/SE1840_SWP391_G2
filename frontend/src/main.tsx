@@ -55,7 +55,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
             {/* <RouterProvider router={router} /> */}
+            {/* <Route element={<PrivateRoute allowedRoles={[Roles.MEMBER]} />}> */}
             <Route path="/consignment" element={<ConsignmentLayout />}></Route>
+            {/* </Route> */}
           </Routes>
         </BrowserRouter>
       </AuthProvider>

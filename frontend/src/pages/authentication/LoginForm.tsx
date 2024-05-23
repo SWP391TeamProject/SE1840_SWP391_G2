@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+import { setCookie } from "@/utils/cookies";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -34,7 +35,8 @@ function LoginForm() {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        localStorage.setItem("token", data.accessToken);
+        setCookie("token", data.token, 30000);
+        setCookie("user", JSON.stringify(data), 30000);
         setUser(data);
         navigate(from, { replace: true });
       });
