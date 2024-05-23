@@ -10,17 +10,6 @@ import lombok.*;
 @Data
 public class RoleDTO {
 
-
-    enum role{
-        ADMIN,
-        MANAGER,
-        MEMBER,
-        STAFF,
-    }
-    private role roleName;
-
-    public RoleDTO(String s) {
-        this.roleName = role.valueOf(s);
-    }
-
+    private int roleId;
+    private String roleName;
 }

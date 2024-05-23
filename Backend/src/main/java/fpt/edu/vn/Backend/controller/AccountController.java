@@ -42,7 +42,7 @@ public class AccountController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
-        return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
+            return new ResponseEntity<>(new AccountDTO(accountService.getAccountById(id)), HttpStatus.OK);
     }
 
     @PostMapping("/create")
@@ -60,7 +60,7 @@ public class AccountController {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            accountService.deleteAccount(id);
+            accountService.getAccountById(id).setStatus(false);
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }

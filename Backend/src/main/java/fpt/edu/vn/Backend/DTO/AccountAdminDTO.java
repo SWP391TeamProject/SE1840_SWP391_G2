@@ -4,12 +4,13 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class AccountAdminDTO {
     private int userId;
     private String nickname;
-    private String role;
+    private List<Integer> role;
     private String email;
     private String phone;
     private BigDecimal balance;

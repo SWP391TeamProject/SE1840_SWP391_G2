@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.RoleDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,9 @@ public class AccountServiceImpl implements AccountService {
                     AccountAdminDTO dto = new AccountAdminDTO();
                     dto.setUserId(account.getAccountId());
                     dto.setNickname(account.getNickname());
-                    dto.setRole(String.valueOf(account.getAuthorities().stream().findFirst().get()));
+                    dto.setRole(account.getAuthorities().stream()
+                            .map(Role::getRoleId)
+                            .collect(Collectors.toList()));
                     dto.setEmail(account.getEmail());
                     dto.setPhone(account.getPhone());
                     dto.setBalance(account.getBalance());
@@ -46,6 +49,7 @@ public class AccountServiceImpl implements AccountService {
     public Account createAccount(Account account) {
         return accountRepos.save(account);
     }
+
 
 
     @Override
