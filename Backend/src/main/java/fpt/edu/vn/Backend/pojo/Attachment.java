@@ -34,8 +34,8 @@ public class Attachment {
 
     @Column(name = "attachment_type")
     @Enumerated(EnumType.STRING)
-    private type attachmentType;
-    enum type{
+    private Type attachmentType;
+    enum Type{
 
         BANNER,AVATAR,PROFILE
     }
