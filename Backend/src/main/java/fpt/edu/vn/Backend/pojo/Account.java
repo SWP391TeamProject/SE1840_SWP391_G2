@@ -50,7 +50,7 @@ public class Account {
 
     @Column(name = "status")
     @ColumnDefault("1") // 1 for true, 0 for false
-    private boolean status;
+    private byte status;
 
 
     @Column(name = "balance")
@@ -85,6 +85,8 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<Deposit> deposits;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
+    private Set<ConsignmentDetail> consignmentDetails;
 
 
     // ... (relationships)

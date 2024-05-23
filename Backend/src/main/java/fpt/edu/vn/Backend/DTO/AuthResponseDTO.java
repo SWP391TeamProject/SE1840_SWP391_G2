@@ -3,10 +3,12 @@ package fpt.edu.vn.Backend.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Builder
 @AllArgsConstructor
+@ToString
 public class AuthResponseDTO {
 
     private String accessToken;

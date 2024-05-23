@@ -18,17 +18,16 @@ public class ItemDTO {
     private int categoryId;
     private Integer orderId;
 
-    ItemDTO(Item item) {
+    public ItemDTO(Item item) {
         this.itemId = item.getItemId();
         this.name = item.getName();
         this.description = item.getDescription();
         this.reservePrice = item.getReservePrice();
         this.buyInPrice = item.getBuyInPrice();
-        this.status = item.getStatus();
+        this.status = String.valueOf(item.getStatus());
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
         this.categoryId = item.getItemCategory().getItemCategoryId();
-        this.orderId = item.getOrder().getOrderId();
     }
     // getters and setters
     // ...

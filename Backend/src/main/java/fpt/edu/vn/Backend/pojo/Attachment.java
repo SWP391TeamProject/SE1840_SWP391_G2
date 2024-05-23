@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.pojo;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,10 @@ import java.time.LocalDateTime;
 public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int attachmentId;
+    private Integer attachmentId;
+
+    @NaturalId
+    private String blobId;
 
     @Column(length = 300,name = "link")
     private String link;
@@ -24,14 +28,15 @@ public class Attachment {
     @Enumerated(EnumType.STRING)
     private FileType type; // jpg, png, mp4, etc.
 
-    enum FileType {
-        IMAGE,VIDEO
+    public enum FileType {
+        IMAGE,VIDEO,UNKNOWN
     }
 
     @Column(name = "attachment_type")
     @Enumerated(EnumType.STRING)
     private type attachmentType;
     enum type{
+
         BANNER,AVATAR,PROFILE
     }
 

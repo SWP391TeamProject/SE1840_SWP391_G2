@@ -24,11 +24,12 @@ public class Consignment {
     @Column(name = "consignment_id")
     private int consignmentId;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
-    enum Status {
+    public enum Status {
         WAITING_STAFF, IN_INITIAL_EVALUATION,SENDING, IN_FINAL_EVALUATION, FINISHED, TERMINATED
     }
 
@@ -38,6 +39,8 @@ public class Consignment {
     @Column(name = "prefer_contact")
     @Enumerated(EnumType.STRING)
     private preferContact preferContact;
+
+//    @Collumn(name ="assignedStaff")
 
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;

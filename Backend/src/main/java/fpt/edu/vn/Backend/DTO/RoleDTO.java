@@ -1,15 +1,15 @@
 package fpt.edu.vn.Backend.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import fpt.edu.vn.Backend.pojo.Role;
+import lombok.*;
 
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
+@Data
 public class RoleDTO {
+
     private int roleId;
     private String roleName;
 }

@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/accounts")
 @CrossOrigin("*")
-
 public class AccountController {
     private final AccountService accountService;
     private static final Logger log = LoggerFactory.getLogger(AccountController.class);
@@ -43,12 +42,7 @@ public class AccountController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
-        try {
             return new ResponseEntity<>(new AccountDTO(accountService.getAccountById(id)), HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            log.error("User Not Found : " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @PostMapping("/create")

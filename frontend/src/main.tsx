@@ -16,11 +16,10 @@ import HomeLayout from "./layout/HomeLayout/HomeLayout.tsx";
 import Administration from "./layout/Administration/Administration.tsx";
 import AccountsList from "./pages/Administration/AccountsList.tsx";
 import DashBoard from "./pages/dashboard/DashBoard.tsx";
-import Home from "./pages/Home/Home.tsx";
 import LoginLayout from "./layout/LoginLayout/LoginLayout.tsx";
-import LoginForm from "./pages/authentication/LoginForm.tsx";
-import RegisterForm from "./pages/authentication/RegisterForm.tsx";
 import RegisterLayout from "./layout/RegisterLayout/RegisterLayout.tsx";
+import { LandingPageLayout } from "./layout/HomeLayout/landing-page-layout.tsx";
+import ConsignmentLayout from "./layout/ConsignmentLayout/ConsignmentLayout.tsx";
 
 const router = createBrowserRouter(routes);
 
@@ -30,12 +29,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomeLayout />}>
-            <Route path="/" element={<Home />}></Route>
+            <Route path="/" element={<LandingPageLayout />}></Route>
           </Route>
           <Route path="/admin" element={<Administration />}>
             <Route path="/admin" element={<DashBoard />}></Route>
             <Route path="accounts" element={<AccountsList />}></Route>
           </Route>
+          <Route path="/consignment" element={<ConsignmentLayout />}></Route>
+
           <Route path="/auth">
             <Route path="/auth/login" element={<LoginLayout />}></Route>
             <Route path="/auth/register" element={<RegisterLayout />}></Route>

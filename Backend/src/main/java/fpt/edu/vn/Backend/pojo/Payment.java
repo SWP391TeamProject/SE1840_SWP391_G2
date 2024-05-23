@@ -30,8 +30,6 @@ public class Payment {
     @Column(name = "payment_type")
     private paymentType paymentType;
 
-
-
     @OneToOne
     @JoinColumn(name = "deposit_id")
     private Deposit deposit;
