@@ -85,7 +85,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public boolean updateItem(@NotNull ItemDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
-        return itemRepos.updateItemByItemId(item.getItemId(), mapDTOToEntity(item));
+        itemRepos.save(mapDTOToEntity(item));
+        return true;
     }
 
     @Override
