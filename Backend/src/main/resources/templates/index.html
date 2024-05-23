@@ -390,7 +390,7 @@
         // Tell your username to the server
         stompClient.send("/app/chat.addUser",
             {},
-            JSON.stringify({price: 0, bidderId: parseInt(user_id), auctionItemId: parseInt(item_id)})
+            JSON.stringify({price: 0, auctionItemId: parseInt(item_id), accountId: parseInt(user_id)})
         )
 
         connectingElement.classList.add('hidden');
@@ -408,8 +408,8 @@
         if (messageContent && stompClient) {
             var chatMessage = {
                 price: parseFloat(messageInput.value, 10),
-                bidderId: parseInt(user_id),
-                auctionItemId: parseInt(item_id)
+                auctionItemId: parseInt(item_id),
+                accountId: parseInt(user_id)
             };
             stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
             messageInput.value = '';

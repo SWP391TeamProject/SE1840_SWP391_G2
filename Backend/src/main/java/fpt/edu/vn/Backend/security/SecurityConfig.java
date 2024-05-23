@@ -46,18 +46,19 @@ public class SecurityConfig {
                 .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().permitAll()
-
+                        .requestMatchers("/auth/**", "/websocket/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults());
+
+          
+
         http.addFilterBefore(
                 jwtAuthenticationFilter(),
                 UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {

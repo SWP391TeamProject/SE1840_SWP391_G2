@@ -10,11 +10,11 @@ import java.util.List;
 
 public interface AccountService {
     List<AccountAdminDTO> getAllAccounts(Pageable pageable);
-    Account createAccount(Account account);
+    AccountDTO createAccount(AccountDTO account);
     AccountDTO getAccountById(int id);
-    Account updateAccount(Account account);
+    AccountDTO updateAccount(AccountDTO account);
     void deleteAccount(int id);
-    Account getAccountByEmail(String username);
-    Account getAccountByEmailAndPassword(String email, String password);
-
+    AccountDTO getAccountByEmail(String username);
+    AccountDTO getAccountByEmailAndPassword(String email, String password);
+    Account parseAccountDTOToEntity(AccountDTO accountDTO) ;
 }

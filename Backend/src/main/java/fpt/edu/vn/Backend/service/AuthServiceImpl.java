@@ -2,10 +2,13 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
+import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.RoleRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,34 +17,54 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
-
+@Slf4j
 public class AuthServiceImpl implements AuthService{
 
 
     private final AccountRepos accountRepos;
     private final JWTGenerator jwtGenerator;
     private final AuthenticationManager authenticationManager;
+    private final RoleRepos roleRepos;
+
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, RoleRepos roleRepos) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
+        this.roleRepos = roleRepos;
     }
 
 
 
     @Override
-    public AuthResponseDTO register(String email, String password) {
+    public AuthResponseDTO register(RegisterDTO registerDTO) {
         Account newAccount ;
         try {
-            accountRepos.findByEmail(email).ifPresent(account -> {
+            if(registerDTO.getEmail().isEmpty() || registerDTO.getPassword().isEmpty()){
+                throw new IllegalStateException("Email or password is empty!");
+            }
+
+            if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
+                throw new IllegalStateException("Password and confirm password do not match!");
+            }
+
+            if (registerDTO.getPassword().length() < 6) {
+                throw new IllegalStateException("Password is too short!");
+            }
+
+            accountRepos.findByEmail(registerDTO.getEmail()).ifPresent(account -> {
                 throw new IllegalStateException("Email already exists! try login instead.");
             });
+            Set<Role> roles = new HashSet<>();
+            roleRepos.findById(1).ifPresent(roles::add);
             newAccount = new Account();
-            newAccount.setEmail(email);
-            newAccount.setPassword(password); // Consider hashing the password before saving
+            newAccount.setEmail(registerDTO.getEmail());
+            newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
+            newAccount.setAuthorities(roles);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -50,8 +73,8 @@ public class AuthServiceImpl implements AuthService{
         // After successful registration, log the user in and generate a token
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        email,
-                        password
+                        registerDTO.getEmail(),
+                        registerDTO.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -59,12 +82,17 @@ public class AuthServiceImpl implements AuthService{
 
         return AuthResponseDTO.builder()
                 .accessToken(token)
-                .username(newAccount.getEmail())
+                .email(newAccount.getEmail())
+                .role(String.valueOf(newAccount.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
                 .build();
     }
 
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
+        if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
+            throw new IllegalStateException("Email or password is empty!");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDTO.getEmail(),
@@ -73,7 +101,9 @@ public class AuthServiceImpl implements AuthService{
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-        Account user = accountRepos.findByEmail(loginDTO.getEmail()).get();
+
+        Account user = accountRepos.findByEmailAndPassword(loginDTO.getEmail(),loginDTO.getPassword());
+
         return AuthResponseDTO
                 .builder()
                 .accessToken(token)
@@ -81,6 +111,7 @@ public class AuthServiceImpl implements AuthService{
                 .email(user.getEmail())
                 .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
                 .build();
+
     }
 
     @Override

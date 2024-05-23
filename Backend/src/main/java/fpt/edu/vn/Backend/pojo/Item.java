@@ -1,16 +1,16 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -22,7 +22,7 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
-    private int itemId;
+    private Integer itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_category_id") // This matches the column in the database
@@ -41,12 +41,13 @@ public class Item {
     @Column(name = "buy_in_price")
     private BigDecimal buyInPrice;
 
-    enum itemStatus{
+    public enum Status {
         VALUATING, QUEUE, IN_AUCTION, SOLD, UNSOLD
     }
 
     @Column(length = 30)
-    private itemStatus status; // VALUATING, QUEUE, IN_AUCTION, etc.
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -59,10 +60,6 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Account owner;
-
-    @OneToMany
-    @JoinColumn(name = "item_id")
-    private Set<AuctionItem> auctionItems;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

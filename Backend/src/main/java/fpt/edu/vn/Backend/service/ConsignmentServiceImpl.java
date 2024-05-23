@@ -45,6 +45,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     @Override
     public ConsignmentDTO requestConsignmentCreate(int userId, int auctionItemId, ConsignmentDetailDTO consignmentDetails) {
 
+        Consignment consignment = new Consignment();
+        consignment.setConsignmentId(userId);
+
 
         return null;
     }
@@ -232,7 +235,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
         List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
-                .map(consignment -> new ConsignmentDTO(consignment))
+                .map(consignment -> new ConsignmentDTO(
+                        consignment.getConsignmentId(),
+                        consignment.getStatus().toString(),
+                        String.valueOf(consignment.getPreferContact()),
+                        consignment.getCreateDate(),
+                        consignment.getUpdateDate()
+                ))
                 .collect(Collectors.toList());
         return consignmentDTOs;
     }
@@ -246,7 +255,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             Page<Consignment> consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
 
             return consignmentPage.getContent().stream()
-                    .map(ConsignmentDTO::new)
+                    .map(consignment -> new ConsignmentDTO(
+                            consignment.getConsignmentId(),
+                            consignment.getStatus().toString(),
+                            String.valueOf(consignment.getPreferContact()),
+                            consignment.getCreateDate(),
+                            consignment.getUpdateDate()
+                    ))
                     .collect(Collectors.toList());
         } catch (IllegalArgumentException e) {
             throw new ConsignmentServiceException("Invalid status value: " + status, e);
@@ -258,7 +273,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
         List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
-                .map(consignment -> new ConsignmentDTO(consignment))
+                .map(consignment -> new ConsignmentDTO(
+                        consignment.getConsignmentId(),
+                        consignment.getStatus().toString(),
+                        String.valueOf(consignment.getPreferContact()),
+                        consignment.getCreateDate(),
+                        consignment.getUpdateDate()
+                ))
                 .collect(Collectors.toList());
 
         return consignmentDTOs;

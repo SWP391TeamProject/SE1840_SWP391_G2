@@ -16,16 +16,14 @@ import HomeLayout from "./layout/HomeLayout/HomeLayout.tsx";
 import Administration from "./layout/Administration/Administration.tsx";
 import AccountsList from "./pages/Administration/AccountsList.tsx";
 import DashBoard from "./pages/dashboard/DashBoard.tsx";
-import Home from "./pages/Home/Home.tsx";
 import LoginLayout from "./layout/LoginLayout/LoginLayout.tsx";
-import LoginForm from "./pages/authentication/LoginForm.tsx";
-import RegisterForm from "./pages/authentication/RegisterForm.tsx";
 import RegisterLayout from "./layout/RegisterLayout/RegisterLayout.tsx";
 import { LandingPageLayout } from "./layout/HomeLayout/landing-page-layout.tsx";
 import PrivateRoute from "./pages/authentication/PrivateRoute.tsx";
 import Unauthorized from "./pages/authentication/Unauthorized.tsx";
 import { AuthProvider } from "./AuthProvider.tsx";
 import { Roles } from "./constants/enums.tsx";
+import ConsignmentLayout from "./layout/ConsignmentLayout/ConsignmentLayout.tsx";
 
 const router = createBrowserRouter(routes);
 
@@ -37,6 +35,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Routes>
             {/* <Route path="/" element={<HomeLayout />}> */}
             <Route path="/" element={<LandingPageLayout />}></Route>
+            
             {/* </Route> */}
             <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]} />}>
               <Route path="/admin" element={<Administration />}>
@@ -49,10 +48,22 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/auth/register" element={<RegisterLayout />}></Route>
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
+            {/* <RouterProvider router={router} /> */}
+
+            <Route path="/admin" element={<Administration />}>
+              <Route path="/admin" element={<DashBoard />}></Route>
+              <Route path="accounts" element={<AccountsList />}></Route>
+            </Route>
+            <Route path="/consignment" element={<ConsignmentLayout />}></Route>
+
+            <Route path="/auth">
+              <Route path="/auth/login" element={<LoginLayout />}></Route>
+              <Route path="/auth/register" element={<RegisterLayout />}></Route>
+            </Route>
           </Routes>
         </BrowserRouter>
-        {/* <RouterProvider router={router} /> */}
       </AuthProvider>
+      {/* <RouterProvider router={router} /> */}
     </TooltipProvider>
   </Provider>
 );
