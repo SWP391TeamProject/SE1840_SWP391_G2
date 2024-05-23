@@ -4,6 +4,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import org.apache.tika.mime.MimeType;
@@ -36,7 +37,25 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public @NotNull Attachment uploadAttachment(@NotNull MultipartFile file, @Nullable Integer attachmentId) throws IOException {
+    public @NotNull AttachmentDTO mapEntityToDTO(@NotNull Attachment attachment, @NotNull AttachmentDTO attachmentDTO) {
+        attachmentDTO.setAttachmentId(attachment.getAttachmentId());
+        attachmentDTO.setUrl(attachment.getLink());
+        attachmentDTO.setCreateDate(attachment.getCreateDate());
+        attachmentDTO.setUpdateDate(attachment.getUpdateDate());
+        return attachmentDTO;
+    }
+
+    @Override
+    public @NotNull Attachment mapDTOToEntity(@NotNull AttachmentDTO attachmentDTO, @NotNull Attachment attachment) {
+        attachment.setAttachmentId(attachmentDTO.getAttachmentId());
+        attachment.setUpdateDate(attachmentDTO.getUpdateDate());
+        attachment.setLink(attachmentDTO.getUrl());
+        attachment.setCreateDate(attachmentDTO.getCreateDate());
+        return attachment;
+    }
+
+    @Override
+    public @NotNull AttachmentDTO uploadAttachment(@NotNull MultipartFile file, @Nullable Integer attachmentId) throws IOException {
         MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
         MimeType mimeType;
         try {
@@ -51,19 +70,19 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         Attachment attachment = null;
         if (attachmentId != null)
-            attachment = getAttachmentById(attachmentId);
+            attachment = attachmentRepository.findById(attachmentId).orElse(null);
         if (attachment == null)
             attachment = new Attachment();
 
         attachment.setBlobId(blobId);
         attachment.setLink(blobClient.getBlobUrl());
         attachmentRepository.save(attachment);
-        return attachment;
+        return mapEntityToDTO(attachment);
     }
 
     @Override
-    public @Nullable Attachment getAttachmentById(int id) {
-        return attachmentRepository.findById(id).orElse(null);
+    public @Nullable AttachmentDTO getAttachmentById(int id) {
+        return attachmentRepository.findById(id).map(this::mapEntityToDTO).orElse(null);
     }
 
     @Override
