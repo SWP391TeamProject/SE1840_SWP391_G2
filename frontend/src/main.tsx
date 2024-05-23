@@ -35,9 +35,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Routes>
             {/* <Route path="/" element={<HomeLayout />}> */}
             <Route path="/" element={<LandingPageLayout />}></Route>
-            
+
             {/* </Route> */}
-            <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]} />}>
+            <Route
+              element={
+                <PrivateRoute
+                  allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
+                />
+              }
+            >
               <Route path="/admin" element={<Administration />}>
                 <Route path="/admin" element={<DashBoard />}></Route>
                 <Route path="accounts" element={<AccountsList />}></Route>
@@ -49,17 +55,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
             {/* <RouterProvider router={router} /> */}
-
-            <Route path="/admin" element={<Administration />}>
-              <Route path="/admin" element={<DashBoard />}></Route>
-              <Route path="accounts" element={<AccountsList />}></Route>
-            </Route>
             <Route path="/consignment" element={<ConsignmentLayout />}></Route>
-
-            <Route path="/auth">
-              <Route path="/auth/login" element={<LoginLayout />}></Route>
-              <Route path="/auth/register" element={<RegisterLayout />}></Route>
-            </Route>
           </Routes>
         </BrowserRouter>
       </AuthProvider>

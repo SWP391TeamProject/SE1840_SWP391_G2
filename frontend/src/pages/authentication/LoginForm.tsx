@@ -20,14 +20,14 @@ function LoginForm() {
   const from = location.state?.from?.pathname || "/";
   const loginForm = useRef<HTMLDivElement>(null);
   // const {authenticated, role} = useContext(AuthContext);
-  const {user, setUser} = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     fetch("http://localhost:8080/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
+        // Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(data),
     })
@@ -35,7 +35,7 @@ function LoginForm() {
       .then((data) => {
         console.log(data);
         localStorage.setItem("token", data.accessToken);
-        setUser(data)
+        setUser(data);
         navigate(from, { replace: true });
       });
   };
