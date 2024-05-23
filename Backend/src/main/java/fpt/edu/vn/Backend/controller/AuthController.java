@@ -6,15 +6,19 @@ import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
+
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
 
     private final AuthService authService;
@@ -32,7 +36,8 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) {
-        return ResponseEntity.ok(authService.login(loginDTO));
+        AuthResponseDTO authResponseDTO = authService.login(loginDTO);
+        return ResponseEntity.ok(authResponseDTO);
     }
 
     @PostMapping("/logout")

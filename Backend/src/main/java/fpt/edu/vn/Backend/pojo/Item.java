@@ -41,10 +41,10 @@ public class Item {
     @Column(name = "buy_in_price")
     private BigDecimal buyInPrice;
 
-    public enum itemStatus{
+    enum itemStatus{
         VALUATING, QUEUE, IN_AUCTION, SOLD, UNSOLD
     }
-    @Enumerated(EnumType.STRING)
+
     @Column(length = 30)
     private itemStatus status; // VALUATING, QUEUE, IN_AUCTION, etc.
 

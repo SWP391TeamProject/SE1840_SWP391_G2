@@ -2,14 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.exception.ItemServiceException;
-
 import fpt.edu.vn.Backend.pojo.Item;
-import fpt.edu.vn.Backend.pojo.ItemCategory;
-import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
-import fpt.edu.vn.Backend.repository.ItemRepos;
-import org.springframework.beans.factory.annotation.Autowired;
-pojo.Item;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
@@ -17,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements IItemService {
@@ -31,39 +23,9 @@ public class ItemServiceImpl implements IItemService {
     @Autowired
     private ItemCategoryRepos itemCategoryRepos;
 
-
-    @Autowired
-    public ItemServiceImpl (ItemRepos itemRepos){
-        this.itemRepos = itemRepos;
-    }
-
-
     @Override
-    public ItemDTO createItem(ItemDTO itemDTO) {
-        try {
-            // Create an Item entity from the DTO
-            Item item = new Item();
-            item.setName(itemDTO.getName());
-            item.setDescription(itemDTO.getDescription());
-            item.setReservePrice(itemDTO.getReservePrice());
-            item.setBuyInPrice(itemDTO.getBuyInPrice());
-            item.setStatus(Item.itemStatus.valueOf(itemDTO.getStatus()));
-            item.setCreateDate(itemDTO.getCreateDate());
-            item.setUpdateDate(itemDTO.getUpdateDate());
-
-            // Set the ItemCategory
-            ItemCategory category = itemCategoryRepos.findById(itemDTO.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            item.setItemCategory(category);
-
-            // Save the item to the database
-            Item savedItem = itemRepos.save(item);
-
-            // Create and return the updated ItemDTO
-            return new ItemDTO(savedItem);
-        } catch (Exception e){
-            throw new ItemServiceException("Error creating item ",e);
-        }
+    public ItemDTO createItem(ItemDTO item) {
+        return null;
     }
 
     @Override
@@ -83,14 +45,7 @@ public class ItemServiceImpl implements IItemService {
 
     @Override
     public List<ItemDTO> getAllItems() {
-        try {
-            List<Item> items = itemRepos.findAll();
-            return items.stream()
-                    .map(ItemDTO::new)
-                    .collect(Collectors.toList());
-        }catch(Exception e){
-            throw new ItemServiceException("Failed to retrieve items", e);
-        }
+        return List.of();
     }
 
     @Override
@@ -110,8 +65,6 @@ public class ItemServiceImpl implements IItemService {
 
     @Override
     public List<ItemDTO> getItemsByCategoryId(int categoryId) {
-        return null;
-
         try {
 
             return itemRepos.findItemByItemCategory(itemCategoryRepos.findById(categoryId).orElseThrow()).stream().map(ItemDTO::new).toList();
