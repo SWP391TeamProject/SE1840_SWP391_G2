@@ -15,29 +15,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod"; // Import the zodResolver function
-import { z } from "zod";
+import { date, z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
 
 gsap.registerPlugin(useGSAP);
 
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Invalid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-  rememberMe: z.boolean(),
-  confirmPassword: z.string().refine((data) => data === formSchema.password, {
-    message: "Passwords do not match.",
-  }),
-});
+const formSchema = z
+  .object({
+    email: z.string().email({
+      message: "Invalid email address.",
+    }),
+    password: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    // rememberMe: z.boolean(),
+    confirmPassword: z.string(),
+  })
+  .refine(
+    (data) => {
+      return data.password === data.confirmPassword;
+    },
+    {
+      message: "Passwords do not match.",
+      path: ["confirmPassword"],
+    }
+  );
 function RegisterForm() {
   const RegisterForm = useRef<HTMLDivElement>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema), // Use the zodResolver function
     defaultValues: {
-      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
   // 2. Define a submit handler.
@@ -85,8 +95,9 @@ function RegisterForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="******" {...field} />
+                    <Input type="text" placeholder="******" {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -97,25 +108,13 @@ function RegisterForm() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="******" {...field} />
+                    <Input type="text" placeholder="******" {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="items-top flex space-x-2">
-              <Checkbox id="terms1" />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="terms1"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Accept terms and conditions
-                </label>
-                <p className="text-sm text-muted-foreground">
-                  You agree to our Terms of Service and Privacy Policy.
-                </p>
-              </div>
-            </div>
+
             <div className="flex w-full justify-center">
               <Button type="submit" className="w-4/6 rounded rounded-2xl">
                 Register
