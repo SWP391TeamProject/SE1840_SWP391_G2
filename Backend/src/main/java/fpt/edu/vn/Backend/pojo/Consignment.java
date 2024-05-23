@@ -24,7 +24,6 @@ public class Consignment {
     @Column(name = "consignment_id")
     private int consignmentId;
 
-    @Enumerated(EnumType.STRING)
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
@@ -34,7 +33,7 @@ public class Consignment {
     }
 
     public enum preferContact {
-        EMAIL, PHONE
+        EMAIL, PHONE , TEXT_MESSAGE , ANY
     }
     @Column(name = "prefer_contact")
     @Enumerated(EnumType.STRING)

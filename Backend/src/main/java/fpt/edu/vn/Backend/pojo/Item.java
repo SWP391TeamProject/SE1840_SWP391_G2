@@ -28,6 +28,7 @@ public class Item {
     @JoinColumn(name = "item_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
 
+
     @Column(length = 300)
     private String name;
 

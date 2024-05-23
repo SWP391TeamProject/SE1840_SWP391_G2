@@ -8,6 +8,7 @@ import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.RoleRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepos accountRepos;
 
+    @Autowired
+    private RoleRepos roleRepos;
     public AccountServiceImpl(AccountRepos accountRepos) {
         this.accountRepos = accountRepos;
     }
@@ -46,8 +49,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account createAccount(Account account) {
-        return accountRepos.save(account);
+    public AccountDTO createAccount(AccountDTO accountDTO) {
+        Account account = new Account();
+        account.setNickname(accountDTO.getNickname());
+        account.setEmail(accountDTO.getEmail());
+        account.setPhone(accountDTO.getPhone());
+        account.setBalance(accountDTO.getBalance());
+        account.setCreateDate(accountDTO.getCreateDate());
+        account.setUpdateDate(accountDTO.getUpdateDate());
+        account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
+            Role role = new Role();
+            role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
+            return role;
+        }).collect(Collectors.toSet()));
+        return new AccountDTO(accountRepos.save(account));
+
     }
 
 
@@ -60,8 +76,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account updateAccount(Account account) {
-        return null;
+    public AccountDTO updateAccount(AccountDTO accountDTO) {
+        Account account = accountRepos.findById(accountDTO.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountDTO.getUserId()));
+        account.setNickname(accountDTO.getNickname());
+        account.setEmail(accountDTO.getEmail());
+        account.setPhone(accountDTO.getPhone());
+        account.setBalance(accountDTO.getBalance());
+        account.setCreateDate(accountDTO.getCreateDate());
+        account.setUpdateDate(accountDTO.getUpdateDate());
+        account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
+            Role role;
+            role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
+            return role;
+        }).collect(Collectors.toSet()));
+        return new AccountDTO(accountRepos.save(account));
+
     }
 
     @Override
@@ -70,12 +99,34 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account getAccountByEmail(String email) {
-        return accountRepos.findAll().stream().filter(account -> account.getEmail().equals(email)).findFirst().orElse(null);
+    public AccountDTO getAccountByEmail(String email) {
+        return new AccountDTO(accountRepos.findAll().stream().filter(
+                account -> account.getEmail().equals(email)).findFirst().orElseThrow(
+                        () -> new ResourceNotFoundException("Account", "email", email)));
     }
 
     @Override
-    public Account getAccountByEmailAndPassword(String email, String password) {
-        return accountRepos.findAll().stream().filter(account -> account.getEmail().equals(email) && account.getPassword().equals(password)).findFirst().orElse(null);
+    public AccountDTO getAccountByEmailAndPassword(String email, String password) {
+        return new AccountDTO(accountRepos.findAll().stream().filter(
+                account -> account.getEmail().equals(email) && account.getPassword().equals(password)).findFirst().orElseThrow(
+                        () -> new ResourceNotFoundException("Account", "email", email))) ;
+    }
+
+    @Override
+    public Account parseAccountDTOToEntity(AccountDTO accountDTO) {
+        Account account = new Account();
+        account.setAccountId(accountDTO.getUserId());
+        account.setNickname(accountDTO.getNickname());
+        account.setEmail(accountDTO.getEmail());
+        account.setPhone(accountDTO.getPhone());
+        account.setBalance(accountDTO.getBalance());
+        account.setCreateDate(accountDTO.getCreateDate());
+        account.setUpdateDate(accountDTO.getUpdateDate());
+        account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
+            Role role;
+            role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
+            return role;
+        }).collect(Collectors.toSet()));
+        return account;
     }
 }
