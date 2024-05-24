@@ -20,18 +20,16 @@ public interface AttachmentService {
         return mapDTOToEntity(attachmentDTO, new Attachment());
     }
 
-    @NotNull default AttachmentDTO uploadAttachment(@NotNull MultipartFile file) throws IOException {
-        return uploadAttachment(file, null);
-    }
 
-    @NotNull AttachmentDTO uploadAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
+
+    @NotNull AttachmentDTO uploadAttachment(@NotNull MultipartFile file) throws IOException;
 
     @Nullable AttachmentDTO getAttachmentById(int id);
 
     boolean deleteAttachment(int attachmentId);
 
-    @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
-    @NotNull AttachmentDTO uploadConsignmentAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
-    @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
+    @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, int accountId) throws IOException;
+    @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, Integer consignmentDetailId) throws IOException;
+    @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException;
 
 }

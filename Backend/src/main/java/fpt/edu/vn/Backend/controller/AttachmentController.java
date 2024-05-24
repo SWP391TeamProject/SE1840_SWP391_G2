@@ -28,7 +28,7 @@ public class AttachmentController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadAttachment(@RequestParam("file") MultipartFile file,@RequestParam int id) {
         try {
-            AttachmentDTO attachmentDTO = attachmentService.uploadAttachment(file,id);
+            AttachmentDTO attachmentDTO = attachmentService.uploadAttachment(file);
             return ResponseEntity.ok(attachmentDTO);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + e.getMessage());

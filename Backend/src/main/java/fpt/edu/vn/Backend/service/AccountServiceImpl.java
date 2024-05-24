@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 @Service
 public class AccountServiceImpl implements AccountService {
     private static final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
-    @Autowired
-    private AccountRepos accountRepos;
+    private final AccountRepos accountRepos;
 
+    private final RoleRepos roleRepos;
     @Autowired
-    private RoleRepos roleRepos;
-    public AccountServiceImpl(AccountRepos accountRepos) {
+    public AccountServiceImpl(AccountRepos accountRepos,RoleRepos roleRepos) {
         this.accountRepos = accountRepos;
+        this.roleRepos = roleRepos;
     }
 
     @Override
