@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@ToString
 public class AccountDTO {
     private int accountId;
     private String nickname;
@@ -29,7 +31,7 @@ public class AccountDTO {
         this.nickname = account.getNickname();
         this.email = account.getEmail();
         this.phone = account.getPhone();
-        this.status = 1;
+        this.status = account.getStatus();
         this.balance = account.getBalance();
         this.createDate = account.getCreateDate();
         this.updateDate = account.getUpdateDate();
