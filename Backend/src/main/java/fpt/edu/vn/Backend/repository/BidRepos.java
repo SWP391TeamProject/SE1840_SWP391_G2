@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AuctionBidRepos extends JpaRepository<Bid, Integer> {
+public interface BidRepos extends JpaRepository<Bid, Integer> {
     @Query("SELECT a FROM Bid a WHERE a.auctionItem.auctionItemId = ?1 ORDER BY a.price DESC")
     List<Bid> findAllBidByAuctionItemId(int auctionItemId);
 }

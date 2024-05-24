@@ -8,6 +8,8 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.RoleRepos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService {
+    private static final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
     @Autowired
     private AccountRepos accountRepos;
 
@@ -86,6 +89,7 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(accountDTO.getBalance());
         account.setCreateDate(accountDTO.getCreateDate());
         account.setUpdateDate(accountDTO.getUpdateDate());
+        account.setStatus((byte)accountDTO.getStatus());
         account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
             Role role;
             role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
@@ -98,6 +102,10 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
+    public void deleteAccount(int id) {
+        accountRepos.findById(id).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", "" + id));
+        accountRepos.deleteById(id);
+    }
     public void deactiveAccount(int id) {
 
     }
