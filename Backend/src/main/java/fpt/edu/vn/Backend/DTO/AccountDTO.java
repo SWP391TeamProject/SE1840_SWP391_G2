@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class AccountDTO {
-    private int userId;
+    private int accountId;
     private String nickname;
     private List<Integer> role;
     private String email;
@@ -25,7 +25,7 @@ public class AccountDTO {
     // getters and setters
 
     public AccountDTO(Account account) {
-        this.userId = account.getAccountId();
+        this.accountId = account.getAccountId();
         this.nickname = account.getNickname();
         this.email = account.getEmail();
         this.phone = account.getPhone();

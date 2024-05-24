@@ -2,11 +2,13 @@ package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Bid;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class BidDTO {
     private int bidId;
     private BigDecimal price;
@@ -22,11 +24,6 @@ public class BidDTO {
         this.accountId = bid.getAccount().getAccountId();
     }
 
-    public BidDTO(int auctionItemId, BigDecimal i, int accountId) {
-        this.auctionItemId = auctionItemId;
-        this.price = i;
-        this.accountId = accountId;
-    }
     public BidDTO(int auctionItemId, BigDecimal i) {
         this.auctionItemId = auctionItemId;
         this.price = i;
