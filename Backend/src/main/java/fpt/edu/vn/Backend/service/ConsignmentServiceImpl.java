@@ -3,8 +3,8 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-import fpt.edu.vn.Backend.controller.AccountController;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.exception.RestExceptionHandler;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
@@ -19,12 +19,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -269,10 +269,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
-
-        return getConsignmentDTOS(pageable, consignmentPage);
+        return null;
     }
 
     @NotNull
@@ -327,11 +324,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    public void deleteConsignment(int id) {
-        try {
+    public ResponseEntity<ConsignmentDTO> deleteConsignment(int id) {
+            if (consignmentRepos.findByConsignmentId(id) == null) {
+                throw new ConsignmentServiceException("Consignment not found");
+            }
             consignmentRepos.deleteById(id);
-        } catch (Exception e) {
-            throw new ConsignmentServiceException("Error deleting consignment", e);
-        }
+
+        return null;
     }
 }

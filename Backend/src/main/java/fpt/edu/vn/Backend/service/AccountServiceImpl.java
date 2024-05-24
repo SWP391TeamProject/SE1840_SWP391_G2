@@ -95,10 +95,19 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+
+
     @Override
-    public void deleteAccount(int id) {
-        accountRepos.deleteById(id);
+    public void deactiveAccount(int id) {
+
     }
+
+    @Override
+    public void activeAccount(int id) {
+
+    }
+
+
 
     @Override
     public AccountDTO getAccountByEmail(String email) {

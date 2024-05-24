@@ -15,8 +15,11 @@ public interface AccountService {
     AccountDTO createAccount( AccountDTO account);
     AccountDTO getAccountById(int id);
     AccountDTO updateAccount(AccountDTO account);
-    void deleteAccount(int id);
     AccountDTO getAccountByEmail(String username);
     AccountDTO getAccountByEmailAndPassword(String email, String password);
     Account parseAccountDTOToEntity(AccountDTO accountDTO) ;
+
+    void deactiveAccount(int id);
+
+    void activeAccount(int id);
 }

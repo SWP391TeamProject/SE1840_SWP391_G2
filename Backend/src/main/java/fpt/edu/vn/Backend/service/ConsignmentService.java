@@ -3,12 +3,11 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
-import fpt.edu.vn.Backend.repository.ConsignmentRepos;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 
 public interface ConsignmentService {
     // Create
@@ -37,5 +36,5 @@ public interface ConsignmentService {
     Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 
     // Delete (or Soft Delete)
-    void deleteConsignment(int id);
+    ResponseEntity<ConsignmentDTO> deleteConsignment(int id);
 }

@@ -119,4 +119,12 @@ public class ConsignmentController {
         }
     }
 
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ConsignmentDTO> deleteConsignment(@PathVariable int id) {
+        return consignmentService.deleteConsignment(id);
+    }
+
+
+
 }
