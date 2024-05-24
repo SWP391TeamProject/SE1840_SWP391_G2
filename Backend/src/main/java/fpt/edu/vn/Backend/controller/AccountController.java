@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,7 +29,7 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<AccountAdminDTO>> getAllAccounts(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "accountId") String sortBy) {
+    public ResponseEntity<Page<AccountAdminDTO>> getAllAccounts(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "accountId") String sortBy) {
         Pageable pageable = PageRequest.of(pageNumb, pageSize, Sort.by(sortBy).ascending());
         return new ResponseEntity<>(accountService.getAllAccounts(pageable), HttpStatus.OK);
     }

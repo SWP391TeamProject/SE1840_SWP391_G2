@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,10 +31,10 @@ public interface ConsignmentService {
 
     // Reads
     ConsignmentDTO getConsignmentById(int id);
-    List<ConsignmentDTO> getAllConsignments(int page, int size);
-    List<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size);
-    List<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
-    List<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
+    Page<ConsignmentDTO> getAllConsignments(int page, int size);
+    Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size);
+    Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
+    Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 
     // Delete (or Soft Delete)
     void deleteConsignment(int id);

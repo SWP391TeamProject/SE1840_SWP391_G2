@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -29,11 +30,15 @@ public class AttachmentServiceImpl implements AttachmentService {
         this.attachmentRepository = attachmentRepository;
 
         String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
-        BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
-                .connectionString(connectStr)
-                .buildClient();
-        blobContainerClient = blobServiceClient.getBlobContainerClient("attachments");
-        blobContainerClient.createIfNotExists();
+        if (connectStr != null && !connectStr.isEmpty()) {
+            BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
+                    .connectionString(connectStr)
+                    .buildClient();
+            blobContainerClient = blobServiceClient.getBlobContainerClient("attachments");
+            blobContainerClient.createIfNotExists();
+        } else {
+            blobContainerClient = null;
+        }
     }
 
     @Override
@@ -66,7 +71,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         String blobId = UUID.randomUUID() + mimeType.getExtension();
 
         BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
-        blobClient.upload(file.getInputStream(), file.getSize(), true);
+
+        // Convert InputStream to ByteArrayInputStream
+        byte[] bytes = file.getBytes();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
 
         Attachment attachment = null;
         if (attachmentId != null)
@@ -93,5 +103,20 @@ public class AttachmentServiceImpl implements AttachmentService {
             return blobClient.deleteIfExists();
         }
         return false;
+    }
+
+    @Override
+    public @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException {
+        return null;
+    }
+
+    @Override
+    public @NotNull AttachmentDTO uploadConsignmentAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException {
+        return null;
+    }
+
+    @Override
+    public @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException {
+        return null;
     }
 }

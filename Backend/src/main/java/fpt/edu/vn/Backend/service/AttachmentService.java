@@ -29,4 +29,9 @@ public interface AttachmentService {
     @Nullable AttachmentDTO getAttachmentById(int id);
 
     boolean deleteAttachment(int attachmentId);
+
+    @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
+    @NotNull AttachmentDTO uploadConsignmentAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
+    @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer attachmentId) throws IOException;
+
 }

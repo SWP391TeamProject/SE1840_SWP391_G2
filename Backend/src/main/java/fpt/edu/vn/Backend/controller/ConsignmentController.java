@@ -7,6 +7,7 @@ import fpt.edu.vn.Backend.service.ConsignmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,9 +28,9 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<ConsignmentDTO>> getAllConsignment(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
-            List<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageNumb, pageSize);
+            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageNumb, pageSize);
             if(consignments == null || consignments.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -43,9 +44,9 @@ public class ConsignmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<ConsignmentDTO>> getConsignmentByID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
-            List<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
+            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
             if (consignments == null || consignments.isEmpty()) {
                 throw new ConsignmentServiceException("No consignments found for user ID: " + id);
             }
@@ -60,9 +61,9 @@ public class ConsignmentController {
     }
 
     @GetMapping("/filter-by-status")
-    public ResponseEntity<List<ConsignmentDTO>> getConsignmentByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
-            List<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageNumb, pageSize);
+            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageNumb, pageSize);
             if (consignments == null || consignments.isEmpty()) {
                 throw new ConsignmentServiceException("No consignments found with status: " + status);
             }

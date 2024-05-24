@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -231,7 +232,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    public List<ConsignmentDTO> getAllConsignments(int page, int size) {
+    public Page<ConsignmentDTO> getAllConsignments(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
         List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
@@ -243,18 +244,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                         consignment.getUpdateDate()
                 ))
                 .collect(Collectors.toList());
-        return consignmentDTOs;
+        return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
     }
 
     @Override
-    public List<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size) {
+    public Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         try {
             Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
             Page<Consignment> consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
 
-            return consignmentPage.getContent().stream()
+            List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
                     .map(consignment -> new ConsignmentDTO(
                             consignment.getConsignmentId(),
                             consignment.getStatus().toString(),
@@ -263,13 +264,15 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                             consignment.getUpdateDate()
                     ))
                     .collect(Collectors.toList());
+
+            return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
         } catch (IllegalArgumentException e) {
             throw new ConsignmentServiceException("Invalid status value: " + status, e);
         }
     }
 
     @Override
-    public List<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
+    public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
         List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
@@ -282,11 +285,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 ))
                 .collect(Collectors.toList());
 
-        return consignmentDTOs;
+        return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
     }
 
     @Override
-    public List<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId) {
+    public Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId) {
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow();
         List<ConsignmentDetailDTO> consignmentDetailDTOs = new ArrayList<>();
         for (ConsignmentDetail detail : consignment.getConsignmentDetails()) {
@@ -300,7 +303,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     .attachmentIds(List.of(detail.getAttachments().stream().map(Attachment::getAttachmentId).toArray(Integer[]::new)))
                     .build());
         }
-        return consignmentDetailDTOs;
+        return new PageImpl<>(consignmentDetailDTOs);
     }
 
     @Override

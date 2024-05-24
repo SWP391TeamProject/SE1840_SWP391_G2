@@ -9,6 +9,8 @@ import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.RoleRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountAdminDTO> getAllAccounts(Pageable pageable) {
-        List<Account> accounts = accountRepos.findAll(pageable).getContent();
-        return accounts.stream()
+    public Page<AccountAdminDTO> getAllAccounts(Pageable pageable) {
+        Page<Account> accounts = accountRepos.findAll(pageable);
+        List<AccountAdminDTO> dtos = accounts.stream()
                 .map(account -> {
                     AccountAdminDTO dto = new AccountAdminDTO();
                     dto.setUserId(account.getAccountId());
@@ -45,6 +47,7 @@ public class AccountServiceImpl implements AccountService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, accounts.getTotalElements());
     }
 
     @Override
