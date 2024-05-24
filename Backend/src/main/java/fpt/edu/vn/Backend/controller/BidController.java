@@ -1,8 +1,8 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
-import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionBidService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
@@ -37,12 +37,16 @@ public class BidController {
     public ResponseEntity<BidDTO> sendMessage(@Payload BidDTO bidDTO, @DestinationVariable int auctionItemId,
                                               SimpMessageHeaderAccessor headerAccessor) {
         try {
+            bidDTO.setAuctionItemId(auctionItemId);
             BigDecimal currentBid = bidService.getHighestAuctionBid(auctionItemId) != null ? bidService.getHighestAuctionBid(auctionItemId).getPrice() : new BigDecimal(0);
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
             log.info(account.getEmail() + " bid " + bidDTO.getPrice() + " on " + bidDTO.getAuctionItemId());
 
             if (bidDTO.getPrice().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
-                bidService.createAuctionBid(bidDTO);
+                bidDTO = bidService.createAuctionBid(bidDTO);
+                AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
+                a.setCurrentPrice(bidDTO.getPrice());
+                auctionItemService.updateAuctionItem(a);
                 return ResponseEntity.ok(bidDTO);
             } else {
                 throw new Exception("Bid must be higher than current bid by at least 5");

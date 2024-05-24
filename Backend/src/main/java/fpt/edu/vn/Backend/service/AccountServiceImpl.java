@@ -3,7 +3,6 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.RoleDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
@@ -77,7 +76,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO updateAccount(AccountDTO accountDTO) {
-        Account account = accountRepos.findById(accountDTO.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountDTO.getUserId()));
+        Account account = accountRepos.findById(accountDTO.getAccountId()).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountDTO.getAccountId()));
         account.setNickname(accountDTO.getNickname());
         account.setEmail(accountDTO.getEmail());
         account.setPhone(accountDTO.getPhone());
@@ -115,7 +114,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account parseAccountDTOToEntity(AccountDTO accountDTO) {
         Account account = new Account();
-        account.setAccountId(accountDTO.getUserId());
+        account.setAccountId(accountDTO.getAccountId());
         account.setNickname(accountDTO.getNickname());
         account.setEmail(accountDTO.getEmail());
         account.setPhone(accountDTO.getPhone());
