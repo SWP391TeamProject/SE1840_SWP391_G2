@@ -13,13 +13,10 @@ public interface ItemService {
         return mapEntityToDTO(item, new ItemDTO());
     }
     @NotNull Item mapDTOToEntity(@NotNull ItemDTO itemDTO, @NotNull Item item);
-    @NotNull default Item mapDTOToEntity(@NotNull ItemDTO itemDTO) {
-        return mapDTOToEntity(itemDTO, new Item());
-    }
 
     @NotNull ItemDTO createItem(@NotNull ItemDTO itemDTO);
     @Nullable ItemDTO getItemById(int id);
-    boolean updateItem(@NotNull ItemDTO itemDTO);
+    ItemDTO updateItem(@NotNull ItemDTO itemDTO);
     boolean deleteItem(int id);
 
     @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable);
