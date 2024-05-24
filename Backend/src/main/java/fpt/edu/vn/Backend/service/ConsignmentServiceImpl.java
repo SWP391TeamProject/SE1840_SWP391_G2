@@ -45,10 +45,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
 
-
-
     @Override
-    public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact,ConsignmentDetailDTO consignmentDetails) {
+    public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails) {
         try {
             Consignment consignment = new Consignment();
             ConsignmentDetail detail = new ConsignmentDetail();
@@ -56,8 +54,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             detail.setPrice(consignmentDetails.getPrice());
             detail.setType(ConsignmentDetail.ConsignmentStatus.REQUEST);
             detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
-            consignmentRepos.save(consignment);
             consignment.setPreferContact(Consignment.preferContact.valueOf(preferContact.toUpperCase()));
+            consignment.setStatus(Consignment.Status.WAITING_STAFF);
+            consignment.setConsignmentDetails(List.of(detail));
+            consignment = consignmentRepos.save(consignment);
+            detail.setConsignment(consignment);
             consignmentDetailRepos.save(detail);
             return getConsignmentDTO(consignment);
         } catch (Exception e) {
@@ -129,6 +130,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Consignment is not SENDING");
             }
         } catch (Exception e) {
+            logger.error("Error confirming jewelry received", e);
             throw new ConsignmentServiceException("Consignment NOT FOUND");
         }
     }
@@ -143,7 +145,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             }
 
             // Check if the consignment is in final evaluation status
-            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId) {
+            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION))) {
                 // Retrieve account by ID
                 AccountDTO dto = accountService.getAccountById(accountId);
                 if (dto == null) {
@@ -228,7 +230,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     @Override
     public void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment) {
         try {
-            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow( () -> new ConsignmentServiceException("Consignment not found"));
+            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             consignment.setPreferContact(Consignment.preferContact.valueOf(updatedConsignment.getPreferContact().toUpperCase()));
             consignment.setCreateDate(updatedConsignment.getCreateDate());
             consignment.setUpdateDate(updatedConsignment.getUpdateDate());
@@ -291,7 +293,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                         detail.getPrice(),
                         detail.getConsignment().getConsignmentId(),
                         detail.getAccount().getAccountId(),
-                        detail.getAttachments().stream().map(Attachment::getAttachmentId).collect(Collectors.toList())
+                        detail.getAttachments() == null ? null : detail.getAttachments().stream().map(Attachment::getAttachmentId).collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
 

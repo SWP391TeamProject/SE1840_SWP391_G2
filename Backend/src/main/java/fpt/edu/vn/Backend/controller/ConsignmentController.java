@@ -80,8 +80,9 @@ public class ConsignmentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ConsignmentDTO> createConsignment(@RequestParam int userId, @RequestParam String preferContact, @RequestBody ConsignmentDetailDTO consignmentDetailDTO) {
+    public ResponseEntity<ConsignmentDTO> createConsignment( @RequestParam String preferContact, @RequestBody ConsignmentDetailDTO consignmentDetailDTO) {
         try {
+            int userId = consignmentDetailDTO.getAccountId(); // Hardcoded user ID for now
             ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId,preferContact,consignmentDetailDTO);
             return new ResponseEntity<>(consignment, HttpStatus.CREATED);
         } catch (ConsignmentServiceException e) {
