@@ -4,7 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.service.AccountService;
-import fpt.edu.vn.Backend.service.AuctionBidService;
+import fpt.edu.vn.Backend.service.BidService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.Objects;
 public class BidController {
     private static final Logger log = LoggerFactory.getLogger(BidController.class);
     @Autowired
-    private AuctionBidService bidService;
+    private BidService bidService;
     @Autowired
     private AccountService accountService;
     @Autowired
@@ -38,12 +38,12 @@ public class BidController {
                                               SimpMessageHeaderAccessor headerAccessor) {
         try {
             bidDTO.setAuctionItemId(auctionItemId);
-            BigDecimal currentBid = bidService.getHighestAuctionBid(auctionItemId) != null ? bidService.getHighestAuctionBid(auctionItemId).getPrice() : new BigDecimal(0);
+            BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPrice();
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
             log.info(account.getEmail() + " bid " + bidDTO.getPrice() + " on " + bidDTO.getAuctionItemId());
 
             if (bidDTO.getPrice().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
-                bidDTO = bidService.createAuctionBid(bidDTO);
+                bidDTO = bidService.createBid(bidDTO);
                 AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
                 a.setCurrentPrice(bidDTO.getPrice());
                 auctionItemService.updateAuctionItem(a);
@@ -66,7 +66,7 @@ public class BidController {
             Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
             // Create a new bid
 //            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestAuctionBid(auctionItemId) == null ? 0 : bidService.getHighestAuctionBid(auctionItemId).getPrice()) + ":JOIN");
+            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestBid(auctionItemId).getPrice()) + ":JOIN");
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
