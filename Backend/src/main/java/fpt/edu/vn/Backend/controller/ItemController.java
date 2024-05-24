@@ -54,12 +54,12 @@ public class ItemController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ItemDTO> createItem(ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> createItem(@RequestBody ItemDTO itemDTO) {
         return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Boolean> updateItem(ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> updateItem(@RequestBody ItemDTO itemDTO) {
         if (itemDTO.getItemId() == null) {
             throw new InvalidInputException("Item id cannot be null");
         }

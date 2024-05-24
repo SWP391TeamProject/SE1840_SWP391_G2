@@ -54,27 +54,35 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public @NotNull Item mapDTOToEntity(@NotNull ItemDTO itemDTO, @NotNull Item item) {
         item.setItemId(itemDTO.getItemId());
-        item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategoryId())
-                .orElseThrow(() -> new MappingException("Category not found")));
-        item.setName(itemDTO.getName());
-        item.setDescription(itemDTO.getDescription());
-        item.setReservePrice(itemDTO.getReservePrice());
-        item.setBuyInPrice(itemDTO.getBuyInPrice());
-        item.setStatus(itemDTO.getStatus());
-        item.setCreateDate(itemDTO.getCreateDate());
-        item.setUpdateDate(itemDTO.getUpdateDate());
-        item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
-                .orElseThrow(() -> new MappingException("Account not found")));
+        if (itemDTO.getCategoryId() != null)
+            item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategoryId())
+                .orElseThrow(() -> new MappingException("Category not found: " + itemDTO.getCategoryId())));
+        if (itemDTO.getName() != null)
+            item.setName(itemDTO.getName());
+        if (itemDTO.getDescription() != null)
+            item.setDescription(itemDTO.getDescription());
+        if (itemDTO.getReservePrice() != null)
+            item.setReservePrice(itemDTO.getReservePrice());
+        if (itemDTO.getBuyInPrice() != null)
+            item.setBuyInPrice(itemDTO.getBuyInPrice());
+        if (itemDTO.getStatus() != null)
+            item.setStatus(itemDTO.getStatus());
+        if (itemDTO.getCreateDate() != null)
+            item.setCreateDate(itemDTO.getCreateDate());
+        if (itemDTO.getUpdateDate() != null)
+            item.setUpdateDate(itemDTO.getUpdateDate());
+        if (itemDTO.getOwnerId() != null)
+            item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
+                .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwnerId())));
         if (itemDTO.getOrderId() != null)
             item.setOrder(orderRepos.findById(itemDTO.getOrderId())
-                    .orElseThrow(() -> new MappingException("Order not found")));
+                    .orElseThrow(() -> new MappingException("Order not found: " + itemDTO.getOrderId())));
         return item;
     }
 
     @Override
     public @NotNull ItemDTO createItem(@NotNull ItemDTO itemDTO) {
-        itemRepos.save(mapDTOToEntity(itemDTO));
-        return itemDTO;
+        return mapEntityToDTO(itemRepos.save(mapDTOToEntity(itemDTO, new Item())));
     }
 
     @Override
@@ -83,10 +91,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public boolean updateItem(@NotNull ItemDTO item) {
+    public ItemDTO updateItem(@NotNull ItemDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
-        itemRepos.save(mapDTOToEntity(item));
-        return true;
+        Item it = itemRepos.findItemByItemId(item.getItemId()).orElseThrow();
+        return mapEntityToDTO(itemRepos.save(mapDTOToEntity(item, it)));
     }
 
     @Override

@@ -1,5 +1,38 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
+###
+GET http://localhost:8080/api/items/
 
 ###
+GET http://localhost:8080/api/items/category/2
+
+###
+GET http://localhost:8080/api/items/status/QUEUE
+
+###
+GET http://localhost:8080/api/items/owner/1
+
+###
+GET http://localhost:8080/api/items/detail/1
+
+###
+POST http://localhost:8080/api/items/create
+Content-Type: application/json
+
+{
+  "categoryId" : 1,
+  "name" : "Bi kíp pass môn",
+  "description" : "Pass mọi môn học FPT",
+  "reservePrice" : 1000,
+  "buyInPrice" : 10000,
+  "status" : "QUEUE",
+  "ownerId" : 1,
+  "orderId" : null
+}
+
+###
+PUT http://localhost:8080/api/items/update
+Content-Type: application/json
+
+{
+  "itemId" : 1,
+  "buyInPrice" : 10000
+}
