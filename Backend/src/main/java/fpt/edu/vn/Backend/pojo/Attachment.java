@@ -24,22 +24,6 @@ public class Attachment {
     @Column(length = 300,name = "link")
     private String link;
 
-    @Column(length = 10)
-    @Enumerated(EnumType.STRING)
-    private FileType type; // jpg, png, mp4, etc.
-
-    public enum FileType {
-        IMAGE,VIDEO,UNKNOWN
-    }
-
-    @Column(name = "attachment_type")
-    @Enumerated(EnumType.STRING)
-    private Type attachmentType;
-    enum Type{
-
-        BANNER,AVATAR,PROFILE
-    }
-
     @CreationTimestamp
     @Column(name = "create_date")
     private LocalDateTime createDate;
@@ -47,6 +31,4 @@ public class Attachment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
-
 }
