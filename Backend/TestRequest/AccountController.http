@@ -1,0 +1,115 @@
+{%env MY_TOKEN='eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBlbWFpbC5jb20iLCJpYXQiOjE3MTY1MjI3MzAsImV4cCI6MTcxNjUyNzczMH0.PUjWL7EUHrADgKgYFxbXDHDmN0y9TZ0UchpyreJkAE1wXlYJvFnwoSFbWwgPMKgT5HDEV_WQlUbTOAGN9ptUhw'%}
+### Get all accounts
+GET http://localhost:8080/api/accounts/
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBlbWFpbC5jb20iLCJpYXQiOjE3MTY1MjI3MzAsImV4cCI6MTcxNjUyNzczMH0.PUjWL7EUHrADgKgYFxbXDHDmN0y9TZ0UchpyreJkAE1wXlYJvFnwoSFbWwgPMKgT5HDEV_WQlUbTOAGN9ptUhw
+
+### Response 200 (application/json)
+Content-Type: application/json
+[
+{
+    "userId": 1,
+    "nickname": "bidder_bob",
+    "role": [
+      3
+    ],
+    "email": "user1@email.com",
+    "phone": "123-456-7890",
+    "balance": 1250.50,
+    "createDate": "2024-05-23T18:46:20.63",
+    "updateDate": "2024-05-23T18:46:20.63"
+  },
+  {
+    "userId": 2,
+    "nickname": "collectibles_sue",
+    "role": [
+      3
+    ],
+    "email": "seller_sue@email.com",
+    "phone": "987-654-3210",
+    "balance": 500.00,
+    "createDate": "2024-05-23T18:46:20.63",
+    "updateDate": "2024-05-23T18:46:20.63"
+  },
+  {
+    "userId": 3,
+    "nickname": "admin_ace",
+    "role": [
+      2
+    ],
+    "email": "admin_alice@email.com",
+    "phone": "555-121-2555",
+    "balance": 8888.88,
+    "createDate": "2024-05-23T18:46:20.63",
+    "updateDate": "2024-05-23T18:46:20.63"
+  },
+  {
+    "userId": 4,
+    "nickname": "arty_amanda",
+    "role": [
+      3
+    ],
+    "email": "artlover@email.com",
+    "phone": "111-222-3333",
+    "balance": 350.25,
+    "createDate": "2024-05-23T18:46:20.63",
+    "updateDate": "2024-05-23T18:46:20.63"
+  },
+  {
+    "userId": 5,
+    "nickname": "techno_tim",
+    "role": [
+      3
+    ],
+    "email": "gadget_guy@email.com",
+    "phone": "444-555-6666",
+    "balance": 999.99,
+    "createDate": "2024-05-23T18:46:20.63",
+    "updateDate": "2024-05-23T18:46:20.63"
+  },
+  {
+    "userId": 6,
+    "nickname": null,
+    "role": [
+      1
+    ],
+    "email": "vidz7504@gmail.com",
+    "phone": null,
+    "balance": null,
+    "createDate": "2024-05-24T10:40:39.644985",
+    "updateDate": "2024-05-24T10:40:39.644985"
+  },
+  {
+    "userId": 7,
+    "nickname": null,
+    "role": [
+      1
+    ],
+    "email": "vidz752204@gmail.com",
+    "phone": null,
+    "balance": null,
+    "createDate": "2024-05-24T10:41:32.263962",
+"updateDate": "2024-05-24T10:41:32.263962"
+}
+]
+
+
+### Get account by userId
+GET http://localhost:8080/api/accounts/1
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBlbWFpbC5jb20iLCJpYXQiOjE3MTY1MjI3MzAsImV4cCI6MTcxNjUyNzczMH0.PUjWL7EUHrADgKgYFxbXDHDmN0y9TZ0UchpyreJkAE1wXlYJvFnwoSFbWwgPMKgT5HDEV_WQlUbTOAGN9ptUhw
+
+### Response 200 (application/json)
+Content-Type: application/json
+{
+  "userId": 1,
+  "nickname": "bidder_bob",
+  "role": [
+    3
+  ],
+  "email": "user1@email.com",
+  "phone": "123-456-7890",
+  "status": 1,
+  "balance": 1250.50,
+  "createDate": "2024-05-23T18:46:20.63",
+  "updateDate": "2024-05-23T18:46:20.63"
+}
+
