@@ -39,12 +39,12 @@ public class AccountController {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {
         return new ResponseEntity<>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<AccountDTO> updateAccount(@RequestBody AccountDTO accountDTO, @PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
