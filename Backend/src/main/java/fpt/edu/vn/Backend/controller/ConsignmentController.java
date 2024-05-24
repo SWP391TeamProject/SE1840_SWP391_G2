@@ -2,6 +2,8 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
+import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import org.slf4j.Logger;
@@ -77,7 +79,18 @@ public class ConsignmentController {
         }
     }
 
-    @PostMapping("/{consignmentId}")
+    @PostMapping("/create")
+    public ResponseEntity<ConsignmentDTO> createConsignment(@RequestParam int userId, @RequestParam String preferContact, @RequestBody ConsignmentDetailDTO consignmentDetailDTO) {
+        try {
+            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId,preferContact,consignmentDetailDTO);
+            return new ResponseEntity<>(consignment, HttpStatus.CREATED);
+        } catch (ConsignmentServiceException e) {
+            logger.error("Error creating consignment", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/confirm/{consignmentId}")
     public ResponseEntity<String> confirmJewelryReceived(@PathVariable int consignmentId) {
         try {
             consignmentService.confirmJewelryReceived(consignmentId);

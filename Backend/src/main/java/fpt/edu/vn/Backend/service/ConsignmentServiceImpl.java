@@ -11,6 +11,7 @@ import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +44,26 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         this.consignmentDetailRepos = consignmentDetailRepos;
     }
 
+
+
+
     @Override
-    public ConsignmentDTO requestConsignmentCreate(int userId, int auctionItemId, ConsignmentDetailDTO consignmentDetails) {
-
-        Consignment consignment = new Consignment();
-        consignment.setConsignmentId(userId);
-
-
-        return null;
+    public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact,ConsignmentDetailDTO consignmentDetails) {
+        try {
+            Consignment consignment = new Consignment();
+            ConsignmentDetail detail = new ConsignmentDetail();
+            detail.setDescription(consignmentDetails.getDescription());
+            detail.setPrice(consignmentDetails.getPrice());
+            detail.setType(ConsignmentDetail.ConsignmentStatus.REQUEST);
+            detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
+            consignmentRepos.save(consignment);
+            consignment.setPreferContact(Consignment.preferContact.valueOf(preferContact.toUpperCase()));
+            consignmentDetailRepos.save(detail);
+            return getConsignmentDTO(consignment);
+        } catch (Exception e) {
+            logger.error("Error creating consignment", e);
+            throw new ConsignmentServiceException("Error creating consignment", e);
+        }
     }
 
     @Override
@@ -235,17 +248,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public Page<ConsignmentDTO> getAllConsignments(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
-        List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
-                .map(consignment -> new ConsignmentDTO(
-                        consignment.getConsignmentId(),
-                        consignment.getStatus().toString(),
-                        String.valueOf(consignment.getPreferContact()),
-                        consignment.getCreateDate(),
-                        consignment.getUpdateDate()
-                ))
-                .collect(Collectors.toList());
-        return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
+
+        return getConsignmentDTOS(pageable, consignmentPage);
     }
+
 
     @Override
     public Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size) {
@@ -255,17 +261,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
             Page<Consignment> consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
 
-            List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
-                    .map(consignment -> new ConsignmentDTO(
-                            consignment.getConsignmentId(),
-                            consignment.getStatus().toString(),
-                            String.valueOf(consignment.getPreferContact()),
-                            consignment.getCreateDate(),
-                            consignment.getUpdateDate()
-                    ))
-                    .collect(Collectors.toList());
-
-            return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
+            return getConsignmentDTOS(pageable, consignmentPage);
         } catch (IllegalArgumentException e) {
             throw new ConsignmentServiceException("Invalid status value: " + status, e);
         }
@@ -275,17 +271,41 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
+
+        return getConsignmentDTOS(pageable, consignmentPage);
+    }
+
+    @NotNull
+    private Page<ConsignmentDTO> getConsignmentDTOS(Pageable pageable, Page<Consignment> consignmentPage) {
         List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
-                .map(consignment -> new ConsignmentDTO(
-                        consignment.getConsignmentId(),
-                        consignment.getStatus().toString(),
-                        String.valueOf(consignment.getPreferContact()),
-                        consignment.getCreateDate(),
-                        consignment.getUpdateDate()
-                ))
+                .map(this::getConsignmentDTO)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
+    }
+
+    @NotNull
+    private ConsignmentDTO getConsignmentDTO(Consignment consignment) {
+        List<ConsignmentDetailDTO> consignmentDetailDTOs = consignment.getConsignmentDetails().stream()
+                .map(detail -> new ConsignmentDetailDTO(
+                        detail.getConsignmentDetailId(),
+                        detail.getDescription(),
+                        detail.getType().toString(),
+                        detail.getPrice(),
+                        detail.getConsignment().getConsignmentId(),
+                        detail.getAccount().getAccountId(),
+                        detail.getAttachments().stream().map(Attachment::getAttachmentId).collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+
+        return new ConsignmentDTO(
+                consignment.getConsignmentId(),
+                String.valueOf(consignment.getStatus()),
+                String.valueOf(consignment.getPreferContact()),
+                consignment.getCreateDate(),
+                consignment.getUpdateDate(),
+                consignmentDetailDTOs
+        );
     }
 
     @Override

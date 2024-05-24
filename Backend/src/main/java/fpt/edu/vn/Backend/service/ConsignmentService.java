@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface ConsignmentService {
     // Create
-    ConsignmentDTO requestConsignmentCreate(int userId, int auctionItemId, ConsignmentDetailDTO consignmentDetails);
+    ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails);
 
     // Evaluations
     void submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments);
