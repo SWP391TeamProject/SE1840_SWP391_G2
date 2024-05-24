@@ -97,6 +97,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deleteAccount(int id) {
+        accountRepos.findById(id).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+id));
         accountRepos.deleteById(id);
     }
 
