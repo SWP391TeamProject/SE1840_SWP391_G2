@@ -3,16 +3,23 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.oauth2.*;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 
 
 @RestController
@@ -22,9 +29,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final AccountRepos accountRepos;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, AccountRepos accountRepos) {
         this.authService = authService;
+        this.accountRepos = accountRepos;
     }
 
     /**
@@ -51,10 +60,13 @@ public class AuthController {
         return null;
     }
 
-    @PostMapping("login-with-google")
-    public ResponseEntity<String> loginWithGoogle(@RequestBody String token) {
-        return null;
+    @GetMapping("/login-with-google")
+    public Map<String, Object> getUserInfo(OAuth2AuthenticationToken authenticationToken) {
+        Map<String, Object> userAttributes = authenticationToken.getPrincipal().getAttributes();
+
+        return userAttributes;
     }
+
 
     @PostMapping("login-with-facebook")
     public ResponseEntity<String> loginWithFacebook(@RequestBody String token) {
