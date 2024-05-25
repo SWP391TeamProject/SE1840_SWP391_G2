@@ -224,4 +224,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         // Map the Attachment entity to an AttachmentDTO and return it
         return mapEntityToDTO(attachment);
     }
+
+    @Override
+    public @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile[] file, int itemId) throws IOException {
+        return null;
+    }
 }

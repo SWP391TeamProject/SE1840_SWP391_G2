@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -56,10 +57,13 @@ public class AccountController {
     }
 
     @PostMapping("/avatar/{id}")
-    public ResponseEntity<AttachmentDTO> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile file) {
-        return new ResponseEntity<>(accountService.addProfileImage(id, file),HttpStatus.OK);
+    public ResponseEntity<List<AttachmentDTO>> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile[] files) {
+        List<AttachmentDTO> attachmentDTOs = new ArrayList<>();
+        for (MultipartFile file : files) {
+            attachmentDTOs.add(accountService.addProfileImage(id, file));
+        }
+        return new ResponseEntity<>(attachmentDTOs, HttpStatus.OK);
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<AccountDTO> deleteAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
