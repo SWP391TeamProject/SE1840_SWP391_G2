@@ -53,11 +53,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/auth/login" element={<LoginLayout />}></Route>
               <Route path="/auth/register" element={<RegisterLayout />}></Route>
             </Route>
+            <Route element={<PrivateRoute allowedRoles={[Roles.MEMBER]} />}>
+              <Route
+                path="/consignment"
+                element={<ConsignmentLayout />}
+              ></Route>
+            </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
             {/* <RouterProvider router={router} /> */}
-            {/* <Route element={<PrivateRoute allowedRoles={[Roles.MEMBER]} />}> */}
-            <Route path="/consignment" element={<ConsignmentLayout />}></Route>
-            {/* </Route> */}
           </Routes>
         </BrowserRouter>
       </AuthProvider>

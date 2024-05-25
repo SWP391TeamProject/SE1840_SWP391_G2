@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService{
                 throw new IllegalStateException("Email already exists! try login instead.");
             });
             Set<Role> roles = new HashSet<>();
-            roleRepos.findById(1).ifPresent(roles::add);
+            roleRepos.findById(4).ifPresent(roles::add);
             newAccount = new Account();
             newAccount.setEmail(registerDTO.getEmail());
             newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
@@ -106,6 +106,7 @@ public class AuthServiceImpl implements AuthService{
 
         return AuthResponseDTO
                 .builder()
+                .id(user.getAccountId())
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())

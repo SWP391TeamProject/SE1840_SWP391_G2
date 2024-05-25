@@ -10,7 +10,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class AuthResponseDTO {
-
+    private int id;
     private String accessToken;
     private String username;
     private String role;

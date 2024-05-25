@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,10 +28,13 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepos accountRepos;
 
     private final RoleRepos roleRepos;
+    private final AttachmentServiceImpl attachmentServiceImpl;
+
     @Autowired
-    public AccountServiceImpl(AccountRepos accountRepos,RoleRepos roleRepos) {
+    public AccountServiceImpl(AccountRepos accountRepos, RoleRepos roleRepos, AttachmentServiceImpl attachmentServiceImpl) {
         this.accountRepos = accountRepos;
         this.roleRepos = roleRepos;
+        this.attachmentServiceImpl = attachmentServiceImpl;
     }
 
     @Override
@@ -140,5 +146,15 @@ public class AccountServiceImpl implements AccountService {
             return role;
         }).collect(Collectors.toSet()));
         return account;
+    }
+
+    @Override
+    public AttachmentDTO addProfileImage(int id, MultipartFile file) {
+        try {
+            return attachmentServiceImpl.uploadAccountAttachment(file, id);
+        } catch (IOException e) {
+            throw new ResourceNotFoundException("Account", "accountId", ""+id);
+            // Handle the exception appropriately
+        }
     }
 }

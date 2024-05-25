@@ -41,6 +41,10 @@ public class Attachment {
     @JoinColumn(name ="auction_session_id")
     private AuctionSession auctionSession;
 
+    @ManyToOne()
+    @JoinColumn(name = "consignment_detail_id")
+    private ConsignmentDetail consignmentDetail;
+
 
     @CreationTimestamp
     @Column(name = "create_date")

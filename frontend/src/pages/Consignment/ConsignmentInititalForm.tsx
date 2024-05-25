@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadIcon } from "lucide-react";
 import DropzoneComponent from "./DropZoneComponent";
+import { getCookie } from "@/utils/cookies";
 
 const formSchema = z.object({
   accountId: z.number(),
@@ -32,7 +33,7 @@ export default function ConsignmentInititalForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: 1,
+      accountId: getCookie("user")?.id,
       email: "",
       phone: "",
       contactName: "",
@@ -63,7 +64,7 @@ export default function ConsignmentInititalForm() {
               <FormItem>
                 <FormLabel>Account ID</FormLabel>
                 <FormControl>
-                  <Input placeholder="sadasd" {...field} />
+                  <Input type="hidden" placeholder="sadasd" {...field} />
                 </FormControl>
                 <FormDescription>
                   this is the account ID we used to contact you

@@ -1,8 +1,7 @@
 import AuthContext from "@/AuthProvider";
 import { Roles } from "@/constants/enums";
 import { getCookie } from "@/utils/cookies";
-import { get } from "http";
-import { useContext, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 
 type RolesEnum = {
@@ -11,9 +10,19 @@ type RolesEnum = {
 
 const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
   const location = useLocation();
-  return allowedRoles?.includes(JSON.parse(getCookie("user"))?.role) ? (
+  const userCookie = getCookie("user");
+  let parsedUser = null;
+
+  if (userCookie) {
+    try {
+      parsedUser = JSON.parse(userCookie);
+    } catch (error) {
+      console.error("Error parsing user cookie", error);
+    }
+  }
+  return allowedRoles?.includes(parsedUser?.role) ? (
     <Outlet />
-  ) : JSON.parse(getCookie("user"))?.email ? (
+  ) : parsedUser?.email ? (
     <Navigate to="/unauthorized" state={{ from: location }} replace />
   ) : (
     <Navigate to="/auth/login" state={{ from: location }} replace />

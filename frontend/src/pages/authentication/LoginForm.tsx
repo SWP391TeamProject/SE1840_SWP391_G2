@@ -35,7 +35,7 @@ function LoginForm() {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        setCookie("token", data.token, 30000);
+        setCookie("token", data.accessToken, 30000);
         setCookie("user", JSON.stringify(data), 30000);
         setUser(data);
         navigate(from, { replace: true });

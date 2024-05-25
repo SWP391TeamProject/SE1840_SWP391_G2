@@ -16,6 +16,8 @@ public class AuctionSessionDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
+    public AuctionSessionDTO() {
+    }
     public AuctionSessionDTO(AuctionSession auctionSession) {
         this.auctionSessionId = auctionSession.getAuctionSessionId();
         this.startDate = auctionSession.getStartDate();

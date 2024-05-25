@@ -5,10 +5,15 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Attachment;
+import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
+import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
+import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
+import fpt.edu.vn.Backend.repository.ItemRepos;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -29,10 +34,15 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final BlobContainerClient blobContainerClient;
     private final AccountRepos accountRepos;
 
+    private final ItemRepos itemRepository;
+
+    private final ConsignmentDetailRepos consignmentDetailRepos;
+
     @Autowired
-    public AttachmentServiceImpl(AttachmentRepos attachmentRepository, AccountRepos accountRepos) {
+    public AttachmentServiceImpl(AttachmentRepos attachmentRepository, AccountRepos accountRepos, ConsignmentDetailRepos consignmentDetailRepos,ItemRepos itemRepository) {
         this.attachmentRepository = attachmentRepository;
         this.accountRepos = accountRepos;
+        this.itemRepository = itemRepository;
 
         String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
         if (connectStr != null && !connectStr.isEmpty()) {
@@ -44,6 +54,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         } else {
             blobContainerClient = null;
         }
+        this.consignmentDetailRepos = consignmentDetailRepos;
     }
 
     @Override
@@ -114,32 +125,103 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, int accountId) throws IOException {
-        // Handle the file upload and get an AttachmentDTO
-        AttachmentDTO attachmentDTO = uploadAttachment(file);
+        Optional<Account> optionalAccount = accountRepos.findById(accountId);
 
-        // Find the account
-        Account account = accountRepos.findById(accountId).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+        if (optionalAccount.isEmpty()) {
+            throw new ResourceNotFoundException("Account with id " + accountId + " does not exist");
+        }
+        Account account = optionalAccount.get();
 
-        // Find the attachment
-        Attachment attachment = attachmentRepository.findById(attachmentDTO.getAttachmentId()).orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new ResourceNotFoundException(e);
+        }
+        String blobId = accountId + "/" + UUID.randomUUID() + mimeType.getExtension();
 
-        // Set the account to the attachment
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+
+        // Convert InputStream to ByteArrayInputStream
+        byte[] bytes = file.getBytes();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
+
+        Attachment attachment = new Attachment();
+        attachment.setBlobId(blobId);
+        attachment.setLink(blobClient.getBlobUrl());
         attachment.setAccount(account);
-
-        // Save the attachment
         attachmentRepository.save(attachment);
-
-        // Map the attachment to AttachmentDTO and return it
-        return mapEntityToDTO(attachment, attachmentDTO);
+        return mapEntityToDTO(attachment);
     }
 
     @Override
     public @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, Integer consignmentDetailId) throws IOException {
-        return null;
+        Optional<ConsignmentDetail> optionalConsignmentDetail = consignmentDetailRepos.findById(consignmentDetailId);
+        if (optionalConsignmentDetail.isEmpty()) {
+            throw new ResourceNotFoundException("ConsignmentDetail with id " + consignmentDetailId + " does not exist");
+        }
+        ConsignmentDetail consignmentDetail = optionalConsignmentDetail.get();
+
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new IOException(e);
+        }
+
+
+        String blobId = consignmentDetail.getAccount().getAccountId()+"/consignment-detail/"+UUID.randomUUID() + mimeType.getExtension();
+
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+
+        // Convert InputStream to ByteArrayInputStream
+        byte[] bytes = file.getBytes();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
+
+        Attachment attachment = new Attachment();
+        attachment.setBlobId(blobId);
+        attachment.setLink(blobClient.getBlobUrl());
+        attachment.setConsignmentDetail(consignmentDetail);
+        attachmentRepository.save(attachment);
+        return mapEntityToDTO(attachment);
     }
 
     @Override
     public @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException {
-        return null;
+        // Get the Item object from the itemId
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Item with id " + itemId + " does not exist"));
+
+        // Generate a unique blobId for the file
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new IOException(e);
+        }
+        String blobId = item.getOwner().getAccountId() + "/item-image/" + UUID.randomUUID() + mimeType.getExtension();
+
+        // Get a BlockBlobClient for the blob with this blobId and upload the file
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+        byte[] bytes = file.getBytes();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
+
+        // Create a new Attachment object, set its properties, and save it to the database
+        Attachment attachment = new Attachment();
+        attachment.setBlobId(blobId);
+        attachment.setLink(blobClient.getBlobUrl());
+        attachment.setItem(item);
+        attachmentRepository.save(attachment);
+
+        // Map the Attachment entity to an AttachmentDTO and return it
+        return mapEntityToDTO(attachment);
     }
 }

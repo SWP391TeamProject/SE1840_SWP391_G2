@@ -21,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/consignments")
+@CrossOrigin("*")
 public class ConsignmentController {
     private final ConsignmentService consignmentService;
     private static final Logger logger = LoggerFactory.getLogger(AccountController.class);

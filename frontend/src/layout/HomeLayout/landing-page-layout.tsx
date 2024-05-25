@@ -33,93 +33,12 @@ import CategoriesSection from "@/pages/LandingPage/CategoriesSection";
 import AuctionProcessSection from "@/pages/LandingPage/AuctionProcessSection";
 import Footer from "../../components/footer/Footer";
 import { GavelIcon, MenuIcon } from "lucide-react";
+import NavBar from "@/components/NavBar/NavBar";
 
 export function LandingPageLayout() {
   return (
     <div key="1" className="flex flex-col min-h-[100dvh] w-screen">
-      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow">
-        <Link className="flex items-center justify-center" to="#">
-          <GavelIcon className="h-6 w-6" />
-          <span className="font-semibold text-lg">Biddify</span>
-        </Link>
-        <nav className="hidden lg:flex items-center gap-6 ml-auto">
-          <Button className="flex items-center gap-2" variant="outline">
-            Put your item for auction
-          </Button>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="#"
-          >
-            Auctions
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2 scroll-smooth"
-            to="#"
-          >
-            Auctions
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="#"
-          >
-            About
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="#"
-          >
-            Blog
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="#"
-          >
-            Contact
-          </Link>
-        </nav>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button className="lg:hidden ml-auto" size="icon" variant="outline">
-              <MenuIcon className="h-6 w-6" />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="bg-white" side="right">
-            <div className="grid gap-2 py-6">
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Put your item for auction
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Auctions
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                About
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Blog
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Contact
-              </Link>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </header>
+      <NavBar />
       <main className="flex-1">
         {/* Start Carouesel Sections */}
         <LandingPageCarousel />

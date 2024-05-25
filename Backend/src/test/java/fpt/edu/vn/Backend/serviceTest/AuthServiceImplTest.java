@@ -179,6 +179,28 @@ class AuthServiceImplTest {
 
         assertThrows(RuntimeException.class, () -> authService.register(registerDTO));
     }
+    @Test
+    @DisplayName("Should add role to set when role with id exists")
+    public void shouldAddRoleToSetWhenRoleWithIdExists() {
+        Role role = new Role();
+        when(roleRepos.findById(anyInt())).thenReturn(Optional.of(role));
+
+        Set<Role> roles = new HashSet<>();
+        roleRepos.findById(4).ifPresent(roles::add);
+
+        assertFalse(roles.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should not add role to set when role with id does not exist")
+    public void shouldNotAddRoleToSetWhenRoleWithIdDoesNotExist() {
+        when(roleRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        Set<Role> roles = new HashSet<>();
+        roleRepos.findById(4).ifPresent(roles::add);
+
+        assertTrue(roles.isEmpty());
+    }
 
     @Test
     @DisplayName("Should return accessToken when user logged in successfully")

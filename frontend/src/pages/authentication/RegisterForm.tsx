@@ -17,6 +17,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"; // Import the zodResolver function
 import { date, z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
+import { registerAccountService } from "@/services/AuthService";
+import { useNavigate } from "react-router-dom";
 
 gsap.registerPlugin(useGSAP);
 
@@ -42,6 +44,7 @@ const formSchema = z
   );
 function RegisterForm() {
   const RegisterForm = useRef<HTMLDivElement>(null);
+  const nav = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema), // Use the zodResolver function
     defaultValues: {
@@ -54,6 +57,14 @@ function RegisterForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    registerAccountService(values).then((res) => {
+      console.log(res);
+      if (res.status === 200) {
+        console.log("Account created successfully");
+        nav("/");
+      }
+    });
+
     console.log(values);
   }
   useGSAP(
