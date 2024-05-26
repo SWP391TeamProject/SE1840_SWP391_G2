@@ -33,7 +33,7 @@ export default function ConsignmentInititalForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: getCookie("user")?.id,
+      accountId: JSON.parse(getCookie("user"))?.id,
       email: "",
       phone: "",
       contactName: "",
@@ -62,12 +62,15 @@ export default function ConsignmentInititalForm() {
             name="accountId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Account ID</FormLabel>
+                <FormLabel>accountId</FormLabel>
                 <FormControl>
-                  <Input type="hidden" placeholder="sadasd" {...field} />
+                  <Input
+                    defaultValue={JSON.parse(getCookie("user"))?.id}
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>
-                  this is the account ID we used to contact you
+                  this is the Name we used to contact you
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -172,7 +175,7 @@ export default function ConsignmentInititalForm() {
           />
           <FormField
             control={form.control}
-            name="accountId"
+            name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>

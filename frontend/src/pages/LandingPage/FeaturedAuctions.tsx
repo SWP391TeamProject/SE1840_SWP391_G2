@@ -41,6 +41,7 @@ export default function FeaturedAuctions() {
                       <Card className="w-[300px] h-full">
                         <CardHeader>
                           <img
+                          
                             alt="Auction Item"
                             className="rounded-t-lg object-cover"
                             height="225"

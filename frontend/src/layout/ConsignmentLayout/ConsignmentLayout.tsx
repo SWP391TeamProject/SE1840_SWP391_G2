@@ -13,7 +13,7 @@ export default function ConsignmentLayout() {
     document.title = "Consignment | Biddify";
 
     // fetchConsignmentsService();
-  }, [nav]);
+  }, [nav]);  
   return (
     <div>
       <NavBar />
