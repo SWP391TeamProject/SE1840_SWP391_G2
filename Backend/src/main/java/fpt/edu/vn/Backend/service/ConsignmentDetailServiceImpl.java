@@ -36,7 +36,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
     @Override
     public List<ConsignmentDetailDTO> getConsignmentsDetailByConsignmentId(int consignmentId) {
-        List<ConsignmentDetail> consignmentDetails = consignmentDetailRepos.findByConsignmentId(consignmentId);
+        List<ConsignmentDetail> consignmentDetails = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId);
         return consignmentDetails.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());

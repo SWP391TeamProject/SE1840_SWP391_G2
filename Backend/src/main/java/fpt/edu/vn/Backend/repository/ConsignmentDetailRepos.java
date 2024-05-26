@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ConsignmentDetailRepos extends JpaRepository<ConsignmentDetail, Integer> {
-    List<ConsignmentDetail> findByConsignmentId(int consignmentId);
-    Account findByAccount_AccountId(int accountId);
+    List<ConsignmentDetail> findDistinctByConsignment_ConsignmentId(int consignmentId);
+//    Account findByAccount_AccountId(int accountId);
 }
