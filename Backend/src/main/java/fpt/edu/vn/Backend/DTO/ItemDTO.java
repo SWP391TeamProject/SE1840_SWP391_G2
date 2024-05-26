@@ -1,35 +1,26 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Item;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemDTO {
-    private int itemId;
+    private Integer itemId;
+    private Integer categoryId;
     private String name;
     private String description;
     private BigDecimal reservePrice;
     private BigDecimal buyInPrice;
-    private String status;
+    private Item.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private int categoryId;
+    private Integer ownerId;
     private Integer orderId;
-
-    ItemDTO(Item item) {
-        this.itemId = item.getItemId();
-        this.name = item.getName();
-        this.description = item.getDescription();
-        this.reservePrice = item.getReservePrice();
-        this.buyInPrice = item.getBuyInPrice();
-        this.status = item.getStatus();
-        this.createDate = item.getCreateDate();
-        this.updateDate = item.getUpdateDate();
-        this.categoryId = item.getItemCategory().getItemCategoryId();
-        this.orderId = item.getOrder().getOrderId();
-    }
-    // getters and setters
-    // ...
 }

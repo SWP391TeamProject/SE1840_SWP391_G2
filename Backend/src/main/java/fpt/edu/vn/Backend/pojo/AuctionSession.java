@@ -28,6 +28,7 @@ public class AuctionSession {
     private LocalDateTime endDate;
 
     @Column(length = 30)
+    @Enumerated(EnumType.STRING)
     private Status status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
 
     enum Status {

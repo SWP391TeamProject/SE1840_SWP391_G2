@@ -12,7 +12,7 @@ public class AuctionItemDTO {
     private int itemId;
     private BigDecimal currentPrice;
 
-    AuctionItemDTO(AuctionItem auctionItem) {
+    public AuctionItemDTO(AuctionItem auctionItem) {
         this.auctionItemId = auctionItem.getAuctionItemId();
         this.auctionSessionId = auctionItem.getAuctionSession().getAuctionSessionId();
         this.itemId = auctionItem.getItem().getItemId();

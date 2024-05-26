@@ -70,8 +70,8 @@ export default function AccountsList() {
     try {
       const list = await fetchAccountsService();
       if (list) {
-        console.log(list.data);
-        dispatch(setAccounts(list.data));
+        console.log(list.data.content);
+        dispatch(setAccounts(list.data.content));
       }
     } catch (error) {
       console.log(error);

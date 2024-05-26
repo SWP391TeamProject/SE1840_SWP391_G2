@@ -2,36 +2,36 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-import fpt.edu.vn.Backend.repository.ConsignmentRepos;
+import fpt.edu.vn.Backend.pojo.Attachment;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ConsignmentService {
     // Create
-    ConsignmentDTO requestConsignmentCreate(Long userId, Long auctionItemId, ConsignmentDetailDTO consignmentDetails);
+    ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails);
 
     // Evaluations
-    void submitInitialEvaluation(Long consignmentId, String evaluation, Long accountId);
-    void submitFinalEvaluationUpdate(Long consignmentId, String evaluation, Long accountId);
+    void submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments);
+    void submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments);
 
     // Status Updates
-    void confirmJewelryReceived(Long consignmentId);
-    void approveFinalEvaluation(Long consignmentId);
-    void rejectFinalEvaluation(Long consignmentId, String rejectionReason);
-
-    void confirmAuctionParticipation(Long consignmentId);
-    void assignAuctionSession(Long consignmentId, Long auctionSessionId);
+    void confirmJewelryReceived(int consignmentId);
+    void approveFinalEvaluation(int consignmentId, int accountId,String description);
+    void rejectFinalEvaluation(int consignmentId,int accountId, String rejectionReason);
 
     // General Updates
-    void updateConsignment(Long consignmentId, ConsignmentDTO updatedConsignment);
+    void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment);
 
     // Reads
-    ConsignmentDTO getConsignmentById(Long id);
-    List<ConsignmentDTO> getAllConsignments(int page, int size);
-    List<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size);
-    List<ConsignmentDTO> getConsignmentsByUserId(Long userId, int page, int size);
-    List<ConsignmentDetailDTO> getConsignmentDetail(Long consignmentId);
+    ConsignmentDTO getConsignmentById(int id);
+    Page<ConsignmentDTO> getAllConsignments(int page, int size);
+    Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size);
+    Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
+    Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 
     // Delete (or Soft Delete)
-    void deleteConsignment(Long id);
+    ResponseEntity<ConsignmentDTO> deleteConsignment(int id);
 }

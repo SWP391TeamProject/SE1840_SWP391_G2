@@ -1,30 +1,34 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Consignment;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
+@Builder
+@NoArgsConstructor
 public class ConsignmentDTO {
     private int consignmentId;
-    private int requesterId;
-    private int staffId;
-    private BigDecimal initialPrice;
-    private String initialEvaluation;
-    private BigDecimal finalPrice;
-    private String finalEvaluation;
     private String status;
+    private String preferContact; // Use String for the enum representation in DTO
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    List<ConsignmentDetailDTO> consignmentDetails;
 
-    ConsignmentDTO(Consignment consignment) {
-        this.consignmentId = consignment.getConsignmentId();
-
-//        this.status = consignment.getStatus();
-        this.createDate = consignment.getCreateDate();
-        this.updateDate = consignment.getUpdateDate();
+    public ConsignmentDTO(int consignmentId, String status, String preferContact, LocalDateTime createDate, LocalDateTime updateDate, List<ConsignmentDetailDTO> consignmentDetails) {
+        this.consignmentId = consignmentId;
+        this.status = status;
+        this.preferContact = preferContact;
+        this.createDate = createDate;
+        this.updateDate = updateDate;
+        this.consignmentDetails = consignmentDetails;
     }
-    // getters and setters
+
+// getters and setters
     // ...
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AttachmentRepos extends JpaRepository<Attachment, Integer> {
+    Attachment deleteByAttachmentId(int attachmentId);
 }

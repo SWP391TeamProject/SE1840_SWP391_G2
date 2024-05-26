@@ -1,0 +1,203 @@
+###
+GET http://localhost:8080/api/items/
+
+### Response
+#{
+#  "content": [
+#    {
+#      "itemId": 1,
+#      "categoryId": 1,
+#      "name": "Bi kíp pass môn",
+#      "description": "Pass m?i môn h?c FPT",
+#      "reservePrice": 1000.00,
+#      "buyInPrice": 10000.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:24:23.206857",
+#      "updateDate": "2024-05-24T21:28:58.186333",
+#      "ownerId": 1,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 2,
+#      "categoryId": 1,
+#      "name": "1950s Radio",
+#      "description": "Vintage radio",
+#      "reservePrice": 1000.00,
+#      "buyInPrice": 1200.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:05:25.203333",
+#      "updateDate": "2024-05-24T21:05:25.203333",
+#      "ownerId": 2,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 3,
+#      "categoryId": 1,
+#      "name": "Tea Set",
+#      "description": "Victorian tea set",
+#      "reservePrice": 700.00,
+#      "buyInPrice": 800.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:05:25.203333",
+#      "updateDate": "2024-05-24T21:05:25.203333",
+#      "ownerId": 2,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 4,
+#      "categoryId": 2,
+#      "name": "Smartphone",
+#      "description": "Latest smartphone",
+#      "reservePrice": 2000.00,
+#      "buyInPrice": 2500.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:05:25.203333",
+#      "updateDate": "2024-05-24T21:05:25.203333",
+#      "ownerId": 2,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 5,
+#      "categoryId": 2,
+#      "name": "Headphones",
+#      "description": "Wireless headphones",
+#      "reservePrice": 100.00,
+#      "buyInPrice": 150.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:05:25.203333",
+#      "updateDate": "2024-05-24T21:05:25.203333",
+#      "ownerId": 2,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 6,
+#      "categoryId": 1,
+#      "name": "Test",
+#      "description": "Test",
+#      "reservePrice": 1000.00,
+#      "buyInPrice": 10000.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:05:28.967914",
+#      "updateDate": "2024-05-24T21:05:28.967914",
+#      "ownerId": 1,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 7,
+#      "categoryId": 1,
+#      "name": "Test",
+#      "description": "Test",
+#      "reservePrice": 1000.00,
+#      "buyInPrice": 10000.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:07:51.631096",
+#      "updateDate": "2024-05-24T21:07:51.632098",
+#      "ownerId": 1,
+#      "orderId": null
+#    },
+#    {
+#      "itemId": 8,
+#      "categoryId": 1,
+#      "name": "Bi kíp pass môn",
+#      "description": "Pass m?i môn h?c FPT",
+#      "reservePrice": 1000.00,
+#      "buyInPrice": 10000.00,
+#      "status": "QUEUE",
+#      "createDate": "2024-05-24T21:11:09.965582",
+#      "updateDate": "2024-05-24T21:11:09.965582",
+#      "ownerId": 1,
+#      "orderId": null
+#    }
+#  ],
+#  "pageable": {
+#    "pageNumber": 0,
+#    "pageSize": 20,
+#    "sort": {
+#      "empty": true,
+#      "sorted": false,
+#      "unsorted": true
+#    },
+#    "offset": 0,
+#    "unpaged": false,
+#    "paged": true
+#  },
+#  "last": true,
+#  "totalElements": 8,
+#  "totalPages": 1,
+#  "size": 20,
+#  "number": 0,
+#  "sort": {
+#    "empty": true,
+#    "sorted": false,
+#    "unsorted": true
+#  },
+#  "first": true,
+#  "numberOfElements": 8,
+#  "empty": false
+#}
+
+###
+GET http://localhost:8080/api/items/category/2
+
+###
+GET http://localhost:8080/api/items/status/QUEUE
+
+###
+GET http://localhost:8080/api/items/owner/1
+
+###
+GET http://localhost:8080/api/items/detail/1
+
+###
+POST http://localhost:8080/api/items/create
+Content-Type: application/json
+
+{
+  "categoryId" : 1,
+  "name" : "Bi kíp pass môn",
+  "description" : "Pass mọi môn học FPT",
+  "reservePrice" : 1000,
+  "buyInPrice" : 10000,
+  "status" : "QUEUE",
+  "ownerId" : 1,
+  "orderId" : null
+}
+
+### Response
+#{
+#  "itemId": 9,
+#  "categoryId": 1,
+#  "name": "Bi kíp pass môn",
+#  "description": "Pass mọi môn học FPT",
+#  "reservePrice": 1000,
+#  "buyInPrice": 10000,
+#  "status": "QUEUE",
+#  "createDate": "2024-05-24T21:56:33.498169",
+#  "updateDate": "2024-05-24T21:56:33.498169",
+#  "ownerId": 1,
+#  "orderId": null
+#}
+
+###
+PUT http://localhost:8080/api/items/update
+Content-Type: application/json
+
+{
+  "itemId" : 1,
+  "buyInPrice" : 10000
+}
+
+### Response
+#{
+#  "itemId": 9,
+#  "categoryId": 1,
+#  "name": "Bi kíp pass môn",
+#  "description": "Pass mọi môn học FPT",
+#  "reservePrice": 1000,
+#  "buyInPrice": 10000,
+#  "status": "QUEUE",
+#  "createDate": "2024-05-24T21:56:33.498169",
+#  "updateDate": "2024-05-24T21:56:33.498169",
+#  "ownerId": 1,
+#  "orderId": null
+#}

@@ -29,8 +29,9 @@ public class Account {
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @Column(name = "avatar_url", length = 100)
-    private  String avatarUrl;
+    @OneToOne
+    private Attachment avatarUrl;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_account",
@@ -50,8 +51,7 @@ public class Account {
 
     @Column(name = "status")
     @ColumnDefault("1") // 1 for true, 0 for false
-    private boolean status;
-
+    private byte status;
 
     @Column(name = "balance")
     private BigDecimal balance;
@@ -85,6 +85,8 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<Deposit> deposits;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
+    private Set<ConsignmentDetail> consignmentDetails;
 
 
     // ... (relationships)

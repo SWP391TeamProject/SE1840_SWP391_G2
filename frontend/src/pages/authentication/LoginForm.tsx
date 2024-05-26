@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import AuthContext from "@/AuthProvider";
+import { useLocation, useNavigate } from "react-router-dom";
+import { setCookie } from "@/utils/cookies";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -13,20 +16,29 @@ type FormValues = {
 };
 
 function LoginForm() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
   const loginForm = useRef<HTMLDivElement>(null);
+  // const {authenticated, role} = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const { register, handleSubmit } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     fetch("http://localhost:8080/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        // Authorization: "Bearer " + localStorage.getItem("token"),
       },
       body: JSON.stringify(data),
     })
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        localStorage.setItem("token", data.accessToken);
+        setCookie("token", data.accessToken, 30000);
+        setCookie("user", JSON.stringify(data), 30000);
+        setUser(data);
+        navigate(from, { replace: true });
       });
   };
 
