@@ -4,7 +4,7 @@ import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 
 import java.util.List;
 
-public interface ConsignmenDetailService {
+public interface ConsignmentDetailService {
 
     List<ConsignmentDetailDTO> getConsignmentsDetailByConsignmentId(int consignmentId);
 
