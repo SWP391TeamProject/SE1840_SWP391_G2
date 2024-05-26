@@ -22,9 +22,6 @@ public interface ConsignmentService {
     void approveFinalEvaluation(int consignmentId, int accountId,String description);
     void rejectFinalEvaluation(int consignmentId,int accountId, String rejectionReason);
 
-    void confirmAuctionParticipation(int consignmentId);
-    void assignAuctionSession(int consignmentId, int auctionSessionId);
-
     // General Updates
     void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment);
 
