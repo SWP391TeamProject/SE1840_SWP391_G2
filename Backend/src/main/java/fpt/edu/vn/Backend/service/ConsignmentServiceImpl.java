@@ -162,11 +162,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
             // Check if the consignment is in final evaluation status
             if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION))) {
-                // Retrieve account by ID
-                AccountDTO dto = accountService.getAccountById(accountId);
-                if (dto == null) {
-                    throw new ConsignmentServiceException("Account not found");
-                }
 
                 // Create and set consignment detail
                 ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -174,7 +169,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignmentDetail.setAccount(accountRepos.findById(accountId).orElse(null));
                 consignmentDetail.setConsignmentDetailId(consignmentId);
                 consignmentDetail.setConsignment(consignment);
-                consignmentDetail.setPrice(dto.getBalance());
+                consignmentDetail.setPrice(consignmentDetail.getPrice());
                 consignmentDetail.setDescription(description);
                 consignmentDetail.setType(ConsignmentDetail.ConsignmentStatus.MANAGER_ACCEPTED);
 //            consignment.getConsignmentDetails().add(consignmentDetail);
@@ -201,22 +196,15 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             if (consignment == null) {
                 throw new ConsignmentServiceException("Consignment not found");
             }
-
             // Check if the consignment is in final evaluation status
             if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId) {
-                // Retrieve account by ID
-                AccountDTO dto = accountService.getAccountById(accountId);
-                if (dto == null) {
-                    throw new ConsignmentServiceException("Account not found");
-                }
-
                 // Create and set consignment detail
                 ConsignmentDetail consignmentDetail = new ConsignmentDetail();
                 consignment.setStatus(Consignment.Status.TERMINATED); // Set status consignment when completed
                 consignmentDetail.setAccount(accountRepos.findById(accountId).orElse(null));
                 consignmentDetail.setConsignmentDetailId(consignmentId);
                 consignmentDetail.setConsignment(consignment);
-                consignmentDetail.setPrice(dto.getBalance());
+                consignmentDetail.setPrice(consignmentDetail.getPrice());
                 consignmentDetail.setDescription(rejectionReason);
                 consignmentDetail.setType(ConsignmentDetail.ConsignmentStatus.MANAGER_REJECTED);
 //            consignment.getConsignmentDetails().add(consignmentDetail);
