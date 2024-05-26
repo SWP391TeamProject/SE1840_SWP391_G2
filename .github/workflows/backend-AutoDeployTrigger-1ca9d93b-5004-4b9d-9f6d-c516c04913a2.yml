@@ -40,7 +40,7 @@ jobs:
           registryPassword: ${{ secrets.BACKEND_REGISTRY_PASSWORD }}
           containerAppName: backend
           resourceGroup: Biddify
-          imageToBuild: vi89012@gmail.com/backend:${{ github.sha }}
+          imageToBuild: vi89012-backend:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
 
