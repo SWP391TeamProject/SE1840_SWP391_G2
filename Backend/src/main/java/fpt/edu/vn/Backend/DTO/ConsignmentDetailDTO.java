@@ -2,12 +2,14 @@ package fpt.edu.vn.Backend.DTO;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class ConsignmentDetailDTO {
     private int consignmentDetailId;
     private String description;

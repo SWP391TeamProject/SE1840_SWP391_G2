@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.DTO;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class ConsignmentDTO {
     private int consignmentId;
     private String status;

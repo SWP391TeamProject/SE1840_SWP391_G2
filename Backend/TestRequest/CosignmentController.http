@@ -1,9 +1,6 @@
 ###Get all consignments
 GET http://localhost:8080/api/consignments/
 
-<> 2024-05-24T194015.200.json
-<> 2024-05-24T193834.200.json
-
 ###Response (HTTP/1.1 200 OK)
 Content-Type: application/json
 {
