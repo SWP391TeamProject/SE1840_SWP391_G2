@@ -37,7 +37,7 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         run: mvn clean package -DskipTests
-        working-directory: ./backend
+        working-directory: ./Backend
 
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v2
