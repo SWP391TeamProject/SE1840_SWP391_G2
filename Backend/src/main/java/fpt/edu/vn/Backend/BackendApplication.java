@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class BackendApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
+//		Dotenv dotenv = Dotenv.load();
+//		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
