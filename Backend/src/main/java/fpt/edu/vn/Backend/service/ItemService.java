@@ -16,8 +16,8 @@ public interface ItemService {
 
     @NotNull ItemDTO createItem(@NotNull ItemDTO itemDTO);
     @Nullable ItemDTO getItemById(int id);
-    @NotNull ItemDTO updateItem(@NotNull ItemDTO itemDTO);
-    boolean deleteItem(int id);
+    ItemDTO updateItem(@NotNull ItemDTO itemDTO);
+
 
     @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable);
     @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status);
