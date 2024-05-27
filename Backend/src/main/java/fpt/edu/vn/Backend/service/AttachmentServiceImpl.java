@@ -61,9 +61,9 @@ public class AttachmentServiceImpl implements AttachmentService {
     public @NotNull AttachmentDTO mapEntityToDTO(@NotNull Attachment attachment, @NotNull AttachmentDTO attachmentDTO) {
         attachmentDTO.setAttachmentId(attachment.getAttachmentId());
         if (attachment.getLink() != null) {
-            attachmentDTO.setUrl(attachment.getLink());
+            attachmentDTO.setLink(attachment.getLink());
         } else {
-            attachmentDTO.setUrl("");
+            attachmentDTO.setLink("");
         }
         attachmentDTO.setCreateDate(attachment.getCreateDate());
         attachmentDTO.setUpdateDate(attachment.getUpdateDate());
@@ -74,7 +74,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     public @NotNull Attachment mapDTOToEntity(@NotNull AttachmentDTO attachmentDTO, @NotNull Attachment attachment) {
         attachment.setAttachmentId(attachmentDTO.getAttachmentId());
         attachment.setUpdateDate(attachmentDTO.getUpdateDate());
-        attachment.setLink(attachmentDTO.getUrl());
+        attachment.setLink(attachmentDTO.getLink());
         attachment.setCreateDate(attachmentDTO.getCreateDate());
         return attachment;
     }
@@ -158,7 +158,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, Integer consignmentDetailId) throws IOException {
+    public @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, int consignmentDetailId) {
         Optional<ConsignmentDetail> optionalConsignmentDetail = consignmentDetailRepos.findById(consignmentDetailId);
         if (optionalConsignmentDetail.isEmpty()) {
             throw new ResourceNotFoundException("ConsignmentDetail with id " + consignmentDetailId + " does not exist");
@@ -170,7 +170,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             mimeType = mimeTypes.forName(file.getContentType());
         } catch (MimeTypeException e) {
-            throw new IOException(e);
+            throw new RuntimeException(e);
         }
 
 
@@ -179,7 +179,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
 
         // Convert InputStream to ByteArrayInputStream
-        byte[] bytes = file.getBytes();
+        byte[] bytes ;
+        try {
+            bytes = file.getBytes();
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 
         blobClient.upload(byteArrayInputStream, bytes.length, true);

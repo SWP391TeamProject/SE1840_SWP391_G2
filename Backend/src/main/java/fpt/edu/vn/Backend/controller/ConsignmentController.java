@@ -1,23 +1,20 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-import fpt.edu.vn.Backend.pojo.Consignment;
-import fpt.edu.vn.Backend.service.AccountService;
+import fpt.edu.vn.Backend.DTO.ConsignmentRequestDTO;
+import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/consignments")
@@ -25,6 +22,11 @@ import java.util.List;
 public class ConsignmentController {
     private final ConsignmentService consignmentService;
     private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+    @Autowired
+    private AttachmentService attachmentService;
+    @Autowired
+    private AccountRepos accountRepos;
+
     @Autowired
     public ConsignmentController(ConsignmentService consignmentService) {
         this.consignmentService = consignmentService;
@@ -81,10 +83,16 @@ public class ConsignmentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ConsignmentDTO> createConsignment( @RequestParam String preferContact, @RequestBody ConsignmentDetailDTO consignmentDetailDTO) {
+        public ResponseEntity<ConsignmentDTO> createConsignment(@ModelAttribute ConsignmentRequestDTO consignmentRequestDTO) {
         try {
+            ConsignmentDetailDTO consignmentDetailDTO = new ConsignmentDetailDTO();
+            consignmentDetailDTO.setAccountId(consignmentRequestDTO.getAccountId());
+            consignmentDetailDTO.setDescription(consignmentRequestDTO.getDescription());
             int userId = consignmentDetailDTO.getAccountId(); // Hardcoded user ID for now
-            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId,preferContact,consignmentDetailDTO);
+            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId,consignmentRequestDTO.getPreferContact(),consignmentDetailDTO);
+            for(MultipartFile f: consignmentRequestDTO.getFiles()){
+                attachmentService.uploadConsignmentDetailAttachment(f,consignment.getConsignmentDetails().stream().filter(x->x.getType().equals("REQUEST")).findFirst().get().getConsignmentDetailId() );
+            }
             return new ResponseEntity<>(consignment, HttpStatus.CREATED);
         } catch (ConsignmentServiceException e) {
             logger.error("Error creating consignment", e);

@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
@@ -266,8 +267,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
-        return null;
-    }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
+
+
+        return getConsignmentDTOS(pageable,consignmentPage);}
 
     @NotNull
     private Page<ConsignmentDTO> getConsignmentDTOS(Pageable pageable, Page<Consignment> consignmentPage) {
@@ -292,7 +296,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                             detail.getPrice(),
                             detail.getConsignment().getConsignmentId(),
                             detail.getAccount().getAccountId(),
-                            detail.getAttachments() == null ? null : detail.getAttachments().stream().map(Attachment::getAttachmentId).collect(Collectors.toList())
+                            detail.getAttachments() == null ? null : detail.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toList())
                     ))
                     .collect(Collectors.toList());
         }
@@ -318,7 +322,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     .price(detail.getPrice())
                     .consignmentId(detail.getConsignment().getConsignmentId())
                     .accountId(detail.getAccount().getAccountId())
-                    .attachmentIds(List.of(detail.getAttachments().stream().map(Attachment::getAttachmentId).toArray(Integer[]::new)))
+                    .attachments(detail.getAttachments().stream().map(AttachmentDTO::new).toList())
                     .build());
         }
         return new PageImpl<>(consignmentDetailDTOs);

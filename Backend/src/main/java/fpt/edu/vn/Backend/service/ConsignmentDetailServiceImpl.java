@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -76,9 +77,9 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             consignmentDetail.setType(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentDetailDTO.getType()));
 
             // Fetch Attachments by IDs
-            List<Integer> attachmentIds = consignmentDetailDTO.getAttachmentIds();
+            List<AttachmentDTO> attachmentIds = consignmentDetailDTO.getAttachments();
             List<Attachment> attachments = attachmentIds.stream()
-                    .map(attachmentId -> attachmentRepos.findById(attachmentId).orElse(null))
+                    .map(attachmentId -> attachmentRepos.findById(attachmentId.getAttachmentId()).orElse(null))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             consignmentDetail.setAttachments(attachments);
@@ -89,7 +90,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             return new ConsignmentDetailDTO(savedConsignmentDetail);
         } catch (Exception e) {
             // Handle exceptions
-            throw new RuntimeException("Error creating consignment detail", e);
+            throw new ResourceNotFoundException("Error creating consignment detail", e);
         }
 
     }
@@ -124,9 +125,9 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             consignmentDetail.setAccount(account);
 
             // Fetch Attachments by IDs from DTO
-            List<Integer> attachmentIds = updatedConsignmentDetail.getAttachmentIds();
+            List<AttachmentDTO> attachmentIds = updatedConsignmentDetail.getAttachments();
             List<Attachment> attachments = attachmentIds.stream()
-                    .map(attachmentId -> attachmentRepos.findById(attachmentId).orElse(null))
+                    .map(attachmentId -> attachmentRepos.findById(attachmentId.getAttachmentId()).orElse(null))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             consignmentDetail.setAttachments(attachments);
@@ -143,8 +144,8 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     private ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
-        List<Integer> attachmentIds = consignmentDetail.getAttachments().stream()
-                .map(Attachment::getAttachmentId)
+        List<AttachmentDTO> attachmentIds = consignmentDetail.getAttachments().stream()
+                .map(AttachmentDTO::new)
                 .collect(Collectors.toList());
 
         return new ConsignmentDetailDTO(
