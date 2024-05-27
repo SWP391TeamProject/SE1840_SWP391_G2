@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**", "/websocket/**","/api/items/**").permitAll()
+                        .requestMatchers("/auth/**", "/auction-session/**","/api/items/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
