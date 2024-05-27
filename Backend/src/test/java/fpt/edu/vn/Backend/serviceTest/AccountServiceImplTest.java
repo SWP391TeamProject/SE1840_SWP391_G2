@@ -1,7 +1,7 @@
 package fpt.edu.vn.Backend.serviceTest;
 
-import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.RoleDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
@@ -17,13 +17,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
 import static org.mockito.ArgumentMatchers.any;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -66,7 +65,7 @@ public class AccountServiceImplTest {
 
         when(accountRepos.findAll(PageRequest.of(0, 2))).thenReturn(accounts);
 
-        Page<AccountAdminDTO> result = accountService.getAllAccounts(PageRequest.of(0, 2));
+        Page<AccountDTO> result = accountService.getAllAccounts(PageRequest.of(0, 2));
 
         assertEquals(2, result.getContent().size());
     }
@@ -78,7 +77,7 @@ public class AccountServiceImplTest {
 
         when(accountRepos.findAll(PageRequest.of(0, 2))).thenReturn(accounts);
 
-        Page<AccountAdminDTO> result = accountService.getAllAccounts(PageRequest.of(0, 2));
+        Page<AccountDTO> result = accountService.getAllAccounts(PageRequest.of(0, 2));
 
         assertEquals(0, result.getContent().size());
     }
@@ -93,7 +92,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(1, 2));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(1,"MEMBER"),new RoleDTO(2,"STAFF")));
 
         Account account = new Account();
         account.setNickname(accountDTO.getNickname());
@@ -124,7 +123,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(999));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(9,"")));
 
         when(roleRepos.findById(999)).thenReturn(Optional.empty());
 
@@ -144,7 +143,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(1, 2));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(1,"MEMBER"),new RoleDTO(2,"STAFF")));
 
         Account account = new Account();
         account.setAccountId(accountDTO.getAccountId());
@@ -177,7 +176,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(1, 2));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(1,"MEMBER"),new RoleDTO(2,"STAFF")));
 
         when(accountRepos.findById(999)).thenReturn(Optional.empty());
 
@@ -195,7 +194,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(999));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(999,"")));
 
         Account account = new Account();
         account.setAccountId(accountDTO.getAccountId());

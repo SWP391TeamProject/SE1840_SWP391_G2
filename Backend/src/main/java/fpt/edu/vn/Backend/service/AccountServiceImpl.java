@@ -1,7 +1,5 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
-
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -13,13 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,25 +34,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Page<AccountAdminDTO> getAllAccounts(Pageable pageable) {
+    public Page<AccountDTO> getAllAccounts(Pageable pageable) {
         Page<Account> accounts = accountRepos.findAll(pageable);
-        List<AccountAdminDTO> dtos = accounts.stream()
-                .map(account -> {
-                    AccountAdminDTO dto = new AccountAdminDTO();
-                    dto.setUserId(account.getAccountId());
-                    dto.setNickname(account.getNickname());
-                    dto.setRole(account.getAuthorities().stream()
-                            .map(Role::getRoleId)
-                            .collect(Collectors.toList()));
-                    dto.setEmail(account.getEmail());
-                    dto.setPhone(account.getPhone());
-                    dto.setBalance(account.getBalance());
-                    dto.setCreateDate(account.getCreateDate());
-                    dto.setUpdateDate(account.getUpdateDate());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-        return new PageImpl<>(dtos, pageable, accounts.getTotalElements());
+        return accounts.map(AccountDTO::new);
     }
 
     @Override
@@ -68,9 +48,9 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(accountDTO.getBalance());
         account.setCreateDate(accountDTO.getCreateDate());
         account.setUpdateDate(accountDTO.getUpdateDate());
-        account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
-            Role role = new Role();
-            role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
+        account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
+            Role role;
+            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleDTO.getRoleId()));
             return role;
         }).collect(Collectors.toSet()));
         return new AccountDTO(accountRepos.save(account));
@@ -96,9 +76,9 @@ public class AccountServiceImpl implements AccountService {
         account.setCreateDate(accountDTO.getCreateDate());
         account.setUpdateDate(accountDTO.getUpdateDate());
         account.setStatus((byte)accountDTO.getStatus());
-        account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
+        account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
             Role role;
-            role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
+            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleDTO", ""+roleDTO.getRoleId()));
             return role;
         }).collect(Collectors.toSet()));
         return new AccountDTO(accountRepos.save(account));
@@ -140,9 +120,9 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(accountDTO.getBalance());
         account.setCreateDate(accountDTO.getCreateDate());
         account.setUpdateDate(accountDTO.getUpdateDate());
-        account.setAuthorities(accountDTO.getRole().stream().map(roleId -> {
+        account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
             Role role;
-            role = roleRepos.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleId));
+            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleDTO", ""+roleDTO.getRoleId()));
             return role;
         }).collect(Collectors.toSet()));
         return account;

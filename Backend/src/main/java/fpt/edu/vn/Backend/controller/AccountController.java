@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.service.AccountService;
@@ -32,7 +31,7 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<AccountAdminDTO>> getAllAccounts(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "accountId") String sortBy) {
+    public ResponseEntity<Page<AccountDTO>> getAllAccounts(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "accountId") String sortBy) {
         Pageable pageable = PageRequest.of(pageNumb, pageSize, Sort.by(sortBy).ascending());
         return new ResponseEntity<>(accountService.getAllAccounts(pageable), HttpStatus.OK);
     }
