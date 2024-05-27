@@ -68,7 +68,7 @@ class AuthServiceImplTest {
         Set<Role> roles = new HashSet<>();
         roles.add(new Role());
         account.setAuthorities(roles);
-        when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(account);
+        when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
         AuthResponseDTO result = authService.login(loginDTO);
 
         assertNotNull(result);
@@ -220,7 +220,7 @@ class AuthServiceImplTest {
         Set<Role> roles = new HashSet<>();
         roles.add(new Role());
         account.setAuthorities(roles);
-        when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(account);
+        when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
 
         // Act
         AuthResponseDTO result = authService.login(loginDTO);

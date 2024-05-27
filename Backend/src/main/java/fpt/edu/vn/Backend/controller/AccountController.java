@@ -1,30 +1,25 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.service.AccountService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/accounts")
 @CrossOrigin("*")
 public class AccountController {
     private final AccountService accountService;
-    private static final Logger log = LoggerFactory.getLogger(AccountController.class);
 
     @Autowired
     public AccountController(AccountService accountService) {
@@ -32,9 +27,12 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<AccountAdminDTO>> getAllAccounts(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize, @RequestParam(defaultValue = "accountId") String sortBy) {
-        Pageable pageable = PageRequest.of(pageNumb, pageSize, Sort.by(sortBy).ascending());
-        return new ResponseEntity<>(accountService.getAllAccounts(pageable), HttpStatus.OK);
+    public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 30) Pageable pageable, @RequestParam int... roleIds) {
+        if (roleIds.length == 0) {
+            return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
+        }
+        var roles = Arrays.stream(roleIds).boxed().collect(Collectors.toSet());
+        return new ResponseEntity<>(accountService.getAccountsByRoleIds(pageable, roles), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -42,7 +40,7 @@ public class AccountController {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {
         return new ResponseEntity<>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
     }
@@ -57,21 +55,16 @@ public class AccountController {
     }
 
     @PostMapping("/avatar/{id}")
-    public ResponseEntity<List<AttachmentDTO>> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile[] files) {
-        List<AttachmentDTO> attachmentDTOs = new ArrayList<>();
-        for (MultipartFile file : files) {
-            attachmentDTOs.add(accountService.addProfileImage(id, file));
-        }
-        return new ResponseEntity<>(attachmentDTOs, HttpStatus.OK);
+    public ResponseEntity<AttachmentDTO> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(accountService.setAvatar(id, file), HttpStatus.OK);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<AccountDTO> deleteAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            AccountDTO accountDTO = accountService.getAccountById(id);
-            accountDTO.setStatus(0);
-            accountService.updateAccount(accountDTO);
+            accountService.deactivateAccount(id);
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
