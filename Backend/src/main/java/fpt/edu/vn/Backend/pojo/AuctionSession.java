@@ -31,7 +31,7 @@ public class AuctionSession {
     @Enumerated(EnumType.STRING)
     private Status status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
 
-    enum Status {
+    public enum Status {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
 
