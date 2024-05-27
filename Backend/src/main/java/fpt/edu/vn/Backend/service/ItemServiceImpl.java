@@ -90,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDTO updateItem(@NotNull ItemDTO item) {
+    public @NotNull ItemDTO updateItem(@NotNull ItemDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
         Item it = itemRepos.findById(item.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found", "itemId", item.getItemId().toString()));

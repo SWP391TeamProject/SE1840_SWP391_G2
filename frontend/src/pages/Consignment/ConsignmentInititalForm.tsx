@@ -18,7 +18,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadIcon } from "lucide-react";
 import DropzoneComponent from "./DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
-
+import { SERVER_DOMAIN_URL } from "@/constants/Domain";
+const MAX_FILE_SIZE = 5000000;
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 const formSchema = z.object({
   accountId: z.number(),
   email: z.string(),
@@ -26,6 +33,24 @@ const formSchema = z.object({
   contactName: z.string(),
   preferContact: z.enum(["email", "phone", "text", "any of the above"]),
   description: z.string(),
+  image: z
+    .instanceof(FileList, { message: "Required" })
+    .refine((file) => file?.length > 0, "A file is required.")
+    .refine((files) => {
+      for (let i = 0; i < files.length; i++) {
+        console.log(i, files[i]);
+        if (files[i].type in ACCEPTED_IMAGE_TYPES) {
+          if (!ACCEPTED_IMAGE_TYPES.includes(files[i].type)) return false; // Check if it's an accepted image type
+        }
+      }
+      return true;
+    }, "Must be a valid image.")
+    .refine((files) => {
+      for (let i = 0; i < files.length; i++) {
+        if (files[i].size > MAX_FILE_SIZE) return false; // Check if size exceeds max size
+      }
+      return true;
+    }, "Max size reached."),
 });
 
 export default function ConsignmentInititalForm() {
@@ -39,11 +64,24 @@ export default function ConsignmentInititalForm() {
       contactName: "",
       preferContact: "any of the above",
       description: "",
+      files: [],
     },
   });
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
-  }
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    // Remove FormData creation and file handling
+
+    // Extract the relevant JSON data (excluding files)
+    const jsonData = Object.keys(data).reduce((acc, key) => {
+      if (key !== "files") {
+        acc[key] = data[key];
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Log the JSON data
+    console.log(JSON.stringify(jsonData, null, 2)); // Pretty-print for readability
+  };
+
   return (
     <div key="1" className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
       <div>
@@ -190,16 +228,34 @@ export default function ConsignmentInititalForm() {
               </FormItem>
             )}
           />
-          <div className="w-full h-48 p-4 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
-            <UploadIcon className="w-10 h-10 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Drag and drop an image or click to upload
-            </p>
-          </div>
+          <FormField
+            control={form.control}
+            name="files"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Upload Files</FormLabel>
+                <FormControl>
+                  <Input
+                    id="files"
+                    type="file"
+                    accept={ACCEPTED_IMAGE_TYPES.join(", ")}
+                    multiple
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Select the files you want to upload.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <DropzoneComponent />
+
           <Button variant={"destructive"} type="submit">
             Submit
           </Button>
-          <DropzoneComponent />
         </form>
       </Form>
     </div>

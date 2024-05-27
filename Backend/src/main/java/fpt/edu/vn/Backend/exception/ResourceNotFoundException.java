@@ -6,8 +6,8 @@ public class ResourceNotFoundException extends RuntimeException {
     super();
   }
 
-  public ResourceNotFoundException(String model, String field, String value) {
-    super(String.format("%s with %s %s is not existed", model, field, value));
+  public ResourceNotFoundException(String model, String field, Object value) {
+    super(String.format("%s with %s %s is not existed", model, field, value.toString()));
   }
 
   public ResourceNotFoundException(String message) {

@@ -18,6 +18,7 @@ public interface ItemService {
     @Nullable ItemDTO getItemById(int id);
     ItemDTO updateItem(@NotNull ItemDTO itemDTO);
 
+
     @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable);
     @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status);
     @NotNull Page<ItemDTO> getItemsByOwnerId(@NotNull Pageable pageable, int ownerId);
