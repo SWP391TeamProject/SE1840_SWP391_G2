@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 @Data
 @Builder
 @NoArgsConstructor
+@Slf4j
 public class ConsignmentDetailDTO {
     private int consignmentDetailId;
     private String description;
@@ -20,15 +22,15 @@ public class ConsignmentDetailDTO {
     private BigDecimal price;
     private int consignmentId; // Use int for the Consignment reference in DTO
     private int accountId; // Use int for the Account reference in DTO
-    private List<Integer> attachmentIds; // Use List of Integer for the Attachment references in DTO
-    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, int accountId, List<Integer> attachmentIds) {
+    private List<AttachmentDTO> attachments; // Use List of Integer for the Attachment references in DTO
+    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, int accountId, List<AttachmentDTO> attachmentIds) {
         this.consignmentDetailId = consignmentDetailId;
         this.description = description;
         this.type = type;
         this.price = price;
         this.consignmentId = consignmentId;
         this.accountId = accountId;
-        this.attachmentIds = attachmentIds;
+        this.attachments = attachmentIds;
     }
 
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
@@ -38,6 +40,10 @@ public class ConsignmentDetailDTO {
         this.price = consignmentDetail.getPrice();
         this.consignmentId = consignmentDetail.getConsignment().getConsignmentId();
         this.accountId = consignmentDetail.getAccount().getAccountId();
-        this.attachmentIds = consignmentDetail.getAttachments().stream().map(Attachment::getAttachmentId).collect(Collectors.toList());
+        this.attachments = consignmentDetail.getAttachments().stream()
+                .map(AttachmentDTO::new)
+                .collect(Collectors.toList());
+
     }
+
 }

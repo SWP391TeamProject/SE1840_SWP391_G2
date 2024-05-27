@@ -12,4 +12,9 @@ public class RoleDTO {
 
     private int roleId;
     private String roleName;
+
+    public RoleDTO(Role role) {
+        this.roleId = role.getRoleId();
+        this.roleName = String.valueOf(role.getRoleName());
+    }
 }

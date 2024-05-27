@@ -16,7 +16,7 @@ import java.util.List;
 public class AccountDTO {
     private int accountId;
     private String nickname;
-    private List<Integer> role;
+    private List<RoleDTO> role;
     private String email;
     private String phone;
     private int status;
@@ -35,7 +35,7 @@ public class AccountDTO {
         this.balance = account.getBalance();
         this.createDate = account.getCreateDate();
         this.updateDate = account.getUpdateDate();
-        this.role = account.getAuthorities().stream().map(Role::getRoleId).toList();
+        this.role = account.getAuthorities().stream().map(RoleDTO::new).toList();
     }
 
 
