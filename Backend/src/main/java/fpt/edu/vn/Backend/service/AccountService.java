@@ -17,9 +17,9 @@ public interface AccountService {
     AccountDTO getAccountByEmailAndPassword(String email, String password);
     Account parseAccountDTOToEntity(AccountDTO accountDTO) ;
 
-    AttachmentDTO addProfileImage(int id, MultipartFile file);
+    AttachmentDTO setAvatar(int id, MultipartFile file);
 
-    void deactiveAccount(int id);
+    void activateAccount(int id);
 
-    void activeAccount(int id);
+    void deactivateAccount(int id);
 }

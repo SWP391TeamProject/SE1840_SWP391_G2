@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,8 +79,8 @@ public class AccountServiceImpl implements AccountService {
         account.setPhone(accountDTO.getPhone());
         account.setBalance(accountDTO.getBalance());
         account.setCreateDate(accountDTO.getCreateDate());
-        account.setUpdateDate(accountDTO.getUpdateDate());
-        account.setStatus((byte)accountDTO.getStatus());
+        account.setUpdateDate(LocalDateTime.now());
+        account.setStatus(accountDTO.getStatus());
         account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
             Role role;
             role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleDTO", ""+roleDTO.getRoleId()));
@@ -125,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file) {
+    public AttachmentDTO setAvatar(int id, @NotNull MultipartFile file) {
         try {
             return attachmentServiceImpl.uploadAccountAttachment(file, id);
         } catch (IOException e) {
@@ -136,7 +137,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void activateAccount(int accountId) {
-        AccountDTO account = new AccountDTO();
+        AccountDTO account = accountRepos.findById(accountId).map(AccountDTO::new).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountId));
         account.setAccountId(accountId);
         account.setStatus((byte) 1);
         updateAccount(account);
