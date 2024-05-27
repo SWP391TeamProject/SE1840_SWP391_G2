@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.exception.MappingException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -36,7 +37,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public @NotNull ItemDTO mapEntityToDTO(@NotNull Item item, @NotNull ItemDTO itemDTO) {
         itemDTO.setItemId(item.getItemId());
-        itemDTO.setCategoryId(item.getItemCategory().getItemCategoryId());
+        if (item.getItemCategory() != null)
+            itemDTO.setCategoryId(item.getItemCategory().getItemCategoryId());
         itemDTO.setName(item.getName());
         itemDTO.setDescription(item.getDescription());
         itemDTO.setReservePrice(item.getReservePrice());
@@ -44,7 +46,8 @@ public class ItemServiceImpl implements ItemService {
         itemDTO.setStatus(item.getStatus());
         itemDTO.setCreateDate(item.getCreateDate());
         itemDTO.setUpdateDate(item.getUpdateDate());
-        itemDTO.setOwnerId(item.getOwner().getAccountId());
+        if (item.getOwner() != null)
+            itemDTO.setOwnerId(item.getOwner().getAccountId());
         Order order = item.getOrder();
         if (order != null)
             itemDTO.setOrderId(order.getOrderId());
@@ -67,10 +70,6 @@ public class ItemServiceImpl implements ItemService {
             item.setBuyInPrice(itemDTO.getBuyInPrice());
         if (itemDTO.getStatus() != null)
             item.setStatus(itemDTO.getStatus());
-        if (itemDTO.getCreateDate() != null)
-            item.setCreateDate(itemDTO.getCreateDate());
-        if (itemDTO.getUpdateDate() != null)
-            item.setUpdateDate(itemDTO.getUpdateDate());
         if (itemDTO.getOwnerId() != null)
             item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
                 .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwnerId())));
@@ -87,19 +86,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO getItemById(int id) {
-        return itemRepos.findItemByItemId(id).map(this::mapEntityToDTO).orElse(null);
+        return itemRepos.findById(id).map(this::mapEntityToDTO).orElse(null);
     }
 
     @Override
-    public ItemDTO updateItem(@NotNull ItemDTO item) {
+    public @NotNull ItemDTO updateItem(@NotNull ItemDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
-        Item it = itemRepos.findItemByItemId(item.getItemId()).orElseThrow();
+        Item it = itemRepos.findById(item.getItemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found", "itemId", item.getItemId().toString()));
         return mapEntityToDTO(itemRepos.save(mapDTOToEntity(item, it)));
-    }
-
-    @Override
-    public boolean deleteItem(int id) {
-        return itemRepos.deleteItemByItemId(id);
     }
 
     @Override

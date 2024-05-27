@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.service.AccountService;
@@ -56,21 +57,15 @@ public class AccountController {
     }
 
     @PostMapping("/avatar/{id}")
-    public ResponseEntity<List<AttachmentDTO>> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile[] files) {
-        List<AttachmentDTO> attachmentDTOs = new ArrayList<>();
-        for (MultipartFile file : files) {
-            attachmentDTOs.add(accountService.addProfileImage(id, file));
-        }
-        return new ResponseEntity<>(attachmentDTOs, HttpStatus.OK);
+    public ResponseEntity<AttachmentDTO> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<>(accountService.setAvatar(id, file), HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<AccountDTO> deleteAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            AccountDTO accountDTO = accountService.getAccountById(id);
-            accountDTO.setStatus(0);
-            accountService.updateAccount(accountDTO);
+            accountService.deactivateAccount(id);
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }

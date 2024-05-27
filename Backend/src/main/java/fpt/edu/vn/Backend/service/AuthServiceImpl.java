@@ -104,7 +104,7 @@ public class AuthServiceImpl implements AuthService{
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
 
-        Optional<Account> userOptional = Optional.ofNullable(accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword()));
+        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
 
         if (!userOptional.isPresent()) {
             throw new InvalidInputException("Invalid email or password");

@@ -7,15 +7,19 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.RoleRepos;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,14 +89,6 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-    public void deactiveAccount(int id) {
-
-    }
-
-    @Override
-    public void activeAccount(int id) {
-
-    }
 
 
 
@@ -129,12 +125,28 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AttachmentDTO addProfileImage(int id, MultipartFile file) {
+    public AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file) {
         try {
             return attachmentServiceImpl.uploadAccountAttachment(file, id);
         } catch (IOException e) {
             throw new ResourceNotFoundException("Account", "accountId", ""+id);
             // Handle the exception appropriately
         }
+    }
+
+    @Override
+    public void activateAccount(int accountId) {
+        AccountDTO account = new AccountDTO();
+        account.setAccountId(accountId);
+        account.setStatus((byte) 1);
+        updateAccount(account);
+    }
+
+    @Override
+    public void deactivateAccount(int accountId) {
+        AccountDTO account = new AccountDTO();
+        account.setAccountId(accountId);
+        account.setStatus((byte) 0);
+        updateAccount(account);
     }
 }

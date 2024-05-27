@@ -14,12 +14,13 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class AccountDTO {
-    private int accountId;
+    private Integer accountId;
     private String nickname;
     private List<RoleDTO> role;
+    private AttachmentDTO avatar;
     private String email;
     private String phone;
-    private int status;
+    private Byte status;
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
