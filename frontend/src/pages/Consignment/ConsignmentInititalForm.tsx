@@ -19,6 +19,8 @@ import { UploadIcon } from "lucide-react";
 import DropzoneComponent from "./DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
 import { SERVER_DOMAIN_URL } from "@/constants/Domain";
+import { useDropzone } from "react-dropzone";
+import { createConsignmentService } from "@/services/ConsignmentService";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -33,24 +35,7 @@ const formSchema = z.object({
   contactName: z.string(),
   preferContact: z.enum(["email", "phone", "text", "any of the above"]),
   description: z.string(),
-  image: z
-    .instanceof(FileList, { message: "Required" })
-    .refine((file) => file?.length > 0, "A file is required.")
-    .refine((files) => {
-      for (let i = 0; i < files.length; i++) {
-        console.log(i, files[i]);
-        if (files[i].type in ACCEPTED_IMAGE_TYPES) {
-          if (!ACCEPTED_IMAGE_TYPES.includes(files[i].type)) return false; // Check if it's an accepted image type
-        }
-      }
-      return true;
-    }, "Must be a valid image.")
-    .refine((files) => {
-      for (let i = 0; i < files.length; i++) {
-        if (files[i].size > MAX_FILE_SIZE) return false; // Check if size exceeds max size
-      }
-      return true;
-    }, "Max size reached."),
+  files: z.any()
 });
 
 export default function ConsignmentInititalForm() {
@@ -69,21 +54,15 @@ export default function ConsignmentInititalForm() {
   });
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     // Remove FormData creation and file handling
-
-    // Extract the relevant JSON data (excluding files)
-    const jsonData = Object.keys(data).reduce((acc, key) => {
-      if (key !== "files") {
-        acc[key] = data[key];
-      }
-      return acc;
-    }, {} as Record<string, any>);
-
-    // Log the JSON data
-    console.log(JSON.stringify(jsonData, null, 2)); // Pretty-print for readability
+    createConsignmentService(data).then((res) => {
+      console.log(res);
+    });
+   
+    console.log(data);
   };
 
   return (
-    <div key="1" className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+    <div key="1" className="max-w-6xl  mx-auto p-4 sm:p-6 md:p-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           List your item for consignment
@@ -199,7 +178,7 @@ export default function ConsignmentInititalForm() {
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="any of the above" />
+                        <RadioGroupItem value="any" />
                       </FormControl>
                       <FormLabel className="font-normal">
                         Any of the above
@@ -228,30 +207,15 @@ export default function ConsignmentInititalForm() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="files"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Upload Files</FormLabel>
-                <FormControl>
-                  <Input
-                    id="files"
-                    type="file"
-                    accept={ACCEPTED_IMAGE_TYPES.join(", ")}
-                    multiple
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Select the files you want to upload.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+       <FormField
+  control={form.control}
+  name="files"
+  render={({ field }) => (
+    <DropzoneComponent {...field} />
+  )}
+/>
 
-          <DropzoneComponent />
+          {/* <DropzoneComponent /> */}
 
           <Button variant={"destructive"} type="submit">
             Submit

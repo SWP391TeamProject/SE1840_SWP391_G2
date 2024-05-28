@@ -29,6 +29,7 @@ export default function NavBar() {
   }, []);
   const handleSignout = () => {
     removeCookie("user");
+    removeCookie("token");
     setIsLogin(false);
     redirect("/");
     // nav("/auth/login");
@@ -65,7 +66,7 @@ export default function NavBar() {
 
           <Link
             className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2 scroll-smooth"
-            to="#"
+            to="/Auctions"
           >
             Auctions
           </Link>

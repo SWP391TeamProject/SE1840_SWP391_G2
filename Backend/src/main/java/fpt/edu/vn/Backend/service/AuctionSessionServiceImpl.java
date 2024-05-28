@@ -84,17 +84,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService{
         if (auctionSessions.isEmpty()) {
             throw new ResourceNotFoundException("No auction sessions found");
         }
-        return auctionSessions.map(auctionSession -> {
-            AuctionSessionDTO dto = new AuctionSessionDTO();
-
-            dto.setAuctionSessionId(auctionSession.getAuctionSessionId());
-            dto.setCreateDate(auctionSession.getCreateDate());
-            dto.setStartDate(auctionSession.getStartDate());
-            dto.setEndDate(auctionSession.getEndDate());
-            dto.setUpdateDate(auctionSession.getCreateDate());
-            dto.setStatus(String.valueOf(auctionSession.getStatus()));
-
-            return dto;
-        });
+        return auctionSessions.map(AuctionSessionDTO::new);
     }
 }

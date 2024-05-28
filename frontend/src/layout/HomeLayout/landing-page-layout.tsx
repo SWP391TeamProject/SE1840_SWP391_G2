@@ -37,7 +37,7 @@ import NavBar from "@/components/NavBar/NavBar";
 
 export function LandingPageLayout() {
   return (
-    <div key="1" className="flex flex-col min-h-[100dvh] w-screen">
+    <div key="1" className="flex flex-col min-h-[100dvh]">
       <NavBar />
       <main className="flex-1">
         {/* Start Carouesel Sections */}

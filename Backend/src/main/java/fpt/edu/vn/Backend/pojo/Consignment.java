@@ -33,7 +33,7 @@ public class Consignment {
     }
 
     public enum preferContact {
-        EMAIL, PHONE , TEXT_MESSAGE , ANY
+        EMAIL, PHONE , TEXT , ANY
     }
     @Column(name = "prefer_contact")
     @Enumerated(EnumType.STRING)

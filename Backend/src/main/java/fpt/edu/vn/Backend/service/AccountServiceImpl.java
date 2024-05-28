@@ -145,6 +145,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deactivateAccount(int accountId) {
+        
         AccountDTO account = new AccountDTO();
         account.setAccountId(accountId);
         account.setStatus((byte) 0);

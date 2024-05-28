@@ -1,4 +1,5 @@
 import NavBar from "@/components/NavBar/NavBar";
+import ConsignmentForm from "@/pages/Consignment/ConsignmentForm";
 import ConsignmentInititalForm from "@/pages/Consignment/ConsignmentInititalForm";
 import { ConsignmentRequestForm } from "@/pages/Consignment/ConsignmentRequestForm";
 import { InputForm } from "@/pages/Consignment/TestForm";
@@ -17,7 +18,7 @@ export default function ConsignmentLayout() {
   return (
     <div>
       <NavBar />
-      <ConsignmentInititalForm />
+      <ConsignmentInititalForm/>
     </div>
   );
 }

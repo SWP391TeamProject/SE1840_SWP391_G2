@@ -11,7 +11,11 @@ export const fetchConsignmentsService = async () => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .then((res) => res.data.content) // return the data here
+    .catch((err) => {
+      console.log(err);
+      throw err; // make sure to throw the error so it can be caught by the query
+    });
 };
 
 export const updateConsignmentService = async (data: any) => {
@@ -29,9 +33,9 @@ export const updateConsignmentService = async (data: any) => {
 
 export const createConsignmentService = async (data: any) => {
   return await axios
-    .post("http://localhost:8080/api/consignments/", data, {
+    .post("http://localhost:8080/api/consignments/create", data, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
         "Access-Control-Allow-Origin": "*",
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",

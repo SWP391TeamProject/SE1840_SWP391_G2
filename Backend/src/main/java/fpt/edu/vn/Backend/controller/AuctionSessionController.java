@@ -9,13 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin("*")
 @RestController
-@RequestMapping("/api/auction-session")
+@RequestMapping("/api/auction-sessions")
 public class AuctionSessionController {
     @Autowired
     private AuctionSessionService auctionSessionService;
-    @GetMapping("/")
+    @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@RequestParam(defaultValue = "0") int pageNumb,@RequestParam(defaultValue = "50") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumb,pageSize);
         return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class AuctionSessionDTO {
     private int auctionSessionId;
+    private String title;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String status;
@@ -25,16 +26,19 @@ public class AuctionSessionDTO {
         this.status = String.valueOf(auctionSession.getStatus());
         this.createDate = auctionSession.getCreateDate();
         this.updateDate = auctionSession.getUpdateDate();
-    }
+        this.title = auctionSession.getTitle();
 
-    public AuctionSessionDTO(int auctionSessionId, LocalDateTime startDate, LocalDateTime endDate, String status, LocalDateTime createDate, LocalDateTime updateDate) {
+    }
+    public AuctionSessionDTO(int auctionSessionId, String title, LocalDateTime startDate, LocalDateTime endDate, String status, LocalDateTime createDate, LocalDateTime updateDate) {
         this.auctionSessionId = auctionSessionId;
+        this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.createDate = createDate;
         this.updateDate = updateDate;
     }
+
 
     // getters and setters
     // ...

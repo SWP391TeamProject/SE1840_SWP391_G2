@@ -24,10 +24,21 @@ import Unauthorized from "./pages/authentication/Unauthorized.tsx";
 import { AuthProvider } from "./AuthProvider.tsx";
 import { Roles } from "./constants/enums.tsx";
 import ConsignmentLayout from "./layout/ConsignmentLayout/ConsignmentLayout.tsx";
-
+import AuctionsLayout from "./layout/AuctionsLayout/AuctionsLayout.tsx";
+import AuctionList from "./pages/Auctions/AuctionList.tsx";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 const router = createBrowserRouter(routes);
+const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
+  <QueryClientProvider client={queryClient}>
+
   <Provider store={store}>
     <TooltipProvider>
       <AuthProvider>
@@ -53,11 +64,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/auth/login" element={<LoginLayout />}></Route>
               <Route path="/auth/register" element={<RegisterLayout />}></Route>
             </Route>
-            <Route element={<PrivateRoute allowedRoles={[Roles.MEMBER]} />}>
+            <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER,Roles.MEMBER]} />}>
               <Route
                 path="/consignment"
                 element={<ConsignmentLayout />}
               ></Route>
+            </Route>
+            <Route path="/Auctions" element={<AuctionsLayout />}>
+              <Route path="/Auctions" element={<AuctionList />}></Route>
             </Route>
             <Route path="/unauthorized" element={<Unauthorized />} />
             {/* <RouterProvider router={router} /> */}
@@ -67,4 +81,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       {/* <RouterProvider router={router} /> */}
     </TooltipProvider>
   </Provider>
+  </QueryClientProvider>
+
 );
