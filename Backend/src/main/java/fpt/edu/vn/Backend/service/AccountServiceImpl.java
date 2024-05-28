@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.service;
 
-import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -14,19 +13,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-    private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountRepos accountRepos;
+
     private final RoleRepos roleRepos;
     private final AttachmentServiceImpl attachmentServiceImpl;
 
@@ -38,103 +39,105 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public @NotNull AccountDTO mapEntityToDTO(@NotNull Account account, @NotNull AccountDTO accountDTO) {
-        accountDTO.setAccountId(account.getAccountId());
-        accountDTO.setNickname(account.getNickname());
-        var avatar = account.getAvatarUrl();
-        if (avatar != null)
-            accountDTO.setAvatar(attachmentServiceImpl.mapEntityToDTO(avatar));
-        if (account.getAuthorities() != null)
-            accountDTO.setRole(account.getAuthorities().stream().map(Role::getRoleId).collect(Collectors.toList()));
-        accountDTO.setEmail(account.getEmail());
-        accountDTO.setPhone(account.getPhone());
-        accountDTO.setStatus(account.getStatus());
-        accountDTO.setBalance(account.getBalance());
-        accountDTO.setCreateDate(account.getCreateDate());
-        accountDTO.setUpdateDate(account.getUpdateDate());
-        return accountDTO;
+    public Page<AccountDTO> getAllAccounts(Pageable pageable) {
+        Page<Account> accounts = accountRepos.findAll(pageable);
+        return accounts.map(AccountDTO::new);
     }
 
     @Override
-    public @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account) {
-        // updating avatar, password is in different functions
+    public AccountDTO createAccount(AccountDTO accountDTO) {
+        Account account = new Account();
+        account.setNickname(accountDTO.getNickname());
+        account.setEmail(accountDTO.getEmail());
+        account.setPhone(accountDTO.getPhone());
+        account.setBalance(accountDTO.getBalance());
+        account.setCreateDate(accountDTO.getCreateDate());
+        account.setUpdateDate(accountDTO.getUpdateDate());
+        account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
+            Role role;
+            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleDTO.getRoleId()));
+            return role;
+        }).collect(Collectors.toSet()));
+        return new AccountDTO(accountRepos.save(account));
+
+    }
+
+
+
+    @Override
+    public AccountDTO getAccountById(int id) {
+        return accountRepos.findById(id)
+                .map(AccountDTO::new)
+                .orElse(null);
+    }
+
+    @Override
+    public AccountDTO updateAccount(AccountDTO accountDTO) {
+        Account account = accountRepos.findById(accountDTO.getAccountId()).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountDTO.getAccountId()));
+        account.setNickname(accountDTO.getNickname());
+        account.setEmail(accountDTO.getEmail());
+        account.setPhone(accountDTO.getPhone());
+        account.setBalance(accountDTO.getBalance());
+        account.setCreateDate(accountDTO.getCreateDate());
+        account.setUpdateDate(LocalDateTime.now());
+        account.setStatus(accountDTO.getStatus());
+        account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
+            Role role;
+            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleDTO", ""+roleDTO.getRoleId()));
+            return role;
+        }).collect(Collectors.toSet()));
+        return new AccountDTO(accountRepos.save(account));
+
+    }
+
+
+
+
+    @Override
+    public AccountDTO getAccountByEmail(String email) {
+        return new AccountDTO(accountRepos.findAll().stream().filter(
+                account -> account.getEmail().equals(email)).findFirst().orElseThrow(
+                        () -> new ResourceNotFoundException("Account", "email", email)));
+    }
+
+    @Override
+    public AccountDTO getAccountByEmailAndPassword(String email, String password) {
+        return new AccountDTO(accountRepos.findAll().stream().filter(
+                account -> account.getEmail().equals(email) && account.getPassword().equals(password)).findFirst().orElseThrow(
+                        () -> new ResourceNotFoundException("Account", "email", email))) ;
+    }
+
+    @Override
+    public Account parseAccountDTOToEntity(AccountDTO accountDTO) {
+        Account account = new Account();
         account.setAccountId(accountDTO.getAccountId());
-        if (accountDTO.getRole() != null && !accountDTO.getRole().isEmpty())
-            account.setAuthorities(accountDTO.getRole().stream().map(roleRepos::findById)
-                    .map((v) -> v.orElseThrow(() -> new ResourceNotFoundException("Role not found")))
-                    .collect(Collectors.toSet()));
-        if (accountDTO.getNickname() != null)
-            account.setNickname(accountDTO.getNickname());
-        if (accountDTO.getPhone() != null)
-            account.setPhone(accountDTO.getPhone());
-        if (accountDTO.getStatus() != null)
-            account.setStatus(accountDTO.getStatus());
-        if (accountDTO.getBalance() != null)
-            account.setBalance(accountDTO.getBalance());
+        account.setNickname(accountDTO.getNickname());
+        account.setEmail(accountDTO.getEmail());
+        account.setPhone(accountDTO.getPhone());
+        account.setBalance(accountDTO.getBalance());
+        account.setCreateDate(accountDTO.getCreateDate());
+        account.setUpdateDate(accountDTO.getUpdateDate());
+        account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
+            Role role;
+            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleDTO", ""+roleDTO.getRoleId()));
+            return role;
+        }).collect(Collectors.toSet()));
         return account;
     }
 
     @Override
-    public @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable) {
-        return accountRepos.findAll(pageable).map(this::mapEntityToDTO);
-    }
-
-    @Override
-    public @NotNull Page<AccountDTO> getAccountsByRoleIds(@NotNull Pageable pageable, Set<Integer> roleIds) {
-        var a = accountRepos.findAccountByAuthoritiesRoleIds(roleIds, pageable);
-        a = a == null ? Page.empty(pageable) : a;
-        return a.map(this::mapEntityToDTO);
-    }
-
-    @Override
-    public @Nullable AccountDTO getAccountById(int accountId) {
-        return accountRepos.findById(accountId).map(this::mapEntityToDTO).orElse(null);
-    }
-
-    @Override
-    public @Nullable AccountDTO getAccountByEmail(@NotNull String email) {
-        return accountRepos.findByEmail(email).map(this::mapEntityToDTO).orElse(null);
-    }
-
-    @Override
-    public @Nullable AccountDTO getAccountByEmailAndPassword(@NotNull String email, @NotNull String password) {
-        return accountRepos.findByEmailAndPassword(email, password).map(this::mapEntityToDTO).orElse(null);
-    }
-
-    @Override
-    public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
-        Account a = new Account();
-        a.setNickname(account.getNickname());
-        a.setAuthorities(account.getRole().stream()
-                .map(roleId -> roleRepos.findById(roleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", roleId)))
-                .collect(Collectors.toSet()));
-        a.setEmail(account.getEmail());
-        a.setPhone(account.getPhone());
-        a.setBalance(account.getBalance());
-        return mapEntityToDTO(accountRepos.save(a));
-    }
-
-    @Override
-    public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account) {
-        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
-        Account acc = accountRepos.findById(account.getAccountId())
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
-        return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc)));
-    }
-
-    @Override
-    public @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file) {
+    public AttachmentDTO setAvatar(int id, @NotNull MultipartFile file) {
         try {
-            return attachmentServiceImpl.uploadAccountAttachment(file, accountId);
+            return attachmentServiceImpl.uploadAccountAttachment(file, id);
         } catch (IOException e) {
-            throw new ResourceNotFoundException("Account", "accountId", accountId);
+            throw new ResourceNotFoundException("Account", "accountId", ""+id);
+            // Handle the exception appropriately
         }
     }
 
     @Override
     public void activateAccount(int accountId) {
-        AccountDTO account = new AccountDTO();
+        AccountDTO account = accountRepos.findById(accountId).map(AccountDTO::new).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountId));
         account.setAccountId(accountId);
         account.setStatus((byte) 1);
         updateAccount(account);

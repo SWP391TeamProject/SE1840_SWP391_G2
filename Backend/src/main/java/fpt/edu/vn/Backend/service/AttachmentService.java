@@ -29,7 +29,7 @@ public interface AttachmentService {
     boolean deleteAttachment(int attachmentId);
 
     @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, int accountId) throws IOException;
-    @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, Integer consignmentDetailId) throws IOException;
+    @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, int consignmentDetailId);
     @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException;
 
     @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile[] file, int itemId) throws IOException;
