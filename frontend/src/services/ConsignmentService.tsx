@@ -1,7 +1,7 @@
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 
-export const fetchConsignmentsService = async () => {
+export const fetchAllConsignmentsService = async () => {
   return await axios
     .get("http://localhost:8080/api/consignments/", {
       headers: {
@@ -11,7 +11,9 @@ export const fetchConsignmentsService = async () => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .then((res) => res.data.content) // return the data here
+    .then((res) => {
+      console.log(res.data.content);
+      return res.data.content}) // return the data here
     .catch((err) => {
       console.log(err);
       throw err; // make sure to throw the error so it can be caught by the query

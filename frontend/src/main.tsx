@@ -33,54 +33,63 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import ConsignmentList from "./pages/Administration/ConsignmentList.tsx";
 const router = createBrowserRouter(routes);
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <QueryClientProvider client={queryClient}>
 
-  <Provider store={store}>
-    <TooltipProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* <Route path="/" element={<HomeLayout />}> */}
-            <Route path="/" element={<LandingPageLayout />}></Route>
+    <QueryClientProvider client={queryClient}>
+    <ToastContainer />
 
-            {/* </Route> */}
-            <Route
-              element={
-                <PrivateRoute
-                  allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
-                />
-              }
-            >
-              <Route path="/admin" element={<Administration />}>
-                <Route path="/admin" element={<DashBoard />}></Route>
-                <Route path="accounts" element={<AccountsList />}></Route>
-              </Route>
-            </Route>
-            <Route path="/auth">
-              <Route path="/auth/login" element={<LoginLayout />}></Route>
-              <Route path="/auth/register" element={<RegisterLayout />}></Route>
-            </Route>
-            <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER,Roles.MEMBER]} />}>
-              <Route
-                path="/consignment"
-                element={<ConsignmentLayout />}
-              ></Route>
-            </Route>
-            <Route path="/Auctions" element={<AuctionsLayout />}>
-              <Route path="/Auctions" element={<AuctionList />}></Route>
-            </Route>
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            {/* <RouterProvider router={router} /> */}
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-      {/* <RouterProvider router={router} /> */}
-    </TooltipProvider>
-  </Provider>
-  </QueryClientProvider>
+      <Provider store={store}>
+        <TooltipProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* <Route path="/" element={<HomeLayout />}> */}
+                <Route path="/" element={<LandingPageLayout />}></Route>
+
+                {/* </Route> */}
+                <Route
+                  element={
+                    <PrivateRoute
+                      allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
+                    />
+                  }
+                >
+                  <Route path="/admin" element={<Administration />}>
+                    <Route path="/admin" element={<DashBoard />}></Route>
+                    <Route path="accounts" element={<AccountsList />}></Route>
+                    <Route path="consignments" element={<ConsignmentList />}></Route>
+                  </Route>
+                </Route>
+
+                <Route path="/auth">
+                  <Route path="/auth/login" element={<LoginLayout />}></Route>
+                  <Route path="/auth/register" element={<RegisterLayout />}></Route>
+                </Route>
+                <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
+                  <Route
+                    path="/consignment"
+                    element={<ConsignmentLayout />}
+                  ></Route>
+                </Route>
+                <Route path="/Auctions" element={<AuctionsLayout />}>
+                  <Route path="/Auctions" element={<AuctionList />}></Route>
+                </Route>
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                {/* <RouterProvider router={router} /> */}
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+          {/* <RouterProvider router={router} /> */}
+        </TooltipProvider>
+      </Provider>
+    </QueryClientProvider>
+
 
 );

@@ -18,7 +18,8 @@ import { zodResolver } from "@hookform/resolvers/zod"; // Import the zodResolver
 import { date, z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import { registerAccountService } from "@/services/AuthService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 gsap.registerPlugin(useGSAP);
 
@@ -45,6 +46,7 @@ const formSchema = z
 function RegisterForm() {
   const RegisterForm = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema), // Use the zodResolver function
     defaultValues: {
@@ -55,16 +57,35 @@ function RegisterForm() {
   });
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     registerAccountService(values).then((res) => {
       console.log(res);
       if (res.status === 200) {
-        console.log("Account created successfully");
+        // toast.play("Account created successfully. Please login.",);
+        toast.success("Account created successfully. Please login.", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         nav("/");
-      }
+      } 
+    }).catch((err) => {
+      toast.error("Error register pls try again", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     });
-
+  
     console.log(values);
   }
   useGSAP(
@@ -83,9 +104,9 @@ function RegisterForm() {
       className="w-3/6 h-3/4 border drop-shadow-md rounded-xl flex "
       ref={RegisterForm}
     >
-      <div className="flex  basis-full md:basis-1/2  w-full p-3 items-center">
+      <div className="flex  basis-full md:basis-1/2 w-full p-3 items-center">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
             <p className="text-2xl font-bold text-center">Register</p>
             <FormField
               control={form.control}
@@ -125,6 +146,7 @@ function RegisterForm() {
                 </FormItem>
               )}
             />
+            <Link to="/auth/login" className="text-center text-blue-500"> Already have an account? Login</Link>
 
             <div className="flex w-full justify-center">
               <Button type="submit" className="w-4/6 rounded rounded-2xl">
@@ -134,13 +156,15 @@ function RegisterForm() {
           </form>
         </Form>
       </div>
-      <div className="hidden md:flex w-full h-full basis-1/2 bg-gray-200">
-        <CardContent className="hidden md:flex bg-red-500 h-full p-0 m-0">
+      <div className="hidden md:flex w-full h-full basis-1/2 bg-gray-200 rounded-2xl">
+        <CardContent className="hidden md:flex h-full p-0 m-0 rounded-2xl">
           <img
             src="https://th.bing.com/th/id/OIP.s6XJW4oxNuygw7C4UBnZggHaEK?rs=1&pid=ImgDetMain"
-            className="w-full h-full object-contain"
+            className="w-full h-full object-fill rounded-2xl "
+            
             alt="Description of the image"
           />
+      
         </CardContent>
       </div>
     </Card>
