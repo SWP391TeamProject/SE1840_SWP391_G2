@@ -10,13 +10,14 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+
     steps:
-    
-    - name: connect SQL server
+    - name: Connect SQL Server
       uses: 280780363/sqlserver-action@v1.0
       with:
-        accept eula: Y #Required, ACCEPT_EULA confirms your acceptance of the End-User Licensing Agreement.
-        sa password: 12345 # Optional, default value is SqlSever123123.
+        accept-eula: 'Y'  # Ensure the key is formatted correctly
+        sa-password: '12345'  # Ensure the key is formatted correctly
+
     - name: Checkout code
       uses: actions/checkout@v4
 
@@ -25,6 +26,18 @@ jobs:
       with:
         java-version: '17'
         distribution: 'adopt'
+
+    - name: Wait for SQL Server to be ready
+      run: |
+        for i in {1..30}; do
+          if sqlcmd -S localhost -U sa -P 12345 -Q "SELECT 1" &> /dev/null; then
+            echo "SQL Server is up and running"
+            break
+          fi
+          echo "Waiting for SQL Server to be available..."
+          sleep 2
+        done
+
     - name: Build with Maven
       run: mvn clean package
       working-directory: ./Backend
