@@ -29,8 +29,9 @@ public class Account {
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @Column(name = "avatar_url", length = 100)
-    private  String avatarUrl;
+    @OneToOne
+    private Attachment avatarUrl;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_account",
@@ -42,21 +43,21 @@ public class Account {
     @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "password", length = 50) // Consider hashing passwords for security
+    @Column(name = "password", length = 50)
     private String password;
 
     @Column(name = "phone", length = 15)
     private String phone;
 
     @Column(name = "status")
-    @ColumnDefault("1") // 1 for true, 0 for false
+    @ColumnDefault("1")
     private byte status;
+  
     @Enumerated(EnumType.STRING)
     public AuthProvider provider;
     public enum AuthProvider{
         local,facebook,google
     }
-
     @Column(name = "balance")
     private BigDecimal balance;
 
@@ -81,8 +82,6 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
-
-
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<Payment> payments;
 
@@ -91,8 +90,5 @@ public class Account {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<ConsignmentDetail> consignmentDetails;
-
-
-    // ... (relationships)
 }
 

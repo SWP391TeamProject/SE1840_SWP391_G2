@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -45,22 +47,22 @@ public class AuthServiceImpl implements AuthService{
         Account newAccount ;
         try {
             if(registerDTO.getEmail().isEmpty() || registerDTO.getPassword().isEmpty()){
-                throw new IllegalStateException("Email or password is empty!");
+                throw new InvalidInputException("Email or password is empty!");
             }
 
             if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
-                throw new IllegalStateException("Password and confirm password do not match!");
+                throw new InvalidInputException("Password and confirm password do not match!");
             }
 
             if (registerDTO.getPassword().length() < 6) {
-                throw new IllegalStateException("Password is too short!");
+                throw new InvalidInputException("Password is too short!");
             }
 
             accountRepos.findByEmail(registerDTO.getEmail()).ifPresent(account -> {
-                throw new IllegalStateException("Email already exists! try login instead.");
+                throw new InvalidInputException("Email already exists! try login instead.");
             });
             Set<Role> roles = new HashSet<>();
-            roleRepos.findById(1).ifPresent(roles::add);
+            roleRepos.findById(4).ifPresent(roles::add);
             newAccount = new Account();
             newAccount.setEmail(registerDTO.getEmail());
             newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
@@ -90,7 +92,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
         if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
-            throw new IllegalStateException("Email or password is empty!");
+            throw new InvalidInputException("Email or password is empty!");
         }
 
         Authentication authentication = authenticationManager.authenticate(
@@ -102,10 +104,16 @@ public class AuthServiceImpl implements AuthService{
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
 
-        Account user = accountRepos.findByEmailAndPassword(loginDTO.getEmail(),loginDTO.getPassword());
+        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
 
+        if (!userOptional.isPresent()) {
+            throw new InvalidInputException("Invalid email or password");
+        }
+
+        Account user = userOptional.get();
         return AuthResponseDTO
                 .builder()
+                .id(user.getAccountId())
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())

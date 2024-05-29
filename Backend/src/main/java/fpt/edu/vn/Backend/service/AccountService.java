@@ -1,20 +1,25 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.DTO.AccountAdminDTO;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.pojo.Account;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.math.BigDecimal;
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AccountService {
-    List<AccountAdminDTO> getAllAccounts(Pageable pageable);
-    Account createAccount(Account account);
+    Page<AccountDTO> getAllAccounts(@NotNull Pageable pageable);
+    AccountDTO createAccount( AccountDTO account);
     AccountDTO getAccountById(int id);
-    Account updateAccount(Account account);
-    void deleteAccount(int id);
-    Account getAccountByEmail(String username);
-    Account getAccountByEmailAndPassword(String email, String password);
+    AccountDTO updateAccount(AccountDTO account);
+    AccountDTO getAccountByEmail(String username);
+    AccountDTO getAccountByEmailAndPassword(String email, String password);
+    Account parseAccountDTOToEntity(AccountDTO accountDTO) ;
 
+    AttachmentDTO setAvatar(int id, MultipartFile file);
+
+    void activateAccount(int id);
+
+    void deactivateAccount(int id);
 }

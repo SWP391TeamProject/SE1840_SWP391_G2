@@ -17,7 +17,17 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadIcon } from "lucide-react";
 import DropzoneComponent from "./DropZoneComponent";
-
+import { getCookie } from "@/utils/cookies";
+import { SERVER_DOMAIN_URL } from "@/constants/Domain";
+import { useDropzone } from "react-dropzone";
+import { createConsignmentService } from "@/services/ConsignmentService";
+const MAX_FILE_SIZE = 5000000;
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 const formSchema = z.object({
   accountId: z.number(),
   email: z.string(),
@@ -25,6 +35,7 @@ const formSchema = z.object({
   contactName: z.string(),
   preferContact: z.enum(["email", "phone", "text", "any of the above"]),
   description: z.string(),
+  files: z.any()
 });
 
 export default function ConsignmentInititalForm() {
@@ -32,19 +43,26 @@ export default function ConsignmentInititalForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: 1,
+      accountId: JSON.parse(getCookie("user"))?.id,
       email: "",
       phone: "",
       contactName: "",
       preferContact: "any of the above",
       description: "",
+      files: [],
     },
   });
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    // Remove FormData creation and file handling
+    createConsignmentService(data).then((res) => {
+      console.log(res);
+    });
+   
     console.log(data);
-  }
+  };
+
   return (
-    <div key="1" className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+    <div key="1" className="max-w-6xl  mx-auto p-4 sm:p-6 md:p-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           List your item for consignment
@@ -61,12 +79,15 @@ export default function ConsignmentInititalForm() {
             name="accountId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Account ID</FormLabel>
+                <FormLabel>accountId</FormLabel>
                 <FormControl>
-                  <Input placeholder="sadasd" {...field} />
+                  <Input
+                    defaultValue={JSON.parse(getCookie("user"))?.id}
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>
-                  this is the account ID we used to contact you
+                  this is the Name we used to contact you
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -157,7 +178,7 @@ export default function ConsignmentInititalForm() {
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="any of the above" />
+                        <RadioGroupItem value="any" />
                       </FormControl>
                       <FormLabel className="font-normal">
                         Any of the above
@@ -171,7 +192,7 @@ export default function ConsignmentInititalForm() {
           />
           <FormField
             control={form.control}
-            name="accountId"
+            name="description"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
@@ -186,16 +207,19 @@ export default function ConsignmentInititalForm() {
               </FormItem>
             )}
           />
-          <div className="w-full h-48 p-4 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500">
-            <UploadIcon className="w-10 h-10 text-gray-400" />
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Drag and drop an image or click to upload
-            </p>
-          </div>
+       <FormField
+  control={form.control}
+  name="files"
+  render={({ field }) => (
+    <DropzoneComponent {...field} />
+  )}
+/>
+
+          {/* <DropzoneComponent /> */}
+
           <Button variant={"destructive"} type="submit">
             Submit
           </Button>
-          <DropzoneComponent />
         </form>
       </Form>
     </div>

@@ -1,0 +1,241 @@
+###Get all consignments
+GET http://localhost:8080/api/consignments/
+
+###Response (HTTP/1.1 200 OK)
+Content-Type: application/json
+{
+  "content": [
+    {
+      "consignmentId": 1,
+      "status": "WAITING_STAFF",
+      "preferContact": "EMAIL",
+      "createDate": "2024-05-24T16:23:54.19",
+      "updateDate": "2024-05-24T16:23:54.19",
+      "consignmentDetails": [
+        {
+          "consignmentDetailId": 1,
+          "description": "Vintage camera collection",
+          "type": "REQUEST",
+          "price": 500.00,
+          "consignmentId": 1,
+          "accountId": 2,
+          "attachmentIds": []
+        }
+      ]
+    },
+    {
+      "consignmentId": 2,
+      "status": "IN_INITIAL_EVALUATION",
+      "preferContact": "PHONE",
+      "createDate": "2024-05-24T16:23:54.19",
+      "updateDate": "2024-05-24T16:23:54.19",
+      "consignmentDetails": [
+        {
+          "consignmentDetailId": 2,
+          "description": "Rare comic books",
+          "type": "INITIAL_EVALUATION",
+          "price": 1200.00,
+          "consignmentId": 2,
+          "accountId": 4,
+          "attachmentIds": []
+        }
+      ]
+    },
+    {
+      "consignmentId": 3,
+      "status": "IN_FINAL_EVALUATION",
+      "preferContact": "EMAIL",
+      "createDate": "2024-05-24T16:23:54.19",
+      "updateDate": "2024-05-24T16:23:54.19",
+      "consignmentDetails": [
+        {
+          "consignmentDetailId": 3,
+          "description": "Signed sports memorabilia",
+          "type": "FINAL_EVALUATION",
+          "price": 2500.00,
+          "consignmentId": 3,
+          "accountId": 1,
+          "attachmentIds": []
+        }
+      ]
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 50,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "offset": 0,
+    "unpaged": false,
+    "paged": true
+  },
+  "last": true,
+  "totalElements": 3,
+  "totalPages": 1,
+  "first": true,
+  "size": 50,
+  "number": 0,
+  "sort": {
+    "empty": true,
+    "sorted": false,
+    "unsorted": true
+  },
+  "numberOfElements": 3,
+  "empty": false
+}
+
+###Get consignment by id
+GET http://localhost:8080/api/consignments/2
+
+###Response (HTTP/1.1 200 OK)
+Content-Type: application/json
+{
+  "content": [
+    {
+      "consignmentId": 2,
+      "status": "IN_INITIAL_EVALUATION",
+      "preferContact": "PHONE",
+      "createDate": "2024-05-24T16:23:54.19",
+      "updateDate": "2024-05-24T16:23:54.19",
+      "consignmentDetails": [
+        {
+          "consignmentDetailId": 2,
+          "description": "Rare comic books",
+          "type": "INITIAL_EVALUATION",
+          "price": 1200.00,
+          "consignmentId": 2,
+          "accountId": 4,
+          "attachmentIds": []
+        }
+      ]
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 50,
+    "sort": {
+      "sorted": false,
+      "unsorted": true,
+      "empty": true
+    },
+    "offset": 0,
+    "unpaged": false,
+    "paged": true
+  },
+  "totalElements": 1,
+  "totalPages": 1,
+  "last": true,
+  "size": 50,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "first": true,
+  "numberOfElements": 1,
+  "empty": false
+}
+
+###Get consignments by status
+GET http://localhost:8080/api/consignments/filter-by-status?status=IN_INITIAL_EVALUATION
+
+###Response (HTTP/1.1 200 OK)
+Content-Type: application/json
+
+{
+  "content": [
+    {
+      "consignmentId": 2,
+      "status": "IN_INITIAL_EVALUATION",
+      "preferContact": "PHONE",
+      "createDate": "2024-05-24T16:23:54.19",
+      "updateDate": "2024-05-24T16:23:54.19",
+      "consignmentDetails": [
+        {
+          "consignmentDetailId": 2,
+          "description": "Rare comic books",
+          "type": "INITIAL_EVALUATION",
+          "price": 1200.00,
+          "consignmentId": 2,
+          "accountId": 4,
+          "attachmentIds": []
+        }
+      ]
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 50,
+    "sort": {
+      "sorted": false,
+      "unsorted": true,
+      "empty": true
+    },
+    "offset": 0,
+    "unpaged": false,
+    "paged": true
+  },
+  "totalElements": 1,
+  "totalPages": 1,
+  "last": true,
+  "size": 50,
+  "number": 0,
+  "sort": {
+    "sorted": false,
+    "unsorted": true,
+    "empty": true
+  },
+  "first": true,
+  "numberOfElements": 1,
+  "empty": false
+}
+
+###Create consignment
+POST http://localhost:8080/api/consignments/create?preferContact=email
+Content-Type: application/json
+
+{
+  "description": "Vintage camera collection",
+  "type": "REQUEST",
+  "price": null,
+  "accountId": 2
+}
+
+<> 2024-05-24T211223.201.json
+
+###Response (HTTP/1.1 201 Created)
+Content-Type: application/json
+
+{
+  "consignmentId": 18,
+  "status": "WAITING_STAFF",
+  "preferContact": "EMAIL",
+  "createDate": "2024-05-24T21:01:21.266955",
+  "updateDate": "2024-05-24T21:01:21.266955",
+  "consignmentDetails": [
+    {
+      "consignmentDetailId": 12,
+      "description": "Vintage camera collection",
+      "type": "REQUEST",
+      "price": null,
+      "consignmentId": 18,
+      "accountId": 2,
+      "attachmentIds": null
+    }
+  ]
+}
+
+###Confirm received
+POST http://localhost:8080/api/consignments/confirm/7
+
+###Response (HTTP/1.1 200 OK)
+Content-Type: text/plain
+
+Jewelry received confirmed.
+
+
+###

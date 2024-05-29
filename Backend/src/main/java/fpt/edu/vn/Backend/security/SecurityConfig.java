@@ -2,9 +2,19 @@ package fpt.edu.vn.Backend.security;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import fpt.edu.vn.Backend.oauth2.security.CustomOAuth2UserService;
 import fpt.edu.vn.Backend.oauth2.security.HttpCookieOAuth2AuthorizationRequestRepository;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTAuthEntryPoint;
 import fpt.edu.vn.Backend.security.JWTAuthenticationFilter;
@@ -21,6 +31,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -54,8 +66,9 @@ public class SecurityConfig {
 //                .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
 //                .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","/login").permitAll()
-                        .anyRequest().permitAll()
+
+                        .requestMatchers("/auth/**", "/api/auction-sessions/**","/api/items/**").permitAll()
+                        .anyRequest().authenticated()
 
                 )
                 .httpBasic(Customizer.withDefaults())
