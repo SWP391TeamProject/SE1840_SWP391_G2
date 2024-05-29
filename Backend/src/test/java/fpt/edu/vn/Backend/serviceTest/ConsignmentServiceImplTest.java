@@ -65,7 +65,11 @@ public class ConsignmentServiceImplTest {
 
     @Test
     public void submitInitialEvaluation_HappyPath() {
+        Account account = new Account();
+        account.setAccountId(1);
         Consignment consignment = new Consignment();
+        consignment.setConsignmentId(1);
+        consignment.setAccount(account);
         consignment.setConsignmentDetails(Collections.emptyList());
 
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
@@ -78,12 +82,15 @@ public class ConsignmentServiceImplTest {
 
     @Test
     public void submitFinalEvaluationUpdate_HappyPath() {
+        Account account = new Account();
+        account.setAccountId(1);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
+        consignment.setAccount(account);
         ConsignmentDetail consignmentDetail = new ConsignmentDetail();
         consignmentDetail.setConsignmentDetailId(1);
         consignmentDetail.setPrice(BigDecimal.valueOf(1000));
-        consignmentDetail.setAccount(new Account());
+        consignmentDetail.setAccount(account);
         consignmentDetail.setType(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION);
         consignment.setConsignmentDetails(new ArrayList<>(Collections.singletonList(consignmentDetail)));
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
