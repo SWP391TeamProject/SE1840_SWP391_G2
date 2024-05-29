@@ -26,6 +26,8 @@ jobs:
           accept-eula: true
           sqlserver-version: 2022
       - run: sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE BIDDIFY'
+      - run: sqlcmd -S localhost -U sa -P '12345'
+
           
 
       - name: Set up JDK 17
