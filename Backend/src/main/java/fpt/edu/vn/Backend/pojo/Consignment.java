@@ -39,9 +39,7 @@ public class Consignment {
     @Enumerated(EnumType.STRING)
     private preferContact preferContact;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id")
-    private Account account;
+//    @Collumn(name ="assignedStaff")
 
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;
