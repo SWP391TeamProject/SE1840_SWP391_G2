@@ -25,8 +25,8 @@ jobs:
         with:
           accept-eula: true
           sqlserver-version: 2022
-      - name: Create Biddify Database
       - run: sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE BIDDIFY'
+          
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
