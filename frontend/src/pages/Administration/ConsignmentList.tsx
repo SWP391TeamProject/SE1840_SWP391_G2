@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,15 +25,15 @@ import { Home, LineChart, Package, Package2, PanelLeft, Search, ShoppingCart, Us
 import { Link } from "react-router-dom";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { fetchAllConsignmentsService } from "@/services/ConsignmentService.tsx";
-
-
-
+import { ConsignmentsContext } from "@/layout/Administration/Administration";
 
 export default function ConsignmentList() {
-    const { data, error, isPending } = useQuery({
-        queryKey: ["consignments"],
-        queryFn: fetchAllConsignmentsService
-      });
+  const consignments = useContext(ConsignmentsContext);
+
+  const { data, error, isPending } = useQuery({
+    queryKey: ["consignments"],
+    queryFn: fetchAllConsignmentsService
+  });
 
   if (isPending) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -156,7 +156,7 @@ export default function ConsignmentList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data?.map((consignment) => (
+                    {consignments?.map((consignment) => (
                       <TableRow key={consignment.consignmentId}>
                         <TableCell className="font-medium">{consignment.consignmentId}</TableCell>
                         <TableCell>{consignment.status}</TableCell>

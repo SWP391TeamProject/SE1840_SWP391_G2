@@ -36,6 +36,10 @@ export function setCookie(
   document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
 }
 
+/**
+ * Removes a cookie by setting its expiration date to a past date.
+ * @param cookieName - The name of the cookie to remove.
+ */
 export const removeCookie = (cookieName: string) => {
   document.cookie =
     cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";

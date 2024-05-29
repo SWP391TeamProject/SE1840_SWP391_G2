@@ -1,16 +1,23 @@
+import FetchButton from '@/components/button/FetchButton'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Accounts from '@/pages/Administration/AccountsList'
+import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
+import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
 import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2 } from 'lucide-react'
+import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
+export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
+    const [consignments, setConsignments] = useState([]);
 
 
-
-
+    useEffect(() => {
+        console.log(consignments);
+    }, [consignments])
     return (
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
             <div className="hidden border-r bg-muted/40 md:block">
@@ -60,15 +67,17 @@ export default function Administration() {
                                 <Users className="h-4 w-4" />
                                 Accounts
                             </Link>
-                            <Link
+                            {/* <Link
                                 to="consignments"
                                 className={"flex items-center gap-3 rounded-lg  px-3 py-2 text-foreground transition-all hover:text-primary"}
 
-                                
+
                             >
                                 <FolderMinus className="h-4 w-4" />
                                 Consignments
-                            </Link>
+                            </Link> */}
+
+                            <FetchButton apiFunction={fetchAllConsignmentsService} buttonName={"Consignments"} setData={setConsignments} navTo={"consignments"} queryKey={['consignments']} />
                             {/* <Link
                                 to=""
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
@@ -80,7 +89,9 @@ export default function Administration() {
                     </div>
                 </div>
             </div>
-            <Outlet></Outlet>
+            <ConsignmentsContext.Provider value={consignments}>
+                <Outlet ></Outlet>
+            </ConsignmentsContext.Provider>
         </div>
     )
 }
