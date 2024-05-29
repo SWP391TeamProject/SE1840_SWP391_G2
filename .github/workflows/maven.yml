@@ -28,20 +28,6 @@ jobs:
           accept-eula: true
           sqlserver-version: 2022
 
-      - name: Wait for SQL Server to be ready
-        run: |
-          echo "Waiting for SQL Server to be ready..."
-          for i in {1..60}; do  # Increased timeout to 60 * 2 = 120 seconds
-            if sqlcmd -S localhost -U sa -P 12345 -Q "SELECT 1" &> /dev/null; then
-              echo "SQL Server is up and running"
-              break
-            fi
-            echo "Waiting for SQL Server to be available..."
-            sleep 2
-          done
-          sqlcmd -S localhost -U sa -P 12345 -Q "SELECT 1"
-
-
       - name: Create Biddify Database
         run: |
           echo "Create Biddify Database"
