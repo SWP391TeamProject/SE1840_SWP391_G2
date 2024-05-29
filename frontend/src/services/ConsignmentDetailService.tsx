@@ -14,8 +14,8 @@ export const fetchConsigntmentDetailByConsignmentId = async (id:number) => {
       },
     })
     .then((res) => {
-      console.log(res.data.content);
-      return res.data.content}) // return the data here
+      console.log(res.data);
+      return res.data}) // return the data here
     .catch((err) => {
       console.log(err);
       throw err; // make sure to throw the error so it can be caught by the query
@@ -32,8 +32,8 @@ export const fetchConsigntmentDetailByConsignmentDetailId = async (id:number) =>
         },
       })
       .then((res) => {
-        console.log(res.data.content);
-        return res.data.content}) // return the data here
+        console.log(res.data);
+        return res.data}) // return the data here
       .catch((err) => {
         console.log(err);
         throw err; // make sure to throw the error so it can be caught by the query
@@ -66,7 +66,7 @@ export const createConsignmentService = async (data: any) => {
 };
 export const deleteConsignmentService = async (id: string) => {
   return await axios
-    .delete(`http://localhost:8080/api/consignments/${id}`, {
+    .delete(`http://localhost:8080/api/consignmentDetails/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
