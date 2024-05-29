@@ -10,18 +10,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
-    services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        env:
-          SA_PASSWORD: "12345"  # Match the password in your application.properties
-          ACCEPT_EULA: "Y"
-        ports:
-          - 1433:1433
-        options: > 
-          --health-cmd="sqlcmd -U sa -P 12345 -Q 'SELECT 1'" --health-interval=10s --health-timeout=5s --health-retries=10
-
     steps:
     
     - name: connect SQL server
