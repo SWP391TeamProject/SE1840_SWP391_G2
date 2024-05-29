@@ -4,25 +4,18 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentRequestDTO;
-import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/consignments")
@@ -59,7 +52,7 @@ public class ConsignmentController {
     @GetMapping("/{id}")
     public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
-            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
+            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsById(id, pageNumb, pageSize);
             if (consignments == null || consignments.isEmpty()) {
                 throw new ConsignmentServiceException("No consignments found for user ID: " + id);
             }

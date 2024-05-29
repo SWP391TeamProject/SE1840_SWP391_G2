@@ -72,6 +72,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public void submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId, List<Attachment> attachments) {
         try {
             consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
+                if (consignment.getAccount().getAccountId()!=accountId){
+                    throw new ConsignmentServiceException("Account not allow to evaluate this consignment");
+                }
                 if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
                         detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
                     throw new ConsignmentServiceException("Initial Evaluation already submitted");
@@ -104,6 +107,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
         try {
             consignmentRepos.findById(consignmentId).ifPresent(consignment -> {
+                if (consignment.getAccount().getAccountId()!=accountId){
+                    throw new ConsignmentServiceException("Account not allow to evaluate this consignment");
+                }
                 if (consignment.getConsignmentDetails().stream().noneMatch(detail ->
                         detail.getType().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
                     throw new ConsignmentServiceException("Initial Evaluation not submitted");
@@ -231,6 +237,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setCreateDate(updatedConsignment.getCreateDate());
             consignment.setUpdateDate(updatedConsignment.getUpdateDate());
             consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
+            consignment.setAccount(accountRepos.findById(updatedConsignment.getStaffId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
             consignmentRepos.save(consignment);
         } catch (Exception e) {
             throw new ConsignmentServiceException("Error updating consignment", e);
@@ -266,11 +273,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
+    public Page<ConsignmentDTO> getConsignmentsById(int id, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
-
-
+        Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(id, pageable);
         return getConsignmentDTOS(pageable,consignmentPage);}
 
     @NotNull
@@ -306,6 +311,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 String.valueOf(consignment.getPreferContact()),
                 consignment.getCreateDate(),
                 consignment.getUpdateDate(),
+                consignment.getAccount().getAccountId(),
                 consignmentDetailDTOs
         );
     }
