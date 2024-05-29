@@ -29,7 +29,7 @@ public interface ConsignmentService {
     ConsignmentDTO getConsignmentById(int id);
     Page<ConsignmentDTO> getAllConsignments(int page, int size);
     Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size);
-    Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
+    Page<ConsignmentDTO> getConsignmentsById(int id, int page, int size);
     Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 
     // Delete (or Soft Delete)
