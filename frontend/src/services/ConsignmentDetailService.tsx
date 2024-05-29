@@ -64,15 +64,4 @@ export const createConsignmentService = async (data: any) => {
     })
     .catch((err) => console.log(err));
 };
-export const deleteConsignmentService = async (id: string) => {
-  return await axios
-    .delete(`http://localhost:8080/api/consignmentDetails/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-      },
-    })
-    .catch((err) => console.log(err));
-};
+
