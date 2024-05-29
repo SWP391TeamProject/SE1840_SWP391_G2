@@ -22,12 +22,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SQL Server
-        uses: ankane/setup-sqlserver@v1
-        with:
-          accept-eula: true
-          sqlserver-version: 2022
-
       - name: Create Biddify Database
         run: |
           echo "Create Biddify Database"
