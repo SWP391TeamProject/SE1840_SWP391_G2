@@ -25,14 +25,8 @@ jobs:
         with:
           accept-eula: true
           sqlserver-version: 2022
-      - name: Manually Configure SQL Server
-        run: |
-          docker exec -it sqlserver /opt/mssql/bin/mssql-conf setup 
-          # Respond to the prompts and provide the password as you did in the environment variables
       - name: Create Biddify Database
-        run: |
-          echo "Create Biddify Database"
-          sqlcmd -S localhost -U sa -P 12345 -Q "CREATE DATABASE Biddify" # This command create the db before the next step run
+      - run: sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE BIDDIFY'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
