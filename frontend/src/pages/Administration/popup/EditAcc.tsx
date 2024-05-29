@@ -15,6 +15,9 @@ import { Account } from '@/models/AccountModel'
 
 export const EditAcc = ({account,hidden}:{account:Account,hidden:boolean}) => {
     const [isHidden, setIsHidden] = React.useState(hidden)
+
+    
+
     return (
         <Card className="w-[350px]" hidden={isHidden}>
             <CardHeader>
