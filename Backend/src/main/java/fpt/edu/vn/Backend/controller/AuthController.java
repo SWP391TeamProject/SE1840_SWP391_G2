@@ -8,13 +8,11 @@ import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 
 @RestController
@@ -53,10 +51,9 @@ public class AuthController {
         return null;
     }
 
-    @GetMapping("/login-with-google")
-    public Map<String,Object> loginWithGoogle(OAuth2AuthenticationToken oAuth2AuthenticationToken)
-    {
-        return oAuth2AuthenticationToken.getPrincipal().getAttributes();
+    @PostMapping("login-with-google")
+    public ResponseEntity<String> loginWithGoogle(@RequestBody String token) {
+        return null;
     }
 
     @PostMapping("login-with-facebook")
