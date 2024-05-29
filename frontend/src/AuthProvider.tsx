@@ -12,7 +12,7 @@ type IAuthContecxt = {
 }
 
 const initalUser: Account = {
-    userId: -1,
+    accountId: -1,
     username: '',
     email: '',
     nickname: '',
