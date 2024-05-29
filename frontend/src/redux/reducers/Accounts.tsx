@@ -39,6 +39,9 @@ export const accountsSlice = createSlice({
             // state.currentPageList = action.payload
             state.currentPageNumber = action.payload;
         },
+        setCurrentPageList: (state, action) => {
+            state.currentPageList = action.payload;
+        },
         error: (state, action) => {
 
         }
@@ -46,5 +49,5 @@ export const accountsSlice = createSlice({
 });
 
 
-export const { setAccounts, setCurrentAccount, error } = accountsSlice.actions;
+export const { setAccounts, setCurrentAccount, setCurrentPageList, error } = accountsSlice.actions;
 export default accountsSlice.reducer

@@ -43,7 +43,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAccounts, setCurrentAccount } from "@/redux/reducers/Accounts";
+import { setAccounts, setCurrentAccount, setCurrentPageList } from "@/redux/reducers/Accounts";
 import { fetchAccountsService, deleteAccountService } from "@/services/AccountsServices";
 import {
   Home,
@@ -60,7 +60,7 @@ import {
   PlusCircle,
   MoreHorizontal,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -70,6 +70,7 @@ export default function AccountsList() {
   const accountsList = useAppSelector((state) => state.accounts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const fetchAccounts = async () => {
     try {
@@ -109,10 +110,19 @@ export default function AccountsList() {
     })
   }
 
+  const handleFilterClick = (status: AccountStatus[], filter: string) => {
+    let filteredList = accountsList.value.filter(x => status.includes(x.status));
+    console.log(filteredList);
+    dispatch(setCurrentPageList(filteredList));
+    setStatusFilter(filter);
+  }
+
   useEffect(() => {}, [accountsList]);
 
   useEffect(() => {
     fetchAccounts();
+    dispatch(setCurrentPageList(accountsList.value));
+    setStatusFilter("all");
   }, []);
 
   return (
@@ -120,12 +130,9 @@ export default function AccountsList() {
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="draft">Draft</TabsTrigger>
-            <TabsTrigger value="archived" className="hidden sm:flex">
-              Archived
-            </TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.ACTIVE, AccountStatus.INACTIVE], "all")} value="all">All</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.ACTIVE], "active")} value="active">Active</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.INACTIVE], "inactive")} value="inactive">Inactive</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>
@@ -161,7 +168,7 @@ export default function AccountsList() {
             </Button>
           </div>
         </div>
-        <TabsContent value="all">
+        <TabsContent value={statusFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
               <CardTitle>Accounts</CardTitle>
@@ -196,7 +203,7 @@ export default function AccountsList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {accountsList.value.map((account) => (
+                  {accountsList.currentPageList.map((account) => (
                     <TableRow key={account.accountId}>
                       <TableCell className="font-medium">
                         {account.accountId}
@@ -284,9 +291,9 @@ export default function AccountsList() {
           </Card>
         </TabsContent>
       </Tabs>
-      {accountsList.value.map((account) => (
+      {/* {accountsList.value.map((account) => (
         <EditAcc account={account} key={account.accountId} hidden={true} />
-      ))}
+      ))} */}
     </main>
   );
 }
