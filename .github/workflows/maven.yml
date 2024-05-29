@@ -17,6 +17,11 @@ jobs:
           ACCEPT_EULA: Y
         ports:
           - 1433:1433
+        options: >-
+          --health-cmd "sqlcmd -S localhost -U sa -P 12345 -Q 'SELECT 1'" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -26,6 +31,10 @@ jobs:
         with:
           accept-eula: true
           sqlserver-version: 2022
+      - name: Manually Configure SQL Server
+        run: |
+          docker exec -it sqlserver /opt/mssql/bin/mssql-conf setup 
+          # Respond to the prompts and provide the password as you did in the environment variables
       - name: Create Biddify Database
         run: |
           echo "Create Biddify Database"
