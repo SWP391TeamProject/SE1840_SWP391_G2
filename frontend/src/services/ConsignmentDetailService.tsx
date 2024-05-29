@@ -39,7 +39,7 @@ export const fetchConsigntmentDetailByConsignmentDetailId = async (id:number) =>
         throw err; // make sure to throw the error so it can be caught by the query
       });
   };
-export const updateConsignmentService = async (data: any,id :number) => {
+export const updateConsignmentDetailService = async (data: any,id :number) => {
   return await axios
     .put(URL+"update/"+id, data, {
       headers: {
@@ -52,7 +52,7 @@ export const updateConsignmentService = async (data: any,id :number) => {
     .catch((err) => console.log(err));
 };
 
-export const createConsignmentService = async (data: any) => {
+export const createConsignmentDetailService = async (data: any) => {
   return await axios
     .post(URL+"create", data, {
       headers: {
@@ -64,15 +64,4 @@ export const createConsignmentService = async (data: any) => {
     })
     .catch((err) => console.log(err));
 };
-export const deleteConsignmentService = async (id: string) => {
-  return await axios
-    .delete(`http://localhost:8080/api/consignmentDetails/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-      },
-    })
-    .catch((err) => console.log(err));
-};
+
