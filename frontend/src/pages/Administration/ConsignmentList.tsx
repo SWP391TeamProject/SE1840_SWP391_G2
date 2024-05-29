@@ -29,14 +29,9 @@ import { ConsignmentsContext } from "@/layout/Administration/Administration";
 
 export default function ConsignmentList() {
   const consignments = useContext(ConsignmentsContext);
-
-  const { data, error, isPending } = useQuery({
-    queryKey: ["consignments"],
-    queryFn: fetchAllConsignmentsService
-  });
-
-  if (isPending) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (!consignments) {
+    return <div>Loading...</div>;
+  }
 
 
   return (
@@ -156,29 +151,29 @@ export default function ConsignmentList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {consignments?.map((consignment) => (
-                      <TableRow key={consignment.consignmentId}>
-                        <TableCell className="font-medium">{consignment.consignmentId}</TableCell>
-                        <TableCell>{consignment.status}</TableCell>
-                        <TableCell className="hidden md:table-cell">{consignment.preferContact}</TableCell>
-                        <TableCell className="hidden md:table-cell">{new Date(consignment.createDate).toLocaleDateString()}</TableCell>
-                        <TableCell className="hidden md:table-cell">{new Date(consignment.updateDate).toLocaleDateString()}</TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button aria-haspopup="true" size="icon" variant="ghost">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem>Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+               {consignments?.map((consignment) => (
+                    <TableRow key={consignment.consignmentId}>
+                      <TableCell className="font-medium">{consignment.consignmentId}</TableCell>
+                      <TableCell>{consignment.status}</TableCell>
+                      <TableCell className="hidden md:table-cell">{consignment.preferContact}</TableCell>
+                      <TableCell className="hidden md:table-cell">{new Date(consignment.createDate).toLocaleDateString()}</TableCell>
+                      <TableCell className="hidden md:table-cell">{new Date(consignment.updateDate).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
                     ))}
                   </TableBody>
                 </Table>

@@ -77,7 +77,7 @@ export default function Administration() {
                                 Consignments
                             </Link> */}
 
-                            <FetchButton apiFunction={fetchAllConsignmentsService} buttonName={"Consignments"} setData={setConsignments} navTo={"consignments"} queryKey={['consignments']} />
+                            <FetchButton apiFunction={fetchAllConsignmentsService} className={"rounded border border-red-600 text-left h-6 flex flex-row gap-2 justify-left items-center"} buttonName={"Consignments"} setData={setConsignments} navTo={"consignments"} queryKey={['consignments']} icon={<FolderMinus/>} />
                             {/* <Link
                                 to=""
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"

@@ -1,17 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { FolderIcon, Loader2 } from "lucide-react";
+import React, { FC, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-
-export default function FetchButton({ apiFunction, buttonName, setData,navTo,queryKey }) {
+type FetchButtonProps = {
+    apiFunction: () => Promise<any>;
+    buttonName: string;
+    setData: (data: any) => void;
+    navTo: string;
+    queryKey: [string, any?];
+    className?: string;
+    icon?: any;
+  };
+  const FetchButton: FC<FetchButtonProps> = ({ apiFunction, buttonName, setData, navTo, queryKey, className, icon }) => {
     const [isEnable, setIsEnable] = useState(false);
     const { data, isRefetching, error, refetch } = useQuery(
         {
             queryKey: queryKey,
             queryFn: apiFunction,
-            enabled: isEnable
+            // enabled: isEnable
         }
     )
     const nav = useNavigate();
@@ -37,9 +45,9 @@ export default function FetchButton({ apiFunction, buttonName, setData,navTo,que
 
 
     if (isRefetching) return (
-        <Button disabled>
-            <Loader2 className="animate-spin" />
-            Please wait
+        <Button disabled className="flex flex-row justify-center items-left">
+            <Loader2 className="animate-spin basis-1/5 " /> 
+             <p className="basis-4/5 text-left">Please wait</p>
         </Button>
     );
 
@@ -48,5 +56,6 @@ export default function FetchButton({ apiFunction, buttonName, setData,navTo,que
 
 
 
-    return <Button className="rounded border border-red-600 text-left h-6" onClick={handleOnClick}>{buttonName}</Button>;
+    return <Button className={className}  onClick={handleOnClick} >{icon}{buttonName}</Button>;
 }
+export default FetchButton;

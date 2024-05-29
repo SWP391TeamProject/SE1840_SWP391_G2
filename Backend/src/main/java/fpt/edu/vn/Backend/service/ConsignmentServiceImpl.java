@@ -307,9 +307,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignment.getConsignmentId(),
                 String.valueOf(consignment.getStatus()),
                 String.valueOf(consignment.getPreferContact()),
+                consignment.getAccount()!=null?consignment.getAccount().getAccountId():null,
                 consignment.getCreateDate(),
                 consignment.getUpdateDate(),
-                consignment.getAccount()!=null?consignment.getAccount().getAccountId():null,
                 consignmentDetailDTOs
         );
     }
