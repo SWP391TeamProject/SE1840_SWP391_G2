@@ -51,7 +51,11 @@ public class Account {
     @Column(name = "status")
     @ColumnDefault("1") // 1 for true, 0 for false
     private byte status;
-
+    @Enumerated(EnumType.STRING)
+    public AuthProvider provider;
+    public enum AuthProvider{
+        local,facebook,google
+    }
 
     @Column(name = "balance")
     private BigDecimal balance;

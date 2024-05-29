@@ -3,10 +3,13 @@ package fpt.edu.vn.Backend.security;
 import java.util.Arrays;
 import java.util.List;
 
+import fpt.edu.vn.Backend.oauth2.security.CustomOAuth2UserService;
+import fpt.edu.vn.Backend.oauth2.security.HttpCookieOAuth2AuthorizationRequestRepository;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTAuthEntryPoint;
 import fpt.edu.vn.Backend.security.JWTAuthenticationFilter;
 import org.apache.catalina.filters.CorsFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,34 +33,50 @@ public class SecurityConfig {
 
     private CustomUserDetailsService userDetailService;
     private final JWTAuthEntryPoint jwtAuthEntryPoint;
+    private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired
+    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     public SecurityConfig(
             CustomUserDetailsService userDetailService,
-            JWTAuthEntryPoint jwtAuthEntryPoint) {
+            JWTAuthEntryPoint jwtAuthEntryPoint, CustomOAuth2UserService customOAuth2UserService) {
         this.userDetailService = userDetailService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
-                .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
+//                .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**", "/websocket/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/auth/**","/login").permitAll()
+                        .anyRequest().permitAll()
+
                 )
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults());
-
-          
-
-        http.addFilterBefore(
-                jwtAuthenticationFilter(),
-                UsernamePasswordAuthenticationFilter.class);
+                .oauth2Login(oauth2 -> oauth2
+                                .authorizationEndpoint(authz -> authz
+                                        .baseUri("/oauth2/authorize")
+                                        .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                                )
+//                        .redirectionEndpoint(redir -> redir
+//                                .baseUri("/oauth2/callback/*")
+//                        )
+                                .userInfoEndpoint(userInfo -> userInfo
+                                        .userService(customOAuth2UserService)
+                                )
+                                .defaultSuccessUrl("/auth/login-with-google")
+                );
+//        http.addFilterBefore(
+//                jwtAuthenticationFilter(),
+//                UsernamePasswordAuthenticationFilter.class);
         return http.build();
+
     }
     @Bean
     public AuthenticationManager authenticationManager(
@@ -84,4 +103,10 @@ public class SecurityConfig {
     public JWTAuthenticationFilter jwtAuthenticationFilter() {
         return new JWTAuthenticationFilter();
     }
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
+
 }
