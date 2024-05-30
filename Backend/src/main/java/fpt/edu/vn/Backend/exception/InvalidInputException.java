@@ -1,5 +1,7 @@
 package fpt.edu.vn.Backend.exception;
 
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
 public class InvalidInputException extends RuntimeException {
 
   public InvalidInputException() {}

@@ -3,7 +3,9 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -95,6 +97,13 @@ public class AuthServiceImpl implements AuthService{
             throw new InvalidInputException("Email or password is empty!");
         }
 
+
+
+        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
+
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException ("Invalid email or password");
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDTO.getEmail(),
@@ -103,12 +112,6 @@ public class AuthServiceImpl implements AuthService{
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
-
-        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
-
-        if (!userOptional.isPresent()) {
-            throw new InvalidInputException("Invalid email or password");
-        }
 
         Account user = userOptional.get();
         return AuthResponseDTO

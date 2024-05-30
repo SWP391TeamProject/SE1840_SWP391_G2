@@ -228,6 +228,7 @@ class AuthServiceImplTest {
         // Assert
         assertNotNull(result);
         assertNotNull(result.getAccessToken());
+        System.out.println(result.getAccessToken());
         assertEquals("someToken", result.getAccessToken());
     }
 }
