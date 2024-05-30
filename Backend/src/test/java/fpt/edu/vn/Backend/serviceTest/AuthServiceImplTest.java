@@ -18,7 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -57,7 +56,7 @@ class AuthServiceImplTest {
 
         Account account = new Account();
         account.setEmail("test@test.com");
-        account.setAuthorities(Set.of(Account.Role.MEMBER));
+        account.setRoles(Set.of(Account.Role.MEMBER));
         when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
         AuthResponseDTO result = authService.login(loginDTO);
 
@@ -97,7 +96,7 @@ class AuthServiceImplTest {
         Account account = new Account();
         account.setEmail(registerDTO.getEmail());
         account.setPassword(registerDTO.getPassword());
-        account.setAuthorities(Set.of(Account.Role.MEMBER));
+        account.setRoles(Set.of(Account.Role.MEMBER));
 
         when(accountRepos.findByEmail(anyString())).thenReturn(Optional.empty());
         when(accountRepos.save(any(Account.class))).thenReturn(account);
@@ -182,7 +181,7 @@ class AuthServiceImplTest {
         Account account = new Account();
         account.setEmail("sdfsdf@sda.cc");
         account.setPassword("password");
-        account.setAuthorities(Set.of(Account.Role.MEMBER));
+        account.setRoles(Set.of(Account.Role.MEMBER));
         when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
 
         // Act

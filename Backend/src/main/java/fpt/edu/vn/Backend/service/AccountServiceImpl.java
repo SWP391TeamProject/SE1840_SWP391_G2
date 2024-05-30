@@ -39,8 +39,8 @@ public class AccountServiceImpl implements AccountService {
         var avatar = account.getAvatarUrl();
         if (avatar != null)
             accountDTO.setAvatar(attachmentServiceImpl.mapEntityToDTO(avatar));
-        if (account.getAuthorities() != null)
-            accountDTO.setRoles(new HashSet<>(account.getAuthorities()));
+        if (account.getRoles() != null)
+            accountDTO.setRoles(new HashSet<>(account.getRoles()));
         accountDTO.setEmail(account.getEmail());
         accountDTO.setPhone(account.getPhone());
         accountDTO.setStatus(account.getStatus());
@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
         // không set toàn bộ tránh exploit
         account.setAccountId(accountDTO.getAccountId());
         if (accountDTO.getRoles() != null && !accountDTO.getRoles().isEmpty())
-            account.setAuthorities(new HashSet<>(accountDTO.getRoles()));
+            account.setRoles(new HashSet<>(accountDTO.getRoles()));
         if (accountDTO.getNickname() != null)
             account.setNickname(accountDTO.getNickname());
         if (accountDTO.getPhone() != null)
@@ -101,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
         // avatar dùng method riêng
         // không set trực tiếp từ DTO tránh exploit
         a.setNickname(account.getNickname());
-        a.setAuthorities(new HashSet<>(account.getRoles()));
+        a.setRoles(new HashSet<>(account.getRoles()));
         a.setEmail(account.getEmail());
         a.setPhone(account.getPhone());
         a.setStatus(Account.Status.ACTIVE);

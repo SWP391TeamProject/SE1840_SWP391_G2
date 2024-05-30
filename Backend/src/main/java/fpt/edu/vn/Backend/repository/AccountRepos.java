@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Repository
 public interface AccountRepos extends JpaRepository<Account, Integer> {
-    @Query("SELECT a FROM Account a JOIN a.authorities r WHERE r IN :roles")
+    @Query("SELECT a FROM Account a JOIN a.roles r WHERE r IN :roles")
     @Nullable
     Page<Account> findAccountByAuthoritiesRoles(Set<Account.Role> roles, Pageable pageable);
 
