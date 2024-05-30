@@ -32,11 +32,11 @@ public class AccountController {
 
     @GetMapping("/")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 30) Pageable pageable,
-                                                        @RequestParam Account.Role... roles) {
-        if (roles.length == 0) {
+                                                        @RequestParam(required = false) Account.Role role) {
+        if (role == null) {
             return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
         }
-        return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(roles)), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

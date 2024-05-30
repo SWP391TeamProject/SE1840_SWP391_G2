@@ -45,6 +45,7 @@ public class AccountServiceImpl implements AccountService {
         accountDTO.setPhone(account.getPhone());
         accountDTO.setStatus(account.getStatus());
         accountDTO.setBalance(account.getBalance());
+        // accountDTO.setPassword(account.getPassword()); // DO NOT RETURN PASSWORD
         accountDTO.setCreateDate(account.getCreateDate());
         accountDTO.setUpdateDate(account.getUpdateDate());
         return accountDTO;
@@ -105,6 +106,7 @@ public class AccountServiceImpl implements AccountService {
         a.setEmail(account.getEmail());
         a.setPhone(account.getPhone());
         a.setStatus(Account.Status.ACTIVE);
+        a.setPassword(account.getPassword());
         return mapEntityToDTO(accountRepos.save(a));
     }
 

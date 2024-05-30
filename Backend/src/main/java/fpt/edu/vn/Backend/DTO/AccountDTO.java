@@ -19,6 +19,7 @@ public class AccountDTO {
     private AttachmentDTO avatar;
     private String email;
     private String phone;
+    private String password;
     private Account.Status status;
     private BigDecimal balance;
     private LocalDateTime createDate;
