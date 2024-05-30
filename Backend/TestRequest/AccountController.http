@@ -1,7 +1,7 @@
 
 ### Get all accounts
 GET http://localhost:8080/api/accounts/
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbkBsb2NhbGhvc3QiLCJpYXQiOjE3MTcwNTUxMDksImV4cCI6MTcxNzA2MDEwOX0.4n6pzcei4Fl3Vizz2esYrP7MW6MWjFq-QvuWONoKtvsYdK4PkkedxdFRETHTu3YBS8jYdpAoL-VE2boz4vym6A
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbkBsb2NhbGhvc3QiLCJpYXQiOjE3MTcwNTY5ODAsImV4cCI6MTcxNzA2MTk4MH0.WYZQvDcqtDEpoxb4jtbfXLIu0WUnIuAsXqthucjMTG2rrOVs2om4eN_yl-4teSuk94ZOxSzWbCQiQjeu-f3Fqw
 
 ###Response (HTTP/1.1 200 OK)
 Content-Type: application/json

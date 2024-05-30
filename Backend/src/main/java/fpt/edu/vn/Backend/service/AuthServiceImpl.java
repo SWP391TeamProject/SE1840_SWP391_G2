@@ -3,13 +3,10 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
-import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.RoleRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,17 +27,13 @@ public class AuthServiceImpl implements AuthService{
     private final AccountRepos accountRepos;
     private final JWTGenerator jwtGenerator;
     private final AuthenticationManager authenticationManager;
-    private final RoleRepos roleRepos;
 
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, RoleRepos roleRepos) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
-        this.roleRepos = roleRepos;
     }
-
-
 
     @Override
     public AuthResponseDTO register(RegisterDTO registerDTO) {
