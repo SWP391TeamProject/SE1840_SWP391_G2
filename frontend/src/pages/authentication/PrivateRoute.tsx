@@ -20,6 +20,7 @@ const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
       console.error("Error parsing user cookie", error);
     }
   }
+  
   return allowedRoles?.includes(parsedUser?.role) ? (
     <Outlet />
   ) : parsedUser?.email ? (

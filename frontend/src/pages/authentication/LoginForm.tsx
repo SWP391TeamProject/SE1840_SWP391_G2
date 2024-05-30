@@ -9,6 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
+import { Roles } from "@/constants/enums";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -38,7 +39,11 @@ function LoginForm() {
         setCookie("token", data.accessToken, 30000);
         setCookie("user", JSON.stringify(data), 30000);
         setUser(data);
-        navigate(from, { replace: true });
+        if (data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])){
+          navigate("/admin");
+        } else {
+          navigate(from, { replace: true });
+        }
       });
   };
 

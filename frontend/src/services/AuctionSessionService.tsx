@@ -1,6 +1,8 @@
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 
+const controller = "auction-sessions";
+
 export const fetchAllAuctionSessions = async () => {
     return await axios
         .get("http://localhost:8080/api/auction-sessions/", {

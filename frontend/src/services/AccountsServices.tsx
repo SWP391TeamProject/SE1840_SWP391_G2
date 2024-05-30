@@ -1,6 +1,8 @@
-import { getCookie } from "@/utils/cookies";
+import { SERVER_DOMAIN_URL } from "@/constants/Domain";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
-const m: string = "https://fakestoreapi.com/users";
+
+const controller = "accounts";
 export const fetchAccountsService = async () => {
   return await axios
     .get("http://localhost:8080/api/accounts/", {
@@ -11,15 +13,22 @@ export const fetchAccountsService = async () => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      if(err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+    });
 };
 
-export const updateAccountService = async (data: any) => {
+export const updateAccountService = async (data: any, id: number) => {
   return await axios
-    .put("http://localhost:8080/api/accounts/", data, {
+    .put("http://localhost:8080/api/accounts/" + id, data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
+        
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -29,7 +38,7 @@ export const updateAccountService = async (data: any) => {
 
 export const createAccountService = async (data: any) => {
   return await axios
-    .post("http://localhost:8080/api/accounts/", data, {
+    .post("http://localhost:8080/api/accounts", data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -42,7 +51,7 @@ export const createAccountService = async (data: any) => {
 
 export const deleteAccountService = async (id: string) => {
   return await axios
-    .delete(`http://localhost:8080/api/accounts/${id}`, {
+    .delete("http://localhost:8080/api/accounts/" + id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
