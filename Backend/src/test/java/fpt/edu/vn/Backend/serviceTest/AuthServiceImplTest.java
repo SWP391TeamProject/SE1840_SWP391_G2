@@ -4,9 +4,7 @@ import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.RoleRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import fpt.edu.vn.Backend.service.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,9 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,11 +38,6 @@ class AuthServiceImplTest {
     @Mock
     private AccountRepos accountRepos;
 
-
-    @Mock
-    private RoleRepos roleRepos;
-
-
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -65,9 +56,7 @@ class AuthServiceImplTest {
 
         Account account = new Account();
         account.setEmail("test@test.com");
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role());
-        account.setAuthorities(roles);
+        account.setRoles(Set.of(Account.Role.MEMBER));
         when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
         AuthResponseDTO result = authService.login(loginDTO);
 
@@ -107,12 +96,9 @@ class AuthServiceImplTest {
         Account account = new Account();
         account.setEmail(registerDTO.getEmail());
         account.setPassword(registerDTO.getPassword());
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role());
-        account.setAuthorities(roles);
+        account.setRoles(Set.of(Account.Role.MEMBER));
 
         when(accountRepos.findByEmail(anyString())).thenReturn(Optional.empty());
-        when(roleRepos.findById(anyInt())).thenReturn(Optional.of(new Role()));
         when(accountRepos.save(any(Account.class))).thenReturn(account);
         when(authenticationManager.authenticate(any())).thenReturn(new UsernamePasswordAuthenticationToken(registerDTO.getEmail(), registerDTO.getPassword()));
         when(jwtGenerator.generateToken(any())).thenReturn("someToken");
@@ -179,28 +165,6 @@ class AuthServiceImplTest {
 
         assertThrows(RuntimeException.class, () -> authService.register(registerDTO));
     }
-    @Test
-    @DisplayName("Should add role to set when role with id exists")
-    public void shouldAddRoleToSetWhenRoleWithIdExists() {
-        Role role = new Role();
-        when(roleRepos.findById(anyInt())).thenReturn(Optional.of(role));
-
-        Set<Role> roles = new HashSet<>();
-        roleRepos.findById(4).ifPresent(roles::add);
-
-        assertFalse(roles.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Should not add role to set when role with id does not exist")
-    public void shouldNotAddRoleToSetWhenRoleWithIdDoesNotExist() {
-        when(roleRepos.findById(anyInt())).thenReturn(Optional.empty());
-
-        Set<Role> roles = new HashSet<>();
-        roleRepos.findById(4).ifPresent(roles::add);
-
-        assertTrue(roles.isEmpty());
-    }
 
     @Test
     @DisplayName("Should return accessToken when user logged in successfully")
@@ -217,9 +181,7 @@ class AuthServiceImplTest {
         Account account = new Account();
         account.setEmail("sdfsdf@sda.cc");
         account.setPassword("password");
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role());
-        account.setAuthorities(roles);
+        account.setRoles(Set.of(Account.Role.MEMBER));
         when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
 
         // Act
