@@ -32,7 +32,7 @@ export const fetchConsigntmentDetailByConsignmentDetailId = async (id:number) =>
         },
       })
       .then((res) => {
-        console.log(res.data);
+        
         return res.data}) // return the data here
       .catch((err) => {
         console.log(err);
