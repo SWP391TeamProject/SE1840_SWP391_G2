@@ -14,22 +14,25 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import static org.mockito.ArgumentMatchers.any;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
-import java.util.stream.Collectors;
+
 public class AccountServiceImplTest {
 
+    private static final Logger log = LoggerFactory.getLogger(AccountServiceImplTest.class);
     @Mock
     private AccountRepos accountRepos;
 
@@ -132,7 +135,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(new RoleDTO(1,""),new RoleDTO(2,"")));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(1, ""), new RoleDTO(2, "")));
 
         Account account = new Account();
         account.setNickname(accountDTO.getNickname());
@@ -163,13 +166,12 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(new RoleDTO(999,"")));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(999, "")));
 
         when(roleRepos.findById(999)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> accountService.createAccount(accountDTO));
     }
-
 
 
     @Test
@@ -184,7 +186,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(new RoleDTO(1,""),new RoleDTO(2,"")));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(1, ""), new RoleDTO(2, "")));
 
         Account account = new Account();
         account.setAccountId(accountDTO.getAccountId());
@@ -218,7 +220,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(new RoleDTO(1,""),new RoleDTO(2,"")));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(1, ""), new RoleDTO(2, "")));
 
         when(accountRepos.findById(999)).thenReturn(Optional.empty());
 
@@ -237,7 +239,7 @@ public class AccountServiceImplTest {
         accountDTO.setStatus((byte) 1);
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRole(Arrays.asList(new RoleDTO(999,"")));
+        accountDTO.setRole(Arrays.asList(new RoleDTO(999, "")));
 
         Account account = new Account();
         account.setAccountId(accountDTO.getAccountId());
@@ -271,12 +273,12 @@ public class AccountServiceImplTest {
         assertEquals("test@test.com", result.getEmail());
     }
 
-//    @Test
-//    @DisplayName("Should return null when getting account with unknown email")
-//    public void shouldReturnNullWhenGettingAccountWithUnknownEmail() {
-//        when(accountRepos.findByEmail("invalid@test.com")).thenReturn(Optional.empty());
-//        assertNull(accountService.getAccountByEmail("invalid@test.com"));
-//    }
+    @Test
+    @DisplayName("Should throw exception when getting account with unknown email")
+    public void shouldThrowExceptionWhenGettingAccountWithUnknownEmail() {
+        when(accountRepos.findByEmail("invalid@test.com")).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountByEmail("invalid@test.com"));
+    }
 
     @Test
     @DisplayName("Should return account when valid email and password are provided")
@@ -308,46 +310,44 @@ public class AccountServiceImplTest {
         });
         assertThrows(ResourceNotFoundException.class, () -> {
             accountService.getAccountByEmailAndPassword("test@test.com", "invalid");
-        });    }
-//
-//    @Test
-//    @DisplayName("Should activate account")
-//    public void shouldActivateAccount() {
-//        Account account = new Account();
-//        account.setAccountId(1);
-//        account.setStatus((byte) 0);
-//        account.setEmail("test@test.com");
-//        account.setPassword("password");
-//        Role role = new Role();
-//        role.setRoleId(1);
-//        role.setRoleName(Role.Group.MEMBER);
-//        roleRepos.save(role);
-//        account.setAuthorities(Set.of(role));
-//        accountRepos.save(account);
-//
-//        when(accountRepos.findById(1)).thenReturn(Optional.of(account));
-//        when(accountRepos.save(account)).thenReturn(account);
-//
-//        accountService.activateAccount(1);
-//
-//        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountByEmailAndPassword("invalid@test.com", "password"));
-//        assertThrows(ResourceNotFoundException.class, () -> accountService.getAccountByEmailAndPassword("test@test.com", "invalid"));
-//    }
-//
-//    @Test
-//    @DisplayName("Should deactivate account")
-//    public void shouldDeactivateAccount() {
-//        Account account = new Account();
-//        account.setAccountId(1);
-//        account.setStatus((byte) 1);
-//        account.setEmail("test@test.com");
-//        account.setPassword("password");
-//
-//        when(accountRepos.findById(1)).thenReturn(Optional.of(account));
-//        when(accountRepos.save(account)).thenReturn(account);
-//
-//        accountService.deactivateAccount(1);
-//
-//        assertEquals((byte) 0, account.getStatus());
-//    }
+        });
+    }
+
+    @Test
+    @DisplayName("Should activate account")
+    public void shouldActivateAccount() {
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setStatus((byte) 0);
+        account.setEmail("test@test.com");
+        account.setPassword("password");
+        Role role = new Role();
+        role.setRoleId(1);
+        role.setRoleName(Role.Group.MEMBER);
+        account.setAuthorities(Set.of(role));
+        when(roleRepos.findById(1)).thenReturn(Optional.of(role));
+        when(accountRepos.findById(1)).thenReturn(Optional.of(account));
+        when(accountRepos.save(account)).thenReturn(account);
+        accountService.activateAccount(1);
+        assertEquals((byte) 1, accountService.getAccountById(1).getStatus());
+    }
+
+    @Test
+    @DisplayName("Should deactivate account")
+    public void shouldDeactivateAccount() {
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setStatus((byte) 1);
+        account.setEmail("test@test.com");
+        account.setPassword("password");
+        Role role = new Role();
+        role.setRoleId(1);
+        role.setRoleName(Role.Group.MEMBER);
+        account.setAuthorities(Set.of(role));
+        when(roleRepos.findById(1)).thenReturn(Optional.of(role));
+        when(accountRepos.findById(1)).thenReturn(Optional.of(account));
+        when(accountRepos.save(account)).thenReturn(account);
+        accountService.deactivateAccount(1);
+        assertEquals((byte) 0, accountService.getAccountById(1).getStatus());
+    }
 }

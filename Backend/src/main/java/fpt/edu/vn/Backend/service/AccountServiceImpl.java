@@ -146,8 +146,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deactivateAccount(int accountId) {
-        
-        AccountDTO account = new AccountDTO();
+        AccountDTO account = accountRepos.findById(accountId).map(AccountDTO::new).orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", ""+accountId));
         account.setAccountId(accountId);
         account.setStatus((byte) 0);
         updateAccount(account);
