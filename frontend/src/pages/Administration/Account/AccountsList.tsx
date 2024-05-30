@@ -76,8 +76,8 @@ export default function AccountsList() {
     try {
       const list = await fetchAccountsService();
       if (list) {
-        console.log(list.data.content);
         dispatch(setAccounts(list.data.content));
+        dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
       }
     } catch (error) {
       console.log(error);
@@ -225,7 +225,7 @@ export default function AccountsList() {
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {account.status == AccountStatus.ACTIVE ? 
-                        <Badge variant="secondary">{AccountStatus[account.status]}</Badge> : 
+                        <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> : 
                         <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
                       </TableCell>
                       <TableCell>
