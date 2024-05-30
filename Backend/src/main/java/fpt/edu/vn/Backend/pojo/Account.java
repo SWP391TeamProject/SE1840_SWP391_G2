@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts")
+@Table(name = "account")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +32,13 @@ public class Account {
     @OneToOne
     private Attachment avatarUrl;
 
-    @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "role_account",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> authorities;
 
     @Column(name = "email", length = 100)
     private String email;
@@ -44,8 +50,8 @@ public class Account {
     private String phone;
 
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @ColumnDefault("1")
+    private byte status;
 
     @Column(name = "balance")
     private BigDecimal balance;
@@ -79,17 +85,5 @@ public class Account {
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<ConsignmentDetail> consignmentDetails;
-
-    public enum Status {
-        ACTIVE,
-        DISABLED
-    }
-
-    public enum Role {
-        ADMIN,
-        MEMBER,
-        MANAGER,
-        STAFF;
-    }
 }
 
