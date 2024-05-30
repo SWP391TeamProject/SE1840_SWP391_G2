@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestController
 @ControllerAdvice
+@Description(value = "Handle all exceptions")
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(value = ResourceNotFoundException.class)
@@ -21,7 +22,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(value = InvalidInputException.class)
-  public ResponseEntity<Object> handleBadRequestException(Exception ex) {
+  public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex) {
     ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(), new Date());
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
