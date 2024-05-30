@@ -326,6 +326,7 @@ public class AccountServiceImplTest {
         role.setRoleName(Role.Group.MEMBER);
         account.setAuthorities(Set.of(role));
         when(roleRepos.findById(1)).thenReturn(Optional.of(role));
+        when(roleRepos.findByRoleName(role.getRoleName())).thenReturn(Optional.of(role));
         when(accountRepos.findById(1)).thenReturn(Optional.of(account));
         when(accountRepos.save(account)).thenReturn(account);
         accountService.activateAccount(1);
@@ -345,6 +346,7 @@ public class AccountServiceImplTest {
         role.setRoleName(Role.Group.MEMBER);
         account.setAuthorities(Set.of(role));
         when(roleRepos.findById(1)).thenReturn(Optional.of(role));
+        when(roleRepos.findByRoleName(role.getRoleName())).thenReturn(Optional.of(role));
         when(accountRepos.findById(1)).thenReturn(Optional.of(account));
         when(accountRepos.save(account)).thenReturn(account);
         accountService.deactivateAccount(1);

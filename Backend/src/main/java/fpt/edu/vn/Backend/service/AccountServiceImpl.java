@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
         account.setUpdateDate(accountDTO.getUpdateDate());
         account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
             Role role;
-            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleDTO.getRoleId()));
+            role = roleRepos.findByRoleName(Role.Group.valueOf(roleDTO.getRoleName().toUpperCase())).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleDTO.getRoleId()));
             return role;
         }).collect(Collectors.toSet()));
         return new AccountDTO(accountRepos.save(account));
@@ -84,7 +84,8 @@ public class AccountServiceImpl implements AccountService {
         account.setStatus(accountDTO.getStatus());
         account.setAuthorities(accountDTO.getRole().stream().map(roleDTO -> {
             Role role;
-            role = roleRepos.findById(roleDTO.getRoleId()).orElseThrow(() -> new ResourceNotFoundException("Role", "roleDTO", ""+roleDTO.getRoleId()));
+            log.info("RoleDTO: "+Role.Group.valueOf(roleDTO.getRoleName().toUpperCase()).name());
+            role = roleRepos.findByRoleName(Role.Group.valueOf(roleDTO.getRoleName().toUpperCase())).orElseThrow(() -> new ResourceNotFoundException("Role", "roleId", ""+roleDTO.getRoleId()));
             return role;
         }).collect(Collectors.toSet()));
         return new AccountDTO(accountRepos.save(account));
