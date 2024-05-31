@@ -6,8 +6,8 @@ export interface Item {
   reservePrice: number;
   buyInPrice: number;
   status: ItemStatus;
-  createDate?: string;
-  updateDate?: string;
+  createDate?: Date;
+  updateDate?: Date;
   ownerId?: number;
   orderId?: number;
 }
