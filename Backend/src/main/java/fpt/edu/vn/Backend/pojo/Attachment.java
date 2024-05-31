@@ -24,21 +24,27 @@ public class Attachment {
     @Column(length = 300,name = "link")
     private String link;
 
-    @Column(length = 10)
-    @Enumerated(EnumType.STRING)
-    private FileType type; // jpg, png, mp4, etc.
 
-    public enum FileType {
-        IMAGE,VIDEO,UNKNOWN
-    }
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @Column(name = "attachment_type")
-    @Enumerated(EnumType.STRING)
-    private type attachmentType;
-    enum type{
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
 
-        BANNER,AVATAR,PROFILE
-    }
+    @ManyToOne
+    @JoinColumn(name = "consignment_id")
+    private Consignment consignment;
+
+    @ManyToOne
+    @JoinColumn(name ="auction_session_id")
+    private AuctionSession auctionSession;
+
+    @ManyToOne()
+    @JoinColumn(name = "consignment_detail_id")
+    private ConsignmentDetail consignmentDetail;
+
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -47,6 +53,4 @@ public class Attachment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
-
 }

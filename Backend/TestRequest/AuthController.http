@@ -1,0 +1,49 @@
+### Login
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email":"user1@email.com",
+  "password":"hashed_password1"
+}
+###Response (HTTP/1.1 200 OK)
+Content-Type: application/json
+{
+  "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBlbWFpbC5jb20iLCJpYXQiOjE3MTY1MjE4MjMsImV4cCI6MTcxNjUyNjgyM30.mg3m0SnghQGpqolH8AykD25LkkPRb3TZXzLp1OxSOMceqV680hlwmEN13SF7OK1dyp4JkrKUGnYl9GZky81qvw",
+  "username": "bidder_bob",
+  "role": "ADMIN",
+  "refreshToken": null,
+  "email": "user1@email.com",
+  "phone": null,
+  "nickname": null,
+  "avatar": null,
+  "address": null
+}
+
+### Register
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email":"vidz752204@gmail.com",
+    "password":"cute123haha",
+    "confirmPassword":"cute123haha"
+}
+
+###Response (HTTP/1.1 200 OK)
+Content-Type: application/json
+
+{
+  "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWR6NzUyMjA0QGdtYWlsLmNvbSIsImlhdCI6MTcxNjUyMjA5MiwiZXhwIjoxNzE2NTI3MDkyfQ.Jy5sMeBFuUZGDmsY6y46fhQj_lZONaMUezEMc3dAUmtVs0v4SqCyzaHpA8KFVTw5nt4VkW9_vguhWhuwrMo0qg",
+  "username": null,
+  "role": "STAFF",
+  "refreshToken": null,
+  "email": "vidz752204@gmail.com",
+  "phone": null,
+  "nickname": null,
+  "avatar": null,
+  "address": null
+}
+
+
+

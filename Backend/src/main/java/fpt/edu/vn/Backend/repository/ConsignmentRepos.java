@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 public interface ConsignmentRepos extends JpaRepository<Consignment, Integer> {
     Page<Consignment> findByConsignmentId(int id, Pageable pageable);
 
+    Consignment findByConsignmentId(int id);
+
     Page<Consignment> findByStatus(Consignment.Status status, Pageable pageable);
 
 }

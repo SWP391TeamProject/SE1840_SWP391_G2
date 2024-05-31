@@ -2,8 +2,20 @@ package fpt.edu.vn.Backend.security;
 
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.UUID;
 import fpt.edu.vn.Backend.oauth2.security.*;
+
+import fpt.edu.vn.Backend.oauth2.security.CustomOAuth2UserService;
+import fpt.edu.vn.Backend.oauth2.security.HttpCookieOAuth2AuthorizationRequestRepository;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTAuthEntryPoint;
 import fpt.edu.vn.Backend.security.JWTAuthenticationFilter;
@@ -29,6 +41,8 @@ import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationC
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -79,7 +93,8 @@ public class SecurityConfig {
                         https.disable()
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","/oauth2/**").permitAll()
+                        .requestMatchers("/auth/**","/oauth2/**", "/api/auction-sessions/**","/api/items/**").permitAll()
+
                         .anyRequest().authenticated()
 
                 )

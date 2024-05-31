@@ -7,9 +7,16 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.stream.Collectors;
+
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,16 +35,23 @@ public class JWTGenerator {
 		Date expireDate = new Date(
 				currentDate.getTime() + SecurityConstants.JWT_EXPIRATION
 		);
-		String token = Jwts
+        return Jwts
 				.builder()
+				.setHeaderParam("typ", "JWT")
+				.claim(
+						"authorities",
+						authentication.getAuthorities().stream()
+								.map(GrantedAuthority::getAuthority)
+								.collect(Collectors.toList())
+				)
 				.setSubject(email)
 				.setIssuedAt(currentDate)
 				.setExpiration(expireDate)
 				.signWith(getSigningKey(), SignatureAlgorithm.HS512)
 				.compact();
-
-		return token;
 	}
+
+
 
 	public String getEmailFromToken(String token) {
 		Claims claims = Jwts

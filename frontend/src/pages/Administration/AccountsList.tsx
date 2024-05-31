@@ -61,6 +61,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { EditAcc } from "./popup/EditAcc";
 
 export default function AccountsList() {
   const accountsList = useAppSelector((state) => state.accounts);
@@ -70,8 +71,8 @@ export default function AccountsList() {
     try {
       const list = await fetchAccountsService();
       if (list) {
-        console.log(list.data);
-        dispatch(setAccounts(list.data));
+        console.log(list.data.content);
+        dispatch(setAccounts(list.data.content));
       }
     } catch (error) {
       console.log(error);
@@ -259,9 +260,9 @@ export default function AccountsList() {
                   </TableHeader>
                   <TableBody>
                     {accountsList.value.map((account) => (
-                      <TableRow key={account.userId}>
+                      <TableRow key={account.accountId}>
                         <TableCell className="font-medium">
-                          {account.userId}
+                          {account.accountId}
                         </TableCell>
                         {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
@@ -290,11 +291,12 @@ export default function AccountsList() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                               <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                              <DropdownMenuItem >Delete</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
+                      
                     ))}
                   </TableBody>
                 </Table>
@@ -308,6 +310,9 @@ export default function AccountsList() {
             </Card>
           </TabsContent>
         </Tabs>
+        {accountsList.value.map((account) => (
+          <EditAcc account={account} key={account.accountId} hidden={false}/> 
+        ))}
       </main>
     </div>
   );
