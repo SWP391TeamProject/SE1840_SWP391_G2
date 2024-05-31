@@ -25,6 +25,8 @@ public class Account {
     @Column(name = "account_id")
     private int accountId;
 
+    private String providerId;
+
     @Column(name = "nickname", length = 100)
     private String nickname;
 

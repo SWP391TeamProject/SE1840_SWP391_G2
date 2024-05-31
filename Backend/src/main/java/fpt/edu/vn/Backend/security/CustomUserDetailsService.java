@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -20,11 +21,13 @@ public class CustomUserDetailsService  implements UserDetailsService {
     private final AccountRepos accountRepos;
 
     @Autowired
+
     public CustomUserDetailsService(AccountRepos accountRepos) {
         this.accountRepos = accountRepos;
     }
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Account user = accountRepos.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
         return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));

@@ -12,7 +12,7 @@ public interface AuthService {
     AuthResponseDTO register(RegisterDTO registerDTO);
     String refreshToken(String token);
     String forgotPassword(String email);
-    String loginWithGoogle(String token);
+    public AuthResponseDTO loginWithGoogle(String token);
     String loginWithFacebook(String token);
 
 }
