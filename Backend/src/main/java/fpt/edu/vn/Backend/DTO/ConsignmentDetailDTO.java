@@ -40,7 +40,7 @@ public class ConsignmentDetailDTO {
         this.price = consignmentDetail.getPrice();
         this.consignmentId = consignmentDetail.getConsignment().getConsignmentId();
         this.accountId = consignmentDetail.getAccount().getAccountId();
-        this.attachments = consignmentDetail.getAttachments().stream()
+        this.attachments = consignmentDetail.getAttachments()==null?null:consignmentDetail.getAttachments().stream()
                 .map(AttachmentDTO::new)
                 .collect(Collectors.toList());
 
