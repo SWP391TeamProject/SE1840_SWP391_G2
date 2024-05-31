@@ -2,6 +2,8 @@ package fpt.edu.vn.Backend.security;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import fpt.edu.vn.Backend.oauth2.security.*;
 
 import fpt.edu.vn.Backend.oauth2.security.*;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
@@ -59,8 +61,9 @@ public class SecurityConfig {
 
     @Autowired
     public SecurityConfig(
-            CustomUserDetailsService userDetailService,
-            JWTAuthEntryPoint jwtAuthEntryPoint, CustomOAuth2UserService customOAuth2UserService) {
+            CustomUserDetailService userDetailService,
+            JWTAuthEntryPoint jwtAuthEntryPoint,
+             CustomOAuth2UserService customOAuth2UserService) {
         this.userDetailService = userDetailService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     }

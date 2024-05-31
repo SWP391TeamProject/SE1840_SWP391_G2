@@ -92,7 +92,8 @@ public class AuthController {
             return "login failed!";
         }
         model.addAttribute("auction_item", id);
-        model.addAttribute("user_id", ((Account)session.getAttribute("account")).getAccountId());
+        model.addAttribute("user_id", ((Account) session.getAttribute("account")).getAccountId());
         return "index";
     }
+
 }
