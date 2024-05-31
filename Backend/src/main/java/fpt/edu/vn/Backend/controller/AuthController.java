@@ -3,18 +3,29 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.oauth2.response.AuthResponse;
+import fpt.edu.vn.Backend.oauth2.security.CookieUtils;
+import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
+import java.util.Optional;
 
 
 @RestController
@@ -24,6 +35,10 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenProvider tokenProvider;
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -54,12 +69,14 @@ public class AuthController {
     }
 
     @GetMapping("/login-with-google")
-    public Map<String,Object> loginWithGoogle(OAuth2AuthenticationToken oAuth2AuthenticationToken)
-    {
-        return oAuth2AuthenticationToken.getPrincipal().getAttributes();
+    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestParam String token) {
+        AuthResponseDTO authResponseDTO = authService.loginWithGoogle(token);
+        return ResponseEntity.ok(authResponseDTO);
+//        return ResponseEntity.ok(new AuthResponse(token));
     }
 
-    @PostMapping("login-with-facebook")
+
+    @PostMapping("/login-with-facebook")
     public ResponseEntity<String> loginWithFacebook(@RequestBody String token) {
         return null;
     }
@@ -68,13 +85,15 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> register(@RequestBody RegisterDTO registerDTO) {
         return ResponseEntity.ok(authService.register(registerDTO));
     }
+
     @GetMapping("/auction-item/{id}")
     public String joinAuction(Model model, HttpSession session, @PathVariable int id) {
-        if(session.getAttribute("account") == null) {
+        if (session.getAttribute("account") == null) {
             return "login failed!";
         }
         model.addAttribute("auction_item", id);
-        model.addAttribute("user_id", ((Account)session.getAttribute("account")).getAccountId());
+        model.addAttribute("user_id", ((Account) session.getAttribute("account")).getAccountId());
         return "index";
     }
+
 }

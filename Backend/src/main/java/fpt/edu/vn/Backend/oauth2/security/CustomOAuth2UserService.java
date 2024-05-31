@@ -1,6 +1,6 @@
 package fpt.edu.vn.Backend.oauth2.security;
 
-import fpt.edu.vn.Backend.oauth2.Exception.OAuth2AuthenticationProcessingException;
+import fpt.edu.vn.Backend.oauth2.exception.OAuth2AuthenticationProcessingException;
 import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfo;
 import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfoFactory;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -61,18 +61,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Account account = new Account();
 
         account.setProvider(Account.AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
-//        account.setProviderId(oAuth2UserInfo.getId());
+
         account.setNickname(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setAvatarUrl(oAuth2UserInfo.getImageUrl());
-        account.setPhone(oAuth2UserInfo.getPhone());
+//        account.setPhone(oAuth2UserInfo.getPhone());
+//        account.setProviderId(oAuth2UserInfo.getId());
+
         return accountRepos.save(account);
     }
 
     private Account updateExistingUser(Account existingUser, OAuth2UserInfo oAuth2UserInfo) {
         existingUser.setNickname(oAuth2UserInfo.getName());
         existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
-        existingUser.setPhone(oAuth2UserInfo.getPhone());
+
 
         return accountRepos.save(existingUser);
     }

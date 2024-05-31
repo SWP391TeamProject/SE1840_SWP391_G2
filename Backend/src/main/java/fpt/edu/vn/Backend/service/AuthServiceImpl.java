@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfo;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -130,8 +131,16 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public String loginWithGoogle(String token) {
-        return "";
+    public AuthResponseDTO loginWithGoogle(String token) {
+        String email = jwtGenerator.getEmailFromToken(token);
+        Account user = accountRepos.findAccountByEmail(email);
+        return AuthResponseDTO
+                .builder()
+                .accessToken(token)
+                .username(user.getNickname())
+                .email(user.getEmail())
+//                .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
+                .build();
     }
 
     @Override
