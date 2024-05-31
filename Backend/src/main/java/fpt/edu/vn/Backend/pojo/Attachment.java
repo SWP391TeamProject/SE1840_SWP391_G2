@@ -28,6 +28,9 @@ public class Attachment {
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;
+    @Column(length = 10)
+    @Enumerated
+    private FileType type; // jpg, png, mp4, etc.
 
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -36,6 +39,10 @@ public class Attachment {
     @ManyToOne
     @JoinColumn(name = "consignment_id")
     private Consignment consignment;
+    @Column(name = "attachment_type")
+    @Enumerated
+    private type attachmentType;
+    enum type{
 
     @ManyToOne
     @JoinColumn(name ="auction_session_id")
@@ -53,4 +60,6 @@ public class Attachment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
+
+
 }

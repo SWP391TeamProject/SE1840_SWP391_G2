@@ -33,4 +33,15 @@ public interface AttachmentService {
     @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException;
 
     @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile[] file, int itemId) throws IOException;
+//    Attachment uploadAttachment(MultipartFile file, int entityId, Attachment.EntityType entityType) throws IOException;
+//
+//    Attachment getAttachmentById(int id);
+//
+//    List<Attachment> getAllAttachments();
+//
+//    List<Attachment> getAllAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
+//
+//    boolean deleteAttachmentByAttachmentId(int attachmentId);
+//
+//    boolean deleteAttachmentsByEntity(int entityId, Attachment.EntityType entityType);
 }
