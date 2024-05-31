@@ -16,7 +16,7 @@ import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadIcon } from "lucide-react";
-import DropzoneComponent from "./DropZoneComponent";
+import DropzoneComponent from "../../components/drop-zone/DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
 import { SERVER_DOMAIN_URL } from "@/constants/Domain";
 import { useDropzone } from "react-dropzone";

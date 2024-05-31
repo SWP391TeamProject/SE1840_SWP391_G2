@@ -86,4 +86,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService{
         }
         return auctionSessions.map(AuctionSessionDTO::new);
     }
+
+    @Override
+    public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
+        return null;
+    }
 }

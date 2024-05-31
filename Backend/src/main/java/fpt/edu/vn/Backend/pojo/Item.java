@@ -47,9 +47,7 @@ public class Item {
 
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
-
     private Status status;
-
 
     @CreationTimestamp
     @Column(name = "create_date")

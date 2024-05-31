@@ -1,4 +1,4 @@
-import { getCookie } from "@/utils/cookies";
+ import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 
 const URL = "http://localhost:8080/api/consignmentDetails/";
@@ -32,7 +32,7 @@ export const fetchConsigntmentDetailByConsignmentDetailId = async (id:number) =>
         },
       })
       .then((res) => {
-        console.log(res.data);
+        
         return res.data}) // return the data here
       .catch((err) => {
         console.log(err);

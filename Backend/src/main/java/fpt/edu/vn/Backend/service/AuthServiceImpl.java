@@ -5,10 +5,9 @@ import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfo;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.RoleRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,17 +28,13 @@ public class AuthServiceImpl implements AuthService{
     private final AccountRepos accountRepos;
     private final JWTGenerator jwtGenerator;
     private final AuthenticationManager authenticationManager;
-    private final RoleRepos roleRepos;
 
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, RoleRepos roleRepos) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
-        this.roleRepos = roleRepos;
     }
-
-
 
     @Override
     public AuthResponseDTO register(RegisterDTO registerDTO) {
@@ -62,12 +55,11 @@ public class AuthServiceImpl implements AuthService{
             accountRepos.findByEmail(registerDTO.getEmail()).ifPresent(account -> {
                 throw new InvalidInputException("Email already exists! try login instead.");
             });
-            Set<Role> roles = new HashSet<>();
-            roleRepos.findById(4).ifPresent(roles::add);
+
             newAccount = new Account();
             newAccount.setEmail(registerDTO.getEmail());
             newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
-            newAccount.setAuthorities(roles);
+            newAccount.setRoles(Set.of(Account.Role.MEMBER));
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -86,7 +78,7 @@ public class AuthServiceImpl implements AuthService{
         return AuthResponseDTO.builder()
                 .accessToken(token)
                 .email(newAccount.getEmail())
-                .role(String.valueOf(newAccount.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
+                .roles(newAccount.getRoles())
                 .build();
     }
 
@@ -96,6 +88,13 @@ public class AuthServiceImpl implements AuthService{
             throw new InvalidInputException("Email or password is empty!");
         }
 
+
+
+        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
+
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException ("Invalid email or password");
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDTO.getEmail(),
@@ -105,12 +104,6 @@ public class AuthServiceImpl implements AuthService{
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
 
-        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
-
-        if (!userOptional.isPresent()) {
-            throw new InvalidInputException("Invalid email or password");
-        }
-
         Account user = userOptional.get();
         return AuthResponseDTO
                 .builder()
@@ -118,7 +111,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
+                .roles(user.getRoles())
                 .build();
 
     }
@@ -141,14 +134,16 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public AuthResponseDTO loginWithGoogle(String token) {
         String email = jwtGenerator.getEmailFromToken(token);
-        Optional<Account> userOptional = accountRepos.findByEmail(email);
-        Account user = userOptional.get();
+        Optional<Account> user = accountRepos.findByEmail(email);
+        if(user.isPresent()){
+            user.get();
+        }
         return AuthResponseDTO
                 .builder()
                 .accessToken(token)
-                .username(user.getNickname())
-                .email(user.getEmail())
-//                .role(String.valueOf(user.getAuthorities().stream().max(Comparator.comparingInt(Role::getRoleId)).get().getRoleName()))
+                .username(user.get().getNickname())
+                .email(user.get().getEmail())
+//                .role(user.get().getAuthorities())
                 .build();
     }
 

@@ -1,8 +1,8 @@
 export enum Roles {
+  MEMBER = "MEMBER",
+  STAFF = "STAFF",
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
-  STAFF = "STAFF",
-  MEMBER = "MEMBER",
   GUEST = "GUEST",
 } // enums.ts
 
@@ -66,8 +66,8 @@ export enum PaymentType {
 }
 
 export enum RoleName {
+  MEMBER = "MEMBER",
   STAFF = "STAFF",
   MANAGER = "MANAGER",
-  MEMBER = "MEMBER",
   ADMIN = "ADMIN",
 }

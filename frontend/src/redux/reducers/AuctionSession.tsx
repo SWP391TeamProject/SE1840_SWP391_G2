@@ -1,11 +1,11 @@
-import { Account } from "@/models/AccountModel";
+import { AuctionSession } from "@/models/AuctionSessionModel";
 import { createSlice } from "@reduxjs/toolkit"
 
-interface AccountsState {
+interface AuctionSessionsState {
     loading: boolean,
-    value: Account[],
-    currentAccount?: Account,
-    currentPageList: Account[],
+    value: AuctionSession[],
+    currentAuctionSession?: AuctionSession,
+    currentPageList: AuctionSession[],
     currentPageNumber: number,
     pageSize: number,
     totalItems: number,
@@ -13,10 +13,10 @@ interface AccountsState {
 }
 
 // Define the initial state using that type
-const initialState: AccountsState = {
+const initialState: AuctionSessionsState = {
     loading: true,
     value: [],
-    currentAccount: undefined,
+    currentAuctionSession: undefined,
     currentPageList: [],
     currentPageNumber: 1,
     pageSize: 10,
@@ -24,16 +24,16 @@ const initialState: AccountsState = {
     error: ''
 }
 
-export const accountsSlice = createSlice({
-    name: 'accounts',
+export const auctionSessionsSlice = createSlice({
+    name: 'auctionSessions',
     initialState,
     reducers: {
-        setAccounts: (state, action) => {
+        setAuctionSessions: (state, action) => {
             state.value = action.payload;
             state.totalItems = action.payload.length;
         },
-        setCurrentAccount: (state, action) => {
-            state.currentAccount = action.payload;
+        setCurrentAuctionSession: (state, action) => {
+            state.currentAuctionSession = action.payload;
         },
         setCurrentPageNumber: (state, action) => {
             // state.currentPageList = action.payload
@@ -49,5 +49,5 @@ export const accountsSlice = createSlice({
 });
 
 
-export const { setAccounts, setCurrentAccount, setCurrentPageList, error } = accountsSlice.actions;
-export default accountsSlice.reducer
+export const { setAuctionSessions, setCurrentAuctionSession, setCurrentPageList, error } = auctionSessionsSlice.actions;
+export default auctionSessionsSlice.reducer
