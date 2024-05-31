@@ -35,7 +35,7 @@ export default function DropzoneComponent({ control, name }) {
         const acceptedFileItems = acceptedFiles.map((file, index) => (
           <li key={`${file.path}-${file.lastModified}`} className="flex flex-row gap-2 w-full ustify-between">
             {/* Display image preview */}
-            <img src={file.preview} alt={file.name}  className="basis 1/3 w-[200px] justify-between" />
+            <img src={file.preview} alt={file.name} className="basis 1/3 w-[200px] justify-between" />
             <div className="w-full flex flex-row justify-between">
               <div className="basis-11/12">
                 <p>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
@@ -50,10 +50,12 @@ export default function DropzoneComponent({ control, name }) {
 
         return (
           <section className="container min-h-[100px] flex justify-center items-center flex-col w-full ">
-            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full border border-red-500 border-dotted h-[100px] hover:cursor-pointer" })}>
+            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full bg-gray-200 rounded-xl border-red-500 border-dotted h-[100px] hover:cursor-pointer" })}>
               <input {...getInputProps()} />
-              <UploadCloudIcon />
-              <p>Drag 'n' drop some images here, or click to select images</p>
+              <div className="w-full flex justify-center items-center gap-2">
+                <UploadCloudIcon />
+                <p> Drag 'n' drop some images here, or click to select images</p>
+              </div>
             </div>
             <ul className="w-full ">{acceptedFileItems}</ul>
           </section>
