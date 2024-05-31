@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import accountsReducer from './reducers/Accounts'
-
+import auctionSessionReducer from './reducers/AuctionSession'
 export const store = configureStore({
   reducer: {
     accounts: accountsReducer,
+    auctionSessions: auctionSessionReducer,
   },
 })
 
