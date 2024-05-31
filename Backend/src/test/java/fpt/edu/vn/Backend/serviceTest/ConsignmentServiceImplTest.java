@@ -96,7 +96,7 @@ public class ConsignmentServiceImplTest {
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
 
-        consignmentService.submitFinalEvaluationUpdate(1, "evaluation", BigDecimal.valueOf(1000), 1, Collections.emptyList());
+        consignmentService.submitFinalEvaluationUpdate(1, "evaluation", BigDecimal.valueOf(1000), 1);
 
         verify(consignmentRepos, times(1)).save(any(Consignment.class));
     }
