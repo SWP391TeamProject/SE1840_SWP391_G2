@@ -1,13 +1,20 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.AuctionSession;
+import fpt.edu.vn.Backend.pojo.Deposit;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuctionSessionDTO {
     private int auctionSessionId;
     private String title;
@@ -16,9 +23,9 @@ public class AuctionSessionDTO {
     private String status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private Set<DepositDTO> deposits;
 
-    public AuctionSessionDTO() {
-    }
+
     public AuctionSessionDTO(AuctionSession auctionSession) {
         this.auctionSessionId = auctionSession.getAuctionSessionId();
         this.startDate = auctionSession.getStartDate();
@@ -27,18 +34,9 @@ public class AuctionSessionDTO {
         this.createDate = auctionSession.getCreateDate();
         this.updateDate = auctionSession.getUpdateDate();
         this.title = auctionSession.getTitle();
+        this.deposits = auctionSession.getDeposits().stream().map(DepositDTO::new).collect(Collectors.toSet());
 
     }
-    public AuctionSessionDTO(int auctionSessionId, String title, LocalDateTime startDate, LocalDateTime endDate, String status, LocalDateTime createDate, LocalDateTime updateDate) {
-        this.auctionSessionId = auctionSessionId;
-        this.title = title;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
-    }
-
 
     // getters and setters
     // ...

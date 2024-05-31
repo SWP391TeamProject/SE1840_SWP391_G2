@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -48,11 +49,11 @@ public class AuctionSession {
     private List<AuctionItem> auctionItems;
 
     @OneToMany(mappedBy = "auctionSession")
-    private List<Deposit> deposits;
+    private Set<Deposit> deposits;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "auction_session_id")
-    private List<Attachment> attachments;
+    private  Set<Attachment> attachments;
 
 
 
