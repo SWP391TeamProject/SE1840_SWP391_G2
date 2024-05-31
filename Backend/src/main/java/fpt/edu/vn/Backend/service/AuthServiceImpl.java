@@ -89,40 +89,33 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
-        try {
-            if (loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()) {
-                throw new InvalidInputException("Email or password is empty!");
-            }
-
-
-            Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
-
-            if (userOptional.isEmpty()) {
-                throw new ResourceNotFoundException("Invalid email or password");
-            }
-
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginDTO.getEmail(),
-                            loginDTO.getPassword()
-                    )
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtGenerator.generateToken(authentication);
-
-            Account user = userOptional.get();
-            return AuthResponseDTO
-                    .builder()
-                    .id(user.getAccountId())
-                    .accessToken(token)
-                    .username(user.getNickname())
-                    .email(user.getEmail())
-                    .roles(user.getRoles())
-                    .build();
-        }catch (Exception e){
-            logger.error("An unexpected error occurred: " + e.getMessage(), e);
-            return null;
+        if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
+            throw new InvalidInputException("Email or password is empty!");
         }
+
+        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
+
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException ("Invalid email or password");
+        }
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDTO.getEmail(),
+                        loginDTO.getPassword()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtGenerator.generateToken(authentication);
+
+        Account user = userOptional.get();
+        return AuthResponseDTO
+                .builder()
+                .id(user.getAccountId())
+                .accessToken(token)
+                .username(user.getNickname())
+                .email(user.getEmail())
+                .roles(user.getRoles())
+                .build();
     }
 
     @Override
