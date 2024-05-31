@@ -34,7 +34,20 @@ public class Account {
     private Attachment avatarUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "provider",length = 30)
+    public AuthProvider provider;
+    public enum AuthProvider{
+        local,google,facebook
+    }
+
+    @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+    public enum Role {
+        ADMIN,
+        MEMBER,
+        MANAGER,
+        STAFF;
+    }
 
     @Column(name = "email", length = 100)
     private String email;
@@ -87,11 +100,6 @@ public class Account {
         DISABLED
     }
 
-    public enum Role {
-        ADMIN,
-        MEMBER,
-        MANAGER,
-        STAFF;
-    }
+
 }
 

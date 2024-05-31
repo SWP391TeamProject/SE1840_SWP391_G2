@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.oauth2.security;
 import fpt.edu.vn.Backend.oauth2.AppProperties;
 import fpt.edu.vn.Backend.oauth2.exception.BadRequestException;
+import fpt.edu.vn.Backend.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -17,12 +18,16 @@ import java.util.Optional;
 import static fpt.edu.vn.Backend.oauth2.security.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 
+
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private TokenProvider tokenProvider;
 
     private AppProperties appProperties;
+
+    @Autowired
+    private JWTGenerator jwtGenerator;
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 

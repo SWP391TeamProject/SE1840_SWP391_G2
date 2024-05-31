@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.oauth2.exception.OAuth2AuthenticationProcessingExcepti
 import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfo;
 import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfoFactory;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Account.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -15,7 +16,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -59,11 +62,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
     private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.valueOf(String.valueOf(Role.MEMBER)));
+
 
         account.setProvider(Account.AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
 
         account.setNickname(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
+        account.setRoles(roles);
+        account.setPassword("12345");
 //        account.setAvatarUrl(oAuth2UserInfo.getImageUrl());
 //        account.setPhone(oAuth2UserInfo.getPhone());
 //        account.setProviderId(oAuth2UserInfo.getId());

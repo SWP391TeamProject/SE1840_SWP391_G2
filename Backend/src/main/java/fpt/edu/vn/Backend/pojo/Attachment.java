@@ -21,7 +21,7 @@ public class Attachment {
     @NaturalId
     private String blobId;
 
-    @Column(length = 300,name = "link")
+    @Column(length = 300, name = "link")
     private String link;
 
 
@@ -31,6 +31,10 @@ public class Attachment {
     @Column(length = 10)
     @Enumerated
     private FileType type; // jpg, png, mp4, etc.
+
+    enum FileType {
+        JPG, PNG, MP4
+    }
 
     @ManyToOne
     @JoinColumn(name = "account_id")
@@ -42,10 +46,11 @@ public class Attachment {
     @Column(name = "attachment_type")
     @Enumerated
     private type attachmentType;
-    enum type{
+
+    enum type {}
 
     @ManyToOne
-    @JoinColumn(name ="auction_session_id")
+    @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;
 
     @ManyToOne()
@@ -61,5 +66,5 @@ public class Attachment {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
-
 }
+

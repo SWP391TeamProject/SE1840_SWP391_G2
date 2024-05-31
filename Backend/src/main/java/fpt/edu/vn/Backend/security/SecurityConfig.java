@@ -10,6 +10,7 @@ import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTAuthEntryPoint;
 import fpt.edu.vn.Backend.security.JWTAuthenticationFilter;
 import org.apache.catalina.filters.CorsFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +48,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 )
 public class SecurityConfig {
 
-    private CustomUserDetailService userDetailService;
     private CustomOAuth2UserService customOAuth2UserService;
 
     private JWTAuthEntryPoint jwtAuthEntryPoint;
@@ -61,11 +61,10 @@ public class SecurityConfig {
 
     @Autowired
     public SecurityConfig(
-            CustomUserDetailService userDetailService,
             JWTAuthEntryPoint jwtAuthEntryPoint,
              CustomOAuth2UserService customOAuth2UserService) {
-        this.userDetailService = userDetailService;
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
 
@@ -115,12 +114,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    public void configure (AuthenticationManagerBuilder auth) throws Exception{
-        auth
-                .userDetailsService(userDetailService)
-                .passwordEncoder(passwordEncoder());
     }
 
     @Bean

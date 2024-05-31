@@ -7,15 +7,21 @@ import fpt.edu.vn.Backend.oauth2.response.AuthResponse;
 import fpt.edu.vn.Backend.oauth2.security.CookieUtils;
 import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -34,12 +40,14 @@ import java.util.Optional;
 @Slf4j
 public class AuthController {
 
-    private final AuthService authService;
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private TokenProvider tokenProvider;
 
+    @Autowired
+    private AccountRepos accountRepos;
+
+
+    private final AuthService authService;
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
