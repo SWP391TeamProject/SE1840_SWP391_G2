@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { fetchAllItems } from "@/services/ItemService";
+import { getItems } from "@/services/ItemService";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -14,7 +14,7 @@ export default function FeaturedAuctions() {
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
 
   useEffect(() => {
-    fetchAllItems().then((data) => {
+    getItems().then((data) => {
       console.log(data.content);
       setFeaturedAuctions(data.content);
     });
