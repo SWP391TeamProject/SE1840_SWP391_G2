@@ -84,6 +84,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             detail.setDescription(evaluation);
             detail.setConsignment(consignment);
             detail = consignmentDetailRepos.save(detail);
+            logger.info("Initial Evaluation submitted"+detail.getConsignmentDetailId()  );
             if (consignment.getConsignmentDetails() == null || consignment.getConsignmentDetails().isEmpty()) {
                 consignment.setConsignmentDetails(new ArrayList<>());
             }
@@ -116,7 +117,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             detail.setPrice(price);
             detail.setDescription(evaluation);
             detail.setConsignment(consignment);
-            detail = consignmentDetailRepos.save(detail);
+            detail=consignmentDetailRepos.save(detail);
             if (consignment.getConsignmentDetails() == null || consignment.getConsignmentDetails().isEmpty()) {
                 consignment.setConsignmentDetails(new ArrayList<>());
             }
