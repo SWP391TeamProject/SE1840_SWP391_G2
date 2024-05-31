@@ -14,6 +14,10 @@ public interface AuctionSessionService {
 
     Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable);
 
+    Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable);
+
+    Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable);
+
     
 
 }
