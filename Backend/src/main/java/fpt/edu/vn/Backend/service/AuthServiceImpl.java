@@ -143,7 +143,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .roles(user.getRole())
+                .role(user.getRole())
                 .build();
     }
 
