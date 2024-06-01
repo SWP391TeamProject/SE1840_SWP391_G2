@@ -31,10 +31,10 @@ public class CustomUserDetailsService  implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Account user = accountRepos.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-        return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(Collections.singleton(user.getRole()) ));
+        return new User(user.getEmail(), user.getPassword(), Collections.singletonList(mapRolesToAuthorities(user.getRole())));
     }
 
-    private Collection<GrantedAuthority> mapRolesToAuthorities(Collection<Account.Role> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toSet());
+    private GrantedAuthority mapRolesToAuthorities(Account.Role role) {
+        return new SimpleGrantedAuthority(role.toString());
     }
 }

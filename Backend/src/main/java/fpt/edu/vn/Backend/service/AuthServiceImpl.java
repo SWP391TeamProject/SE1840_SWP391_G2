@@ -23,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -83,7 +82,7 @@ public class AuthServiceImpl implements AuthService{
         return AuthResponseDTO.builder()
                 .accessToken(token)
                 .email(newAccount.getEmail())
-                .roles(newAccount.getRole())
+                .role(newAccount.getRole())
                 .build();
     }
 
@@ -114,7 +113,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .roles(user.getRole())
+                .role(user.getRole())
                 .build();
     }
 
@@ -144,7 +143,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .roles(user.getRole())
+                .role(user.getRole())
                 .build();
     }
 

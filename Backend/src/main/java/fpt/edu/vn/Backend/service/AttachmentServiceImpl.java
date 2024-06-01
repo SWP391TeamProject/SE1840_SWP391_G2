@@ -6,14 +6,8 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Attachment;
-import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
-import fpt.edu.vn.Backend.pojo.Item;
-import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.AttachmentRepos;
-import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
-import fpt.edu.vn.Backend.repository.ItemRepos;
+import fpt.edu.vn.Backend.pojo.*;
+import fpt.edu.vn.Backend.repository.*;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -38,6 +32,8 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final ConsignmentDetailRepos consignmentDetailRepos;
 
+    @Autowired
+    private BlogPostRepos blogPostRepos;
     @Autowired
     public AttachmentServiceImpl(AttachmentRepos attachmentRepository, AccountRepos accountRepos, ConsignmentDetailRepos consignmentDetailRepos,ItemRepos itemRepository) {
         this.attachmentRepository = attachmentRepository;
@@ -229,7 +225,38 @@ public class AttachmentServiceImpl implements AttachmentService {
         // Map the Attachment entity to an AttachmentDTO and return it
         return mapEntityToDTO(attachment);
     }
+    @Override
+    public @NotNull AttachmentDTO uploadBlogAttachment(@NotNull MultipartFile file, Integer blogId) throws IOException {
+        // Get the Item object from the itemId
+        BlogPost blog = blogPostRepos.findById(blogId)
+                .orElseThrow(() -> new ResourceNotFoundException("Blog with id " + blogId + " does not exist"));
 
+        // Generate a unique blobId for the file
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new IOException(e);
+        }
+        String blobId = blog.getAuthor().getAccountId() + "/blog-image/" + UUID.randomUUID() + mimeType.getExtension();
+
+        // Get a BlockBlobClient for the blob with this blobId and upload the file
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+        byte[] bytes = file.getBytes();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
+
+        // Create a new Attachment object, set its properties, and save it to the database
+        Attachment attachment = new Attachment();
+        attachment.setBlobId(blobId);
+        attachment.setLink(blobClient.getBlobUrl());
+        attachment.setBlogPost(blog);
+        attachment=attachmentRepository.save(attachment);
+
+        // Map the Attachment entity to an AttachmentDTO and return it
+        return mapEntityToDTO(attachment);
+    }
     @Override
     public @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile[] file, int itemId) throws IOException {
         return null;

@@ -69,7 +69,7 @@ public class ConsignmentServiceImplTest {
         account.setAccountId(1);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
-        consignment.setAccount(account);
+        consignment.setStaff(account);
         consignment.setConsignmentDetails(Collections.emptyList());
 
         ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -82,7 +82,7 @@ public class ConsignmentServiceImplTest {
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail);
         when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
-        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
 
         consignmentService.submitInitialEvaluation(2, "evaluation", BigDecimal.valueOf(1000), 1);
 
@@ -95,7 +95,7 @@ public class ConsignmentServiceImplTest {
         account.setAccountId(1);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
-        consignment.setAccount(account);
+        consignment.setStaff(account);
         ConsignmentDetail consignmentDetailInitial = new ConsignmentDetail();
         consignmentDetailInitial.setConsignmentDetailId(1);
         consignmentDetailInitial.setPrice(BigDecimal.valueOf(1000));
@@ -111,10 +111,10 @@ public class ConsignmentServiceImplTest {
         consignmentDetailFinal.setConsignment(consignment);
         consignmentDetailFinal.setType(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
 
-        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
-        when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.of(consignmentDetailInitial));
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetailFinal);
-        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
 
         consignmentService.submitFinalEvaluationUpdate(1, "evaluation", BigDecimal.valueOf(1000), 1);
 

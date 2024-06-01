@@ -33,7 +33,7 @@ public class Account {
     @OneToOne
     private Attachment avatarUrl;
 
-    @Enumerated(EnumType.STRING)
+
     @Column(name = "provider",length = 30)
     public AuthProvider provider;
     public enum AuthProvider{

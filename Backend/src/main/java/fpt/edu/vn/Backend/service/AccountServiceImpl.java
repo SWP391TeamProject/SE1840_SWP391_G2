@@ -76,7 +76,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles) {
-        var a = accountRepos.findAccountByAuthoritiesRoles(roles, pageable);
+        var a = accountRepos.findByRoleIn(roles, pageable);
         a = a == null ? Page.empty(pageable) : a;
         return a.map(this::mapEntityToDTO);
     }

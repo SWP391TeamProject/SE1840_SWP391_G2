@@ -13,9 +13,9 @@ import java.util.Set;
 
 @Repository
 public interface AccountRepos extends JpaRepository<Account, Integer> {
-    @Query("SELECT a FROM Account a JOIN a.role r WHERE r IN :roles")
+    @Query("SELECT a FROM Account a WHERE a.role IN :roles")
     @Nullable
-    Page<Account> findAccountByAuthoritiesRoles(Set<Account.Role> roles, Pageable pageable);
+    Page<Account> findByRoleIn(Set<Account.Role> roles, Pageable pageable);
 
     Optional<Account> findByEmail(String email);
 

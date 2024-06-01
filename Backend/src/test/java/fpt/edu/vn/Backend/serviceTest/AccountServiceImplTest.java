@@ -91,18 +91,18 @@ public class AccountServiceImplTest {
 
         var pr = PageRequest.of(0, 2);
 
-        when(accountRepos.findAccountByAuthoritiesRoles(
+        when(accountRepos.findByRoleIn(
                 Set.of(Account.Role.ADMIN),
                 pr
         )).thenReturn(new PageImpl<>(List.of(account1)));
 
-        when(accountRepos.findAccountByAuthoritiesRoles(
+        when(accountRepos.findByRoleIn(
                 Set.of(Account.Role.MANAGER),
                 pr
         )).thenReturn(new PageImpl<>(List.of(account2)));
 
         assertEquals(1, accountService.getAccountsByRoles(pr, Set.of(Account.Role.ADMIN)).getContent().size());
-        assertEquals(1, accountService.getAccountsByRoles(pr, Set.of(Account.Role.MANAGER)).getContent().size());
+        assertEquals(1, accountService.getAccountsByRoles(pr, Set.of(Account.Role.MANAGER) ).getContent().size());
         assertEquals(0, accountService.getAccountsByRoles(pr, Set.of(Account.Role.ADMIN, Account.Role.MANAGER)).getContent().size());
     }
 
@@ -189,8 +189,7 @@ public class AccountServiceImplTest {
     public void shouldReturnAccountWhenValidEmailIsProvided() {
         Account account = new Account();
         account.setEmail("test@test.com");
-
-
+        account.setRole(Account.Role.MEMBER);
         when(accountRepos.findByEmail("test@test.com")).thenReturn(Optional.of(account));
 
         AccountDTO result = accountService.getAccountByEmail("test@test.com");
@@ -212,6 +211,7 @@ public class AccountServiceImplTest {
         Account account = new Account();
         account.setEmail("test@test.com");
         account.setPassword("password");
+        account.setRole(Account.Role.STAFF);
         when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
 
         AccountDTO result = accountService.getAccountByEmailAndPassword("test@test.com", "password");
