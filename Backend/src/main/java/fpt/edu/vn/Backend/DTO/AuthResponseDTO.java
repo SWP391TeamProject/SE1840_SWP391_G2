@@ -21,4 +21,5 @@ public class AuthResponseDTO {
     private String nickname;
     private String avatar;
     private String address;
+
 }

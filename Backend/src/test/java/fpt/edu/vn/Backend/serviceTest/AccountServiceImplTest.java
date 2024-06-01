@@ -190,7 +190,6 @@ public class AccountServiceImplTest {
         Account account = new Account();
         account.setEmail("test@test.com");
         account.setRole(Account.Role.MEMBER);
-
         when(accountRepos.findByEmail("test@test.com")).thenReturn(Optional.of(account));
 
         AccountDTO result = accountService.getAccountByEmail("test@test.com");
@@ -213,7 +212,6 @@ public class AccountServiceImplTest {
         account.setEmail("test@test.com");
         account.setPassword("password");
         account.setRole(Account.Role.STAFF);
-
         when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
 
         AccountDTO result = accountService.getAccountByEmailAndPassword("test@test.com", "password");

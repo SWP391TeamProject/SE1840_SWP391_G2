@@ -43,6 +43,10 @@ public class AccountController {
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
+//            return new ResponseEntity<>(new AccountDTO(accountService.getAccountById(id)), HttpStatus.OK);
+//    }
 
     @PostMapping("/")
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {
@@ -75,4 +79,13 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Account> deleteAccount(@PathVariable int id) {
+//        if (accountService.getAccountById(id) == null) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } else {
+//            accountService.getAccountById(id).setStatus(false);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        }
+//    }
 }

@@ -25,14 +25,30 @@ public class Account {
     @Column(name = "account_id")
     private int accountId;
 
+    private String providerId;
+
     @Column(name = "nickname", length = 100)
     private String nickname;
 
     @OneToOne
     private Attachment avatarUrl;
 
+
+    @Column(name = "provider",length = 30)
+    public AuthProvider provider;
+    public enum AuthProvider{
+        local,google,facebook
+    }
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "role",length = 30)
     private Role role;
+    public enum Role {
+        ADMIN,
+        MEMBER,
+        MANAGER,
+        STAFF;
+    }
 
     @Column(name = "email", length = 100)
     private String email;
@@ -85,11 +101,6 @@ public class Account {
         DISABLED
     }
 
-    public enum Role {
-        ADMIN,
-        MEMBER,
-        MANAGER,
-        STAFF;
-    }
+
 }
 
