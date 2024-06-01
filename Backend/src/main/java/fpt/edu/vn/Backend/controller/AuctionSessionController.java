@@ -44,8 +44,9 @@ public class AuctionSessionController {
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<Page<AuctionSessionDTO>> getCompletedAuctionSession() {
-        return null;
+    public ResponseEntity<Page<AuctionSessionDTO>> getCompletedAuctionSession(@RequestParam(defaultValue = "0") int pageNumb,@RequestParam(defaultValue = "50") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumb,pageSize);
+        return new ResponseEntity<>(auctionSessionService.getPastAuctionSessions(pageable), HttpStatus.OK);
     }
 
     @GetMapping("/current")
