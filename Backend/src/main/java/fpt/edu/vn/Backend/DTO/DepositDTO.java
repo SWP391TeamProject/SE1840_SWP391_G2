@@ -25,7 +25,7 @@ public class DepositDTO {
         this.depositId = deposit.getDepositId();
         this.depositAmount = deposit.getDepositAmount();
         this.depositDate = deposit.getDepositDate();
-        this.account = new AccountDTO(deposit.getAccount());
+//        this.account = new AccountDTO(deposit.getAccount());
 //        this.payment = new PaymentDTO(deposit.getPayment());
     }
 }

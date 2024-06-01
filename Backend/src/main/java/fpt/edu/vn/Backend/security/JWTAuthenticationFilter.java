@@ -1,10 +1,14 @@
 package fpt.edu.vn.Backend.security;
 
+import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,9 +21,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JWTGenerator jwtGenerator;
-
+    private static final Logger logger = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
     @Autowired
     private CustomUserDetailsService customUserDetailService;
+    @Autowired
+    private TokenProvider tokenProvider;
 
     @Override
     protected void doFilterInternal(
@@ -27,21 +33,25 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = getJWTFromRequest(request);
-        if (StringUtils.hasText(token) && jwtGenerator.validateToken(token)) {
-            String email = jwtGenerator.getEmailFromToken(token);
-            UserDetails userDetails = customUserDetailService.loadUserByUsername(
-                    email
-            );
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails.getUsername(),
-                    userDetails.getPassword(),
-                    userDetails.getAuthorities()
-            );
-            authenticationToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        try {
+            String token = getJWTFromRequest(request);
+            if (StringUtils.hasText(token) && jwtGenerator.validateToken(token)) {
+                String email = jwtGenerator.getEmailFromToken(token);
+                UserDetails userDetails = customUserDetailService.loadUserByUsername(
+                        email
+                );//chua fix
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails.getUsername(),
+                        userDetails.getPassword(),
+                        userDetails.getAuthorities()
+                );
+                authenticationToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        }catch (Exception ex){
+            logger.error("Could not set user authentication in security context", ex);
         }
         filterChain.doFilter(request, response);
     }

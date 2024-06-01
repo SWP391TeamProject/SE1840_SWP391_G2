@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
         // avatar dùng method riêng
         // không set toàn bộ tránh exploit
         account.setAccountId(accountDTO.getAccountId());
-        if (accountDTO.getRole() != null)
+        if (accountDTO.getRole() != null && !String.valueOf(accountDTO.getRole()).isEmpty())
             account.setRole(accountDTO.getRole());
         if (accountDTO.getNickname() != null)
             account.setNickname(accountDTO.getNickname());

@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.DTO;
 
+
 import lombok.*;
 
 @Getter
@@ -9,6 +10,9 @@ import lombok.*;
 @ToString
 public class LoginDTO {
 
+
     private String email;
+
+
     private String password;
 }
