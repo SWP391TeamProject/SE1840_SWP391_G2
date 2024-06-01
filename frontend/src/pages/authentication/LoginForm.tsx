@@ -2,17 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
-import { useLocation, useNavigate } from "react-router-dom";
+import { redirect, redirectDocument, useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { Roles } from "@/constants/enums";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { GoogleLogin } from "@react-oauth/google";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -25,6 +26,8 @@ function LoginForm() {
   const from = location.state?.from?.pathname || "/";
   const loginForm = useRef<HTMLDivElement>(null);
   const [isLogin, setIsLogin] = useState(false);
+  const searchParams = new URLSearchParams(location.search);
+  const token = searchParams.get('token');
   // const {authenticated, role} = useContext(AuthContext);
   const { user, setUser } = useContext(AuthContext);
   const { register, handleSubmit } = useForm<FormValues>();
@@ -65,6 +68,30 @@ function LoginForm() {
     },
     { scope: loginForm }
   );
+
+  useEffect(() => {
+    console.log(token)
+    if(token !== null){
+      axios.get("http://localhost:8080/auth/login-with-google?token=" + token)
+      .then(res => {
+        setIsLogin(false);
+        console.log(res.data);
+        setCookie("token", res.data.accessToken, 30000);
+        setCookie("user", JSON.stringify(res.data), 30000);
+        setUser(res.data);
+        if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
+          navigate("/admin/accounts");
+        } else {
+          navigate(from, { replace: true });
+        }
+        toast.success('logged in succesfully')
+      })
+      .catch(err => {
+        toast.error(err.response.data.message);
+        setIsLogin(false);
+      })
+    }
+  }, []);
 
   return (
     <Card
@@ -117,9 +144,30 @@ function LoginForm() {
               >
                 Login
               </Button>}
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
+            <div className="grid gap-4">
+              {/* <GoogleLogin
+                onSuccess={credentialResponse => {
+                  console.log(credentialResponse);
+                  axios.get('http://localhost:8080/auth/login-with-google?token=' + credentialResponse.credential)
+                    .then(
+                      res => {
+                        console.log(res.data);
+                        setCookie("token", res.data.accessToken, 30000);
+                        setCookie("user", JSON.stringify(res.data), 30000);
+                        setUser(res.data);
+                        if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
+                          navigate("/admin/accounts");
+                        } else {
+                          navigate(from, { replace: true });
+                        }
+                        toast.success('logged in succesfully')
+                      }
+                    )
+                }
+                } /> */}
+
+              {/* rest of your form */}
+            </div>
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
@@ -129,6 +177,11 @@ function LoginForm() {
           </div>
         </CardContent>
       </form>
+      <Button >
+        <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login">
+          login with google
+        </a>
+      </Button>
     </Card>
   );
 }
