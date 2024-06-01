@@ -29,7 +29,7 @@ public class AuctionSession {
     private LocalDateTime endDate;
 
     @Column(length = 30)
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     private Status status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
 
     public enum Status {
