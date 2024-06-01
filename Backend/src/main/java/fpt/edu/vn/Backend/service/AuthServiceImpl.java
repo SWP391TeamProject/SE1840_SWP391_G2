@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService{
             newAccount = new Account();
             newAccount.setEmail(registerDTO.getEmail());
             newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
-            newAccount.setRoles(Set.of(Account.Role.MEMBER));
+            newAccount.setRole(Account.Role.MEMBER);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -83,7 +83,7 @@ public class AuthServiceImpl implements AuthService{
         return AuthResponseDTO.builder()
                 .accessToken(token)
                 .email(newAccount.getEmail())
-                .roles(newAccount.getRoles())
+                .roles(newAccount.getRole())
                 .build();
     }
 
@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .roles(user.getRoles())
+                .roles(user.getRole())
                 .build();
     }
 
@@ -144,7 +144,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .username(user.getNickname())
                 .email(user.getEmail())
-                .roles(user.getRoles())
+                .roles(user.getRole())
                 .build();
     }
 

@@ -15,7 +15,7 @@ import java.util.Set;
 public class AccountDTO {
     private Integer accountId;
     private String nickname;
-    private Set<Account.Role> roles;
+    private Account.Role role;
     private AttachmentDTO avatar;
     private String email;
     private String phone;

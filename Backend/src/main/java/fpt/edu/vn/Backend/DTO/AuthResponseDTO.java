@@ -16,7 +16,7 @@ public class AuthResponseDTO {
     private int id;
     private String accessToken;
     private String username;
-    private Set<Account.Role> roles;
+    private Account.Role roles;
     private String refreshToken;
     private String email;
     private String phone;

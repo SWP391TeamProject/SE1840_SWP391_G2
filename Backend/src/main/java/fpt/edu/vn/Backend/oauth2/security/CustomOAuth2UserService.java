@@ -62,15 +62,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
     private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
-        Set<Role> roles = new HashSet<>();
-        roles.add(Role.valueOf(String.valueOf(Role.MEMBER)));
-
-
         account.setProvider(Account.AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
 
         account.setNickname(oAuth2UserInfo.getName());
         account.setEmail(oAuth2UserInfo.getEmail());
-        account.setRoles(roles);
+        account.setRole(Role.MEMBER);
         account.setPassword("12345");
 //        account.setAvatarUrl(oAuth2UserInfo.getImageUrl());
 //        account.setPhone(oAuth2UserInfo.getPhone());

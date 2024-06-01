@@ -41,7 +41,8 @@ public class Account {
     }
 
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    @Column(name = "role",length = 30)
+    private Role role;
     public enum Role {
         ADMIN,
         MEMBER,

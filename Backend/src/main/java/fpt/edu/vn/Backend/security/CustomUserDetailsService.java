@@ -31,7 +31,7 @@ public class CustomUserDetailsService  implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Account user = accountRepos.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
-        return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+        return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(Collections.singleton(user.getRole()) ));
     }
 
     private Collection<GrantedAuthority> mapRolesToAuthorities(Collection<Account.Role> roles) {
