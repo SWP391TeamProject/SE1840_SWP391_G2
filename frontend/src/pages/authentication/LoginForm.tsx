@@ -7,12 +7,13 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
-import { useLocation, useNavigate } from "react-router-dom";
+import { redirect, useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { Roles } from "@/constants/enums";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { GoogleLogin } from "@react-oauth/google";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -66,6 +67,7 @@ function LoginForm() {
     { scope: loginForm }
   );
 
+
   return (
     <Card
       className="login-form mx-auto  min-w-[360px] w-1/3 mt-10 h-fit border drop-shadow-md rounded-xl"
@@ -117,9 +119,34 @@ function LoginForm() {
               >
                 Login
               </Button>}
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
+            <div className="grid gap-4">
+              <GoogleLogin
+                onSuccess={credentialResponse => {
+                  axios.get('http://localhost:8080/auth/login-with-google', {
+                    params: {
+                        token: credentialResponse.credential
+                    }
+                })
+                .then(res => {
+                    console.log(res.data);
+                    setCookie("token", res.data.accessToken, 30000);
+                    setCookie("user", JSON.stringify(res.data), 30000);
+                    setUser(res.data);
+                    if (res.data.role.includes(Roles.ADMIN) || res.data.role.includes(Roles.STAFF) || res.data.role.includes(Roles.MANAGER)) {
+                        navigate("/admin/accounts");
+                    } else {
+                        navigate(from, { replace: true });
+                    }
+                    toast.success('logged in succesfully')
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toast.error('Failed to log in');
+                });
+                }
+                } />
+              {/* rest of your form */}
+            </div>
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}

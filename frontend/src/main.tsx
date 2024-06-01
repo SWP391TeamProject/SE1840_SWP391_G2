@@ -40,70 +40,73 @@ import AccountEdit from "./pages/Administration/Account/AccountEdit.tsx";
 import AccountCreate from "./pages/Administration/Account/AccountCreate.tsx";
 import AuctionSessionList from "./pages/Administration/Auction-session/AuctionSessionList.tsx";
 import AuctionSessionCreate from "./pages/Administration/Auction-session/AuctionSessionCreate.tsx";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 const router = createBrowserRouter(routes);
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
+  <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
+    <QueryClientProvider client={queryClient}>
+      <ToastContainer />
+      <Provider store={store}>
+        <TooltipProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* <Route path="/" element={<HomeLayout />}> */}
+                <Route path="/" element={<LandingPageLayout />}></Route>
 
-  <QueryClientProvider client={queryClient}>
-    <ToastContainer />
-    <Provider store={store}>
-      <TooltipProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              {/* <Route path="/" element={<HomeLayout />}> */}
-              <Route path="/" element={<LandingPageLayout />}></Route>
-
-              {/* Administration */}
-              <Route
-                element={
-                  <PrivateRoute
-                    allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
-                  />
-                }
-              >
-                <Route path="/admin" element={<Administration />}>
-                  <Route path="dashboard" element={<DashBoard />}></Route>
-                  <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
-                    <Route path="accounts" element={<AccountsList />}></Route>
-                    <Route path="accounts/edit" element={<AccountEdit />}></Route>
-                    <Route path="accounts/create" element={<AccountCreate />}></Route>
-                  </Route>
-                  <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER,Roles.ADMIN]} />} >
-                    <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
-                    <Route path="auction-sessions/create" element={<AuctionSessionCreate/>}></Route>
-                    {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
-                  </Route>
-
-                  <Route path="consignments" element={<ConsignmentList />}></Route>
-                </Route>
-              </Route>
-
-              
-              <Route path="/auth">
-                <Route path="/auth/login" element={<LoginLayout />}></Route>
-                <Route path="/auth/register" element={<RegisterLayout />}></Route>
-              </Route>
-              <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
+                {/* Administration */}
                 <Route
-                  path="/consignment"
-                  element={<ConsignmentLayout />}
-                ></Route>
-              </Route>
-              <Route path="/Auctions" element={<AuctionsLayout />}>
-                <Route path="/Auctions" element={<AuctionList />}></Route>
-              </Route>
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              {/* <RouterProvider router={router} /> */}
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-        {/* <RouterProvider router={router} /> */}
-      </TooltipProvider>
-    </Provider>
-  </QueryClientProvider>
+                  element={
+                    <PrivateRoute
+                      allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
+                    />
+                  }
+                >
+                  <Route path="/admin" element={<Administration />}>
+                    <Route path="dashboard" element={<DashBoard />}></Route>
+                    <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
+                      <Route path="accounts" element={<AccountsList />}></Route>
+                      <Route path="accounts/edit" element={<AccountEdit />}></Route>
+                      <Route path="accounts/create" element={<AccountCreate />}></Route>
+                    </Route>
+                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
+                      <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
+                      <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
+                      {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
+                    </Route>
+
+                    <Route path="consignments" element={<ConsignmentList />}></Route>
+                  </Route>
+                </Route>
+
+
+                <Route path="/auth">
+                  <Route path="/auth/login" element={<LoginLayout />}></Route>
+                  <Route path="/auth/register" element={<RegisterLayout />}></Route>
+                </Route>
+                <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
+                  <Route
+                    path="/consignment"
+                    element={<ConsignmentLayout />}
+                  ></Route>
+                </Route>
+                <Route path="/Auctions" element={<AuctionsLayout />}>
+                  <Route path="/Auctions" element={<AuctionList />}></Route>
+                </Route>
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                {/* <RouterProvider router={router} /> */}
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+          {/* <RouterProvider router={router} /> */}
+        </TooltipProvider>
+      </Provider>
+    </QueryClientProvider>
+  </GoogleOAuthProvider>
+
 
 );
