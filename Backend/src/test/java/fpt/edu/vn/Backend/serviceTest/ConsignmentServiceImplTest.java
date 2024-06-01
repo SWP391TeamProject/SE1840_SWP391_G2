@@ -69,7 +69,7 @@ public class ConsignmentServiceImplTest {
         account.setAccountId(1);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
-        consignment.setAccount(account);
+        consignment.setStaff(account);
         consignment.setConsignmentDetails(Collections.emptyList());
 
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
@@ -86,7 +86,7 @@ public class ConsignmentServiceImplTest {
         account.setAccountId(1);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
-        consignment.setAccount(account);
+        consignment.setStaff(account);
         ConsignmentDetail consignmentDetail = new ConsignmentDetail();
         consignmentDetail.setConsignmentDetailId(1);
         consignmentDetail.setPrice(BigDecimal.valueOf(1000));

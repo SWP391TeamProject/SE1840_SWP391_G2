@@ -45,6 +45,9 @@ public class Attachment {
     @JoinColumn(name = "consignment_detail_id")
     private ConsignmentDetail consignmentDetail;
 
+    @ManyToOne()
+    @JoinColumn(name = "blog_id")
+    private BlogPost blogPost;
 
     @CreationTimestamp
     @Column(name = "create_date")
