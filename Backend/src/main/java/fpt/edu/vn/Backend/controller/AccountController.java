@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
+import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/accounts")
 @CrossOrigin("*")
+@Slf4j
 public class AccountController {
     private final AccountService accountService;
 
@@ -32,7 +34,8 @@ public class AccountController {
 
     @GetMapping("/")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 30) Pageable pageable,
-                                                        @RequestParam(required = false) Account.Role role) {
+                                                        @RequestParam(required = false,name = "Role") Account.Role role) {
+        log.info("Get accounts with role: {}", role);
         if (role == null) {
             return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
         }
