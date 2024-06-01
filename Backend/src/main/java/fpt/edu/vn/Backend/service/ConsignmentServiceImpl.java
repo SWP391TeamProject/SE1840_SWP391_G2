@@ -228,7 +228,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setUpdateDate(updatedConsignment.getUpdateDate());
             consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
 
-            consignment.setAccount(updatedConsignment.getStaffId() == null ? null : accountRepos.findById(updatedConsignment.getStaffId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
+            consignment.setStaff(updatedConsignment.getStaffId() == null ? null : accountRepos.findById(updatedConsignment.getStaffId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
 
             consignmentRepos.save(consignment);
         } catch (Exception e) {
@@ -304,7 +304,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignment.getConsignmentId(),
                 String.valueOf(consignment.getStatus()),
                 String.valueOf(consignment.getPreferContact()),
-                consignment.getAccount() != null ? consignment.getAccount().getAccountId() : null,
+                consignment.getStaff() != null ? consignment.getStaff().getAccountId() : null,
                 consignment.getCreateDate(),
                 consignment.getUpdateDate(),
                 consignmentDetailDTOs
