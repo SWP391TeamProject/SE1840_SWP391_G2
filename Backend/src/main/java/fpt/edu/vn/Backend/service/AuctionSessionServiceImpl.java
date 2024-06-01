@@ -68,14 +68,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService{
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
         try {
-            AuctionSession auctionSession = auctionSessionRepos.findById(id).orElse(null);
-            if(auctionSession != null){
-               return new AuctionSessionDTO(auctionSession);
-            }
-            return null;
-        }catch(Exception e){
-            logger.error("Auction Session Id Not Found");
-            throw new ResourceNotFoundException("Error processing ", e.getCause());
+            AuctionSession auctionSession = auctionSessionRepos.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Auction Session Id Not Found"));
+            return new AuctionSessionDTO(auctionSession);
+        } catch (Exception e) {
+            logger.error("Error processing auction session id: " + id, e);
+            throw new ResourceNotFoundException("Error processing auction session", e);
         }
     }
 
@@ -90,11 +88,32 @@ public class AuctionSessionServiceImpl implements AuctionSessionService{
 
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        return null;
+        try {
+            Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
+            if (pastAuctionSessions.isEmpty()) {
+                logger.warn("No past auction sessions found");
+                throw new ResourceNotFoundException("No past auction sessions found");
+            }
+            return pastAuctionSessions.map(AuctionSessionDTO::new);
+        } catch (Exception e) {
+            logger.error("Error retrieving past auction sessions", e);
+            throw new RuntimeException("Error retrieving past auction sessions", e);
+        }
+
     }
 
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
-        return null;
+        try {
+            Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
+            if (upcomingAuctionSessions.isEmpty()) {
+                logger.warn("No upcoming auction sessions found");
+                throw new ResourceNotFoundException("No upcoming auction sessions found");
+            }
+            return upcomingAuctionSessions.map(AuctionSessionDTO::new);
+        } catch (Exception e) {
+            logger.error("Error retrieving upcoming auction sessions", e);
+            throw new RuntimeException("Error retrieving upcoming auction sessions", e);
+        }
     }
 }
