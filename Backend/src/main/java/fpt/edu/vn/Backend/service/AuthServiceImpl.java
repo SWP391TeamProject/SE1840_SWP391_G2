@@ -148,7 +148,17 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public String loginWithFacebook(String token) {
-        return "";
+    public AuthResponseDTO loginWithFacebook(String token) {
+        String email = jwtGenerator.getEmailFromToken(token);
+        Optional<Account> userOptional = accountRepos.findByEmail(email);
+        Account user = userOptional.get();
+        return AuthResponseDTO
+                .builder()
+                .id(user.getAccountId())
+                .accessToken(token)
+                .username(user.getNickname())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
     }
 }

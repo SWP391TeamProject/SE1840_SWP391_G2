@@ -12,4 +12,5 @@ import java.time.LocalDateTime;
 public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integer> {
     Page<AuctionSession> findByEndDateBefore(LocalDateTime endDate, Pageable pageable);
     Page<AuctionSession> findByStartDateAfter(LocalDateTime startDate, Pageable pageable);
+
 }

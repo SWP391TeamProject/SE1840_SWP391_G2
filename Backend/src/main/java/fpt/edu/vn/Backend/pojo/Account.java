@@ -35,9 +35,10 @@ public class Account {
 
 
     @Column(name = "provider",length = 30)
+    @Enumerated(EnumType.STRING)
     public AuthProvider provider;
     public enum AuthProvider{
-        local,google,facebook
+        LOCAL,FACEBOOK,GOOGLE
     }
 
     @Enumerated(EnumType.STRING)

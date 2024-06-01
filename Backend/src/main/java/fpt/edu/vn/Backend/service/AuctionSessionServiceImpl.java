@@ -69,14 +69,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
         try {
-            AuctionSession auctionSession = auctionSessionRepos.findById(id).orElse(null);
-            if (auctionSession != null) {
-                return new AuctionSessionDTO(auctionSession);
-            }
-            return null;
+            AuctionSession auctionSession = auctionSessionRepos.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Auction Session Id Not Found"));
+            return new AuctionSessionDTO(auctionSession);
         } catch (Exception e) {
-            logger.error("Auction Session Id Not Found");
-            throw new ResourceNotFoundException("Error processing ", e.getCause());
+            logger.error("Error processing auction session id: " + id, e);
+            throw new ResourceNotFoundException("Error processing auction session", e);
         }
     }
 
@@ -102,6 +100,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.error("Error retrieving past auction sessions", e);
             throw new RuntimeException("Error retrieving past auction sessions", e);
         }
+
     }
 
     @Override
