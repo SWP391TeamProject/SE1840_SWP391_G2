@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,7 +28,7 @@ public class AuctionSession {
     private LocalDateTime endDate;
 
     @Column(length = 30)
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Status status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED
 
     public enum Status {

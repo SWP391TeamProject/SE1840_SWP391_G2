@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -89,7 +90,17 @@ public class AuctionSessionServiceImpl implements AuctionSessionService{
 
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        return null;
+        try {
+            Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
+            if (pastAuctionSessions.isEmpty()) {
+                logger.warn("No past auction sessions found");
+                throw new ResourceNotFoundException("No past auction sessions found");
+            }
+            return pastAuctionSessions.map(AuctionSessionDTO::new);
+        } catch (Exception e) {
+            logger.error("Error retrieving past auction sessions", e);
+            throw new RuntimeException("Error retrieving past auction sessions", e);
+        }
     }
 
     @Override
