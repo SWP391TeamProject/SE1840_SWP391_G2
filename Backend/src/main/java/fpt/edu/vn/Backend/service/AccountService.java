@@ -3,10 +3,12 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.pojo.Account;
+import jakarta.mail.MessagingException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.MailException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
@@ -29,4 +31,6 @@ public interface AccountService {
     @NotNull AccountDTO updateAccount(@NotNull AccountDTO account);
 
     @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file);
+    void requestResetPassword(int accountId) throws MailException, MessagingException;
+    boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword);
 }
