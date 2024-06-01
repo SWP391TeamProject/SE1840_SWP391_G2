@@ -7,7 +7,6 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +14,7 @@ import java.util.Set;
 public class AccountDTO {
     private Integer accountId;
     private String nickname;
-    private Set<Account.Role> roles;
+    private Account.Role role;
     private AttachmentDTO avatar;
     private String email;
     private String phone;
@@ -24,4 +23,18 @@ public class AccountDTO {
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+
+    public AccountDTO(Account account) {
+        this.accountId = account.getAccountId();
+        this.nickname = account.getNickname();
+        this.role = account.getRole();
+        this.avatar = new AttachmentDTO(account.getAvatarUrl());
+        this.email = account.getEmail();
+        this.phone = account.getPhone();
+        this.password = account.getPassword();
+        this.status = account.getStatus();
+        this.balance = account.getBalance();
+        this.createDate = account.getCreateDate();
+        this.updateDate = account.getUpdateDate();
+    }
 }

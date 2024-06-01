@@ -49,8 +49,8 @@ public class AccountServiceImplTest {
         account2.setNickname("test2");
         account2.setEmail("test2@test.com");
 
-        account1.setRoles(Set.of(Account.Role.MEMBER));
-        account2.setRoles(Set.of(Account.Role.MEMBER));
+        account1.setRole(Account.Role.MEMBER);
+        account2.setRole(Account.Role.MEMBER);
 
         Page<Account> accounts = new PageImpl<>(Arrays.asList(account1, account2));
 
@@ -86,8 +86,8 @@ public class AccountServiceImplTest {
         account2.setNickname("test2");
         account2.setEmail("test2@test.com");
 
-        account1.setRoles(Set.of(Account.Role.ADMIN));
-        account2.setRoles(Set.of(Account.Role.MANAGER));
+        account1.setRole(Account.Role.ADMIN);
+        account2.setRole(Account.Role.MANAGER);
 
         var pr = PageRequest.of(0, 2);
 
@@ -116,7 +116,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRoles(Set.of(Account.Role.ADMIN));
+        accountDTO.setRole(Account.Role.ADMIN);
 
         Account account = new Account();
         account.setNickname(accountDTO.getNickname());
@@ -125,7 +125,7 @@ public class AccountServiceImplTest {
         account.setBalance(accountDTO.getBalance());
         account.setCreateDate(accountDTO.getCreateDate());
         account.setUpdateDate(accountDTO.getUpdateDate());
-        account.setRoles(Set.of(Account.Role.ADMIN));
+        account.setRole(Account.Role.ADMIN);
 
         when(accountRepos.save(any())).thenReturn(account);
 
@@ -146,7 +146,7 @@ public class AccountServiceImplTest {
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
-        accountDTO.setRoles(Set.of(Account.Role.MEMBER));
+        accountDTO.setRole(Account.Role.MEMBER);
 
         Account account = new Account();
         account.setAccountId(accountDTO.getAccountId());
@@ -156,7 +156,7 @@ public class AccountServiceImplTest {
         account.setBalance(accountDTO.getBalance());
         account.setCreateDate(accountDTO.getCreateDate());
         account.setUpdateDate(accountDTO.getUpdateDate());
-        account.setRoles(Set.of(Account.Role.MEMBER));
+        account.setRole(Account.Role.MEMBER);
 
         when(accountRepos.findById(accountDTO.getAccountId())).thenReturn(Optional.of(account));
         when(accountRepos.save(any())).thenReturn(account);
@@ -189,7 +189,7 @@ public class AccountServiceImplTest {
     public void shouldReturnAccountWhenValidEmailIsProvided() {
         Account account = new Account();
         account.setEmail("test@test.com");
-        account.setRoles(new HashSet<>());
+        account.setRole(Account.Role.MEMBER);
 
         when(accountRepos.findByEmail("test@test.com")).thenReturn(Optional.of(account));
 
@@ -212,7 +212,7 @@ public class AccountServiceImplTest {
         Account account = new Account();
         account.setEmail("test@test.com");
         account.setPassword("password");
-        account.setRoles(new HashSet<>());
+        account.setRole(Account.Role.STAFF);
 
         when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
 

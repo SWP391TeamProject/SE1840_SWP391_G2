@@ -32,7 +32,7 @@ public class Account {
     private Attachment avatarUrl;
 
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    private Role role;
 
     @Column(name = "email", length = 100)
     private String email;

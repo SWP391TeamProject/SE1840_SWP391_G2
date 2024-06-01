@@ -46,7 +46,7 @@ public class BlogPost {
     private LocalDateTime updateDate;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "blog_id")
     private List<Attachment> attachments;
 }
 

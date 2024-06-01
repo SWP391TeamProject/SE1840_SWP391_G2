@@ -84,7 +84,7 @@ public class ConsignmentServiceImplTest {
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
 
-        consignmentService.submitInitialEvaluation(2, "evaluation", BigDecimal.valueOf(1000), 1, Collections.emptyList());
+        consignmentService.submitInitialEvaluation(2, "evaluation", BigDecimal.valueOf(1000), 1);
 
         verify(consignmentRepos, times(1)).save(any(Consignment.class));
     }
@@ -111,10 +111,12 @@ public class ConsignmentServiceImplTest {
         consignmentDetailFinal.setConsignment(consignment);
         consignmentDetailFinal.setType(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
 
+        when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetailFinal);
+        when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
 
-        consignmentService.submitFinalEvaluationUpdate(1, "evaluation", BigDecimal.valueOf(1000), 1, Collections.emptyList());
+        consignmentService.submitFinalEvaluationUpdate(1, "evaluation", BigDecimal.valueOf(1000), 1);
 
         verify(consignmentRepos, times(1)).save(any(Consignment.class));
     }
