@@ -35,6 +35,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -71,24 +72,27 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // Or specify your origins
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Corrected origin
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-        configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
+        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token","access-control-allow-origin"));
+        configuration.setExposedHeaders(List.of("x-auth-token"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS and use corsConfigurationSource
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()). ignoringRequestMatchers("/auth/**", "/api/auction-sessions/**")
+                )
                 .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
                 .httpBasic(
-                        https ->
-                        https.disable()
+                        AbstractHttpConfigurer::disable
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**","/oauth2/**","/api/auction-sessions/**","/api/items/**").permitAll()
@@ -96,10 +100,10 @@ public class SecurityConfig {
 
                 )
                 .oauth2Login(oauth2 -> oauth2
-                                .authorizationEndpoint(authz -> authz
-                                        .baseUri("/oauth2/authorize")
-                                        .authorizationRequestRepository(cookieAuthorizationRequestRepository())
-                                )
+                        .authorizationEndpoint(authz -> authz
+                                .baseUri("/oauth2/authorize")
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                        )
                         .redirectionEndpoint(redir -> redir
                                 .baseUri("/oauth2/callback/*")
                         )
@@ -107,18 +111,18 @@ public class SecurityConfig {
                                 tokenEndpoint
                                         .accessTokenResponseClient(this.accessTokenResponseClient())
                         )
-                                .userInfoEndpoint(userInfo -> userInfo
-                                        .userService(customOAuth2UserService)
-                                )
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
 
-                                .successHandler(customOAuth2Success)
-                                .failureHandler(customOAuth2Failure)
+                        .successHandler(customOAuth2Success)
+                        .failureHandler(customOAuth2Failure)
                 );
         http.addFilterBefore(
                 jwtAuthenticationFilter(),
-                UsernamePasswordAuthenticationFilter.class);
+                UsernamePasswordAuthenticationFilter.class
+        );
         return http.build();
-
     }
     @Bean
     public AuthenticationManager authenticationManager(

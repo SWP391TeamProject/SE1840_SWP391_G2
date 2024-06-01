@@ -78,7 +78,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             loginMethod = "/auth/login-with-facebook";
         }
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .path(loginMethod)
+//                .path(loginMethod)
 
                 .queryParam("token", token)
                 .build().toUriString();

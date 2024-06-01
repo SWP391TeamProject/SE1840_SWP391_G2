@@ -20,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { registerAccountService } from "@/services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
+import logo from '../../assets/registration_logo.jpg';
 gsap.registerPlugin(useGSAP);
 
 const formSchema = z
@@ -74,7 +74,8 @@ function RegisterForm() {
         nav("/");
       } 
     }).catch((err) => {
-      toast.error("Error register pls try again", {
+      console.log(err)
+      toast.error(err.response.data.message, {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -149,7 +150,7 @@ function RegisterForm() {
             <Link to="/auth/login" className="text-center text-blue-500"> Already have an account? Login</Link>
 
             <div className="flex w-full justify-center">
-              <Button type="submit" className="w-4/6 rounded rounded-2xl">
+              <Button type="submit" className="w-4/6   rounded-2xl">
                 Register
               </Button>
             </div>
@@ -159,9 +160,8 @@ function RegisterForm() {
       <div className="hidden md:flex w-full h-full basis-1/2 bg-gray-200 rounded-2xl">
         <CardContent className="hidden md:flex h-full p-0 m-0 rounded-2xl">
           <img
-            src="https://th.bing.com/th/id/OIP.s6XJW4oxNuygw7C4UBnZggHaEK?rs=1&pid=ImgDetMain"
+            src={logo}
             className="w-full h-full object-fill rounded-2xl "
-            
             alt="Description of the image"
           />
       

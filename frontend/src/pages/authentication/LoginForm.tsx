@@ -178,10 +178,16 @@ function LoginForm() {
         </CardContent>
       </form>
       <Button >
-        <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login">
+        <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login?type=google">
           login with google
         </a>
       </Button>
+      <Button >
+        <a href="http://localhost:8080/oauth2/authorize/facebook?redirect_uri=http://localhost:5173/auth/login?type=facebook">
+          login with Facebook
+        </a>
+      </Button>
+     
     </Card>
   );
 }
