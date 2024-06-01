@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Accounts from '@/pages/Administration/Account/AccountsList'
 import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
 import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
-import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search } from 'lucide-react'
+import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon } from 'lucide-react'
 import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
@@ -135,6 +135,13 @@ export default function Administration() {
                             >
                                 <Users className="h-4 w-4" />
                                 Accounts
+                            </Link>
+                            <Link
+                                to="auction-sessions"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <AreaChartIcon/>
+                                Auction Session
                             </Link>
                             {/* <Link
                                 to="consignments"
