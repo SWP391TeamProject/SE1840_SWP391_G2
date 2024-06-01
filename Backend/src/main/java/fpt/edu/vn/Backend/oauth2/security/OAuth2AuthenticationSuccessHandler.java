@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.oauth2.security;
 import fpt.edu.vn.Backend.oauth2.AppProperties;
 import fpt.edu.vn.Backend.oauth2.exception.BadRequestException;
+import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private TokenProvider tokenProvider;
 
     private AppProperties appProperties;
+
+    @Autowired
+    private AccountRepos accountRepos;
 
     @Autowired
     private JWTGenerator jwtGenerator;
@@ -63,9 +68,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
         String token = tokenProvider.createToken(authentication);
-
+        String email = jwtGenerator.getEmailFromToken(token);
+        Optional<Account> userOptional = accountRepos.findByEmail(email);
+        Account user = userOptional.get();
+        String loginMethod;
+        if(user.getProvider().equals(Account.AuthProvider.GOOGLE)){
+            loginMethod = "/auth/login-with-google";
+        } else{
+            loginMethod = "/auth/login-with-facebook";
+        }
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .path("/auth/login-with-google")
+                .path(loginMethod)
                 .queryParam("token", token)
                 .build().toUriString();
     }

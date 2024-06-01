@@ -13,6 +13,6 @@ public interface AuthService {
     String refreshToken(String token);
     String forgotPassword(String email);
     public AuthResponseDTO loginWithGoogle(String token);
-    String loginWithFacebook(String token);
+    AuthResponseDTO loginWithFacebook(String token);
 
 }

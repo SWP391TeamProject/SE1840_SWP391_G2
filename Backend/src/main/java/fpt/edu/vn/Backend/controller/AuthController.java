@@ -83,9 +83,10 @@ public class AuthController {
     }
 
 
-    @PostMapping("/login-with-facebook")
-    public ResponseEntity<String> loginWithFacebook(@RequestBody String token) {
-        return null;
+    @GetMapping("/login-with-facebook")
+    public ResponseEntity<AuthResponseDTO> loginWithFacebook(@RequestParam String token) {
+        AuthResponseDTO authResponseDTO = authService.loginWithFacebook(token);
+        return ResponseEntity.ok(authResponseDTO);
     }
 
     @PostMapping("/register")
