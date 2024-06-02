@@ -22,8 +22,8 @@ public class AttachmentDTO {
 
     public AttachmentDTO(Attachment attachment) {
         this.attachmentId = attachment.getAttachmentId();
-        this.link = attachment.getLink();
-        this.createDate = attachment.getCreateDate();
-        this.updateDate = attachment.getUpdateDate();
+        this.link = (attachment.getLink() != null) ? attachment.getLink() : "default_link"; // Provide a default link
+        this.createDate = (attachment.getCreateDate() != null) ? attachment.getCreateDate() : LocalDateTime.now(); // Default to current time
+        this.updateDate = (attachment.getUpdateDate() != null) ? attachment.getUpdateDate() : LocalDateTime.now(); // Default to current time
     }
 }

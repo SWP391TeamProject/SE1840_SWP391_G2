@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Accounts from '@/pages/Administration/Account/AccountsList'
 import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
 import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
-import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon } from 'lucide-react'
+import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed } from 'lucide-react'
 import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
@@ -137,6 +137,13 @@ export default function Administration() {
                                 Accounts
                             </Link>
                             <Link
+                                to="consignments"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <FolderClosed/>
+                                Manage Consignments
+                            </Link>
+                            <Link
                                 to="auction-sessions"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
@@ -153,7 +160,7 @@ export default function Administration() {
                                 Consignments
                             </Link> */}
 
-                            <FetchButton apiFunction={fetchAllConsignmentsService} className={"rounded border border-red-600 text-left h-6 flex flex-row gap-2 justify-left items-center"} buttonName={"Consignments"} setData={setConsignments} navTo={"consignments"} queryKey={['consignments']} icon={<FolderMinus />} />
+                            {/* <FetchButton apiFunction={fetchAllConsignmentsService} className={"rounded border border-red-600 text-left h-6 flex flex-row gap-2 justify-left items-center"} buttonName={"Consignments"} setData={setConsignments} navTo={"consignments"} queryKey={['consignments']} icon={<FolderMinus />} /> */}
                             {/* <Link
                                 to=""
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"

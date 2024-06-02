@@ -6,7 +6,6 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
@@ -100,28 +99,6 @@ public class AccountController {
 //        }
 //    }
 
-    @PostMapping("/request-reset-password/")
-    public ResponseEntity<AccountDTO> requestResetPassword(@RequestParam int id) {
-        if (accountService.getAccountById(id) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            try {
-                accountService.requestResetPassword(id);
-            } catch (MessagingException e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-    }
-
-    @PostMapping("/reset-password/")
-    public ResponseEntity<AccountDTO> resetPassword(@RequestParam String newPassword,
-                                                    @RequestParam String code) {
-        if (!accountService.confirmResetPassword(code, newPassword)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 
     @GetMapping("/export")
     public void exportToExcel(HttpServletResponse response){

@@ -86,8 +86,8 @@ public class SecurityConfig {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS and use corsConfigurationSource
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()). ignoringRequestMatchers("/auth/**", "/api/auction-sessions/**")
+                .csrf(csrf -> csrf.disable()
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()). ignoringRequestMatchers("/auth/**", "/api/auction-sessions/**")
                 )
                 .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))

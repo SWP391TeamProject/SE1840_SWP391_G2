@@ -15,7 +15,7 @@ export const fetchConsigntmentDetailByConsignmentId = async (id:number) => {
     })
     .then((res) => {
       console.log(res.data);
-      return res.data}) // return the data here
+      return res}) // return the data here
     .catch((err) => {
       console.log(err);
       throw err; // make sure to throw the error so it can be caught by the query

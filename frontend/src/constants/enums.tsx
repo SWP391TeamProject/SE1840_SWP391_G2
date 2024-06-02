@@ -7,8 +7,8 @@ export enum Roles {
 } // enums.ts
 
 export enum AccountStatus {
-  ACTIVE = 1,
-  INACTIVE = 0,
+  ACTIVE = "ACTIVE",
+  DISABLED = "DISABLED",
   // Add more statuses if needed (e.g., BANNED, SUSPENDED)
 }
 
