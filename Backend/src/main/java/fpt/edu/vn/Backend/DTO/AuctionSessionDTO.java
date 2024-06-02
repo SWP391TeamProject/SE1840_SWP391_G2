@@ -37,9 +37,9 @@ public class AuctionSessionDTO {
         this.createDate = auctionSession.getCreateDate();
         this.updateDate = auctionSession.getUpdateDate();
         this.title = auctionSession.getTitle();
-        this.deposits = auctionSession.getDeposits().stream().map(DepositDTO::new).collect(Collectors.toSet());
-        this.attachments = auctionSession.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
-        this.auctionItems = auctionSession.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet());
+        this.deposits = auctionSession.getDeposits() != null ? auctionSession.getDeposits().stream().map(DepositDTO::new).collect(Collectors.toSet()) : new HashSet<>();
+        this.attachments = auctionSession.getAttachments() != null ? auctionSession.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet()) : new HashSet<>();
+        this.auctionItems = auctionSession.getAuctionItems() != null ? auctionSession.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet()) : new HashSet<>();
     }
 
 
