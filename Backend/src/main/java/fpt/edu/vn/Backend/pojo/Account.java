@@ -59,10 +59,10 @@ public class Account {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.DISABLED;
 
     @Column(name = "balance")
-    private BigDecimal balance;
+    private BigDecimal balance = new BigDecimal(0);
 
     @CreationTimestamp
     @Column(name = "create_date")
