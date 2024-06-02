@@ -19,17 +19,14 @@ import { toast } from "@/components/ui/use-toast"
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
 
 const FormSchema = z.object({
-    username: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
-    }),
     title: z.string().min(2, {
         message: "Title must be at least 2 characters.",
     }),
-    startDate: z.date(
+    startDate: z.string(
         {
             message: "Start date is required.",
         }),
-    endDate: z.date(
+    endDate: z.string(
         {
             message: "End date is required.",
         }),
@@ -40,9 +37,8 @@ export default function AuctionSessionCreate() {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            username: "",
             title: "",
-            startDate: Date.now().toLocaleString('en-US'),
+            startDate: "",
             endDate: "",
             attachments: [],
 
@@ -53,6 +49,9 @@ export default function AuctionSessionCreate() {
         console.log(data)
         toast.success("Auction session created")
     }
+
+    
+
 
     return (
         <Form {...form}>
@@ -84,7 +83,6 @@ export default function AuctionSessionCreate() {
                                 <FormLabel>Start Date</FormLabel>
                                 <FormControl>
                                     <Input
-                                        defaultValue={new Date().toISOString().slice(0, 16)}
                                         type="datetime-local" {...field} />
                                 </FormControl>
                                 <FormDescription>

@@ -29,7 +29,7 @@ POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-    "email":"vidz752204@gmail.com",
+    "email":"anhhdse182336@fpt.edu.vn",
     "password":"cute123haha",
     "confirmPassword":"cute123haha"
 }
@@ -52,4 +52,20 @@ Content-Type: application/json
   "address": null
 }
 
+### Activate account
+POST http://localhost:8080/auth/activate-account/
+Content-Type: application/x-www-form-urlencoded
 
+code=658566
+
+### Request reset password
+POST http://localhost:8080/auth/request-reset-password/
+Content-Type: application/x-www-form-urlencoded
+
+id=2
+
+### Reset password
+POST http://localhost:8080/auth/reset-password/
+Content-Type: application/x-www-form-urlencoded
+
+code=558064&newPassword=hehe

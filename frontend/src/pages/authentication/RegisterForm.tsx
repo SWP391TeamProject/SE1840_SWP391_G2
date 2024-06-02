@@ -102,7 +102,7 @@ function RegisterForm() {
 
   return (
     <Card
-      className="w-3/6 h-3/4 border drop-shadow-md rounded-xl flex "
+      className="w-3/6 h-3/4 mt-20 border drop-shadow-md rounded-xl flex "
       ref={RegisterForm}
     >
       <div className="flex  basis-full md:basis-1/2 w-full p-3 items-center">
@@ -157,16 +157,16 @@ function RegisterForm() {
           </form>
         </Form>
       </div>
-      <div className="hidden md:flex w-full h-full basis-1/2 bg-gray-200 rounded-2xl">
-        <CardContent className="hidden md:flex h-full p-0 m-0 rounded-2xl">
+      {/* <div className="hidden md:flex w-full h-full  bg-gray-200 rounded-2xl"> */}
+        <CardContent className="hidden md:flex justify-center items-center basis-1/2  h-full p-0 m-0 rounded-2xl">
           <img
             src={logo}
-            className="w-full h-full object-fill rounded-2xl "
-            alt="Description of the image"
+            className="w-full h-full object-contain rounded-2xl "
+            alt="auction registration logo"
           />
       
         </CardContent>
-      </div>
+      {/* </div> */}
     </Card>
   );
 }

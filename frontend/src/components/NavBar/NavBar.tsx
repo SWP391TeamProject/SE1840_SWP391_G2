@@ -37,7 +37,7 @@ export default function NavBar() {
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow">
+      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow w-full">
         <Link className="flex items-center justify-center" to="/">
           <GavelIcon className="h-6 w-6" />
           <span className="font-semibold text-lg">Biddify</span>

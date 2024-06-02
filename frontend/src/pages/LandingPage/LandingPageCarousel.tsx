@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/carousel";
 import React from "react";
 import { Link } from "react-router-dom";
-import Autoplay from "embla-carousel-autoplay"
-
+import Autoplay from "embla-carousel-autoplay";
 export default function LandingPageCarousel() {
   return (
     <>
-      <Carousel className="w-full flex justify-center content-center bg-red-600">
+      <Carousel className="w-full flex justify-center content-center ">
         <CarouselContent>
           <CarouselItem>
             <section className="w-full flex justify-center items-center p-3 ">

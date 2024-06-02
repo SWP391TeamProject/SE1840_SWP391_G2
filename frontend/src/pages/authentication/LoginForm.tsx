@@ -5,15 +5,15 @@ import { Label } from "@/components/ui/label";
 import { useContext, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { SubmitHandler, set, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
-import { redirect, redirectDocument, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { Roles } from "@/constants/enums";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import { GoogleLogin } from "@react-oauth/google";
+import googleIcon from "../../assets/icons8-google.svg";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -71,31 +71,31 @@ function LoginForm() {
 
   useEffect(() => {
     console.log(token)
-    if(token !== null){
+    if (token !== null) {
       axios.get("http://localhost:8080/auth/login-with-google?token=" + token)
-      .then(res => {
-        setIsLogin(false);
-        console.log(res.data);
-        setCookie("token", res.data.accessToken, 30000);
-        setCookie("user", JSON.stringify(res.data), 30000);
-        setUser(res.data);
-        if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
-          navigate("/admin/accounts");
-        } else {
-          navigate(from, { replace: true });
-        }
-        toast.success('logged in succesfully')
-      })
-      .catch(err => {
-        toast.error(err.response.data.message);
-        setIsLogin(false);
-      })
+        .then(res => {
+          setIsLogin(false);
+          console.log(res.data);
+          setCookie("token", res.data.accessToken, 30000);
+          setCookie("user", JSON.stringify(res.data), 30000);
+          setUser(res.data);
+          if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
+            navigate("/admin/accounts");
+          } else {
+            navigate(from, { replace: true });
+          }
+          toast.success('logged in succesfully')
+        })
+        .catch(err => {
+          toast.error(err.response.data.message);
+          setIsLogin(false);
+        })
     }
   }, []);
 
   return (
     <Card
-      className="login-form mx-auto  min-w-[360px] w-1/3 mt-10 h-fit border drop-shadow-md rounded-xl"
+      className="login-form mx-auto  min-w-[360px] w-1/3 mt-32 h-fit border drop-shadow-md rounded-xl"
       ref={loginForm}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -171,23 +171,27 @@ function LoginForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
-            <a href="/auth/register" className="underline">
+            <a href="/auth/register" className="underline hover:text-blue-700">
               Sign up
             </a>
           </div>
+          <Button type="button" className="h-fit bg-white text-black border rounded-xl m-0 w-full hover:bg-gray-200 mt-2"  >
+            <img src={googleIcon} about="google icon" className="object-contain " width={'30px'} height={'30px'} />
+            <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login?type=google">
+              Login with google
+            </a>
+          </Button>
         </CardContent>
+
       </form>
-      <Button >
-        <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login?type=google">
-          login with google
-        </a>
-      </Button>
-      <Button >
-        <a href="http://localhost:8080/oauth2/authorize/facebook?redirect_uri=http://localhost:5173/auth/login?type=facebook">
-          login with Facebook
-        </a>
-      </Button>
-     
+      <div className="hidden">
+
+        <Button >
+          <a href="http://localhost:8080/oauth2/authorize/facebook?redirect_uri=http://localhost:5173/auth/login?type=facebook">
+            login with Facebook
+          </a>
+        </Button>
+      </div>
     </Card>
   );
 }
