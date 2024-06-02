@@ -100,4 +100,12 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/activate-account/")
+    public ResponseEntity<AccountDTO> activateAccount(@RequestParam String code) {
+        if (!authService.confirmActivateAccount(code)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

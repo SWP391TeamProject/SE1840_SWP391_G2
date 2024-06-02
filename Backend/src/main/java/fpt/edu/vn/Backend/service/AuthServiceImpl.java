@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +42,10 @@ public class AuthServiceImpl implements AuthService{
     private String systemEmail;
     @Value("${app.reset-email-link}")
     private String resetEmailLink;
+    @Value("${app.activate-account-link}")
+    private String activateAccountLink;
     private final ExpiringMap<String, Integer> resetCodeCache = ExpiringMap.builder().variableExpiration().build();
+    private final ExpiringMap<String, Integer> activationCodeCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     @Autowired
@@ -78,6 +82,12 @@ public class AuthServiceImpl implements AuthService{
             newAccount.setRole(Account.Role.MEMBER);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            requestActivateAccount(newAccount.getAccountId()); // send activation email
+        } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
 
@@ -218,6 +228,52 @@ public class AuthServiceImpl implements AuthService{
         accountRepos.save(acc);
         resetCodeCache.remove(resetCode);
         logger.info("Reset password for account {} with code {} successfully", id, resetCode);
+        return true;
+    }
+
+    @Override
+    public void requestActivateAccount(int accountId) throws MailException, MessagingException {
+        Account a = accountRepos.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", accountId));
+
+        String code;
+        do {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 6; i++)
+                sb.append((int) (Math.random() * 10));
+            code = sb.toString();
+        } while (activationCodeCache.containsKey(code));
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, false);
+        helper.setFrom(systemEmail);
+        helper.setTo(a.getEmail());
+        helper.setSubject("[Biddify] Activate account");
+        String link = String.format(activateAccountLink, code);
+        helper.setText("""
+                <p>Click here to activate your account: <a href="%s">Activate account</a></p>
+                <p>The link will expire after 1 hour.</p>
+                <p>- Biddify</p>
+                """.formatted(link), true);
+        mailSender.send(message);
+
+        activationCodeCache.put(code, accountId, 1, TimeUnit.HOURS);
+        logger.info("Sending activation code for account {} to {} with code {}", accountId, a.getEmail(), code);
+    }
+
+    @Override
+    public boolean confirmActivateAccount(@NotNull String activateCode) {
+        Integer id = activationCodeCache.get(activateCode);
+        if (id == null)
+            return false;
+        Account acc = accountRepos.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
+        if (acc.getStatus() == Account.Status.ACTIVE)
+            throw new IllegalStateException("Account already activated");
+        acc.setStatus(Account.Status.ACTIVE);
+        accountRepos.save(acc);
+        activationCodeCache.remove(activateCode);
+        logger.info("Activated account {} with code {} successfully", id, activateCode);
         return true;
     }
 }
