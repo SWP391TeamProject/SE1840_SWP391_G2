@@ -102,7 +102,7 @@ function RegisterForm() {
 
   return (
     <Card
-      className="w-3/6 h-3/4 border drop-shadow-md rounded-xl flex "
+      className="w-3/6 h-3/4 mt-32 border drop-shadow-md rounded-xl flex "
       ref={RegisterForm}
     >
       <div className="flex  basis-full md:basis-1/2 w-full p-3 items-center">
