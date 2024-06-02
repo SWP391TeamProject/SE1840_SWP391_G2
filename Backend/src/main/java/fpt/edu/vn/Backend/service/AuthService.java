@@ -3,7 +3,9 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
-import org.springframework.stereotype.Service;
+import jakarta.mail.MessagingException;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.mail.MailException;
 
 public interface AuthService {
     public AuthResponseDTO login(LoginDTO loginDTO);
@@ -14,5 +16,7 @@ public interface AuthService {
     String forgotPassword(String email);
     public AuthResponseDTO loginWithGoogle(String token);
     AuthResponseDTO loginWithFacebook(String token);
+    void requestResetPassword(int accountId) throws MailException, MessagingException;
+    boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword);
 
 }

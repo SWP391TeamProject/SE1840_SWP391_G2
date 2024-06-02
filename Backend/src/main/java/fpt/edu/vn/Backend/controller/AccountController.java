@@ -1,13 +1,10 @@
 package fpt.edu.vn.Backend.controller;
 
-import com.fasterxml.jackson.databind.DatabindException;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
-import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -92,27 +87,4 @@ public class AccountController {
 //            return new ResponseEntity<>(HttpStatus.OK);
 //        }
 //    }
-
-    @PostMapping("/request-reset-password/")
-    public ResponseEntity<AccountDTO> requestResetPassword(@RequestParam int id) {
-        if (accountService.getAccountById(id) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            try {
-                accountService.requestResetPassword(id);
-            } catch (MessagingException e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-    }
-
-    @PostMapping("/reset-password/")
-    public ResponseEntity<AccountDTO> resetPassword(@RequestParam String newPassword,
-                                                    @RequestParam String code) {
-        if (!accountService.confirmResetPassword(code, newPassword)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 }

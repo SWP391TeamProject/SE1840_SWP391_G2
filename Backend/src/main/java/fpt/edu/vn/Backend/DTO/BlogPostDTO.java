@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.BlogPost;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BlogPostDTO {
     private int postId;
     private int categoryId;
