@@ -111,6 +111,7 @@ export interface IConsignmentDetail {
   type?: ConsignmentDetailType;
   account_id?: number;
   consignment_id?: number;
+  attachments: [IAttachment];
 }
 
 export interface IDeposit {

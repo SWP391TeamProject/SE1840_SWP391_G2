@@ -132,7 +132,7 @@ export default function ConsignmentList() {
             <Tabs defaultValue="all">
                 <div className="flex items-center">
                     <TabsList>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED, ConsignmentStatus.IN_FINAL_EVALUATION,ConsignmentStatus.IN_INITIAL_EVALUATION, ConsignmentStatus.SENDING,ConsignmentStatus.WAITING_STAFF, ConsignmentStatus.TERMINATED], "all")} value="all">All</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED, ConsignmentStatus.IN_FINAL_EVALUATION, ConsignmentStatus.IN_INITIAL_EVALUATION, ConsignmentStatus.SENDING, ConsignmentStatus.WAITING_STAFF, ConsignmentStatus.TERMINATED], "all")} value="all">All</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_INITIAL_EVALUATION], "IN_INITIAL_EVALUATION")} value="IN_INITIAL_EVALUATION">initial evaluation</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_FINAL_EVALUATION], "IN_FINAL_EVALUATION")} value="IN_FINAL_EVALUATION">final evaluation</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.SENDING], "SENDING")} value="SENDING">sending</TabsTrigger>
@@ -191,10 +191,13 @@ export default function ConsignmentList() {
                                             create Date
                                         </TableHead>
                                         <TableHead className="hidden md:table-cell">
+                                            Assigned Staff
+                                        </TableHead>
+                                        <TableHead className="hidden md:table-cell">
                                             Phone
                                         </TableHead>
                                         <TableHead className="hidden md:table-cell">
-                                            Assigned Staff
+                                            Status
                                         </TableHead>
                                         <TableHead className="hidden md:table-cell">
                                             Status
@@ -223,10 +226,13 @@ export default function ConsignmentList() {
                                                 {new Date(consignment.createDate).toLocaleDateString('en-US')}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
+                                                {consignment.staffId ? consignment.staffId : "Not assigned"}
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">
                                                 {consignment.staffId}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {consignment.status == ConsignmentStatus.FINISHED ?
+                                                {consignment.status == ConsignmentStatus.IN_INITIAL_EVALUATION ?
                                                     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[consignment.status]}</Badge> :
                                                     <Badge variant="destructive">{ConsignmentStatus[consignment.status]}</Badge>}
                                             </TableCell>

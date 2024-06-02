@@ -214,7 +214,7 @@ export default function AuctionSessionList() {
                       Participant
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Status
+                      number of lots
                     </TableHead>
                     {/* <TableHead className="hidden md:table-cell">
                                                     Created at
@@ -250,7 +250,11 @@ export default function AuctionSessionList() {
                         {auctionSession.deposits.length}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
+                        {auctionSession.auctionsItems}
+
                         {/* {auctionSession.status == AuctionSessionStatus.ACTIVE ? 
+                        {auctionSession.deposits.length}
+
                         <Badge variant="default" className="bg-green-500">{AuctionSessionStatus[auctionSession.status]}</Badge> : 
                         <Badge variant="destructive">{AuctionSessionStatus[auctionSession.status]}</Badge>} */}
                       </TableCell>

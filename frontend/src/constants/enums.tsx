@@ -8,7 +8,7 @@ export enum Roles {
 
 export enum AccountStatus {
   ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
+  DISABLED = "DISABLED",
   // Add more statuses if needed (e.g., BANNED, SUSPENDED)
 }
 
