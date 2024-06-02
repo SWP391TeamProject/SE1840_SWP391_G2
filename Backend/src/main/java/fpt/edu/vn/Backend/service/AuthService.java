@@ -19,5 +19,5 @@ public interface AuthService {
     void requestResetPassword(int accountId) throws MailException, MessagingException;
     boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword);
     void requestActivateAccount(int accountId) throws MailException, MessagingException;
-    boolean confirmActivateAccount(String activateCode);
+    boolean confirmActivateAccount(@NotNull String activateCode);
 }

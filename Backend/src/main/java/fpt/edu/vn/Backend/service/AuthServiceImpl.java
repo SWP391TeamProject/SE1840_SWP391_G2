@@ -262,7 +262,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public boolean confirmActivateAccount(String activateCode) {
+    public boolean confirmActivateAccount(@NotNull String activateCode) {
         Integer id = activationCodeCache.get(activateCode);
         if (id == null)
             return false;
