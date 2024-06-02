@@ -1,28 +1,32 @@
 package fpt.edu.vn.Backend.controller;
 
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentRequestDTO;
-import fpt.edu.vn.Backend.pojo.Consignment;
+import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/consignments")
@@ -43,7 +47,8 @@ public class ConsignmentController {
     @GetMapping("/")
     public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {
-            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageNumb, pageSize);
+            Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumb);
+            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable);
             if(consignments == null || consignments.isEmpty()){
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
@@ -94,12 +99,13 @@ public class ConsignmentController {
         public ResponseEntity<ConsignmentDTO> createConsignment(@ModelAttribute ConsignmentRequestDTO consignmentRequestDTO) {
         try {
             ConsignmentDetailDTO consignmentDetailDTO = new ConsignmentDetailDTO();
-            consignmentDetailDTO.setAccountId(consignmentRequestDTO.getAccountId());
+            consignmentDetailDTO.setAccount(new AccountDTO(accountRepos.findById(consignmentRequestDTO.getAccountId()).orElseThrow(
+                    ()->new ConsignmentServiceException("No Account found for Consignment"))));
             consignmentDetailDTO.setDescription(consignmentRequestDTO.getDescription());
-            int userId = consignmentDetailDTO.getAccountId(); // Hardcoded user ID for now
+            int userId = consignmentDetailDTO.getAccount().getAccountId(); // Hardcoded user ID for now
             ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId,consignmentRequestDTO.getPreferContact(),consignmentDetailDTO);
             for(MultipartFile f: consignmentRequestDTO.getFiles()){
-                attachmentService.uploadConsignmentDetailAttachment(f,consignment.getConsignmentDetails().stream().filter(x->x.getType().equals("REQUEST")).findFirst().get().getConsignmentDetailId() );
+                attachmentService.uploadConsignmentDetailAttachment(f,consignment.getConsignmentDetails().stream().filter(x->x.getStatus().equals("REQUEST")).findFirst().get().getConsignmentDetailId() );
             }
             return new ResponseEntity<>(consignment, HttpStatus.CREATED);
         } catch (ConsignmentServiceException e) {
@@ -143,6 +149,20 @@ public class ConsignmentController {
         return consignmentService.deleteConsignment(id);
     }
 
+    @GetMapping("/export")
+    public void exportConsignment(HttpServletResponse response){
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
 
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=Consignments_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        Pageable pageable = Pageable.unpaged();
+        List<ConsignmentDTO> listConsignments = consignmentService.getAllConsignments(pageable).getContent();
 
+        ConsignmentExporter excelExporter = new ConsignmentExporter(listConsignments);
+
+        excelExporter.export(response);
+    }
 }

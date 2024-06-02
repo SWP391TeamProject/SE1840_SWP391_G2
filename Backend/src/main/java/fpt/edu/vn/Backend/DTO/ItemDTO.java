@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemDTO {
     private Integer itemId;
-    private Integer categoryId;
+    private ItemCategoryDTO category;
     private String name;
     private String description;
     private BigDecimal reservePrice;
@@ -20,6 +21,6 @@ public class ItemDTO {
     private Item.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private Integer ownerId;
+    private AccountDTO owner;
     private Integer orderId;
 }

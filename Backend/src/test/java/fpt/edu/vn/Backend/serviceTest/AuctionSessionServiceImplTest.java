@@ -80,6 +80,7 @@ public class AuctionSessionServiceImplTest {
         verify(auctionSessionRepos, times(1)).save(any(AuctionSession.class));
     }
 
+
     @Test
     @DisplayName("Test get auction session by id")
     public void testGetAuctionSessionById() {
@@ -150,5 +151,6 @@ public class AuctionSessionServiceImplTest {
         assertTrue(result.getDeposits().isEmpty()); // Ensure deposits are an empty set
         verify(auctionSessionRepos, times(1)).findById(1);
     }
+
 
 }
