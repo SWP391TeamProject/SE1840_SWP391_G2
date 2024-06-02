@@ -1,14 +1,11 @@
 package fpt.edu.vn.Backend.service;
 
 import com.google.common.base.Preconditions;
-import com.google.common.cache.Cache;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import net.jodah.expiringmap.ExpiringMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,39 +13,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class AccountServiceImpl implements AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountRepos accountRepos;
     private final AttachmentServiceImpl attachmentServiceImpl;
-    private final JavaMailSender mailSender;
-    @Value("${app.email}")
-    private String systemEmail;
-    @Value("${app.reset-email-link}")
-    private String resetEmailLink;
-    private final ExpiringMap<String, Integer> resetCodeCache = ExpiringMap.builder().variableExpiration().build();
 
     @Autowired
-    public AccountServiceImpl(AccountRepos accountRepos, AttachmentServiceImpl attachmentServiceImpl, JavaMailSender mailSender) {
+    public AccountServiceImpl(AccountRepos accountRepos, AttachmentServiceImpl attachmentServiceImpl) {
         this.accountRepos = accountRepos;
         this.attachmentServiceImpl = attachmentServiceImpl;
-        this.mailSender = mailSender;
     }
 
     @Override
@@ -144,48 +127,5 @@ public class AccountServiceImpl implements AccountService {
         } catch (IOException e) {
             throw new ResourceNotFoundException("Account", "accountId", accountId);
         }
-    }
-
-    @Override
-    public void requestResetPassword(int accountId) throws MessagingException {
-        Account a = accountRepos.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", accountId));
-
-        String code;
-        do {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 6; i++)
-                sb.append((int) (Math.random() * 10));
-            code = sb.toString();
-        } while (resetCodeCache.containsKey(code));
-
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, false);
-        helper.setFrom(systemEmail);
-        helper.setTo(a.getEmail());
-        helper.setSubject("[Biddify] Reset Password");
-        String link = String.format(resetEmailLink, code);
-        helper.setText("""
-                <p>Click here to reset your password: <a href="%s">Reset Password</a></p>
-                <p>The link will expire after 1 hour.</p>
-                <p>- Biddify</p>
-                """.formatted(link), true);
-        mailSender.send(message);
-
-        resetCodeCache.put(code, accountId, 1, TimeUnit.HOURS);
-        logger.info("Sending reset password account {} to {} with code {}", accountId, a.getEmail(), code);
-    }
-
-    @Override
-    public boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword) {
-        Integer id = resetCodeCache.get(resetCode);
-        if (id == null)
-            return false;
-        Account acc = accountRepos.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
-        acc.setPassword(newPassword);
-        resetCodeCache.remove(resetCode);
-        logger.info("Reset password for account {} with code {} successfully", id, resetCode);
-        return true;
     }
 }

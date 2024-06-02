@@ -194,4 +194,3 @@ DELETE http://localhost:8080/api/accounts/6
 Content-Type: application/json
 
 ###Response (HTTP/1.1 200 OK)
-
