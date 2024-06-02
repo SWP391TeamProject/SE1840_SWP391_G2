@@ -1,15 +1,15 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Deposit;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@Builder
+@EqualsAndHashCode
+
 @NoArgsConstructor
-@AllArgsConstructor
+//@Builder
+//@AllArgsConstructor
+@Getter
+@Setter
 public class DepositDTO {
     private int depositId;
     private int depositAmount;

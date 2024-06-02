@@ -6,6 +6,8 @@ import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfoFactory;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Account.Role;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -22,6 +24,7 @@ import java.util.Set;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
     @Autowired
     private AccountRepos accountRepos;
 
@@ -62,6 +65,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
     private Account registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         Account account = new Account();
+        log.info("sssssssssssssssssssssssssssssssssssssssssssssssssssssProvider: {}", oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase());
+
+
+
+
+
         account.setProvider(Account.AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase()));
 
         account.setNickname(oAuth2UserInfo.getName());

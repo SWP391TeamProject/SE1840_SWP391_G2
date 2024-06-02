@@ -61,9 +61,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
-        if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-            throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
-        }
+//        if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
+//            throw new BadRequestException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication");
+//        }
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
@@ -78,7 +78,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             loginMethod = "/auth/login-with-facebook";
         }
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .path(loginMethod)
+//                .path(loginMethod)
+
                 .queryParam("token", token)
                 .build().toUriString();
     }

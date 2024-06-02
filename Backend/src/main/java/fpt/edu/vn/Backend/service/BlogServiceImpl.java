@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.BlogPostDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.BlogPost;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
 import fpt.edu.vn.Backend.repository.BlogPostRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,8 @@ public class BlogServiceImpl implements BlogService{
     private BlogPostRepos blogPostRepos;
     @Autowired
     private AccountRepos accountRepos;
+    @Autowired
+    private BlogCategoryRepos blogCategoryRepos;
 
     @Override
     public Page<BlogPostDTO> getAllBlogs(Pageable pageable) {
@@ -43,6 +46,7 @@ public class BlogServiceImpl implements BlogService{
         blogPost.setContent(blogPostDTO.getContent());
         blogPost.setCreateDate(blogPostDTO.getCreateDate());
         blogPost.setUpdateDate(blogPostDTO.getUpdateDate());
+        blogPost.setCategory(blogCategoryRepos.findById(blogPostDTO.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Invalid category id: " + blogPostDTO.getCategoryId())));
         blogPost.setAuthor(accountRepos.findById(blogPostDTO.getAuthorId()).orElseThrow(() -> new ResourceNotFoundException("Invalid author id: " + blogPostDTO.getAuthorId())));
         return blogPost;
     }

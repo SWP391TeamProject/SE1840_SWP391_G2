@@ -15,9 +15,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class AuctionSessionServiceImpl implements AuctionSessionService{
+public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final AuctionSessionRepos auctionSessionRepos;
     private static final Logger logger = LoggerFactory.getLogger(AuctionSessionServiceImpl.class);
+
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos) {
         this.auctionSessionRepos = auctionSessionRepos;

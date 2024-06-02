@@ -1,37 +1,19 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
-import fpt.edu.vn.Backend.oauth2.response.AuthResponse;
-import fpt.edu.vn.Backend.oauth2.security.CookieUtils;
-import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.service.AuthService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Map;
-import java.util.Optional;
-
 
 @RestController
 @CrossOrigin("*")
@@ -39,14 +21,9 @@ import java.util.Optional;
 @Slf4j
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private AccountRepos accountRepos;
-
-
     private final AuthService authService;
+
+    @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -76,7 +53,7 @@ public class AuthController {
     }
 
     @GetMapping("/login-with-google")
-    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestParam String token) {
+    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestParam(required = false) String token) {
         AuthResponseDTO authResponseDTO = authService.loginWithGoogle(token);
         return ResponseEntity.ok(authResponseDTO);
 //        return ResponseEntity.ok(new AuthResponse(token));
@@ -102,6 +79,33 @@ public class AuthController {
         model.addAttribute("auction_item", id);
         model.addAttribute("user_id", ((Account) session.getAttribute("account")).getAccountId());
         return "index";
+    }
+
+    @PostMapping("/request-reset-password/")
+    public ResponseEntity<AccountDTO> requestResetPassword(@RequestParam int id) {
+        try {
+            authService.requestResetPassword(id);
+        } catch (MessagingException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/reset-password/")
+    public ResponseEntity<AccountDTO> resetPassword(@RequestParam String newPassword,
+                                                    @RequestParam String code) {
+        if (!authService.confirmResetPassword(code, newPassword)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/activate-account/")
+    public ResponseEntity<AccountDTO> activateAccount(@RequestParam String code) {
+        if (!authService.confirmActivateAccount(code)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

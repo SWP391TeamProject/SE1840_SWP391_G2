@@ -25,14 +25,11 @@ public class Account {
     @Column(name = "account_id")
     private int accountId;
 
-    private String providerId;
-
     @Column(name = "nickname", length = 100)
     private String nickname;
 
     @OneToOne
     private Attachment avatarUrl;
-
 
     @Column(name = "provider",length = 30)
     @Enumerated(EnumType.STRING)
@@ -62,10 +59,10 @@ public class Account {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.DISABLED;
 
     @Column(name = "balance")
-    private BigDecimal balance;
+    private BigDecimal balance = new BigDecimal(0);
 
     @CreationTimestamp
     @Column(name = "create_date")

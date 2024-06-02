@@ -13,5 +13,4 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
     Page<AuctionSession> findByEndDateBefore(LocalDateTime endDate, Pageable pageable);
     Page<AuctionSession> findByStartDateAfter(LocalDateTime startDate, Pageable pageable);
 
-
 }
