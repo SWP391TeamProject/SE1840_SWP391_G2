@@ -41,6 +41,10 @@ import AccountCreate from "./pages/Administration/Account/AccountCreate.tsx";
 import AuctionSessionList from "./pages/Administration/Auction-session/AuctionSessionList.tsx";
 import AuctionSessionCreate from "./pages/Administration/Auction-session/AuctionSessionCreate.tsx";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import Home from "./pages/Home/Home.tsx";
+import AuthenticationLayout from "./layout/AuthenticationLayout/AuthenticationLayout.tsx";
+import RegisterForm from "./pages/authentication/RegisterForm.tsx";
+import LoginForm from "./pages/authentication/LoginForm.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -84,9 +88,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </Route>
 
 
-                <Route path="/auth">
-                  <Route path="/auth/login" element={<LoginLayout />}></Route>
-                  <Route path="/auth/register" element={<RegisterLayout />}></Route>
+                <Route path="/auth" element={<AuthenticationLayout/>}>
+                  <Route path="login" element={<LoginForm />}></Route>
+                  <Route path="register" element={<RegisterForm />}></Route>
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
                   <Route
