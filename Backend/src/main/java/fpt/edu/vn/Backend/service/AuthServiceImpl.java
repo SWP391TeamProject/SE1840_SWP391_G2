@@ -64,6 +64,7 @@ public class AuthServiceImpl implements AuthService{
             newAccount.setEmail(registerDTO.getEmail());
             newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
             newAccount.setRole(Account.Role.MEMBER);
+            newAccount.setProvider(Account.AuthProvider.LOCAL);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
