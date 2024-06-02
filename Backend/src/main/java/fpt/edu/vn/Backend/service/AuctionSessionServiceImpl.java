@@ -34,7 +34,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             auctionSession.setCreateDate(auctionDTO.getCreateDate());
             auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
             auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
-
             AuctionSession savedAuctionSession = auctionSessionRepos.save(auctionSession);
 
             auctionDTO.setAuctionSessionId(savedAuctionSession.getAuctionSessionId());
