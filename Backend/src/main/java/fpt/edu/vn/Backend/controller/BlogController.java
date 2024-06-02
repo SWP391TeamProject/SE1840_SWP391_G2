@@ -1,7 +1,9 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.BlogCategoryDTO;
 import fpt.edu.vn.Backend.DTO.BlogCreateDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
+import fpt.edu.vn.Backend.pojo.BlogCategory;
 import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
 import fpt.edu.vn.Backend.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
