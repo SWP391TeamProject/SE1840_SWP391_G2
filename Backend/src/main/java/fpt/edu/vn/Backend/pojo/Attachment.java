@@ -29,7 +29,7 @@ public class Attachment {
     @JoinColumn(name = "item_id")
     private Item item;
     @Column(length = 10)
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private FileType type; // jpg, png, mp4, etc.
 
     enum FileType {
@@ -43,11 +43,6 @@ public class Attachment {
     @ManyToOne
     @JoinColumn(name = "consignment_id")
     private Consignment consignment;
-    @Column(name = "attachment_type")
-    @Enumerated
-    private type attachmentType;
-
-    enum type {}
 
     @ManyToOne
     @JoinColumn(name = "auction_session_id")
