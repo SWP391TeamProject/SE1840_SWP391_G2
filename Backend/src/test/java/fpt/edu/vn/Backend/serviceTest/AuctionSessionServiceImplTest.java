@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.service.AuctionSessionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -80,6 +81,7 @@ public class AuctionSessionServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test get auction session by id")
     public void testGetAuctionSessionById() {
         when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
 
@@ -90,7 +92,9 @@ public class AuctionSessionServiceImplTest {
         verify(auctionSessionRepos, times(1)).findById(1);
     }
 
+
     @Test
+    @DisplayName("Test get all auction sessions")
     void testGetAllAuctionSessions() {
         Pageable pageable = PageRequest.of(0, 50);
         Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
@@ -104,6 +108,7 @@ public class AuctionSessionServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test get past auction sessions")
     void testGetPastAuctionSessions() {
         Pageable pageable = PageRequest.of(0, 50);
         Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
@@ -117,6 +122,7 @@ public class AuctionSessionServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test get upcoming auction sessions")
     void testGetUpcomingAuctionSessions() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
@@ -130,6 +136,7 @@ public class AuctionSessionServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test get auction session by id - Success")
     public void testGetAuctionSessionById_Success_WithNullDeposits() {
         auctionSession.setAuctionSessionId(1);
         auctionSession.setDeposits(null); // Set deposits to null
