@@ -12,7 +12,7 @@ public class BlogCategoryDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    BlogCategoryDTO(BlogCategory blogCategory) {
+    public BlogCategoryDTO(BlogCategory blogCategory) {
         this.blogCategoryId = blogCategory.getBlogCategoryId();
         this.name = blogCategory.getName();
         this.createDate = blogCategory.getCreateDate();
