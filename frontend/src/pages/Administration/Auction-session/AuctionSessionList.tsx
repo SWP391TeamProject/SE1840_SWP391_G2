@@ -77,9 +77,9 @@ export default function AuctionSessionList() {
     try {
       const list = await fetchAllAuctionSessions();
       if (list) {
+        console.log(list?.data.content);
         dispatch(setAuctionSessions(list.data.content));
         dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
-        console.log(list?.data.content);
 
       }
 
@@ -123,15 +123,15 @@ export default function AuctionSessionList() {
 
 
   const handleFilterClick = (filter: string) => {
-    let filteredList  = [];
-    if(filter ==="all") filteredList = auctionSessionsList.value;
+    let filteredList = [];
+    if (filter === "all") filteredList = auctionSessionsList.value;
 
-    if(filter ==="upcoming") filteredList = auctionSessionsList.value.filter(x => new Date(x.startDate) > new Date());
+    if (filter === "upcoming") filteredList = auctionSessionsList.value.filter(x => new Date(x.startDate) > new Date());
 
-    if(filter ==="past") filteredList = auctionSessionsList.value.filter(x => new Date(x.endDate) < new Date());
+    if (filter === "past") filteredList = auctionSessionsList.value.filter(x => new Date(x.endDate) < new Date());
 
-    if(filter ==="live") filteredList = auctionSessionsList.value.filter(x => new Date(x.startDate) < new Date() && new Date(x.endDate) > new Date());
-    
+    if (filter === "live") filteredList = auctionSessionsList.value.filter(x => new Date(x.startDate) < new Date() && new Date(x.endDate) > new Date());
+
 
     console.log(filteredList);
     dispatch(setCurrentPageList(filteredList));
@@ -151,10 +151,10 @@ export default function AuctionSessionList() {
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger onClick={() => handleFilterClick( "all")} value="all">All</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick( "upcoming")} value="upcoming">Upcoming</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick( "past")} value="past">Past</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick( "live")} value="live">Live</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick("all")} value="all">All</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick("upcoming")} value="upcoming">Upcoming</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick("past")} value="past">Past</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick("live")} value="live">Live</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>

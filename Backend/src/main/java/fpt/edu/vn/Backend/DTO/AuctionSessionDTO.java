@@ -37,7 +37,7 @@ public class AuctionSessionDTO {
         this.title = auctionSession.getTitle();
         this.deposits = (auctionSession.getDeposits() != null)
                 ? auctionSession.getDeposits().stream()
-                .map(deposit -> new DepositDTO(deposit))
+                .map(DepositDTO::new)
                 .collect(Collectors.toSet())
                 : Collections.emptySet();
 

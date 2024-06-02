@@ -13,7 +13,7 @@ export const fetchAllConsignmentsService = async () => {
     })
     .then((res) => {
       console.log(res.data.content);
-      return res.data.content}) // return the data here
+      return res}) // return the data here
     .catch((err) => {
       console.log(err);
       throw err; // make sure to throw the error so it can be caught by the query
