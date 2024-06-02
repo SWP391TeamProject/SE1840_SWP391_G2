@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RoleName, Roles } from '@/constants/enums';
-import { updateAccountService } from "@/services/AccountsServices";
+import { updateAccountService } from "@/services/AccountsServices.ts";
 import { setCurrentAccount } from '@/redux/reducers/Accounts';
 import { useLocation, useNavigate } from "react-router-dom";
 

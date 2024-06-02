@@ -1,11 +1,10 @@
-import { SERVER_DOMAIN_URL } from "@/constants/Domain";
+import { API_SERVER } from "@/constants/domain";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 
-const controller = "accounts";
 export const fetchAccountsService = async () => {
   return await axios
-    .get("http://localhost:8080/api/accounts/", {
+    .get(API_SERVER + "/accounts/", {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -24,7 +23,7 @@ export const fetchAccountsService = async () => {
 
 export const updateAccountService = async (data: any, id: number) => {
   return await axios
-    .put("http://localhost:8080/api/accounts/" + id, data, {
+    .put(API_SERVER + "/accounts/" + id, data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -38,7 +37,7 @@ export const updateAccountService = async (data: any, id: number) => {
 
 export const createAccountService = async (data: any) => {
   return await axios
-    .post("http://localhost:8080/api/accounts", data, {
+    .post(API_SERVER + "/accounts", data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -51,7 +50,7 @@ export const createAccountService = async (data: any) => {
 
 export const deleteAccountService = async (id: string) => {
   return await axios
-    .delete("http://localhost:8080/api/accounts/" + id, {
+    .delete(API_SERVER + "/accounts/" + id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

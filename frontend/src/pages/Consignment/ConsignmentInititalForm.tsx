@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadIcon } from "lucide-react";
 import DropzoneComponent from "../../components/drop-zone/DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
-import { SERVER_DOMAIN_URL } from "@/constants/Domain";
+import { API_SERVER } from "@/constants/domain.ts";
 import { useDropzone } from "react-dropzone";
 import { createConsignmentService } from "@/services/ConsignmentService";
 const MAX_FILE_SIZE = 5000000;

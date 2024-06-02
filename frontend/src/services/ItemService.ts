@@ -2,14 +2,15 @@ import axios from "axios";
 import {Item, ItemStatus} from "@/models/Item.ts";
 import {Page} from "@/models/Page.ts";
 import { getCookie } from "@/utils/cookies";
+import {API_SERVER} from "@/constants/domain";
 
 // Service methods
-const baseUrl = "http://localhost:8080/api/items";
+const baseUrl = API_SERVER + "/items";
 const authHeader = {
     headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        // Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
     },
 };
 

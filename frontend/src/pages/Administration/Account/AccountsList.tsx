@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAccounts, setCurrentAccount, setCurrentPageList } from "@/redux/reducers/Accounts";
-import { fetchAccountsService, deleteAccountService } from "@/services/AccountsServices";
+import { fetchAccountsService, deleteAccountService } from "@/services/AccountsServices.ts";
 import {
   Home,
   LineChart,
