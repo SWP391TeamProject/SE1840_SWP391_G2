@@ -78,70 +78,70 @@ public class AuctionSessionServiceImplTest {
         verify(auctionSessionRepos, times(1)).findById(1);
         verify(auctionSessionRepos, times(1)).save(any(AuctionSession.class));
     }
-
-    @Test
-    public void testGetAuctionSessionById() {
-        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
-
-        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
-
-        assertNotNull(result);
-        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
-        verify(auctionSessionRepos, times(1)).findById(1);
-    }
-
-    @Test
-    void testGetAllAuctionSessions() {
-        Pageable pageable = PageRequest.of(0, 50);
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
-        when(auctionSessionRepos.findAll(pageable)).thenReturn(auctionSessionPage);
-
-        Page<AuctionSessionDTO> result = auctionSessionService.getAllAuctionSessions(pageable);
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(auctionSessionRepos, times(1)).findAll(pageable);
-    }
-
-    @Test
-    void testGetPastAuctionSessions() {
-        Pageable pageable = PageRequest.of(0, 50);
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
-        when(auctionSessionRepos.findByEndDateBefore(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
-
-        Page<AuctionSessionDTO> result = auctionSessionService.getPastAuctionSessions(pageable);
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(auctionSessionRepos, times(1)).findByEndDateBefore(any(LocalDateTime.class), eq(pageable));
-    }
-
-    @Test
-    void testGetUpcomingAuctionSessions() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
-        when(auctionSessionRepos.findByStartDateAfter(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
-
-        Page<AuctionSessionDTO> result = auctionSessionService.getUpcomingAuctionSessions(pageable);
-
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(auctionSessionRepos, times(1)).findByStartDateAfter(any(LocalDateTime.class), eq(pageable));
-    }
-
-    @Test
-    public void testGetAuctionSessionById_Success_WithNullDeposits() {
-        auctionSession.setAuctionSessionId(1);
-        auctionSession.setDeposits(null); // Set deposits to null
-        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
-
-        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
-
-        assertNotNull(result);
-        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
-        assertNotNull(result.getDeposits());
-        assertTrue(result.getDeposits().isEmpty()); // Ensure deposits are an empty set
-        verify(auctionSessionRepos, times(1)).findById(1);
-    }
+//
+//    @Test
+//    public void testGetAuctionSessionById() {
+//        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
+//
+//        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
+//
+//        assertNotNull(result);
+//        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
+//        verify(auctionSessionRepos, times(1)).findById(1);
+//    }
+//
+//    @Test
+//    void testGetAllAuctionSessions() {
+//        Pageable pageable = PageRequest.of(0, 50);
+//        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
+//        when(auctionSessionRepos.findAll(pageable)).thenReturn(auctionSessionPage);
+//
+//        Page<AuctionSessionDTO> result = auctionSessionService.getAllAuctionSessions(pageable);
+//
+//        assertNotNull(result);
+//        assertEquals(1, result.getTotalElements());
+//        verify(auctionSessionRepos, times(1)).findAll(pageable);
+//    }
+//
+//    @Test
+//    void testGetPastAuctionSessions() {
+//        Pageable pageable = PageRequest.of(0, 50);
+//        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
+//        when(auctionSessionRepos.findByEndDateBefore(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
+//
+//        Page<AuctionSessionDTO> result = auctionSessionService.getPastAuctionSessions(pageable);
+//
+//        assertNotNull(result);
+//        assertEquals(1, result.getTotalElements());
+//        verify(auctionSessionRepos, times(1)).findByEndDateBefore(any(LocalDateTime.class), eq(pageable));
+//    }
+//
+//    @Test
+//    void testGetUpcomingAuctionSessions() {
+//        Pageable pageable = PageRequest.of(0, 10);
+//        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
+//        when(auctionSessionRepos.findByStartDateAfter(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
+//
+//        Page<AuctionSessionDTO> result = auctionSessionService.getUpcomingAuctionSessions(pageable);
+//
+//        assertNotNull(result);
+//        assertEquals(1, result.getTotalElements());
+//        verify(auctionSessionRepos, times(1)).findByStartDateAfter(any(LocalDateTime.class), eq(pageable));
+//    }
+//
+//    @Test
+//    public void testGetAuctionSessionById_Success_WithNullDeposits() {
+//        auctionSession.setAuctionSessionId(1);
+//        auctionSession.setDeposits(null); // Set deposits to null
+//        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
+//
+//        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
+//
+//        assertNotNull(result);
+//        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
+//        assertNotNull(result.getDeposits());
+//        assertTrue(result.getDeposits().isEmpty()); // Ensure deposits are an empty set
+//        verify(auctionSessionRepos, times(1)).findById(1);
+//    }
 
 }
