@@ -1,9 +1,13 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exporter.AccountExporter;
+import fpt.edu.vn.Backend.exporter.ItemExporter;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.service.ItemService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +15,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/items")
@@ -65,5 +74,21 @@ public class ItemController {
             throw new InvalidInputException("Item id cannot be null");
         }
         return new ResponseEntity<>(itemService.updateItem(itemDTO), HttpStatus.OK);
+    }
+    @GetMapping("/export")
+    public void exportToExcel(HttpServletResponse response){
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=accounts_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        Pageable pageable = Pageable.unpaged();
+        List<ItemDTO> listItems = itemService.getItems(pageable).getContent();
+
+        ItemExporter excelExporter = new ItemExporter(listItems);
+
+        excelExporter.export(response);
     }
 }

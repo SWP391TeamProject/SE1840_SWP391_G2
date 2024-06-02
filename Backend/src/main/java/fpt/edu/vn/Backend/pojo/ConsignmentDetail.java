@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
 import jakarta.persistence.*;
-import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +27,9 @@ public class ConsignmentDetail {
     public enum ConsignmentStatus {
         REQUEST, INITIAL_EVALUATION, FINAL_EVALUATION, MANAGER_ACCEPTED, MANAGER_REJECTED
     }
-    @Column(name = "type",nullable = false)
+    @Column(name = "status",nullable = false)
     @Enumerated(EnumType.STRING)
-    private ConsignmentStatus type;
+    private ConsignmentStatus status;
 
     @Column(name = "price")
     private BigDecimal price;

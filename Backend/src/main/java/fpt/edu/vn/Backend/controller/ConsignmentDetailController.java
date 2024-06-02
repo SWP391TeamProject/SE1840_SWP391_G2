@@ -1,18 +1,27 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.EvaluationDTO;
+import fpt.edu.vn.Backend.exporter.AccountExporter;
+import fpt.edu.vn.Backend.exporter.ConsignmentDetailExporter;
 import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentDetailService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -61,4 +70,20 @@ public class ConsignmentDetailController {
         return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId,updatedConsignmentDetail), HttpStatus.OK);
     }
 
+    @GetMapping("/export")
+    public void exportToExcel(HttpServletResponse response){
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=ConsignmentDetails_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        Pageable pageable = Pageable.unpaged();
+        List<ConsignmentDetailDTO> listDetail = consignmentDetailService.getAllConsignmentsDetail(pageable).getContent();
+        listDetail.sort(Comparator.comparingInt(ConsignmentDetailDTO::getConsignmentId));
+        ConsignmentDetailExporter excelExporter = new ConsignmentDetailExporter(listDetail);
+
+        excelExporter.export(response);
+    }
 }

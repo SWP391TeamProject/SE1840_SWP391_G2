@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -13,6 +14,8 @@ import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +36,11 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
         this.attachmentRepos = attachmentRepos;
         this.accountRepos = accountRepos;
         this.consignmentRepos = consignmentRepos;
+    }
+
+    @Override
+    public Page<ConsignmentDetailDTO> getAllConsignmentsDetail(Pageable pageable) {
+        return consignmentDetailRepos.findAll(pageable).map(this::mapToDTO);
     }
 
     @Override
@@ -67,14 +75,14 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             consignmentDetail.setPrice(consignmentDetailDTO.getPrice());
 
             // Fetch Account by ID
-            Account account = accountRepos.findById(consignmentDetailDTO.getAccountId()).orElse(null);
+            Account account = accountRepos.findById(consignmentDetailDTO.getAccount().getAccountId()).orElse(null);
             if (account == null) {
                 throw new ResourceNotFoundException("Account not found");
             }
             consignmentDetail.setAccount(account);
 
             // Set ConsignmentStatus enum
-            consignmentDetail.setType(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentDetailDTO.getType()));
+            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentDetailDTO.getStatus()));
 
             // Fetch Attachments by IDs
             List<AttachmentDTO> attachmentIds = consignmentDetailDTO.getAttachments();
@@ -108,7 +116,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             // Update the fields with the provided data from updatedConsignmentDetail
             consignmentDetail.setDescription(updatedConsignmentDetail.getDescription());
             consignmentDetail.setPrice(updatedConsignmentDetail.getPrice());
-            consignmentDetail.setType(ConsignmentDetail.ConsignmentStatus.valueOf(updatedConsignmentDetail.getType()));
+            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(updatedConsignmentDetail.getStatus()));
 
             // Fetch Consignment by ID from DTO and set it in the ConsignmentDetail
             Consignment consignment = consignmentRepos.findByConsignmentId(updatedConsignmentDetail.getConsignmentId());
@@ -118,7 +126,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             consignmentDetail.setConsignment(consignment);
 
             // Fetch Account by ID from DTO and set it in the ConsignmentDetail
-            Account account = accountRepos.findById(updatedConsignmentDetail.getAccountId()).orElse(null);
+            Account account = accountRepos.findById(updatedConsignmentDetail.getAccount().getAccountId()).orElse(null);
             if (account == null) {
                 throw new ResourceNotFoundException("Account not found");
             }
@@ -151,10 +159,10 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
         return new ConsignmentDetailDTO(
                 consignmentDetail.getConsignmentDetailId(),
                 consignmentDetail.getDescription(),
-                consignmentDetail.getType().toString(), // Convert enum to string
+                consignmentDetail.getStatus().toString(), // Convert enum to string
                 consignmentDetail.getPrice(),
                 consignmentDetail.getConsignment().getConsignmentId(),
-                consignmentDetail.getAccount().getAccountId(),
+                new AccountDTO(consignmentDetail.getAccount()),
                 attachmentIds
         );
     }

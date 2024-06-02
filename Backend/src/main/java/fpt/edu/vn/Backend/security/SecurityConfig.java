@@ -83,45 +83,45 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS and use corsConfigurationSource
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()). ignoringRequestMatchers("/auth/**", "/api/auction-sessions/**")
-                )
-                .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
-                .httpBasic(
-                        AbstractHttpConfigurer::disable
-                )
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","/oauth2/**","/api/auction-sessions/**","/api/items/**").permitAll()
-                        .anyRequest().authenticated()
-
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(authz -> authz
-                                .baseUri("/oauth2/authorize")
-                                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
-                        )
-                        .redirectionEndpoint(redir -> redir
-                                .baseUri("/oauth2/callback/*")
-                        )
-                        .tokenEndpoint(tokenEndpoint ->
-                                tokenEndpoint
-                                        .accessTokenResponseClient(this.accessTokenResponseClient())
-                        )
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
-
-                        .successHandler(customOAuth2Success)
-                        .failureHandler(customOAuth2Failure)
-                );
-        http.addFilterBefore(
-                jwtAuthenticationFilter(),
-                UsernamePasswordAuthenticationFilter.class
-        );
+//
+//        http
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS and use corsConfigurationSource
+//                .csrf(csrf -> csrf
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()). ignoringRequestMatchers("/auth/**", "/api/auction-sessions/**")
+//                )
+//                .sessionManagement(authorize -> authorize.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .exceptionHandling(authorize -> authorize.authenticationEntryPoint(jwtAuthEntryPoint))
+//                .httpBasic(
+//                        AbstractHttpConfigurer::disable
+//                )
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/auth/**","/oauth2/**","/api/auction-sessions/**","/api/items/**").permitAll()
+//                        .anyRequest().authenticated()
+//
+//                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .authorizationEndpoint(authz -> authz
+//                                .baseUri("/oauth2/authorize")
+//                                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+//                        )
+//                        .redirectionEndpoint(redir -> redir
+//                                .baseUri("/oauth2/callback/*")
+//                        )
+//                        .tokenEndpoint(tokenEndpoint ->
+//                                tokenEndpoint
+//                                        .accessTokenResponseClient(this.accessTokenResponseClient())
+//                        )
+//                        .userInfoEndpoint(userInfo -> userInfo
+//                                .userService(customOAuth2UserService)
+//                        )
+//
+//                        .successHandler(customOAuth2Success)
+//                        .failureHandler(customOAuth2Failure)
+//                );
+//        http.addFilterBefore(
+//                jwtAuthenticationFilter(),
+//                UsernamePasswordAuthenticationFilter.class
+//        );
         return http.build();
     }
     @Bean

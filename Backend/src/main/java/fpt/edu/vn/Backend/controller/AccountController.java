@@ -3,9 +3,11 @@ package fpt.edu.vn.Backend.controller;
 import com.fasterxml.jackson.databind.DatabindException;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -115,4 +122,22 @@ public class AccountController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/export")
+    public void exportToExcel(HttpServletResponse response){
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=accounts_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        Pageable pageable = Pageable.unpaged();
+        List<AccountDTO> listUsers = accountService.getAccounts(pageable).getContent();
+
+        AccountExporter excelExporter = new AccountExporter(listUsers);
+
+        excelExporter.export(response);
+    }
+
 }
