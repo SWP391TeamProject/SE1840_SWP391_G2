@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.DTO;
 
+import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.pojo.Deposit;
 import lombok.AllArgsConstructor;
@@ -8,8 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -26,7 +26,6 @@ public class AuctionSessionDTO {
     private LocalDateTime updateDate;
     private Set<DepositDTO> deposits;
 
-
     public AuctionSessionDTO(AuctionSession auctionSession) {
         this.auctionSessionId = auctionSession.getAuctionSessionId();
         this.startDate = auctionSession.getStartDate();
@@ -35,12 +34,7 @@ public class AuctionSessionDTO {
         this.createDate = auctionSession.getCreateDate();
         this.updateDate = auctionSession.getUpdateDate();
         this.title = auctionSession.getTitle();
-        this.deposits = (auctionSession.getDeposits() != null)
-                ? auctionSession.getDeposits().stream()
-                .map(DepositDTO::new)
-                .collect(Collectors.toSet())
-                : Collections.emptySet();
-
+        this.deposits = new HashSet<>();
     }
 
     // getters and setters
