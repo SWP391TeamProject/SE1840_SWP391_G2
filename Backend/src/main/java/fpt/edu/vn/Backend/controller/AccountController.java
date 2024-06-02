@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
