@@ -10,7 +10,7 @@ const authHeader = {
     headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
     },
 };
 
