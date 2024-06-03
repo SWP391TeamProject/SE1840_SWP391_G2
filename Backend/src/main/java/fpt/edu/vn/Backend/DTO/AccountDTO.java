@@ -28,7 +28,7 @@ public class AccountDTO {
         this.accountId = account.getAccountId();
         this.nickname = account.getNickname();
         this.role = account.getRole();
-        this.avatar = new AttachmentDTO(account.getAvatarUrl());
+        this.avatar = account.getAvatarUrl()==null? null : new AttachmentDTO(account.getAvatarUrl());
         this.email = account.getEmail();
         this.phone = account.getPhone();
         this.password = account.getPassword();

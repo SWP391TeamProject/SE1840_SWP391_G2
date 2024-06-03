@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.service;
 
 import com.google.common.base.Preconditions;
+import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.exception.MappingException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -38,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
     public @NotNull ItemDTO mapEntityToDTO(@NotNull Item item, @NotNull ItemDTO itemDTO) {
         itemDTO.setItemId(item.getItemId());
         if (item.getItemCategory() != null)
-            itemDTO.setCategoryId(item.getItemCategory().getItemCategoryId());
+            itemDTO.setCategory(new ItemCategoryDTO(item.getItemCategory()));
         itemDTO.setName(item.getName());
         itemDTO.setDescription(item.getDescription());
         itemDTO.setReservePrice(item.getReservePrice());
@@ -47,7 +49,7 @@ public class ItemServiceImpl implements ItemService {
         itemDTO.setCreateDate(item.getCreateDate());
         itemDTO.setUpdateDate(item.getUpdateDate());
         if (item.getOwner() != null)
-            itemDTO.setOwnerId(item.getOwner().getAccountId());
+            itemDTO.setOwner(new AccountDTO(item.getOwner()));
         Order order = item.getOrder();
         if (order != null)
             itemDTO.setOrderId(order.getOrderId());
@@ -57,9 +59,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public @NotNull Item mapDTOToEntity(@NotNull ItemDTO itemDTO, @NotNull Item item) {
         item.setItemId(itemDTO.getItemId());
-        if (itemDTO.getCategoryId() != null)
-            item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategoryId())
-                .orElseThrow(() -> new MappingException("Category not found: " + itemDTO.getCategoryId())));
+        if (itemDTO.getCategory() != null)
+            item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategory().getItemCategoryId())
+                .orElseThrow(() -> new MappingException("Category not found: " + itemDTO.getCategory())));
         if (itemDTO.getName() != null)
             item.setName(itemDTO.getName());
         if (itemDTO.getDescription() != null)
@@ -70,9 +72,9 @@ public class ItemServiceImpl implements ItemService {
             item.setBuyInPrice(itemDTO.getBuyInPrice());
         if (itemDTO.getStatus() != null)
             item.setStatus(itemDTO.getStatus());
-        if (itemDTO.getOwnerId() != null)
-            item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
-                .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwnerId())));
+        if (itemDTO.getOwner() != null)
+            item.setOwner(accountRepos.findById(itemDTO.getOwner().getAccountId())
+                .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwner())));
         if (itemDTO.getOrderId() != null)
             item.setOrder(orderRepos.findById(itemDTO.getOrderId())
                     .orElseThrow(() -> new MappingException("Order not found: " + itemDTO.getOrderId())));
