@@ -89,7 +89,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignment.setConsignmentDetails(new ArrayList<>());
             }
             consignment.getConsignmentDetails().add(detail);
-            consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
+            consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
             consignmentRepos.save(consignment);
             return new ConsignmentDetailDTO(detail);
         } catch (Exception e) {

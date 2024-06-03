@@ -38,7 +38,6 @@ export default function ConsignmentDetail() {
     }, []);
 
     return (
-        <>
             <div className="flex flex-col justify-start w-full h-full m-0 p-3">
                 <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
                     <Card className="basis-3/6">
@@ -120,6 +119,5 @@ export default function ConsignmentDetail() {
 
 
 
-        </>
     )
 }

@@ -121,6 +121,9 @@ export default function ConsignmentList() {
         setStatusFilter(filter);
     }
 
+    const handleEvaluateClick = (consignmentId: number) => {
+        navigate(`/admin/consignments/${consignmentId}/sendEvaluation`);
+    }
     useEffect(() => { }, [consignmentsList]);
 
     useEffect(() => {
@@ -207,8 +210,11 @@ export default function ConsignmentList() {
                                         {/* <TableHead className="hidden md:table-cell">
                                                     Created at
                                                 </TableHead> */}
+                                        <TableHead className="hidden md:table-cell">
+                                            Action
+                                        </TableHead>
                                         <TableHead>
-                                            <span className="sr-only">Actions</span>
+                                            <span className="sr-only">More Actions</span>
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -237,6 +243,12 @@ export default function ConsignmentList() {
                                                 {consignment.status == ConsignmentStatus.IN_INITIAL_EVALUATION ?
                                                     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[consignment.status]}</Badge> :
                                                     <Badge variant="destructive">{ConsignmentStatus[consignment.status]}</Badge>}
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                {consignment.status ==='WAITING_STAFF'?
+                                                    <Button variant="default" className="bg-green-500">Take this</Button> :
+                                                    consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">{"Wating Manager To Approve"}</Badge>:
+                                                    <Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Send {consignment.status==='IN_INITIAL_EVALUATION'?'Initial Evaluation':'Final Evaluation'}</Button>}
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>

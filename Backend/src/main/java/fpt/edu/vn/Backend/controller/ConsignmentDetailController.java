@@ -1,17 +1,13 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.EvaluationDTO;
-import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.exporter.ConsignmentDetailExporter;
 import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentDetailService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +29,7 @@ public class ConsignmentDetailController {
     private ConsignmentService consignmentService;
     @Autowired
     private AttachmentServiceImpl attachmentService;
+
     @Autowired
     public ConsignmentDetailController(ConsignmentDetailService consignmentDetailService) {
         this.consignmentDetailService = consignmentDetailService;
@@ -50,28 +47,33 @@ public class ConsignmentDetailController {
 
     @PostMapping("/createInitialEvaluation")
     public ResponseEntity<ConsignmentDetailDTO> createInitialEvaluation(@ModelAttribute EvaluationDTO evaluationDTO) {
-        ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitInitialEvaluation(evaluationDTO.getAccountId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getConsignmentId());
-        for(MultipartFile f: evaluationDTO.getFiles()){
-            attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+        ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitInitialEvaluation(evaluationDTO.getConsignmentId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getAccountId());
+        if (evaluationDTO.getFiles() != null) {
+            for (MultipartFile f : evaluationDTO.getFiles()) {
+                attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+            }
         }
         return new ResponseEntity<>(consignmentDetailDTO, HttpStatus.OK);
     }
+
     @PostMapping("/createFinalEvaluation")
     public ResponseEntity<ConsignmentDetailDTO> createFinalEvaluation(@ModelAttribute EvaluationDTO evaluationDTO) {
-        ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitFinalEvaluationUpdate(evaluationDTO.getAccountId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getConsignmentId());
-        for(MultipartFile f: evaluationDTO.getFiles()){
-            attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+        ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitFinalEvaluationUpdate(evaluationDTO.getConsignmentId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getAccountId());
+        if (evaluationDTO.getFiles() != null) {
+            for (MultipartFile f : evaluationDTO.getFiles()) {
+                attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+            }
         }
         return new ResponseEntity<>(consignmentDetailDTO, HttpStatus.OK);
     }
 
     @PutMapping("/update/{consignmentDetailId}")
     public ResponseEntity<ConsignmentDetailDTO> updateConsignmentDetail(@PathVariable int consignmentDetailId, @RequestBody ConsignmentDetailDTO updatedConsignmentDetail) {
-        return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId,updatedConsignmentDetail), HttpStatus.OK);
+        return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId, updatedConsignmentDetail), HttpStatus.OK);
     }
 
     @GetMapping("/export")
-    public void exportToExcel(HttpServletResponse response){
+    public void exportToExcel(HttpServletResponse response) {
         response.setContentType("application/octet-stream");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
