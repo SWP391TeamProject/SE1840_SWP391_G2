@@ -27,6 +27,7 @@ public class ConsignmentDTO {
         this.createDate = createDate;
         this.updateDate = updateDate;
         this.consignmentDetails = consignmentDetails;
+        if(staff!=null) staff.setPassword("");
     }
 
     // getters and setters

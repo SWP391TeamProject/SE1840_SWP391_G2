@@ -226,7 +226,7 @@ export default function ConsignmentList() {
                                                 {new Date(consignment.createDate).toLocaleDateString('en-US')}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {consignment.staffId ? consignment.staffId : "Not assigned"}
+                                                {consignment.staff ? consignment.staff.nickname : "Not assigned"}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {consignment.staffId}

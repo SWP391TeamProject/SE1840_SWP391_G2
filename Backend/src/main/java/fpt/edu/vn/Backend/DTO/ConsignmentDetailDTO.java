@@ -30,6 +30,8 @@ public class ConsignmentDetailDTO {
         this.consignmentId = consignmentId;
         this.account = accountId;
         this.attachments = attachmentIds;
+        if(account!=null) account.setPassword("");
+
     }
 
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
@@ -42,7 +44,7 @@ public class ConsignmentDetailDTO {
         this.attachments = consignmentDetail.getAttachments()==null?null:consignmentDetail.getAttachments().stream()
                 .map(AttachmentDTO::new)
                 .collect(Collectors.toList());
-
+        if(account!=null) account.setPassword("");
     }
 
 }
