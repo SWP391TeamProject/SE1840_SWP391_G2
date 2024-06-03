@@ -14,10 +14,10 @@ const authHeader = {
     },
 };
 
-export const getItems = async (page: number, size: number) => {
+export const getItems = async () => {
     return await axios.get<Page<Item>>(`${baseUrl}/`, {
         ...authHeader,
-        params: { page, size },
+        // params: { page, size },
     });
 };
 

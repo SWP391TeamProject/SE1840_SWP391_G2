@@ -36,6 +36,7 @@ import RegisterForm from "./pages/authentication/RegisterForm.tsx";
 import LoginForm from "./pages/authentication/LoginForm.tsx";
 import ConsignmentList from "./pages/Administration/consignments/ConsignmentList.tsx";
 import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDetail.tsx";
+import ItemsList from "./pages/Administration/item/ItemsList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -76,6 +77,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
                       <Route path="consignments" element={<ConsignmentList />}></Route>
                       <Route path="consignments/:id" element={<ConsignmentDetail />}></Route>
+                      {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
+                    </Route>
+                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
+                      <Route path="items" element={<ItemsList />}></Route>
+                      <Route path="items/:id" element={<ItemsList />}></Route>
                       {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                     </Route>
 

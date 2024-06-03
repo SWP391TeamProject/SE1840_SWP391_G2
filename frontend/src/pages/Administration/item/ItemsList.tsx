@@ -43,8 +43,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAccounts, setCurrentAccount, setCurrentPageList } from "@/redux/reducers/Accounts";
-import { fetchAccountsService, deleteAccountService } from "@/services/AccountsServices.ts";
 import {
   Home,
   LineChart,
@@ -64,19 +62,22 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AccountStatus } from "@/constants/enums";
+import { setCurrentItem, setCurrentPageList, setItems } from "@/redux/reducers/Items";
+import { getItems } from "@/services/ItemService";
+import { ItemStatus } from "@/constants/enums";
 
-export default function AccountsList() {
-  const accountsList = useAppSelector((state) => state.accounts);
+export default function ItemsList() {
+  const itemsList = useAppSelector((state) => state.items);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const fetchAccounts = async () => {
+  const fetchItems = async () => {
     try {
-      const list = await fetchAccountsService();
+      const list = await getItems();
+      console.log(list.data.content);
       if (list) {
-        dispatch(setAccounts(list.data.content));
+        dispatch(setItems(list.data.content));
         dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
       }
     } catch (error) {
@@ -84,44 +85,44 @@ export default function AccountsList() {
     }
   };
 
-  const handleEditClick = (accountId: number) => {
-    let account = accountsList.value.find(account => account.accountId == accountId);
-    console.log(account);
-    // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
-    dispatch(setCurrentAccount(account));
-    navigate("/admin/accounts/edit");
+  const handleEditClick = (itemId: number) => {
+    let item = itemsList.value.find(item => item.itemId == itemId);
+    console.log(item);
+    // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
+    dispatch(setCurrentItem(item));
+    navigate("/admin/items/edit");
   }
 
   const handleCreateClick = () => {
-    // let account = accountsList.value.find(account => account.accountId == accountId);
-    // console.log(account);
-    // // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
-    // dispatch(setCurrentAccount(account));
-    navigate("/admin/accounts/create");
+    // let item = itemsList.value.find(item => item.itemId == itemId);
+    // console.log(item);
+    // // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
+    // dispatch(setCurrentItem(item));
+    navigate("/admin/items/create");
   }
 
-  const handleSuspendClick = (accountId: number) => {
-    // console.log(account);
-    // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
-    // dispatch(setCurrentAccount(account));
-    // navigate("/admin/accounts/edit");
-    deleteAccountService(accountId.toString()).then((res) => {
-      console.log(res);
-    })
+  const handleSuspendClick = (itemId: number) => {
+    // console.log(item);
+    // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
+    // dispatch(setCurrentItem(item));
+    // navigate("/admin/items/edit");
+    // deleteItemsetCurrentItemService(itemId.toString()).then((res) => {
+    //   console.log(res);
+    // })
   }
 
-  const handleFilterClick = (status: AccountStatus[], filter: string) => {
-    let filteredList = accountsList.value.filter(x => status.includes(x.status));
+  const handleFilterClick = (status: ItemStatus[], filter: string) => {
+    let filteredList = itemsList.value.filter(x => status.includes(x.status));
     console.log(filteredList);
     dispatch(setCurrentPageList(filteredList));
     setStatusFilter(filter);
   }
 
-  useEffect(() => {}, [accountsList]);
+  useEffect(() => {}, [itemsList]);
 
   useEffect(() => {
-    fetchAccounts();
-    dispatch(setCurrentPageList(accountsList.value));
+    fetchItems();
+    dispatch(setCurrentPageList(itemsList.value));
     setStatusFilter("all");
   }, []);
 
@@ -130,9 +131,12 @@ export default function AccountsList() {
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.ACTIVE, AccountStatus.DISABLED], "all")} value="all">All</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.ACTIVE], "active")} value="active">Active</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.DISABLED], "disabled")} value="disabled">Disabled</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION, ItemStatus.QUEUE,ItemStatus.UNSOLD, ItemStatus.SOLD,ItemStatus.VALUATING], "all")} value="all">All</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION], "in_auction")} value="in_auction">IN_AUCTION</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.QUEUE], "queue")} value="queue">QUEUE</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.UNSOLD], "unsold")} value="unsold">UNSOLD</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.SOLD], "sold")} value="sold">SOLD</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.VALUATING], "valuating")} value="valuating">VALUATING</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>
@@ -163,7 +167,7 @@ export default function AccountsList() {
             <Button size="sm" className="h-8 gap-1" onClick={() => {handleCreateClick()}}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Add Account
+                Add ItemsetCurrentItem
               </span>
             </Button>
           </div>
@@ -171,9 +175,9 @@ export default function AccountsList() {
         <TabsContent value={statusFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>Accounts</CardTitle>
+              <CardTitle>Items</CardTitle>
               <CardDescription>
-                Manage accounts and view their details.
+                Manage items and view their details.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -203,30 +207,30 @@ export default function AccountsList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {accountsList.currentPageList.map((account) => (
-                    <TableRow key={account.accountId}>
+                  {itemsList.currentPageList.map((item) => (
+                    <TableRow key={item.itemId}>
                       <TableCell className="font-medium">
-                        {account.accountId}
+                        {item.itemId}
                       </TableCell>
                       {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
                       <TableCell className="hidden md:table-cell">
-                        {account.nickname}
+                        {item.name}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {account.email}
+                        {item.buyInPrice}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {account.phone}
+                        {item.status}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {account.role[0]?.roleName}
+                        {item.description}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {account.status == AccountStatus.ACTIVE ? 
-                        <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> : 
-                        <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
+                        {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
+                        <Badge variant="default" className="bg-green-500">{ItemsetCurrentItemStatus[item.status]}</Badge> : 
+                        <Badge variant="destructive">{ItemsetCurrentItemStatus[item.status]}</Badge>} */}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -242,8 +246,8 @@ export default function AccountsList() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => { handleEditClick(account.accountId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleSuspendClick(account.accountId) }}>Suspend</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -291,8 +295,8 @@ export default function AccountsList() {
           </Card>
         </TabsContent>
       </Tabs>
-      {/* {accountsList.value.map((account) => (
-        <EditAcc account={account} key={account.accountId} hidden={true} />
+      {/* {itemsList.value.map((item) => (
+        <EditAcc item={item} key={item.itemId} hidden={true} />
       ))} */}
     </main>
   );
