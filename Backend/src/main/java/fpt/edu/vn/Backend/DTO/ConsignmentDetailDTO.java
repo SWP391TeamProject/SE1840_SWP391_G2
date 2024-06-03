@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.DTO;
 
-import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import lombok.Builder;
 import lombok.Data;
@@ -18,28 +17,28 @@ import java.util.stream.Collectors;
 public class ConsignmentDetailDTO {
     private int consignmentDetailId;
     private String description;
-    private String type; // Use String for the enum representation in DTO
+    private String status; // Use String for the enum representation in DTO
     private BigDecimal price;
     private int consignmentId; // Use int for the Consignment reference in DTO
-    private int accountId; // Use int for the Account reference in DTO
+    private AccountDTO account; // Use int for the Account reference in DTO
     private List<AttachmentDTO> attachments; // Use List of Integer for the Attachment references in DTO
-    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, int accountId, List<AttachmentDTO> attachmentIds) {
+    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, AccountDTO accountId, List<AttachmentDTO> attachmentIds) {
         this.consignmentDetailId = consignmentDetailId;
         this.description = description;
-        this.type = type;
+        this.status = type;
         this.price = price;
         this.consignmentId = consignmentId;
-        this.accountId = accountId;
+        this.account = accountId;
         this.attachments = attachmentIds;
     }
 
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
         this.consignmentDetailId = consignmentDetail.getConsignmentDetailId();
         this.description = consignmentDetail.getDescription();
-        this.type = String.valueOf(consignmentDetail.getType());
+        this.status = String.valueOf(consignmentDetail.getStatus());
         this.price = consignmentDetail.getPrice();
         this.consignmentId = consignmentDetail.getConsignment().getConsignmentId();
-        this.accountId = consignmentDetail.getAccount().getAccountId();
+        this.account = new AccountDTO(consignmentDetail.getAccount());
         this.attachments = consignmentDetail.getAttachments()==null?null:consignmentDetail.getAttachments().stream()
                 .map(AttachmentDTO::new)
                 .collect(Collectors.toList());

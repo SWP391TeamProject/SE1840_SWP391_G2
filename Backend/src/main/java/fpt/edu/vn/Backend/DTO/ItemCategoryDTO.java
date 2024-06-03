@@ -11,7 +11,7 @@ public class ItemCategoryDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    ItemCategoryDTO(ItemCategory itemCategory) {
+    public ItemCategoryDTO(ItemCategory itemCategory) {
         this.itemCategoryId = itemCategory.getItemCategoryId();
         this.name = itemCategory.getName();
         this.createDate = itemCategory.getCreateDate();
