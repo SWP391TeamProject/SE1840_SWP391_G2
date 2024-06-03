@@ -38,7 +38,6 @@ export default function ConsignmentDetail() {
     }, []);
 
     return (
-        <>
             <div className="flex flex-col justify-start w-full h-full m-0 p-3">
                 <section className="w-full h-1/3 p-3  mb-3 drop-shadow-lg">
                     <Card>
@@ -115,6 +114,5 @@ export default function ConsignmentDetail() {
 
 
 
-        </>
     )
 }
