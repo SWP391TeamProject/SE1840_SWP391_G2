@@ -5,7 +5,9 @@ import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfo;
 import fpt.edu.vn.Backend.oauth2.user.OAuth2UserInfoFactory;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Account.Role;
+import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +30,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
     @Autowired
     private AccountRepos accountRepos;
+    @Autowired
+    private AttachmentRepos attachmentRepos;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -77,9 +82,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setRole(Role.MEMBER);
         account.setPassword("12345");
-//        account.setAvatarUrl(oAuth2UserInfo.getImageUrl());
-//        account.setPhone(oAuth2UserInfo.getPhone());
-//        account.setProviderId(oAuth2UserInfo.getId());
+        account.setStatus(Account.Status.ACTIVE);
+        account=accountRepos.save(account);
+
+        Attachment attachment=new Attachment();
+        attachment.setLink(oAuth2UserInfo.getImageUrl());
+        attachment.setAccount(account);
+        attachment.setCreateDate(LocalDateTime.now());
+        attachment.setUpdateDate(LocalDateTime.now());
+        attachment=attachmentRepos.save(attachment);
+        account.setAvatarUrl(attachment);
 
         return accountRepos.save(account);
     }
