@@ -17,7 +17,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"; // Import the zodResolver function
 import { date, z } from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
-import { registerAccountService } from "@/services/AuthService";
+import { register } from "@/services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from '../../assets/registration_logo.jpg';
@@ -57,7 +57,7 @@ function RegisterForm() {
   });
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    registerAccountService(values).then((res) => {
+    register(values).then((res) => {
       console.log(res);
       if (res.status === 200) {
         // toast.play("Account created successfully. Please login.",);
