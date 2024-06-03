@@ -80,3 +80,5 @@ export const deleteConsignmentService = async (id: string) => {
     })
     .catch((err) => console.log(err));
 };
+
+

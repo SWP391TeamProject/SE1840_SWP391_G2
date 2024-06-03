@@ -40,8 +40,8 @@ export default function ConsignmentDetail() {
     return (
         <>
             <div className="flex flex-col justify-start w-full h-full m-0 p-3">
-                <section className="w-full h-1/3 p-3  mb-3 drop-shadow-lg">
-                    <Card>
+                <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
+                    <Card className="basis-3/6">
                         <CardHeader>
                             <CardTitle>Consignment #{consignment?.consignmentId}</CardTitle>
                             <CardDescription>Status: {consignment?.status}  </CardDescription>
@@ -53,8 +53,44 @@ export default function ConsignmentDetail() {
                             <p>Prefer contact: {consignment?.preferContact}</p>
                         </CardFooter>
                     </Card>
-                </section>
-                <div className="flex justify-start flex-row w-full gap-2">
+                    <Card className="basis-2/6 h-fit  ">
+                        <CardHeader>
+
+                            <CardTitle className="flex flex-row justify-between items-center">
+
+                                <h3>Customer information</h3>
+                                <Avatar>
+                                    <AvatarImage src="https://github.com/shadcn.png" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                            </CardTitle>
+
+
+                            <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex justify-between items-center">
+                                <div className="flex flex-col w-full">
+                                    <p>
+                                        Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.nickname : null}
+
+                                    </p>
+                                    <p>
+                                        Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}
+                                    </p>
+                                    <p>
+                                        Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.phone : 'not provided'}
+
+                                    </p>
+                                </div>
+
+
+                            </div>
+
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="flex justify-start flex-row w-full mt-1 gap-2">
                     <div className="basis-2/3">
                         {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
                             return (
@@ -77,41 +113,10 @@ export default function ConsignmentDetail() {
                         ) : null}
                     </div>
 
-                    <Card className="basis-1/3">
-                        <CardHeader>
-                            <CardTitle>Customer information
 
-
-                            </CardTitle>
-                            <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex justify-between items-center">
-                                <div className="flex flex-col w-full">
-                                    <p>
-                                        Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.nickname : null}
-
-                                    </p>
-                                    <p>
-                                        Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}
-                                    </p>
-                                    <p>
-                                        Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.phone : 'not provided'}
-
-                                    </p>
-                                </div>
-
-                                <Avatar>
-                                    <AvatarImage src="https://github.com/shadcn.png" />
-                                    <AvatarFallback>CN</AvatarFallback>
-                                </Avatar>
-                            </div>
-
-                        </CardContent>
-                    </Card>
 
                 </div>
-            </div>
+            </div >
 
 
 

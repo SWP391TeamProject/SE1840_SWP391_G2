@@ -66,6 +66,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ConsignmentStatus } from "@/constants/enums";
 import { deleteConsignmentService, fetchAllConsignmentsService } from "@/services/ConsignmentService";
 import { setConsignments, setCurrentConsignment, setCurrentPageList } from "@/redux/reducers/Consignments";
+import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
+import CreateInitialEvaluation from "./CreateInitialEvaluation";
 
 export default function ConsignmentList() {
     const consignmentsList = useAppSelector((state) => state.consignments);
@@ -252,6 +254,12 @@ export default function ConsignmentList() {
                                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                         <DropdownMenuItem onClick={() => { handleEditClick(consignment.consignmentId) }}>Edit</DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => { handleDetailClick(consignment.consignmentId) }}>Detail</DropdownMenuItem>
+                                                        {consignment.status === ConsignmentStatus.IN_INITIAL_EVALUATION ? <UpdateConsignmentStatus id={consignment.consignmentId} /> : ''}
+
+                                                        {consignment.status === ConsignmentStatus.WAITING_STAFF ?
+                                                            <CreateInitialEvaluation/>
+                                                            : ''}
+
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
