@@ -28,13 +28,6 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /**
-     * Handles the login request.
-     *
-     * @param loginDTO The password of the user trying to log in.
-     * @return A ResponseEntity with the login status.
-     * @author Vi LE
-     */
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) {
         AuthResponseDTO authResponseDTO = authService.login(loginDTO);
@@ -46,19 +39,11 @@ public class AuthController {
         return null;
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody String email) {
-
-        return null;
-    }
-
     @GetMapping("/login-with-google")
     public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestParam(required = false) String token) {
         AuthResponseDTO authResponseDTO = authService.loginWithGoogle(token);
         return ResponseEntity.ok(authResponseDTO);
-//        return ResponseEntity.ok(new AuthResponse(token));
     }
-
 
     @GetMapping("/login-with-facebook")
     public ResponseEntity<AuthResponseDTO> loginWithFacebook(@RequestParam String token) {
@@ -82,7 +67,7 @@ public class AuthController {
     }
 
     @PostMapping("/request-reset-password/")
-    public ResponseEntity<AccountDTO> requestResetPassword(@RequestParam int id) {
+    public ResponseEntity<?> requestResetPassword(@RequestParam int id) {
         try {
             authService.requestResetPassword(id);
         } catch (MessagingException e) {
@@ -92,7 +77,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password/")
-    public ResponseEntity<AccountDTO> resetPassword(@RequestParam String newPassword,
+    public ResponseEntity<?> resetPassword(@RequestParam String newPassword,
                                                     @RequestParam String code) {
         if (!authService.confirmResetPassword(code, newPassword)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -101,7 +86,7 @@ public class AuthController {
     }
 
     @PostMapping("/activate-account/")
-    public ResponseEntity<AccountDTO> activateAccount(@RequestParam String code) {
+    public ResponseEntity<?> activateAccount(@RequestParam String code) {
         if (!authService.confirmActivateAccount(code)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
