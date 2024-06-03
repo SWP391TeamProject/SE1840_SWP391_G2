@@ -65,6 +65,7 @@ import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AccountStatus } from "@/constants/enums";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function AccountsList() {
   const accountsList = useAppSelector((state) => state.accounts);
@@ -117,7 +118,7 @@ export default function AccountsList() {
     setStatusFilter(filter);
   }
 
-  useEffect(() => {}, [accountsList]);
+  useEffect(() => { }, [accountsList]);
 
   useEffect(() => {
     fetchAccounts();
@@ -160,7 +161,7 @@ export default function AccountsList() {
                                         Export
                                     </span>
                                 </Button> */}
-            <Button size="sm" className="h-8 gap-1" onClick={() => {handleCreateClick()}}>
+            <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Add Account
@@ -212,7 +213,14 @@ export default function AccountsList() {
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
                       <TableCell className="hidden md:table-cell">
-                        {account.nickname}
+                        <div className="flex items-center ">
+                          <Avatar className="mr-5">
+                            <AvatarImage src={account.avatar != null ? account.avatar.link : 'https://github.com/shadcn.png'} />
+                            <AvatarFallback>SOS</AvatarFallback>
+                          </Avatar>
+                          {account.nickname}
+                          </div>
+
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {account.email}
@@ -221,12 +229,12 @@ export default function AccountsList() {
                         {account.phone}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {account.role[0]?.roleName}
+                        {account.role}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {account.status == AccountStatus.ACTIVE ? 
-                        <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> : 
-                        <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
+                        {account.status == AccountStatus.ACTIVE ?
+                          <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> :
+                          <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>

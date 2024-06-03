@@ -57,7 +57,7 @@ export default function ConsignmentInititalForm() {
     createConsignmentService(data).then((res) => {
       console.log(res);
     });
-   
+
     console.log(data);
   };
 
@@ -82,6 +82,7 @@ export default function ConsignmentInititalForm() {
                 <FormLabel>accountId</FormLabel>
                 <FormControl>
                   <Input
+                    type="hidden"
                     defaultValue={JSON.parse(getCookie("user"))?.id}
                     {...field}
                   />
@@ -207,13 +208,13 @@ export default function ConsignmentInititalForm() {
               </FormItem>
             )}
           />
-       <FormField
-  control={form.control}
-  name="files"
-  render={({ field }) => (
-    <DropzoneComponent {...field} />
-  )}
-/>
+          <FormField
+            control={form.control}
+            name="files"
+            render={({ field }) => (
+              <DropzoneComponent {...field} />
+            )}
+          />
 
           {/* <DropzoneComponent /> */}
 

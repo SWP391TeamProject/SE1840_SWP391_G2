@@ -22,11 +22,7 @@ public class DepositDTO {
         this.depositAmount = deposit.getDepositAmount();
         this.depositDate = deposit.getDepositDate() != null ? deposit.getDepositDate() : "default_date"; // Provide a default date if needed
         this.account = deposit.getAccount() != null ? new AccountDTO(deposit.getAccount()) : null; // Handle potential null account
-        this.payment = null; // Initialize payment with null to break the circular dependency
-    }
-
-    public void setPayment(PaymentDTO payment) {
-        this.payment = payment;
+        this.payment = new PaymentDTO(deposit.getPayment()); // Initialize payment with null to break the circular dependency
     }
 
 }
