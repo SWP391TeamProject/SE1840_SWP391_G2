@@ -246,14 +246,18 @@ export default function ConsignmentList() {
                                                 {consignment.staffId}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {consignment.status == ConsignmentStatus.IN_INITIAL_EVALUATION ?
+                                                {consignment.status != ConsignmentStatus.WAITING_STAFF ?
                                                     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[consignment.status]}</Badge> :
                                                     <Badge variant="destructive">{ConsignmentStatus[consignment.status]}</Badge>}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {consignment.status ==='WAITING_STAFF'?
                                                     <Button onClick={()=> handleTakeClick(consignment.consignmentId)} variant="default" className="bg-green-500">Take this</Button> :
-                                                    consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">{"Wating Manager To Approve"}</Badge>:
+                                                        consignment.status==='IN_INITIAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'INITIAL_EVALUATION') ?<Badge className="bg-emerald-400">Wating Requester To Accept</Badge>:
+                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'MANAGER_ACCEPTED') ?<Badge className="bg-yellow-400">SUCCESS</Badge>:
+                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">Wating Manager To Approve</Badge>:
+                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'MANAGER_REJECTED') ?<Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Resend Final Evaluation</Button>:
+                                                        consignment.status==='SENDING'?<Button>Recieved</Button>:
                                                     <Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Send {consignment.status==='IN_INITIAL_EVALUATION'?'Initial Evaluation':'Final Evaluation'}</Button>}
                                             </TableCell>
                                             <TableCell>

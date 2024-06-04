@@ -90,7 +90,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignment.setConsignmentDetails(new ArrayList<>());
             }
             consignment.getConsignmentDetails().add(detail);
-            consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+            consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
             consignmentRepos.save(consignment);
             return new ConsignmentDetailDTO(detail);
         } catch (Exception e) {
@@ -345,7 +345,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
                 () -> new ConsignmentServiceException("Consignment not found : "+consignmentId));
         if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getStaff() == null) {
-            consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+            consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
             consignment.setStaff(account);
             consignmentRepos.save(consignment);
             return getConsignmentDTO(consignment);
