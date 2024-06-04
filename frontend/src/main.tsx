@@ -39,6 +39,7 @@ import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDe
 import ItemsList from "./pages/Administration/item/ItemsList.tsx";
 import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx";
 import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
+import About from "./pages/about/About.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -93,7 +94,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Route>
                 </Route>
 
-
+                  <Route path="/about" element={<About/>}></Route>
                 <Route path="/auth" element={<AuthenticationLayout />}>
                   <Route path="login" element={<LoginForm />}></Route>
                   <Route path="register" element={<RegisterForm />}></Route>
