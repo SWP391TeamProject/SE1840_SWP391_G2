@@ -26,3 +26,12 @@ export function addRandomHours(hourOffsetMin: number, hourOffsetMax: number, dat
     );
     return newDate.toDate();
 }
+
+export function addRandomMinute(minuteOffsetMin: number, minuteOffsetMax: number, date?: Date) {
+    let newDate = dayjs(date);
+    newDate = newDate.add(
+        faker.number.int({ min: minuteOffsetMin, max: minuteOffsetMax }),
+        "minute"
+    );
+    return newDate.toDate();
+}

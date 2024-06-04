@@ -11,6 +11,7 @@ import {
     ConsignmentDetailStatus
 } from "../model/consignment_detail";
 import dayjs from "dayjs";
+import {NUMBER_OF_CONSIGNMENT} from "../config";
 
 export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: CrawledItem[]): [Consignment[], ConsignmentDetail[]] {
     const consignmentList: Consignment[] = [];
@@ -19,7 +20,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
     let detailId = 1;
 
     outer:
-    for (let i = 0; i < items.length; i++) {
+    for (let i = 0; i < NUMBER_OF_CONSIGNMENT; i++) {
         const numOfDetails = faker.number.int({ min: 1, max: 3 });
         let detailStatus: ConsignmentDetailStatus[] = [];
         const sender = faker.helpers.arrayElement(roleToAccounts.MEMBER);
@@ -38,6 +39,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             consignmentDetailList.push({
                 consignmentId: i + 1,
                 __categoryId: crawledItem.categoryId,
+                __senderId: sender.id,
                 id: detailId++,
                 __name: crawledItem.name,
                 status: status,

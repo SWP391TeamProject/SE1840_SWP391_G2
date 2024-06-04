@@ -1,9 +1,10 @@
 import fs from "fs";
-import {genAccount, updateBalance} from "./gen_account";
+import {genAccount} from "./gen_account";
 import {genItems, prepareItemAndCategory} from "./gen_item";
 import {Account, Role} from "../model/account";
 import {genConsignment} from "./gen_consignment";
 import {simulateAuction} from "./auction_simulator";
+import {PaymentType} from "../model/transaction";
 
 /*
 1. account, citizen_card
@@ -52,7 +53,28 @@ export async function generate() {
     console.log("Simulating auction...");
     const transAndAuction = simulateAuction(accountList.filter(a => a.role == Role.MEMBER), items);
 
-    updateBalance(accountList, transAndAuction[0]);
+    for (const transaction of transAndAuction[0]) {
+        switch (transaction.type) {
+            case PaymentType.DEPOSIT:
+                break;
+            case PaymentType.WITHDRAW:
+                accountList[transaction.accountId-1].balance -= transaction.amount;
+                break;
+            case PaymentType.AUCTION_DEPOSIT:
+                accountList[transaction.accountId-1].balance -= transaction.amount;
+                break;
+            case PaymentType.AUCTION_DEPOSIT_REFUND:
+                accountList[transaction.accountId-1].balance += transaction.amount;
+                break;
+            case PaymentType.AUCTION_ORDER:
+                accountList[transaction.accountId-1].balance -= transaction.amount;
+                break;
+            case PaymentType.CONSIGNMENT_REWARD:
+                accountList[transaction.accountId-1].balance += transaction.amount;
+                break;
+        }
+        accountList[transaction.accountId-1].balance += transaction.amount;
+    }
 
     fs.writeFile(`./data/account.json`, JSON.stringify(accountList), (err) => {
         if (err) throw err;

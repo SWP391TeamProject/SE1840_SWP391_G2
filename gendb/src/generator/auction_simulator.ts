@@ -1,11 +1,19 @@
 import {PaymentStatus, PaymentType, Transaction} from "../model/transaction";
 import {AuctionSession, AuctionStatus} from "../model/auction_session";
 import {Account} from "../model/account";
-import {addRandomDays, addRandomHours} from "../utils/utils";
+import {addRandomDays, addRandomHours, addRandomMinute} from "../utils/utils";
 import {Item, ItemStatus} from "../model/item";
 import {AuctionItem} from "../model/auction_item";
 import {faker} from "@faker-js/faker";
 import dayjs from "dayjs";
+import {
+    MAX_AUCTION_MINUTES, MAX_BID_TIME_INCREMENT,
+    MAX_ITEM_PER_AUCTION,
+    MAX_PARTICIPANT, MIN_AUCTION_MINUTES, MIN_BID_TIME_INCREMENT,
+    MIN_ITEM_PER_AUCTION,
+    MIN_PARTICIPANT,
+    NUMBER_OF_AUCTION
+} from "../config";
 
 export function simulateAuction(members: Account[], items: Item[]): [Transaction[], AuctionSession[]] {
     const transactions: Transaction[] = [];
@@ -16,11 +24,11 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
     let auctionItemId = 1;
 
     outer:
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < NUMBER_OF_AUCTION; i++) {
             const auctionId = i + 1;
             console.log("Generating auction: " + auctionId);
             const startDate = addRandomDays(-365, 100);
-            const endDate = addRandomHours(1, 3, startDate);
+            const endDate = addRandomMinute(MIN_AUCTION_MINUTES, MAX_AUCTION_MINUTES, startDate);
             const createdDate = addRandomDays(-90, -3, startDate);
             const status = now < startDate
                 ? AuctionStatus.SCHEDULED
@@ -30,7 +38,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
             console.log(`Start at ${startDate}, end at ${endDate}, status: ${status}`);
             const auctionItems: AuctionItem[] = [];
 
-            const numOfItems = faker.number.int({ min: 3, max: 5 });
+            const numOfItems = faker.number.int({ min: MIN_ITEM_PER_AUCTION, max: MAX_ITEM_PER_AUCTION });
             console.log(`Number of items: ${numOfItems}`);
 
             for (let j = 0; j < numOfItems; j++) {
@@ -44,7 +52,10 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
                 let currentPrice = 0;
 
-                const numOfParticipants = faker.number.int({min: 10, max: 30});
+                const numOfParticipants = faker.number.int({
+                    min: MIN_PARTICIPANT,
+                    max: MAX_PARTICIPANT
+                });
                 const participants: Account[] = members.filter(m =>
                     m.createDate < dayjs(startDate).subtract(3, 'day').toDate())
                     .slice(0, numOfParticipants);
@@ -98,8 +109,8 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                     while (virtualDate.valueOf() < endDate.getTime()) {
                         bidCount++;
                         virtualDate = virtualDate.add(faker.number.int({
-                            min: 15,
-                            max: 60
+                            min: MIN_BID_TIME_INCREMENT,
+                            max: MAX_BID_TIME_INCREMENT
                         }), 'second');
                         const participant = faker.helpers.arrayElement(participants);
                         lastParticipant = participant;
@@ -142,6 +153,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                                 createDate: orderDate,
                                 auctionItem: null
                             });
+                            item.orderId = transId;
                             transactions.push({
                                 id: transId++,
                                 amount: currentPrice,
@@ -154,6 +166,20 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                                     auctionId: auctionId,
                                 }
                             });
+                            if (item.ownerId !== undefined) {
+                                transactions.push({
+                                    id: transId++,
+                                    amount: currentPrice,
+                                    type: PaymentType.CONSIGNMENT_REWARD,
+                                    status: PaymentStatus.SUCCESS,
+                                    accountId: item.ownerId,
+                                    createDate: orderDate,
+                                    auctionItem: {
+                                        itemId: item.id,
+                                        auctionId: auctionId,
+                                    }
+                                });
+                            }
 
                             // refund
                             for (let entry of deposits.entries()) {

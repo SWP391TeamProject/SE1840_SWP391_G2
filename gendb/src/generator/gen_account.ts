@@ -3,31 +3,39 @@ import {addRandomYears} from '../utils/utils';
 import {CitizenCard} from "../model/citizen_card";
 import {Account, Role} from "../model/account";
 import {PaymentType, Transaction} from "../model/transaction";
+import {
+    ACCOUNT_AGE_MAX, ACCOUNT_AGE_MIN,
+    HAS_CITIZEN_CARD,
+    NUMBER_OF_ACCOUNT,
+    NUMBER_OF_ADMIN,
+    NUMBER_OF_MANAGER,
+    NUMBER_OF_STAFF, OLDEST_ACCOUNT_CREATE_YEAR
+} from "../config";
 
 export function genAccount(): Account[] {
     const accounts: Account[] = [];
 
-    for(let i = 0; i < 1000; i++) {
+    for(let i = 0; i < NUMBER_OF_ACCOUNT; i++) {
         let role: Role;
-        if (i === 0) {
+        if (i < NUMBER_OF_ADMIN) {
             role = Role.ADMIN;
-        } else if (i >= 1 && i <= 3) {
+        } else if (i >= NUMBER_OF_ADMIN && i < NUMBER_OF_ADMIN + NUMBER_OF_MANAGER) {
             role = Role.MANAGER;
-        } else if (i >= 4 && i <= 8) {
+        } else if (i >= NUMBER_OF_ADMIN + NUMBER_OF_MANAGER && i < NUMBER_OF_ADMIN + NUMBER_OF_MANAGER + NUMBER_OF_STAFF) {
             role = Role.STAFF;
         } else {
             role = Role.MEMBER;
         }
-        const accountCreateDate = addRandomYears(-3, 0);
+        const accountCreateDate = addRandomYears(-OLDEST_ACCOUNT_CREATE_YEAR, 0);
         const sex = faker.person.sexType()
         const fullName = faker.person.fullName({sex: sex})
 
-        const citizenCard: CitizenCard | null = faker.number.float() < 0.5 ? null : {
+        const citizenCard: CitizenCard | null = faker.number.float() < HAS_CITIZEN_CARD ? null : {
             cardId: faker.string.numeric({
                 length: 12,
                 allowLeadingZeros: true
             }),
-            birthday: addRandomYears(-50, -20),
+            birthday: addRandomYears(-ACCOUNT_AGE_MAX, -ACCOUNT_AGE_MIN),
             address: faker.location.streetAddress(true),
             city: faker.location.city(),
             fullName: fullName,
@@ -54,26 +62,4 @@ export function genAccount(): Account[] {
     }
 
     return accounts;
-}
-
-export function updateBalance(accountList: Account[], transactions: Transaction[]) {
-    for (const transaction of transactions) {
-        switch (transaction.type) {
-            case PaymentType.DEPOSIT:
-                accountList[transaction.accountId-1].balance += transaction.amount;
-                break;
-            case PaymentType.WITHDRAW:
-                accountList[transaction.accountId-1].balance -= transaction.amount;
-                break;
-            case PaymentType.AUCTION_DEPOSIT:
-                accountList[transaction.accountId-1].balance -= transaction.amount;
-                break;
-            case PaymentType.AUCTION_DEPOSIT_REFUND:
-                accountList[transaction.accountId-1].balance += transaction.amount;
-                break;
-            case PaymentType.AUCTION_ORDER:
-                accountList[transaction.accountId-1].balance -= transaction.amount;
-                break;
-        }
-    }
 }

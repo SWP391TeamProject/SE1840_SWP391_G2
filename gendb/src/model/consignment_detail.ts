@@ -3,6 +3,7 @@ export interface ConsignmentDetail {
     id: number,
     __name: string, // lưu tạm
     __categoryId: number, // lưu tạm
+    __senderId: number, // lưu tạm
     status: ConsignmentDetailStatus,
     description: string,
     price: number,

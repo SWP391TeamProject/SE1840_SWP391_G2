@@ -63,7 +63,7 @@ export function genItems(consignmentDetails: ConsignmentDetail[]): Item[] {
             imageURLs: cd.imageUrls,
             createDate: date,
             updateDate: date,
-            ownerId: undefined, // generate later
+            ownerId: cd.__senderId, // generate later
             orderId: undefined // generate later
         })
     }
