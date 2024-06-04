@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 public class AuctionItemDTO {
     private int auctionItemId;
     private int auctionSessionId;
-    private int itemId;
+    private ItemDTO itemDTO;
     private BigDecimal currentPrice;
 
     public AuctionItemDTO(AuctionItem auctionItem) {
         this.auctionItemId = auctionItem.getAuctionItemId();
         this.auctionSessionId = auctionItem.getAuctionSession().getAuctionSessionId();
-        this.itemId = auctionItem.getItem().getItemId();
+        this.itemDTO = new ItemDTO(auctionItem.getItem());
         this.currentPrice = auctionItem.getCurrentPrice();
     }
 }
