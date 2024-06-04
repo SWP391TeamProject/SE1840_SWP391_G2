@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "citizen_card")
 public class CitizenCard {
     @Id
+    @Column(name = "account_id")
     private int userId;
 
     @OneToOne

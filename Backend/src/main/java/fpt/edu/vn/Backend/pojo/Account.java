@@ -25,6 +25,10 @@ public class Account {
     @Column(name = "account_id")
     private int accountId;
 
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private CitizenCard citizenCard;
+
     @Column(name = "nickname", length = 100)
     private String nickname;
 

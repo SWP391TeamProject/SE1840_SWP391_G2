@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -34,7 +37,6 @@ public class ConsignmentDetail {
     @Column(name = "price")
     private BigDecimal price;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "consignment_id")
     private Consignment consignment;
@@ -46,4 +48,12 @@ public class ConsignmentDetail {
     @OneToMany( fetch = FetchType.LAZY)
     @JoinColumn(name = "consignment_detail_id")
     private List<Attachment> attachments;
+
+    @CreationTimestamp
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
+
+    @UpdateTimestamp
+    @Column(name = "update_date")
+    private LocalDateTime updateDate;
 }
