@@ -37,8 +37,8 @@ public class AuctionItemServiceImpl implements AuctionItemService{
         newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemDTO.getAuctionSessionId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction session id: " + auctionItemDTO.getAuctionSessionId())
         ));
-        newAuctionItem.setItem(itemRepos.findById(auctionItemDTO.getItemId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid item id: " + auctionItemDTO.getItemId())
+        newAuctionItem.setItem(itemRepos.findById(auctionItemDTO.getItemDTO().getItemId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid item id: " + auctionItemDTO.getItemDTO())
         ));
         newAuctionItem.setCurrentPrice(auctionItemDTO.getCurrentPrice());
         auctionItemRepos.save(newAuctionItem);
@@ -53,8 +53,8 @@ public class AuctionItemServiceImpl implements AuctionItemService{
         newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemDTO.getAuctionSessionId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction session id: " + auctionItemDTO.getAuctionSessionId())
         ));
-        newAuctionItem.setItem(itemRepos.findById(auctionItemDTO.getItemId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid item id: " + auctionItemDTO.getItemId())
+        newAuctionItem.setItem(itemRepos.findById(auctionItemDTO.getItemDTO().getItemId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid item id: " + auctionItemDTO.getItemDTO())
         ));
         newAuctionItem.setCurrentPrice(auctionItemDTO.getCurrentPrice());
         auctionItemRepos.save(newAuctionItem);
