@@ -50,7 +50,7 @@ export async function generate() {
 
     // tạo auction session, auction item va transaction
     console.log("Simulating auction...");
-    const transAndAuction = simulateAuction(accountList, items);
+    const transAndAuction = simulateAuction(accountList.filter(a => a.role == Role.MEMBER), items);
 
     updateBalance(accountList, transAndAuction[0]);
 
