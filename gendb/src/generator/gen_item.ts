@@ -5,12 +5,9 @@ import {scrapeItemDetails} from "../crawler/item_detail_crawler";
 import {ItemCategory} from "../model/item_category";
 import {CrawledItem} from "../model/crawled_item";
 import dayjs from "dayjs";
-import {
-    ConsignmentDetail,
-    ConsignmentDetailStatus
-} from "../model/consignment_detail";
 import {Item, ItemStatus} from "../model/item";
 import {addRandomDays} from "../utils/utils";
+import {Consignment, ConsignmentStatus} from "../model/consignment";
 
 export async function prepareItemAndCategory(baseDate: Date): Promise<[ItemCategory[], CrawledItem[]]> {
     const categories = JSON.parse(
@@ -43,27 +40,28 @@ export async function prepareItemAndCategory(baseDate: Date): Promise<[ItemCateg
     return [categoryList, itemList]
 }
 
-export function genItems(consignmentDetails: ConsignmentDetail[]): Item[] {
-    const finishedConsignmentDetails = consignmentDetails
-        .filter(d => d.status == ConsignmentDetailStatus.FINISHED);
+export function genItems(consignments: Consignment[]): Item[] {
+    const availableConsignments = consignments
+        .filter(d => d.status == ConsignmentStatus.FINISHED);
     const items: Item[] = [];
 
-    for (let i = 0; i < finishedConsignmentDetails.length; i++){
-        const cd = finishedConsignmentDetails[i];
+    for (let i = 0; i < availableConsignments.length; i++){
+        const cd = availableConsignments[i];
         const date = addRandomDays(3, 60, cd.createDate);
+        const detail = cd.details[cd.details.length - 1];
 
         items.push({
             id: i + 1,
             categoryId: cd.__categoryId,
             name: cd.__name,
-            description: cd.description,
-            reservePrice: cd.price, // giá sàn
-            buyInPrice: cd.price * faker.number.int({ min: 10, max: 100 }), // gia mua đứt
+            description: detail.description,
+            reservePrice: detail.price, // giá sàn
+            buyInPrice: detail.price * faker.number.int({ min: 10, max: 100 }), // gia mua đứt
             status: ItemStatus.QUEUE, // generate later
-            imageURLs: cd.imageUrls,
+            imageURLs: detail.imageUrls,
             createDate: date,
             updateDate: date,
-            ownerId: cd.__senderId, // generate later
+            ownerId: cd.senderId, // generate later
             orderId: undefined // generate later
         })
     }

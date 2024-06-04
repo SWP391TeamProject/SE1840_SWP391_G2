@@ -47,7 +47,7 @@ export async function generate() {
 
     // tạo item
     console.log("Generating items...");
-    const items = genItems(consignmentList[1]);
+    const items = genItems(consignmentList);
 
     // tạo auction session, auction item va transaction
     console.log("Simulating auction...");
@@ -86,15 +86,10 @@ export async function generate() {
     });
     console.log(`Generated ${categoryAndRawItems[0].length} item categories!`);
 
-    fs.writeFile(`./data/consignment.json`, JSON.stringify(consignmentList[0]), (err) => {
+    fs.writeFile(`./data/consignment.json`, JSON.stringify(consignmentList), (err) => {
         if (err) throw err;
     });
-    console.log(`Generated ${consignmentList[0].length} consignments!`);
-
-    fs.writeFile(`./data/consignment_detail.json`, JSON.stringify(consignmentList[1]), (err) => {
-        if (err) throw err;
-    });
-    console.log(`Generated ${consignmentList[1].length} consignment details!`);
+    console.log(`Generated ${consignmentList.length} consignments!`);
 
     fs.writeFile(`./data/item.json`, JSON.stringify(items), (err) => {
         if (err) throw err;

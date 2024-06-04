@@ -13,61 +13,94 @@ import {
 import dayjs from "dayjs";
 import {NUMBER_OF_CONSIGNMENT} from "../config";
 
-export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: CrawledItem[]): [Consignment[], ConsignmentDetail[]] {
+export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: CrawledItem[]): Consignment[] {
     const consignmentList: Consignment[] = [];
-    const consignmentDetailList: ConsignmentDetail[] = [];
     let itemIndex = 0;
-    let detailId = 1;
 
-    outer:
     for (let i = 0; i < NUMBER_OF_CONSIGNMENT; i++) {
-        const numOfDetails = faker.number.int({ min: 1, max: 3 });
-        let detailStatus: ConsignmentDetailStatus[] = [];
+        if (itemIndex == items.length)
+            break;
+        const crawledItem = items[itemIndex++];
         const sender = faker.helpers.arrayElement(roleToAccounts.MEMBER);
         const sendDate = dayjs(sender.createDate).add(
             faker.number.int({ min: 10, max: 300 }),
             "minute"
-        ).toDate();
+        );
+        let updateDate = sendDate;
+        const details: ConsignmentDetail[] = [];
 
-        for (let j = 0; j < numOfDetails; j++) {
-            let status =  faker.helpers.enumValue(ConsignmentDetailStatus);
-            status = faker.number.float() < 0.9 ? ConsignmentDetailStatus.FINISHED : status;
-            if (itemIndex == items.length)
-                break outer;
-            const crawledItem = items[itemIndex++];
+        let status: ConsignmentStatus = ConsignmentStatus.WAITING_STAFF;
+        details.push({
+            consignmentId: i + 1,
+            status: ConsignmentDetailStatus.REQUEST,
+            description: crawledItem.description,
+            price: faker.number.int({ min: 10000, max: 1000000 }),
+            imageUrls: crawledItem.imageUrls,
+            createDate: updateDate.toDate(),
+            updateDate: updateDate.toDate()
+        });
 
-            consignmentDetailList.push({
+        if (status == ConsignmentStatus.WAITING_STAFF && faker.number.float() < 0.9) {
+            status = ConsignmentStatus.IN_INITIAL_EVALUATION;
+            updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+            details.push({
                 consignmentId: i + 1,
-                __categoryId: crawledItem.categoryId,
-                __senderId: sender.id,
-                id: detailId++,
-                __name: crawledItem.name,
-                status: status,
+                status: ConsignmentDetailStatus.INITIAL_EVALUATION,
                 description: crawledItem.description,
                 price: faker.number.int({ min: 10000, max: 1000000 }),
                 imageUrls: crawledItem.imageUrls,
-                createDate: sendDate,
-                updateDate: sendDate
+                createDate: updateDate.toDate(),
+                updateDate: updateDate.toDate()
             });
-            detailStatus.push(status);
         }
 
-        let status: ConsignmentStatus = detailStatus.every(s => s === ConsignmentDetailStatus.FINISHED)
-            ? ConsignmentStatus.FINISHED
-            : detailStatus.some(s => s === ConsignmentDetailStatus.TERMINATED)
-                ? ConsignmentStatus.TERMINATED
-                : ConsignmentStatus.EVALUATING;
+        if (status == ConsignmentStatus.IN_INITIAL_EVALUATION && faker.number.float() < 0.9) {
+            status = ConsignmentStatus.SENDING;
+            updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+        }
+
+        if (status == ConsignmentStatus.SENDING && faker.number.float() < 0.9) {
+            status = ConsignmentStatus.IN_FINAL_EVALUATION;
+            updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+            details.push({
+                consignmentId: i + 1,
+                status: ConsignmentDetailStatus.FINAL_EVALUATION,
+                description: crawledItem.description,
+                price: faker.number.int({ min: 10000, max: 1000000 }),
+                imageUrls: crawledItem.imageUrls,
+                createDate: updateDate.toDate(),
+                updateDate: updateDate.toDate()
+            });
+        }
+
+        if (status == ConsignmentStatus.IN_FINAL_EVALUATION && faker.number.float() < 0.9) {
+            const res = faker.number.float() < 0.9 ? ConsignmentDetailStatus.MANAGER_ACCEPTED : ConsignmentDetailStatus.MANAGER_REJECTED;
+            status = res == ConsignmentDetailStatus.MANAGER_ACCEPTED ? ConsignmentStatus.FINISHED : ConsignmentStatus.TERMINATED;
+            updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+            details.push({
+                consignmentId: i + 1,
+                status: res,
+                description: crawledItem.description,
+                price: faker.number.int({ min: 10000, max: 1000000 }),
+                imageUrls: crawledItem.imageUrls,
+                createDate: updateDate.toDate(),
+                updateDate: updateDate.toDate()
+            });
+        }
 
         consignmentList.push({
+            __name: crawledItem.name,
+            __categoryId: crawledItem.categoryId,
             id: i + 1,
             senderId: sender.id,
             status: status,
             preferContact: faker.helpers.enumValue(ContactPreference),
             staffId: faker.helpers.arrayElement(roleToAccounts.STAFF).id,
-            createDate: sendDate,
-            updateDate: sendDate
+            createDate: sendDate.toDate(),
+            updateDate: updateDate.toDate(),
+            details
         })
     }
 
-    return [consignmentList, consignmentDetailList];
+    return consignmentList;
 }
