@@ -1,5 +1,6 @@
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export const fetchAllConsignmentsService = async () => {
   return await axios
@@ -70,7 +71,7 @@ export const createConsignmentService = async (data: any) => {
 };
 export const deleteConsignmentService = async (id: string) => {
   return await axios
-    .delete(`http://localhost:8080/api/consignments/${id}`, {
+    .get(`http://localhost:8080/api/consignments/take/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -78,7 +79,21 @@ export const deleteConsignmentService = async (id: string) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .catch((err) => toast.error(err.response.data.message+": you are not allow to delete this consignment"));
 };
 
+export const takeConsignment = async (id: string) => {
+  const data=JSON.parse(getCookie("user"))?.id;
+  
+  return await axios
+    .put(`http://localhost:8080/api/consignments/take/${id}`, data,{
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      }
+    })
+    .catch((err) => toast.error(err.response.data.message+": you are not allow to take this consignment"));
+};
 

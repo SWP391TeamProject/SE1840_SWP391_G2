@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentRequestDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.service.AttachmentService;
@@ -18,15 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/consignments")
@@ -49,7 +47,7 @@ public class ConsignmentController {
         try {
             Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumb);
             Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable);
-            if(consignments == null || consignments.isEmpty()){
+            if (consignments == null || consignments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(consignments, HttpStatus.OK);
@@ -96,16 +94,18 @@ public class ConsignmentController {
     }
 
     @PostMapping("/create")
-        public ResponseEntity<ConsignmentDTO> createConsignment(@ModelAttribute ConsignmentRequestDTO consignmentRequestDTO) {
+    public ResponseEntity<ConsignmentDTO> createConsignment(@ModelAttribute ConsignmentRequestDTO consignmentRequestDTO) {
         try {
             ConsignmentDetailDTO consignmentDetailDTO = new ConsignmentDetailDTO();
             consignmentDetailDTO.setAccount(new AccountDTO(accountRepos.findById(consignmentRequestDTO.getAccountId()).orElseThrow(
-                    ()->new ConsignmentServiceException("No Account found for Consignment"))));
+                    () -> new ConsignmentServiceException("No Account found for Consignment"))));
             consignmentDetailDTO.setDescription(consignmentRequestDTO.getDescription());
             int userId = consignmentDetailDTO.getAccount().getAccountId(); // Hardcoded user ID for now
-            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId,consignmentRequestDTO.getPreferContact(),consignmentDetailDTO);
-            for(MultipartFile f: consignmentRequestDTO.getFiles()){
-                attachmentService.uploadConsignmentDetailAttachment(f,consignment.getConsignmentDetails().stream().filter(x->x.getStatus().equals("REQUEST")).findFirst().get().getConsignmentDetailId() );
+            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId, consignmentRequestDTO.getPreferContact(), consignmentDetailDTO);
+            if (consignmentRequestDTO.getFiles() != null) {
+                for (MultipartFile f : consignmentRequestDTO.getFiles()) {
+                    attachmentService.uploadConsignmentDetailAttachment(f, consignment.getConsignmentDetails().stream().filter(x -> x.getStatus().equals("REQUEST")).findFirst().get().getConsignmentDetailId());
+                }
             }
             return new ResponseEntity<>(consignment, HttpStatus.CREATED);
         } catch (ConsignmentServiceException e) {
@@ -133,6 +133,7 @@ public class ConsignmentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing consignment");
         }
     }
+
     @PostMapping("/rejected/{consignmentId}")
     public ResponseEntity<String> rejectFinalEvaluation(@PathVariable int consignmentId, @RequestParam int accountId, @RequestParam(defaultValue = "Rejected By Manager") String rejectReason) {
         try {
@@ -149,8 +150,14 @@ public class ConsignmentController {
         return consignmentService.deleteConsignment(id);
     }
 
+    @PutMapping("/take/{consignmentId}")
+    public ResponseEntity<ConsignmentDTO> takeConsignment(@PathVariable int consignmentId, @RequestBody int accountId) {
+        logger.info("Taking consignment with ID: " + consignmentId + " by Account ID: " + accountId);
+        return new ResponseEntity<>(consignmentService.takeConsignment(consignmentId, accountId), HttpStatus.OK);
+    }
+
     @GetMapping("/export")
-    public void exportConsignment(HttpServletResponse response){
+    public void exportConsignment(HttpServletResponse response) {
         response.setContentType("application/octet-stream");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
