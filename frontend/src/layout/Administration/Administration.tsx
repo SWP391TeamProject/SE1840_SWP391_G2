@@ -249,10 +249,15 @@ export default function Administration() {
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Avatar className="mr-5">
-                                    <AvatarImage src={JSON.parse(getCookie('user')).avatar != null ? JSON.parse(getCookie('user')).avatar .link : 'https://github.com/shadcn.png'} />
-                                    <AvatarFallback>SOS</AvatarFallback>
-                                </Avatar>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="overflow-hidden rounded-full"
+                                >
+                                    <Avatar>
+                                        <AvatarImage src={JSON.parse(getCookie("user"))?.avatar?.link || 'https://play-lh.googleusercontent.com/jA5PwYqtmoFS7StajBe2EawN4C8WDdltO68JcsrvYKSuhjcTap5QMETkloXSq5soqRBqFjuTAhh28AYrA6A'} />
+                                    </Avatar>
+                                </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>

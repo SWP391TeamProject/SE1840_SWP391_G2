@@ -64,7 +64,7 @@ import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ConsignmentStatus } from "@/constants/enums";
-import { deleteConsignmentService, fetchAllConsignmentsService } from "@/services/ConsignmentService";
+import { deleteConsignmentService, fetchAllConsignmentsService, takeConsignment } from "@/services/ConsignmentService";
 import { setConsignments, setCurrentConsignment, setCurrentPageList } from "@/redux/reducers/Consignments";
 import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
 import CreateInitialEvaluation from "./CreateInitialEvaluation";
@@ -133,6 +133,12 @@ export default function ConsignmentList() {
         setStatusFilter("all");
     }, []);
 
+    const handleTakeClick = (consignmentId: number) => {
+        takeConsignment(consignmentId.toString()).then((res) => {
+            console.log(res);
+            fetchConsignments();
+        });
+    }
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
@@ -241,12 +247,19 @@ export default function ConsignmentList() {
                                                 {consignment.staffId}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
-                                                {consignment.status == ConsignmentStatus.IN_INITIAL_EVALUATION ?
+                                                {consignment.status != ConsignmentStatus.WAITING_STAFF ?
                                                     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[consignment.status]}</Badge> :
                                                     <Badge variant="destructive">{ConsignmentStatus[consignment.status]}</Badge>}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {consignment.status ==='WAITING_STAFF'?
+                                                    <Button onClick={()=> handleTakeClick(consignment.consignmentId)} variant="default" className="bg-green-500">Take this</Button> :
+                                                        consignment.status==='IN_INITIAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'INITIAL_EVALUATION') ?<Badge className="bg-emerald-400">Wating Requester To Accept</Badge>:
+                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'MANAGER_ACCEPTED') ?<Badge className="bg-yellow-400">SUCCESS</Badge>:
+                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">Wating Manager To Approve</Badge>:
+                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'MANAGER_REJECTED') ?<Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Resend Final Evaluation</Button>:
+                                                        consignment.status==='SENDING'?<Button>Recieved</Button>:
+                                                    <Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Send {consignment.status==='IN_INITIAL_EVALUATION'?'Initial Evaluation':'Final Evaluation'}</Button>}
                                                     <Button variant="default" className="bg-green-500">Take this</Button> :
                                                     consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">{"Wating Manager To Approve"}</Badge>:
                                                     <SendEvaluationForm consignmentParent={consignment} />}
