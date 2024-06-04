@@ -155,6 +155,10 @@ public class ConsignmentController {
         logger.info("Taking consignment with ID: " + consignmentId + " by Account ID: " + accountId);
         return new ResponseEntity<>(consignmentService.takeConsignment(consignmentId, accountId), HttpStatus.OK);
     }
+    @GetMapping("/received/{consignmentId}")
+    public ResponseEntity<ConsignmentDTO> receivedConsignment(@PathVariable int consignmentId) {
+        return new ResponseEntity<>(consignmentService.receivedConsignment(consignmentId), HttpStatus.OK);
+    }
 
     @GetMapping("/export")
     public void exportConsignment(HttpServletResponse response) {

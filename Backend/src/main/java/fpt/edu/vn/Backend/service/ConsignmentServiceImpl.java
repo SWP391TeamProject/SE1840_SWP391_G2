@@ -347,10 +347,23 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getStaff() == null) {
             consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
             consignment.setStaff(account);
-            consignmentRepos.save(consignment);
+            consignment=consignmentRepos.save(consignment);
             return getConsignmentDTO(consignment);
         } else {
             throw new ConsignmentServiceException("Consignment just available for staff");
+        }
+    }
+
+    @Override
+    public ConsignmentDTO receivedConsignment(int consignmentId) {
+        Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
+                () -> new ConsignmentServiceException("Consignment not found : "+consignmentId));
+        if (consignment.getStatus().equals(Consignment.Status.SENDING)) {
+            consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+            consignmentRepos.save(consignment);
+            return getConsignmentDTO(consignment);
+        } else {
+            throw new ConsignmentServiceException("Consignment is not in SENDING status");
         }
     }
 }
