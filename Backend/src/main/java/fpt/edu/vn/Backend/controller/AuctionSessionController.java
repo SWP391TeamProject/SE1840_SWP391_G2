@@ -67,6 +67,8 @@ public class AuctionSessionController {
     }
 
 
+
+
     @PutMapping("/{id}")
     public ResponseEntity<AuctionSessionDTO> updateAuctionSession(@RequestBody AuctionSessionDTO auctionDTO) {
         return new ResponseEntity<>(auctionSessionService.updateAuctionSession(auctionDTO), HttpStatus.OK);

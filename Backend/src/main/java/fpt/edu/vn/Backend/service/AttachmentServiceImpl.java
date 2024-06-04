@@ -3,6 +3,8 @@ package fpt.edu.vn.Backend.service;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.sas.BlobContainerSasPermission;
+import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,6 +77,8 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setCreateDate(attachmentDTO.getCreateDate());
         return attachment;
     }
+
+
 
     @Override
     public @NotNull AttachmentDTO uploadAttachment(@NotNull MultipartFile file) throws IOException {

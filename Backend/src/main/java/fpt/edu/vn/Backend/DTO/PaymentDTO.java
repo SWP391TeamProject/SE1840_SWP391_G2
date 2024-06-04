@@ -13,10 +13,12 @@ public class PaymentDTO {
     private int depositId;
 
     public PaymentDTO(Payment payment) {
-        this.paymentId = payment.getPaymentId();
-        this.paymentAmount = payment.getPaymentAmount() != null ? payment.getPaymentAmount() : BigDecimal.ZERO; // Default to 0 if null
-        this.paymentDate = payment.getPaymentDate() != null ? payment.getPaymentDate() : "default_date"; // Provide a default date if needed
-        this.depositId = payment.getDeposit().getDepositId(); // Initialize deposit with null to break the circular dependency
+        if (payment != null) {
+            this.paymentId = payment.getPaymentId();
+            this.paymentAmount = payment.getPaymentAmount() != null ? payment.getPaymentAmount() : BigDecimal.ZERO; // Default to 0 if null
+            this.paymentDate = payment.getPaymentDate() != null ? payment.getPaymentDate() : "default_date"; // Provide a default date if needed
+            this.depositId = payment.getDeposit().getDepositId(); // Initialize deposit with null to break the circular dependency
+        }
     }
 
 

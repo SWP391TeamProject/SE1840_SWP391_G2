@@ -1,3 +1,4 @@
+import CountDownTime from "@/components/countdownTimer/CountDownTime";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Carousel,
@@ -6,17 +7,26 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
 import { getItems } from "@/services/ItemService";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function FeaturedAuctions() {
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
+  const [daysLeft, setDaysLeft] = React.useState(0);
+
+  const getDaysLeft = (endDate: Date) => {
+    const difference = endDate.getTime() - new Date().getTime();
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    return days;
+  };
 
   useEffect(() => {
-    getItems().then((data) => {
-      console.log(data.content);
-      setFeaturedAuctions(data.content);
+    fetchAllAuctionSessions().then((data) => {
+      console.log(data);
+      // setFeaturedAuctions(data.data.content.filter((item) => item.status == "FEATURED"));
+      setFeaturedAuctions(data.data.content);
     });
   }, []);
 
@@ -41,7 +51,7 @@ export default function FeaturedAuctions() {
                       <Card className="w-[300px] h-full">
                         <CardHeader>
                           <img
-                          
+
                             alt="Auction Item"
                             className="rounded-t-lg object-cover"
                             height="225"
@@ -56,18 +66,16 @@ export default function FeaturedAuctions() {
                         <CardContent className="space-y-2">
                           <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold">
-                              {item.name}
+                              {item.title}
                             </h3>
                             <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium dark:bg-gray-800">
-                              {item.reservedPrice}
+                              <CountDownTime end={new Date(item.endDate)}/>
                             </div>
                           </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {item.description}
-                          </p>
+                  
                           <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-500 dark:text-gray-400">
-                              Ends in 3 days
+                              Ends in {getDaysLeft(new Date(item.endDate))} days
                             </div>
                             <Link
                               className="inline-flex h-8 items-center justify-center rounded-md bg-gray-900 px-4 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
