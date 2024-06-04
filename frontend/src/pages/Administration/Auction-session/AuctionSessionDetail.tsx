@@ -1,7 +1,10 @@
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuctionSession } from "@/models/AuctionSessionModel";
 import { useAppSelector } from "@/redux/hooks";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function AuctionSessionDetail() {
 
@@ -11,26 +14,38 @@ export default function AuctionSessionDetail() {
         console.log(auctionSession);
     }, [auctionSession]);
     return <div>
-        <h1 className="font-medium text-5xl">
-            {auctionSession?.title}
-        </h1>
-        <p>
-            Start Date: {new Date(auctionSession?.startDate).toLocaleDateString('en-US')}
-        </p>
-        <p>
-            End Date: {new Date(auctionSession?.endDate).toLocaleDateString('en-US')}
-        </p>
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-2xl font-bold">{auctionSession?.title}</CardTitle>
+                <CardDescription>
+                    Start Date: {new Date(auctionSession?.startDate).toLocaleDateString('en-US')} <br />
+                    End Date: {new Date(auctionSession?.endDate).toLocaleDateString('en-US')}
+                </CardDescription>
+                <Button>
+                    <Link to={`/admin/auction-sessions/${auctionSession?.auctionSessionId}/add-auction-items`}>Add Items</Link>
+                </Button>
+            </CardHeader>
 
-        <p>
-            number of items: {auctionSession?.auctionItems.length}
-        </p>
+            <Separator />
 
-        {auctionSession?.auctionItems.map((item) => {
-            <Card>
-                <h1>{item.title}</h1>
-                <p>{item.description}</p>
-            </Card>
-        })}
+            <CardContent>
+                <p className="text-sm text-muted-foreground">
+                    Number of items: {auctionSession?.auctionItems.length}
+                </p>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {auctionSession?.auctionItems.map((item) => (
+                        <Card key={item.id} className="shadow-md">
+                            <CardHeader>
+                                <CardTitle>{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <CardDescription>{item.description}</CardDescription>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
 
     </div>;
 }

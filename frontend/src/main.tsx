@@ -39,6 +39,11 @@ import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDe
 import ItemsList from "./pages/Administration/item/ItemsList.tsx";
 import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx";
 import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
+import ProfileLayout from "./layout/ProfileLayout/ProfileLayout.tsx";
+import ProfileSetting from "./layout/ProfileLayout/ProfileSetting.tsx";
+import ProfileDetail from "./layout/ProfileLayout/ProfileDetail.tsx";
+import { getCookie } from "./utils/cookies.ts";
+import AddAuctionItems from "./pages/Administration/Auction-session/AddAuctionItems.tsx";
 import About from "./pages/about/About.tsx";
 
 
@@ -104,6 +109,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     path="/consignment"
                     element={<ConsignmentLayout />}
                   ></Route>
+                  <Route path="/profile" element={<ProfileLayout />}>
+                    <Route path="" element={<ProfileDetail profileData={JSON.parse(getCookie('user'))} />}></Route>
+                    <Route path="/profile/settings" element={<ProfileSetting/>}></Route>
+
+                  </Route>
+
                 </Route>
                 <Route path="/Auctions" element={<AuctionsLayout />}>
                   <Route path="/Auctions" element={<AuctionList />}></Route>

@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { set, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -15,8 +15,12 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
+import { toast } from "react-toastify"
+import { createAuctionSession } from "@/services/AuctionSessionService"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState } from "react"
+import { Loader2 } from "lucide-react"
 
 const FormSchema = z.object({
     title: z.string().min(2, {
@@ -34,6 +38,7 @@ const FormSchema = z.object({
 })
 
 export default function AuctionSessionCreate() {
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -46,11 +51,21 @@ export default function AuctionSessionCreate() {
     })
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
+        setIsSubmitting(true)
         console.log(data)
-        toast.success("Auction session created")
+        createAuctionSession(data).then(() => {
+            setIsSubmitting(false)
+            form.reset()
+            toast.success("Auction session created successfully.")
+            
+        })
+            .catch((err) => {
+                setIsSubmitting(false)
+                toast.error('An error occurred while creating the auction session.')
+            })
     }
 
-    
+
 
 
     return (
@@ -115,14 +130,21 @@ export default function AuctionSessionCreate() {
 
 
                 {/* This is the attachments for the auction session. */}
-                <FormField
-                    control={form.control}
-                    name="attachments"
-                    render={({ field }) => (
-                        <DropzoneComponent {...field} control={form.control} />
-                    )}
-                />
-                <Button type="submit">Submit</Button>
+                <ScrollArea className="w-full h-64 overflow-hidden">
+                    <FormField
+                        control={form.control}
+                        name="attachments"
+                        render={({ field }) => (
+                            <DropzoneComponent {...field} control={form.control} />
+                        )}
+                    />
+                </ScrollArea>
+                {isSubmitting
+                    ? <Button variant="default" disabled>
+                        <Loader2 className="animate-spin" size={24} />
+                        Submitting...</Button>
+                    : <Button type="submit" variant="default">Submit</Button>
+                }
             </form>
         </Form>
     )
