@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCurrentConsignment } from "@/redux/reducers/Consignments";
 import { RootState } from "@/redux/store";
 import { fetchConsigntmentDetailByConsignmentId } from "@/services/ConsignmentDetailService";
-import { fetchConsignmentByConsignmentId } from "@/services/ConsignmentService";
+import { fetchConsignmentByConsignmentId, receivedConsignment, takeConsignment } from "@/services/ConsignmentService";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { UploadIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -19,6 +19,9 @@ import ConsignmentDetailDialog from "./ConsignmentDetailDialog";
 import SendEvaluationForm from "./SendEvaluation";
 import { ConsignmentStatus, Roles } from "@/constants/enums";
 import { getCookie } from "@/utils/cookies";
+import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { set } from "react-hook-form";
 
 export default function ConsignmentDetail() {
     const param = useParams();
@@ -40,6 +43,74 @@ export default function ConsignmentDetail() {
         })
     }, []);
 
+    const ConfirmReceive = (consignmentId: any) => {
+        return (
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button variant="default">Confirm item received</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your
+                            account and remove your data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={()=>handleRecieve(consignmentId)}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        )
+
+    }
+
+    const ConfirmTake = (consignmentId: any) => {
+        return (
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button variant="default">Take this consignment</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your
+                            account and remove your data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={()=>handleTake(consignmentId)}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        )
+
+    }
+
+    const handleRecieve = (consignmentId: any) => {
+        receivedConsignment(consignmentId?.consignmentId).then((res) => {
+            console.log(res);
+            setConsignment(res.data);
+            toast.success("Received consignment successfully");
+        }).catch((error) => {
+            console.log(error);
+            toast.error(error.response.data.message);
+        })
+    }
+    const handleTake = (consignmentId: any) => {
+        takeConsignment(consignmentId?.consignmentId).then((res) => {
+            console.log(res);
+            setConsignment(res.data);
+            toast.success("Take consignment successfully");
+        }).catch((error) => {
+            console.log(error);
+            toast.error(error.response.data.message);
+        })
+    }
     return (
         <div className="flex flex-col justify-start w-full h-full m-0 p-3">
             <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
@@ -56,10 +127,13 @@ export default function ConsignmentDetail() {
 
                     </CardContent>
                     <CardFooter>
-                        {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && <SendEvaluationForm consignmentParent={consignment} />}
-                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && <SendEvaluationForm consignmentParent={consignment} />}
-                        {consignment?.status === ConsignmentStatus.SENDING && <Button variant={"default"}> Confirm item received</Button>}
-                        {consignment?.status === ConsignmentStatus.WAITING_STAFF && JSON.parse(getCookie('user')).role === Roles.STAFF && <Button variant={"default"}> Take This</Button>}
+                        {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && !consignment?.consignmentDetails?.some(detail => detail?.status === 'INITIAL_EVALUATION') && <SendEvaluationForm consignmentParent={consignment} />}
+                        {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'INITIAL_EVALUATION') && <Badge className="bg-amber-400	">Waiting Seller Accept</Badge>}
+                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED') && <Badge className="bg-green-300	">Success</Badge>}
+                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') && <Badge className="bg-amber-400	">Waiting Manager Accept</Badge>}
+                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && !consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') &&  !consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED')  && <SendEvaluationForm consignmentParent={consignment} />}
+                        {consignment?.status === ConsignmentStatus.SENDING && <ConfirmReceive consignmentId={consignment?.consignmentId} />}
+                        {consignment?.status === ConsignmentStatus.WAITING_STAFF && JSON.parse(getCookie('user')).role === Roles.STAFF && <ConfirmTake consignmentId={consignment?.consignmentId}  />}
 
                     </CardFooter>
                 </Card>

@@ -96,4 +96,17 @@ export const takeConsignment = async (id: string) => {
     })
     .catch((err) => toast.error(err.response.data.message+": you are not allow to take this consignment"));
 };
+export const receivedConsignment = async (id: string) => {  
+  return await axios
+    .get(`http://localhost:8080/api/consignments/received/${id}`,{
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      }
+    })
+    .catch((err) => toast.error(err.response.data.message+": you are not allow to take this consignment"));
+};
+
 

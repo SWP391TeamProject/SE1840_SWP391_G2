@@ -23,6 +23,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { on } from "events";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { log } from "console";
+import { fetchConsignmentByConsignmentId } from "@/services/ConsignmentService";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
     "image/jpeg",
@@ -64,23 +66,21 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
             consignmentId: consignmentParent.consignmentId,
             files: [],
             evaluation: "",
-            price: 0,
+            price: '0',
         },
     });
     const { errors } = form.formState;
 
     useEffect(() => {
         // console.log(param);
-        setConsignment(consignment);
-        // dispatch(setCurrentConsignment(param.id));
-        // fetchConsignmentByConsignmentId(param.id).then((res) => {
-        //     console.log(res.data.content);
-        //     setConsignment(res.data.content[0]);
-        //     form.setValue('consignmentId', res.data.content[0].consignmentId);
-        // }).catch((error) => {
-        //     console.log(error);
-        //     toast.error(error.response.data.message);
-        // })
+        fetchConsignmentByConsignmentId(consignmentParent.consignmentId).then((res) => {
+            console.log(res.data.content);
+            setConsignment(res.data.content[0]);
+            form.setValue('consignmentId', res.data.content[0].consignmentId);
+        }).catch((error) => {
+            console.log(error);
+            toast.error(error.response.data.message);
+        })
     }, []);
     // 1. Define your form.
 
@@ -102,6 +102,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
             })
         }
         else {
+
             createFinalEvaluation(data).then((res) => {
                 toast.success("Evaluation sent successfully");
                 setOpen(false);
