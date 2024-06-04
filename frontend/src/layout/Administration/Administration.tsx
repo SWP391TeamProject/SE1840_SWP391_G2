@@ -1,5 +1,5 @@
 import FetchButton from '@/components/button/FetchButton'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -249,11 +249,10 @@ export default function Administration() {
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="overflow-hidden rounded-full"
-                                ></Button>
+                                <Avatar className="mr-5">
+                                    <AvatarImage src={JSON.parse(getCookie('user')).avatar != null ? JSON.parse(getCookie('user')).avatar .link : 'https://github.com/shadcn.png'} />
+                                    <AvatarFallback>SOS</AvatarFallback>
+                                </Avatar>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>

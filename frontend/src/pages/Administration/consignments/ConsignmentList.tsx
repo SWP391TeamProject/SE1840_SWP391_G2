@@ -68,6 +68,7 @@ import { deleteConsignmentService, fetchAllConsignmentsService } from "@/service
 import { setConsignments, setCurrentConsignment, setCurrentPageList } from "@/redux/reducers/Consignments";
 import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
 import CreateInitialEvaluation from "./CreateInitialEvaluation";
+import SendEvaluationForm from "./SendEvaluation";
 
 export default function ConsignmentList() {
     const consignmentsList = useAppSelector((state) => state.consignments);
@@ -248,7 +249,7 @@ export default function ConsignmentList() {
                                                 {consignment.status ==='WAITING_STAFF'?
                                                     <Button variant="default" className="bg-green-500">Take this</Button> :
                                                     consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">{"Wating Manager To Approve"}</Badge>:
-                                                    <Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Send {consignment.status==='IN_INITIAL_EVALUATION'?'Initial Evaluation':'Final Evaluation'}</Button>}
+                                                    <SendEvaluationForm consignmentParent={consignment} />}
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>

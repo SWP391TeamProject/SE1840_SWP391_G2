@@ -1,5 +1,6 @@
  import { getCookie } from "@/utils/cookies";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const URL = "http://localhost:8080/api/consignmentDetails/";
 
@@ -62,7 +63,6 @@ export const createInitialEvaluation = async (data: any) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
 };
 export const createFinalEvaluation = async (data: any) => {
   return await axios
@@ -74,6 +74,5 @@ export const createFinalEvaluation = async (data: any) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
 };
 
