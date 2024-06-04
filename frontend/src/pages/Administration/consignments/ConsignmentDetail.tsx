@@ -16,6 +16,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConsignmentDetailDialog from "./ConsignmentDetailDialog";
+import SendEvaluationForm from "./SendEvaluation";
+import { ConsignmentStatus, Roles } from "@/constants/enums";
+import { getCookie } from "@/utils/cookies";
 
 export default function ConsignmentDetail() {
     const param = useParams();
@@ -38,84 +41,92 @@ export default function ConsignmentDetail() {
     }, []);
 
     return (
-            <div className="flex flex-col justify-start w-full h-full m-0 p-3">
-                <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
-                    <Card className="basis-3/6">
-                        <CardHeader>
-                            <CardTitle>Consignment #{consignment?.consignmentId}</CardTitle>
-                            <CardDescription>Status: {consignment?.status}  </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p>Create Date: {new Date(consignment?.createDate).toLocaleDateString('en-US')}</p>
-                        </CardContent>
-                        <CardFooter>
-                            <p>Prefer contact: {consignment?.preferContact}</p>
-                        </CardFooter>
-                    </Card>
-                    <Card className="basis-2/6 h-fit  ">
-                        <CardHeader>
-
-                            <CardTitle className="flex flex-row justify-between items-center">
-
-                                <h3>Customer information</h3>
-                                <Avatar>
-                                    <AvatarImage src="https://github.com/shadcn.png" />
-                                    <AvatarFallback>CN</AvatarFallback>
-                                </Avatar>
-                            </CardTitle>
+        <div className="flex flex-col justify-start w-full h-full m-0 p-3">
+            <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
+                <Card className="basis-3/6">
+                    <CardHeader>
+                        <CardTitle>Consignment #{consignment?.consignmentId}</CardTitle>
+                        <CardDescription>Status: {consignment?.status}  </CardDescription>
 
 
-                            <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex justify-between items-center">
-                                <div className="flex flex-col w-full">
-                                    <p>
-                                        Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.nickname : null}
+                    </CardHeader>
+                    <CardContent>
+                        <p>Create Date: {new Date(consignment?.createDate).toLocaleDateString('en-US')}</p>
+                        <p>Prefer contact: {consignment?.preferContact}</p>
 
-                                    </p>
-                                    <p>
-                                        Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}
-                                    </p>
-                                    <p>
-                                        Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.phone : 'not provided'}
+                    </CardContent>
+                    <CardFooter>
+                        {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && <SendEvaluationForm consignmentParent={consignment} />}
+                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && <SendEvaluationForm consignmentParent={consignment} />}
+                        {consignment?.status === ConsignmentStatus.SENDING && <Button variant={"default"}> Confirm item received</Button>}
+                        {consignment?.status === ConsignmentStatus.WAITING_STAFF && JSON.parse(getCookie('user')).role === Roles.STAFF && <Button variant={"default"}> Take This</Button>}
 
-                                    </p>
-                                </div>
+                    </CardFooter>
+                </Card>
+                <Card className="basis-2/6 h-fit  ">
+                    <CardHeader>
+
+                        <CardTitle className="flex flex-row justify-between items-center">
+
+                            <h3>Customer information</h3>
+                            <Avatar>
+                                <AvatarImage src="https://github.com/shadcn.png" />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                        </CardTitle>
 
 
+                        <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex justify-between items-center">
+                            <div className="flex flex-col w-full">
+                                <p>
+                                    Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.nickname : null}
+
+                                </p>
+                                <p>
+                                    Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}
+                                </p>
+                                <p>
+                                    Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.phone : 'not provided'}
+
+                                </p>
                             </div>
 
-                        </CardContent>
-                    </Card>
+
+                        </div>
+
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="flex justify-start flex-row w-full mt-1 gap-2">
+                <div className="basis-2/3">
+                    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
+                        return (
+                            <Card key={index} className="w-full">
+                                <CardHeader>
+                                    <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
+                                    <CardDescription>{item.status}</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p>description:{item.description}</p>
+                                    <p>price:{item.price ? item.price : "not specified"}</p>
+                                    <div className="w-ful flex justify-between">
+                                        <p>Initiator: {item.account.nickname}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )
+
+                    }
+                    ) : null}
                 </div>
-                <div className="flex justify-start flex-row w-full mt-1 gap-2">
-                    <div className="basis-2/3">
-                        {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
-                            return (
-                                <Card key={index} className="w-full">
-                                    <CardHeader>
-                                        <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
-                                        <CardDescription>{item.status}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>description:{item.description}</p>
-                                        <p>price:{item.price ? item.price : "not specified"}</p>
-                                        <div className="w-ful flex justify-between">
-                                            <p>Initiator: {item.account.nickname}</p>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )
-
-                        }
-                        ) : null}
-                    </div>
 
 
 
-                </div>
-            </div >
+            </div>
+        </div >
 
 
 

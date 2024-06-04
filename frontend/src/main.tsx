@@ -38,6 +38,7 @@ import ConsignmentList from "./pages/Administration/consignments/ConsignmentList
 import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDetail.tsx";
 import ItemsList from "./pages/Administration/item/ItemsList.tsx";
 import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx";
+import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -73,12 +74,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
                       <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
                       <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
+                      <Route path="auction-sessions/:id" element={<AuctionSessionDetail/>}></Route>
+
                       {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                     </Route>
-                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN,Roles.STAFF]} />} >
+                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
                       <Route path="consignments" element={<ConsignmentList />}></Route>
                       <Route path="consignments/:id" element={<ConsignmentDetail />}></Route>
-                      <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route>
+                      {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                       {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                     </Route>
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >

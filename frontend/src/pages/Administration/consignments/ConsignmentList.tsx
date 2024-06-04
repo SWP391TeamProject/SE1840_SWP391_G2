@@ -63,7 +63,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ConsignmentStatus } from "@/constants/enums";
+import { ConsignmentContactPreference, ConsignmentStatus } from "@/constants/enums";
 import { deleteConsignmentService, fetchAllConsignmentsService, takeConsignment } from "@/services/ConsignmentService";
 import { setConsignments, setCurrentConsignment, setCurrentPageList } from "@/redux/reducers/Consignments";
 import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
@@ -211,9 +211,6 @@ export default function ConsignmentList() {
                                         <TableHead className="hidden md:table-cell">
                                             Status
                                         </TableHead>
-                                        <TableHead className="hidden md:table-cell">
-                                            Status
-                                        </TableHead>
                                         {/* <TableHead className="hidden md:table-cell">
                                                     Created at
                                                 </TableHead> */}
@@ -235,7 +232,18 @@ export default function ConsignmentList() {
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
                                             <TableCell className="hidden md:table-cell">
-                                                {consignment.preferContact}
+                                                {(() => {
+                                                    switch (consignment.preferContact) {
+                                                        case ConsignmentContactPreference.EMAIL:
+                                                            return "Email"
+                                                        case ConsignmentContactPreference.PHONE:
+                                                            return "Phone"
+                                                        case ConsignmentContactPreference.TEXT_MESSAGE:
+                                                            return "Text"
+                                                        default:
+                                                            return "Any of the above"
+                                                    }
+                                                })()}
                                             </TableCell>
                                             <TableCell className="hidden md:table-cell">
                                                 {new Date(consignment.createDate).toLocaleDateString('en-US')}
@@ -246,24 +254,27 @@ export default function ConsignmentList() {
                                             <TableCell className="hidden md:table-cell">
                                                 {consignment.staffId}
                                             </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                {consignment.status != ConsignmentStatus.WAITING_STAFF ?
-                                                    <Badge variant="default" className="bg-green-500">{ConsignmentStatus[consignment.status]}</Badge> :
-                                                    <Badge variant="destructive">{ConsignmentStatus[consignment.status]}</Badge>}
+                                            <TableCell>
+                                                {(() => {
+                                                    switch (consignment.status) {
+                                                        case ConsignmentStatus.WAITING_STAFF:
+                                                            return <Badge variant="default" className="bg-yellow-500 w-[200px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
+                                                        case ConsignmentStatus.FINISHED:
+                                                            return <Badge variant="default" className="bg-green-500 w-[200px] text-center flex justify-center items-center">Finished</Badge>;
+                                                        case ConsignmentStatus.IN_INITIAL_EVALUATION:
+                                                            return <Badge variant="default" className="bg-blue-500 w-[200px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
+                                                        case ConsignmentStatus.IN_FINAL_EVALUATION:
+                                                            return <Badge variant="default" className="bg-indigo-500 w-[200px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
+                                                        case ConsignmentStatus.SENDING:
+                                                            return <Badge variant="default" className="bg-purple-500 w-[200px] text-center flex justify-center items-center">Sending</Badge>;
+                                                        case ConsignmentStatus.TERMINATED:
+                                                            return <Badge variant="default" className="bg-red-500 w-[200px] text-center flex justify-center items-center">Terminated</Badge>;
+                                                        default:
+                                                            return <Badge variant="destructive">Unknown Status</Badge>;
+                                                    }
+                                                })()}
                                             </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                {consignment.status ==='WAITING_STAFF'?
-                                                    <Button onClick={()=> handleTakeClick(consignment.consignmentId)} variant="default" className="bg-green-500">Take this</Button> :
-                                                        consignment.status==='IN_INITIAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'INITIAL_EVALUATION') ?<Badge className="bg-emerald-400">Wating Requester To Accept</Badge>:
-                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'MANAGER_ACCEPTED') ?<Badge className="bg-yellow-400">SUCCESS</Badge>:
-                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">Wating Manager To Approve</Badge>:
-                                                        consignment.status==='IN_FINAL_EVALUATION' && consignment.consignmentDetails?.some(x => x.status === 'MANAGER_REJECTED') ?<Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Resend Final Evaluation</Button>:
-                                                        consignment.status==='SENDING'?<Button>Recieved</Button>:
-                                                    <Button variant="destructive" onClick={()=> {handleEvaluateClick(consignment.consignmentId)}}>Send {consignment.status==='IN_INITIAL_EVALUATION'?'Initial Evaluation':'Final Evaluation'}</Button>}
-                                                    <Button variant="default" className="bg-green-500">Take this</Button> :
-                                                    consignment.consignmentDetails?.some(x => x.status === 'FINAL_EVALUATION') ?<Badge className="bg-blue-500">{"Wating Manager To Approve"}</Badge>:
-                                                    <SendEvaluationForm consignmentParent={consignment} />}
-                                            </TableCell>
+
                                             <TableCell>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -280,12 +291,6 @@ export default function ConsignmentList() {
                                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                         <DropdownMenuItem onClick={() => { handleEditClick(consignment.consignmentId) }}>Edit</DropdownMenuItem>
                                                         <DropdownMenuItem onClick={() => { handleDetailClick(consignment.consignmentId) }}>Detail</DropdownMenuItem>
-                                                        {consignment.status === ConsignmentStatus.IN_INITIAL_EVALUATION ? <UpdateConsignmentStatus id={consignment.consignmentId} /> : ''}
-
-                                                        {consignment.status === ConsignmentStatus.WAITING_STAFF ?
-                                                            <CreateInitialEvaluation/>
-                                                            : ''}
-
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>

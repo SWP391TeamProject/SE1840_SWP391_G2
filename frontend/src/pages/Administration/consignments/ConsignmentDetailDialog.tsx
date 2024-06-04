@@ -20,7 +20,7 @@ export default function ConsignmentDetailDialog(consignmentDetail: consignmentDe
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="outline">View Details</Button>
+                <Button variant="outline">View Attachments</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[660px]">
                 <DialogHeader>

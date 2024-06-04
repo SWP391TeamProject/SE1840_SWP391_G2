@@ -118,7 +118,7 @@ export default function AuctionSessionList() {
     let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
     console.log(auctionSession);
     dispatch(setCurrentAuctionSession(auctionSession));
-    navigate("/admin/auctionSessions/detail");
+    navigate(`/admin/auction-sessions/${auctionSessionId}`);
   }
 
 

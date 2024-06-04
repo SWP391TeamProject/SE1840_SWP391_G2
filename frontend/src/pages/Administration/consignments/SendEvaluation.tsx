@@ -22,6 +22,7 @@ import { createFinalEvaluation, createInitialEvaluation } from "@/services/Consi
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { on } from "events";
 import { Loader2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
     "image/jpeg",
@@ -31,7 +32,10 @@ const ACCEPTED_IMAGE_TYPES = [
 ];
 const formSchema = z.object({
     accountId: z.number(),
-    evaluation: z.string().min(10),
+    evaluation: z.string().min(10, {
+        message: "Evaluation must be at least 10 characters long"
+
+    }),
     price: z.string(),
     consignmentId: z.number(),
     files: z.any()
@@ -58,9 +62,13 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
         defaultValues: {
             accountId: JSON.parse(getCookie("user"))?.id,
             consignmentId: consignmentParent.consignmentId,
-            files: []
+            files: [],
+            evaluation: "",
+            price: 0,
         },
     });
+    const { errors } = form.formState;
+
     useEffect(() => {
         // console.log(param);
         setConsignment(consignment);
@@ -113,60 +121,47 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
 
     return (
         <>
-            <AlertDialog open={open} onOpenChange={setOpen}  > 
+            <AlertDialog open={open} onOpenChange={setOpen}  >
                 <AlertDialogTrigger asChild>
                     <Button variant="default">Send Evaluation</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent  className="max-h-[800px] w-4/5 overflow-hidden bg-red-600 " >
+                <AlertDialogContent className="w-80 sm:w-full  sm:max-w-lg max-h-fit" >
                     <AlertDialogHeader>
-                        <AlertDialogTitle>    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                            {consignment?.status === 'IN_INITIAL_EVALUATION' ? 'Initial' : 'Final'} Evaluation Form
-                        </h1></AlertDialogTitle>
-                    </AlertDialogHeader>
-
-                    <AlertDialogDescription>
-                        <div key="1" className="max-w-6xl  mx-auto p-4 sm:p-6 md:p-8">
+                        <AlertDialogTitle>
+                            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                                {consignmentParent && consignmentParent?.status === 'IN_INITIAL_EVALUATION' ? 'Initial' : 'Final'} Evaluation Form
+                            </h1>
                             <div>
-
-                                <p className="mt-2 text-gray-500 dark:text-gray-400">
+                                <p className=" text-gray-500 dark:text-gray-400">
                                     Fill out the form below to submit your evaluation
                                 </p>
                             </div>
+                        </AlertDialogTitle>
+                    </AlertDialogHeader>
+
+                    <AlertDialogDescription>
+                        <div key="1" className=" max-w-full  mx-auto p-2   max-h-fit">
+
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                                    <FormField
-                                        control={form.control}
-                                        name="accountId"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>accountId</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        readOnly
-                                                        defaultValue={JSON.parse(getCookie("user"))?.id}
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                           <FormField
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+                                    <input type="hidden" {...form.register('accountId')} />
+                                    <input type="hidden" {...form.register('consignmentId')} />
+
+                                    {/* <FormField
                                         control={form.control}
                                         name="consignmentId"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Consignment Id</FormLabel>
                                                 <FormControl>
-                                                    <Input readOnly defaultValue={consignment?.consignmentId} {...field} />
+                                                    <Input
+                                                        type="hidden"
+                                                        readOnly defaultValue={consignment?.consignmentId} {...field} />
                                                 </FormControl>
-                                                <FormDescription>
-                                                    this is the id of the consignment you are evaluating
-                                                </FormDescription>
+
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    />
+                                    /> */}
                                     <FormField
                                         control={form.control}
                                         name="evaluation"
@@ -179,7 +174,9 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                                                         {...field}
                                                     />
                                                 </FormControl>
-                                                <FormMessage />
+
+                                                <FormMessage>{errors.evaluation?.message}</FormMessage>
+
                                             </FormItem>
                                         )}
                                     />
@@ -188,41 +185,42 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                                         name="price"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{consignment?.status === 'IN_INITIAL_EVALUATION' ? 'Initial' : 'Final'} Evaluation Price:</FormLabel>
+                                                <FormLabel>{consignmentParent?.status === 'IN_INITIAL_EVALUATION' ? 'Initial' : 'Final'} Evaluation Price:</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="enter price" {...field} />
+                                                    <Input placeholder="enter price"  {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                             
 
-                                    <FormField
-                                        control={form.control}
-                                        name="files"
-                                        render={({ field }) => (
-                                            <DropzoneComponent {...field} />
-                                        )}
-                                    />
+                                    <ScrollArea className="h-[100px] min-w-[350px] rounded-md border p-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="files"
+                                            render={({ field }) => (
+                                                <DropzoneComponent {...field} />
+                                            )}
+                                        />
+                                    </ScrollArea>
+
                                     {/* <DropzoneComponent /> */}
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction asChild>
                                             {isLoading ?
-                                                <Button variant={"destructive"} type="submit" className="w-[150px]"  disabled>
-                                                    <Loader2 className="animate-spin"/>
+                                                <Button variant={"destructive"} type="submit" className="w-[150px]" disabled>
+                                                    <Loader2 className="animate-spin" />
                                                     Submitting...
                                                 </Button>
                                                 :
 
                                                 <Button variant={"destructive"} type="submit" className="w-[150px]" onClick={(event) => {
-                                                    event.preventDefault();
                                                     if (form.formState.isValid) {
                                                         console.log(form.getValues())
-                                                        onSubmit(form.getValues());
+                                                        onSubmit(form.getValues()); // Wait for onSubmit to complete
                                                     } else {
                                                         console.log(form.getValues())
+                                                        console.log(form.formState) // Log the errors
                                                         toast.error("Please fill out the form correctly");
                                                         setOpen(true);
                                                     }
@@ -231,7 +229,6 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                                                     Submit
                                                 </Button>
                                             }
-                                        </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </form>
                             </Form>
