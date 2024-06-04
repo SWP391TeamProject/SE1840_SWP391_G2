@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -335,5 +336,21 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         consignmentRepos.deleteById(id);
 
         return null;
+    }
+
+    @Override
+    public ConsignmentDTO takeConsignment(int consignmentId, int accountId) {
+        Account account = accountRepos.findById(accountId).orElseThrow(
+                () -> new ConsignmentServiceException("Account not found : "+accountId));
+        Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
+                () -> new ConsignmentServiceException("Consignment not found : "+consignmentId));
+        if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getStaff() == null) {
+            consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+            consignment.setStaff(account);
+            consignmentRepos.save(consignment);
+            return getConsignmentDTO(consignment);
+        } else {
+            throw new ConsignmentServiceException("Consignment just available for staff");
+        }
     }
 }

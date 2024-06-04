@@ -35,4 +35,6 @@ public interface ConsignmentService {
 
     // Delete (or Soft Delete)
     ResponseEntity<ConsignmentDTO> deleteConsignment(int id);
+
+    ConsignmentDTO takeConsignment(int consignmentId, int accountId);
 }

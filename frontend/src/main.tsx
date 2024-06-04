@@ -75,7 +75,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                       <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
                       {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                     </Route>
-                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
+                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN,Roles.STAFF]} />} >
                       <Route path="consignments" element={<ConsignmentList />}></Route>
                       <Route path="consignments/:id" element={<ConsignmentDetail />}></Route>
                       <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route>
