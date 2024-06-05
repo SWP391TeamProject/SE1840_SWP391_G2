@@ -33,7 +33,7 @@ public class DbGenService {
     }
 
     private static final Gson GSON = new Gson();
-    private static final File DATA = new File("./gendb/data");
+    private static final File DATA = new File("../gendb/data");
     private static final Logger LOGGER = Logger.getLogger(DbGenService.class.getName());
 
     @Autowired
