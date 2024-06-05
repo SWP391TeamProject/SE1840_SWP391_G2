@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.request.AuctionItemRequestDTO;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
 import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
@@ -32,33 +33,43 @@ public class AuctionItemServiceImpl implements AuctionItemService{
     }
 
     @Override
-    public AuctionItemDTO createAuctionItem(AuctionItemDTO auctionItemDTO) {
+    public AuctionItemDTO createAuctionItem(AuctionItemRequestDTO auctionItemRequestDTO) {
         AuctionItem newAuctionItem = new AuctionItem();
-        newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemDTO.getAuctionSessionId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction session id: " + auctionItemDTO.getAuctionSessionId())
+        newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemRequestDTO.getAuctionSessionId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid auction session id: " + auctionItemRequestDTO.getAuctionSessionId())
         ));
-        newAuctionItem.setItem(itemRepos.findById(auctionItemDTO.getItemDTO().getItemId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid item id: " + auctionItemDTO.getItemDTO())
+        newAuctionItem.setItem(itemRepos.findById(auctionItemRequestDTO.getItemDTO().getItemId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid item id: " + auctionItemRequestDTO.getItemDTO())
         ));
-        newAuctionItem.setCurrentPrice(auctionItemDTO.getCurrentPrice());
+        newAuctionItem.setCurrentPrice(auctionItemRequestDTO.getCurrentPrice());
         auctionItemRepos.save(newAuctionItem);
         return new AuctionItemDTO(newAuctionItem);
 
     }
 
     @Override
-    public AuctionItemDTO updateAuctionItem(AuctionItemDTO auctionItemDTO) {
-        AuctionItem newAuctionItem = auctionItemRepos.findById(auctionItemDTO.getAuctionItemId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemDTO.getAuctionItemId()));
-        newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemDTO.getAuctionSessionId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction session id: " + auctionItemDTO.getAuctionSessionId())
+    public AuctionItemDTO updateAuctionItem(AuctionItemRequestDTO auctionItemRequestDTO) {
+        AuctionItem newAuctionItem = auctionItemRepos.findById(auctionItemRequestDTO.getAuctionItemId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemRequestDTO.getAuctionItemId()));
+        newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemRequestDTO.getAuctionSessionId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid auction session id: " + auctionItemRequestDTO.getAuctionSessionId())
         ));
-        newAuctionItem.setItem(itemRepos.findById(auctionItemDTO.getItemDTO().getItemId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid item id: " + auctionItemDTO.getItemDTO())
+        newAuctionItem.setItem(itemRepos.findById(auctionItemRequestDTO.getItemDTO().getItemId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid item id: " + auctionItemRequestDTO.getItemDTO())
         ));
-        newAuctionItem.setCurrentPrice(auctionItemDTO.getCurrentPrice());
+        newAuctionItem.setCurrentPrice(auctionItemRequestDTO.getCurrentPrice());
         auctionItemRepos.save(newAuctionItem);
         return new AuctionItemDTO(newAuctionItem);
 
     }
+
+    @Override
+    public void deleteAuctionItem(int id) {
+        if (!auctionItemRepos.existsById(id)) {
+            throw new IllegalArgumentException("Invalid auction item id: " + id);
+        }
+        auctionItemRepos.deleteById(id);
+    }
+
+
 }

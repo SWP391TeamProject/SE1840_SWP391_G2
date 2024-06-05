@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.DTO.request.AuctionItemRequestDTO;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.BidService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
@@ -46,7 +47,8 @@ public class BidController {
                 bidDTO = bidService.createBid(bidDTO);
                 AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
                 a.setCurrentPrice(bidDTO.getPrice());
-                auctionItemService.updateAuctionItem(a);
+                AuctionItemRequestDTO auctionItemRequestDTO = new AuctionItemRequestDTO(a);
+                auctionItemService.updateAuctionItem(auctionItemRequestDTO);
                 return ResponseEntity.ok(bidDTO);
             } else {
                 throw new Exception("Bid must be higher than current bid by at least 5");
