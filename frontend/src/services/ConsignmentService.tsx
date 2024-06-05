@@ -109,4 +109,30 @@ export const receivedConsignment = async (id: string) => {
     .catch((err) => toast.error(err.response.data.message+": you are not allow to take this consignment"));
 };
 
+export const rejectEvaluation = async (id: string,accountId:number,reason:any) => {  
+  console.log({accountId: accountId,reason:reason})
+  return await axios
+    .post(`http://localhost:8080/api/consignments/reject/${id}`,{accountId: accountId,reason:reason},{
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      }
+    })
+    .catch((err) => toast.error(err.response.data.message));
+};
+export const acceptEvaluation = async (id: string,accountId:number) => {  
+  console.log({accountId: accountId})
+  return await axios
+    .post(`http://localhost:8080/api/consignments/approve/${id}`,{accountId: accountId},{
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      }
+    })
+    .catch((err) => toast.error(err.response.data.message));
+};
 
