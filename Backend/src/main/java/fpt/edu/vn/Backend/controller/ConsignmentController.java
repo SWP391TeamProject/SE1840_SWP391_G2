@@ -4,7 +4,8 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-import fpt.edu.vn.Backend.DTO.ConsignmentRequestDTO;
+
+import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
 import fpt.edu.vn.Backend.repository.AccountRepos;
