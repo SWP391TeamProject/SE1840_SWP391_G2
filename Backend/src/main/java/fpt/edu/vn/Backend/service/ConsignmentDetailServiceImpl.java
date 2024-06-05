@@ -75,33 +75,27 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             consignmentDetail.setPrice(consignmentDetailDTO.getPrice());
 
             // Fetch Account by ID
-            Account account = accountRepos.findById(consignmentDetailDTO.getAccount().getAccountId()).orElse(null);
-            if (account == null) {
-                throw new ResourceNotFoundException("Account not found");
-            }
+            Account account = accountRepos.findById(consignmentDetailDTO.getAccount().getAccountId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
             consignmentDetail.setAccount(account);
 
             // Set ConsignmentStatus enum
             consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentDetailDTO.getStatus()));
 
             // Fetch Attachments by IDs
-            List<AttachmentDTO> attachmentIds = consignmentDetailDTO.getAttachments();
-            List<Attachment> attachments = attachmentIds.stream()
-                    .map(attachmentId -> attachmentRepos.findById(attachmentId.getAttachmentId()).orElse(null))
-                    .filter(Objects::nonNull)
+            List<Attachment> attachments = consignmentDetailDTO.getAttachments().stream()
+                    .map(attachmentDTO -> attachmentRepos.findById(attachmentDTO.getAttachmentId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Attachment not found: " + attachmentDTO.getAttachmentId())))
                     .collect(Collectors.toList());
             consignmentDetail.setAttachments(attachments);
-
-            // Set other fields as needed
 
             ConsignmentDetail savedConsignmentDetail = consignmentDetailRepos.save(consignmentDetail);
             return new ConsignmentDetailDTO(savedConsignmentDetail);
         } catch (Exception e) {
-            // Handle exceptions
             throw new ResourceNotFoundException("Error creating consignment detail", e);
         }
-
     }
+
 
     @Override
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailDTO updatedConsignmentDetail) {
