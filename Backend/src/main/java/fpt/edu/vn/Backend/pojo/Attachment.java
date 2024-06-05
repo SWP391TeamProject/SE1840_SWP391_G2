@@ -24,35 +24,31 @@ public class Attachment {
     @Column(length = 300, name = "link")
     private String link;
 
-
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
     @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private FileType type; // jpg, png, mp4, etc.
 
-    enum FileType {
+    public enum FileType {
         JPG, PNG, MP4
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @ManyToOne
-    @JoinColumn(name = "consignment_id")
-    private Consignment consignment;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "consignment_detail_id")
     private ConsignmentDetail consignmentDetail;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id")
     private BlogPost blogPost;
 

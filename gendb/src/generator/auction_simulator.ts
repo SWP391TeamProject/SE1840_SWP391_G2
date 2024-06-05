@@ -207,10 +207,10 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
                 auctionItems.push({
                     id: auctionItemId + 1,
-                    item_id: item.id,
-                    current_price: currentPrice,
-                    create_date: createdDate,
-                    update_date: status == AuctionStatus.SCHEDULED ? createdDate :
+                    itemId: item.id,
+                    currentPrice: currentPrice,
+                    createDate: createdDate,
+                    updateDate: status == AuctionStatus.SCHEDULED ? createdDate :
                         (status == AuctionStatus.PROGRESSING ? new Date() : endDate)
                 });
             }
@@ -224,7 +224,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                 createDate: createdDate,
                 updateDate: status == AuctionStatus.SCHEDULED ? createdDate :
                     (status == AuctionStatus.PROGRESSING ? startDate : endDate),
-                imageURLs: auctionItems.map(i => items[i.item_id-1])
+                imageURLs: auctionItems.map(i => items[i.itemId-1])
                     .flatMap(i => i.imageURLs)
                     .slice(0, faker.number.int({ min: 3, max: 10 })),
                 items: auctionItems

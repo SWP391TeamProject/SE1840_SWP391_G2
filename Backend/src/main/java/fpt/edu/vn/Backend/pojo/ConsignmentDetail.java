@@ -17,14 +17,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class ConsignmentDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "consignment_detail_id")
     private int consignmentDetailId;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 5000)
     private String description;
 
     public enum ConsignmentStatus {
@@ -45,7 +44,7 @@ public class ConsignmentDetail {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @OneToMany( fetch = FetchType.LAZY)
+    @OneToMany
     @JoinColumn(name = "consignment_detail_id")
     private List<Attachment> attachments;
 

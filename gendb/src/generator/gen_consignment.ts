@@ -35,7 +35,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             status: ConsignmentDetailStatus.REQUEST,
             description: crawledItem.description,
             price: faker.number.int({ min: 10000, max: 1000000 }),
-            imageUrls: crawledItem.imageUrls,
+            imageURLs: crawledItem.imageUrls,
             createDate: updateDate.toDate(),
             updateDate: updateDate.toDate()
         });
@@ -48,7 +48,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                 status: ConsignmentDetailStatus.INITIAL_EVALUATION,
                 description: crawledItem.description,
                 price: faker.number.int({ min: 10000, max: 1000000 }),
-                imageUrls: crawledItem.imageUrls,
+                imageURLs: crawledItem.imageUrls,
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
             });
@@ -67,7 +67,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                 status: ConsignmentDetailStatus.FINAL_EVALUATION,
                 description: crawledItem.description,
                 price: faker.number.int({ min: 10000, max: 1000000 }),
-                imageUrls: crawledItem.imageUrls,
+                imageURLs: crawledItem.imageUrls,
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
             });
@@ -82,7 +82,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                 status: res,
                 description: crawledItem.description,
                 price: faker.number.int({ min: 10000, max: 1000000 }),
-                imageUrls: crawledItem.imageUrls,
+                imageURLs: crawledItem.imageUrls,
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
             });

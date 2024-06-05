@@ -3,7 +3,7 @@ export interface ConsignmentDetail {
     status: ConsignmentDetailStatus,
     description: string,
     price: number,
-    imageUrls: string[],
+    imageURLs: string[],
     createDate: Date,
     updateDate: Date
 }

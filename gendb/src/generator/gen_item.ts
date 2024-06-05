@@ -33,6 +33,10 @@ export async function prepareItemAndCategory(baseDate: Date): Promise<[ItemCateg
         await scrapeItems(categoryCache.name.toLowerCase())
         const crawledItems = await scrapeItemDetails(categoryCache.name.toLowerCase(), category.id)
 
+        for (let crawledItem of crawledItems) {
+            crawledItem.categoryId = category.id
+        }
+
         categoryList.push(category)
         itemList.push(...crawledItems)
     }
@@ -58,7 +62,7 @@ export function genItems(consignments: Consignment[]): Item[] {
             reservePrice: detail.price, // giá sàn
             buyInPrice: detail.price * faker.number.int({ min: 10, max: 100 }), // gia mua đứt
             status: ItemStatus.QUEUE, // generate later
-            imageURLs: detail.imageUrls,
+            imageURLs: detail.imageURLs,
             createDate: date,
             updateDate: date,
             ownerId: cd.senderId, // generate later

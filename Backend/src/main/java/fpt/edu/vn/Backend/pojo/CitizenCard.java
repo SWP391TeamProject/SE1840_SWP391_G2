@@ -21,7 +21,7 @@ public class CitizenCard {
     @Column(name = "account_id")
     private int userId;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "account_id")
     private Account account;
