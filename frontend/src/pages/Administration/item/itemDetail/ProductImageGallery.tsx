@@ -16,9 +16,9 @@ export default function ProductImageGallery() {
     return (
         <Card className="overflow-hidden  w-full h-[400px]">
             <CardHeader>
-                <CardTitle>Product Images</CardTitle>
+                <CardTitle>Item Images</CardTitle>
                 <CardDescription>
-                    Lipsum dolor sit amet, consectetur adipiscing elit
+                    Upload images of the product.
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center items-center">

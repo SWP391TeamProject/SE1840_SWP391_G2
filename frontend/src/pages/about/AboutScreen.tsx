@@ -33,8 +33,8 @@ export default function AboutScreen() {
 
             </div>
 
-            <div className="flex">
-                <div className="">
+            <div className="flex container">
+                <div className="p-3">
                     <Sidebar
                         about={aboutPosition}
                         ourTeam={ourTeamPosition}
@@ -42,7 +42,7 @@ export default function AboutScreen() {
                         sell={sellPosition}
                     />
                 </div>
-                <div>
+                <div className="p-3">
                     <WhatIs />
                     <div ref={about}>
                         <About />

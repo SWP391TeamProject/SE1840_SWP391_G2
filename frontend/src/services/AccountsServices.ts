@@ -14,25 +14,23 @@ export const fetchAccountsService = async () => {
     })
     .catch((err) => {
       console.log(err);
-      if(err?.response.status == 401) {
+      if (err?.response.status == 401) {
         removeCookie("user");
         removeCookie("token");
       }
     });
 };
 
-export const updateAccountService = async (data: any, id: number) => {
+export const fetchAccountById = async (id: number) => {
   return await axios
-    .put(API_SERVER + "/accounts/" + id, data, {
+    .get(API_SERVER + "/accounts/" + id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        Authorization
+          : "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
 };
 
 export const createAccountService = async (data: any) => {
@@ -47,6 +45,23 @@ export const createAccountService = async (data: any) => {
     })
     .catch((err) => console.log(err));
 };
+
+export const updateAccountService = async (data: any, id: number) => {
+  return await axios
+    .put(API_SERVER + "/accounts/" + id, data, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
+    .catch((err) => console.log(err));
+};
+
+
+
 
 export const deleteAccountService = async (id: string) => {
   return await axios

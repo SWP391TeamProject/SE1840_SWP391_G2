@@ -135,8 +135,8 @@ public class ConsignmentController {
         }
     }
 
-    @PostMapping("/rejected/{consignmentId}")
-    public ResponseEntity<String> rejectFinalEvaluation(@PathVariable int consignmentId, @RequestParam int accountId, @RequestParam(defaultValue = "Rejected By Manager") String rejectReason) {
+    @PostMapping("/reject/{consignmentId}")
+    public ResponseEntity<String> rejectFinalEvaluation(@PathVariable int consignmentId, @RequestParam("accountId") int accountId, @RequestParam(defaultValue = "Rejected By Manager",name = "reason") String rejectReason) {
         try {
             consignmentService.rejectFinalEvaluation(consignmentId, accountId, rejectReason);
             return ResponseEntity.ok("Consignment rejected successfully");

@@ -6,8 +6,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Accounts from '@/pages/Administration/Account/AccountsList'
 import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
 import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
-import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, Backpack } from 'lucide-react'
-import { createContext, useEffect, useState } from 'react'
+import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, Backpack, User2, Menu } from 'lucide-react'
+import React, { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
     DropdownMenu,
@@ -30,10 +30,28 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCookie, removeCookie } from "@/utils/cookies";
+import { fetchAccountById } from '@/services/AccountsServices'
 
 export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
+    const [user, setUser] = React.useState<any>();
+    useEffect(() => {
+        const userCookie = getCookie("user");
+        if (userCookie) {
+            try {
+                const userData = JSON.parse(userCookie);
+                fetchAccountById(userData?.id).then((res) => {
+                    console.log(res.data)
+                    setUser(res.data)
+                }).catch((err) => {
+                    console.log(err);
+                });
+            } catch (err) {
+                console.error("Failed to parse user cookie:", err);
+            }
+        }
+    }, []);
     const [consignments, setConsignments] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
@@ -109,31 +127,15 @@ export default function Administration() {
                                 to="dashboard"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
-                                <Home className="h-4 w-4" />
+                                <Menu />
                                 Dashboard
                             </Link>
-                            {/* <Link
-                                to=""
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                            >
-                                <ShoppingCart className="h-4 w-4" />
-                                Orders
-                                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                                    6
-                                </Badge>
-                            </Link> */}
-                            {/* <Link
-                                to=""
-                                className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
-                            >
-                                <Package className="h-4 w-4" />
-                                Products{" "}
-                            </Link> */}
+
                             <Link
                                 to="accounts"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
-                                <Users className="h-4 w-4" />
+                                <User2 />
                                 Accounts
                             </Link>
                             <Link
@@ -157,24 +159,7 @@ export default function Administration() {
                                 <Backpack />
                                 Manage Item
                             </Link>
-                            {/* <Link
-                                to="consignments"
-                                className={"flex items-center gap-3 rounded-lg  px-3 py-2 text-foreground transition-all hover:text-primary"}
 
-
-                            >
-                                <FolderMinus className="h-4 w-4" />
-                                Consignments
-                            </Link> */}
-
-                            {/* <FetchButton apiFunction={fetchAllConsignmentsService} className={"rounded border border-red-600 text-left h-6 flex flex-row gap-2 justify-left items-center"} buttonName={"Consignments"} setData={setConsignments} navTo={"consignments"} queryKey={['consignments']} icon={<FolderMinus />} /> */}
-                            {/* <Link
-                                to=""
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                            >
-                                <LineChart className="h-4 w-4" />
-                                Analytics
-                            </Link> */}
                         </nav>
                     </div>
                 </div>
@@ -249,15 +234,10 @@ export default function Administration() {
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="overflow-hidden rounded-full"
-                                >
-                                    <Avatar>
-                                        <AvatarImage src={JSON.parse(getCookie("user"))?.avatar?.link || 'https://play-lh.googleusercontent.com/jA5PwYqtmoFS7StajBe2EawN4C8WDdltO68JcsrvYKSuhjcTap5QMETkloXSq5soqRBqFjuTAhh28AYrA6A'} />
-                                    </Avatar>
-                                </Button>
+                                <Avatar className="mr-5">
+                                    <AvatarImage src={user != null ? user?.avatar?.link : 'https://github.com/shadcn.png'} />
+                                    <AvatarFallback>SOS</AvatarFallback>
+                                </Avatar>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
