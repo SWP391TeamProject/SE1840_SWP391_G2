@@ -1,4 +1,4 @@
-package fpt.edu.vn.Backend.DTO;
+package fpt.edu.vn.Backend.DTO.request;
 
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
