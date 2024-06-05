@@ -42,19 +42,13 @@ public class AuctionSession {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-    //Relationships
-    @OneToMany
+
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private List<AuctionItem> auctionItems;
 
-    @OneToMany(mappedBy = "auctionSession")
-    private Set<Deposit> deposits;
-
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
-    private  Set<Attachment> attachments;
-
-
-
+    private List<Attachment> attachments;
 }
 

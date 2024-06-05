@@ -24,23 +24,17 @@ public class Order {
     @Column(name = "order_id")
     private int orderId;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @Column(name = "order_date")
-    private LocalDateTime orderDate;
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
-    @Column(name = "ship_address")
-    private String shipAddress;
-
-    @OneToMany
-
-    @JoinColumn(name = "order_id")
-    private List<Item> items;
-
-    @OneToMany
-    @JoinColumn(name = "order_id")
-    private Set<Payment> payments;
-
+    @Override
+    public int hashCode() {
+        return orderId;
+    }
 }

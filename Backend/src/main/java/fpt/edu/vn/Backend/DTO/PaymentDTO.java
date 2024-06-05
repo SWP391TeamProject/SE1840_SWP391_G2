@@ -2,23 +2,29 @@ package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Payment;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+@NoArgsConstructor
 @Data
 public class PaymentDTO {
-    private int paymentId;
-    private BigDecimal paymentAmount;
-    private String paymentDate;
-    private int depositId;
+    private int id;
+    private BigDecimal amount;
+    private LocalDateTime date;
+    private Payment.Type type;
+    private Payment.Status status;
+    private int accountId;
 
     public PaymentDTO(Payment payment) {
-        if (payment != null) {
-            this.paymentId = payment.getPaymentId();
-            this.paymentAmount = payment.getPaymentAmount() != null ? payment.getPaymentAmount() : BigDecimal.ZERO; // Default to 0 if null
-            this.paymentDate = payment.getPaymentDate() != null ? payment.getPaymentDate() : "default_date"; // Provide a default date if needed
-            this.depositId = payment.getDeposit().getDepositId(); // Initialize deposit with null to break the circular dependency
-        }
+        if (payment == null) return;
+        this.id = payment.getPaymentId();
+        this.amount = payment.getPaymentAmount() != null ? payment.getPaymentAmount() : BigDecimal.ZERO;
+        this.date = payment.getCreateDate();
+        this.type = payment.getType();
+        this.status = payment.getStatus();
+        this.accountId = payment.getAccount().getAccountId();
     }
 
 

@@ -34,6 +34,7 @@ public class Consignment {
     public enum preferContact {
         EMAIL, PHONE , TEXT , ANY
     }
+
     @Column(name = "prefer_contact")
     @Enumerated(EnumType.STRING)
     private preferContact preferContact;
@@ -52,7 +53,6 @@ public class Consignment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
 
 }
 
