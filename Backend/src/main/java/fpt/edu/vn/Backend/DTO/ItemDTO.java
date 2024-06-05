@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -23,6 +26,7 @@ public class ItemDTO {
     private LocalDateTime updateDate;
     private AccountDTO owner;
     private Integer orderId;
+    private Set<AttachmentDTO> attachments;
 
     public ItemDTO(Item item) {
         this.itemId = item.getItemId();
@@ -36,5 +40,6 @@ public class ItemDTO {
         this.updateDate = item.getUpdateDate();
         this.owner = new AccountDTO(item.getOwner());
         this.orderId = item.getOrder()==null?null:item.getOrder().getOrderId();
+        this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
     }
 }
