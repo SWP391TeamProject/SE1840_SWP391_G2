@@ -56,4 +56,12 @@ public class AuctionItemServiceImpl implements AuctionItemService{
         return new AuctionItemDTO(newAuctionItem);
 
     }
+
+    @Override
+    public void deleteById(AuctionItemId id) {
+        if (!auctionItemRepos.existsById(id)) {
+            throw new IllegalArgumentException("Invalid auction item id: " + id);
+        }
+        auctionItemRepos.deleteById(id);
+    }
 }
