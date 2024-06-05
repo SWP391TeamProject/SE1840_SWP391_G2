@@ -19,6 +19,9 @@ import { Loader2 } from "lucide-react";
 import DropzoneComponent from "../../components/drop-zone/DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
 import { createConsignmentService } from "@/services/ConsignmentService";
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "react-toastify";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -62,9 +65,13 @@ export default function ConsignmentInititalForm() {
     setIsLoading(true);
     // Remove FormData creation and file handling
     createConsignmentService(data).then((res) => {
-      console.log(res);
+      toast.success("Consignment created successfully");
       setIsLoading(false);
-    });
+    }).catch((err) => {
+      toast.error("Failed to create consignment");
+      setIsLoading(false);
+    }
+    );
 
     console.log(data);
   };
@@ -72,169 +79,178 @@ export default function ConsignmentInititalForm() {
   return (
     <>
       {
-        isLoading &&
-        <div className="w-screen h-screen flex justify-center items-center absolute bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 opacity-75 transition-opacity duration-500 ease-in-out">
-          <div className="space-y-3 text-center">
-            <Loader2 className="animate-spin text-white text-6xl" />
-            <p className="text-white text-2xl">Loading...</p>
+        isLoading ?
+          <LoadingAnimation />
+          :
+
+          <div className="w-full min-h-screen flex flex-row flex-nowrap container">
+
+            <div key="1" className="flex justify-start align-top flex-col basis-4/4 md:basis-2/4 max-w-6xl p-4 sm:p-6 md:p-8">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  List your item for consignment
+                </h1>
+                <p className="mt-2 text-gray-500 dark:text-gray-400">
+                  Fill out the form below to list your item for consignment. We'll
+                  review your submission and get back to you within 2 business days.
+                </p>
+              </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+                  <input type="hidden" name="accountId" value={JSON.parse(getCookie("user"))?.id} />
+                  <FormField
+                    control={form.control}
+                    name="contactName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contact Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="enter your prefer contact name here"
+                            defaultValue={JSON.parse(getCookie("user"))?.username}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          this is the Name we used to contact you
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="adasd"
+                            defaultValue={JSON.parse(getCookie("user"))?.email}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          this is the email we used to contact you
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="shadcn" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          this is the phone we used to contact you
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="preferContact"
+                    render={({ field }) => (
+                      <FormItem className="space-y-3">
+                        <FormLabel>Communication Preferences</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-col space-y-1"
+                          >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="email" />
+                              </FormControl>
+                              <FormLabel className="font-normal">Email</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="phone" />
+                              </FormControl>
+                              <FormLabel className="font-normal">Phone calls</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="text" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Text message
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="any" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Any of the above
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          {/* <Input type="" placeholder="sadasd" {...field} /> */}
+                          <Textarea placeholder="nihaoma" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Describe the item you'd like to consign. Include any relevant
+                          details about the item's condition, history, and provenance.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <ScrollArea className="h-[200px]">
+                    <FormField
+                      control={form.control}
+                      name="files"
+                      render={({ field }) => (
+                        <DropzoneComponent {...field} />
+                      )}
+                    />
+                  </ScrollArea>
+
+                  {/* <DropzoneComponent /> */}
+                  {isLoading ?
+                    <Button variant={"default"} disabled>
+                      Loading
+                    </Button>
+                    :
+                    <Button variant={"default"} type="submit">
+                      Submit
+                    </Button>
+                  }
+                </form>
+              </Form>
+            </div>
+
+            <div className="hidden md:block basis-2/4 p-5">
+              <img
+                src="src\assets\thumnail1.jpg"
+                alt=""
+                className="object-cover w-full h-full border rounded-lg shadow-lg"
+              />
+            </div>
           </div>
-        </div>
+
       }
-
-      <div key="1" className="max-w-6xl  mx-auto p-4 sm:p-6 md:p-8">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            List your item for consignment
-          </h1>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Fill out the form below to list your item for consignment. We'll
-            review your submission and get back to you within 2 business days.
-          </p>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <input type="hidden" name="accountId" value={JSON.parse(getCookie("user"))?.id} />
-            <FormField
-              control={form.control}
-              name="contactName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Contact Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="enter your prefer contact name here"
-                      defaultValue={JSON.parse(getCookie("user"))?.username}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    this is the Name we used to contact you
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="adasd"
-                      defaultValue={JSON.parse(getCookie("user"))?.email}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    this is the email we used to contact you
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="shadcn" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    this is the phone we used to contact you
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="preferContact"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Communication Preferences</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="email" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Email</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="phone" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Phone calls</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="text" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          Text message
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="any" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          Any of the above
-                        </FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    {/* <Input type="" placeholder="sadasd" {...field} /> */}
-                    <Textarea placeholder="nihaoma" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Describe the item you'd like to consign. Include any relevant
-                    details about the item's condition, history, and provenance.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="files"
-              render={({ field }) => (
-                <DropzoneComponent {...field} />
-              )}
-            />
-
-            {/* <DropzoneComponent /> */}
-            {isLoading ?
-              <Button variant={"default"} disabled>
-                Loading
-              </Button>
-              :
-              <Button variant={"default"} type="submit">
-                Submit
-              </Button>
-            }
-          </form>
-        </Form>
-      </div>
-
 
     </>
 

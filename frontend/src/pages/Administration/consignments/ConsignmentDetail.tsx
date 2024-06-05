@@ -22,6 +22,7 @@ import { getCookie } from "@/utils/cookies";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { set } from "react-hook-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConsignmentDetail() {
     const param = useParams();
@@ -59,7 +60,7 @@ export default function ConsignmentDetail() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={()=>handleRecieve(consignmentId)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleRecieve(consignmentId)}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -83,7 +84,7 @@ export default function ConsignmentDetail() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={()=>handleTake(consignmentId)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleTake(consignmentId)}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -131,9 +132,9 @@ export default function ConsignmentDetail() {
                         {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'INITIAL_EVALUATION') && <Badge className="bg-amber-400	">Waiting Seller Accept</Badge>}
                         {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED') && <Badge className="bg-green-300	">Success</Badge>}
                         {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') && <Badge className="bg-amber-400	">Waiting Manager Accept</Badge>}
-                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && !consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') &&  !consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED')  && <SendEvaluationForm consignmentParent={consignment} />}
+                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && !consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') && !consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED') && <SendEvaluationForm consignmentParent={consignment} />}
                         {consignment?.status === ConsignmentStatus.SENDING && <ConfirmReceive consignmentId={consignment?.consignmentId} />}
-                        {consignment?.status === ConsignmentStatus.WAITING_STAFF && JSON.parse(getCookie('user')).role === Roles.STAFF && <ConfirmTake consignmentId={consignment?.consignmentId}  />}
+                        {consignment?.status === ConsignmentStatus.WAITING_STAFF && JSON.parse(getCookie('user')).role === Roles.STAFF && <ConfirmTake consignmentId={consignment?.consignmentId} />}
 
                     </CardFooter>
                 </Card>
@@ -176,25 +177,28 @@ export default function ConsignmentDetail() {
             </div>
             <div className="flex justify-start flex-row w-full mt-1 gap-2">
                 <div className="basis-2/3">
-                    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
-                        return (
-                            <Card key={index} className="w-full">
-                                <CardHeader>
-                                    <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
-                                    <CardDescription>{item.status}</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>description:{item.description}</p>
-                                    <p>price:{item.price ? item.price : "not specified"}</p>
-                                    <div className="w-ful flex justify-between">
-                                        <p>Initiator: {item.account.nickname}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )
+                    <ScrollArea className="w-full h-72">
+                        {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
+                            return (
+                                <Card key={index} className="w-full">
+                                    <CardHeader>
+                                        <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
+                                        <CardDescription>{item.status}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>description:{item.description}</p>
+                                        <p>price:{item.price ? item.price : "not specified"}</p>
+                                        <div className="w-ful flex justify-between">
+                                            <p>Initiator: {item.account.nickname}</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )
 
-                    }
-                    ) : null}
+                        }
+                        ) : null}
+                    </ScrollArea>
+
                 </div>
 
 
