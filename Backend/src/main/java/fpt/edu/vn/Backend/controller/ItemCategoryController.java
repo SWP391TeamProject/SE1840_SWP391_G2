@@ -34,7 +34,7 @@ public class ItemCategoryController {
         return ResponseEntity.ok(createdItemCategory);
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<ItemCategoryDTO> updateItemCategory(
             @RequestBody ItemCategoryRequestDTO itemCategoryRequestDTO) {
         ItemCategoryDTO updatedItemCategory = itemCategoryService.updateItemCategory(itemCategoryRequestDTO);
