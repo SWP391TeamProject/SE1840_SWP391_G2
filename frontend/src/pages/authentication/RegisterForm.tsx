@@ -26,7 +26,7 @@ gsap.registerPlugin(useGSAP);
 const formSchema = z
   .object({
     name: z.string().min(5, {
-      message: "Name must be at least 8 characters.",
+      message: "Name must be at least 5 characters.",
     }),
     email: z.string().email({
       message: "Invalid email address.",
