@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
@@ -134,7 +135,7 @@ public class AuthServiceImpl implements AuthService{
                 .builder()
                 .id(user.getAccountId())
                 .accessToken(token)
-                .username(user.getNickname())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();
@@ -160,14 +161,8 @@ public class AuthServiceImpl implements AuthService{
         String email = jwtGenerator.getEmailFromToken(token);
         Optional<Account> userOptional = accountRepos.findByEmail(email);
         Account user = userOptional.get();
-        return AuthResponseDTO
-                .builder()
-                .id(user.getAccountId())
-                .accessToken(token)
-                .username(user.getNickname())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+        return new AuthResponseDTO(user, token);
+
     }
 
     @Override
@@ -175,14 +170,7 @@ public class AuthServiceImpl implements AuthService{
         String email = jwtGenerator.getEmailFromToken(token);
         Optional<Account> userOptional = accountRepos.findByEmail(email);
         Account user = userOptional.get();
-        return AuthResponseDTO
-                .builder()
-                .id(user.getAccountId())
-                .accessToken(token)
-                .username(user.getNickname())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .build();
+        return new AuthResponseDTO(user, token);
     }
 
     @Override
