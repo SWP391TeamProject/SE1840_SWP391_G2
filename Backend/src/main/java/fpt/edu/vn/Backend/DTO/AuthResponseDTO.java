@@ -13,8 +13,8 @@ import lombok.ToString;
 public class AuthResponseDTO {
     private int id;
     private String accessToken;
-    private String username;
     private Account.Role role;
+    private Account.Status status;
     private String refreshToken;
     private String email;
     private String phone;
