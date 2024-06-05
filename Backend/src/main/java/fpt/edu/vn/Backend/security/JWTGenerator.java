@@ -10,6 +10,7 @@ import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -47,6 +48,7 @@ public class JWTGenerator {
 				.setSubject(email)
 				.setIssuedAt(currentDate)
 				.setExpiration(expireDate)
+				.setId(UUID.randomUUID().toString())
 				.signWith(getSigningKey(), SignatureAlgorithm.HS512)
 				.compact();
 	}

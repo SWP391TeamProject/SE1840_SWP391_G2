@@ -1,21 +1,55 @@
 package fpt.edu.vn.Backend.oauth2.security;
+
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
+import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
+import fpt.edu.vn.Backend.oauth2.exception.AppException;
+import fpt.edu.vn.Backend.oauth2.exception.ErrorCode;
+import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.InvalidatedToken;
+import fpt.edu.vn.Backend.repository.InvalidatedTokenRepos;
 import fpt.edu.vn.Backend.security.SecurityConstants;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.experimental.NonFinal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.security.Security;
+
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+
+import java.util.UUID;
 
 @Service
 public class TokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
+    @NonFinal
+    @Value("${jwt.signerKey}")
+    protected String SIGNER_KEY;
+
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    protected long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    protected long REFRESHABLE_DURATION;
+
+    @Autowired
+    private InvalidatedTokenRepos invalidatedTokenRepos;
 
     private Key getSigningKey() {
         byte[] keyBytes = SecurityConstants.JWT_SECRET.getBytes(
@@ -24,27 +58,12 @@ public class TokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-
-    public String createToken(Authentication authentication) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        String email = authentication.getName();
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + SecurityConstants.JWT_EXPIRATION);
-
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
-                .compact();
-    }
-
     public String getEmailFromToken(String token) {
         Claims claims =
-                 Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                Jwts.parser()
+                        .setSigningKey(getSigningKey())
+                        .parseClaimsJws(token)
+                        .getBody();
 
         return claims.getSubject();
     }
@@ -73,4 +92,35 @@ public class TokenProvider {
 
 
 
+    public SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expiryTime = (isRefresh)
+                ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
+                .toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        var verified = signedJWT.verify(verifier);
+
+        if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        if (invalidatedTokenRepos.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return signedJWT;
+    }
+    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
+        var token = request.getToken();
+        boolean isValid = true;
+
+        try {
+            verifyToken(token, false);
+        } catch (AppException e) {
+            isValid = false;
+        }
+
+        return IntrospectResponse.builder().valid(isValid).build();
+    }
 }
