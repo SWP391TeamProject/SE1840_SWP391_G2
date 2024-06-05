@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.request.AuctionItemRequestDTO;
+import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.BidService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
@@ -33,17 +34,20 @@ public class BidController {
     @Autowired
     private AuctionItemService auctionItemService;
 
-    @MessageMapping("/chat.sendMessage/{auctionItemId}")
-    @SendTo("/topic/public/{auctionItemId}")
-    public ResponseEntity<BidDTO> sendMessage(@Payload BidDTO bidDTO, @DestinationVariable int auctionItemId,
+    @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
+    @SendTo("/topic/public/{auctionSessionId}/{itemId}")
+    public ResponseEntity<BidDTO> sendMessage(@Payload BidDTO bidDTO,
+                                              @DestinationVariable int auctionSessionId,
+                                              @DestinationVariable int itemId,
                                               SimpMessageHeaderAccessor headerAccessor) {
         try {
+            AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
             bidDTO.setAuctionItemId(auctionItemId);
-            BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPrice();
+            BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getAmount();
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
-            log.info(account.getEmail() + " bid " + bidDTO.getPrice() + " on " + bidDTO.getAuctionItemId());
+            log.info(account.getEmail() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId());
 
-            if (bidDTO.getPrice().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
+            if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
                 bidDTO = bidService.createBid(bidDTO);
                 AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
                 a.setCurrentPrice(bidDTO.getPrice());
@@ -58,17 +62,21 @@ public class BidController {
         }
     }
 
-    @MessageMapping("/chat.addUser/{auctionItemId}")
-    @SendTo("/topic/public/{auctionItemId}")
-    public ResponseEntity<String> addUser(@Payload BidDTO bidDTO, @DestinationVariable int auctionItemId, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("/chat.addUser/{auctionSessionId}/{itemId}")
+    @SendTo("/topic/public/{auctionSessionId}/{itemId}")
+    public ResponseEntity<String> addUser(@Payload BidDTO bidDTO,
+                                          @DestinationVariable int auctionSessionId,
+                                          @DestinationVariable int itemId,
+                                          SimpMessageHeaderAccessor headerAccessor) {
+        AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
         // Add username in web socket session
-        AccountDTO persistedAccount = accountService.getAccountById(bidDTO.getAccountId());
+        AccountDTO persistedAccount = accountService.getAccountById(bidDTO.getPayment().getAccountId());
         if (persistedAccount != null) {
             // Add the updated Account to the session attributes
             Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
             // Create a new bid
 //            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestBid(auctionItemId).getPrice()) + ":JOIN");
+            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":JOIN");
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.request.AuctionItemRequestDTO;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
+import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
 import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
@@ -26,13 +27,13 @@ public class AuctionItemServiceImpl implements AuctionItemService{
     }
 
     @Override
-    public AuctionItemDTO getAuctionItemById(int id) {
+    public AuctionItemDTO getAuctionItemById(AuctionItemId id) {
         return new AuctionItemDTO(auctionItemRepos.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + id)
         ));
     }
 
-    @Override
+   @Override
     public AuctionItemDTO createAuctionItem(AuctionItemRequestDTO auctionItemRequestDTO) {
         AuctionItem newAuctionItem = new AuctionItem();
         newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemRequestDTO.getAuctionSessionId()).orElseThrow(

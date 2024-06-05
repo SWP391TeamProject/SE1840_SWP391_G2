@@ -1,10 +1,12 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.BidRepos;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
+import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class BidServiceImpl implements BidService {
     @Autowired
     private AuctionItemRepos auctionItemRepos;
     @Autowired
-    private AccountRepos accountRepos;
+    private PaymentRepos paymentRepos;
 
 
     @Autowired
@@ -37,13 +39,12 @@ public class BidServiceImpl implements BidService {
     @Override
     public BidDTO createBid(BidDTO bid) {
         Bid newBid = new Bid();
-        newBid.setPrice(bid.getPrice());
-        newBid.setCreateDate(bid.getCreateDate());
+        newBid.setBidId(bid.getBidId());
         newBid.setAuctionItem(auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + bid.getAuctionItemId())
         ));
-        newBid.setAccount(accountRepos.findById(bid.getAccountId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
+        newBid.setPayment(paymentRepos.findById(bid.getPayment().getId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid payment id: " + bid.getPayment())
         ));
         return new BidDTO(bidRepos.save(newBid));
     }
@@ -56,14 +57,14 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public BidDTO getHighestBid(int auctionItemId) {
+    public BidDTO getHighestBid(AuctionItemId auctionItemId) {
         // This method requires a custom query to be implemented in the repository
         auctionItemRepos.findById(auctionItemId).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
         );
-        Bid highestBid = bidRepos.findAllBidByAuctionItemId(auctionItemId)==null?null: bidRepos.findAllBidByAuctionItemId(auctionItemId).get(0);
-        if(highestBid == null) return new BidDTO(auctionItemId, new BigDecimal(0));
-        return new BidDTO(highestBid);
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        if(bids.isEmpty()) return null;
+        return new BidDTO(bids.get(0));
     }
 
     @Override

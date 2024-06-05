@@ -90,7 +90,7 @@ export default function ItemsList() {
     console.log(item);
     // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
     dispatch(setCurrentItem(item));
-    navigate("/admin/items/edit");
+    navigate(`/admin/items/${itemId}`);
   }
 
   const handleCreateClick = () => {
@@ -247,7 +247,8 @@ export default function ItemsList() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem>
+
+                            {/* <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem> */}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

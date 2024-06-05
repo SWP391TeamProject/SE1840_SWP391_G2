@@ -140,15 +140,12 @@ public class AuctionSessionServiceImplTest {
     @DisplayName("Test get auction session by id - Success")
     public void testGetAuctionSessionById_Success_WithNullDeposits() {
         auctionSession.setAuctionSessionId(1);
-        auctionSession.setDeposits(null); // Set deposits to null
         when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
 
         AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
 
         assertNotNull(result);
         assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
-        assertNotNull(result.getDeposits());
-        assertTrue(result.getDeposits().isEmpty()); // Ensure deposits are an empty set
         verify(auctionSessionRepos, times(1)).findById(1);
     }
 

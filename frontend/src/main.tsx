@@ -45,6 +45,7 @@ import ProfileDetail from "./layout/ProfileLayout/ProfileDetail.tsx";
 import { getCookie } from "./utils/cookies.ts";
 import AddAuctionItems from "./pages/Administration/Auction-session/AddAuctionItems.tsx";
 import About from "./pages/about/About.tsx";
+import ItemDetail from "./pages/Administration/item/itemDetail/ItemDetail.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -92,7 +93,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     </Route>
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
                       <Route path="items" element={<ItemsList />}></Route>
-                      <Route path="items/:id" element={<ItemsList />}></Route>
+                      <Route path="items/:id" element={<ItemDetail />}></Route>
                       {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                     </Route>
 

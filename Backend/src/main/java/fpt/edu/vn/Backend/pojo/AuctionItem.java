@@ -2,8 +2,11 @@ package fpt.edu.vn.Backend.pojo;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -13,24 +16,27 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "auction_item")
 public class AuctionItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "auction_item_id")
-    private int auctionItemId;
+    @EmbeddedId
+    private AuctionItemId auctionItemId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("auctionSessionId")
     @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("itemId")
     @JoinColumn(name = "item_id")
     private Item item;
 
     @Column(name = "current_price")
     private BigDecimal currentPrice;
 
-    @OneToMany
-    @JoinColumn(name = "auction_item_id")
-    private List<Bid> bids;
-    // Consider adding currentPrice to track the highest bid during the auction
+    @CreationTimestamp
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
+
+    @UpdateTimestamp
+    @Column(name = "update_date")
+    private LocalDateTime updateDate;
 }

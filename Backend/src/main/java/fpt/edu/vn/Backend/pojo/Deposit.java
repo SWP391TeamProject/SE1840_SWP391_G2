@@ -9,30 +9,20 @@ public class Deposit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int depositId;
 
-    private int depositAmount;
-    private String depositDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
+            @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+    })
+    private AuctionItem auctionItem;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
-
-    @ManyToOne
-    @JoinColumn(name = "auction_session_id")
-    private AuctionSession auctionSession;
-
-    @OneToOne(mappedBy = "deposit")
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + depositId;
-        result = prime * result + depositAmount;
-        result = prime * result + (depositDate == null ? 0 : depositDate.hashCode());
-        result = prime * result + (account == null ? 0 : account.hashCode());
-        result = prime * result + (auctionSession == null ? 0 : auctionSession.hashCode());
-        // exclude payment from hashCode calculation
-        return result;
+        return depositId;
     }
 }

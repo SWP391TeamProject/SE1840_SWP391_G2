@@ -1,23 +1,20 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Order;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
+
+@NoArgsConstructor
 @Data
 public class OrderDTO {
     private int orderId;
-    private int userId;
-    private LocalDateTime orderDate;
-    private String shipAddress;
+    private int itemId;
+    private PaymentDTO payment;
 
-    OrderDTO(Order order){
+    public OrderDTO(Order order){
         this.orderId = order.getOrderId();
-        this.userId = order.getAccount().getAccountId();
-        this.orderDate = order.getOrderDate();
-        this.shipAddress = order.getShipAddress();
-
+        this.itemId = order.getItem().getItemId();
+        this.payment = new PaymentDTO(order.getPayment());
     }
-    // getters and setters
-    // ...
 }

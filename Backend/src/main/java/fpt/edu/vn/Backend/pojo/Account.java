@@ -25,6 +25,10 @@ public class Account {
     @Column(name = "account_id")
     private int accountId;
 
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private CitizenCard citizenCard;
+
     @Column(name = "nickname", length = 100)
     private String nickname;
 
@@ -34,6 +38,7 @@ public class Account {
     @Column(name = "provider",length = 30)
     @Enumerated(EnumType.STRING)
     public AuthProvider provider;
+
     public enum AuthProvider{
         LOCAL,FACEBOOK,GOOGLE
     }
@@ -79,17 +84,11 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "author",cascade = CascadeType.ALL)
     private List<BlogPost> blogPosts;
 
-    @OneToMany(mappedBy = "account")
-    private List<Bid> bids;
-
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<Payment> payments;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
-    private Set<Deposit> deposits;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<ConsignmentDetail> consignmentDetails;

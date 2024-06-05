@@ -28,7 +28,6 @@ public class Item {
     @JoinColumn(name = "item_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
 
-
     @Column(length = 300)
     private String name;
 
@@ -61,7 +60,7 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
