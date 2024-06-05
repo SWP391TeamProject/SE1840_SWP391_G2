@@ -72,7 +72,7 @@ export default function NavBar() {
           </Link>
           <Link
             className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="#"
+            to="about"
           >
             About
           </Link>

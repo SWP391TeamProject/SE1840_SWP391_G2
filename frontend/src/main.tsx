@@ -44,6 +44,7 @@ import ProfileSetting from "./layout/ProfileLayout/ProfileSetting.tsx";
 import ProfileDetail from "./layout/ProfileLayout/ProfileDetail.tsx";
 import { getCookie } from "./utils/cookies.ts";
 import AddAuctionItems from "./pages/Administration/Auction-session/AddAuctionItems.tsx";
+import About from "./pages/about/About.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -80,7 +81,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                       <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
                       <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
                       <Route path="auction-sessions/:id" element={<AuctionSessionDetail/>}></Route>
-                      <Route path="auction-sessions/:id/add-auction-items" element={<AddAuctionItems/>}></Route>
+
                       {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                     </Route>
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
@@ -97,9 +98,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                   </Route>
                 </Route>
-                
 
-
+                  <Route path="/about" element={<About/>}></Route>
                 <Route path="/auth" element={<AuthenticationLayout />}>
                   <Route path="login" element={<LoginForm />}></Route>
                   <Route path="register" element={<RegisterForm />}></Route>
