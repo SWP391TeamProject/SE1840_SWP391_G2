@@ -25,6 +25,9 @@ gsap.registerPlugin(useGSAP);
 
 const formSchema = z
   .object({
+    name: z.string().min(5, {
+      message: "Name must be at least 5 characters.",
+    }),
     email: z.string().email({
       message: "Invalid email address.",
     }),
@@ -50,6 +53,7 @@ function RegisterForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema), // Use the zodResolver function
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -109,6 +113,18 @@ function RegisterForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
             <p className="text-2xl font-bold text-center">Register</p>
+            <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="enter your name here" {...field} />
+                      </FormControl>
+                    </FormItem>
+                )}
+            />
             <FormField
               control={form.control}
               name="email"
