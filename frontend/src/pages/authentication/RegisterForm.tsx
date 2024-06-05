@@ -1,26 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod"; // Import the zodResolver function
-import { date, z } from "zod";
-import { Checkbox } from "@/components/ui/checkbox";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { register } from "@/services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from '../../assets/registration_logo.jpg';
+import {setCookie} from "@/utils/cookies.ts";
+
 gsap.registerPlugin(useGSAP);
 
 const formSchema = z
@@ -48,31 +48,29 @@ function RegisterForm() {
   const nav = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema), // Use the zodResolver function
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
-  // 2. Define a submit handler.
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     register(values).then((res) => {
       console.log(res);
-      if (res.status === 200) {
-        // toast.play("Account created successfully. Please login.",);
-        toast.success("Account created successfully. Please login.", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        nav("/");
-      } 
+      toast.success("Account created successfully. Please login.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setCookie("unactivated-user", JSON.stringify(res), 30000);
+      nav("/auth/unactivated");
     }).catch((err) => {
       console.log(err)
       toast.error(err.response.data.message, {

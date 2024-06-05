@@ -106,6 +106,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .email(newAccount.getEmail())
                 .role(newAccount.getRole())
+                .status(newAccount.getStatus())
                 .build();
     }
 
@@ -134,9 +135,10 @@ public class AuthServiceImpl implements AuthService{
                 .builder()
                 .id(user.getAccountId())
                 .accessToken(token)
-                .username(user.getNickname())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .status(user.getStatus())
                 .build();
     }
 
@@ -164,9 +166,10 @@ public class AuthServiceImpl implements AuthService{
                 .builder()
                 .id(user.getAccountId())
                 .accessToken(token)
-                .username(user.getNickname())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .status(user.getStatus())
                 .build();
     }
 
@@ -179,9 +182,10 @@ public class AuthServiceImpl implements AuthService{
                 .builder()
                 .id(user.getAccountId())
                 .accessToken(token)
-                .username(user.getNickname())
+                .nickname(user.getNickname())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .status(user.getStatus())
                 .build();
     }
 
