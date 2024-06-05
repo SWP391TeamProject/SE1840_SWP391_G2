@@ -44,8 +44,9 @@ import ProfileSetting from "./layout/ProfileLayout/ProfileSetting.tsx";
 import ProfileDetail from "./layout/ProfileLayout/ProfileDetail.tsx";
 import { getCookie } from "./utils/cookies.ts";
 import AddAuctionItems from "./pages/Administration/Auction-session/AddAuctionItems.tsx";
-import About from "./pages/about/About.tsx";
 import ItemDetail from "./pages/Administration/item/itemDetail/ItemDetail.tsx";
+import AboutScreen from "./pages/about/AboutScreen.tsx";
+import { Contact } from "./pages/contact/Contact.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -99,8 +100,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                   </Route>
                 </Route>
-
-                  <Route path="/about" element={<About/>}></Route>
+                  <Route path="/contact" element={<Contact/>}></Route>
+                  <Route path="/about" element={<AboutScreen/>}></Route>
                 <Route path="/auth" element={<AuthenticationLayout />}>
                   <Route path="login" element={<LoginForm />}></Route>
                   <Route path="register" element={<RegisterForm />}></Route>
