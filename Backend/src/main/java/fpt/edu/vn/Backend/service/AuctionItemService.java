@@ -11,4 +11,5 @@ public interface AuctionItemService {
     AuctionItemDTO getAuctionItemById(AuctionItemId id);
     AuctionItemDTO createAuctionItem(AuctionItemDTO auctionItemDTO);
     AuctionItemDTO updateAuctionItem(AuctionItemDTO auctionItemDTO);
+    void deleteById(AuctionItemId id);
 }
