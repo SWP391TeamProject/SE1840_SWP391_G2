@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
+import fpt.edu.vn.Backend.DTO.request.ItemCategoryRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.ItemCategory;
@@ -28,17 +29,15 @@ public class ItemCategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ItemCategoryDTO> createItemCategory(@RequestBody ItemCategoryDTO itemCategoryDTO) {
-        ItemCategoryDTO createdItemCategory = itemCategoryService.createItemCategory(itemCategoryDTO);
+    public ResponseEntity<ItemCategoryDTO> createItemCategory(@RequestBody ItemCategoryRequestDTO itemCategoryRequestDTO) {
+        ItemCategoryDTO createdItemCategory = itemCategoryService.createItemCategory(itemCategoryRequestDTO);
         return ResponseEntity.ok(createdItemCategory);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update")
     public ResponseEntity<ItemCategoryDTO> updateItemCategory(
-            @PathVariable int id,
-            @RequestBody ItemCategoryDTO itemCategoryDTO) {
-        itemCategoryDTO.setItemCategoryId(id);
-        ItemCategoryDTO updatedItemCategory = itemCategoryService.updateItemCategory(itemCategoryDTO);
+            @RequestBody ItemCategoryRequestDTO itemCategoryRequestDTO) {
+        ItemCategoryDTO updatedItemCategory = itemCategoryService.updateItemCategory(itemCategoryRequestDTO);
         return ResponseEntity.ok(updatedItemCategory);
     }
 

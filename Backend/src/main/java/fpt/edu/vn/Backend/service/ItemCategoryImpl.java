@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
+import fpt.edu.vn.Backend.DTO.request.ItemCategoryRequestDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.ItemCategory;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
@@ -20,9 +21,9 @@ public class ItemCategoryImpl implements ItemCategoryService{
 
 
     @Override
-    public ItemCategoryDTO createItemCategory(ItemCategoryDTO itemCategoryDTO) {
+    public ItemCategoryDTO createItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
         ItemCategory itemCategory = new ItemCategory();
-        itemCategory.setName(itemCategoryDTO.getName());
+        itemCategory.setName(itemCategoryRequestDTO.getName());
         itemCategory.setCreateDate(LocalDateTime.now());
         itemCategory.setUpdateDate(LocalDateTime.now());
 
@@ -31,18 +32,18 @@ public class ItemCategoryImpl implements ItemCategoryService{
     }
 
     @Override
-    public ItemCategoryDTO updateItemCategory(ItemCategoryDTO itemCategoryDTO) {
-        Optional<ItemCategory> optionalItemCategory = itemCategoryRepos.findById(itemCategoryDTO.getItemCategoryId());
+    public ItemCategoryDTO updateItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
+        Optional<ItemCategory> optionalItemCategory = itemCategoryRepos.findById(itemCategoryRequestDTO.getItemCategoryId());
         if (optionalItemCategory.isPresent()) {
             ItemCategory itemCategory = optionalItemCategory.get();
-            itemCategory.setName(itemCategoryDTO.getName());
+            itemCategory.setName(itemCategoryRequestDTO.getName());
             itemCategory.setUpdateDate(LocalDateTime.now());
 
             ItemCategory updatedItemCategory = itemCategoryRepos.save(itemCategory);
             return new ItemCategoryDTO(updatedItemCategory);
         } else {
             // Handle item category not found
-            throw new ResourceNotFoundException("ItemCategory not found with id " + itemCategoryDTO.getItemCategoryId());
+            throw new ResourceNotFoundException("ItemCategory not found with id " + itemCategoryRequestDTO.getItemCategoryId());
         }
     }
 
