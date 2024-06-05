@@ -144,9 +144,12 @@ public class ConsignmentServiceImplTest {
         consignment.setConsignmentDetails(new ArrayList<>(Collections.singletonList(consignmentDetail)));
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
         when(accountService.getAccountById(anyInt())).thenReturn(new AccountDTO());
-
+        when(consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(anyInt())).thenReturn(consignment.getConsignmentDetails());
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setRole(Account.Role.MANAGER);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
         consignmentService.approveFinalEvaluation(1, 1, "description");
-
         verify(consignmentRepos, times(1)).save(any(Consignment.class));
         verify(consignmentDetailRepos, times(1)).save(any(ConsignmentDetail.class));
     }
@@ -157,10 +160,17 @@ public class ConsignmentServiceImplTest {
         consignment.setConsignmentId(1);
         consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
         consignment.setConsignmentDetails(Collections.emptyList());
-
+        ConsignmentDetail consignmentDetail = new ConsignmentDetail();
+        consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+        consignment.setConsignmentDetails(new ArrayList<>(Collections.singletonList(consignmentDetail)));
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setRole(Account.Role.MANAGER);
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
         when(accountService.getAccountById(anyInt())).thenReturn(new AccountDTO());
-
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail);
+        
         consignmentService.rejectFinalEvaluation(1, 1, "rejectionReason");
 
         verify(consignmentRepos, times(1)).save(any(Consignment.class));

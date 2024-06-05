@@ -18,15 +18,38 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
 import { get } from "http";
 import { getCookie, removeCookie } from "@/utils/cookies";
-
+import { fetchAccountById } from "@/services/AccountsServices";
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+});
 export default function NavBar() {
   const [isLogin, setIsLogin] = React.useState(false);
   const nav = useNavigate();
+  const [user, setUser] = React.useState<any>();
   useEffect(() => {
-    if (getCookie("user")) {
-      setIsLogin(true);
+    const userCookie = getCookie("user");
+    if (userCookie) {
+      try {
+        const userData = JSON.parse(userCookie);
+        setIsLogin(true);
+        fetchAccountById(userData?.id).then((res) => {
+          console.log(res.data)
+          setUser(res.data)
+        }).catch((err) => {
+          console.log(err);
+        });
+      } catch (err) {
+        console.error("Failed to parse user cookie:", err);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    console.log('user:');
+    console.log(user);
+  }, [user]);
+
   const handleSignout = () => {
     removeCookie("user");
     removeCookie("token");
@@ -48,16 +71,17 @@ export default function NavBar() {
           </Button>
           {isLogin ? (
             <Button
-              className="flex items-center gap-2"
-              variant="outline"
+              className="flex items-center gap-2 bg-red-500 text-white"
+              variant="default"
+
               onClick={handleSignout}
             >
               Sign Out
             </Button>
           ) : (
             <Button
-              className="flex items-center gap-2"
-              variant="outline"
+              className="flex items-center gap-2 bg-green-500 text-white"
+              variant="default"
               asChild
             >
               <Link to="/auth/login">Login</Link>
@@ -88,6 +112,52 @@ export default function NavBar() {
           >
             Contact
           </Link>
+          {
+            isLogin &&
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="overflow-hidden rounded-full"
+                >
+                  <img
+                    src={user && user.avatar ? user.avatar.link : "/placeholder-user.jpg"}
+                    width={36}
+                    height={36}
+                    alt="Avatar"
+                    className="overflow-hidden rounded-full"
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <div className="flex justify-between items-center">
+                    <div className="basis-1/2">
+                      <p >
+                        Balance:
+                      </p>
+                    </div>
+                    <div className="basis-1/2 font-medium text-left block">
+                      <p >
+                        {user && user?.balance !== null ? user?.balance : '0'}
+                      </p>
+                    </div>
+
+                  </div>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignout}
+                >Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
+
         </nav>
         <Sheet>
           <SheetTrigger asChild>
@@ -128,6 +198,7 @@ export default function NavBar() {
               >
                 Contact
               </Link>
+
             </div>
           </SheetContent>
         </Sheet>

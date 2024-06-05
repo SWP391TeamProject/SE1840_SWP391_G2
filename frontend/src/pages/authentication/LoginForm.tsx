@@ -9,7 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
-import { Roles } from "@/constants/enums";
+import {AccountStatus, Roles} from "@/constants/enums";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
@@ -40,6 +40,11 @@ function LoginForm() {
       }
     })
       .then((res) => {
+        if (res.data.status == AccountStatus.DISABLED) {
+          setCookie("unactivated-user", JSON.stringify(res.data), 30000);
+          navigate("/auth/unactivated");
+          return
+        }
         setIsLogin(false);
         console.log(res.data);
         setCookie("token", res.data.accessToken, 30000);

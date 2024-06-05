@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCurrentConsignment } from "@/redux/reducers/Consignments";
 import { RootState } from "@/redux/store";
 import { fetchConsigntmentDetailByConsignmentId } from "@/services/ConsignmentDetailService";
-import { fetchConsignmentByConsignmentId, receivedConsignment, takeConsignment } from "@/services/ConsignmentService";
+import { acceptEvaluation, fetchConsignmentByConsignmentId, receivedConsignment, rejectEvaluation, takeConsignment } from "@/services/ConsignmentService";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { UploadIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -22,15 +22,15 @@ import { getCookie } from "@/utils/cookies";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { set } from "react-hook-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConsignmentDetail() {
     const param = useParams();
 
     const dispatch = useAppDispatch();
 
-
     const [consignment, setConsignment] = useState<Consignment | undefined>(undefined);
-
+    const [state, setState] = useState(false);
     useEffect(() => {
         console.log(param);
         // dispatch(setCurrentConsignment(param.id));
@@ -41,7 +41,7 @@ export default function ConsignmentDetail() {
             console.log(error);
             toast.error(error.response.data.message);
         })
-    }, []);
+    }, [state]);
 
     const ConfirmReceive = (consignmentId: any) => {
         return (
@@ -59,7 +59,7 @@ export default function ConsignmentDetail() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={()=>handleRecieve(consignmentId)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleRecieve(consignmentId)}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -83,7 +83,7 @@ export default function ConsignmentDetail() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={()=>handleTake(consignmentId)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleTake(consignmentId)}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -96,6 +96,7 @@ export default function ConsignmentDetail() {
             console.log(res);
             setConsignment(res.data);
             toast.success("Received consignment successfully");
+            setState(!state);
         }).catch((error) => {
             console.log(error);
             toast.error(error.response.data.message);
@@ -106,11 +107,79 @@ export default function ConsignmentDetail() {
             console.log(res);
             setConsignment(res.data);
             toast.success("Take consignment successfully");
+            setState(!state);
         }).catch((error) => {
             console.log(error);
             toast.error(error.response.data.message);
         })
     }
+    
+        
+    const rejectConsignment = (consignmentId: number, reasonInput: any) => {
+        console.log(consignmentId);
+        
+        const accountId = JSON.parse(getCookie('user')).id;
+        const reason = reasonInput == null ? "reject by manager" : reasonInput;
+        rejectEvaluation(consignmentId.toString(), accountId, reason).then((res) => {
+            console.log(res);
+            toast.success("Reject consignment successfully");
+            setState(!state);
+        }).catch((error) => {
+            console.log(error);
+            toast.error(error.response.data.message);
+        })
+    }
+    const acceptConsignment = (consignmentId: number) => {
+        console.log(consignmentId);
+        
+        const accountId = JSON.parse(getCookie('user')).id;
+        acceptEvaluation(consignmentId.toString(), accountId).then((res) => {
+            console.log(res);
+            toast.success("Accept consignment successfully");
+            setState(!state);
+        }).catch((error) => {
+            console.log(error);
+            toast.error(error.response.data.message);
+        })
+    }
+
+    const Action = () => {
+        const length = consignment?.consignmentDetails?.length;
+        if (JSON.parse(getCookie('user')).role === Roles.STAFF) {
+            if (consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {
+                if (!consignment?.consignmentDetails?.some(detail => detail?.status === 'INITIAL_EVALUATION')) {
+                    return <SendEvaluationForm consignmentParent={consignment} />;
+                } else {
+                    return <Badge className="bg-amber-400">Waiting Seller Accept</Badge>;
+                }
+            }
+            if (consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
+                if (consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED')) {
+                    return <Badge className="bg-green-300">Success</Badge>;
+                } else if (consignment?.consignmentDetails[length-1]?.status === 'FINAL_EVALUATION') {
+                    return <Badge className="bg-amber-400">Waiting Manager Accept</Badge>;
+                } else {
+                    return <SendEvaluationForm consignmentParent={consignment} />;
+                }
+            }
+            if (consignment?.status === ConsignmentStatus.SENDING) {
+                return <ConfirmReceive consignmentId={consignment?.consignmentId} />;
+            }
+            if (consignment?.status === ConsignmentStatus.WAITING_STAFF) {
+                return <ConfirmTake consignmentId={consignment?.consignmentId} />;
+            }
+        } else if (JSON.parse(getCookie('user')).role === Roles.MANAGER) {
+            if (consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
+                if (consignment?.consignmentDetails[length-1]?.status === 'FINAL_EVALUATION') {
+                    return <><Button className="bg-red-400 mr-16 w-24" onClick={()=>rejectConsignment(consignment.consignmentId, null)}>Reject</Button>
+                        <Button className="bg-green-400  mr-16 w-24" onClick={()=>acceptConsignment(consignment.consignmentId)}>Accept</Button></>;
+                }
+            }
+        }
+    }
+
+
+
     return (
         <div className="flex flex-col justify-start w-full h-full m-0 p-3">
             <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
@@ -127,14 +196,7 @@ export default function ConsignmentDetail() {
 
                     </CardContent>
                     <CardFooter>
-                        {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && !consignment?.consignmentDetails?.some(detail => detail?.status === 'INITIAL_EVALUATION') && <SendEvaluationForm consignmentParent={consignment} />}
-                        {consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'INITIAL_EVALUATION') && <Badge className="bg-amber-400	">Waiting Seller Accept</Badge>}
-                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED') && <Badge className="bg-green-300	">Success</Badge>}
-                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') && <Badge className="bg-amber-400	">Waiting Manager Accept</Badge>}
-                        {consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION && !consignment?.consignmentDetails?.some(detail => detail?.status === 'FINAL_EVALUATION') &&  !consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED')  && <SendEvaluationForm consignmentParent={consignment} />}
-                        {consignment?.status === ConsignmentStatus.SENDING && <ConfirmReceive consignmentId={consignment?.consignmentId} />}
-                        {consignment?.status === ConsignmentStatus.WAITING_STAFF && JSON.parse(getCookie('user')).role === Roles.STAFF && <ConfirmTake consignmentId={consignment?.consignmentId}  />}
-
+                        {Action()}
                     </CardFooter>
                 </Card>
                 <Card className="basis-2/6 h-fit  ">
@@ -176,25 +238,28 @@ export default function ConsignmentDetail() {
             </div>
             <div className="flex justify-start flex-row w-full mt-1 gap-2">
                 <div className="basis-2/3">
-                    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
-                        return (
-                            <Card key={index} className="w-full">
-                                <CardHeader>
-                                    <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
-                                    <CardDescription>{item.status}</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>description:{item.description}</p>
-                                    <p>price:{item.price ? item.price : "not specified"}</p>
-                                    <div className="w-ful flex justify-between">
-                                        <p>Initiator: {item.account.nickname}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )
+                    <ScrollArea className="w-full h-72">
+                        {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
+                            return (
+                                <Card key={index} className="w-full">
+                                    <CardHeader>
+                                        <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
+                                        <CardDescription>{item.status}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>description:{item.description}</p>
+                                        <p>price:{item.price ? item.price : "not specified"}</p>
+                                        <div className="w-ful flex justify-between">
+                                            <p>Initiator: {item.account.nickname}</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )
 
-                    }
-                    ) : null}
+                        }
+                        ) : null}
+                    </ScrollArea>
+
                 </div>
 
 
