@@ -111,7 +111,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     element={<ConsignmentLayout />}
                   ></Route>
                   <Route path="/profile" element={<ProfileLayout />}>
-                    <Route path="" element={<ProfileDetail profileData={JSON.parse(getCookie('user'))} />}></Route>
+                    {/* <Route path="" element={<ProfileDetail profileData={JSON.parse(getCookie('user'))} />}></Route> */}
                     <Route path="/profile/settings" element={<ProfileSetting/>}></Route>
 
                   </Route>
