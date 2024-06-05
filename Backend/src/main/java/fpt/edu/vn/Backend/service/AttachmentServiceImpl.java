@@ -3,6 +3,8 @@ package fpt.edu.vn.Backend.service;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.sas.BlobContainerSasPermission;
+import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,7 +34,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final ItemRepos itemRepository;
 
     private final ConsignmentDetailRepos consignmentDetailRepos;
-
+    @Autowired
+    private AuctionSessionRepos auctionRepos;
     @Autowired
     private BlogPostRepos blogPostRepos;
     @Autowired
@@ -74,6 +78,8 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setCreateDate(attachmentDTO.getCreateDate());
         return attachment;
     }
+
+
 
     @Override
     public @NotNull AttachmentDTO uploadAttachment(@NotNull MultipartFile file) throws IOException {
@@ -258,8 +264,35 @@ public class AttachmentServiceImpl implements AttachmentService {
         return mapEntityToDTO(attachment);
     }
     @Override
-    public @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile[] file, int itemId) throws IOException {
-        return null;
+    public @NotNull AttachmentDTO uploadAuctionAttachment(@NotNull MultipartFile file, Integer auctionId) throws IOException {
+        // Get the Item object from the itemId
+        AuctionSession auction = auctionRepos.findById(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction with id " + auctionId + " does not exist"));
+        // Generate a unique blobId for the file
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new IOException(e);
+        }
+        String blobId = auction.getAuctionSessionId()+ "/auction-image/" + UUID.randomUUID() + mimeType.getExtension();
+
+        // Get a BlockBlobClient for the blob with this blobId and upload the file
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+        byte[] bytes = file.getBytes();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
+
+        // Create a new Attachment object, set its properties, and save it to the database
+        Attachment attachment = new Attachment();
+        attachment.setBlobId(blobId);
+        attachment.setLink(blobClient.getBlobUrl());
+        attachment.setAuctionSession(auction);
+        attachment=attachmentRepository.save(attachment);
+
+        // Map the Attachment entity to an AttachmentDTO and return it
+        return mapEntityToDTO(attachment);
     }
 }
 

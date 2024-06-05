@@ -18,6 +18,7 @@ public class PaymentDTO {
     private int accountId;
 
     public PaymentDTO(Payment payment) {
+        if (payment == null) return;
         this.id = payment.getPaymentId();
         this.amount = payment.getPaymentAmount() != null ? payment.getPaymentAmount() : BigDecimal.ZERO;
         this.date = payment.getCreateDate();
@@ -25,5 +26,6 @@ public class PaymentDTO {
         this.status = payment.getStatus();
         this.accountId = payment.getAccount().getAccountId();
     }
+
 
 }

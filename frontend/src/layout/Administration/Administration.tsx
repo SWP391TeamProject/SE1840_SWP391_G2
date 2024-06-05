@@ -1,5 +1,5 @@
 import FetchButton from '@/components/button/FetchButton'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -253,7 +253,11 @@ export default function Administration() {
                                     variant="outline"
                                     size="icon"
                                     className="overflow-hidden rounded-full"
-                                ></Button>
+                                >
+                                    <Avatar>
+                                        <AvatarImage src={JSON.parse(getCookie("user"))?.avatar?.link || 'https://play-lh.googleusercontent.com/jA5PwYqtmoFS7StajBe2EawN4C8WDdltO68JcsrvYKSuhjcTap5QMETkloXSq5soqRBqFjuTAhh28AYrA6A'} />
+                                    </Avatar>
+                                </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>

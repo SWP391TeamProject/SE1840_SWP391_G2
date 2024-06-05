@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,12 +11,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auction-sessions")
 public class AuctionSessionController {
     @Autowired
     private AuctionSessionService auctionSessionService;
+    @Autowired
+    private AttachmentService attachmentService;
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@RequestParam(defaultValue = "0") int pageNumb,@RequestParam(defaultValue = "50") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumb,pageSize);
@@ -62,9 +70,28 @@ public class AuctionSessionController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<AuctionSessionDTO> createAuctionSession(@RequestBody AuctionSessionDTO auctionDTO) {
-        return new ResponseEntity<>(auctionSessionService.createAuctionSession(auctionDTO), HttpStatus.OK);
+    public ResponseEntity<AuctionSessionDTO> createAuctionSession(@RequestBody AuctionCreateDTO auctionDTO) {
+        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
+        auctionSessionDTO.setTitle(auctionDTO.getTitle());
+        auctionSessionDTO.setStartDate(auctionDTO.getStartDate());
+        auctionSessionDTO.setEndDate(auctionDTO.getEndDate());
+        auctionSessionDTO.setStatus("SCHEDULED");
+        auctionSessionDTO.setCreateDate(LocalDateTime.now());
+        auctionSessionDTO.setUpdateDate(LocalDateTime.now());
+        auctionSessionDTO=auctionSessionService.createAuctionSession(auctionSessionDTO);
+        if(auctionDTO.getFiles()!=null){
+            try {
+                for (MultipartFile file : auctionDTO.getFiles()) {
+                    attachmentService.uploadAuctionAttachment(file,auctionSessionDTO.getAuctionSessionId());
+                }
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        return new ResponseEntity<>(auctionSessionService.getAuctionSessionById(auctionSessionDTO.getAuctionSessionId()), HttpStatus.OK);
     }
+
+
 
 
     @PutMapping("/{id}")

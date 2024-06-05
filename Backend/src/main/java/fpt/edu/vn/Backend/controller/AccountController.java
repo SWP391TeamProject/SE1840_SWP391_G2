@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AccountService;
+import fpt.edu.vn.Backend.service.AttachmentService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +35,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AccountController {
     private final AccountService accountService;
+    private final AttachmentService attachmentService;
 
     @Autowired
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, AttachmentService attachmentService) {
         this.accountService = accountService;
+        this.attachmentService = attachmentService;
     }
 
     @GetMapping("/")

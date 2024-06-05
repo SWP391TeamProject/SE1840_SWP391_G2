@@ -9,10 +9,12 @@ import java.math.BigDecimal;
 @Data
 public class AuctionItemDTO {
     private AuctionItemId id;
+    private ItemDTO itemDTO;
     private BigDecimal currentPrice;
 
     public AuctionItemDTO(AuctionItem auctionItem) {
         this.id = auctionItem.getAuctionItemId();
+        this.itemDTO = new ItemDTO(auctionItem.getItem());
         this.currentPrice = auctionItem.getCurrentPrice();
     }
 }

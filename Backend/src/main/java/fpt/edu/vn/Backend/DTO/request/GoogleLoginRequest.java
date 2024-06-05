@@ -1,4 +1,4 @@
-package fpt.edu.vn.Backend.DTO;
+package fpt.edu.vn.Backend.DTO.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

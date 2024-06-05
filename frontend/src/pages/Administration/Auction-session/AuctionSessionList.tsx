@@ -1,14 +1,4 @@
-import { Badge } from "@/components/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { PaginationPrevious, PaginationItem, PaginationLink, PaginationEllipsis, PaginationNext, PaginationContent, Pagination } from "@/components/ui/pagination";
 import {
   Card,
   CardContent,
@@ -19,15 +9,11 @@ import {
 } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -37,33 +23,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageList } from "@/redux/reducers/AuctionSession";
 // import { fetchAuctionSessionsService, deleteAuctionSessionService } from "@/services/AuctionSessionsServices";
 import {
-  Home,
-  LineChart,
-  ListFilter,
-  Package,
-  Package2,
-  PanelLeft,
-  Search,
-  Settings,
-  ShoppingCart,
-  Users2,
-  File,
   PlusCircle,
   MoreHorizontal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { EditAcc } from "../popup/EditAcc";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
 import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
 
@@ -118,7 +86,7 @@ export default function AuctionSessionList() {
     let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
     console.log(auctionSession);
     dispatch(setCurrentAuctionSession(auctionSession));
-    navigate("/admin/auctionSessions/detail");
+    navigate(`/admin/auction-sessions/${auctionSessionId}`);
   }
 
 
@@ -247,7 +215,8 @@ export default function AuctionSessionList() {
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {/* {auctionSession.role[0]?.roleName} */}
-                        {auctionSession.deposits.length}
+                        {/* {auctionSession.deposits.length}
+                         */}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {auctionSession.auctionsItems}

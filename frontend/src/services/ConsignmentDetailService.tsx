@@ -1,5 +1,6 @@
  import { getCookie } from "@/utils/cookies";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const URL = "http://localhost:8080/api/consignmentDetails/";
 
@@ -52,9 +53,9 @@ export const updateConsignmentDetailService = async (data: any,id :number) => {
     .catch((err) => console.log(err));
 };
 
-export const createConsignmentDetailService = async (data: any) => {
+export const createInitialEvaluation = async (data: any) => {
   return await axios
-    .post(URL+"create", data, {
+    .post(URL+"createInitialEvaluation", data, {
       headers: {
         "Content-Type": "multipart/form-data",
         "Access-Control-Allow-Origin": "*",
@@ -62,6 +63,16 @@ export const createConsignmentDetailService = async (data: any) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+};
+export const createFinalEvaluation = async (data: any) => {
+  return await axios
+    .post(URL+"createFinalEvaluation", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
 };
 
