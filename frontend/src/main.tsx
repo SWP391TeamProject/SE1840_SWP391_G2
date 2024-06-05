@@ -47,6 +47,7 @@ import AddAuctionItems from "./pages/Administration/Auction-session/AddAuctionIt
 import ItemDetail from "./pages/Administration/item/itemDetail/ItemDetail.tsx";
 import AboutScreen from "./pages/about/AboutScreen.tsx";
 import { Contact } from "./pages/contact/Contact.tsx";
+import UnactivatedWarning from "@/pages/authentication/UnactivatedWarning.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -105,6 +106,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/auth" element={<AuthenticationLayout />}>
                   <Route path="login" element={<LoginForm />}></Route>
                   <Route path="register" element={<RegisterForm />}></Route>
+                  <Route path="unactivated" element={<UnactivatedWarning />}></Route>
                 </Route>
                 <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
                   <Route

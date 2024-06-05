@@ -1,30 +1,33 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod"; // Import the zodResolver function
-import { date, z } from "zod";
-import { Checkbox } from "@/components/ui/checkbox";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { register } from "@/services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from '../../assets/registration_logo.jpg';
+import {setCookie} from "@/utils/cookies.ts";
+
 gsap.registerPlugin(useGSAP);
 
 const formSchema = z
   .object({
+    name: z.string().min(5, {
+      message: "Name must be at least 5 characters.",
+    }),
     email: z.string().email({
       message: "Invalid email address.",
     }),
@@ -48,31 +51,30 @@ function RegisterForm() {
   const nav = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema), // Use the zodResolver function
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
-  // 2. Define a submit handler.
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     register(values).then((res) => {
       console.log(res);
-      if (res.status === 200) {
-        // toast.play("Account created successfully. Please login.",);
-        toast.success("Account created successfully. Please login.", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        nav("/");
-      } 
+      toast.success("Account created successfully. Please login.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setCookie("unactivated-user", JSON.stringify(res), 30000);
+      nav("/auth/unactivated");
     }).catch((err) => {
       console.log(err)
       toast.error(err.response.data.message, {
@@ -109,6 +111,18 @@ function RegisterForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
             <p className="text-2xl font-bold text-center">Register</p>
+            <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="enter your name here" {...field} />
+                      </FormControl>
+                    </FormItem>
+                )}
+            />
             <FormField
               control={form.control}
               name="email"

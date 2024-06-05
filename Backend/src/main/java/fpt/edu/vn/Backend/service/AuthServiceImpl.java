@@ -61,8 +61,12 @@ public class AuthServiceImpl implements AuthService{
     public AuthResponseDTO register(RegisterDTO registerDTO) {
         Account newAccount ;
         try {
-            if(registerDTO.getEmail().isEmpty() || registerDTO.getPassword().isEmpty()){
-                throw new InvalidInputException("Email or password is empty!");
+            if(registerDTO.getName().isEmpty() || registerDTO.getEmail().isEmpty() || registerDTO.getPassword().isEmpty()){
+                throw new InvalidInputException("Name or Email or password is empty!");
+            }
+
+            if (registerDTO.getName().length() < 5) {
+                throw new InvalidInputException("Name is too short!");
             }
 
             if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
@@ -78,6 +82,7 @@ public class AuthServiceImpl implements AuthService{
             });
 
             newAccount = new Account();
+            newAccount.setNickname(registerDTO.getName());
             newAccount.setEmail(registerDTO.getEmail());
             newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
             newAccount.setRole(Account.Role.MEMBER);
@@ -107,6 +112,7 @@ public class AuthServiceImpl implements AuthService{
                 .accessToken(token)
                 .email(newAccount.getEmail())
                 .role(newAccount.getRole())
+                .status(newAccount.getStatus())
                 .build();
     }
 
@@ -138,6 +144,7 @@ public class AuthServiceImpl implements AuthService{
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .status(user.getStatus())
                 .build();
     }
 
@@ -161,6 +168,7 @@ public class AuthServiceImpl implements AuthService{
         String email = jwtGenerator.getEmailFromToken(token);
         Optional<Account> userOptional = accountRepos.findByEmail(email);
         Account user = userOptional.get();
+
         return new AuthResponseDTO(user, token);
 
     }
