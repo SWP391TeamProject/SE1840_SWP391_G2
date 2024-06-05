@@ -1,9 +1,8 @@
 import React from "react";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
-import { z } from "zod";
 
-export default function AutomaticInputsField({ formSchema }: { formSchema: z.infer<typeof formSchema> }) {
+export default function AutomaticInputsField({ formSchema }: { formSchema:  }) {
 
     return <>
 

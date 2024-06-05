@@ -258,17 +258,17 @@ export default function ConsignmentList() {
                                                 {(() => {
                                                     switch (consignment.status) {
                                                         case ConsignmentStatus.WAITING_STAFF:
-                                                            return <Badge variant="default" className="bg-yellow-500 w-[200px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
+                                                            return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
                                                         case ConsignmentStatus.FINISHED:
-                                                            return <Badge variant="default" className="bg-green-500 w-[200px] text-center flex justify-center items-center">Finished</Badge>;
+                                                            return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
                                                         case ConsignmentStatus.IN_INITIAL_EVALUATION:
-                                                            return <Badge variant="default" className="bg-blue-500 w-[200px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
+                                                            return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
                                                         case ConsignmentStatus.IN_FINAL_EVALUATION:
-                                                            return <Badge variant="default" className="bg-indigo-500 w-[200px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
+                                                            return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
                                                         case ConsignmentStatus.SENDING:
-                                                            return <Badge variant="default" className="bg-purple-500 w-[200px] text-center flex justify-center items-center">Sending</Badge>;
+                                                            return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
                                                         case ConsignmentStatus.TERMINATED:
-                                                            return <Badge variant="default" className="bg-red-500 w-[200px] text-center flex justify-center items-center">Terminated</Badge>;
+                                                            return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
                                                         default:
                                                             return <Badge variant="destructive">Unknown Status</Badge>;
                                                     }
