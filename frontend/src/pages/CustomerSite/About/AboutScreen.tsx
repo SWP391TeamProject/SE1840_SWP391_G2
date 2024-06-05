@@ -1,7 +1,6 @@
 import NavBar from "@/components/NavBar/NavBar";
 import AuctionProcessSection from "../LandingPage/AuctionProcessSection";
 import Footer from "@/components/footer/Footer";
-import { Sidebar } from "./SideBar";
 import { WhatIs } from "./WhatIs";
 import { useEffect, useRef, useState } from "react";
 import { OurTeam } from "./OurTeam";
@@ -9,6 +8,7 @@ import { About } from "./About";
 import { set } from "react-hook-form";
 import { Buy } from "./Buy";
 import { Sell } from "./Sell";
+import { Sidebar } from "./SideBar";
 
 export default function AboutScreen() {
     const about = useRef(null);
@@ -28,11 +28,6 @@ export default function AboutScreen() {
     }, [])
     return (
         <>
-            <div className="sticky top-0 z-10 w-full">
-                <NavBar />
-
-            </div>
-
             <div className="flex container">
                 <div className="p-3">
                     <Sidebar

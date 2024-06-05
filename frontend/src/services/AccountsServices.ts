@@ -31,6 +31,13 @@ export const fetchAccountById = async (id: number) => {
           : "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+    });
 };
 
 export const createAccountService = async (data: any) => {
@@ -43,7 +50,13 @@ export const createAccountService = async (data: any) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+    });
 };
 
 export const updateAccountService = async (data: any, id: number) => {
@@ -57,7 +70,13 @@ export const updateAccountService = async (data: any, id: number) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+    });
 };
 
 
