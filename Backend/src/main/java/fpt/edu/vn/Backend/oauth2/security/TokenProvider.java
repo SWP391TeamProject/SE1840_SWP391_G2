@@ -128,8 +128,6 @@ public class TokenProvider {
 
         return IntrospectResponse.builder().valid(isValid).build();
     }
-
-    @Scheduled(fixedRate = 5000000) // Run every minute
     @Transactional
     public void cleanupExpiredTokens() {
         Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
