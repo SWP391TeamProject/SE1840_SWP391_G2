@@ -173,7 +173,7 @@ public class AuthServiceImpl implements AuthService{
 
             InvalidatedToken invalidatedToken =
                     InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
-
+            tokenProvider.cleanupExpiredTokens();
             invalidatedTokenRepos.save(invalidatedToken);
         } catch (AppException exception){
             logger.info("Token already expired");
