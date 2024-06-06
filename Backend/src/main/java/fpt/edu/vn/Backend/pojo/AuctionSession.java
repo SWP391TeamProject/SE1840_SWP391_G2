@@ -37,7 +37,7 @@ public class AuctionSession {
     }
 
     @Column(name = "is_featured")
-    @DefaultValue("0")
+//    @DefaultValue("0")
     private byte isFeatured;
 
     @CreationTimestamp
