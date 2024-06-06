@@ -20,8 +20,8 @@ public interface AuthService {
     String forgotPassword(String email);
     public AuthResponseDTO loginWithGoogle(String token);
     AuthResponseDTO loginWithFacebook(String token);
-    void requestResetPassword(int accountId) throws MailException, MessagingException;
+    void requestResetPassword(@NotNull String email) throws MessagingException;
     boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword);
-    void requestActivateAccount(@NotNull String email) throws MailException, MessagingException, IllegalAccessException;
+    void requestActivateAccount(@NotNull String email) throws MessagingException, IllegalAccessException;
     boolean confirmActivateAccount(@NotNull String activateCode);
 }

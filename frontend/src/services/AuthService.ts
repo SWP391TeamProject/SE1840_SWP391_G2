@@ -46,10 +46,9 @@ export const register = async (registerDTO: Register): Promise<AuthResponse> => 
   return response.data;
 };
 
-export const requestResetPassword = async (id: number): Promise<void> => {
-  await axios.post(`${baseUrl}/request-reset-password/`, null, {
-    ...authHeader,
-    params: { id },
+export const requestResetPassword = async (dto: { email: string }): Promise<void> => {
+  await axios.post(`${baseUrl}/request-reset-password/`, dto, {
+    ...authHeader
   });
 };
 

@@ -8,6 +8,7 @@ import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.DTO.request.AccountActivationRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.DTO.request.ResetPasswordRequestDTO;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.ErrorResponse;
@@ -89,9 +90,9 @@ public class AuthController {
     }
 
     @PostMapping("/request-reset-password/")
-    public ResponseEntity<?> requestResetPassword(@RequestParam int id) {
+    public ResponseEntity<?> requestResetPassword(@RequestBody ResetPasswordRequestDTO dto) {
         try {
-            authService.requestResetPassword(id);
+            authService.requestResetPassword(dto.getEmail());
         } catch (MessagingException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
