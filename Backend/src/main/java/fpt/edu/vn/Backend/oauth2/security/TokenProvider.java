@@ -7,11 +7,14 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.DTO.request.RefreshRequest;
+import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
 import fpt.edu.vn.Backend.oauth2.exception.ErrorCode;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.InvalidatedToken;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.InvalidatedTokenRepos;
 import fpt.edu.vn.Backend.security.SecurityConstants;
 import io.jsonwebtoken.*;
@@ -35,6 +38,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 @Service
@@ -55,6 +60,9 @@ public class TokenProvider {
 
     @Autowired
     private InvalidatedTokenRepos invalidatedTokenRepos;
+
+    @Autowired
+    private AccountRepos accountRepos;
 
     private Key getSigningKey() {
         byte[] keyBytes = SecurityConstants.JWT_SECRET.getBytes(
@@ -134,5 +142,67 @@ public class TokenProvider {
         Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
         invalidatedTokenRepos.deleteByExpiryTimeBefore(now);
         System.out.println("Expired tokens cleaned up at " + new Date());
+    }
+    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
+        var signedJWT = verifyToken(request.getToken(), true);
+        var email = signedJWT.getJWTClaimsSet().getSubject();
+
+        Optional<Account> accountOptional = accountRepos.findByEmail(email);
+        Account account = accountOptional.get();
+
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken =
+                InvalidatedToken.builder()
+                        .token(jit)
+                        .expiryTime(expiryTime)
+                        .tokenType("Bearer")
+                        .account(account)
+                        .build();
+
+        invalidatedTokenRepos.save(invalidatedToken);
+
+
+
+        var user =
+                accountRepos.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+
+        var token = generateRefreshToken(user);
+
+        return AuthenticationResponse.builder().accessToken(token).authenticated(true).build();
+    }
+
+    private String generateRefreshToken(Account account) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(account.getEmail())
+                .issuer("Biddify.com")
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
+                ))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("scope", buildScope(account))
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+
+        JWSObject jwsObject = new JWSObject(header, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            logger.error("Cannot create token", e);
+            throw new RuntimeException(e);
+        }
+    }
+    private String buildScope(Account account) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        String role = String.valueOf(account.getRole());
+        stringJoiner.add("ROLE_" + role);
+        return stringJoiner.toString();
     }
 }
