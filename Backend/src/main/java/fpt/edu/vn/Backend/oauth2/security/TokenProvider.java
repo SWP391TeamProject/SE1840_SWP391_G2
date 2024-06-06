@@ -22,11 +22,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -122,5 +126,12 @@ public class TokenProvider {
         }
 
         return IntrospectResponse.builder().valid(isValid).build();
+    }
+
+    @Transactional
+    public void cleanupExpiredTokens() {
+        Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+        invalidatedTokenRepos.deleteByExpiryTimeBefore(now);
+        System.out.println("Expired tokens cleaned up at " + new Date());
     }
 }
