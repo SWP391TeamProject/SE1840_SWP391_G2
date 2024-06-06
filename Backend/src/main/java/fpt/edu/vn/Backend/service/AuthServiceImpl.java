@@ -258,7 +258,7 @@ public class AuthServiceImpl implements AuthService{
         Account a = accountRepos.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
 
-        if (a.getStatus() == Account.Status.ACTIVATED)
+        if (a.getStatus() == Account.Status.ACTIVE)
             throw new IllegalAccessException("The account is already activated");
 
         if (activationCooldownCache.containsKey(a.getAccountId()))
@@ -298,9 +298,9 @@ public class AuthServiceImpl implements AuthService{
             return false;
         Account acc = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
-        if (acc.getStatus() == Account.Status.ACTIVATED)
+        if (acc.getStatus() == Account.Status.ACTIVE)
             throw new IllegalStateException("Account already activated");
-        acc.setStatus(Account.Status.ACTIVATED);
+        acc.setStatus(Account.Status.ACTIVE);
         accountRepos.save(acc);
         activationCodeCache.remove(activateCode);
         logger.info("Activated account {} with code {} successfully", id, activateCode);
