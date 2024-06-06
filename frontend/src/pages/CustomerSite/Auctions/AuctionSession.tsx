@@ -1,26 +1,47 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { set } from 'react-hook-form'
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
     const dispatch = useAppDispatch();
-
+    const [sessionAttachments,setSessionAttachments] = useState([]);
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
     });
+    useEffect(() => {
+        
+        if(auctionSession == null){
+            axios.get("http://localhost:8080/api/auction-sessions/1")
+            .then(res => {
+                dispatch({type: "auctionSessions/setCurrentAuctionSession", payload: res.data});
+                setSessionAttachments(res.data.attachments);
+                toast.success("Auction Session Loaded");
+            })
+            .catch(err => {
+                toast.error("Failed to load Auction Session");
+                console.log(err);
+            })
 
+        }
+
+
+    }, []);
     useEffect(() => {
         console.log(auctionSession);
+        setSessionAttachments(auctionSession?.attachments);
     },[auctionSession])
 
     return (
         <div className="flex flex-col min-h-screen">
-            <section className="bg-gray-100 py-12 md:py-20 dark:bg-gray-800">
+            <section className="bg-gray-100 py-12 md:py-12 dark:bg-gray-800">
                 <div className="container px-4 md:px-6">
                     <div className="grid gap-8 md:grid-cols-2 md:items-center">
                         <div className="space-y-4">
@@ -36,11 +57,11 @@ export default function AuctionSession() {
                                     <ClockIcon className="h-5 w-5" />
                                     <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>
                                 </div>
-                                <Button>Place Bid</Button>
+                                <Button>Register to bid</Button>
                             </div>
                         </div>
                         <img
-                            src="/placeholder.svg"
+                            src={sessionAttachments[0]?.link}
                             width={600}
                             height={400}
                             alt="Auction Hero"
@@ -54,10 +75,10 @@ export default function AuctionSession() {
                     <div>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => (
-                                <Card>
+                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item,index) => (
+                                <Card key={index}>
                                 <img
-                                    src="/placeholder.svg"
+                                    src={item.itemDTO.attachments[0].link}
                                     width={300}
                                     height={200}
                                     alt="Auction Item"
@@ -67,6 +88,7 @@ export default function AuctionSession() {
                                     <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
                                     <div className="flex items-center justify-between">
                                         <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
+                                        <Button>Place Bid</Button>
                                         {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
                                     </div>
                                 </CardContent>

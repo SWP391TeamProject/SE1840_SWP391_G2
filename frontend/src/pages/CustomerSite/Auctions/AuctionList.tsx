@@ -48,7 +48,7 @@ export default function AuctionList() {
 
   // We can assume by this point that `isSuccess === true`
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32">
+    <section className="w-full py-12 md:py-2 lg:py-2">
       <div className="container px-4 md:px-6">
         <div className="grid gap-8">
           <div className="grid gap-2">
@@ -63,7 +63,7 @@ export default function AuctionList() {
                 <CardContent className="grid gap-4">
                   <div className="grid gap-2">
                     <h3 className="font-semibold text-lg">{session.title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2">Auction Session description here</p>
+                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{session.title}</p>
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center gap-2">

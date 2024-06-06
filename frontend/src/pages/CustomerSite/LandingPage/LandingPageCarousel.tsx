@@ -11,7 +11,15 @@ import Autoplay from "embla-carousel-autoplay";
 export default function LandingPageCarousel() {
   return (
     <>
-      <Carousel className="w-full flex justify-center content-center ">
+      <Carousel className="w-full flex justify-center content-center "
+        plugins={[
+          Autoplay({
+            delay: 3000,
+            pauseOnHover: true,
+          
+          }),
+        ]}
+      >
         <CarouselContent>
           <CarouselItem>
             <section className="w-full flex justify-center items-center p-3 ">
@@ -85,7 +93,7 @@ export default function LandingPageCarousel() {
                     <div className="space-x-4 mt-6">
                       <Link
                         className="inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                        to="#"
+                        to="auctions"
                       >
                         Participate in Auction
                       </Link>
@@ -102,12 +110,11 @@ export default function LandingPageCarousel() {
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
                   </div>
                 </div>
+
               </div>
             </section>
           </CarouselItem>
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
       </Carousel>
     </>
   );
