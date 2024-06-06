@@ -50,13 +50,14 @@ export default function DropzoneComponent({ control, name }) {
 
         return (
           <section className="container min-h-[100px] flex justify-center items-center flex-col w-full ">
-            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full bg-gray-200 rounded-xl border-red-500 border-dotted h-[100px] hover:cursor-pointer" })}>
+            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full border rounded-xl  border-dotted h-[100px] hover:cursor-pointer hover:bg-gray-100" })}>
               <input {...getInputProps()} />
               <div className="w-full flex justify-center items-center gap-2">
                 <UploadCloudIcon />
                 <p> Drag 'n' drop some images here, or click to select images</p>
               </div>
             </div>
+            
             <ul className="w-full ">{acceptedFileItems}</ul>
           </section>
         );
