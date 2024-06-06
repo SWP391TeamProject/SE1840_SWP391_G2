@@ -114,7 +114,7 @@ public class AuthController {
         } catch (MessagingException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IllegalAccessException e) {
-            throw new CooldownException(e);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -122,7 +122,7 @@ public class AuthController {
     @PostMapping("/activate-account/")
     public ResponseEntity<?> activateAccount(@RequestParam String code) {
         if (!authService.confirmActivateAccount(code)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
