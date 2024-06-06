@@ -77,6 +77,23 @@ public class ConsignmentController {
         }
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByUserID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+        try {
+            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
+            if (consignments == null || consignments.isEmpty()) {
+                throw new ConsignmentServiceException("No consignments found for user ID: " + id);
+            }
+            return new ResponseEntity<>(consignments, HttpStatus.OK);
+        } catch (ConsignmentServiceException e) {
+            logger.error("Error retrieving consignments by ID", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            logger.error("Unexpected error retrieving consignments by ID", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/filter-by-status")
     public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
         try {

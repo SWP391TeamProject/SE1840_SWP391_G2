@@ -11,6 +11,7 @@ import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ConsignmentServiceImpl implements ConsignmentService {
 
     AccountService accountService;
@@ -276,10 +278,16 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     @Override
     public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Consignment> consignmentPage = consignmentRepos.findByConsignmentId(userId, pageable);
+        Page<Consignment> consignmentPage = consignmentRepos.findByUserID(userId, pageable);
 
+        consignmentPage.stream().filter(consignment -> consignment.getStatus().equals(Consignment.Status.FINISHED)).forEach(consignment -> {
+            consignment.setConsignmentDetails(consignment.getConsignmentDetails().stream().filter(detail -> detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.MANAGER_ACCEPTED)).toList());
+        });
+//        logger.info("Retrieved consignments by user ID: " + consignmentPage.size()  );
 
         return getConsignmentDTOS(pageable, consignmentPage);
+
+//        return PageImpl(consignmentPage.stream().map(this::getConsignmentDTO).collect(Collectors.toList()));
     }
 
     @NotNull
