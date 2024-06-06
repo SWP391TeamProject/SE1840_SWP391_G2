@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.security;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
 import fpt.edu.vn.Backend.oauth2.security.*;
 
 import fpt.edu.vn.Backend.oauth2.security.*;
@@ -33,6 +34,8 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -51,10 +54,10 @@ public class SecurityConfig {
 
     private CustomOAuth2UserService customOAuth2UserService;
 
-    private JWTAuthEntryPoint jwtAuthEntryPoint;
     @Autowired
-    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private CustomJwtDecoder customJwtDecoder;
 
+    private JWTAuthEntryPoint jwtAuthEntryPoint;
     @Autowired
     private OAuth2AuthenticationSuccessHandler customOAuth2Success;
     @Autowired
@@ -63,7 +66,7 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(
             JWTAuthEntryPoint jwtAuthEntryPoint,
-             CustomOAuth2UserService customOAuth2UserService) {
+            CustomOAuth2UserService customOAuth2UserService) {
         this.jwtAuthEntryPoint = jwtAuthEntryPoint;
         this.customOAuth2UserService = customOAuth2UserService;
     }
@@ -74,12 +77,13 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Corrected origin
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token","access-control-allow-origin"));
+        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token", "access-control-allow-origin"));
         configuration.setExposedHeaders(List.of("x-auth-token"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -95,7 +99,7 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","/oauth2/**","/api/auction-sessions/**","/api/items/**").permitAll()
+                        .requestMatchers("/auth/**", "/oauth2/**", "/api/auction-sessions/**", "/api/items/**").permitAll()
                         .anyRequest().authenticated()
 
                 )
@@ -117,13 +121,19 @@ public class SecurityConfig {
 
                         .successHandler(customOAuth2Success)
                         .failureHandler(customOAuth2Failure)
-                );
+                ).oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                                .decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        ));
+
         http.addFilterBefore(
                 jwtAuthenticationFilter(),
                 UsernamePasswordAuthenticationFilter.class
         );
         return http.build();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -161,6 +171,15 @@ public class SecurityConfig {
         return new DefaultAuthorizationCodeTokenResponseClient();
     }
 
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
+        return jwtAuthenticationConverter;
+    }
 
 }

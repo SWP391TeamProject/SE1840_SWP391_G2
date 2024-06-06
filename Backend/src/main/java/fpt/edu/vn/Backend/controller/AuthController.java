@@ -1,9 +1,15 @@
 package fpt.edu.vn.Backend.controller;
 
+import com.nimbusds.jose.JOSEException;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
+import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
+import fpt.edu.vn.Backend.oauth2.response.ApiResponse;
+import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.mail.MessagingException;
@@ -15,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/auth")
@@ -22,7 +30,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-
+    @Autowired
+    private TokenProvider tokenProvider;
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -35,8 +44,18 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return null;
+    public ResponseEntity<Void> logout(@RequestBody LogOutRequest logOutRequest)
+            throws ParseException, JOSEException {
+        authService.logout(logOutRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/introspect")
+    public ResponseEntity<IntrospectResponse> isAuthenticate(@RequestBody IntrospectRequest request)
+            throws ParseException, JOSEException {
+        boolean result = tokenProvider.introspect(request).isValid();
+        IntrospectResponse introspectResponse = IntrospectResponse.builder().valid(result).build();
+        return ResponseEntity.ok(introspectResponse);
     }
 
     @GetMapping("/login-with-google")

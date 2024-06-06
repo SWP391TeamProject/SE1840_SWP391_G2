@@ -1,13 +1,22 @@
 package fpt.edu.vn.Backend.service;
 
+
+import com.nimbusds.jose.JOSEException;
+
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.oauth2.exception.AppException;
+import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.InvalidatedToken;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.InvalidatedTokenRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -27,6 +36,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +59,10 @@ public class AuthServiceImpl implements AuthService{
     private final ExpiringMap<String, Integer> resetCodeCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<String, Integer> activationCodeCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
-
+    @Autowired
+    private TokenProvider tokenProvider;
+    @Autowired
+    private InvalidatedTokenRepos invalidatedTokenRepos;
     @Autowired
     public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender) {
         this.accountRepos = accountRepos;
@@ -149,8 +163,20 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public AuthResponseDTO logout() {
-        return null;
+    public void logout(LogOutRequest request) throws ParseException, JOSEException {
+        try {
+            var signToken = tokenProvider.verifyToken(request.getToken(), true);
+
+            String jit = signToken.getJWTClaimsSet().getJWTID();
+            Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken invalidatedToken =
+                    InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
+
+            invalidatedTokenRepos.save(invalidatedToken);
+        } catch (AppException exception){
+            logger.info("Token already expired");
+        }
     }
 
     @Override
