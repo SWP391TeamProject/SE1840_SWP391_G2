@@ -111,9 +111,8 @@ public class TokenProvider {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if (invalidatedTokenRepos.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        if (invalidatedTokenRepos.existsByToken(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
-
         return signedJWT;
     }
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
