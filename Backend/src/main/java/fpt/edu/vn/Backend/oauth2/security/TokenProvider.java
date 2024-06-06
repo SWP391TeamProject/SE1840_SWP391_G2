@@ -20,6 +20,7 @@ import lombok.experimental.NonFinal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +129,7 @@ public class TokenProvider {
         return IntrospectResponse.builder().valid(isValid).build();
     }
 
+    @Scheduled(fixedRate = 8000000) //every 80 minute will auto clean
     @Transactional
     public void cleanupExpiredTokens() {
         Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());

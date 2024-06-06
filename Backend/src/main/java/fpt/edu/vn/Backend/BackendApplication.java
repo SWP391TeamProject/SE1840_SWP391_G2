@@ -5,12 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.io.IOException;
 
 @SpringBootApplication
 @CrossOrigin(origins = "http://localhost:5173/**")
+@EnableScheduling
 public class BackendApplication {
 
 	public static void main(String[] args) {
