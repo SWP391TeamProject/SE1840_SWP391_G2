@@ -38,15 +38,20 @@ const formSchema = z.object({
   accountId: z.number(),
   email: z.string().regex(mailRegex, { message: "Invalid email address" }),
   phone: z.string().regex(phoneRegex,
-     { message: "Invalid phone number.must be 10-digit phone number." }),
+    { message: "Invalid phone number.must be 10-digit phone number." }),
   contactName: z.string(),
   preferContact: z.enum(["email", "phone", "text", "any of the above"]),
-  description: z.string().min(10,{
+  description: z.string().min(10, {
     message: "Description must be between 10 and 500 characters"
-  }).max(500,{
+  }).max(500, {
     message: "Description must be between 10 and 500 characters"
   }),
-  files: z.any()
+  files: z.array(z.object({
+    path: z.string(),
+    size: z.number(),
+    type: z.string(),
+  })).max(5, { message: "You can only upload up to 5 images" })
+
 });
 
 export default function ConsignmentInititalForm() {
@@ -217,7 +222,7 @@ export default function ConsignmentInititalForm() {
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           {/* <Input type="" placeholder="sadasd" {...field} /> */}
-                          <Textarea placeholder="nihaoma" {...field} />
+                          <Textarea placeholder="enter your item description here" {...field} />
                         </FormControl>
                         <FormDescription>
                           Describe the item you'd like to consign. Include any relevant

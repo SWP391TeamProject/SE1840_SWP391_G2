@@ -57,6 +57,7 @@ export default function DropzoneComponent({ control, name }) {
                 <p> Drag 'n' drop some images here, or click to select images</p>
               </div>
             </div>
+            
             <ul className="w-full ">{acceptedFileItems}</ul>
           </section>
         );
