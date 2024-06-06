@@ -52,10 +52,6 @@ export default function NavBar() {
   }, [user]);
 
   const handleSignout = () => {
-    
-
-
-
     removeCookie("user");
     removeCookie("token");
     setIsLogin(false);
@@ -72,7 +68,7 @@ export default function NavBar() {
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
           <Button className="flex items-center gap-2" variant="outline" asChild>
-            <Link to="/consignment">Put your item for auction</Link>
+            <Link to="/create-consignment">Put your item for auction</Link>
           </Button>
           {isLogin ? (
             <Button
@@ -135,10 +131,14 @@ export default function NavBar() {
                   />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-fit p-4">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  
+                  <Link to={'/profile'}>Profiles</Link>
+                  </DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuItem>
                   <div className="flex justify-between items-center">
@@ -154,6 +154,11 @@ export default function NavBar() {
                     </div>
 
                   </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+
+                  <Link to={'/consignments'}>Manage Consignment</Link>
+
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

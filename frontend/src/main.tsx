@@ -55,6 +55,8 @@ import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
 import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
 import ResetPasswordForm from "@/pages/authentication/ResetPasswordForm.tsx";
+import CustomerConsignmentList from "./pages/CustomerSite/Consignment/CustomerConsignmentList.tsx";
+import CustomerDashBoard from "./layout/CustomerSite/CustomerDashBoard.tsx";
 
 
 
@@ -80,17 +82,23 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="Auctions/details" element={<AuctionSession />}></Route>
                   <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
                     <Route
-                      path="consignment"
+                      path="create-consignment"
                       element={<Consignment />}
                     ></Route>
+                    <Route path="consignments" element={<CustomerConsignmentList />}>
+                      <Route path="consignments/:id" element={<CustomerConsignmentList />}></Route>
+                    </Route>
                     <Route path="/profile" element={<ProfileLayout />}>
-                      {/* <Route path="" element={<ProfileDetail profileData={JSON.parse(getCookie('user'))} />}></Route> */}
+                      <Route path="" element={<ProfileDetail />}></Route>
                       <Route path="/profile/settings" element={<ProfileSetting />}></Route>
 
                     </Route>
                   </Route>
                 </Route>
+                <Route path="/dashboard" element={<CustomerDashBoard />}>
+                  <Route path="consignments" element={<CustomerConsignmentList />}></Route>
 
+                </Route>
                 {/* Administration */}
                 <Route
                   element={
