@@ -7,6 +7,7 @@ import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
@@ -262,7 +263,7 @@ public class AuthServiceImpl implements AuthService{
             throw new IllegalAccessException("The account is already activated");
 
         if (activationCooldownCache.containsKey(a.getAccountId()))
-            throw new IllegalAccessException("Please wait 10 minutes to activate your account again");
+            throw new CooldownException("Please wait 10 minutes to activate your account again");
 
         activationCooldownCache.put(a.getAccountId(), 0, 10, TimeUnit.MINUTES);
 
