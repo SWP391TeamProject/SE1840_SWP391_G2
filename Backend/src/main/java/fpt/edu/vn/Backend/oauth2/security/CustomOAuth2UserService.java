@@ -80,7 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setRole(Role.MEMBER);
         account.setPassword("12345");
-        account.setStatus(Account.Status.ACTIVATED);
+        account.setStatus(Account.Status.ACTIVE);
         account=accountRepos.save(account);
 
         Attachment attachment=new Attachment();

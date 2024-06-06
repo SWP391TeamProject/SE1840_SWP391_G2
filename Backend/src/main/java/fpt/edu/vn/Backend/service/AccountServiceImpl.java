@@ -104,7 +104,7 @@ public class AccountServiceImpl implements AccountService {
         a.setRole(account.getRole());
         a.setEmail(account.getEmail());
         a.setPhone(account.getPhone());
-        a.setStatus(Account.Status.ACTIVATED);
+        a.setStatus(Account.Status.ACTIVE);
         a.setPassword(account.getPassword());
         return mapEntityToDTO(accountRepos.save(a));
     }

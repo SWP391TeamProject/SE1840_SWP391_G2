@@ -96,7 +96,7 @@ public class Account {
     private Set<ConsignmentDetail> consignmentDetails;
 
     public enum Status {
-        ACTIVATED,
+        ACTIVE,
         DISABLED
     }
 
