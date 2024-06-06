@@ -36,8 +36,8 @@ public class AuctionSession {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
 
-    @Column(name = "is_featured")
-    private byte isFeatured;
+//    @Column(name = "is_featured")
+//    private byte isFeatured;
 
     @CreationTimestamp
     @Column(name = "create_date")
