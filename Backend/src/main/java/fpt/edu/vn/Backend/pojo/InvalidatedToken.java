@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.pojo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,7 +15,17 @@ import java.util.Date;
 @Entity
 public class InvalidatedToken {
     @Id
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    int id;
+
+    String token;
+    @Column(name = "exipration_time")
     Date expiryTime;
+    @Column(name = "token_type")
+    String tokenType;
+
+    @OneToOne
+    @JoinColumn(name = "account_id")
+    Account account;
 
 }

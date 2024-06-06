@@ -167,12 +167,19 @@ public class AuthServiceImpl implements AuthService{
     public void logout(LogOutRequest request) throws ParseException, JOSEException {
         try {
             var signToken = tokenProvider.verifyToken(request.getToken(), true);
+            Optional<Account> accountOptional = accountRepos.findByEmail(jwtGenerator.getEmailFromToken(request.getToken()));
+            Account account = accountOptional.get();
 
             String jit = signToken.getJWTClaimsSet().getJWTID();
             Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
 
             InvalidatedToken invalidatedToken =
-                    InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
+                    InvalidatedToken.builder()
+                            .token(jit)
+                            .expiryTime(expiryTime)
+                            .account(account)
+                            .tokenType("Bearer")
+                            .build();
             tokenProvider.cleanupExpiredTokens();
             invalidatedTokenRepos.save(invalidatedToken);
         } catch (AppException exception){
