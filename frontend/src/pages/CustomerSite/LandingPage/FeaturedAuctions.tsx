@@ -40,7 +40,7 @@ export default function FeaturedAuctions() {
                 Featured Auctions
               </h2>
               <p className="text-gray-500 dark:text-gray-400">
-                Discover our latest and most exclusive auction items.
+                Discover our latest and most exclusive auction.
               </p>
             </div>
             <Carousel className="w-full  mx-auto">
@@ -55,7 +55,7 @@ export default function FeaturedAuctions() {
                             alt="Auction Item"
                             className="rounded-t-lg object-cover"
                             height="225"
-                            src="/placeholder.svg"
+                            src={item.attachments[0].link}  
                             style={{
                               aspectRatio: "400/225",
                               objectFit: "cover",

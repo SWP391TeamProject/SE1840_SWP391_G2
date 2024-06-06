@@ -19,6 +19,7 @@ import { GavelIcon, MenuIcon } from "lucide-react";
 import { get } from "http";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import { fetchAccountById } from "@/services/AccountsServices";
+import axios from "axios";
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -51,6 +52,10 @@ export default function NavBar() {
   }, [user]);
 
   const handleSignout = () => {
+    
+
+
+
     removeCookie("user");
     removeCookie("token");
     setIsLogin(false);
