@@ -5,10 +5,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
-import fpt.edu.vn.Backend.DTO.request.AccountActivationRequestDTO;
-import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
-import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
-import fpt.edu.vn.Backend.DTO.request.ResetPasswordRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.*;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.ErrorResponse;
@@ -100,10 +97,9 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password/")
-    public ResponseEntity<?> resetPassword(@RequestParam String newPassword,
-                                                    @RequestParam String code) {
-        if (!authService.confirmResetPassword(code, newPassword)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordConfirmDTO dto) {
+        if (!authService.confirmResetPassword(dto.getCode(), dto.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

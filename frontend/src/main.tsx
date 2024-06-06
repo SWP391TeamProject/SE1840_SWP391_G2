@@ -54,6 +54,7 @@ import AuctionSession from "./pages/CustomerSite/Auctions/AuctionSession.tsx";
 import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
 import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
+import ResetPasswordForm from "@/pages/authentication/ResetPasswordForm.tsx";
 
 
 
@@ -132,6 +133,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="register" element={<RegisterForm />}></Route>
                   <Route path="unactivated" element={<UnactivatedWarning />}></Route>
                   <Route path="forgot-password" element={<ForgotPasswordForm />}></Route>
+                  <Route path="reset-password" element={<ResetPasswordForm />}></Route>
                   <Route path="activate" element={<ActivationForm />}></Route>
                 </Route>
 

@@ -52,10 +52,9 @@ export const requestResetPassword = async (dto: { email: string }): Promise<void
   });
 };
 
-export const resetPassword = async (newPassword: string, code: string): Promise<void> => {
-  await axios.post(`${baseUrl}/reset-password/`, null, {
-    ...authHeader,
-    params: { newPassword, code },
+export const resetPassword = async (dto: { code: string, password: string }): Promise<void> => {
+  await axios.post(`${baseUrl}/reset-password/`, dto, {
+    ...authHeader
   });
 };
 
