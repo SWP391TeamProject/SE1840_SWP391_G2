@@ -6,16 +6,13 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import net.jodah.expiringmap.ExpiringMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -107,7 +104,7 @@ public class AccountServiceImpl implements AccountService {
         a.setRole(account.getRole());
         a.setEmail(account.getEmail());
         a.setPhone(account.getPhone());
-        a.setStatus(Account.Status.ACTIVE);
+        a.setStatus(Account.Status.ACTIVATED);
         a.setPassword(account.getPassword());
         return mapEntityToDTO(accountRepos.save(a));
     }

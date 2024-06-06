@@ -60,6 +60,13 @@ export const resetPassword = async (newPassword: string, code: string): Promise<
   });
 };
 
+export const requestActivateAccount = async (dto: { email: string }): Promise<void> => {
+  await axios.post(`${baseUrl}/request-activate-account/`, dto, {
+    ...authHeader
+  });
+};
+
+
 export const activateAccount = async (code: string): Promise<void> => {
   await axios.post(`${baseUrl}/activate-account/`, null, {
     ...authHeader,
