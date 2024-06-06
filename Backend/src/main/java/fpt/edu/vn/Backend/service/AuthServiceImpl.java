@@ -233,10 +233,11 @@ public class AuthServiceImpl implements AuthService{
         helper.setSubject("[Biddify] Reset Password");
         String link = String.format(resetEmailLink, code);
         helper.setText("""
+                <p>Your reset code: %s</p>
                 <p>Click here to reset your password: <a href="%s">Reset Password</a></p>
-                <p>The link will expire after 1 hour.</p>
+                <p>The code will expire after 1 hour.</p>
                 <p>- Biddify</p>
-                """.formatted(link), true);
+                """.formatted(code, link), true);
         mailSender.send(message);
 
         resetPasswordCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
@@ -245,7 +246,7 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword) {
-        if (newPassword.length() < 6) {
+        if (newPassword.length() < 8) {
             throw new InvalidInputException("Password is too short!");
         }
         Integer id = resetPasswordCodeCache.get(resetCode);
@@ -288,10 +289,11 @@ public class AuthServiceImpl implements AuthService{
         helper.setSubject("[Biddify] Activate account");
         String link = String.format(activateAccountLink, code);
         helper.setText("""
+                <p>Your activation code: %s</p>
                 <p>Click here to activate your account: <a href="%s">Activate account</a></p>
-                <p>The link will expire after 1 hour.</p>
+                <p>The code will expire after 1 hour.</p>
                 <p>- Biddify</p>
-                """.formatted(link), true);
+                """.formatted(code, link), true);
         mailSender.send(message);
 
         activationCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
