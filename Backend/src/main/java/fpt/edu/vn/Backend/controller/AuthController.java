@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.DTO.request.*;
+import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.ErrorResponse;
@@ -57,6 +58,14 @@ public class AuthController {
         boolean result = tokenProvider.introspect(request).isValid();
         IntrospectResponse introspectResponse = IntrospectResponse.builder().valid(result).build();
         return ResponseEntity.ok(introspectResponse);
+    }
+
+    @PostMapping("/refresh")
+    ResponseEntity<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        String result = String.valueOf(tokenProvider.refreshToken(request));
+        AuthenticationResponse authenticationResponse = AuthenticationResponse.builder().accessToken(result).authenticated(true).build();
+        return ResponseEntity.ok(authenticationResponse);
     }
 
     @GetMapping("/login-with-google")
