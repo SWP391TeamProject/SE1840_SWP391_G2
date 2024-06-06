@@ -269,7 +269,7 @@ public class AuthServiceImpl implements AuthService{
             throw new IllegalAccessException("The account is already activated");
 
         if (activationCooldownCache.containsKey(a.getAccountId()))
-            throw new IllegalAccessException("Please wait 10 minutes to activate your account again");
+            throw new CooldownException("Please wait 10 minutes to activate your account again");
 
         activationCooldownCache.put(a.getAccountId(), 0, 10, TimeUnit.MINUTES);
 

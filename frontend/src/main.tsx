@@ -53,6 +53,8 @@ import Consignment from "./pages/CustomerSite/Consignment/Consignment.tsx";
 import AuctionSession from "./pages/CustomerSite/Auctions/AuctionSession.tsx";
 import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
+import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
+
 
 
 const router = createBrowserRouter(routes);
@@ -130,6 +132,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="register" element={<RegisterForm />}></Route>
                   <Route path="unactivated" element={<UnactivatedWarning />}></Route>
                   <Route path="forgot-password" element={<ForgotPasswordForm />}></Route>
+                  <Route path="activate" element={<ActivationForm />}></Route>
                 </Route>
 
                 <Route path="/unauthorized" element={<Unauthorized />} />
