@@ -22,6 +22,9 @@ import { createConsignmentService } from "@/services/ConsignmentService";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "react-toastify";
+import { Separator } from "@/components/ui/separator";
+import { Description } from "@radix-ui/react-dialog";
+import { mailRegex, phoneRegex } from "@/constants/regex";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -29,13 +32,20 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/webp",
 ];
+
+
 const formSchema = z.object({
   accountId: z.number(),
-  email: z.string(),
-  phone: z.string(),
+  email: z.string().regex(mailRegex, { message: "Invalid email address" }),
+  phone: z.string().regex(phoneRegex,
+     { message: "Invalid phone number.must be 10-digit phone number." }),
   contactName: z.string(),
   preferContact: z.enum(["email", "phone", "text", "any of the above"]),
-  description: z.string(),
+  description: z.string().min(10,{
+    message: "Description must be between 10 and 500 characters"
+  }).max(500,{
+    message: "Description must be between 10 and 500 characters"
+  }),
   files: z.any()
 });
 
@@ -144,7 +154,7 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input placeholder="shadcn" {...field} />
+                          <Input placeholder="enter your phone number here" {...field} />
                         </FormControl>
                         <FormDescription>
                           this is the phone we used to contact you
@@ -187,7 +197,7 @@ export default function ConsignmentInititalForm() {
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                               <FormControl>
-                                <RadioGroupItem value="any" />
+                                <RadioGroupItem value="any of the above" />
                               </FormControl>
                               <FormLabel className="font-normal">
                                 Any of the above
@@ -233,9 +243,12 @@ export default function ConsignmentInititalForm() {
                       Loading
                     </Button>
                     :
-                    <Button variant={"default"} type="submit">
-                      Submit
-                    </Button>
+                    <div className="sticky bottom-0 flex flex-col justify-center w-full">
+                      <Separator className="my-2 w-full" />
+                      <Button variant={"default"} type="submit" className="" >
+                        Submit
+                      </Button>
+                    </div>
                   }
                 </form>
               </Form>
