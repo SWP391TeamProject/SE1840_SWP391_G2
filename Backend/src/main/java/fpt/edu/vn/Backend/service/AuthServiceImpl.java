@@ -7,6 +7,7 @@ import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
@@ -54,7 +55,8 @@ public class AuthServiceImpl implements AuthService{
     private String resetEmailLink;
     @Value("${app.activate-account-link}")
     private String activateAccountLink;
-    private final ExpiringMap<String, Integer> resetCodeCache = ExpiringMap.builder().variableExpiration().build();
+    private final ExpiringMap<String, Integer> resetPasswordCodeCache = ExpiringMap.builder().variableExpiration().build();
+    private final ExpiringMap<Integer, Object> resetPasswordCooldownCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<String, Integer> activationCodeCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<Integer, Object> activationCooldownCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
@@ -207,9 +209,14 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public void requestResetPassword(int accountId) throws MessagingException {
-        Account a = accountRepos.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", accountId));
+    public void requestResetPassword(@NotNull String email) throws MessagingException {
+        Account a = accountRepos.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+
+        if (resetPasswordCooldownCache.containsKey(a.getAccountId()))
+            throw new CooldownException("Please wait 10 minutes to request a new password.");
+
+        resetPasswordCooldownCache.put(a.getAccountId(), 0, 10, TimeUnit.MINUTES);
 
         String code;
         do {
@@ -217,7 +224,7 @@ public class AuthServiceImpl implements AuthService{
             for (int i = 0; i < 6; i++)
                 sb.append((int) (Math.random() * 10));
             code = sb.toString();
-        } while (resetCodeCache.containsKey(code));
+        } while (resetPasswordCodeCache.containsKey(code));
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false);
@@ -232,8 +239,8 @@ public class AuthServiceImpl implements AuthService{
                 """.formatted(link), true);
         mailSender.send(message);
 
-        resetCodeCache.put(code, accountId, 1, TimeUnit.HOURS);
-        logger.info("Sending reset password account {} to {} with code {}", accountId, a.getEmail(), code);
+        resetPasswordCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
+        logger.info("Sending reset password account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
     }
 
     @Override
@@ -241,14 +248,14 @@ public class AuthServiceImpl implements AuthService{
         if (newPassword.length() < 6) {
             throw new InvalidInputException("Password is too short!");
         }
-        Integer id = resetCodeCache.get(resetCode);
+        Integer id = resetPasswordCodeCache.get(resetCode);
         if (id == null)
             return false;
         Account acc = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
         acc.setPassword(newPassword);
         accountRepos.save(acc);
-        resetCodeCache.remove(resetCode);
+        resetPasswordCodeCache.remove(resetCode);
         logger.info("Reset password for account {} with code {} successfully", id, resetCode);
         return true;
     }

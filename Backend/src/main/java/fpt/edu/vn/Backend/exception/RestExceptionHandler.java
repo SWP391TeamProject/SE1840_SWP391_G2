@@ -36,4 +36,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(),new Date());
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST); // Or appropriate status
   }
+
+  @ExceptionHandler(CooldownException.class)
+  public ResponseEntity<ErrorResponse> handleConsignmentServiceException(CooldownException ex) {
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(),new Date());
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST); // Or appropriate status
+  }
 }
