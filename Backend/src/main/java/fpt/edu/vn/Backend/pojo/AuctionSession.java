@@ -35,9 +35,9 @@ public class AuctionSession {
     public enum Status {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
+//    @Column(name = "is_featured")
+//    private byte isFeatured =0;
 
-    @Column(name = "is_featured")
-    private byte isFeatured;
 
     @CreationTimestamp
     @Column(name = "create_date")
