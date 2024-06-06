@@ -11,6 +11,5 @@ import java.util.Date;
 public interface InvalidatedTokenRepos extends JpaRepository<InvalidatedToken, String> {
     @Transactional
     void deleteByExpiryTimeBefore(Date now);
-
     boolean existsByToken(String token);
 }
