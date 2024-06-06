@@ -21,9 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -82,7 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         account.setEmail(oAuth2UserInfo.getEmail());
         account.setRole(Role.MEMBER);
         account.setPassword("12345");
-        account.setStatus(Account.Status.ACTIVE);
+        account.setStatus(Account.Status.ACTIVATED);
         account=accountRepos.save(account);
 
         Attachment attachment=new Attachment();

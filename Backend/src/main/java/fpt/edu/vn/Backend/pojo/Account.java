@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -54,6 +55,7 @@ public class Account {
     }
 
     @Column(name = "email", length = 100)
+    @NaturalId
     private String email;
 
     @Column(name = "password", length = 50)
@@ -94,7 +96,7 @@ public class Account {
     private Set<ConsignmentDetail> consignmentDetails;
 
     public enum Status {
-        ACTIVE,
+        ACTIVATED,
         DISABLED
     }
 

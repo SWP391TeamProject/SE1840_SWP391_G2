@@ -3,8 +3,6 @@ package fpt.edu.vn.Backend.service;
 
 import com.nimbusds.jose.JOSEException;
 
-import fpt.edu.vn.Backend.DTO.AttachmentDTO;
-
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
@@ -58,6 +56,7 @@ public class AuthServiceImpl implements AuthService{
     private String activateAccountLink;
     private final ExpiringMap<String, Integer> resetCodeCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<String, Integer> activationCodeCache = ExpiringMap.builder().variableExpiration().build();
+    private final ExpiringMap<Integer, Object> activationCooldownCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     @Autowired
     private TokenProvider tokenProvider;
@@ -107,8 +106,8 @@ public class AuthServiceImpl implements AuthService{
         }
 
         try {
-            requestActivateAccount(newAccount.getAccountId()); // send activation email
-        } catch (MessagingException e) {
+            requestActivateAccount(newAccount.getEmail()); // send activation email
+        } catch (MessagingException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -255,9 +254,17 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public void requestActivateAccount(int accountId) throws MailException, MessagingException {
-        Account a = accountRepos.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", accountId));
+    public void requestActivateAccount(@NotNull String email) throws MailException, MessagingException, IllegalAccessException {
+        Account a = accountRepos.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+
+        if (a.getStatus() == Account.Status.ACTIVATED)
+            throw new IllegalAccessException("The account is already activated");
+
+        if (activationCooldownCache.containsKey(a.getAccountId()))
+            throw new IllegalAccessException("Please wait 10 minutes to activate your account again");
+
+        activationCooldownCache.put(a.getAccountId(), 0, 10, TimeUnit.MINUTES);
 
         String code;
         do {
@@ -280,8 +287,8 @@ public class AuthServiceImpl implements AuthService{
                 """.formatted(link), true);
         mailSender.send(message);
 
-        activationCodeCache.put(code, accountId, 1, TimeUnit.HOURS);
-        logger.info("Sending activation code for account {} to {} with code {}", accountId, a.getEmail(), code);
+        activationCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
+        logger.info("Sending activation code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
     }
 
     @Override
@@ -291,9 +298,9 @@ public class AuthServiceImpl implements AuthService{
             return false;
         Account acc = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
-        if (acc.getStatus() == Account.Status.ACTIVE)
+        if (acc.getStatus() == Account.Status.ACTIVATED)
             throw new IllegalStateException("Account already activated");
-        acc.setStatus(Account.Status.ACTIVE);
+        acc.setStatus(Account.Status.ACTIVATED);
         accountRepos.save(acc);
         activationCodeCache.remove(activateCode);
         logger.info("Activated account {} with code {} successfully", id, activateCode);
