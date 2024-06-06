@@ -19,12 +19,11 @@ const profileNavItems = [
   // Add more profile navigation items as needed
 ];
 
-export default function ProfileLayout() {
+export default function Profile() {
   const location = useLocation();
 
   return (
     <>
-      <NavBar />
       <div className="container min-h-screen m-3 flex flex-row">
         {/* Vertical Sidebar */}
         <aside className="w-64 lg:w-80 bg-gray-50 border-r border-gray-200 p-4 hidden lg:block">

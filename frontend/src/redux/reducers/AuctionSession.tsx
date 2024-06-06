@@ -29,6 +29,7 @@ export const auctionSessionsSlice = createSlice({
     initialState,
     reducers: {
         setAuctionSessions: (state, action) => {
+            console.log(action.payload);
             state.value = action.payload;
             state.totalItems = action.payload.length;
         },

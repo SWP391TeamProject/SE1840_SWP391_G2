@@ -1,4 +1,4 @@
-import { getCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -14,6 +14,10 @@ export const fetchAllAuctionSessions = async () => {
         })
         .catch((err) => {
             toast.error(err.response.data.message);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
         });
 };
 
@@ -27,4 +31,11 @@ export const createAuctionSession = async (data: any) => {
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
+        });
 }

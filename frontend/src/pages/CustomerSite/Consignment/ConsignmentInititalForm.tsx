@@ -16,7 +16,7 @@ import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-import DropzoneComponent from "../../components/drop-zone/DropZoneComponent";
+import DropzoneComponent from "../../../components/drop-zone/DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
 import { createConsignmentService } from "@/services/ConsignmentService";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";

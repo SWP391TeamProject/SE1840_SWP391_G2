@@ -30,7 +30,6 @@ export const Contact = () => {
 
     return (
         <>
-            <NavBar />
             <div className="contact-us flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-sky-500 to-indigo-500 py-20 px-8  shadow-md">
                 <h1 className="text-5xl font-bold text-center text-white mb-8">Biddify - Contact Us</h1>
                 <div className="block sm:flex justify-center md:flex-row md:space-x-16 w-full mb-16">

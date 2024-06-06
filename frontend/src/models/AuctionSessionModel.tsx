@@ -4,6 +4,7 @@ export interface AuctionSession {
     startDate?: Date;
     endDate?: Date;
     status?: string;
+    auctionItems?: [];
     deposits?:[];
     createDate?: Date;
     updateDate?: Date;

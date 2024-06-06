@@ -27,18 +27,17 @@ To read more about using these font, please visit the Next.js documentation:
 import { Button } from "@/components/ui/button";
 import { SheetTrigger, SheetContent, Sheet } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
-import LandingPageCarousel from "@/pages/LandingPage/LandingPageCarousel";
-import FeaturedAuctions from "@/pages/LandingPage/FeaturedAuctions";
-import CategoriesSection from "@/pages/LandingPage/CategoriesSection";
-import AuctionProcessSection from "@/pages/LandingPage/AuctionProcessSection";
-import Footer from "../../components/footer/Footer";
+import LandingPageCarousel from "@/pages/CustomerSite/LandingPage/LandingPageCarousel";
+import FeaturedAuctions from "@/pages/CustomerSite/LandingPage/FeaturedAuctions";
+import CategoriesSection from "@/pages/CustomerSite/LandingPage/CategoriesSection";
+import AuctionProcessSection from "@/pages/CustomerSite/LandingPage/AuctionProcessSection";
+import Footer from "../../../components/footer/Footer";
 import { GavelIcon, MenuIcon } from "lucide-react";
 import NavBar from "@/components/NavBar/NavBar";
 
-export function LandingPageLayout() {
+export function LandingPage() {
   return (
     <div key="1" className="flex flex-col min-h-[100dvh]">
-      <NavBar />
       <main className="flex-1">
         {/* Start Carouesel Sections */}
         <LandingPageCarousel />
