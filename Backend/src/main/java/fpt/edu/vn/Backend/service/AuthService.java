@@ -22,6 +22,6 @@ public interface AuthService {
     AuthResponseDTO loginWithFacebook(String token);
     void requestResetPassword(int accountId) throws MailException, MessagingException;
     boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword);
-    void requestActivateAccount(int accountId) throws MailException, MessagingException;
+    void requestActivateAccount(@NotNull String email) throws MailException, MessagingException, IllegalAccessException;
     boolean confirmActivateAccount(@NotNull String activateCode);
 }

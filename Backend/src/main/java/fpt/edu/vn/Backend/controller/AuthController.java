@@ -5,9 +5,12 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.DTO.request.AccountActivationRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
+import fpt.edu.vn.Backend.exception.CooldownException;
+import fpt.edu.vn.Backend.exception.ErrorResponse;
 import fpt.edu.vn.Backend.oauth2.response.ApiResponse;
 import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -100,6 +103,18 @@ public class AuthController {
                                                     @RequestParam String code) {
         if (!authService.confirmResetPassword(code, newPassword)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/request-activate-account/")
+    public ResponseEntity<?> requestActivatePassword(@RequestBody AccountActivationRequestDTO dto) {
+        try {
+            authService.requestActivateAccount(dto.getEmail());
+        } catch (MessagingException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IllegalAccessException e) {
+            throw new CooldownException(e);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
