@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +35,9 @@ public class AuctionSession {
     public enum Status {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
+//
+//    @Column(name = "is_featured")
+//    private byte isFeatured =0;
 
     @CreationTimestamp
     @Column(name = "create_date")
