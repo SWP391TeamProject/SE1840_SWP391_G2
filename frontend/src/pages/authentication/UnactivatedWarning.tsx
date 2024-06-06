@@ -1,25 +1,20 @@
 import {Card} from "@/components/ui/card";
 import {useRef, useState} from "react";
 import {Button} from "@/components/ui/button.tsx";
-import {getCookie, setCookie} from "@/utils/cookies.ts";
+import {getCookie} from "@/utils/cookies.ts";
 import {AuthResponse} from "@/models/AuthResponse.ts";
 
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import {ScrollArea} from "@/components/ui/scroll-area.tsx";
-import {Label} from "@/components/ui/label.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Loader2} from "lucide-react";
 import {SubmitHandler, useForm} from "react-hook-form";
-import axios from "axios";
-import {AccountStatus, Roles} from "@/constants/enums.tsx";
 import {toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
 import {requestActivateAccount} from "@/services/AuthService.ts";
@@ -30,10 +25,10 @@ type FormValues = {
 
 function UnactivatedWarning() {
     const UnactivatedWarning = useRef<HTMLDivElement>(null);
-    const user = JSON.parse(getCookie('unactivated-user')) as AuthResponse;
+    const user = JSON.parse(getCookie('unactivated-user') ?? "{}") as AuthResponse;
     const { register, handleSubmit } = useForm<FormValues>({
         defaultValues: {
-            email: user.email
+            email: user.email ?? ""
         }
     });
     const [locked, setLocked] = useState(false);
