@@ -7,11 +7,14 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
+import fpt.edu.vn.Backend.DTO.request.RefreshRequest;
+import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
 import fpt.edu.vn.Backend.oauth2.exception.ErrorCode;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.InvalidatedToken;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.InvalidatedTokenRepos;
 import fpt.edu.vn.Backend.security.SecurityConstants;
 import io.jsonwebtoken.*;
@@ -35,6 +38,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -55,6 +59,11 @@ public class TokenProvider {
 
     @Autowired
     private InvalidatedTokenRepos invalidatedTokenRepos;
+
+    @Autowired
+    private AccountRepos accountRepos;
+
+
 
     private Key getSigningKey() {
         byte[] keyBytes = SecurityConstants.JWT_SECRET.getBytes(
@@ -111,7 +120,7 @@ public class TokenProvider {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if (invalidatedTokenRepos.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        if (invalidatedTokenRepos.existsByToken(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
