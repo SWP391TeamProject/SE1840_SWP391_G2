@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
+import fpt.edu.vn.Backend.DTO.request.OrderRequest;
 import fpt.edu.vn.Backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
-        OrderDTO createdOrder = orderService.createOrder(orderDTO);
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderRequest orderRequest) {
+        OrderDTO createdOrder = orderService.createOrder(orderRequest);
         return ResponseEntity.ok(createdOrder);
     }
 
@@ -34,9 +35,9 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable int id, @RequestBody OrderDTO orderDTO) {
-        OrderDTO updatedOrder = orderService.updateOrder(id, orderDTO);
+    @PutMapping("/update")
+    public ResponseEntity<OrderDTO> updateOrder(@RequestBody OrderRequest orderRequest) {
+        OrderDTO updatedOrder = orderService.updateOrder(orderRequest);
         return ResponseEntity.ok(updatedOrder);
     }
 
