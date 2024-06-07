@@ -1,8 +1,5 @@
 package fpt.edu.vn.Backend.DTO.request;
 
-import fpt.edu.vn.Backend.DTO.PaymentDTO;
-import fpt.edu.vn.Backend.pojo.AuctionItemId;
-import fpt.edu.vn.Backend.pojo.AuctionSession;
 import lombok.*;
 
 
