@@ -130,7 +130,7 @@ export default function DashBoardNavBar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
 
-                  <Link to={'/'}>Switch to traveling</Link>
+                  <Link to={'/'}>Switch to auctioning</Link>
 
                 </DropdownMenuItem>
 

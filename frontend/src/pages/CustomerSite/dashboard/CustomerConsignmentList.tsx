@@ -5,9 +5,11 @@ import React from "react";
 import CustomerConsigmentCard from "./components/CustomerConsigmentCard";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { Button } from "@/components/ui/button";
-import { PlusCircleIcon } from "lucide-react";
+import { Grid2x2Icon, PlusCircleIcon, WalletCards } from "lucide-react";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
 import { useNavigate } from "react-router-dom";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ConsignmentStatus } from "@/constants/enums";
 
 
 const consignmentCard = (consignment: any) => {
@@ -33,7 +35,7 @@ enum layoutType {
 export default function CustomerConsignmentList() {
     const [account, setAccount] = React.useState<any>();
     const [consignments, setConsignments] = React.useState<any[]>([]);
-    const [layout,setLayout] = React.useState<any>(consignmentCard);
+    const [layout, setLayout] = React.useState<any>(layoutType.CARD);
     const nav = useNavigate();
 
 
@@ -82,13 +84,31 @@ export default function CustomerConsignmentList() {
                         <NavigationMenu className="flex items-center gap-2">
                             <NavigationMenuList>
                                 <NavigationMenuItem>
-                                    <NavigationMenuLink asChild  className="hover:cursor-pointer rounded-full hover:bg-gray-400 ">
-                                        <PlusCircleIcon className="h-6 w-6 " onClick={()=>{
-                                            nav('/create-consignment');
-                                        }} />
+                                    <NavigationMenuLink asChild className="hover:cursor-pointer rounded-full hover:bg-gray-400 ">
+                                        <div className="h-8 w-8 rounded-full flex items-center justify-center">
+                                            <PlusCircleIcon className="h-6 w-6 " onClick={() => {
+                                                nav('/create-consignment');
+                                            }} />
+                                        </div>
                                     </NavigationMenuLink>
 
 
+                                </NavigationMenuItem>
+                                <NavigationMenuItem>
+                                    <NavigationMenuLink asChild className="hover:cursor-pointer rounded-full hover:bg-gray-400 " onClick={() => {
+                                        setLayout(prev => {
+                                            return prev === layoutType.CARD ? layoutType.TABLE : layoutType.CARD;
+                                        });
+                                    }}>
+                                        {layout === layoutType.CARD ?
+                                            <div className="h-8 w-8 rounded-full flex items-center justify-center">
+                                                <Grid2x2Icon className="sad" />
+                                            </div>
+                                            :
+                                            <WalletCards className="h-8 w-8 rounded-full flex items-center justify-center" />
+
+                                        }
+                                    </NavigationMenuLink>
                                 </NavigationMenuItem>
                             </NavigationMenuList>
 
@@ -96,10 +116,37 @@ export default function CustomerConsignmentList() {
                         </NavigationMenu>
                     </div>
                 </div>
-                <div className="flex flex-row flex-wrap gap-16 ">
-                    {consignments ? consignments.map((consignment) => <CustomerConsigmentCard key={consignment.consignmentId} consignment={consignment} />) : <LoadingAnimation />}
+                {layout === layoutType.TABLE && consignments && consignments.length > 0 &&
+                    <Table data={consignments} >
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>
+                                    Id
+                                </TableHead>
+                                <TableHead>
+                                    Create Date
+                                </TableHead>
+                                <TableHead>
+                                    Status
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {consignments.map((consignment) => (
+                                <TableRow key={consignment.consignmentId}>
+                                    <TableCell >{consignment.consignmentId}</TableCell >
+                                    <TableCell >{consignment.createDate}</TableCell >
+                                    <TableCell >{consignment.status == ConsignmentStatus.WAITING_STAFF ? 'Evaluating' : 'Terminated'}</TableCell >
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+
+                }
+                <div className={`flex flex-row flex-wrap gap-16 ${layout === layoutType.CARD ? 'block' : 'hidden'}`}>
+                    {layout === layoutType.CARD && consignments && consignments.map((consignment) => <CustomerConsigmentCard key={consignment.consignmentId} consignment={consignment} />)}
                 </div>
-            </div>
+            </div >
 
 
         </>);

@@ -8,7 +8,7 @@ export default function CustomerDashboard() {
 
   return (
     <>
-      <div className=" gap-2 flex flex-col justify-center items-start basis-1/3">
+      <div className=" gap-2 flex flex-col justify-center items-start mb-3">
         <section className="body-font h-96 p-20">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
             Welcome back, Customer
@@ -25,39 +25,30 @@ export default function CustomerDashboard() {
           <p className="leading-7 [&:not(:first-child)]:mt-6">
             It's time to review a couple of current settings.
           </p>
-          <Carousel className="w-full min-w-xs">
-            <CarouselContent className="-ml-4">
-              { Array.from({length: 3 }).map((_, index) => (
-              <CarouselItem key={index} className="basis-1/6">
-                <Card className="w-[200px] h-[200px] aspect-square">
-                  <CardHeader>
-                    <CheckIcon color="green" className="h-6 w-6 " />
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold">Verify your email address</h2>
-                    </div>
+          <div className="w-full justify-center items-center">
+            <Carousel className="w-full min-w-xs overflow-hidden ">
+              <CarouselContent className="-ml-1">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <CarouselItem key={index} className="basis1 md:basis-1/3">
+                    <Card className="w-[200px] h-[200px] aspect-square">
+                      <CardHeader>
+                        <CheckIcon color="green" className="h-6 w-6 " />
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-lg font-semibold">Verify your email address</h2>
+                        </div>
 
-                  </CardContent>
-                </Card>
-              </CarouselItem>
-              ))}              <CarouselItem>
-                <Card className="w-[200px] h-[200px] aspect-square">
-                  <CardHeader>
-                    <CheckIcon color="green" className="h-6 w-6 " />
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold">Verify your email address</h2>
-                    </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}             
 
-                  </CardContent>
-                </Card>
-              </CarouselItem>
+              </CarouselContent>
 
-            </CarouselContent>
+            </Carousel>
+          </div>
 
-          </Carousel>
 
         </section>
 

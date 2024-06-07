@@ -7,9 +7,9 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
-import { useLocation, useNavigate } from "react-router-dom";
+import { redirect, redirectDocument, useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
-import {AccountStatus, Roles} from "@/constants/enums";
+import { AccountStatus, Roles } from "@/constants/enums";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
@@ -180,11 +180,15 @@ function LoginForm() {
               Sign up
             </a>
           </div>
-          <Button type="button" className="h-fit bg-white text-black border rounded-xl m-0 w-full hover:bg-gray-200 mt-2"  >
-            <img src={googleIcon} about="google icon" className="object-contain " width={'30px'} height={'30px'} />
-            <a href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login?type=google">
-              Login with google
-            </a>
+          <Button
+            type="button"
+            className="h-fit bg-white text-black border rounded-xl m-0 w-full hover:bg-gray-200 mt-2"
+            onClick={() => {
+              window.location.href = 'http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login?type=google';
+            }}
+          >
+            <img src={googleIcon} alt="google icon" className="object-contain" width={'30px'} height={'30px'} />
+            Login with Google
           </Button>
         </CardContent>
 
