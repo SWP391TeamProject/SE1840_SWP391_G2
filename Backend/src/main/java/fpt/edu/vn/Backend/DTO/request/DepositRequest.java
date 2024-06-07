@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.DTO.request;
 
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import lombok.*;
 
 
@@ -12,7 +13,7 @@ import lombok.*;
 @ToString
 public class DepositRequest {
     private int depositId;
-    private AuctionItemId auctionItemId;
+    private int  auctionSessionId;
     private int paymentId;
 
 }

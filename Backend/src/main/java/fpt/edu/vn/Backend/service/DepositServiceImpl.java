@@ -31,9 +31,9 @@ public class DepositServiceImpl implements DepositService{
     public DepositDTO createDeposit(DepositRequest depositRequest) {
         try {
             Deposit deposit = new Deposit();
-            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositRequest.getAuctionItemId());
-            if (auctionItemOptional.isPresent()) {
-                deposit.setAuctionItem(auctionItemOptional.get());
+            Optional<AuctionSession> auctionSessionOptional = auctionSessionRepos.findById(depositRequest.getAuctionSessionId());
+            if (auctionSessionOptional.isPresent()) {
+                deposit.setAuctionSession(auctionSessionOptional.get());
             } else {
                 throw new RuntimeException("Auction Item not found");
             }
@@ -79,9 +79,9 @@ public class DepositServiceImpl implements DepositService{
             Deposit deposit = depositRepos.findById(depositRequest.getDepositId())
                     .orElseThrow(() -> new RuntimeException("Deposit not found"));
 
-            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositRequest.getAuctionItemId());
-            if (auctionItemOptional.isPresent()) {
-                deposit.setAuctionItem(auctionItemOptional.get());
+           Optional<AuctionSession> auctionSessionOptional = auctionSessionRepos.findById(depositRequest.getAuctionSessionId());
+            if (auctionSessionOptional.isPresent()) {
+                deposit.setAuctionSession(auctionSessionOptional.get());
             } else {
                 throw new RuntimeException("Auction Item not found");
             }
