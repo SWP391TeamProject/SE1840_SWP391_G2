@@ -2,6 +2,7 @@ import { fetchAccountById } from "@/services/AccountsServices";
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 import React from "react";
+import CustomerConsigmentCard from "./card/CustomerConsigmentCard";
 
 
 const consignmentCard = (consignment: any) => {
@@ -65,5 +66,6 @@ export default function CustomerConsignmentList() {
 
 
             </div>
+            <CustomerConsigmentCard/>
         </>);
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
 import axios from 'axios'
@@ -12,6 +12,7 @@ export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
     const dispatch = useAppDispatch();
     const [sessionAttachments,setSessionAttachments] = useState([]);
+    const navigate = useNavigate();
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -88,7 +89,7 @@ export default function AuctionSession() {
                                     <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
                                     <div className="flex items-center justify-between">
                                         <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
-                                        <Button>Place Bid</Button>
+                                        <Button onClick={()=>navigate(`/auction-join`,{state: {id: item?.id , itemDTO: item?.itemDTO}})}>Place Bid</Button>
                                         {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
                                     </div>
                                 </CardContent>

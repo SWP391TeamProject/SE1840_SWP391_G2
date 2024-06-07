@@ -26,6 +26,18 @@ export default function AboutScreen() {
         setBuyPosition(buy?.current?.offsetTop);
         setSellPosition(sell?.current?.offsetTop);
     }, [])
+    const scrollToElement = () => {
+        let currentLocation = window.location.href;
+        const hasElementAnchor = currentLocation.includes("#");
+        if (hasElementAnchor) {
+            const anchorElementId = `${currentLocation.substring(currentLocation.indexOf("#") + 1)}`;
+            const anchorElement = document.getElementById(anchorElementId);
+            if (anchorElement) {
+                scrollTo({top:anchorElement.offsetTop-100,behavior:"smooth"})
+            }
+        }
+    }
+    scrollToElement();
     return (
         <>
             <div className="flex container">
@@ -45,14 +57,14 @@ export default function AboutScreen() {
                     <div ref={ourTeam}>
                         <OurTeam />
                     </div>
-                    <h1 className="mx-auto px-4 text-4xl font-extrabold my-16">How it works</h1>
-                    <hr/>
-                    <hr/>
+                    <h1 id="how-it-works" className="mx-auto px-4 text-4xl font-extrabold my-16">How it works</h1>
+                    <hr />
+                    <hr />
                     <div ref={buy}>
                         <Buy />
                     </div>
-                    <hr/>
-                    <hr/>
+                    <hr />
+                    <hr />
                     <div ref={sell}>
                         <Sell />
                     </div>

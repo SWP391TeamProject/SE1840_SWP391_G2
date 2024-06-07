@@ -1,5 +1,8 @@
 package fpt.edu.vn.Backend.dbgen;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -371,6 +374,7 @@ public class DbGenService {
 
     private void generateTransaction(JsonArray e) {
         LOGGER.info("Generate transactions...");
+        Multimap<Integer, Integer> depositSet = HashMultimap.create();
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
             Payment payment = new Payment();
@@ -379,6 +383,16 @@ public class DbGenService {
             payment.setStatus(Payment.Status.valueOf(obj.get("status").getAsString()));
             payment.setType(Payment.Type.valueOf(obj.get("type").getAsString()));
             payment.setAccount(accountRepos.findById(obj.get("accountId").getAsInt()).get());
+
+            if (payment.getType() == Payment.Type.AUCTION_DEPOSIT) {
+                JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
+                int auctionId = auctionItem.get("auctionId").getAsInt();
+                if (depositSet.get(auctionId).contains(obj.get("accountId").getAsInt())) {
+                    continue;
+                }
+                depositSet.put(auctionId, obj.get("accountId").getAsInt());
+            }
+
             payment = paymentRepos.save(payment);
             {
                 Map<String, Object> paramMap = new HashMap<>();
@@ -408,11 +422,7 @@ public class DbGenService {
                 case AUCTION_DEPOSIT -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Deposit deposit = new Deposit();
-                    deposit.setAuctionItem(auctionItemRepos.findById(new AuctionItemId(
-                                    auctionItem.get("auctionId").getAsInt(),
-                                    auctionItem.get("itemId").getAsInt()
-                            )
-                    ).get());
+                    deposit.setAuctionSession(auctionSessionRepos.findById(auctionItem.get("auctionId").getAsInt()).get());
                     deposit.setPayment(payment);
                     payment.setDeposit(deposit);
                     paymentRepos.save(payment);
