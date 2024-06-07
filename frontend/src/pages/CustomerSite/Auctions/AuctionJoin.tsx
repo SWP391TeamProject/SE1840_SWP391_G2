@@ -88,7 +88,10 @@ export default function AuctionJoin() {
     <div className="grid grid-cols-[300px_1fr_300px] gap-8 h-screen">
       <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg sticky top-6">
         <div className="grid gap-4">
-          <div>
+          <div> 
+            <Button size="large" className="text-white p-4" onClick={()=>{
+              window.history.back();
+            }}>Back</Button>
             <div className="grid grid-cols-1 gap-4">
               <img
                 src={itemDTO.attachments[0].link}

@@ -59,6 +59,7 @@ import AuctionJoin from "./pages/CustomerSite/Auctions/AuctionJoin.tsx";
 import CustomerDashboard from "./pages/CustomerSite/dashboard/CustomerDashboard.tsx";
 import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerConsignmentList.tsx";
 import TestPage from "./pages/TestPage.tsx";
+import { Bids } from "./pages/CustomerSite/dashboard/bids/Bids.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -81,6 +82,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="about" element={<AboutScreen />}></Route>
                   <Route path="Auctions" element={<AuctionList />}></Route>
                   <Route path="Auctions/details" element={<AuctionSession />}></Route>
+                  <Route path="Auctions/:id" element={<AuctionSession />}></Route>
                   <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
                     <Route
                       path="create-consignment"
@@ -99,7 +101,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/dashboard" element={<CustomerDashBoard />}>
                   <Route path="" element={<CustomerDashboard />}></Route>
                   <Route path="consignments" element={<CustomerConsignmentList />}></Route>
-
+                  <Route path="bids" element={<Bids />}></Route>
                 </Route>
                 {/* Administration */}
                 <Route
