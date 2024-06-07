@@ -134,12 +134,12 @@ export default function NavBar() {
               <DropdownMenuContent align="end" className="w-fit p-4">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  
                   <Link to={'/profile'}>Profiles</Link>
-                  </DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to={'/about'}>About</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <div className="flex justify-between items-center">
                     <div className="basis-1/2">

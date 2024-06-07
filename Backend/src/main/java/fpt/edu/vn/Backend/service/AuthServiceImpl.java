@@ -35,6 +35,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Optional;
@@ -216,7 +219,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public void requestResetPassword(@NotNull String email) throws MessagingException {
+    public void requestResetPassword(@NotNull String email) throws MessagingException, IOException {
         Account a = accountRepos.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
 
@@ -238,13 +241,15 @@ public class AuthServiceImpl implements AuthService{
         helper.setFrom(systemEmail);
         helper.setTo(a.getEmail());
         helper.setSubject("[Biddify] Reset Password");
-        String link = String.format(resetEmailLink, code);
-        helper.setText("""
-                <p>Your reset code: %s</p>
-                <p>Click here to reset your password: <a href="%s">Reset Password</a></p>
-                <p>The code will expire after 1 hour.</p>
-                <p>- Biddify</p>
-                """.formatted(code, link), true);
+        // Read the HTML file into a String
+        String htmlContent = new String(Files.readAllBytes(Paths.get("src/main/resources/templates/resetpasswordEmail.html")));
+
+        // Replace placeholders in the HTML content with actual values
+        htmlContent = htmlContent.replace("{code}", code);
+        htmlContent = htmlContent.replace("{link}", String.format(resetEmailLink, code));
+
+        // Set the HTML content as the body of the email
+        helper.setText(htmlContent, true);
         mailSender.send(message);
 
         resetPasswordCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);

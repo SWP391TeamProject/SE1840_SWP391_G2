@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 @RestController
@@ -100,6 +101,8 @@ public class AuthController {
             authService.requestResetPassword(dto.getEmail());
         } catch (MessagingException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
