@@ -10,6 +10,9 @@ import fpt.edu.vn.Backend.service.AuctionItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,12 +22,17 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Set;
 
 
-@Controller
+@RestController
 public class BidController {
     private static final Logger log = LoggerFactory.getLogger(BidController.class);
     @Autowired
@@ -33,6 +41,13 @@ public class BidController {
     private AccountService accountService;
     @Autowired
     private AuctionItemService auctionItemService;
+
+    @GetMapping("/api/bids/{accountId}")
+    public ResponseEntity<Page<BidDTO>> getBidsByAccountId(@PathVariable int accountId, @RequestParam(defaultValue = "0") int pageNumb,@RequestParam(defaultValue = "50") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumb,pageSize);
+
+        return ResponseEntity.ok(bidService.getBidsByAccountId(accountId, pageable));
+    }
 
     @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
     @SendTo("/topic/public/{auctionSessionId}/{itemId}")

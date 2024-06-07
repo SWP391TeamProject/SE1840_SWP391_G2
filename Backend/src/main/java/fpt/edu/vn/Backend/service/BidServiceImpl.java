@@ -1,21 +1,29 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.BidRepos;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class BidServiceImpl implements BidService {
 
+    private static final Logger log = LoggerFactory.getLogger(BidServiceImpl.class);
     private final BidRepos bidRepos;
 
     @Autowired
@@ -34,6 +42,16 @@ public class BidServiceImpl implements BidService {
         return
                 bidRepos.findAll().stream().map(
                         BidDTO::new).toList();
+    }
+
+    @Override
+    public Page<BidDTO> getBidsByAccountId(int id, Pageable pageable) {
+        try {
+            return bidRepos.findByPayment_Account_AccountId(id, pageable).map(BidDTO::new);
+        }catch (Exception e){
+            throw new ResourceNotFoundException("Invalid account id: " + id);
+        }
+
     }
 
     @Override

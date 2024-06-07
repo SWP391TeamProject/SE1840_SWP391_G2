@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
 import axios from 'axios'
@@ -17,6 +17,7 @@ export default function AuctionSession() {
         style: 'currency',
         currency: 'USD',
     });
+    const param = useParams();
     useEffect(() => {
         
         if(auctionSession == null){
@@ -31,6 +32,18 @@ export default function AuctionSession() {
                 console.log(err);
             })
 
+        }
+        if(param.id){
+            axios.get("http://localhost:8080/api/auction-sessions/"+param.id)
+            .then(res => {
+                dispatch({type: "auctionSessions/setCurrentAuctionSession", payload: res.data});
+                setSessionAttachments(res.data.attachments);
+                toast.success("Auction Session Loaded");
+            })
+            .catch(err => {
+                toast.error("Failed to load Auction Session");
+                console.log(err);
+            })
         }
 
 
