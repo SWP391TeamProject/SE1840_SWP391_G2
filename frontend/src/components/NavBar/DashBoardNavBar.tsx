@@ -56,8 +56,7 @@ export default function DashBoardNavBar() {
     removeCookie("user");
     removeCookie("token");
     setIsLogin(false);
-    redirect("/");
-    // nav("/auth/login");
+    nav("/auth/login");
   };
 
   return (

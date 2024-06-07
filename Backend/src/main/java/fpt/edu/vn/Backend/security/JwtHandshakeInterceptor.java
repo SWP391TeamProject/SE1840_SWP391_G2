@@ -7,10 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 @Component
@@ -33,7 +37,12 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         // Validate the JWT and perform authentication
         if (jwtGenerator.validateToken(jwt)) {
             String username = jwtGenerator.getEmailFromToken(jwt);
-            if(accountService.getAccountByEmail(username).getEmail().equals("asbfdxca")){
+            if(accountService.getAccountByEmail(username).getEmail()!=null){
+                // Create an Authentication object
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+                // Set the Authentication in the SecurityContextHolder
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
                 attributes.put("username", username);
                 return true;
             }else {
