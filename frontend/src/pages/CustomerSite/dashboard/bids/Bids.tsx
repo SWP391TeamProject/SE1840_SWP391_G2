@@ -23,8 +23,10 @@ export const Bids = () => {
             toast.error(err);
         })
     }, [])
-
-    const handleViewDetailsClick = (id: any) => {
+    const handleViewItemDetailsClick = (id: any) => {
+        nav("/item/" + id);
+    }
+    const handleViewAuctionDetailsClick = (id: any) => {
         nav("/Auctions/" + id);
     }
     return (
@@ -55,14 +57,13 @@ export const Bids = () => {
                                 {/* <TableCell>{bid.auctionItemId.auctionId}</TableCell>
                             <TableCell>{bid.auctionItemId.itemId}</TableCell> */}
                                 <TableCell>
-                                    <Link to={`/Auctions`}>
-                                        <Button variant="outline" size="sm">
-                                            Details
-                                        </Button>
-                                    </Link>
+                                    <Button variant="outline" size="sm" onClick={() => handleViewAuctionDetailsClick(bid.auctionItemId.au)}>
+                                        Details
+                                    </Button>
                                 </TableCell>
                                 <TableCell>
-                                    <Button variant="outline" size="sm" onClick={() => handleViewDetailsClick(bid.auctionItemId.itemId)}>
+                                    <Button variant="outline" size="sm">
+                                     {/* onClick={() => handleViewItemDetailsClick(bid.auctionItemId.itemId)}> */}
                                         Details
                                     </Button>
                                 </TableCell>

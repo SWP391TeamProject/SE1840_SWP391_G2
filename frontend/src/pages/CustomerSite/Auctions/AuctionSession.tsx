@@ -11,47 +11,53 @@ import { set } from 'react-hook-form'
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
     const dispatch = useAppDispatch();
-    const [sessionAttachments,setSessionAttachments] = useState([]);
+    const [sessionAttachments, setSessionAttachments] = useState([]);
     const navigate = useNavigate();
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
     });
     const param = useParams();
+
     useEffect(() => {
-        
-        if(auctionSession == null){
+
+        if (auctionSession == null) {
             axios.get("http://localhost:8080/api/auction-sessions/1")
-            .then(res => {
-                dispatch({type: "auctionSessions/setCurrentAuctionSession", payload: res.data});
-                setSessionAttachments(res.data.attachments);
-                toast.success("Auction Session Loaded");
-            })
-            .catch(err => {
-                toast.error("Failed to load Auction Session");
-                console.log(err);
-            })
+                .then(res => {
+                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setSessionAttachments(res.data.attachments);
+                    toast.success("Auction Session Loaded");
+                })
+                .catch(err => {
+                    toast.error("Failed to load Auction Session");
+                    console.log(err);
+                })
 
         }
-        if(param.id){
-            axios.get("http://localhost:8080/api/auction-sessions/"+param.id)
-            .then(res => {
-                dispatch({type: "auctionSessions/setCurrentAuctionSession", payload: res.data});
-                setSessionAttachments(res.data.attachments);
-                toast.success("Auction Session Loaded");
-            })
-            .catch(err => {
-                toast.error("Failed to load Auction Session");
-                console.log(err);
-            })
+        if (param.id) {
+            axios.get("http://localhost:8080/api/auction-sessions/" + param.id)
+                .then(res => {
+                    console.log(res.data.attachments);
+                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setSessionAttachments(res.data.attachments);
+                    toast.success("Auction Session Loaded");
+                })
+                .catch(err => {
+                    toast.error("Failed to load Auction Session");
+                    console.log(err);
+                })
         }
 
 
     }, []);
+
     useEffect(() => {
         console.log(auctionSession);
-        setSessionAttachments(auctionSession?.attachments);
-    },[auctionSession])
+        if (auctionSession) {
+            setSessionAttachments(auctionSession?.attachments);
+        }
+    }, [auctionSession])
+
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -89,23 +95,23 @@ export default function AuctionSession() {
                     <div>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item,index) => (
+                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item, index) => (
                                 <Card key={index}>
-                                <img
-                                    src={item.itemDTO.attachments[0].link}
-                                    width={300}
-                                    height={200}
-                                    alt="Auction Item"
-                                    className="rounded-t-lg object-cover"
-                                />
-                                <CardContent className="space-y-2 p-4">
-                                    <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
-                                    <div className="flex items-center justify-between">
-                                        <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
-                                        <Button onClick={()=>navigate(`/auction-join`,{state: {id: item?.id , itemDTO: item?.itemDTO}})}>Place Bid</Button>
-                                        {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
-                                    </div>
-                                </CardContent>
+                                    <img
+                                        src={item.itemDTO.attachments[0].link}
+                                        width={300}
+                                        height={200}
+                                        alt="Auction Item"
+                                        className="rounded-t-lg object-cover"
+                                    />
+                                    <CardContent className="space-y-2 p-4">
+                                        <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
+                                            <Button onClick={() => navigate(`/auction-join`, { state: { id: item?.id, itemDTO: item?.itemDTO } })}>Place Bid</Button>
+                                            {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
+                                        </div>
+                                    </CardContent>
                                 </Card>
                             )) : "No Item"}
                         </div>
