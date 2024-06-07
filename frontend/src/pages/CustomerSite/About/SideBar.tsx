@@ -15,7 +15,7 @@ export const  Sidebar = ({about,ourTeam,buy,sell }:{about:number,ourTeam:number,
                         <button onClick={()=>scrollTo({top:ourTeam-50,behavior:"smooth"})}  className="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">Our Team</button>
                     </li>
                     <li>
-                        <button onClick={()=>scrollTo({top:buy-150,behavior:"smooth"})} className="text-lg font-semibold text-gray-700 dark:text-gray-100 ">How It Work?</button>
+                        <button onClick={()=>scrollTo({top:buy-180,behavior:"smooth"})} className="text-lg font-semibold text-gray-700 dark:text-gray-100 ">How It Works?</button>
                     </li>
                     <li>
                         <button onClick={()=>scrollTo({top:buy-50,behavior:"smooth"})} className="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">

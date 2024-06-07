@@ -69,6 +69,7 @@ import { setConsignments, setCurrentConsignment, setCurrentPageList } from "@/re
 import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
 import CreateInitialEvaluation from "./CreateInitialEvaluation";
 import SendEvaluationForm from "./SendEvaluation";
+import { getCookie } from "@/utils/cookies";
 
 export default function ConsignmentList() {
     const consignmentsList = useAppSelector((state) => state.consignments);
@@ -144,6 +145,7 @@ export default function ConsignmentList() {
             <Tabs defaultValue="all">
                 <div className="flex items-center">
                     <TabsList>
+                        {/* {JSON.parse(getCookie('user').role) } */}
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED, ConsignmentStatus.IN_FINAL_EVALUATION, ConsignmentStatus.IN_INITIAL_EVALUATION, ConsignmentStatus.SENDING, ConsignmentStatus.WAITING_STAFF, ConsignmentStatus.TERMINATED], "all")} value="all">All</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_INITIAL_EVALUATION], "IN_INITIAL_EVALUATION")} value="IN_INITIAL_EVALUATION">initial evaluation</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_FINAL_EVALUATION], "IN_FINAL_EVALUATION")} value="IN_FINAL_EVALUATION">final evaluation</TabsTrigger>
