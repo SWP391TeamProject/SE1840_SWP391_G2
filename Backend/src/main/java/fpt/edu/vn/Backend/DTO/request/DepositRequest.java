@@ -1,4 +1,4 @@
-package fpt.edu.vn.Backend.service;
+package fpt.edu.vn.Backend.DTO.request;
 
 import lombok.*;
 
