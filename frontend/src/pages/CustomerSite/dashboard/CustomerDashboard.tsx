@@ -7,7 +7,6 @@ export default function CustomerDashboard() {
 
 
   return (
-    <>
       <div className=" gap-2 flex flex-col justify-center items-start">
         <section className="body-font h-96 p-20">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
@@ -62,7 +61,5 @@ export default function CustomerDashboard() {
         </section>
 
       </div>
-
-    </>
   )
 }
