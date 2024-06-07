@@ -1,10 +1,10 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.DepositDTO;
-import fpt.edu.vn.Backend.pojo.AuctionItem;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.pojo.Deposit;
 import fpt.edu.vn.Backend.pojo.Payment;
-import fpt.edu.vn.Backend.repository.AuctionItemRepos;
+import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.repository.DepositRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class DepositServiceImpl implements DepositService{
     @Autowired
     private DepositRepos depositRepos;
     @Autowired
-    private AuctionItemRepos auctionItemRepos;
+    private AuctionSessionRepos auctionSessionRepos;
     @Autowired
     private PaymentRepos paymentRepos;
 
@@ -28,9 +28,9 @@ public class DepositServiceImpl implements DepositService{
     public DepositDTO createDeposit(DepositDTO depositDTO) {
         try {
             Deposit deposit = new Deposit();
-            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositDTO.getAuctionItemId());
-            if (auctionItemOptional.isPresent()) {
-                deposit.setAuctionItem(auctionItemOptional.get());
+            Optional<AuctionSession> auctionSession = auctionSessionRepos.findById(depositDTO.getAuctionSessionId());
+            if (auctionSession.isPresent()) {
+                deposit.setAuctionSession(auctionSession.get());
             } else {
                 throw new RuntimeException("Auction Item not found");
             }
@@ -76,9 +76,9 @@ public class DepositServiceImpl implements DepositService{
             Deposit deposit = depositRepos.findById(depositId)
                     .orElseThrow(() -> new RuntimeException("Deposit not found"));
 
-            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositDTO.getAuctionItemId());
-            if (auctionItemOptional.isPresent()) {
-                deposit.setAuctionItem(auctionItemOptional.get());
+            Optional<AuctionSession> auctionSession = auctionSessionRepos.findById(depositDTO.getAuctionSessionId());
+            if (auctionSession.isPresent()) {
+                deposit.setAuctionSession(auctionSession.get());
             } else {
                 throw new RuntimeException("Auction Item not found");
             }
