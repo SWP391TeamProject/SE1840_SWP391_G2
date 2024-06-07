@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
+import fpt.edu.vn.Backend.DTO.request.OrderRequest;
 import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.repository.ItemRepos;
 import fpt.edu.vn.Backend.repository.OrderRepos;
@@ -27,37 +28,63 @@ public class OrderServiceImpl implements OrderService{
 
 
     @Override
-    public OrderDTO createOrder(OrderDTO orderDTO) {
-        Order order = new Order();
-        order.setItem(itemRepository.findById(orderDTO.getItemId()).orElseThrow(() -> new RuntimeException("Item not found")));
-        order.setPayment(paymentRepository.findById(orderDTO.getPayment().getId()).orElseThrow(() -> new RuntimeException("Payment not found")));
-        order = orderRepository.save(order);
-        return new OrderDTO(order);
+    public OrderDTO createOrder(OrderRequest orderRequest) {
+        try {
+            Order order = new Order();
+            order.setItem(itemRepository.findById(orderRequest.getItemId()).orElseThrow(() -> new RuntimeException("Item not found")));
+            order.setPayment(paymentRepository.findById(orderRequest.getPaymentId()).orElseThrow(() -> new RuntimeException("Payment not found")));
+            order = orderRepository.save(order);
+            return new OrderDTO(order);
+        } catch (Exception e) {
+            // Log the exception (using a logging framework is recommended)
+            System.err.println("An error occurred while creating order: " + e.getMessage());
+            throw new RuntimeException("Failed to create order", e);
+        }
     }
 
     @Override
     public OrderDTO getOrderById(int orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        return new OrderDTO(order);
+        try {
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            return new OrderDTO(order);
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching order by ID: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch order by ID", e);
+        }
     }
 
     @Override
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream().map(OrderDTO::new).collect(Collectors.toList());
+        try {
+            return orderRepository.findAll().stream().map(OrderDTO::new).collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching all orders: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch all orders", e);
+        }
     }
 
     @Override
-    public OrderDTO updateOrder(int orderId, OrderDTO orderDTO) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        order.setItem(itemRepository.findById(orderDTO.getItemId()).orElseThrow(() -> new RuntimeException("Item not found")));
-        order.setPayment(paymentRepository.findById(orderDTO.getPayment().getId()).orElseThrow(() -> new RuntimeException("Payment not found")));
-        order = orderRepository.save(order);
-        return new OrderDTO(order);
+    public OrderDTO updateOrder(OrderRequest orderRequest) {
+        try {
+            Order order = orderRepository.findById(orderRequest.getOrderId()).orElseThrow(() -> new RuntimeException("Order not found"));
+            order.setItem(itemRepository.findById(orderRequest.getItemId()).orElseThrow(() -> new RuntimeException("Item not found")));
+            order.setPayment(paymentRepository.findById(orderRequest.getPaymentId()).orElseThrow(() -> new RuntimeException("Payment not found")));
+            order = orderRepository.save(order);
+            return new OrderDTO(order);
+        } catch (Exception e) {
+            System.err.println("An error occurred while updating order: " + e.getMessage());
+            throw new RuntimeException("Failed to update order", e);
+        }
     }
 
     @Override
     public void deleteOrder(int orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        orderRepository.delete(order);
+        try {
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            orderRepository.delete(order);
+        } catch (Exception e) {
+            System.err.println("An error occurred while deleting order: " + e.getMessage());
+            throw new RuntimeException("Failed to delete order", e);
+        }
     }
 }

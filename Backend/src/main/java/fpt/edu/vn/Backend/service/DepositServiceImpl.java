@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.DepositDTO;
+import fpt.edu.vn.Backend.DTO.request.DepositRequest;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.Deposit;
 import fpt.edu.vn.Backend.pojo.Payment;
@@ -25,16 +26,16 @@ public class DepositServiceImpl implements DepositService{
 
 
     @Override
-    public DepositDTO createDeposit(DepositDTO depositDTO) {
+    public DepositDTO createDeposit(DepositRequest depositRequest) {
         try {
             Deposit deposit = new Deposit();
-            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositDTO.getAuctionItemId());
+            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositRequest.getAuctionItemId());
             if (auctionItemOptional.isPresent()) {
                 deposit.setAuctionItem(auctionItemOptional.get());
             } else {
                 throw new RuntimeException("Auction Item not found");
             }
-            int paymentId = depositDTO.getPayment().getId();
+            int paymentId = depositRequest.getPaymentId();
             Optional<Payment> paymentOptional = paymentRepos.findById(paymentId);
             if (paymentOptional.isPresent()) {
                 deposit.setPayment(paymentOptional.get());
@@ -71,18 +72,18 @@ public class DepositServiceImpl implements DepositService{
     }
 
     @Override
-    public DepositDTO updateDeposit(int depositId, DepositDTO depositDTO) {
+    public DepositDTO updateDeposit(DepositRequest depositRequest) {
         try {
-            Deposit deposit = depositRepos.findById(depositId)
+            Deposit deposit = depositRepos.findById(depositRequest.getDepositId())
                     .orElseThrow(() -> new RuntimeException("Deposit not found"));
 
-            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositDTO.getAuctionItemId());
+            Optional<AuctionItem> auctionItemOptional = auctionItemRepos.findById(depositRequest.getAuctionItemId());
             if (auctionItemOptional.isPresent()) {
                 deposit.setAuctionItem(auctionItemOptional.get());
             } else {
                 throw new RuntimeException("Auction Item not found");
             }
-            int paymentId = depositDTO.getPayment().getId();
+            int paymentId = depositRequest.getPaymentId();
             Optional<Payment> paymentOptional = paymentRepos.findById(paymentId);
             if (paymentOptional.isPresent()) {
                 deposit.setPayment(paymentOptional.get());
