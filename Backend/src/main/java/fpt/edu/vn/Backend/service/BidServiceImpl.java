@@ -1,9 +1,13 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.DTO.PaymentDTO;
+import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
+import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.BidRepos;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
@@ -15,10 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class BidServiceImpl implements BidService {
@@ -30,7 +32,10 @@ public class BidServiceImpl implements BidService {
     private AuctionItemRepos auctionItemRepos;
     @Autowired
     private PaymentRepos paymentRepos;
-
+    @Autowired
+    private PaymentService paymentService;
+    @Autowired
+    private AccountRepos accountRepos;
 
     @Autowired
     public BidServiceImpl(BidRepos auctionBidRepository) {
@@ -42,6 +47,15 @@ public class BidServiceImpl implements BidService {
         return
                 bidRepos.findAll().stream().map(
                         BidDTO::new).toList();
+    }
+
+    @Override
+    public List<BidDTO> getBidsByAuctionItemId(AuctionItemId auctionItemId) {
+        try {
+            return bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId).stream().map(BidDTO::new).toList();
+        }catch (Exception e){
+            throw new ResourceNotFoundException("Invalid auction item id: " + auctionItemId);
+        }
     }
 
     @Override
@@ -61,9 +75,21 @@ public class BidServiceImpl implements BidService {
         newBid.setAuctionItem(auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + bid.getAuctionItemId())
         ));
-        newBid.setPayment(paymentRepos.findById(bid.getPayment().getId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid payment id: " + bid.getPayment())
+        PaymentDTO payment = bid.getPayment();
+        payment.setType(Payment.Type.AUCTION_BID);
+        payment.setAmount(bid.getPayment().getAmount());
+        payment.setAccountId(bid.getPayment().getAccountId());
+        payment.setStatus(Payment.Status.PENDING);
+        Payment newPayment = new Payment();
+        newPayment.setPaymentAmount(payment.getAmount());
+        newPayment.setCreateDate(payment.getDate());
+        newPayment.setType(payment.getType());
+        newPayment.setStatus(payment.getStatus());
+        newPayment.setAccount(accountRepos.findById(payment.getAccountId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
         ));
+        newBid.setPayment(newPayment);
+        newPayment.setBid(newBid);
         return new BidDTO(bidRepos.save(newBid));
     }
 
@@ -91,6 +117,22 @@ public class BidServiceImpl implements BidService {
                 () -> new IllegalArgumentException("Invalid bid id: " + id)
         );
         bidRepos.deleteById(id);
+    }
+
+    @Override
+    public List<BidResponse> toBidResponse(List<BidDTO> bids) {
+        List<BidResponse> responses = new ArrayList<>();
+        for (BidDTO bid : bids) {
+            BidResponse response = new BidResponse();
+            response.setBidId(bid.getBidId());
+            response.setAccount(new AccountDTO(accountRepos.findById(bid.getPayment().getAccountId()).orElseThrow(
+                    () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
+            )));
+            response.getAccount().setPassword(null);
+            response.setPrice(Double.parseDouble(bid.getPayment().getAmount().toString()));
+            responses.add(response);
+        }
+        return responses;
     }
 
 }
