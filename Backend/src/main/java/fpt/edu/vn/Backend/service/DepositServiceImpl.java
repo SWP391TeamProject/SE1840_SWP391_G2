@@ -3,9 +3,11 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.DepositDTO;
 import fpt.edu.vn.Backend.DTO.request.DepositRequest;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
+
 import fpt.edu.vn.Backend.pojo.Deposit;
 import fpt.edu.vn.Backend.pojo.Payment;
-import fpt.edu.vn.Backend.repository.AuctionItemRepos;
+import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.repository.DepositRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ public class DepositServiceImpl implements DepositService{
     @Autowired
     private DepositRepos depositRepos;
     @Autowired
-    private AuctionItemRepos auctionItemRepos;
+    private AuctionSessionRepos auctionSessionRepos;
     @Autowired
     private PaymentRepos paymentRepos;
 
@@ -73,7 +75,7 @@ public class DepositServiceImpl implements DepositService{
 
     @Override
     public DepositDTO updateDeposit(DepositRequest depositRequest) {
-        try {
+       try {
             Deposit deposit = depositRepos.findById(depositRequest.getDepositId())
                     .orElseThrow(() -> new RuntimeException("Deposit not found"));
 

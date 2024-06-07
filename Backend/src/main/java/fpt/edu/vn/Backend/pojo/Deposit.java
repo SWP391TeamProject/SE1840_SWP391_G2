@@ -10,11 +10,8 @@ public class Deposit {
     private int depositId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
-            @JoinColumn(name = "item_id", referencedColumnName = "item_id")
-    })
-    private AuctionItem auctionItem;
+    @JoinColumn(name = "auction_session_id")
+    private AuctionSession auctionSession;
 
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId

@@ -14,11 +14,8 @@ import AccountsList from "./pages/Administration/Account/AccountsList.tsx";
 import DashBoard from "./pages/Administration/dashboard/DashBoard.tsx";
 // import { LandingPageLayout } from "./layout/HomeLayout/landing-page-layout.tsx";
 import PrivateRoute from "./pages/authentication/PrivateRoute.tsx";
-import Unauthorized from "./pages/authentication/Unauthorized.tsx";
 import { AuthProvider } from "./AuthProvider.tsx";
 import { Roles } from "./constants/enums.tsx";
-import ConsignmentLayout from "./layout/ConsignmentLayout/ConsignmentLayout.tsx";
-import AuctionsLayout from "./layout/AuctionsLayout/AuctionsLayout.tsx";
 import AuctionList from "./pages/CustomerSite/Auctions/AuctionList.tsx";
 import {
   QueryClient,
@@ -37,7 +34,7 @@ import LoginForm from "./pages/authentication/LoginForm.tsx";
 import ConsignmentList from "./pages/Administration/consignments/ConsignmentList.tsx";
 import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDetail.tsx";
 import ItemsList from "./pages/Administration/item/ItemsList.tsx";
-import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx";
+import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx"; 
 import ProfileLayout from "./pages/CustomerSite/Profile/Profile.tsx";
 import ProfileSetting from "./pages/CustomerSite/Profile/ProfileSetting.tsx";
 import ProfileDetail from "./pages/CustomerSite/Profile/ProfileDetail.tsx";
@@ -55,9 +52,12 @@ import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
 import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
 import ResetPasswordForm from "@/pages/authentication/ResetPasswordForm.tsx";
-import CustomerConsignmentList from "./pages/CustomerSite/Consignment/CustomerConsignmentList.tsx";
 import CustomerDashBoard from "./layout/CustomerSite/CustomerDashBoard.tsx";
 
+import { ErrorPage } from "./components/component/error-page.tsx";
+import AuctionJoin from "./pages/CustomerSite/Auctions/AuctionJoin.tsx";
+import CustomerDashboard from "./pages/CustomerSite/dashboard/CustomerDashboard.tsx";
+import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerConsignmentList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -96,6 +96,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Route>
                 </Route>
                 <Route path="/dashboard" element={<CustomerDashBoard />}>
+                  <Route path="" element={<CustomerDashboard />}></Route>
                   <Route path="consignments" element={<CustomerConsignmentList />}></Route>
 
                 </Route>
@@ -145,8 +146,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="activate" element={<ActivationForm />}></Route>
                 </Route>
 
-                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/unauthorized" element={<ErrorPage />} />
                 {/* <RouterProvider router={router} /> */}
+                <Route path="/auction-join" element={<AuctionJoin />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>

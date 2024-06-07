@@ -1,14 +1,14 @@
 package fpt.edu.vn.Backend.controller;
 
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-
 import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
-import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Consignment;
+import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,9 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/consignments")
@@ -36,7 +39,7 @@ public class ConsignmentController {
     @Autowired
     private AttachmentService attachmentService;
     @Autowired
-    private AccountRepos accountRepos;
+    private AccountService accountService;
 
     @Autowired
     public ConsignmentController(ConsignmentService consignmentService) {
@@ -44,12 +47,27 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "200") int pageSize, Authentication authentication) {
+
         try {
             Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumb);
-            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable);
+            Pageable pageable1 = Pageable.unpaged();
+            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable1);
             if (consignments == null || consignments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            switch (accountService.getAccountByEmail(authentication.getName()).getRole()){
+                case STAFF: {
+                    List<ConsignmentDTO> listStaffPage=consignments.stream().filter(consignmentDTO -> consignmentDTO.getStatus().equals(String.valueOf(Consignment.Status.WAITING_STAFF))||consignmentDTO.getStaff()==null||consignmentDTO.getStaff().getEmail().equals(authentication.getName())).toList();
+                    Page<ConsignmentDTO> staffPage= new PageImpl(listStaffPage,pageable,listStaffPage.size());
+
+                    return new ResponseEntity<>(staffPage, HttpStatus.OK);
+                }
+                case MANAGER:
+                {
+                    return new ResponseEntity<>(consignments, HttpStatus.OK);
+                }
+
             }
             return new ResponseEntity<>(consignments, HttpStatus.OK);
         } catch (Exception e) {
@@ -115,8 +133,7 @@ public class ConsignmentController {
     public ResponseEntity<ConsignmentDTO> createConsignment(@ModelAttribute ConsignmentRequestDTO consignmentRequestDTO) {
         try {
             ConsignmentDetailDTO consignmentDetailDTO = new ConsignmentDetailDTO();
-            consignmentDetailDTO.setAccount(new AccountDTO(accountRepos.findById(consignmentRequestDTO.getAccountId()).orElseThrow(
-                    () -> new ConsignmentServiceException("No Account found for Consignment"))));
+            consignmentDetailDTO.setAccount(accountService.getAccountById(consignmentRequestDTO.getAccountId()));
             consignmentDetailDTO.setDescription(consignmentRequestDTO.getDescription());
             int userId = consignmentDetailDTO.getAccount().getAccountId(); // Hardcoded user ID for now
             ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId, consignmentRequestDTO.getPreferContact(), consignmentDetailDTO);
@@ -153,7 +170,7 @@ public class ConsignmentController {
     }
 
     @PostMapping("/reject/{consignmentId}")
-    public ResponseEntity<String> rejectFinalEvaluation(@PathVariable int consignmentId, @RequestParam("accountId") int accountId, @RequestParam(defaultValue = "Rejected By Manager",name = "reason") String rejectReason) {
+    public ResponseEntity<String> rejectFinalEvaluation(@PathVariable int consignmentId, @RequestParam("accountId") int accountId, @RequestParam(defaultValue = "Rejected By Manager", name = "reason") String rejectReason) {
         try {
             consignmentService.rejectFinalEvaluation(consignmentId, accountId, rejectReason);
             return ResponseEntity.ok("Consignment rejected successfully");
@@ -173,6 +190,7 @@ public class ConsignmentController {
         logger.info("Taking consignment with ID: " + consignmentId + " by Account ID: " + accountId);
         return new ResponseEntity<>(consignmentService.takeConsignment(consignmentId, accountId), HttpStatus.OK);
     }
+
     @GetMapping("/received/{consignmentId}")
     public ResponseEntity<ConsignmentDTO> receivedConsignment(@PathVariable int consignmentId) {
         return new ResponseEntity<>(consignmentService.receivedConsignment(consignmentId), HttpStatus.OK);

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class PaymentDTO {
     private int id;
-    private BigDecimal amount;
+    private BigDecimal amount = BigDecimal.ZERO;
     private LocalDateTime date;
     private Payment.Type type;
     private Payment.Status status;

@@ -17,6 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
@@ -64,11 +65,11 @@ public class BidController {
     @SendTo("/topic/public/{auctionSessionId}/{itemId}")
     public ResponseEntity<String> addUser(@Payload BidDTO bidDTO,
                                           @DestinationVariable int auctionSessionId,
-                                          @DestinationVariable int itemId,
+                                          @DestinationVariable int itemId, Authentication authentication,
                                           SimpMessageHeaderAccessor headerAccessor) {
         AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
         // Add username in web socket session
-        AccountDTO persistedAccount = accountService.getAccountById(bidDTO.getPayment().getAccountId());
+        AccountDTO persistedAccount = accountService.getAccountByEmail(authentication.getName());
         if (persistedAccount != null) {
             // Add the updated Account to the session attributes
             Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);

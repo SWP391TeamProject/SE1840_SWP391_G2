@@ -57,7 +57,7 @@ export default function Administration() {
     const navigate = useNavigate();
     const [arrayPath, setArrayPath] = useState([""]);
     const breadcrumbs = [
-        <BreadcrumbItem>
+        <BreadcrumbItem key={1}>
 
         </BreadcrumbItem>
     ];
@@ -69,7 +69,7 @@ export default function Administration() {
             tempPath = tempPath + "/" + arrayPath[i];
             // console.log(tempPath);
             breadcrumbs.push(
-                <BreadcrumbItem>
+                <BreadcrumbItem key={i}>
                     <BreadcrumbLink asChild>
                         <Link to={tempPath}>{arrayPath[i].toLocaleUpperCase()}</Link>
                     </BreadcrumbLink>
@@ -80,7 +80,7 @@ export default function Administration() {
             }
         }
         return (
-            <BreadcrumbList>
+            <BreadcrumbList >
                 {breadcrumbs}
             </BreadcrumbList>
         );
@@ -109,7 +109,7 @@ export default function Administration() {
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
             <div className="hidden border-r bg-muted/40 md:block">
                 <div className="flex h-full max-h-screen flex-col gap-2">
-                    <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+                    <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 ">
                         <Link to="" className="flex items-center gap-2 font-semibold">
                             <Avatar>
                                 <AvatarImage src="src\assets\icon.png" />
@@ -234,7 +234,7 @@ export default function Administration() {
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Avatar className="mr-5">
+                                <Avatar className="mr-5 hover:cursor-pointer">
                                     <AvatarImage src={user != null ? user?.avatar?.link : 'https://github.com/shadcn.png'} />
                                     <AvatarFallback>SOS</AvatarFallback>
                                 </Avatar>

@@ -60,7 +60,7 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
