@@ -38,7 +38,7 @@ export const Bids = () => {
                 </Button>
             </div>
             <div className="overflow-x-auto">
-                <Table>
+                {bids.length != 0 ? <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>ID</TableHead>
@@ -63,14 +63,19 @@ export const Bids = () => {
                                 </TableCell>
                                 <TableCell>
                                     <Button variant="outline" size="sm">
-                                     {/* onClick={() => handleViewItemDetailsClick(bid.auctionItemId.itemId)}> */}
+                                        {/* onClick={() => handleViewItemDetailsClick(bid.auctionItemId.itemId)}> */}
                                         Details
                                     </Button>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        ))
+                        }
                     </TableBody>
                 </Table>
+                    :
+                    <div className=' w-full h-full flex justify-center items-center'>
+                        No Bids Found
+                    </div>}
             </div>
         </div>
     )

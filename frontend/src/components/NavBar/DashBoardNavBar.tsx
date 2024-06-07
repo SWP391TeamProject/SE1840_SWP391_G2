@@ -56,8 +56,7 @@ export default function DashBoardNavBar() {
     removeCookie("user");
     removeCookie("token");
     setIsLogin(false);
-    redirect("/");
-    // nav("/auth/login");
+    nav("/auth/login");
   };
 
   return (
@@ -131,7 +130,7 @@ export default function DashBoardNavBar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
 
-                  <Link to={'/'}>Switch to traveling</Link>
+                  <Link to={'/'}>Switch to auctioning</Link>
 
                 </DropdownMenuItem>
 

@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.DepositDTO;
+import fpt.edu.vn.Backend.DTO.request.DepositRequest;
 import fpt.edu.vn.Backend.service.DepositService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,8 +19,8 @@ public class DepositController {
     private DepositService depositService;
 
     @PostMapping("/create")
-    public ResponseEntity<DepositDTO> createDeposit(@RequestBody DepositDTO depositDTO) {
-        DepositDTO createdDeposit = depositService.createDeposit(depositDTO);
+    public ResponseEntity<DepositDTO> createDeposit(@RequestBody DepositRequest depositRequest) {
+        DepositDTO createdDeposit = depositService.createDeposit(depositRequest);
         return ResponseEntity.ok(createdDeposit);
     }
 
@@ -37,8 +38,8 @@ public class DepositController {
     }
 
     @PostMapping("/update/{depositId}")
-    public ResponseEntity<DepositDTO> updateDeposit(@PathVariable int depositId, @RequestBody DepositDTO depositDTO) {
-        DepositDTO updatedDeposit = depositService.updateDeposit(depositId, depositDTO);
+    public ResponseEntity<DepositDTO> updateDeposit(@RequestBody DepositRequest depositRequest) {
+        DepositDTO updatedDeposit = depositService.updateDeposit(depositRequest);
         return ResponseEntity.ok(updatedDeposit);
     }
 

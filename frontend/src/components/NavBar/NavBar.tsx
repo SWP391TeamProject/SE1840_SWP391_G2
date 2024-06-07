@@ -20,6 +20,7 @@ import { get } from "http";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import { fetchAccountById } from "@/services/AccountsServices";
 import axios from "axios";
+import {countUnreadNotifications} from "@/services/NotificationService.ts";
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -28,6 +29,8 @@ export default function NavBar() {
   const [isLogin, setIsLogin] = React.useState(false);
   const nav = useNavigate();
   const [user, setUser] = React.useState<any>();
+  const [unreadNoti, setUnreadNoti] = React.useState<number>(0);
+
   useEffect(() => {
     const userCookie = getCookie("user");
     if (userCookie) {
@@ -50,6 +53,10 @@ export default function NavBar() {
     console.log('user:');
     console.log(user);
   }, [user]);
+
+  useEffect(() => {
+    countUnreadNotifications().then((r) => setUnreadNoti(r.data));
+  }, []);
 
   const handleSignout = () => {
     removeCookie("user");
@@ -109,7 +116,7 @@ export default function NavBar() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="overflow-hidden rounded-full"
+                  className="rounded-full relative"
                 >
                   <img
                     src={user && user.avatar ? user.avatar.link : "/placeholder-user.jpg"}
@@ -118,38 +125,36 @@ export default function NavBar() {
                     alt="Avatar"
                     className="overflow-hidden rounded-full"
                   />
+                  {unreadNoti > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti}</span> : null}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-fit p-4">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to={'/profile'}>Profiles</Link>
+                  <Link to={'/profile'}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to={'/about'}>About</Link>
+                  <Link to={'/profile/notification'}>
+                    <span>Notification</span>
+                    <span className="ml-2 w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti}</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-2">
                     <div className="basis-1/2">
-                      <p >
-                        Balance:
-                      </p>
+                      Balance:
                     </div>
                     <div className="basis-1/2 font-medium text-left block">
                       <p >
                         {user && user?.balance !== null ? user?.balance : '0'}
                       </p>
                     </div>
-
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-
                   <Link to={'/dashboard'}>Dashboard</Link>
-
                 </DropdownMenuItem>
-
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignout}
                 >Logout</DropdownMenuItem>

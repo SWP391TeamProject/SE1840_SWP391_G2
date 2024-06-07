@@ -1,5 +1,5 @@
 import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from '@/config/axiosConfig.ts';
 import { toast } from "react-toastify";
 
 const controller = "auction-sessions";

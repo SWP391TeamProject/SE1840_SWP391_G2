@@ -41,4 +41,9 @@ public class NotificationController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/unread/")
+    public ResponseEntity<Integer> countUnreadNotifications(Principal principal) {
+        return new ResponseEntity<>(notificationService.countUnreadNotifications(principal.getName()), HttpStatus.OK);
+    }
 }

@@ -12,7 +12,7 @@ import {
   RoleName,
 } from "./enums";
 
-export interface IAccount {
+export interface Account {
   account_id?: number;
   balance?: number;
   create_date?: Date;
@@ -25,7 +25,7 @@ export interface IAccount {
   avatar_url_attachment_id?: number;
 }
 
-export interface IAttachment {
+export interface Attachment {
   attachment_id?: number;
   blob_id?: string;
   create_date?: Date;
@@ -39,14 +39,14 @@ export interface IAttachment {
   post_id?: number;
 }
 
-export interface IAuctionItem {
+export interface AuctionItem {
   auction_item_id?: number;
   current_price?: number;
   auction_session_id?: number;
   item_id?: number;
 }
 
-export interface IAuctionSession {
+export interface AuctionSession {
   auction_session_id?: number;
   create_date?: Date;
   end_date?: Date;
@@ -56,7 +56,7 @@ export interface IAuctionSession {
   update_date?: Date;
 }
 
-export interface IBid {
+export interface Bid {
   bid_id?: number;
   create_date?: Date;
   price?: number;
@@ -67,14 +67,14 @@ export interface IBid {
 // ... (interfaces for BlogCategory, BlogPost, CitizenCard, Consignment, etc.)
 // interfaces.ts (continued)
 
-export interface IBlogCategory {
+export interface BlogCategory {
   blog_category_id?: number;
   create_date?: Date;
   name?: string;
   update_date?: Date;
 }
 
-export interface IBlogPost {
+export interface BlogPost {
   post_id?: number;
   content?: string;
   create_date?: Date;
@@ -84,7 +84,7 @@ export interface IBlogPost {
   blog_category_id?: number;
 }
 
-export interface ICitizenCard {
+export interface CitizenCard {
   account_id: number;
   address?: string;
   birthday?: Date;
@@ -96,7 +96,7 @@ export interface ICitizenCard {
   update_date?: Date;
 }
 
-export interface IConsignment {
+export interface Consignment {
   consignment_id?: number;
   create_date?: Date;
   prefer_contact?: ConsignmentContactPreference;
@@ -104,17 +104,17 @@ export interface IConsignment {
   update_date?: Date;
 }
 
-export interface IConsignmentDetail {
+export interface ConsignmentDetail {
   consignment_detail_id?: number;
   description?: string;
   price?: number;
   type?: ConsignmentDetailType;
   account_id?: number;
   consignment_id?: number;
-  attachments: [IAttachment];
+  attachments: [Attachment];
 }
 
-export interface IDeposit {
+export interface Deposit {
   deposit_id?: number;
   deposit_amount: number;
   deposit_date?: string;
@@ -122,7 +122,7 @@ export interface IDeposit {
   auction_session_id?: number;
 }
 
-export interface IItem {
+export interface Item {
   item_id?: number;
   buy_in_price?: number;
   create_date?: Date;
@@ -136,14 +136,14 @@ export interface IItem {
   owner_id?: number;
 }
 
-export interface IItemCategory {
+export interface ItemCategory {
   item_category_id?: number;
   create_date?: Date;
   name?: string;
   update_date?: Date;
 }
 
-export interface INotification {
+export interface Notification {
   notification_id?: number;
   create_date?: Date;
   is_read?: boolean;
@@ -153,14 +153,14 @@ export interface INotification {
   account_id?: number;
 }
 
-export interface IOrder {
+export interface Order {
   order_id?: number;
   order_date?: Date;
   ship_address?: string;
   account_id?: number;
 }
 
-export interface IPayment {
+export interface Payment {
   payment_id?: number;
   create_date?: Date;
   payment_amount?: number;
@@ -174,12 +174,12 @@ export interface IPayment {
   order_id?: number;
 }
 
-export interface IRole {
+export interface Role {
   role_id?: number;
   role_name?: RoleName;
 }
 
-export interface IRoleAccount {
+export interface RoleAccount {
   account_id: number;
   role_id: number;
 }
