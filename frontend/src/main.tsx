@@ -52,11 +52,12 @@ import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
 import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
 import ResetPasswordForm from "@/pages/authentication/ResetPasswordForm.tsx";
-import CustomerConsignmentList from "./pages/CustomerSite/Consignment/CustomerConsignmentList.tsx";
 import CustomerDashBoard from "./layout/CustomerSite/CustomerDashBoard.tsx";
 
 import { ErrorPage } from "./components/component/error-page.tsx";
 import AuctionJoin from "./pages/CustomerSite/Auctions/AuctionJoin.tsx";
+import CustomerDashboard from "./pages/CustomerSite/dashboard/CustomerDashboard.tsx";
+import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerConsignmentList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -95,6 +96,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Route>
                 </Route>
                 <Route path="/dashboard" element={<CustomerDashBoard />}>
+                  <Route path="" element={<CustomerDashboard />}></Route>
                   <Route path="consignments" element={<CustomerConsignmentList />}></Route>
 
                 </Route>

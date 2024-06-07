@@ -67,19 +67,8 @@ export default function NavBar() {
           <span className="font-semibold text-lg">Biddify</span>
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
-          <Button className="flex items-center gap-2" variant="outline" asChild>
-            <Link to="/create-consignment">Put your item for auction</Link>
-          </Button>
-          {isLogin ? (
-            <Button
-              className="flex items-center gap-2 bg-red-500 text-white"
-              variant="default"
-
-              onClick={handleSignout}
-            >
-              Sign Out
-            </Button>
-          ) : (
+        
+          {isLogin ? '' : (
             <Button
               className="flex items-center gap-2 bg-green-500 text-white"
               variant="default"
@@ -157,7 +146,7 @@ export default function NavBar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
 
-                  <Link to={'/consignments'}>Manage Consignment</Link>
+                  <Link to={'/dashboard'}>Dashboard</Link>
 
                 </DropdownMenuItem>
 
@@ -169,6 +158,15 @@ export default function NavBar() {
           }
 
         </nav>
+
+
+
+
+
+
+
+        {/* Mobile menu */}
+        {/*TODO: Add mobile menu */}
         <Sheet>
           <SheetTrigger asChild>
             <Button className="lg:hidden ml-auto" size="icon" variant="outline">
@@ -208,7 +206,6 @@ export default function NavBar() {
               >
                 Contact
               </Link>
-
             </div>
           </SheetContent>
         </Sheet>

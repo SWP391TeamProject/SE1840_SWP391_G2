@@ -20,6 +20,7 @@ import { get } from "http";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import { fetchAccountById } from "@/services/AccountsServices";
 import axios from "axios";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -66,53 +67,26 @@ export default function DashBoardNavBar() {
           <GavelIcon className="h-6 w-6" />
           <span className="font-semibold text-lg">Biddify</span>
         </Link>
+        <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild >
+                <Link to="/dashboard" className={navigationMenuTriggerStyle()}>Home</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild >
+                <Link to="/dashboard/consignments" className={navigationMenuTriggerStyle()}>Consignments</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild >
+                <Link to="/dashboard/bids" className={navigationMenuTriggerStyle()}>Bids</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
-          <Button className="flex items-center gap-2" variant="outline" asChild>
-            <Link to="/create-consignment">Put your item for auction</Link>
-          </Button>
-          {isLogin ? (
-            <Button
-              className="flex items-center gap-2 bg-red-500 text-white"
-              variant="default"
-
-              onClick={handleSignout}
-            >
-              Sign Out
-            </Button>
-          ) : (
-            <Button
-              className="flex items-center gap-2 bg-green-500 text-white"
-              variant="default"
-              asChild
-            >
-              <Link to="/auth/login">Login</Link>
-            </Button>
-          )}
-
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2 scroll-smooth"
-            to="/Auctions"
-          >
-            Auctions
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="/about"
-          >
-            About
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="#"
-          >
-            Blog
-          </Link>
-          <Link
-            className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2"
-            to="/contact"
-          >
-            Contact
-          </Link>
           {
             isLogin &&
             <DropdownMenu>
@@ -131,14 +105,14 @@ export default function DashBoardNavBar() {
                   />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-fit p-4">
+              <DropdownMenuContent align="end" className="xmd:hidden lg:block w-fit p-4">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  
+
                   <Link to={'/profile'}>Profiles</Link>
-                  </DropdownMenuItem>
+                </DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuItem>
                   <div className="flex justify-between items-center">
@@ -157,7 +131,7 @@ export default function DashBoardNavBar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
 
-                  <Link to={'/consignments'}>Manage Consignment</Link>
+                  <Link to={'/'}>Switch to traveling</Link>
 
                 </DropdownMenuItem>
 
@@ -169,14 +143,14 @@ export default function DashBoardNavBar() {
           }
 
         </nav>
-        <Sheet>
+        <Sheet >
           <SheetTrigger asChild>
             <Button className="lg:hidden ml-auto" size="icon" variant="outline">
               <MenuIcon className="h-6 w-6" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent className="bg-white" side="right">
+          <SheetContent className="bg-white" side="top">
             <div className="grid gap-2 py-6">
               <Link
                 className="flex w-full items-center py-2 text-lg font-semibold"
