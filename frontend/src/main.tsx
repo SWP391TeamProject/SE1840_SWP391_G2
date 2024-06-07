@@ -60,6 +60,7 @@ import CustomerDashboard from "./pages/CustomerSite/dashboard/CustomerDashboard.
 import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerConsignmentList.tsx";
 import TestPage from "./pages/TestPage.tsx";
 import { Bids } from "./pages/CustomerSite/dashboard/bids/Bids.tsx";
+import NotificationsList from "@/pages/CustomerSite/Profile/Notification.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -94,6 +95,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/profile" element={<ProfileLayout />}>
                       <Route path="" element={<ProfileDetail />}></Route>
                       <Route path="/profile/settings" element={<ProfileSetting />}></Route>
+                      <Route path="/profile/notification" element={<NotificationsList />}></Route>
 
                     </Route>
                   </Route>

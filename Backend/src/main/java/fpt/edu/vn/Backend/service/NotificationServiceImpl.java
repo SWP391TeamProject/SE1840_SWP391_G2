@@ -34,6 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
         if (notification.isRead())
             return false;
         notification.setRead(true);
+        notificationRepos.save(notification);
         return true;
     }
 
@@ -55,5 +56,10 @@ public class NotificationServiceImpl implements NotificationService {
     public @NotNull Page<NotificationDTO> getNotifications(@NotNull Pageable pageable, String userEmail) {
         return notificationRepos.findNotificationByAccount_EmailOrderByCreateDateDesc(userEmail, pageable)
                 .map(NotificationDTO::new);
+    }
+
+    @Override
+    public int countUnreadNotifications(String userEmail) {
+        return notificationRepos.countAllByAccount_EmailAndReadIsFalse(userEmail);
     }
 }
