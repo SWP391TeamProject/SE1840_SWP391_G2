@@ -17,7 +17,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConsignmentDetailDialog from "./ConsignmentDetailDialog";
 import SendEvaluationForm from "./SendEvaluation";
-import { ConsignmentStatus, Roles } from "@/constants/enums";
+import { ConsignmentDetailType, ConsignmentStatus, Roles } from "@/constants/enums";
 import { getCookie } from "@/utils/cookies";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -113,11 +113,11 @@ export default function ConsignmentDetail() {
             toast.error(error.response.data.message);
         })
     }
-    
-        
+
+
     const rejectConsignment = (consignmentId: number, reasonInput: any) => {
         console.log(consignmentId);
-        
+
         const accountId = JSON.parse(getCookie('user')).id;
         const reason = reasonInput == null ? "reject by manager" : reasonInput;
         rejectEvaluation(consignmentId.toString(), accountId, reason).then((res) => {
@@ -131,7 +131,7 @@ export default function ConsignmentDetail() {
     }
     const acceptConsignment = (consignmentId: number) => {
         console.log(consignmentId);
-        
+
         const accountId = JSON.parse(getCookie('user')).id;
         acceptEvaluation(consignmentId.toString(), accountId).then((res) => {
             console.log(res);
@@ -156,7 +156,7 @@ export default function ConsignmentDetail() {
             if (consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
                 if (consignment?.consignmentDetails?.some(detail => detail?.status === 'MANAGER_ACCEPTED')) {
                     return <Badge className="bg-green-300">Success</Badge>;
-                } else if (consignment?.consignmentDetails[length-1]?.status === 'FINAL_EVALUATION') {
+                } else if (consignment?.consignmentDetails[length - 1]?.status === 'FINAL_EVALUATION') {
                     return <Badge className="bg-amber-400">Waiting Manager Accept</Badge>;
                 } else {
                     return <SendEvaluationForm consignmentParent={consignment} />;
@@ -170,9 +170,9 @@ export default function ConsignmentDetail() {
             }
         } else if (JSON.parse(getCookie('user')).role === Roles.MANAGER) {
             if (consignment?.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
-                if (consignment?.consignmentDetails[length-1]?.status === 'FINAL_EVALUATION') {
-                    return <><Button className="bg-red-400 mr-16 w-24" onClick={()=>rejectConsignment(consignment.consignmentId, null)}>Reject</Button>
-                        <Button className="bg-green-400  mr-16 w-24" onClick={()=>acceptConsignment(consignment.consignmentId)}>Accept</Button></>;
+                if (consignment?.consignmentDetails[length - 1]?.status === 'FINAL_EVALUATION') {
+                    return <><Button className="bg-red-400 mr-16 w-24" onClick={() => rejectConsignment(consignment.consignmentId, null)}>Reject</Button>
+                        <Button className="bg-green-400  mr-16 w-24" onClick={() => acceptConsignment(consignment.consignmentId)}>Accept</Button></>;
                 }
             }
         }
@@ -186,7 +186,26 @@ export default function ConsignmentDetail() {
                 <Card className="basis-3/6">
                     <CardHeader>
                         <CardTitle>Consignment #{consignment?.consignmentId}</CardTitle>
-                        <CardDescription>Status: {consignment?.status}  </CardDescription>
+                        <CardDescription className="flex gap-3">Status: 
+                        {(() => {
+                            switch (consignment?.status) {
+                                case ConsignmentStatus.WAITING_STAFF:
+                                    return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
+                                case ConsignmentStatus.FINISHED:
+                                    return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
+                                case ConsignmentStatus.IN_INITIAL_EVALUATION:
+                                    return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
+                                case ConsignmentStatus.IN_FINAL_EVALUATION:
+                                    return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
+                                case ConsignmentStatus.SENDING:
+                                    return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
+                                case ConsignmentStatus.TERMINATED:
+                                    return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
+                                default:
+                                    return <Badge variant="destructive">Unknown Status</Badge>;
+                            }
+                        })()}
+                        </CardDescription>
 
 
                     </CardHeader>
@@ -238,13 +257,29 @@ export default function ConsignmentDetail() {
             </div>
             <div className="flex justify-start flex-row w-full mt-1 gap-2">
                 <div className="basis-2/3">
-                    <ScrollArea className="w-full h-72">
+                    <ScrollArea className="w-full h-96 border rounded-xl ">
                         {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
                             return (
                                 <Card key={index} className="w-full">
                                     <CardHeader>
                                         <CardTitle>Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} /></CardTitle>
-                                        <CardDescription>{item.status}</CardDescription>
+                                        <CardDescription>
+                                            {(() => {
+                                                switch (item.status) {
+                                                    case ConsignmentDetailType.MANAGER_REJECTED:
+                                                        return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Manager Rejected</Badge>;
+                                                    case ConsignmentDetailType.INITIAL_EVALUATION:
+                                                        return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Initial Evaluation</Badge>;
+                                                    case ConsignmentDetailType.FINAL_EVALUATION:
+                                                        return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">Final Evaluation</Badge>;
+                                                    case ConsignmentDetailType.MANAGER_ACCEPTED:
+                                                        return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">Manager Accepted</Badge>;
+                                                    case ConsignmentDetailType.REQUEST:
+                                                        return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Request</Badge>;
+                                                    default:
+                                                        return <Badge variant="destructive">Unknown Status</Badge>;
+                                                }
+                                            })()}</CardDescription>
                                     </CardHeader>
                                     <CardContent>
                                         <p>description:{item.description}</p>
