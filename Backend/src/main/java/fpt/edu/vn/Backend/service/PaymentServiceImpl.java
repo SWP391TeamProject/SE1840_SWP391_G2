@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-public class PaymentServiceImpl implements PaymentService{
+public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentRepos paymentRepos;
@@ -95,6 +95,7 @@ public class PaymentServiceImpl implements PaymentService{
         }
     }
 
+
     @Override
     public PaymentDTO createPayment(PaymentDTO paymentDTO) {
         Payment payment = new Payment();
@@ -104,6 +105,9 @@ public class PaymentServiceImpl implements PaymentService{
         payment.setStatus(paymentDTO.getStatus());
         payment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).get());
         return new PaymentDTO(paymentRepos.save(payment));
+    }
+
+    @Override
     public Page<PaymentDTO> getAllPayment(Pageable pageable) {
         try {
             Page<Payment> payments = paymentRepos.findAll(pageable);
@@ -120,7 +124,8 @@ public class PaymentServiceImpl implements PaymentService{
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
         return null;
     }
-}
+
+    @Override
     public PaymentDTO deleteById(int id) {
         try {
             Payment payment = paymentRepos.findById(id)
