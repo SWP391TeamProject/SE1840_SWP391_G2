@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
 import React, { useEffect } from "react";
+import RegisterToBid from "./global_popup/RegisterToBid";
 
 export default function TestPage() {
     const [item, setItem] = React.useState<any>();
@@ -27,6 +28,7 @@ export default function TestPage() {
         <div className="flex flex-col p-4 bg-white rounded-md shadow-md">
             <div className="flex justify-between">
                     {JSON.stringify(item)}
+                    <RegisterToBid />
             </div>
         </div>
     </div>;

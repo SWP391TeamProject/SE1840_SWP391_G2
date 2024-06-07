@@ -1,5 +1,5 @@
 import { ConsignmentStatus } from "@/constants/enums";
-import { IAccount, IConsignmentDetail } from "@/constants/interfaces";
+import { Account, ConsignmentDetail } from "@/constants/interfaces";
 
 interface Consignment {
     consignmentId?: number;
@@ -8,7 +8,7 @@ interface Consignment {
     status?: ConsignmentStatus;
     createDate?: Date;
     updateDate?: Date;
-    staff?: IAccount;
-    consignmentDetails?: [IConsignmentDetail];
+    staff?: Account;
+    consignmentDetails?: [ConsignmentDetail];
 }
 export default Consignment;

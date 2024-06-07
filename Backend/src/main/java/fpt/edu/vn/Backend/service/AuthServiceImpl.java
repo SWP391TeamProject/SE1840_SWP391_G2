@@ -6,6 +6,7 @@ import com.nimbusds.jose.JOSEException;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
+import fpt.edu.vn.Backend.DTO.request.ChangePasswordDTO;
 import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
 import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
@@ -34,6 +35,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -216,6 +218,31 @@ public class AuthServiceImpl implements AuthService{
         Optional<Account> userOptional = accountRepos.findByEmail(email);
         Account user = userOptional.get();
         return new AuthResponseDTO(user, token);
+    }
+
+    @Override
+    public boolean changePassword(String email, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
+        Account a = accountRepos.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+        if (!a.getPassword().equals(changePasswordDTO.getOldPassword()))
+            throw new InvalidInputException("Old password is incorrect!");
+        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword()))
+            throw new InvalidInputException("New password and confirm password do not match!");
+        if (changePasswordDTO.getNewPassword().length() < 8)
+            throw new InvalidInputException("Password is too short!");
+        a.setPassword(changePasswordDTO.getNewPassword());
+        accountRepos.save(a);
+        return true;
+    }
+
+    @Override
+    public boolean uploadAvatar(String email, MultipartFile file) throws IllegalAccessException {
+        Account a = accountRepos.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+        // Save the file to the server
+        // a.setAvatarUrl("http://localhost:8080/avatars/" + file.getOriginalFilename());
+        accountRepos.save(a);
+        return false;
     }
 
     @Override
