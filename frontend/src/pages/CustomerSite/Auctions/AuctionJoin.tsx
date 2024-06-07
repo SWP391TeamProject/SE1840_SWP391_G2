@@ -1,218 +1,188 @@
-import { useEffect, useState } from "react";
-import { Client } from '@stomp/stompjs';
-import { useLocation, useParams } from "react-router-dom";
-import { getCookie } from "@/utils/cookies";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import React, { useState, useEffect, useRef } from 'react';
+import { Client, IMessage } from '@stomp/stompjs';
+import { useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { set } from 'react-hook-form';
+import { getCookie } from '@/utils/cookies';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { fetchBidsByAuctionItemId } from '@/services/BidsService';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay"
+
 
 export default function AuctionJoin() {
-  let client: Client | null = null;
+  const [isReceived, setIsReceived] = useState(false);
+  const [accountId, setAcccountId] = useState<number | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
+  const messageAreaRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  let message = "";
   const [price, setPrice] = useState("");
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
+  const [bids, setBids] = useState([]);
   useEffect(() => {
-    // Create a WebSocket connection
-
-    client = new Client();
-
-    // Configure the WebSocket endpoint URL
-    const websocketUrl = `ws://localhost:8080/auction-join?token=${JSON.parse(getCookie("user")).accessToken}`; // Replace with your WebSocket endpoint URL
-
-    // Connect to the WebSocket server
-    client.configure({
-      brokerURL: websocketUrl,
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      logRawCommunication: true,
-      debug: function (str) {
-        console.log(str);
-      },
+    const newClient = new Client({
+      brokerURL: 'ws://localhost:8080/auction-join?token=' + JSON.parse(getCookie("user")).accessToken,
       onConnect: () => {
-        client?.publish({
-          destination: `/app/chat.addUser/${auctionId}/${itemId}`,
+        newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
+
+        newClient.publish({
+          destination: '/app/chat.addUser/' + auctionId + '/' + itemId,
           body: JSON.stringify({
             auctionItemId: location.state.id,
-            payment:{
+            payment: {
               accountId: JSON.parse(getCookie("user")).id
             }
-          }),
-        });
-        // Perform actions after successful connection
-        const destination = `/topic/public/${auctionId}/${itemId}`; // Specify the destination for the server-side message handler
-        client?.subscribe(destination, (message) => {
-          if (JSON.parse(message.body).body.toString().endsWith("JOIN") || JSON.parse(message.body).body.toString().endsWith("BID")) {
-            setPrice(JSON.parse(message.body).body.split(":")[1]);
-          }
-          console.log('Received message:', JSON.parse(message.body));
-
+          })
         });
       },
-      // You can add more event handlers and configuration options as needed
+      onStompError: (error) => {
+        console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
+      },
     });
 
-    // Connect to the WebSocket server
-    client.activate();
+    setClient(newClient);
+    newClient.activate();
+  }, [accountId]);
 
+  const onMessageReceived = (payload: IMessage) => {
+    const message = JSON.parse(payload.body).body;
+    console.log(message);
+    let content = '';
+    if (message.split(":")[2] === 'JOIN' || message.split(":")[2] === 'BID') {
+      content = `${message.split(":")[0]}`;
+      setPrice(parseFloat(message.split(":")[1]).toString());
+    }
+    setIsReceived(!isReceived);
+    console.log(content);
+  };
 
-    // Clean up the connection on component unmount
-    return () => {
-      client?.deactivate();
-    };
-  }, []);
-
-  const sendMessage = () => {
-    message = (document.getElementById("price") as HTMLInputElement).value;
-    const destination = `/app/chat.sendMessage/${auctionId}/${itemId}`; // Specify the destination for the server-side message handler            
+  const sendMessage = (event: React.FormEvent) => {
+    event.preventDefault();
 
     if (client != null) {
-      console.log("" + JSON.stringify({
-        price: parseFloat(message),
-        accountId: JSON.parse(getCookie("user")).id
-      }));
+      const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       client.publish({
-        destination,
+        destination: '/app/chat.sendMessage/' + auctionId + '/' + itemId,
         body: JSON.stringify({
-          price: parseFloat(message),
-          accountId: JSON.parse(getCookie("user")).id
-        }),
+          auctionItemId: location.state.id,
+          payment: {
+            accountId: JSON.parse(getCookie("user")).id,
+            amount: paymentAmount
+          }
+        })
       });
+      (document.getElementById('price') as HTMLInputElement).value = '';
     }
+
+  };
+
+  useEffect(() => {
+    console.log("abc " + bids);
+    fetchBidsByAuctionItemId(auctionId, itemId).then((res) => {
+      console.log(res);
+      setBids(res.data);
+      bids.sort((a, b) => { return a.price - b.price });
+    }).catch((err) => {
+      console.log(err);
+    });
+    console.log("abc " + bids);
+
+  }, [price]);
+  if (accountId === null) {
+    setAcccountId(JSON.parse(getCookie("user")).id);
   }
-
   return (
-    <div className="grid grid-cols-[300px_1fr_300px] gap-8 h-screen">
-      <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg sticky top-6">
-        <div className="grid gap-4">
-          <div> 
-            <Button size="large" className="text-white p-4" onClick={()=>{
-              window.history.back();
-            }}>Back</Button>
-            <div className="grid grid-cols-1 gap-4">
-              <img
-                src={itemDTO.attachments[0].link}
-                alt="Vintage Typewriter"
-                width={300}
-                height={300}
-                className="rounded-lg object-cover"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-4 my-4">
-              <img
-                src={itemDTO.attachments[1].link}
-                alt="Vintage Typewriter"
-                width={300}
-                height={300}
-                className="rounded-lg object-cover"
-              />
-              <img
-                src={itemDTO.attachments[2].link}
-                alt="Vintage Typewriter"
-                width={300}
-                height={300}
-                className="rounded-lg object-cover"
-              />
-              <img
-                src={itemDTO.attachments[3].link}
-                alt="Vintage Typewriter"
-                width={300}
-                height={300}
-                className="rounded-lg object-cover"
-              />
-
-            </div>
-            <h2 className="text-2xl font-bold">{itemDTO.name}</h2>
-            <ScrollArea className="w-full h-72 border rounded-xl ">
-              <p className="text-gray-500 dark:text-gray-400 h-96 p-2">
-                {itemDTO.description}
-              </p>
-            </ScrollArea>
-
+    <div className="flex flex-col min-h-screen">
+      <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
+        <Carousel className="flex " plugins={[
+          Autoplay({
+            delay: 2000,
+          }),
+        ]}>
+          <CarouselContent className=' w-full'>
+            {itemDTO?.attachments.map((image) => (
+              <CarouselItem key={image.attachmentId} className="basis-1/3 rounded-full border overflow-hidden border-gray-700">
+                <img src={image.link} alt={itemDTO?.name} className="mx-auto " />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-10">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+              Vintage Leather Armchair
+            </h1>
+            <p className="mt-4 max-w-3xl text-lg md:text-xl">
+              Discover the timeless elegance of this beautifully crafted vintage leather armchair, a true statement piece
+              for your home.
+            </p>
           </div>
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Condition:</span>
-              <span>Excellent</span>
+
+          <CarouselPrevious />
+          <CarouselNext />
+
+        </Carousel>
+
+      </section>
+      <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-4">Item Details</h2>
+            <div className="space-y-4">
+              <div
+                dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
+              />
+
             </div>
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Dimensions:</span>
-              <span>12 x 8 x 5 inches</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Weight:</span>
-              <span>8 lbs</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Authenticity:</span>
-              <span>Certified</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-4">Bidding History</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
+                  <p className="text-2xl font-bold">${price}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Bid Count</p>
+                  <p className="text-2xl font-bold">{bids.length}</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <ScrollArea className="h-48 overflow-hidden p-4" css={{ width: 400 }}>
+                  {bids?.map((bid) => (
+                    <div className="flex items-center justify-between" key={bid?.bidId}>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-8 h-8 border">
+                          <img src={bid?.account.avatar?.link} alt="@username" />
+                          <AvatarFallback>N/A</AvatarFallback>
+                        </Avatar>
+                        <p>{bid?.account.nickname}</p>
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
+                    </div>
+                  ))}
+                </ScrollArea>
+
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="flex flex-col items-center justify-center">
-        <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Current Bid:</span>
-              <span className="text-lg font-semibold">${price}</span>
-            </div>
-            <div className="flex items-start gap-3">
-
-              <div className="rounded-full bg-blue-500 text-white flex items-center justify-center w-8 h-8">
-                <span>B</span>
+        <div className="mt-12 md:mt-16 lg:mt-20">
+          <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
+          <form className="max-w-md mx-auto" onSubmit={sendMessage}>
+            <div className="grid gap-4">
+              <div>
+                <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
               </div>
-              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg max-w-[70%]">
-                <p>Hey, I'd like to place a bid on the vintage typewriter. What's the current highest bid?</p>
-                <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">2:30 PM</div>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 justify-end">
-              <div className="bg-blue-500 text-white p-3 rounded-lg max-w-[70%]">
-                <p>The current highest bid is $425. Feel free to place your bid above that amount.</p>
-                <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">2:31 PM</div>
-              </div>
-              <div className="rounded-full bg-blue-500 text-white flex items-center justify-center w-8 h-8">
-                <span>A</span>
-              </div>
-            </div>
-
-          </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <div className="relative">
-              <Input type="number" placeholder="Type your message..." className="pr-12 rounded-lg w-full" id='price' />
-              <Button type="submit" size="icon" className="absolute top-1/2 right-3 -translate-y-1/2" onClick={sendMessage}>
-                Send
+              <Button type="submit" className="w-full">
+                Place Bid
               </Button>
             </div>
-          </div>
-        </div>
-      </div>
-      <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-        <div className="grid gap-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold">Time Remaining</h3>
-            <div className="text-2xl font-bold">
-              <div className="text-2xl font-bold" />
-            </div>
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Auction Status:</span>
-              <span>Live</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Number of Bids:</span>
-              <span>12</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-medium">Highest Bid:</span>
-              <span>$425</span>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
