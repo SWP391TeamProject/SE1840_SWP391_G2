@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/auction-join");
+        registry.addEndpoint("/auction-join").addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, accountService)).setAllowedOrigins("http://localhost:5173");
         registry.addEndpoint("/auction-join")
                 .addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, accountService))
                 .setAllowedOrigins("http://localhost:5173");

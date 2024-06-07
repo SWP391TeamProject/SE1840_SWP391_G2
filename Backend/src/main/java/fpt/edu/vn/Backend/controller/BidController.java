@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.BidService;
@@ -22,17 +23,17 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 
-@RestController
+@Controller
 public class BidController {
     private static final Logger log = LoggerFactory.getLogger(BidController.class);
     @Autowired
@@ -49,9 +50,16 @@ public class BidController {
         return ResponseEntity.ok(bidService.getBidsByAccountId(accountId, pageable));
     }
 
+    @GetMapping("/api/bids/{auctionSessionId}/{itemId}")
+    public ResponseEntity<List<BidResponse>> getBidsByAuctionItemId(@PathVariable int auctionSessionId, @PathVariable int itemId) {
+        AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
+        return ResponseEntity.ok(bidService.toBidResponse(bidService.getBidsByAuctionItemId(auctionItemId)));
+    }
+
     @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
     @SendTo("/topic/public/{auctionSessionId}/{itemId}")
-    public ResponseEntity<BidDTO> sendMessage(@Payload BidDTO bidDTO,
+    @Transactional
+    public ResponseEntity<String> sendMessage(@Payload BidDTO bidDTO,
                                               @DestinationVariable int auctionSessionId,
                                               @DestinationVariable int itemId,
                                               SimpMessageHeaderAccessor headerAccessor) {
@@ -60,14 +68,14 @@ public class BidController {
             bidDTO.setAuctionItemId(auctionItemId);
             BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getAmount();
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
-            log.info(account.getEmail() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId());
+            log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount()+ " on " + bidDTO.getAuctionItemId().getItemId()+","+bidDTO.getAuctionItemId().getAuctionSessionId());
 
             if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
                 bidDTO = bidService.createBid(bidDTO);
                 AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
                 a.setCurrentPrice(bidDTO.getPayment().getAmount());
                 auctionItemService.updateAuctionItem(a);
-                return ResponseEntity.ok(bidDTO);
+                return ResponseEntity.ok(bidDTO.getPayment().getAmount()+ "  : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":BID");
             } else {
                 throw new Exception("Bid must be higher than current bid by at least 5");
             }

@@ -13,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
-public class PaymentServiceImpl implements PaymentService{
+public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private PaymentRepos paymentRepos;
@@ -93,6 +95,18 @@ public class PaymentServiceImpl implements PaymentService{
         }
     }
 
+
+    @Override
+    public PaymentDTO createPayment(PaymentDTO paymentDTO) {
+        Payment payment = new Payment();
+        payment.setPaymentAmount(paymentDTO.getAmount());
+        payment.setCreateDate(LocalDateTime.now());
+        payment.setType(paymentDTO.getType());
+        payment.setStatus(paymentDTO.getStatus());
+        payment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).get());
+        return new PaymentDTO(paymentRepos.save(payment));
+    }
+
     @Override
     public Page<PaymentDTO> getAllPayment(Pageable pageable) {
         try {
@@ -104,6 +118,11 @@ public class PaymentServiceImpl implements PaymentService{
             // Throw a custom exception
             throw new ResourceNotFoundException("Failed to get all payments", e);
         }
+    }
+
+    @Override
+    public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
+        return null;
     }
 
     @Override

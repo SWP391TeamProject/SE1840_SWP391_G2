@@ -12,4 +12,7 @@ public interface PaymentService {
     PaymentDTO getPaymentById(int id);
     Page<PaymentDTO> getAllPayment(Pageable pageable);
     PaymentDTO deleteById(int id);
+    PaymentDTO createPayment(PaymentDTO paymentDTO);
+    PaymentDTO updatePayment(PaymentDTO paymentDTO);
+
 }
