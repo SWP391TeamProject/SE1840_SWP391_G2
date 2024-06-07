@@ -58,6 +58,7 @@ import { ErrorPage } from "./components/component/error-page.tsx";
 import AuctionJoin from "./pages/CustomerSite/Auctions/AuctionJoin.tsx";
 import CustomerDashboard from "./pages/CustomerSite/dashboard/CustomerDashboard.tsx";
 import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerConsignmentList.tsx";
+import TestPage from "./pages/TestPage.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -149,6 +150,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/unauthorized" element={<ErrorPage />} />
                 {/* <RouterProvider router={router} /> */}
                 <Route path="/auction-join" element={<AuctionJoin />} />
+                <Route path="*" element={<ErrorPage />} />
+                <Route path="/test" element={<TestPage />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>
