@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
+import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.exporter.ItemExporter;
@@ -15,7 +16,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,8 +66,20 @@ public class ItemController {
         return new ResponseEntity<>(itemService.getItemById(id), HttpStatus.OK);
     }
 
+
     @PostMapping("/create")
-    public ResponseEntity<ItemDTO> createItem(@RequestBody ItemDTO itemDTO) {
+    public ResponseEntity<ItemDTO> createItem(@ModelAttribute CreateItemRequestDTO itemDTO) throws IOException {
+
+        if (itemDTO.getFiles() != null) {
+            for (MultipartFile f : itemDTO.getFiles()) {
+                if (f.getSize() > 10000000) {
+                    throw new InvalidInputException("File size must be less than 10MB");
+                }
+
+            }
+        }else {
+            throw new InvalidInputException("File cannot be null");
+        }
         return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
     }
 

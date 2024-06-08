@@ -13,6 +13,7 @@ import java.io.IOException;
 @SpringBootApplication
 @CrossOrigin(origins = "http://localhost:5173/**")
 @EnableScheduling
+
 public class BackendApplication {
 
 	public static void main(String[] args) {
