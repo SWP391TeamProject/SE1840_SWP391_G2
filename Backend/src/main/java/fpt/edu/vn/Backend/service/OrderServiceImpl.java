@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderRequest;
+import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.repository.ItemRepos;
 import fpt.edu.vn.Backend.repository.OrderRepos;
@@ -9,7 +10,9 @@ import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +34,11 @@ public class OrderServiceImpl implements OrderService{
     public OrderDTO createOrder(OrderRequest orderRequest) {
         try {
             Order order = new Order();
-            order.setItem(itemRepository.findById(orderRequest.getItemId()).orElseThrow(() -> new RuntimeException("Item not found")));
+            Set<Item> items = new HashSet<>();
+            for (int itemId : orderRequest.getItemId()) {
+                items.add(itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found")));
+            }
+            order.setItems(items);
             order.setPayment(paymentRepository.findById(orderRequest.getPaymentId()).orElseThrow(() -> new RuntimeException("Payment not found")));
             order = orderRepository.save(order);
             return new OrderDTO(order);
@@ -67,7 +74,11 @@ public class OrderServiceImpl implements OrderService{
     public OrderDTO updateOrder(OrderRequest orderRequest) {
         try {
             Order order = orderRepository.findById(orderRequest.getOrderId()).orElseThrow(() -> new RuntimeException("Order not found"));
-            order.setItem(itemRepository.findById(orderRequest.getItemId()).orElseThrow(() -> new RuntimeException("Item not found")));
+            Set<Item> items = new HashSet<>();
+            for (int itemId : orderRequest.getItemId()) {
+                items.add(itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found")));
+            }
+            order.setItems(items);
             order.setPayment(paymentRepository.findById(orderRequest.getPaymentId()).orElseThrow(() -> new RuntimeException("Payment not found")));
             order = orderRepository.save(order);
             return new OrderDTO(order);

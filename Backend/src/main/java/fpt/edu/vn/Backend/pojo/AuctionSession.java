@@ -54,5 +54,9 @@ public class AuctionSession {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private List<Attachment> attachments;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_session_id")
+    private Set<Deposit> deposits;
 }
 

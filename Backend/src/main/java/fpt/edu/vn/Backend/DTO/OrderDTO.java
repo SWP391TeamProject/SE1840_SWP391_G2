@@ -3,18 +3,19 @@ package fpt.edu.vn.Backend.DTO;
 import fpt.edu.vn.Backend.pojo.Order;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Data
 public class OrderDTO {
     private int orderId;
-    private int itemId;
+    private Set<ItemDTO> item;
     private PaymentDTO payment;
 
     public OrderDTO(Order order){
         this.orderId = order.getOrderId();
-        this.itemId = order.getItem().getItemId();
+        this.item = order.getItems().stream().map(ItemDTO::new).collect(Collectors.toSet());
         this.payment = new PaymentDTO(order.getPayment());
     }
 }

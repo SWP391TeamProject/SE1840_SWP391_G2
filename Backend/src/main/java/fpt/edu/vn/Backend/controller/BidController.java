@@ -2,12 +2,15 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.service.AccountService;
-import fpt.edu.vn.Backend.service.BidService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
+import fpt.edu.vn.Backend.service.AuctionSessionService;
+import fpt.edu.vn.Backend.service.BidService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +45,12 @@ public class BidController {
     private AccountService accountService;
     @Autowired
     private AuctionItemService auctionItemService;
+    @Autowired
+    private AuctionSessionService auctionSessionService;
 
     @GetMapping("/api/bids/{accountId}")
-    public ResponseEntity<Page<BidDTO>> getBidsByAccountId(@PathVariable int accountId, @RequestParam(defaultValue = "0") int pageNumb,@RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb,pageSize);
+    public ResponseEntity<Page<BidDTO>> getBidsByAccountId(@PathVariable int accountId, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumb, pageSize);
 
         return ResponseEntity.ok(bidService.getBidsByAccountId(accountId, pageable));
     }
@@ -68,16 +73,16 @@ public class BidController {
             bidDTO.setAuctionItemId(auctionItemId);
             BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getAmount();
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
-            log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount()+ " on " + bidDTO.getAuctionItemId().getItemId()+","+bidDTO.getAuctionItemId().getAuctionSessionId());
+            log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
 
             if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
                 bidDTO = bidService.createBid(bidDTO);
                 AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
                 a.setCurrentPrice(bidDTO.getPayment().getAmount());
                 auctionItemService.updateAuctionItem(a);
-                return ResponseEntity.ok(bidDTO.getPayment().getAmount()+ "  : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":BID");
+                return ResponseEntity.ok(account.getNickname()+" bid "+bidDTO.getPayment().getAmount() + "  : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":BID");
             } else {
-                throw new Exception("Bid must be higher than current bid by at least 5");
+                return new ResponseEntity<>("Your bid must be higher than the current bid by at least 5", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -86,22 +91,27 @@ public class BidController {
 
     @MessageMapping("/chat.addUser/{auctionSessionId}/{itemId}")
     @SendTo("/topic/public/{auctionSessionId}/{itemId}")
+    @Transactional
     public ResponseEntity<String> addUser(@Payload BidDTO bidDTO,
                                           @DestinationVariable int auctionSessionId,
                                           @DestinationVariable int itemId, Authentication authentication,
                                           SimpMessageHeaderAccessor headerAccessor) {
         AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
+        AuctionSessionDTO auctionSessionDTO = auctionSessionService.getAuctionSessionById(auctionSessionId);
         // Add username in web socket session
         AccountDTO persistedAccount = accountService.getAccountByEmail(authentication.getName());
-        if (persistedAccount != null) {
-            // Add the updated Account to the session attributes
-            Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
-            // Create a new bid
-//            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-            return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":JOIN");
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(persistedAccount==null){
+            return new ResponseEntity<>("You have not log-in yet", HttpStatus.BAD_REQUEST);
         }
+        if (auctionSessionDTO.getDeposits().stream().noneMatch(depositDTO -> depositDTO.getPayment().getAccountId() == persistedAccount.getAccountId())) {
+            return new ResponseEntity<>("You have not registered to this auction yet", HttpStatus.BAD_REQUEST);
+        }
+        // Add the updated Account to the session attributes
+        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
+        // Create a new bid
+//            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
+        return ResponseEntity.ok(persistedAccount.getNickname() + " join the auction : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":JOIN");
+
 
     }
 
