@@ -251,7 +251,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public ConsignmentDTO getConsignmentById(int id) {
-        return null;
+
+
+        return consignmentRepos.findById(id).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
     }
 
     @Override

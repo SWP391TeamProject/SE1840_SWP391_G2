@@ -36,7 +36,7 @@ export default function ConsignmentDetail() {
         // dispatch(setCurrentConsignment(param.id));
         fetchConsignmentByConsignmentId(param.id).then((res) => {
             console.log(res.data.content);
-            setConsignment(res.data.content[0]);
+            setConsignment(res.data);
         }).catch((error) => {
             console.log(error);
             toast.error(error.response.data.message);
