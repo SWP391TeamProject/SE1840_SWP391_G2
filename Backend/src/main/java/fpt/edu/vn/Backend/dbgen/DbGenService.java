@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.dbgen;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -30,13 +29,19 @@ import java.util.logging.Logger;
 public class DbGenService {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+    private static File DATA = new File("../gendb/output");
 
     static {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ICT"));
+        if (!DATA.exists())
+            DATA = new File("./gendb/output");
+        if (!DATA.exists()) {
+            System.err.println("Data not found");
+            System.exit(1);
+        }
     }
 
     private static final Gson GSON = new Gson();
-    private static final File DATA = new File("../gendb/data");
     private static final Logger LOGGER = Logger.getLogger(DbGenService.class.getName());
 
     @Autowired
@@ -63,22 +68,29 @@ public class DbGenService {
     private AuctionItemRepos auctionItemRepos;
     @Autowired
     private PaymentRepos paymentRepos;
+    @Autowired
+    private NotificationRepos notificationRepos;
 
     public void generate() throws IOException {
         LOGGER.info("Generate database...");
 
-        generateAccount(parse("account.json"));
-        generateConsignment(parse("consignment.json"));
-        generateItemCategory(parse("item_category.json"));
-        generateItem(parse("item.json"));
-        generateAuction(parse("auction_session.json"));
-        generateTransaction(parse("transaction.json"));
+        generateAccount(loadArray("account.json"));
+        generateConsignment(loadArray("consignment.json"));
+        generateItemCategory(loadArray("item_category.json"));
+        generateItem(loadArray("item.json"));
+        generateAuction(loadArray("auction_session.json"));
+        generateTransaction(loadArray("transaction.json"));
+        generateNotification(loadObject("notification.json"));
 
         System.exit(0);
     }
 
-    private JsonArray parse(String path) throws IOException {
+    private JsonArray loadArray(String path) throws IOException {
         return GSON.fromJson(Files.readString(new File(DATA, path).toPath()), JsonArray.class);
+    }
+
+    private JsonObject loadObject(String path) throws IOException {
+        return GSON.fromJson(Files.readString(new File(DATA, path).toPath()), JsonObject.class);
     }
 
     private LocalDateTime parseDate(String createDate) {
@@ -437,6 +449,26 @@ public class DbGenService {
                 }
             }
         }
+    }
+
+    private void generateNotification(JsonObject jsonObject) {
+        LOGGER.info("Generate notifications...");
+        String[] notificationList = jsonObject.getAsJsonArray("notification").asList()
+                .stream().map(JsonElement::getAsString).toArray(String[]::new);
+        JsonObject distribution = jsonObject.getAsJsonObject("distribution");
+        List<Notification> notifications = new ArrayList<>();
+        for (Map.Entry<String, JsonElement> e : distribution.entrySet()) {
+            int accountId = Integer.parseInt(e.getKey());
+            int[] where = e.getValue().getAsJsonArray().asList()
+                    .stream().mapToInt(JsonElement::getAsInt).toArray();
+            for (int i : where) {
+                Notification notification = new Notification();
+                notification.setMessage(notificationList[i]);
+                notification.setAccount(accountRepos.findById(accountId).get());
+                notifications.add(notification);
+            }
+        }
+        notificationRepos.saveAllAndFlush(notifications);
     }
 
 }

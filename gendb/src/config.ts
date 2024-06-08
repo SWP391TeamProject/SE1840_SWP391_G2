@@ -16,3 +16,5 @@ export const MIN_AUCTION_MINUTES = 10;
 export const MAX_AUCTION_MINUTES = 20;
 export const MIN_BID_TIME_INCREMENT = 30;
 export const MAX_BID_TIME_INCREMENT = 60;
+export const NOTIFICATION_PER_ACCOUNT_MIN = 20;
+export const NOTIFICATION_PER_ACCOUNT_MAX = 50;

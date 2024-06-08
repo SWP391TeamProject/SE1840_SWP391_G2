@@ -1,15 +1,16 @@
-import {faker, tr} from '@faker-js/faker';
+import {faker} from '@faker-js/faker';
 import {addRandomYears} from '../utils/utils';
 import {CitizenCard} from "../model/citizen_card";
 import {Account, Role} from "../model/account";
-import {PaymentType, Transaction} from "../model/transaction";
 import {
-    ACCOUNT_AGE_MAX, ACCOUNT_AGE_MIN,
+    ACCOUNT_AGE_MAX,
+    ACCOUNT_AGE_MIN,
     HAS_CITIZEN_CARD,
     NUMBER_OF_ACCOUNT,
     NUMBER_OF_ADMIN,
     NUMBER_OF_MANAGER,
-    NUMBER_OF_STAFF, OLDEST_ACCOUNT_CREATE_YEAR
+    NUMBER_OF_STAFF,
+    OLDEST_ACCOUNT_CREATE_YEAR
 } from "../config";
 
 export function genAccount(): Account[] {
@@ -51,7 +52,7 @@ export function genAccount(): Account[] {
             email: faker.internet.email(),
             phone: "0" + faker.string.numeric(9),
             password: faker.internet.password({ length: 20 }),
-            status: faker.helpers.arrayElement(["ACTIVE", "DISABLED"]),
+            status: role == Role.MEMBER ? (faker.number.float() < 0.2 ? "DISABLED" : "ACTIVE") : "ACTIVE",
             balance: 0, // generate later
             citizenCard: citizenCard,
             createDate: accountCreateDate,

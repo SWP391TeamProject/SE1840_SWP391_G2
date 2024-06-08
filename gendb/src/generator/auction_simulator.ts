@@ -35,11 +35,9 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                 : now > endDate
                     ? AuctionStatus.FINISHED
                     : AuctionStatus.PROGRESSING;
-            console.log(`Start at ${startDate}, end at ${endDate}, status: ${status}`);
             const auctionItems: AuctionItem[] = [];
-
             const numOfItems = faker.number.int({ min: MIN_ITEM_PER_AUCTION, max: MAX_ITEM_PER_AUCTION });
-            console.log(`Number of items: ${numOfItems}`);
+            console.log(`Generating auction: ${auctionId}, status: ${status}, items: ${numOfItems}`);
 
             for (let j = 0; j < numOfItems; j++) {
                 const item = items.find(i => i.status == ItemStatus.QUEUE &&
@@ -59,7 +57,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                 const participants: Account[] = members.filter(m =>
                     m.createDate < dayjs(startDate).subtract(3, 'day').toDate())
                     .slice(0, numOfParticipants);
-                console.log(`Item ${item.id}, number of participants: ${numOfParticipants}`);
+                console.log(`- Item ${item.id}, number of participants: ${numOfParticipants}`);
                 const deposits: Map<number, number> = new Map();
 
                 for (let participant of participants) {
@@ -115,8 +113,8 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                         const participant = faker.helpers.arrayElement(participants);
                         lastParticipant = participant;
                         const bidIncrease = item.reservePrice * faker.number.float({
-                            min: 0.01,
-                            max: 0.05
+                            min: 0.02,
+                            max: 0.08
                         });
                         const bidPrice = currentPrice + bidIncrease;
                         transactions.push({
@@ -133,9 +131,10 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                         });
                         currentPrice = Math.max(currentPrice, bidPrice);
                     }
-                    console.log(`- Number of bids: ${bidCount}`);
+                    console.log(`> Number of bids: ${bidCount}`);
 
                     if (status == AuctionStatus.FINISHED) {
+                        console.log(`> Final bid: ${currentPrice}/${item.reservePrice}`);
                         if (currentPrice >= item.reservePrice && lastParticipant !== undefined) {
                             item.status = ItemStatus.SOLD;
 
@@ -198,7 +197,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                                     }
                                 });
                             }
-                            console.log(`- Winner: ${lastParticipant.id}`);
+                            console.log(`> Winner: ${lastParticipant.id}`);
                         } else {
                             item.status = ItemStatus.UNSOLD;
                         }

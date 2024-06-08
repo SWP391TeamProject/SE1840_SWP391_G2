@@ -5,6 +5,7 @@ import {Account, Role} from "../model/account";
 import {genConsignment} from "./gen_consignment";
 import {simulateAuction} from "./auction_simulator";
 import {PaymentType} from "../model/transaction";
+import {genNotification} from "./gen_notification";
 
 /*
 1. account, citizen_card
@@ -76,33 +77,41 @@ export async function generate() {
         accountList[transaction.accountId-1].balance += transaction.amount;
     }
 
-    fs.writeFile(`./data/account.json`, JSON.stringify(accountList), (err) => {
+    // tạo noti
+    const [noti, notiCount] = genNotification(accountList);
+
+    fs.writeFile(`./output/account.json`, JSON.stringify(accountList), (err) => {
         if (err) throw err;
     });
     console.log(`Generated ${accountList.length} accounts!`);
 
-    fs.writeFile(`./data/item_category.json`, JSON.stringify(categoryAndRawItems[0]), (err) => {
+    fs.writeFile(`./output/item_category.json`, JSON.stringify(categoryAndRawItems[0]), (err) => {
         if (err) throw err;
     });
     console.log(`Generated ${categoryAndRawItems[0].length} item categories!`);
 
-    fs.writeFile(`./data/consignment.json`, JSON.stringify(consignmentList), (err) => {
+    fs.writeFile(`./output/consignment.json`, JSON.stringify(consignmentList), (err) => {
         if (err) throw err;
     });
     console.log(`Generated ${consignmentList.length} consignments!`);
 
-    fs.writeFile(`./data/item.json`, JSON.stringify(items), (err) => {
+    fs.writeFile(`./output/item.json`, JSON.stringify(items), (err) => {
         if (err) throw err;
     });
     console.log(`Generated ${items.length} items!`);
 
-    fs.writeFile(`./data/transaction.json`, JSON.stringify(transAndAuction[0]), (err) => {
+    fs.writeFile(`./output/transaction.json`, JSON.stringify(transAndAuction[0]), (err) => {
         if (err) throw err;
     });
     console.log(`Generated ${transAndAuction[0].length} transactions!`);
 
-    fs.writeFile(`./data/auction_session.json`, JSON.stringify(transAndAuction[1]), (err) => {
+    fs.writeFile(`./output/auction_session.json`, JSON.stringify(transAndAuction[1]), (err) => {
         if (err) throw err;
     });
     console.log(`Generated ${transAndAuction[1].length} auction sessions!`);
+
+    fs.writeFile(`./output/notification.json`, JSON.stringify(noti), (err) => {
+        if (err) throw err;
+    });
+    console.log(`Generated ${notiCount} notifications!`);
 }
