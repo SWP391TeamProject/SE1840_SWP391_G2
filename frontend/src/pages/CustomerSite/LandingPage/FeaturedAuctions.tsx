@@ -55,7 +55,7 @@ export default function FeaturedAuctions() {
                             alt="Auction Item"
                             className="rounded-t-lg object-cover"
                             height="225"
-                            src={item.attachments[0].link}  
+                            src={item.attachments.length > 0 ? item.attachments[0].link : "https://placehold.co/400"}
                             style={{
                               aspectRatio: "400/225",
                               objectFit: "cover",
@@ -69,10 +69,10 @@ export default function FeaturedAuctions() {
                               {item.title}
                             </h3>
                             <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium dark:bg-gray-800">
-                              <CountDownTime end={new Date(item.endDate)}/>
+                              <CountDownTime end={new Date(item.endDate)} />
                             </div>
                           </div>
-                  
+
                           <div className="flex items-center justify-between">
                             <div className="text-sm text-gray-500 dark:text-gray-400">
                               Ends in {getDaysLeft(new Date(item.endDate))} days

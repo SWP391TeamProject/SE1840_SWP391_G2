@@ -61,6 +61,7 @@ import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerCons
 import TestPage from "./pages/TestPage.tsx";
 import { Bids } from "./pages/CustomerSite/dashboard/bids/Bids.tsx";
 import NotificationsList from "@/pages/CustomerSite/Profile/Notification.tsx";
+import ItemCreate from "./pages/Administration/item/ItemCreate.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -136,7 +137,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
                       <Route path="items" element={<ItemsList />}></Route>
                       <Route path="items/:id" element={<ItemDetail />}></Route>
-                      {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
+                      <Route path="items/create" element={<ItemCreate />}></Route>
                     </Route>
 
                   </Route>

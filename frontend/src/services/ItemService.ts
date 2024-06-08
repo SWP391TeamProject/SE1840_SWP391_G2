@@ -1,8 +1,8 @@
 import axios from "axios";
-import {Item, ItemStatus} from "@/models/Item.ts";
-import {Page} from "@/models/Page.ts";
+import { Item, ItemStatus } from "@/models/Item.ts";
+import { Page } from "@/models/Page.ts";
 import { getCookie } from "@/utils/cookies";
-import {API_SERVER} from "@/constants/domain";
+import { API_SERVER } from "@/constants/domain";
 
 // Service methods
 const baseUrl = API_SERVER + "/items";
@@ -46,8 +46,14 @@ export const getItemById = async (id: number) => {
     return await axios.get<Item>(`${baseUrl}/detail/${id}`, authHeader);
 };
 
-export const createItem = async (itemDTO: Item) => {
-    return await axios.post<Item>(`${baseUrl}/create`, itemDTO, authHeader);
+export const createItem = async (itemDTO: any) => {
+    return await axios.post<Item>(`${baseUrl}/create`, itemDTO, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Access-Control-Allow-Origin": "*",
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
+        }
+    });
 };
 
 export const updateItem = async (itemDTO: Item) => {
