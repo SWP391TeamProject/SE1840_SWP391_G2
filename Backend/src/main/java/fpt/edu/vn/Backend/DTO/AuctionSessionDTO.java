@@ -27,6 +27,7 @@ public class AuctionSessionDTO {
     private LocalDateTime updateDate;
     private Set<AttachmentDTO> attachments;
     private Set<AuctionItemDTO> auctionItems;
+    private Set<DepositDTO> deposits;
 
     public AuctionSessionDTO(AuctionSession auctionSession) {
         this.auctionSessionId = auctionSession.getAuctionSessionId();
@@ -38,6 +39,7 @@ public class AuctionSessionDTO {
         this.title = auctionSession.getTitle();
         this.attachments = auctionSession.getAttachments() != null ? auctionSession.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet()) : new HashSet<>();
         this.auctionItems = auctionSession.getAuctionItems() != null ? auctionSession.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet()) : new HashSet<>();
+        this.deposits = auctionSession.getDeposits() != null ? auctionSession.getDeposits().stream().map(DepositDTO::new).collect(Collectors.toSet()) : new HashSet<>();
     }
 
 

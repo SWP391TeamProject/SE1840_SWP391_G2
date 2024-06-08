@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.dbgen;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -25,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class DbGenService {
@@ -430,7 +430,7 @@ public class DbGenService {
                 case AUCTION_ORDER -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Order order = new Order();
-                    order.setItem(itemRepos.findById(auctionItem.get("itemId").getAsInt()).get());
+                    order.setItems(itemRepos.findById(auctionItem.get("itemId").getAsInt()).stream().collect(Collectors.toSet()));
                     order.setPayment(payment);
                     payment.setOrder(order);
                     paymentRepos.save(payment);
