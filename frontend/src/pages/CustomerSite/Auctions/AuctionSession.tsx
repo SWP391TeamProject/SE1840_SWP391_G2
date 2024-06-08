@@ -7,6 +7,9 @@ import CountDownTime from '@/components/countdownTimer/CountDownTime'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { set } from 'react-hook-form'
+import { log } from 'console'
+import { getCookie } from '@/utils/cookies'
+import { registerAuctionSession } from '@/services/AuctionSessionService'
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
@@ -18,7 +21,9 @@ export default function AuctionSession() {
         currency: 'USD',
     });
     const param = useParams();
-
+    const [bidders, setBidders] = useState<number[]>([]);
+    const user = JSON.parse(getCookie("user") || "null");
+    const userId = user == null ? -1 : user.id;
     useEffect(() => {
 
         if (auctionSession == null) {
@@ -55,10 +60,22 @@ export default function AuctionSession() {
         console.log(auctionSession);
         if (auctionSession) {
             setSessionAttachments(auctionSession?.attachments);
+            auctionSession?.deposits.forEach((deposit: any) => {
+                setBidders(prevBidders => [...prevBidders, deposit?.payment.accountId]);
+            });
         }
     }, [auctionSession])
 
-
+    const handleRegister = () => {
+        registerAuctionSession(auctionSession?.auctionSessionId ?? -1).then(res => {
+            res.data.deposits.forEach((deposit: any) => {
+                if (!bidders.includes(deposit.payment.accountId)) {
+                    setBidders(prevBidders => [...prevBidders, deposit.payment.accountId]);
+                }
+            });
+            toast.success("Registered Successfully");
+        }).catch(() => { toast.error("Failed to Register") });
+    }
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-gray-100 py-12 md:py-12 dark:bg-gray-800">
@@ -77,7 +94,15 @@ export default function AuctionSession() {
                                     <ClockIcon className="h-5 w-5" />
                                     <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>
                                 </div>
-                                <Button>Register to bid</Button>
+
+
+                                {bidders.includes(userId) ? (
+                                    <Button onClick={()=>scrollTo({ top: (document.getElementById("auction-items")?.offsetTop), behavior: 'smooth' })}>Place Bid</Button>
+                                ) : (
+                                    <Button onClick={handleRegister}>Register to bid</Button>
+                                )}
+
+
                             </div>
                         </div>
                         <img
@@ -92,7 +117,7 @@ export default function AuctionSession() {
             </section>
             <main className="container px-4 py-12 md:px-6 md:py-20">
                 <div className="grid gap-12 md:grid-cols-[1fr_300px]">
-                    <div>
+                    <div id='auction-items'>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item, index) => (

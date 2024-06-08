@@ -18,6 +18,6 @@ public interface AuctionSessionService {
 
     Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable);
 
-    
+    AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId);
 
 }

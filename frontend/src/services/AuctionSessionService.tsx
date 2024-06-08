@@ -39,3 +39,21 @@ export const createAuctionSession = async (data: any) => {
             }
         });
 }
+export const registerAuctionSession = async (id: number) => {
+    return await axios
+        .get(`http://localhost:8080/api/auction-sessions/register/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
+        });
+}

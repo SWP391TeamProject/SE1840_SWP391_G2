@@ -34,7 +34,7 @@ import LoginForm from "./pages/authentication/LoginForm.tsx";
 import ConsignmentList from "./pages/Administration/consignments/ConsignmentList.tsx";
 import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDetail.tsx";
 import ItemsList from "./pages/Administration/item/ItemsList.tsx";
-import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx"; 
+import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx";
 import ProfileLayout from "./pages/CustomerSite/Profile/Profile.tsx";
 import ProfileSetting from "./pages/CustomerSite/Profile/ProfileSetting.tsx";
 import ProfileDetail from "./pages/CustomerSite/Profile/ProfileDetail.tsx";
@@ -78,6 +78,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 {/* <Route path="/" element={<HomeLayout />}> */}
                 {/* Customer Site */}
                 <Route path="/" element={<CustomerLayout />}>
+                  <Route path="/auction-join" element={<AuctionJoin />} />
+
                   <Route path="/" element={<LandingPage />}></Route>
                   <Route path="contact" element={<Contact />}></Route>
                   <Route path="about" element={<AboutScreen />}></Route>
@@ -153,7 +155,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
                 <Route path="/unauthorized" element={<ErrorPage />} />
                 {/* <RouterProvider router={router} /> */}
-                <Route path="/auction-join" element={<AuctionJoin />} />
                 <Route path="*" element={<ErrorPage />} />
                 <Route path="/test" element={<TestPage />} />
               </Routes>
