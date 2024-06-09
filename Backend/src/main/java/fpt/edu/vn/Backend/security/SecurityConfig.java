@@ -99,7 +99,7 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","api/auction-sessions/**","/auction-join/**","/api/item-categories/**").permitAll()
+                        .requestMatchers("/api/payments/**","/auth/**","api/auction-sessions/**","/auction-join/**","/api/item-categories/**","/test").permitAll()
                         .anyRequest().authenticated()
 
                 )

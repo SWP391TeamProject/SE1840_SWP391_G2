@@ -3,12 +3,14 @@ package fpt.edu.vn.Backend.DTO;
 import fpt.edu.vn.Backend.pojo.Payment;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Data
+@ToString
 public class PaymentDTO {
     private int id;
     private BigDecimal amount;
@@ -16,6 +18,7 @@ public class PaymentDTO {
     private Payment.Type type;
     private Payment.Status status;
     private int accountId;
+
 
     public PaymentDTO(Payment payment) {
         if (payment == null) return;

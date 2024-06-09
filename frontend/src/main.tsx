@@ -62,6 +62,8 @@ import TestPage from "./pages/TestPage.tsx";
 import { Bids } from "./pages/CustomerSite/dashboard/bids/Bids.tsx";
 import NotificationsList from "@/pages/CustomerSite/Profile/Notification.tsx";
 import ItemCreate from "./pages/Administration/item/ItemCreate.tsx";
+import Balance from "./pages/CustomerSite/Profile/Balance.tsx";
+import PaymentStatus from "./pages/CustomerSite/Profile/PaymentStatus.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -99,6 +101,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                       <Route path="" element={<ProfileDetail />}></Route>
                       <Route path="/profile/settings" element={<ProfileSetting />}></Route>
                       <Route path="/profile/notification" element={<NotificationsList />}></Route>
+                      <Route path="/profile/balance" element={<Balance />}></Route>
 
                     </Route>
                   </Route>
@@ -157,7 +160,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/unauthorized" element={<ErrorPage />} />
                 {/* <RouterProvider router={router} /> */}
                 <Route path="*" element={<ErrorPage />} />
-                <Route path="/test" element={<TestPage />} />
+                <Route path="/test" element={<PaymentStatus />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>
