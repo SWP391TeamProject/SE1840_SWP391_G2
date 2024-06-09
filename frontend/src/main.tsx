@@ -121,7 +121,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="dashboard" element={<DashBoard />}></Route>
                     <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
                       <Route path="accounts" element={<AccountsList />}></Route>
-                      <Route path="accounts/edit" element={<AccountEdit />}></Route>
+                      <Route path="accounts/:id" element={<AccountEdit />}></Route>
                       <Route path="accounts/create" element={<AccountCreate />}></Route>
                     </Route>
                     <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
