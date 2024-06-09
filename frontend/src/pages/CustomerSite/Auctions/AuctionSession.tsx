@@ -10,6 +10,7 @@ import { set } from 'react-hook-form'
 import { log } from 'console'
 import { getCookie } from '@/utils/cookies'
 import { registerAuctionSession } from '@/services/AuctionSessionService'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
@@ -24,6 +25,7 @@ export default function AuctionSession() {
     const [bidders, setBidders] = useState<number[]>([]);
     const user = JSON.parse(getCookie("user") || "null");
     const userId = user == null ? -1 : user.id;
+
     useEffect(() => {
 
         if (auctionSession == null) {
@@ -76,6 +78,53 @@ export default function AuctionSession() {
             toast.success("Registered Successfully");
         }).catch(() => { toast.error("Failed to Register") });
     }
+    const ConfirmRegister = () => {
+        return (
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button variant="default">Register to bid</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will
+                            directly remove your balance from your
+                            account and remove your data from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleRegister()}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        )
+
+    }
+    const RegisterAlert = () => {
+        return (
+            <AlertDialog>
+                <AlertDialogTrigger>
+                    <Button variant="default">Place Bid</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Register is needed</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            You need to register to this auction first
+                            if you want to place a bid.
+                            Do you want to continue?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleRegister()}>Register</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        )
+    }
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-gray-100 py-12 md:py-12 dark:bg-gray-800">
@@ -97,9 +146,9 @@ export default function AuctionSession() {
 
 
                                 {bidders.includes(userId) ? (
-                                    <Button onClick={()=>scrollTo({ top: (document.getElementById("auction-items")?.offsetTop), behavior: 'smooth' })}>Place Bid</Button>
+                                    <Button onClick={() => scrollTo({ top: (document.getElementById("auction-items")?.offsetTop), behavior: 'smooth' })}>Place Bid</Button>
                                 ) : (
-                                    <Button onClick={handleRegister}>Register to bid</Button>
+                                    <ConfirmRegister></ConfirmRegister>
                                 )}
 
 
@@ -133,7 +182,11 @@ export default function AuctionSession() {
                                         <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
                                         <div className="flex items-center justify-between">
                                             <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
-                                            <Button onClick={() => navigate(`/auction-join`, { state: { id: item?.id, itemDTO: item?.itemDTO } })}>Place Bid</Button>
+                                            {bidders.includes(userId) ? (
+                                                <Button onClick={() => navigate(`/auction-join`, { state: { id: item?.id, itemDTO: item?.itemDTO }})}>Place Bid</Button>
+                                            ) : (
+                                                <RegisterAlert></RegisterAlert>
+                                            )}
                                             {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
                                         </div>
                                     </CardContent>
@@ -183,8 +236,8 @@ export default function AuctionSession() {
                         </Card>
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }
 
