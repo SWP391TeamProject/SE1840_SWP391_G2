@@ -17,7 +17,7 @@ const profileNavItems = [
   { title: "Overview", href: "/profile" },
   { title: "Notification", href: "/profile/notification" },
   { title: "Settings", href: "/profile/settings" },
-  // Add more profile navigation items as needed
+  { title: "Balance", href: "/profile/balance" },
 ];
 
 export default function Profile() {

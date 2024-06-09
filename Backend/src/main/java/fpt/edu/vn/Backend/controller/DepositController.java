@@ -19,9 +19,9 @@ public class DepositController {
     private DepositService depositService;
 
     @PostMapping("/create")
-    public ResponseEntity<DepositDTO> createDeposit(@RequestBody DepositRequest depositRequest) {
+    public String createDeposit(@RequestBody DepositRequest depositRequest) {
         DepositDTO createdDeposit = depositService.createDeposit(depositRequest);
-        return ResponseEntity.ok(createdDeposit);
+        return "ResponseEntity.ok(createdDeposit)";
     }
 
     @GetMapping("/{depositId}")

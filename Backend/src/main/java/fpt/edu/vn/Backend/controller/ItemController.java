@@ -36,7 +36,7 @@ public class ItemController {
     }
 
     @GetMapping("/")
-    public Page<ItemDTO> getItems(Pageable pageable) {
+    public Page<ItemDTO> getItems(@PageableDefault(size = 50) Pageable pageable) {
         return itemService.getItems(pageable);
     }
 

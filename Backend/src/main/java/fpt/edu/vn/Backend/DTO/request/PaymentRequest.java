@@ -13,15 +13,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
+
 public class PaymentRequest {
     private int paymentId;
     private BigDecimal amount;
     private Payment.Type type;
     private Payment.Status status;
     private int accountId;
-
-
-    public LocalDateTime getLocalDateTimeWithCurrentTime() {
-        return LocalDateTime.now();
-    }
+    private String ipAddr;
+    private VnPayPaymentRequestDTO.OrderInfoType orderInfoType;
 }

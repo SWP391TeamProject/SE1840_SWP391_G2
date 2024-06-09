@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -32,8 +33,7 @@ public class AuctionSessionController {
     @Autowired
     private AccountService accountService;
     @GetMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@RequestParam(defaultValue = "0") int pageNumb,@RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb,pageSize);
+    public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@PageableDefault(size = 50) Pageable pageable) {
         return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
     }
 
