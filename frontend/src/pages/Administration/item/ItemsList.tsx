@@ -62,9 +62,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
-import { setCurrentItem, setCurrentPageList, setItems } from "@/redux/reducers/Items";
+import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } from "@/redux/reducers/Items";
 import { getItems } from "@/services/ItemService";
 import { ItemStatus } from "@/constants/enums";
+import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function ItemsList() {
   const itemsList = useAppSelector((state) => state.items);
@@ -72,13 +73,18 @@ export default function ItemsList() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const fetchItems = async () => {
+  const fetchItems = async (pageNumber: number) => {
     try {
-      const list = await getItems();
-      console.log(list.data.content);
-      if (list) {
-        dispatch(setItems(list.data.content));
-        dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
+      const res = await getItems(pageNumber, 5);
+      console.log(res);
+      if (res) {
+        // dispatch(setItems(list.data.content));
+        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+        let paging: any = {
+          pageNumber: res.data.number,
+          totalPages: res.data.totalPages
+        }
+        dispatch(setCurrentPageNumber(paging));
       }
     } catch (error) {
       console.log(error);
@@ -91,6 +97,10 @@ export default function ItemsList() {
     // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
     dispatch(setCurrentItem(item));
     navigate(`/admin/items/${itemId}`);
+  }
+
+  const handlePageSelect = (pageNumber: number) => {
+    fetchItems(pageNumber);
   }
 
   const handleCreateClick = () => {
@@ -121,8 +131,7 @@ export default function ItemsList() {
   useEffect(() => {}, [itemsList]);
 
   useEffect(() => {
-    fetchItems();
-    dispatch(setCurrentPageList(itemsList.value));
+    fetchItems(itemsList.currentPageNumber);
     setStatusFilter("all");
   }, []);
 
@@ -257,35 +266,7 @@ export default function ItemsList() {
                   ))}
                 </TableBody>
               </Table>
-              {/* <div className="flex justify-center mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">10</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext href="#" />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div> */}
+              <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">
