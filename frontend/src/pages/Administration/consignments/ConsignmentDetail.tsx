@@ -282,7 +282,7 @@ export default function ConsignmentDetail() {
                                             })()}</CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <p>description:{item.description}</p>
+                                        <div contentEditable='true' dangerouslySetInnerHTML={{ __html: item.description }}></div>
                                         <p>price:{item.price ? item.price : "not specified"}</p>
                                         <div className="w-ful flex justify-between">
                                             <p>Initiator: {item.account.nickname}</p>
