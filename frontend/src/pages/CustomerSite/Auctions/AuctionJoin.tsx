@@ -11,19 +11,20 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { fetchBidsByAuctionItemId } from '@/services/BidsService';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay"
+import { toast } from 'react-toastify';
+import { parse } from 'path';
 
 
 export default function AuctionJoin() {
   const [isReceived, setIsReceived] = useState(false);
   const [accountId, setAcccountId] = useState<number | null>(null);
   const [client, setClient] = useState<Client | null>(null);
-  const messageAreaRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState<String | null>(null);
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
-  const [bids, setBids] = useState([]);
+  const [bids, setBids] = useState<YourBidType[]>([]);
   useEffect(() => {
     const newClient = new Client({
       brokerURL: 'ws://localhost:8080/auction-join?token=' + JSON.parse(getCookie("user")).accessToken,
@@ -50,6 +51,12 @@ export default function AuctionJoin() {
   }, [accountId]);
 
   const onMessageReceived = (payload: IMessage) => {
+    console.log(payload);
+    if (JSON.parse(payload.body).statusCodeValue == 400) {
+      toast.error(JSON.parse(payload.body).body);
+      client?.deactivate();
+      return;
+    }
     const message = JSON.parse(payload.body).body;
     console.log(message);
     let content = '';
@@ -58,14 +65,18 @@ export default function AuctionJoin() {
       setPrice(parseFloat(message.split(":")[1]).toString());
     }
     setIsReceived(!isReceived);
-    console.log(content);
+    toast.info(content);
   };
 
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault();
-
+    
     if (client != null) {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
+      if(!/^\d+(\.\d+)?$/.test(paymentAmount)){
+        toast.error("Please enter a valid number");
+        return;
+      }
       client.publish({
         destination: '/app/chat.sendMessage/' + auctionId + '/' + itemId,
         body: JSON.stringify({
@@ -99,7 +110,7 @@ export default function AuctionJoin() {
   return (
     <div className="flex flex-col min-h-screen">
       <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
-        <Carousel className="flex " plugins={[
+        <Carousel className="flex w-5/6" plugins={[
           Autoplay({
             delay: 2000,
           }),
@@ -112,8 +123,8 @@ export default function AuctionJoin() {
             ))}
           </CarouselContent>
           <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-10">
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-              Vintage Leather Armchair
+            <h1 className=" w-3/5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl   ">
+              {itemDTO.name}
             </h1>
             <p className="mt-4 max-w-3xl text-lg md:text-xl">
               Discover the timeless elegance of this beautifully crafted vintage leather armchair, a true statement piece
@@ -144,7 +155,7 @@ export default function AuctionJoin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
-                  <p className="text-2xl font-bold">${price}</p>
+                  <p className="text-2xl font-bold">${price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)}</p>
                 </div>
                 <div>
                   <p className="text-gray-500 dark:text-gray-400">Bid Count</p>
@@ -168,22 +179,23 @@ export default function AuctionJoin() {
                 </ScrollArea>
 
               </div>
+              <div className="mt-12 md:mt-16 lg:mt-20">
+                <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
+                <form className="max-w-md mx-auto" onSubmit={sendMessage}>
+                  <div className="grid gap-4">
+                    <div>
+                      <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
+                    </div>
+                    <Button type="submit" className="w-full">
+                      Place Bid
+                    </Button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-        <div className="mt-12 md:mt-16 lg:mt-20">
-          <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
-          <form className="max-w-md mx-auto" onSubmit={sendMessage}>
-            <div className="grid gap-4">
-              <div>
-                <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
-              </div>
-              <Button type="submit" className="w-full">
-                Place Bid
-              </Button>
-            </div>
-          </form>
-        </div>
+
       </div>
     </div>
   );

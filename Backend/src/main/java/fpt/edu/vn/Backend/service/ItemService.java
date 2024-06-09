@@ -1,11 +1,14 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ItemDTO;
+import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.pojo.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.io.IOException;
 
 public interface ItemService {
     @NotNull ItemDTO mapEntityToDTO(@NotNull Item item, @NotNull ItemDTO itemDTO);
@@ -14,7 +17,7 @@ public interface ItemService {
     }
     @NotNull Item mapDTOToEntity(@NotNull ItemDTO itemDTO, @NotNull Item item);
 
-    @NotNull ItemDTO createItem(@NotNull ItemDTO itemDTO);
+    @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO itemDTO) throws IOException;
     @Nullable ItemDTO getItemById(int id);
     ItemDTO updateItem(@NotNull ItemDTO itemDTO);
 

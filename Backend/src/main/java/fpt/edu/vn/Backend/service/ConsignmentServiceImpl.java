@@ -87,7 +87,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             detail.setDescription(evaluation);
             detail.setConsignment(consignment);
             detail = consignmentDetailRepos.save(detail);
-            logger.info("Initial Evaluation submitted" + detail.getConsignmentDetailId());
+            logger.info("Initial Evaluation submitted :" + detail.getConsignmentDetailId());
             if (consignment.getConsignmentDetails() == null || consignment.getConsignmentDetails().isEmpty()) {
                 consignment.setConsignmentDetails(new ArrayList<>());
             }
@@ -233,6 +233,72 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
+    public ConsignmentDTO custAcceptInitialEvaluation(int consignmentId) {
+        try{
+            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
+            if (consignment.getStatus().equals(Consignment.Status.IN_INITIAL_EVALUATION)) {
+                consignment.setStatus(Consignment.Status.SENDING);
+                consignmentRepos.save(consignment);
+            } else {
+                throw new ConsignmentServiceException("Consignment is not in IN_INITIAL_EVALUATION status");
+            }
+            return getConsignmentDTO(consignment);
+        }catch (Exception e){
+            logger.error("Error accepting initial evaluation", e);
+            throw new ConsignmentServiceException("Error accepting initial evaluation", e);
+        }
+    }
+    @Override
+    public ConsignmentDTO custRejectInitialEvaluation(int consignmentId) {
+        try{
+            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
+            if (consignment.getStatus().equals(Consignment.Status.IN_INITIAL_EVALUATION)) {
+                consignment.setStatus(Consignment.Status.TERMINATED);
+                consignmentRepos.save(consignment);
+            } else {
+                throw new ConsignmentServiceException("Consignment is not in IN_INITIAL_EVALUATION status");
+            }
+            return getConsignmentDTO(consignment);
+        }catch (Exception e){
+            logger.error("Error rejecting initial evaluation", e);
+            throw new ConsignmentServiceException("Error rejecting initial evaluation", e);
+        }
+    }
+    @Override
+    public ConsignmentDTO custAcceptFinaltialEvaluation(int consignmentId) {
+        try{
+            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
+            if (consignment.getStatus().equals(Consignment.Status.WAITING_SELLER)) {
+                consignment.setStatus(Consignment.Status.FINISHED);
+                consignmentRepos.save(consignment);
+            } else {
+                throw new ConsignmentServiceException("Consignment is not in IN_FinalTIAL_EVALUATION status");
+            }
+            return getConsignmentDTO(consignment);
+        }catch (Exception e){
+            logger.error("Error accepting Final evaluation", e);
+            throw new ConsignmentServiceException("Error accepting final evaluation", e);
+        }
+    }
+    @Override
+    public ConsignmentDTO custRejectFinaltialEvaluation(int consignmentId) {
+        try{
+            Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
+            if (consignment.getStatus().equals(Consignment.Status.WAITING_SELLER)) {
+                consignment.setStatus(Consignment.Status.TERMINATED);
+                consignmentRepos.save(consignment);
+            } else {
+                throw new ConsignmentServiceException("Consignment is not in IN_FINAL_EVALUATION status");
+            }
+            return getConsignmentDTO(consignment);
+        }catch (Exception e){
+            logger.error("Error rejecting final evaluation", e);
+            throw new ConsignmentServiceException("Error rejecting Final evaluation", e);
+        }
+    }
+
+
+    @Override
     public void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -251,7 +317,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public ConsignmentDTO getConsignmentById(int id) {
-        return null;
+
+
+        return consignmentRepos.findById(id).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
     }
 
     @Override

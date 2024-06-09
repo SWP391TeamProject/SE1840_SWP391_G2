@@ -4,8 +4,10 @@ import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
+import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.exception.MappingException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -17,6 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -25,15 +33,18 @@ public class ItemServiceImpl implements ItemService {
     private final ItemCategoryRepos itemCategoryRepos;
     private final OrderRepos orderRepos;
 
+    private final AttachmentService attachmentService;
+
     @Autowired
     public ItemServiceImpl(AccountRepos accountRepos,
                            ItemRepos itemRepos,
                            ItemCategoryRepos itemCategoryRepos,
-                           OrderRepos orderRepos) {
+                           OrderRepos orderRepos, AttachmentService attachmentService) {
         this.accountRepos = accountRepos;
         this.itemRepos = itemRepos;
         this.itemCategoryRepos = itemCategoryRepos;
         this.orderRepos = orderRepos;
+        this.attachmentService = attachmentService;
     }
 
     @Override
@@ -82,8 +93,39 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public @NotNull ItemDTO createItem(@NotNull ItemDTO itemDTO) {
-        return mapEntityToDTO(itemRepos.save(mapDTOToEntity(itemDTO, new Item())));
+    public @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO itemDTO) throws IOException {
+//        Preconditions.checkNotNull(itemDTO.getCategoryId(), "Category is required");
+//        Preconditions.checkNotNull(itemDTO.getName(), "Name is required");
+//        Preconditions.checkNotNull(itemDTO.getDescription(), "Description is required");
+//        Preconditions.checkNotNull(itemDTO.getReservePrice(), "Reserve price is required");
+//        Preconditions.checkNotNull(itemDTO.getBuyInPrice(), "Buy-in price is required");
+//        Preconditions.checkNotNull(itemDTO.getOwnerId(), "Owner is required");
+//        for (MultipartFile file : itemDTO.getFiles()) {
+//            Preconditions.checkArgument(file.getContentType().startsWith("image/"), "All attachments must be images");
+//        }
+
+        Item item = new Item();
+        item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found", "categoryId", itemDTO.getCategoryId()))
+        );
+        item.setName(itemDTO.getName());
+        item.setDescription(itemDTO.getDescription());
+        item.setReservePrice(BigDecimal.valueOf(itemDTO.getReservePrice()));
+        item.setBuyInPrice(BigDecimal.valueOf(itemDTO.getBuyInPrice()));
+        item.setStatus(Item.Status.QUEUE);
+        item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found", "ownerId: ", itemDTO.getOwnerId()))
+        );
+        Item savedItem = itemRepos.save(item);
+        Set<Attachment> attachments = new HashSet<>();
+        for(MultipartFile file : itemDTO.getFiles()) {
+            try {
+                attachmentService.uploadItemAttachment(file, savedItem.getItemId());
+            } catch (IOException e) {
+                throw new IOException("Error uploading attachment: " + e.getMessage());
+            }
+        }
+        return mapEntityToDTO(item);
     }
 
     @Override

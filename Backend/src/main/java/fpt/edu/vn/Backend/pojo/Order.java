@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Setter
 @Getter
@@ -18,9 +20,9 @@ public class Order {
     @Column(name = "order_id")
     private int orderId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
-    private Item item;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Set<Item> items;
 
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId

@@ -79,13 +79,13 @@ public class ConsignmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<ConsignmentDTO> getConsignmentByID(@PathVariable int id) {
         try {
-            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
-            if (consignments == null || consignments.isEmpty()) {
-                throw new ConsignmentServiceException("No consignments found for user ID: " + id);
+           ConsignmentDTO consignment = consignmentService.getConsignmentById(id);
+            if (consignment == null ) {
+                throw new ConsignmentServiceException("No consignments found for acc ID: " + id);
             }
-            return new ResponseEntity<>(consignments, HttpStatus.OK);
+            return new ResponseEntity<>(consignment, HttpStatus.OK);
         } catch (ConsignmentServiceException e) {
             logger.error("Error retrieving consignments by ID", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -194,6 +194,24 @@ public class ConsignmentController {
     @GetMapping("/received/{consignmentId}")
     public ResponseEntity<ConsignmentDTO> receivedConsignment(@PathVariable int consignmentId) {
         return new ResponseEntity<>(consignmentService.receivedConsignment(consignmentId), HttpStatus.OK);
+    }
+
+    //Customer
+    @GetMapping("/acceptIniEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> acceptInitialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custAcceptInitialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+    @GetMapping("/rejectIniEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> rejectInitialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custRejectInitialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+    @GetMapping("/acceptFinalEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> acceptFinaltialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custAcceptFinaltialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+    @GetMapping("/rejectFinalEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> rejectFinaltialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custRejectFinaltialEvaluation(consignmentDetailId), HttpStatus.OK);
     }
 
     @GetMapping("/export")
