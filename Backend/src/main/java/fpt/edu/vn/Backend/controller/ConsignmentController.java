@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -47,12 +48,9 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "200") int pageSize, Authentication authentication) {
-
+    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@PageableDefault(size = 50) Pageable pageable, Authentication authentication) {
         try {
-            Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumb);
-            Pageable pageable1 = Pageable.unpaged();
-            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable1);
+            Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable);
             if (consignments == null || consignments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }

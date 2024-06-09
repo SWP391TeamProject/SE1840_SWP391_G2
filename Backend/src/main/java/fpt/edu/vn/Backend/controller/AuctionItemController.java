@@ -5,6 +5,8 @@ import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.service.AuctionItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +21,8 @@ public class AuctionItemController {
     private AuctionItemService auctionItemService;
 
     @GetMapping("/")
-    public ResponseEntity<List<AuctionItemDTO>> getAllAuctionItems() {
+    public ResponseEntity<List<AuctionItemDTO>> getAllAuctionItems(@PageableDefault(size = 30) Pageable pageable)
+            {
         List<AuctionItemDTO> auctionItems = auctionItemService.getAllAuctionItems();
         return new ResponseEntity<>(auctionItems, HttpStatus.OK);
     }

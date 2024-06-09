@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,7 @@ public class BlogController {
     private AttachmentServiceImpl attachmentServiceImpl;
 
     @GetMapping("/")
-    public ResponseEntity<Page<BlogPostDTO>> getAllBlogs(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb, pageSize);
+    public ResponseEntity<Page<BlogPostDTO>> getAllBlogs(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(blogService.getAllBlogs(pageable), HttpStatus.OK);
     }
 
