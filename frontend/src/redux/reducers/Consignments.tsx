@@ -9,6 +9,7 @@ interface ConsignmentsState {
     currentPageNumber: number,
     pageSize: number,
     totalItems: number,
+    totalPages: number,
     error: string
 }
 
@@ -21,6 +22,7 @@ const initialState: ConsignmentsState = {
     currentPageNumber: 1,
     pageSize: 10,
     totalItems: 0,
+    totalPages: 0,
     error: ''
 }
 
@@ -36,8 +38,8 @@ export const consignmentsSlice = createSlice({
             state.currentConsignment = action.payload;
         },
         setCurrentPageNumber: (state, action) => {
-            // state.currentPageList = action.payload
-            state.currentPageNumber = action.payload;
+            state.currentPageNumber = action.payload.pageNumber;
+            state.totalPages = action.payload.totalPages;
         },
         setCurrentPageList: (state, action) => {
             state.currentPageList = action.payload;
@@ -49,5 +51,5 @@ export const consignmentsSlice = createSlice({
 });
 
 
-export const { setConsignments, setCurrentConsignment, setCurrentPageList, error } = consignmentsSlice.actions;
+export const { setConsignments, setCurrentConsignment, setCurrentPageList, setCurrentPageNumber, error } = consignmentsSlice.actions;
 export default consignmentsSlice.reducer

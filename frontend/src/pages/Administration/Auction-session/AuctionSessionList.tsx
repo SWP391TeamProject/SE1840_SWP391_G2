@@ -117,8 +117,7 @@ export default function AuctionSessionList() {
   useEffect(() => { }, [auctionSessionsList]);
 
   useEffect(() => {
-    fetchAuctionSessions();
-    dispatch(setCurrentPageList(auctionSessionsList.value));
+    fetchAuctionSessions(auctionSessionsList.currentPageNumber);
     setStatusFilter("all");
   }, []);
 
