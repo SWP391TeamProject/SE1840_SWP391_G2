@@ -33,6 +33,12 @@ public interface ConsignmentService {
     Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
     Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 
+    //Customer
+    ConsignmentDTO custAcceptInitialEvaluation(int consignmentId);
+    ConsignmentDTO custRejectInitialEvaluation(int consignmentId);
+    ConsignmentDTO custAcceptFinaltialEvaluation(int consignmentId);
+    ConsignmentDTO custRejectFinaltialEvaluation(int consignmentId);
+
     // Delete (or Soft Delete)
     ResponseEntity<ConsignmentDTO> deleteConsignment(int id);
 
