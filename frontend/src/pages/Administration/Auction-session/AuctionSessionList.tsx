@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageList } from "@/redux/reducers/AuctionSession";
+import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
 // import { fetchAuctionSessionsService, deleteAuctionSessionService } from "@/services/AuctionSessionsServices";
 import {
   PlusCircle,
@@ -34,6 +34,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
 import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
+import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function AuctionSessionList() {
   const auctionSessionsList = useAppSelector((state) => state.auctionSessions);
@@ -41,14 +42,18 @@ export default function AuctionSessionList() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const fetchAuctionSessions = async () => {
+  const fetchAuctionSessions = async (pageNumber: number) => {
     try {
-      const list = await fetchAllAuctionSessions();
-      if (list) {
-        console.log(list?.data.content);
-        dispatch(setAuctionSessions(list.data.content));
-        dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
-
+      const res = await fetchAllAuctionSessions(pageNumber, 5);
+      if (res) {
+        console.log(res?.data.content);
+        // dispatch(setAuctionSessions(list.data.content));
+        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+        let paging: any = {
+          pageNumber: res.data.number,
+          totalPages: res.data.totalPages
+        }
+        dispatch(setCurrentPageNumber(paging));
       }
 
     } catch (error) {
@@ -89,6 +94,9 @@ export default function AuctionSessionList() {
     navigate(`/admin/auction-sessions/${auctionSessionId}`);
   }
 
+  const handlePageSelect = (pageNumber: number) => {
+    fetchAuctionSessions(pageNumber);
+  }
 
   const handleFilterClick = (filter: string) => {
     let filteredList = [];
@@ -253,35 +261,7 @@ export default function AuctionSessionList() {
                   ))}
                 </TableBody>
               </Table>
-              {/* <div className="flex justify-center mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">10</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext href="#" />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div> */}
+              <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">

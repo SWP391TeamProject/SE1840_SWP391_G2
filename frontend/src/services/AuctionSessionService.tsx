@@ -4,13 +4,18 @@ import { toast } from "react-toastify";
 
 const controller = "auction-sessions";
 
-export const fetchAllAuctionSessions = async () => {
+export const fetchAllAuctionSessions = async (pageNumber?: number, pageSize?: number) => {
+    let params = {
+        pageNumb: pageNumber,
+        pageSize: pageSize,
+    }
     return await axios
         .get("http://localhost:8080/api/auction-sessions/", {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
             },
+            params: params
         })
         .catch((err) => {
             toast.error(err.response.data.message);

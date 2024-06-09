@@ -9,6 +9,7 @@ interface AuctionSessionsState {
     currentPageNumber: number,
     pageSize: number,
     totalItems: number,
+    totalPages: number,
     error: string
 }
 
@@ -21,6 +22,7 @@ const initialState: AuctionSessionsState = {
     currentPageNumber: 1,
     pageSize: 10,
     totalItems: 0,
+    totalPages: 0,
     error: ''
 }
 
@@ -37,8 +39,8 @@ export const auctionSessionsSlice = createSlice({
             state.currentAuctionSession = action.payload;
         },
         setCurrentPageNumber: (state, action) => {
-            // state.currentPageList = action.payload
-            state.currentPageNumber = action.payload;
+            state.currentPageNumber = action.payload.pageNumber;
+            state.totalPages = action.payload.totalPages;
         },
         setCurrentPageList: (state, action) => {
             state.currentPageList = action.payload;
@@ -50,5 +52,5 @@ export const auctionSessionsSlice = createSlice({
 });
 
 
-export const { setAuctionSessions, setCurrentAuctionSession, setCurrentPageList, error } = auctionSessionsSlice.actions;
+export const { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber, setCurrentPageList, error } = auctionSessionsSlice.actions;
 export default auctionSessionsSlice.reducer

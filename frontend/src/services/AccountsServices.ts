@@ -9,7 +9,6 @@ export const fetchAccountsService = async (pageNumber: number, pageSize: number,
     size: pageSize,
     Role: role? role : "",
   }
-  console.log(params);
   return await axios
     .get(API_SERVER + "/accounts/", {
       headers: {

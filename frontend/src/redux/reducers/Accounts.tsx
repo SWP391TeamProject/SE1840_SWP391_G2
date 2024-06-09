@@ -40,8 +40,6 @@ export const accountsSlice = createSlice({
             state.currentAccount = action.payload;
         },
         setCurrentPageNumber: (state, action) => {
-            console.log(action.payload);
-            // state.currentPageList = action.payload
             state.currentPageNumber = action.payload.pageNumber;
             state.totalPages = action.payload.totalPages;
         },
