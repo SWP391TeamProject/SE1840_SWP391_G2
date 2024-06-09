@@ -8,4 +8,5 @@ export interface AuctionSession {
     deposits?:[];
     createDate?: Date;
     updateDate?: Date;
+    attachments?: [];
 }

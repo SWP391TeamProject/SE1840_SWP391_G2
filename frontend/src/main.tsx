@@ -79,7 +79,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 {/* <Route path="/" element={<HomeLayout />}> */}
                 {/* Customer Site */}
                 <Route path="/" element={<CustomerLayout />}>
-                  <Route path="/auction-join" element={<AuctionJoin />} />
+                  
 
                   <Route path="/" element={<LandingPage />}></Route>
                   <Route path="contact" element={<Contact />}></Route>
@@ -87,6 +87,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="Auctions" element={<AuctionList />}></Route>
                   <Route path="Auctions/details" element={<AuctionSession />}></Route>
                   <Route path="Auctions/:id" element={<AuctionSession />}></Route>
+                  <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
                   <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
                     <Route
                       path="create-consignment"

@@ -43,7 +43,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAccounts, setCurrentAccount, setCurrentPageList } from "@/redux/reducers/Accounts";
+import { setAccounts, setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
 import { fetchAccountsService, deleteAccountService } from "@/services/AccountsServices.ts";
 import {
   Home,
@@ -64,21 +64,28 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AccountStatus } from "@/constants/enums";
+import { AccountStatus, Roles } from "@/constants/enums";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function AccountsList() {
-  const accountsList = useAppSelector((state) => state.accounts);
+  const accountsList: any = useAppSelector((state) => state.accounts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("");
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = async (pageNumber: number, role?: Roles) => {
     try {
-      const list = await fetchAccountsService();
-      if (list) {
-        dispatch(setAccounts(list.data.content));
-        dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
+      console.log(role);
+      const res = await fetchAccountsService(pageNumber, 5, role);
+      if (res) {
+        console.log(res);
+        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+        let paging: any = {
+          pageNumber: res.data.number,
+          totalPages: res.data.totalPages
+        }
+        dispatch(setCurrentPageNumber(paging));
       }
     } catch (error) {
       console.log(error);
@@ -87,7 +94,6 @@ export default function AccountsList() {
 
   const handleEditClick = (accountId: number) => {
     let account = accountsList.value.find(account => account.accountId == accountId);
-    console.log(account);
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     dispatch(setCurrentAccount(account));
     navigate("/admin/accounts/edit");
@@ -95,14 +101,12 @@ export default function AccountsList() {
 
   const handleCreateClick = () => {
     // let account = accountsList.value.find(account => account.accountId == accountId);
-    // console.log(account);
     // // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     // dispatch(setCurrentAccount(account));
     navigate("/admin/accounts/create");
   }
 
   const handleSuspendClick = (accountId: number) => {
-    // console.log(account);
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     // dispatch(setCurrentAccount(account));
     // navigate("/admin/accounts/edit");
@@ -111,19 +115,34 @@ export default function AccountsList() {
     })
   }
 
-  const handleFilterClick = (status: AccountStatus[], filter: string) => {
-    let filteredList = accountsList.value.filter(x => status.includes(x.status));
-    console.log(filteredList);
-    dispatch(setCurrentPageList(filteredList));
-    setStatusFilter(filter);
+  const handleFilterClick = (roles: Roles[], filter: string) => {
+    // let filteredList = accountsList.value.filter(x => status.includes(x.status));
+    // dispatch(setCurrentPageList(filteredList));
+    // if (filter != roleFilter) {
+      if (filter == "all") {
+        fetchAccounts(0);
+        setRoleFilter(filter);
+      } 
+      else {
+        console.log(roles);
+        fetchAccounts(0, roles[0]);
+        setRoleFilter(filter);
+      }
+    // }
   }
 
-  useEffect(() => { }, [accountsList]);
+  useEffect(() => {}, [accountsList.currentPageList]);
+
+  const handlePageSelect = (pageNumber: number) => {
+    fetchAccounts(pageNumber, accountsList.filter);
+  }
 
   useEffect(() => {
-    fetchAccounts();
-    dispatch(setCurrentPageList(accountsList.value));
-    setStatusFilter("all");
+    fetchAccounts(accountsList.currentPageNumber);
+    // data.then((data) => {
+    //   dispatch(setCurrentPageList(data.content));
+    // })
+    setRoleFilter("all");
   }, []);
 
   return (
@@ -131,9 +150,11 @@ export default function AccountsList() {
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.ACTIVE, AccountStatus.DISABLED], "all")} value="all">All</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.ACTIVE], "active")} value="active">Active</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([AccountStatus.DISABLED], "disabled")} value="disabled">Disabled</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([Roles.ADMIN, Roles.MANAGER, Roles.STAFF, Roles.MEMBER], "all")} value="all">All</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([Roles.ADMIN], "admin")} value="admin">Admin</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([Roles.MANAGER], "manager")} value="manager">Manager</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([Roles.STAFF], "staff")} value="staff">Staff</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([Roles.MEMBER], "member")} value="member">Member</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>
@@ -169,7 +190,7 @@ export default function AccountsList() {
             </Button>
           </div>
         </div>
-        <TabsContent value={statusFilter}>
+        <TabsContent value={roleFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
               <CardTitle>Accounts</CardTitle>
@@ -219,7 +240,7 @@ export default function AccountsList() {
                             <AvatarFallback>SOS</AvatarFallback>
                           </Avatar>
                           {account.nickname}
-                          </div>
+                        </div>
 
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
@@ -260,35 +281,7 @@ export default function AccountsList() {
                   ))}
                 </TableBody>
               </Table>
-              {/* <div className="flex justify-center mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">10</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext href="#" />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div> */}
+              <PagingIndexes pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">
