@@ -6,7 +6,7 @@ if (!fs.existsSync("./cache")) {
     throw new Error("unzip cache.zip :D");
 }
 
-fs.mkdir("./data", { recursive: true }, (err: any) => {
+fs.mkdir("./output", { recursive: true }, (err: any) => {
     if (err) throw err;
 });
 
