@@ -196,6 +196,24 @@ public class ConsignmentController {
         return new ResponseEntity<>(consignmentService.receivedConsignment(consignmentId), HttpStatus.OK);
     }
 
+    //Customer
+    @GetMapping("/acceptIniEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> acceptInitialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custAcceptInitialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+    @GetMapping("/rejectIniEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> rejectInitialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custRejectInitialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+    @GetMapping("/acceptFinalEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> acceptFinaltialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custAcceptFinaltialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+    @GetMapping("/rejectFinalEva/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDTO> rejectFinaltialEvaluation(@PathVariable int consignmentDetailId) {
+        return new ResponseEntity<>(consignmentService.custRejectFinaltialEvaluation(consignmentDetailId), HttpStatus.OK);
+    }
+
     @GetMapping("/export")
     public void exportConsignment(HttpServletResponse response) {
         response.setContentType("application/octet-stream");

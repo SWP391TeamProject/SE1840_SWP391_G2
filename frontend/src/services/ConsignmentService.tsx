@@ -82,6 +82,7 @@ export const deleteConsignmentService = async (id: string) => {
     .catch((err) => toast.error(err.response.data.message+": you are not allow to delete this consignment"));
 };
 
+//staff
 export const takeConsignment = async (id: string) => {
   const data=JSON.parse(getCookie("user"))?.id;
   
@@ -109,6 +110,7 @@ export const receivedConsignment = async (id: string) => {
     .catch((err) => toast.error(err.response.data.message+": you are not allow to take this consignment"));
 };
 
+//manager
 export const rejectEvaluation = async (id: string,accountId:number,reason:any) => {  
   console.log({accountId: accountId,reason:reason})
   return await axios
@@ -136,3 +138,49 @@ export const acceptEvaluation = async (id: string,accountId:number) => {
     .catch((err) => toast.error(err.response.data.message));
 };
 
+//customer
+export const acceptInitialEva = async (id: number) => {
+  return await axios
+    .get("http://localhost:8080/api/consignments/acceptIniEva/"+id, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
+};
+export const rejectInitialEva = async (id: number) => {
+  return await axios
+    .get("http://localhost:8080/api/consignments/rejectIniEva/"+id, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
+};
+
+export const acceptFinalEva = async (id: number) => {
+  return await axios
+    .get("http://localhost:8080/api/consignments/acceptFinalEva/"+id, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
+};
+export const rejectFinalEva = async (id: number) => {
+  return await axios
+    .get("http://localhost:8080/api/consignments/rejectFinalEva/"+id, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
+};

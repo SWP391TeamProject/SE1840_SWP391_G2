@@ -40,17 +40,13 @@ const formSchema = z.object({
   phone: z.string().regex(phoneRegex,
     { message: "Invalid phone number.must be 10-digit phone number." }),
   contactName: z.string(),
-  preferContact: z.enum(["email", "phone", "text", "any of the above"]),
+  preferContact: z.enum(["email", "phone", "text", "any"]),
   description: z.string().min(10, {
     message: "Description must be between 10 and 500 characters"
   }).max(500, {
     message: "Description must be between 10 and 500 characters"
   }),
-  files: z.array(z.object({
-    path: z.string(),
-    size: z.number(),
-    type: z.string(),
-  })).max(5, { message: "You can only upload up to 5 images" })
+  files: z.array(z.any()).max(5, { message: "You can only upload up to 5 images" })
 
 });
 
@@ -66,7 +62,7 @@ export default function ConsignmentInititalForm() {
       email: JSON.parse(getCookie("user"))?.email || "",
       phone: JSON.parse(getCookie("user"))?.phone || "",
       contactName: JSON.parse(getCookie("user"))?.username || "",
-      preferContact: "any of the above",
+      preferContact: "any",
       description: "",
       files: [],
     },
@@ -82,7 +78,7 @@ export default function ConsignmentInititalForm() {
     createConsignmentService(data).then((res) => {
       toast.success("Consignment created successfully");
       setIsLoading(false);
-    }).catch((err) => {
+    }).catch((err) => { 
       toast.error("Failed to create consignment");
       setIsLoading(false);
     }
@@ -202,7 +198,7 @@ export default function ConsignmentInititalForm() {
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                               <FormControl>
-                                <RadioGroupItem value="any of the above" />
+                                <RadioGroupItem value="any" />
                               </FormControl>
                               <FormLabel className="font-normal">
                                 Any of the above
@@ -248,7 +244,7 @@ export default function ConsignmentInititalForm() {
                       Loading
                     </Button>
                     :
-                    <div className="sticky bottom-0 flex flex-col justify-center w-full">
+                    <div className="sticky bottom-2 flex flex-col justify-center w-full">
                       <Separator className="my-2 w-full" />
                       <Button variant={"default"} type="submit" className="" >
                         Submit

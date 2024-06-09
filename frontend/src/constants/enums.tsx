@@ -33,6 +33,7 @@ export enum ConsignmentStatus {
   SENDING = "SENDING",
   IN_INITIAL_EVALUATION = "IN_INITIAL_EVALUATION",
   WAITING_STAFF = "WAITING_STAFF",
+  WAITING_SELLER = "WAITING_SELLER",
 }
 
 export enum ConsignmentDetailType {

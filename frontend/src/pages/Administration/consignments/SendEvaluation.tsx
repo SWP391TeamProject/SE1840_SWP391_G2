@@ -25,6 +25,7 @@ import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { log } from "console";
 import { fetchConsignmentByConsignmentId } from "@/services/ConsignmentService";
+import { ConsignmentStatus } from "@/constants/enums";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
     "image/jpeg",
@@ -74,9 +75,9 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
     useEffect(() => {
         // console.log(param);
         fetchConsignmentByConsignmentId(consignmentParent.consignmentId).then((res) => {
-            console.log(res.data.content);
-            setConsignment(res.data.content[0]);
-            form.setValue('consignmentId', res.data.content[0].consignmentId);
+            console.log(res.data);
+            setConsignment(res.data);
+            form.setValue('consignmentId', res.data.consignmentId);
         }).catch((error) => {
             console.log(error);
             toast.error(error.response.data.message);
@@ -87,7 +88,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         setIsLoading(true);
         // Remove FormData creation and file handling
-        if (consignment?.status === 'IN_INITIAL_EVALUATION') {
+        if (consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {
             createInitialEvaluation(data).then((res) => {
                 toast.success("Evaluation sent successfully");
                 setOpen(false);
@@ -121,7 +122,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
     };
 
     return (
-        <>
+        
             <AlertDialog open={open} onOpenChange={setOpen}  >
                 <AlertDialogTrigger asChild>
                     <Button variant="default">Send Evaluation</Button>
@@ -242,6 +243,5 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
             </AlertDialog>
 
 
-        </>
     );
 }

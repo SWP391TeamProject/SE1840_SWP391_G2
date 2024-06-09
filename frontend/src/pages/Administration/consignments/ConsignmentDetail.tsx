@@ -35,7 +35,8 @@ export default function ConsignmentDetail() {
         console.log(param);
         // dispatch(setCurrentConsignment(param.id));
         fetchConsignmentByConsignmentId(param.id).then((res) => {
-            console.log(res.data.content);
+
+            console.log(res.data);
             setConsignment(res.data);
         }).catch((error) => {
             console.log(error);
@@ -59,7 +60,7 @@ export default function ConsignmentDetail() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleRecieve(consignmentId)}>Continue</AlertDialogAction>
+                        <AlertDialogAction onClick={() => { handleRecieve(consignmentId) }}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -186,25 +187,27 @@ export default function ConsignmentDetail() {
                 <Card className="basis-3/6">
                     <CardHeader>
                         <CardTitle>Consignment #{consignment?.consignmentId}</CardTitle>
-                        <CardDescription className="flex gap-3">Status: 
-                        {(() => {
-                            switch (consignment?.status) {
-                                case ConsignmentStatus.WAITING_STAFF:
-                                    return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
-                                case ConsignmentStatus.FINISHED:
-                                    return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
-                                case ConsignmentStatus.IN_INITIAL_EVALUATION:
-                                    return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
-                                case ConsignmentStatus.IN_FINAL_EVALUATION:
-                                    return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
-                                case ConsignmentStatus.SENDING:
-                                    return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
-                                case ConsignmentStatus.TERMINATED:
-                                    return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
-                                default:
-                                    return <Badge variant="destructive">Unknown Status</Badge>;
-                            }
-                        })()}
+                        <CardDescription className="flex gap-3">Status:
+                            {(() => {
+                                switch (consignment?.status) {
+                                    case ConsignmentStatus.WAITING_STAFF:
+                                        return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
+                                    case ConsignmentStatus.FINISHED:
+                                        return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
+                                    case ConsignmentStatus.IN_INITIAL_EVALUATION:
+                                        return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
+                                    case ConsignmentStatus.IN_FINAL_EVALUATION:
+                                        return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
+                                    case ConsignmentStatus.SENDING:
+                                        return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
+                                    case ConsignmentStatus.TERMINATED:
+                                        return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
+                                    case ConsignmentStatus.WAITING_SELLER:
+                                        return <Badge variant="default" className="bg-cyan-500 w-[150px] text-center flex justify-center items-center">Waiting seller</Badge>;
+                                    default:
+                                        return <Badge variant="destructive">Unknown Status</Badge>;
+                                }
+                            })()}
                         </CardDescription>
 
 
