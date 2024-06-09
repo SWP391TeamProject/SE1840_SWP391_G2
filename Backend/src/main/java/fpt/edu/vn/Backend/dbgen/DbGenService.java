@@ -30,16 +30,10 @@ import java.util.stream.Collectors;
 public class DbGenService {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-    private static File DATA = new File("../gendb/output");
+    private static File DATA;
 
     static {
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("ICT"));
-        if (!DATA.exists())
-            DATA = new File("./gendb/output");
-        if (!DATA.exists()) {
-            System.err.println("Data not found");
-            System.exit(1);
-        }
     }
 
     private static final Gson GSON = new Gson();
@@ -73,6 +67,14 @@ public class DbGenService {
     private NotificationRepos notificationRepos;
 
     public void generate() throws IOException {
+        DATA = new File("../gendb/output");
+        if (!DATA.exists())
+            DATA = new File("./gendb/output");
+        if (!DATA.exists()) {
+            System.err.println("Data not found");
+            System.exit(1);
+        }
+
         LOGGER.info("Generate database...");
 
         generateAccount(loadArray("account.json"));
