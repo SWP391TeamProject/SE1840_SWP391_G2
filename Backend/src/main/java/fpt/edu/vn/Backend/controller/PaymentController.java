@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
 import fpt.edu.vn.Backend.DTO.request.VnPayPaymentRequestDTO;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.service.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +79,8 @@ public class PaymentController {
         }
     }
 
+
+
     @PostMapping("/delete/{id}")
     public ResponseEntity<PaymentDTO> deletePayment(@PathVariable int id) {
         try {
@@ -89,6 +92,9 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
+
 
     @PostMapping("/create-vnpay-payment")
     public ResponseEntity<String> createVNPayPayment(@RequestBody VnPayPaymentRequestDTO paymentRequest, HttpServletRequest request) {
@@ -125,15 +131,14 @@ public class PaymentController {
             fields.remove("vnp_SecureHash");
         }
         String signValue = VnPayConfig.hashAllFields(fields);
+        String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
+        String[] parts = vnp_OrderInfo.split("-");
+        String orderType = parts[0]; // "DEPOSIT"
+        String orderId = parts[1];
+        PaymentDTO paymentDTO;
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
-
                 log.info("Payment success");
-                String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
-                String[] parts = vnp_OrderInfo.split("-");
-                String orderType = parts[0]; // "DEPOSIT"
-                String orderId = parts[1];
-                PaymentDTO paymentDTO;
                 switch (orderType) {
                     case "DEPOSIT":
                         // Deposit money to user account
@@ -141,7 +146,7 @@ public class PaymentController {
                         updatePayment(new PaymentRequest().builder()
                                 .paymentId(Integer.parseInt(orderId))
 
-                                .status(fpt.edu.vn.Backend.pojo.Payment.Status.SUCCESS)
+                                .status(Payment.Status.SUCCESS)
                                 .build());
                         return 1;
                     case "PAYMENT":
@@ -154,9 +159,14 @@ public class PaymentController {
                 return 1;
             } else {
                 log.info("Payment failed");
+                updatePayment(new PaymentRequest().builder()
+                        .paymentId(Integer.parseInt(orderId))
+                        .status(Payment.Status.FAILED)
+                        .build());
                 return 0;
             }
         } else {
+            log.info("FAILED: Invalid signature");
             return -1;
         }
     }

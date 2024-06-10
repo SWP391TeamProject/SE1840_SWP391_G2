@@ -161,7 +161,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/unauthorized" element={<ErrorPage />} />
                 {/* <RouterProvider router={router} /> */}
                 <Route path="*" element={<ErrorPage />} />
-                <Route path="/test" element={<PaymentStatus />} />
+                <Route path="/test" element={<TestPage />} />
               </Routes>
             </BrowserRouter>
           </AuthProvider>

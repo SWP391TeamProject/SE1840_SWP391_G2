@@ -21,8 +21,7 @@ public class AuctionItemController {
     private AuctionItemService auctionItemService;
 
     @GetMapping("/")
-    public ResponseEntity<List<AuctionItemDTO>> getAllAuctionItems(@PageableDefault(size = 30) Pageable pageable)
-            {
+    public ResponseEntity<List<AuctionItemDTO>> getAllAuctionItems(@PageableDefault(size = 30) Pageable pageable) {
         List<AuctionItemDTO> auctionItems = auctionItemService.getAllAuctionItems();
         return new ResponseEntity<>(auctionItems, HttpStatus.OK);
     }
