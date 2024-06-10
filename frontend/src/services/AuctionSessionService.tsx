@@ -4,10 +4,10 @@ import { toast } from "react-toastify";
 
 const controller = "auction-sessions";
 
-export const fetchAllAuctionSessions = async (pageNumber?: number, pageSize?: number) => {
+export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
     let params = {
-        pageNumb: pageNumber,
-        pageSize: pageSize,
+        page: 0,
+        size: 10,
     }
     return await axios
         .get("http://localhost:8080/api/auction-sessions/", {

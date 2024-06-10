@@ -52,7 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
             VnPayPaymentRequestDTO vnPayPaymentRequestDTO = new VnPayPaymentRequestDTO().builder()
                     .accountId(savedPayment.getAccount().getAccountId())
                     .vnp_Amount(savedPayment.getPaymentAmount())
-                    .vnp_OrderInfo(paymentRequest.getOrderInfoType() +"-"+savedPayment.getPaymentId())
+                    .vnp_OrderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
                     .build();
             // Return the saved payment as a DTO
             return createVNPayPayment(vnPayPaymentRequestDTO, paymentRequest.getIpAddr());
@@ -70,14 +70,17 @@ public class PaymentServiceImpl implements PaymentService {
                     .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentRequest.getPaymentId()));
 
             // Update payment field
-            payment.setStatus(paymentRequest.getStatus());
             // Find the account by ID and handle if it's not found
             Account account = accountRepos.findById(payment.getAccount().getAccountId())
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId()));
             payment.setAccount(account);
-            if(paymentRequest.getStatus().equals(Payment.Status.SUCCESS)){
-                payment.getAccount().setBalance(account.getBalance().add(payment.getPaymentAmount()));
+            if (payment.getStatus().equals(Payment.Status.PENDING)) {
+                payment.setStatus(paymentRequest.getStatus());
+                if (paymentRequest.getStatus().equals(Payment.Status.SUCCESS)) {
+                    payment.getAccount().setBalance(account.getBalance().add(payment.getPaymentAmount()));
+                }
             }
+
             // Save the updated payment
             Payment updatedPayment = paymentRepos.save(payment);
             // Return the updated payment as a DTO
@@ -137,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr ) throws UnsupportedEncodingException {
+    public String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr) throws UnsupportedEncodingException {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TmnCode = VnPayConfig.vnp_TmnCode;

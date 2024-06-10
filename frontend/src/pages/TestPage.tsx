@@ -1,35 +1,60 @@
-import { Button } from "@/components/ui/button";
-import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
-import React, { useEffect } from "react";
-import RegisterToBid from "./global_popup/RegisterToBid";
-
-export default function TestPage() {
-    const [item, setItem] = React.useState<any>();
-    const handleClick = () => {
-
-        fetchAllAuctionSessions().then((res) => {
-            console.log(res.data);
-            setItem(res.data);
-        }).catch((err) => {
-            console.log(err);
-        }
-        );
-        // truyen ham vao day
-
-    }
-
-    useEffect(() => {
-        console.log("Hello");
-    }, [item]);
-    return <div>
-        <Button onClick={handleClick}>Click Me</Button>
-
-
-        <div className="flex flex-col p-4 bg-white rounded-md shadow-md">
-            <div className="flex justify-between">
-                    {JSON.stringify(item)}
-                    <RegisterToBid />
-            </div>
-        </div>
-    </div>;
+// TextEditor.tsx
+import React from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+ 
+const modules = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    ["link", "code"],
+    ["clean"],
+  ],
+};
+ 
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "bullet",
+  "indent",
+  "link",
+  "code",
+];
+ 
+interface OnChangeHandler {
+  (e: any): void;
 }
+ 
+type Props = {
+  value: string;
+  placeholder: string;
+  onChange: OnChangeHandler;
+};
+ 
+const TestPage: React.FC<Props> = ({ value, onChange, placeholder }) => {
+  return (
+    <>
+      <ReactQuill
+        theme="snow"
+        value={value || ""}
+        modules={modules}
+        formats={formats}
+        onChange={onChange}
+        placeholder={placeholder}
+      />
+    </>
+  );
+};
+ 
+export default TestPage;
