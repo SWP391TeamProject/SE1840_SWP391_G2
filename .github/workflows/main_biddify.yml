@@ -23,13 +23,7 @@ jobs:
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
-      - name: Setup SQL Server
-        uses: ankane/setup-sqlserver@v1
-        with:
-          accept-eula: true
-          sqlserver-version: 2022
-      - run: sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE BIDDIFY'
-      
+  
       - name: Setup Java Sdk ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v1
         with: 
