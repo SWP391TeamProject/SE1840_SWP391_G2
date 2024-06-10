@@ -37,7 +37,7 @@ jobs:
           mvn clean package
           popd
         env:
-          DB_PASSWORD: '${{secrets.DB_PASSWORD}}'
+          DB_PASSWORD: '${{ secrets.DB_PASSWORD }}'
         working-directory: ./Backend
       
       - name: Login to Azure
