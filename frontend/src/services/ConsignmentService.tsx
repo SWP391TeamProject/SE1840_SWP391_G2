@@ -1,8 +1,13 @@
-import { getCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export const fetchAllConsignmentsService = async () => {
+export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {
+  let params = {
+    pageNumb: pageNumber,
+    pageSize: pageSize,
+  }
+  console.log(params);
   return await axios
     .get("http://localhost:8080/api/consignments/", {
       headers: {
@@ -11,6 +16,7 @@ export const fetchAllConsignmentsService = async () => {
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
+      params: params
     })
     .then((res) => {
       console.log(res.data.content);
@@ -18,6 +24,10 @@ export const fetchAllConsignmentsService = async () => {
     }) // return the data here
     .catch((err) => {
       console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
       throw err; // make sure to throw the error so it can be caught by the query
     });
 };

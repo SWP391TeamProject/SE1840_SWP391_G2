@@ -60,11 +60,13 @@ export default function AuctionSession() {
 
     useEffect(() => {
         console.log(auctionSession);
-        if (auctionSession) {
-            setSessionAttachments(auctionSession?.attachments);
-            auctionSession?.deposits.forEach((deposit: any) => {
-                setBidders(prevBidders => [...prevBidders, deposit?.payment.accountId]);
-            });
+        if (auctionSession && auctionSession.attachments) {
+            setSessionAttachments(auctionSession.attachments);
+            if (auctionSession.deposits) {
+                auctionSession?.deposits.forEach((deposit: any) => {
+                    setBidders(prevBidders => [...prevBidders, deposit?.payment.accountId]);
+                });
+            }
         }
     }, [auctionSession])
 
@@ -183,7 +185,10 @@ export default function AuctionSession() {
                                         <div className="flex items-center justify-between">
                                             <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
                                             {bidders.includes(userId) ? (
-                                                <Button onClick={() => navigate(`/auction-join`, { state: { id: item?.id, itemDTO: item?.itemDTO }})}>Place Bid</Button>
+                                                <Button onClick={() => {
+                                                    let name = item?.itemDTO.name;
+                                                    navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO } });
+                                                }}>Place Bid</Button>
                                             ) : (
                                                 <RegisterAlert></RegisterAlert>
                                             )}

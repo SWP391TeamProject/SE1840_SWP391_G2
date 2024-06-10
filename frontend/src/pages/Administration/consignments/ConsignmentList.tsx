@@ -65,11 +65,12 @@ import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ConsignmentContactPreference, ConsignmentStatus } from "@/constants/enums";
 import { deleteConsignmentService, fetchAllConsignmentsService, takeConsignment } from "@/services/ConsignmentService";
-import { setConsignments, setCurrentConsignment, setCurrentPageList } from "@/redux/reducers/Consignments";
+import { setConsignments, setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
 import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
 import CreateInitialEvaluation from "./CreateInitialEvaluation";
 import SendEvaluationForm from "./SendEvaluation";
 import { getCookie } from "@/utils/cookies";
+import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function ConsignmentList() {
     const consignmentsList = useAppSelector((state) => state.consignments);
@@ -77,20 +78,28 @@ export default function ConsignmentList() {
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("all");
 
-    const fetchConsignments = async () => {
+    const fetchConsignments = async (pageNumber: number) => {
         try {
-            const list = await fetchAllConsignmentsService();
+            const res = await fetchAllConsignmentsService(pageNumber, 5);
 
-            if (list) {
-                console.log(list);
+            if (res) {
+                console.log(res);
 
-                dispatch(setConsignments(list.data.content));
-                dispatch(setCurrentPageList(list.data.content)); // Update currentPageList here
+                dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+                let paging: any = {
+                    pageNumber: res.data.number,
+                    totalPages: res.data.totalPages
+                }
+                dispatch(setCurrentPageNumber(paging));
             }
         } catch (error) {
             console.log(error);
         }
     };
+
+    const handlePageSelect = (pageNumber: number) => {
+        fetchConsignments(pageNumber);
+    }
 
     const handleEditClick = (consignmentId: number) => {
         let consignment = consignmentsList.value.find(consignment => consignment.consignmentId == consignmentId);
@@ -129,7 +138,7 @@ export default function ConsignmentList() {
     useEffect(() => { }, [consignmentsList]);
 
     useEffect(() => {
-        fetchConsignments();
+        fetchConsignments(consignmentsList.currentPageNumber);
         dispatch(setCurrentPageList(consignmentsList.value));
         setStatusFilter("all");
     }, []);
@@ -301,35 +310,7 @@ export default function ConsignmentList() {
                                     ))}
                                 </TableBody>
                             </Table>
-                            {/* <div className="flex justify-center mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious href="#" />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>
-                        2
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">10</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext href="#" />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div> */}
+                            <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} size={10} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                         </CardContent>
                         <CardFooter>
                             {/* <div className="text-xs text-muted-foreground">

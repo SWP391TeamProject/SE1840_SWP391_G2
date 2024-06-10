@@ -1,8 +1,14 @@
 import { API_SERVER } from "@/constants/domain";
+import { Roles } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 
-export const fetchAccountsService = async () => {
+export const fetchAccountsService = async (pageNumber: number, pageSize: number, role?: Roles) => {
+  let params = {
+    page: pageNumber,
+    size: pageSize,
+    Role: role? role : "",
+  }
   return await axios
     .get(API_SERVER + "/accounts/", {
       headers: {
@@ -11,6 +17,7 @@ export const fetchAccountsService = async () => {
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
+      params: params
     })
     .catch((err) => {
       console.log(err);

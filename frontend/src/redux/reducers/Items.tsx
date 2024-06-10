@@ -9,6 +9,7 @@ interface ItemsState {
     currentPageNumber: number,
     pageSize: number,
     totalItems: number,
+    totalPages: number,
     error: string
 }
 
@@ -21,6 +22,7 @@ const initialState: ItemsState = {
     currentPageNumber: 1,
     pageSize: 10,
     totalItems: 0,
+    totalPages: 0,
     error: ''
 }
 
@@ -36,8 +38,8 @@ export const accountsSlice = createSlice({
             state.currentItem = action.payload;
         },
         setCurrentPageNumber: (state, action) => {
-            // state.currentPageList = action.payload
-            state.currentPageNumber = action.payload;
+            state.currentPageNumber = action.payload.pageNumber;
+            state.totalPages = action.payload.totalPages;
         },
         setCurrentPageList: (state, action) => {
             state.currentPageList = action.payload;
@@ -49,5 +51,5 @@ export const accountsSlice = createSlice({
 });
 
 
-export const { setItems, setCurrentItem, setCurrentPageList, error } = accountsSlice.actions;
+export const { setItems, setCurrentItem, setCurrentPageList, setCurrentPageNumber, error } = accountsSlice.actions;
 export default accountsSlice.reducer
