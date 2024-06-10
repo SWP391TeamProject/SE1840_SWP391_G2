@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import "./styles.css";
 import {
   DropdownMenu,
@@ -8,62 +7,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Col, Container, Row } from "react-bootstrap";
 import { Link, redirect } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
-import { get } from "http";
-import { getCookie, removeCookie } from "@/utils/cookies";
-import { fetchAccountById } from "@/services/AccountsServices";
-import axios from "axios";
-import {countUnreadNotifications} from "@/services/NotificationService.ts";
-const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
+import {useAuth} from "@/AuthProvider.tsx";
+import {useAppSelector} from "@/redux/hooks.tsx";
+import {logout} from "@/services/AuthService.ts";
+
 export default function NavBar() {
-  const [isLogin, setIsLogin] = React.useState(false);
-  const nav = useNavigate();
-  const [user, setUser] = React.useState<any>();
-  const [unreadNoti, setUnreadNoti] = React.useState<number>(0);
+  const auth = useAuth();
+  const isLogin = auth.user.accountId !== 0;
+  const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
 
-  useEffect(() => {
-    const userCookie = getCookie("user");
-    if (userCookie) {
-      try {
-        const userData = JSON.parse(userCookie);
-        setIsLogin(true);
-        fetchAccountById(userData?.id).then((res) => {
-          console.log(res.data)
-          setUser(res.data)
-        }).catch((err) => {
-          console.log(err);
-        });
-      } catch (err) {
-        console.error("Failed to parse user cookie:", err);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log('user:');
-    console.log(user);
-  }, [user]);
-
-  useEffect(() => {
-    countUnreadNotifications().then((r) => setUnreadNoti(r.data));
-  }, []);
-
-  const handleSignout = () => {
-    removeCookie("user");
-    removeCookie("token");
-    setIsLogin(false);
-    redirect("/");
-    // nav("/auth/login");
+  const handleSignout = function () {
+    logout().then(function() {
+      redirect("/");
+    })
   };
 
   return (
@@ -74,7 +34,7 @@ export default function NavBar() {
           <span className="font-semibold text-lg">Biddify</span>
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
-        
+
           {isLogin ? '' : (
             <Button
               className="flex items-center gap-2 bg-green-500 text-white"
@@ -119,45 +79,47 @@ export default function NavBar() {
                   className="rounded-full relative"
                 >
                   <img
-                    src={user && user.avatar ? user.avatar.link : "/placeholder-user.jpg"}
+                    src={auth.user.avatar ?? './placeholder.svg'}
                     width={36}
                     height={36}
                     alt="Avatar"
                     className="overflow-hidden rounded-full"
                   />
-                  {unreadNoti > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti}</span> : null}
+                  {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-fit p-4">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to={'/profile'}>Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to={'/profile/notification'}>
-                    <span>Notification</span>
-                    <span className="ml-2 w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti}</span>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to={'/profile/notification'} className="flex gap-2">
+                    <div>Notification</div>
+                    <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
+                      <div>{unreadNoti.count}</div>
+                    </div>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to={'/dashboard'}>Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem style={{pointerEvents: "none"}}>
                   <div className="flex justify-between items-center gap-2">
                     <div className="basis-1/2">
                       Balance:
                     </div>
                     <div className="basis-1/2 font-medium text-left block">
                       <p >
-                        {user && user?.balance !== null ? user?.balance : '0'}
+                        {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
                       </p>
                     </div>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to={'/dashboard'}>Dashboard</Link>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignout}
-                >Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           }
@@ -169,9 +131,6 @@ export default function NavBar() {
 
 
 
-
-        {/* Mobile menu */}
-        {/*TODO: Add mobile menu */}
         <Sheet>
           <SheetTrigger asChild>
             <Button className="lg:hidden ml-auto" size="icon" variant="outline">
