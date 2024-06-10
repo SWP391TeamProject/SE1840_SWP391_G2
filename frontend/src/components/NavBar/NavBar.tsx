@@ -17,7 +17,6 @@ import {logout} from "@/services/AuthService.ts";
 
 export default function NavBar() {
   const auth = useAuth();
-  const isLogin = auth.user.accountId !== 0;
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
 
   const handleSignout = function () {
@@ -35,7 +34,7 @@ export default function NavBar() {
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
 
-          {isLogin ? '' : (
+          {auth.isAuthenticated() ? '' : (
             <Button
               className="flex items-center gap-2 bg-green-500 text-white"
               variant="default"
@@ -70,7 +69,7 @@ export default function NavBar() {
             Contact
           </Link>
           {
-            isLogin &&
+              auth.isAuthenticated() &&
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

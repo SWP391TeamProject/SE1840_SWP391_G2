@@ -17,6 +17,7 @@ type Props = {
 type IAuthContecxt = {
     user: Account;
     setUser: (newState: Account) => void;
+    isAuthenticated: () => boolean;
 }
 
 const initalUser: Account = {
@@ -33,6 +34,9 @@ const initalUser: Account = {
 const initialValue = {
     user: initalUser,
     setUser: () => { },
+    isAuthenticated: () => {
+        return false;
+    },
 }
 
 const AuthContext = createContext<IAuthContecxt>(initialValue);
@@ -64,10 +68,9 @@ export const AuthProvider = ({ children }: Props) => {
                             removeCookie("token");
                         }
                     });
-                if (!response.status) {
-                    return;
+                if (response.data !== undefined) {
+                    setUser(response.data);
                 }
-                setUser(response.data);
             } catch (err: any) {
             }
         }
@@ -89,7 +92,7 @@ export const AuthProvider = ({ children }: Props) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{user, setUser}}>
+        <AuthContext.Provider value={{user, setUser, isAuthenticated: () => user.accountId > 0}}>
             {loading ? LoadingScreen() : children}
         </AuthContext.Provider>
     )

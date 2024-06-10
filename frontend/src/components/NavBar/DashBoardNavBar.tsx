@@ -18,7 +18,6 @@ import {GavelIcon, MenuIcon} from "lucide-react";
 
 export default function DashBoardNavBar() {
   const auth = useAuth();
-  const isLogin = auth.user.accountId !== 0;
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
 
   const handleSignout = function () {
@@ -55,7 +54,7 @@ export default function DashBoardNavBar() {
         </NavigationMenu>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
           {
-            isLogin &&
+            auth.isAuthenticated() &&
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
