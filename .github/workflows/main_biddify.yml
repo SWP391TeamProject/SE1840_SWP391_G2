@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write #This is required for requesting the JWT
-
+    env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v4
@@ -36,8 +37,7 @@ jobs:
           pushd './${{ env.PACKAGE_DIRECTORY }}'
           mvn clean package
           popd
-        env:
-          DB_PASSWORD: '${{ env.DB_PASSWORD }}'
+        
         working-directory: ./Backend
       
       - name: Login to Azure
