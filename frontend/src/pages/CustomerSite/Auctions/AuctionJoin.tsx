@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,7 @@ export default function AuctionJoin() {
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
+  
   const [bids, setBids] = useState<YourBidType[]>([]);
   useEffect(() => {
     const newClient = new Client({
@@ -48,7 +49,19 @@ export default function AuctionJoin() {
 
     setClient(newClient);
     newClient.activate();
+
+    return () => {
+      if (newClient.connected) {
+        newClient.deactivate();
+      }
+    };
   }, [accountId]);
+
+  useEffect(() => {
+    window.onpopstate = function() {
+      client?.deactivate();
+    };
+  }, []);
 
   const onMessageReceived = (payload: IMessage) => {
     console.log(payload);
@@ -70,10 +83,10 @@ export default function AuctionJoin() {
 
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     if (client != null) {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
-      if(!/^\d+(\.\d+)?$/.test(paymentAmount)){
+      if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
         toast.error("Please enter a valid number");
         return;
       }
@@ -104,6 +117,7 @@ export default function AuctionJoin() {
     console.log("abc " + bids);
 
   }, [price]);
+
   if (accountId === null) {
     setAcccountId(JSON.parse(getCookie("user")).id);
   }

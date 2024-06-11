@@ -98,7 +98,7 @@ export default function CustomerConsigmentCard({ consignment }) {
 
                             <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null ? "Your consignment is in evaluation process. Please wait for the result." : "Description"}</h1>
                             {custConsignmentDetail?.description}
-                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null ? "" : "Price"}</h1>
+                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null || custConsignmentDetail.status=== ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
                             {custConsignmentDetail?.price}
                             <div className="flex justify-end">
                                 {custConsignmentDetail?.attachments?.map((attachment: any, index: number) => {
