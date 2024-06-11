@@ -16,6 +16,7 @@ public class VnPayPaymentRequestDTO implements Serializable {
     private int accountId;
     private BigDecimal vnp_Amount;
     private String vnp_OrderInfo;
+    private int vnp_txnRef;
 
     public  enum OrderInfoType {
          DEPOSIT, ORDER

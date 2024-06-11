@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import { AuthResponse } from "@/models/AuthResponse";
 import { Login } from "@/models/Login";
 import { Register } from "@/models/Register";
@@ -22,7 +22,9 @@ export const login = async (loginDTO: Login): Promise<AuthResponse> => {
 };
 
 export const logout = async (): Promise<void> => {
-  await axios.post(`${baseUrl}/logout`, {}, authHeader);
+  await axios.post(`${baseUrl}/logout`, {
+    token: JSON.parse(getCookie("user")).accessToken,
+  }, authHeader);
 };
 
 export const loginWithGoogle = async (token: string | null): Promise<AuthResponse> => {

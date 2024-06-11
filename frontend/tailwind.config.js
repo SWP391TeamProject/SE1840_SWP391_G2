@@ -8,7 +8,8 @@ module.exports = {
     './src/**/*.{ts,tsx}',
   ],
   prefix: "",
-  theme: {
+  
+  theme:  {
     container: {
       center: true,
       padding: "2rem",

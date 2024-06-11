@@ -94,7 +94,7 @@ function RegisterForm() {
   useGSAP(
     () => {
       gsap.from(RegisterForm.current, {
-        y: -100,
+        y: -50,
         duration: 2,
         ease: "power2.inOut",
       });
@@ -104,7 +104,7 @@ function RegisterForm() {
 
   return (
     <Card
-      className="w-3/6 h-3/4 mt-20 border drop-shadow-md rounded-xl flex "
+      className="w-3/6 h-3/5 mt-10 border drop-shadow-md rounded-xl flex "
       ref={RegisterForm}
     >
       <div className="flex  basis-full md:basis-1/2 w-full p-3 items-center">

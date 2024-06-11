@@ -1,12 +1,12 @@
-import {ReactNode, createContext, useState, useEffect, useContext} from "react";
+import { ReactNode, createContext, useState, useEffect, useContext } from "react";
 import { Account } from "./models/AccountModel";
 import { Roles } from "./constants/enums";
-import {useAppDispatch} from "@/redux/hooks.tsx";
-import {getCookie, removeCookie} from "@/utils/cookies.ts";
-import {API_SERVER} from "@/constants/domain.ts";
-import axios from "axios";
-import {AuthResponse} from "@/models/AuthResponse.ts";
-import {countUnreadNotifications} from "@/services/NotificationService.ts";
+import { useAppDispatch } from "@/redux/hooks.tsx";
+import { getCookie, removeCookie } from "@/utils/cookies.ts";
+import { API_SERVER } from "@/constants/domain.ts";
+import axios from "./config/axiosConfig.ts";
+import { AuthResponse } from "@/models/AuthResponse.ts";
+import { countUnreadNotifications } from "@/services/NotificationService.ts";
 import { setUnreadNotificationCount } from "@/redux/reducers/UnreadNotificationCountReducer.ts";
 import LoadingScreen from "@/pages/LoadingScreen.tsx";
 
@@ -51,16 +51,20 @@ export const AuthProvider = ({ children }: Props) => {
             const userCookie = getCookie("user");
             console.log(userCookie);
             const userData = JSON.parse(userCookie || "{}") as AuthResponse;
-            if (userData.id == 0)
+            if (userData.id == 0 || userData.accessToken === undefined)
                 return;
             try {
-                const response = await axios
-                    .get(API_SERVER + "/accounts/" + userData.id, {
+                await axios
+                    .get(API_SERVER + "/accounts/" + userData?.id, {
                         headers: {
                             "Content-Type": "application/json",
                             "Access-Control-Allow-Origin": "*",
                             "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
                         }
+                    })
+                    .then((res) => {
+                        setUser(res.data);
+
                     })
                     .catch((err) => {
                         if (err?.response.status == 401) {
@@ -68,9 +72,7 @@ export const AuthProvider = ({ children }: Props) => {
                             removeCookie("token");
                         }
                     });
-                if (response.data !== undefined) {
-                    setUser(response.data);
-                }
+
             } catch (err: any) {
             }
         }
@@ -92,7 +94,7 @@ export const AuthProvider = ({ children }: Props) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{user, setUser, isAuthenticated: () => user.accountId > 0}}>
+        <AuthContext.Provider value={{ user, setUser, isAuthenticated: () => user.accountId > 0 }}>
             {loading ? LoadingScreen() : children}
         </AuthContext.Provider>
     )

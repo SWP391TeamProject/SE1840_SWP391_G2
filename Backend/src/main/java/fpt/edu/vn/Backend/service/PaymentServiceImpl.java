@@ -51,6 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
             Payment savedPayment = paymentRepos.save(payment);
             VnPayPaymentRequestDTO vnPayPaymentRequestDTO = new VnPayPaymentRequestDTO().builder()
                     .accountId(savedPayment.getAccount().getAccountId())
+                    .vnp_txnRef(savedPayment.getPaymentId())
                     .vnp_Amount(savedPayment.getPaymentAmount())
                     .vnp_OrderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
                     .build();
@@ -144,7 +145,7 @@ public class PaymentServiceImpl implements PaymentService {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
-        String vnp_TxnRef = VnPayConfig.getRandomNumber(8);
+
 //        String vnp_IpAddr = VnPayConfig.getIpAddress(req);
 
         BigDecimal amount = paymentRequest.getVnp_Amount().multiply(BigDecimal.valueOf(100));
@@ -159,7 +160,7 @@ public class PaymentServiceImpl implements PaymentService {
 //            vnp_Params.put("vnp_BankCode", String.valueOf(paymentRequest.getVnp_BankCode()));
 //        }
 
-        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        vnp_Params.put("vnp_TxnRef", String.valueOf(paymentRequest.getVnp_txnRef()));
         vnp_Params.put("vnp_OrderInfo", paymentRequest.getVnp_OrderInfo());
         vnp_Params.put("vnp_OrderType", !paymentRequest.getVnp_OrderInfo().equals("DEPOSIT") ? "200000" : "Other");
 

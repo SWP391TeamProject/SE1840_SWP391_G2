@@ -8,6 +8,7 @@ import {
 import React from "react";
 import { Link } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
+import { Button } from "@/components/ui/button";
 export default function LandingPageCarousel() {
   return (
     <>
@@ -16,7 +17,7 @@ export default function LandingPageCarousel() {
           Autoplay({
             delay: 3000,
             pauseOnHover: true,
-          
+
           }),
         ]}
       >
@@ -34,12 +35,15 @@ export default function LandingPageCarousel() {
                       online auction house.
                     </p>
                     <div className="space-x-4 mt-6">
-                      <Link
-                        className="inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                        to="/create-consignment"
-                      >
-                        Consign an Item
-                      </Link>
+                      <Button variant="default" className="w-fit" asChild>
+
+                        <Link
+                          to="/create-consignment"
+                        >
+                          Consign an Item
+                        </Link>
+                      </Button>
+
                     </div>
                   </div>
                   <div className="relative">
@@ -91,12 +95,14 @@ export default function LandingPageCarousel() {
                       and unique jewelry you won't find anywhere else.
                     </p>
                     <div className="space-x-4 mt-6">
-                      <Link
-                        className="inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                        to="auctions"
-                      >
-                        Participate in Auction
-                      </Link>
+                      <Button variant="default" className="w-fit">
+                        <Link
+                          to="auctions"
+                        >
+                          Participate in Auction
+                        </Link>
+                      </Button>
+
                     </div>
                   </div>
                   <div className="relative">

@@ -21,7 +21,6 @@ instance.interceptors.response.use(
       console.log('Redirect to login');
       window.location.href = '/auth/login';
       // redirect('/auth/login');
-      alert('You are not authorized to access this page. Please login first.');
     }
     return Promise.reject(error);
   }

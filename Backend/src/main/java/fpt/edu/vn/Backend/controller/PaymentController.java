@@ -131,36 +131,21 @@ public class PaymentController {
             fields.remove("vnp_SecureHash");
         }
         String signValue = VnPayConfig.hashAllFields(fields);
-        String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
-        String[] parts = vnp_OrderInfo.split("-");
-        String orderType = parts[0]; // "DEPOSIT"
-        String orderId = parts[1];
+        String paymentId = request.getParameter("vnp_TxnRef");
+
         PaymentDTO paymentDTO;
         if (signValue.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 log.info("Payment success");
-                switch (orderType) {
-                    case "DEPOSIT":
-                        // Deposit money to user account
-                        log.info("here is the paymentID "+orderId);
-                        updatePayment(new PaymentRequest().builder()
-                                .paymentId(Integer.parseInt(orderId))
 
+                        updatePayment(new PaymentRequest().builder()
+                                .paymentId(Integer.parseInt(paymentId))
                                 .status(Payment.Status.SUCCESS)
                                 .build());
-                        return 1;
-                    case "PAYMENT":
-                        // Pay for order
-                        log.info("Pay for order");
-                        break;
-                    default:
-                        break;
-                }
                 return 1;
             } else {
-                log.info("Payment failed");
                 updatePayment(new PaymentRequest().builder()
-                        .paymentId(Integer.parseInt(orderId))
+                        .paymentId(Integer.parseInt(paymentId))
                         .status(Payment.Status.FAILED)
                         .build());
                 return 0;

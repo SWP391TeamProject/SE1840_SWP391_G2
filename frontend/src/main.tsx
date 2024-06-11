@@ -64,112 +64,115 @@ import NotificationsList from "@/pages/CustomerSite/Profile/Notification.tsx";
 import ItemCreate from "./pages/Administration/item/ItemCreate.tsx";
 import Balance from "./pages/CustomerSite/Profile/Balance.tsx";
 import PaymentStatus from "./pages/CustomerSite/Profile/PaymentStatus.tsx";
+import ThemeProvider from "./components/component/ThemeProvider.tsx";
 
 
 const router = createBrowserRouter(routes);
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
-    <QueryClientProvider client={queryClient}>
-      <ToastContainer />
-      <Provider store={store}>
-        <TooltipProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <Routes>
-                {/* <Route path="/" element={<HomeLayout />}> */}
-                {/* Customer Site */}
-                <Route path="/" element={<CustomerLayout />}>
-                  
+  <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme" >
+    <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
+      <QueryClientProvider client={queryClient}>
+        <ToastContainer />
+        <Provider store={store}>
+          <TooltipProvider>
+            <AuthProvider>
+              <BrowserRouter>
+                <Routes>
+                  {/* <Route path="/" element={<HomeLayout />}> */}
+                  {/* Customer Site */}
+                  <Route path="/" element={<CustomerLayout />}>
 
-                  <Route path="/" element={<LandingPage />}></Route>
-                  <Route path="contact" element={<Contact />}></Route>
-                  <Route path="about" element={<AboutScreen />}></Route>
-                  <Route path="Auctions" element={<AuctionList />}></Route>
-                  <Route path="Auctions/details" element={<AuctionSession />}></Route>
-                  <Route path="Auctions/:id" element={<AuctionSession />}></Route>
-                  <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
-                  <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
-                    <Route
-                      path="create-consignment"
-                      element={<Consignment />}
-                    ></Route>
-                    <Route path="consignments" element={<CustomerConsignmentList />}>
-                      <Route path="consignments/:id" element={<CustomerConsignmentList />}></Route>
+
+                    <Route path="/" element={<LandingPage />}></Route>
+                    <Route path="contact" element={<Contact />}></Route>
+                    <Route path="about" element={<AboutScreen />}></Route>
+                    <Route path="Auctions" element={<AuctionList />}></Route>
+                    <Route path="Auctions/details" element={<AuctionSession />}></Route>
+                    <Route path="Auctions/:id" element={<AuctionSession />}></Route>
+                    <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
+                    <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
+                      <Route
+                        path="create-consignment"
+                        element={<Consignment />}
+                      ></Route>
+                      <Route path="consignments" element={<CustomerConsignmentList />}>
+                        <Route path="consignments/:id" element={<CustomerConsignmentList />}></Route>
+                      </Route>
+                      <Route path="/profile" element={<ProfileLayout />}>
+                        <Route path="" element={<ProfileDetail />}></Route>
+                        <Route path="/profile/settings" element={<ProfileSetting />}></Route>
+                        <Route path="/profile/notification" element={<NotificationsList />}></Route>
+                        <Route path="/profile/balance" element={<Balance />}></Route>
+
+                      </Route>
                     </Route>
-                    <Route path="/profile" element={<ProfileLayout />}>
-                      <Route path="" element={<ProfileDetail />}></Route>
-                      <Route path="/profile/settings" element={<ProfileSetting />}></Route>
-                      <Route path="/profile/notification" element={<NotificationsList />}></Route>
-                      <Route path="/profile/balance" element={<Balance />}></Route>
+                  </Route>
+                  <Route path="/dashboard" element={<CustomerDashBoard />}>
+                    <Route path="" element={<CustomerDashboard />}></Route>
+                    <Route path="consignments" element={<CustomerConsignmentList />}></Route>
+                    <Route path="bids" element={<Bids />}></Route>
+                  </Route>
+                  {/* Administration */}
+                  <Route
+                    element={
+                      <PrivateRoute
+                        allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
+                      />
+                    }
+                  >
+                    <Route path="/admin" element={<Administration />}>
+                      <Route path="dashboard" element={<DashBoard />}></Route>
+                      <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
+                        <Route path="accounts" element={<AccountsList />}></Route>
+                        <Route path="accounts/:id" element={<AccountEdit />}></Route>
+                        <Route path="accounts/create" element={<AccountCreate />}></Route>
+                      </Route>
+                      <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
+                        <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
+                        <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
+                        <Route path="auction-sessions/:id" element={<AuctionSessionDetail />}></Route>
+
+                        {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
+                      </Route>
+                      <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
+                        <Route path="consignments" element={<ConsignmentList />}></Route>
+                        <Route path="consignments/:id" element={<ConsignmentDetail />}></Route>
+                        {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
+                        {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
+                      </Route>
+                      <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
+                        <Route path="items" element={<ItemsList />}></Route>
+                        <Route path="items/:id" element={<ItemDetail />}></Route>
+                        <Route path="items/create" element={<ItemCreate />}></Route>
+                      </Route>
 
                     </Route>
                   </Route>
-                </Route>
-                <Route path="/dashboard" element={<CustomerDashBoard />}>
-                  <Route path="" element={<CustomerDashboard />}></Route>
-                  <Route path="consignments" element={<CustomerConsignmentList />}></Route>
-                  <Route path="bids" element={<Bids />}></Route>
-                </Route>
-                {/* Administration */}
-                <Route
-                  element={
-                    <PrivateRoute
-                      allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]}
-                    />
-                  }
-                >
-                  <Route path="/admin" element={<Administration />}>
-                    <Route path="dashboard" element={<DashBoard />}></Route>
-                    <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
-                      <Route path="accounts" element={<AccountsList />}></Route>
-                      <Route path="accounts/:id" element={<AccountEdit />}></Route>
-                      <Route path="accounts/create" element={<AccountCreate />}></Route>
-                    </Route>
-                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
-                      <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
-                      <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
-                      <Route path="auction-sessions/:id" element={<AuctionSessionDetail />}></Route>
 
-                      {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
-                    </Route>
-                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
-                      <Route path="consignments" element={<ConsignmentList />}></Route>
-                      <Route path="consignments/:id" element={<ConsignmentDetail />}></Route>
-                      {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
-                      {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
-                    </Route>
-                    <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />} >
-                      <Route path="items" element={<ItemsList />}></Route>
-                      <Route path="items/:id" element={<ItemDetail />}></Route>
-                      <Route path="items/create" element={<ItemCreate />}></Route>
-                    </Route>
-
+                  <Route path="/auth" element={<AuthenticationLayout />}>
+                    <Route path="login" element={<LoginForm />}></Route>
+                    <Route path="register" element={<RegisterForm />}></Route>
+                    <Route path="unactivated" element={<UnactivatedWarning />}></Route>
+                    <Route path="forgot-password" element={<ForgotPasswordForm />}></Route>
+                    <Route path="reset-password" element={<ResetPasswordForm />}></Route>
+                    <Route path="activate" element={<ActivationForm />}></Route>
                   </Route>
-                </Route>
 
-                <Route path="/auth" element={<AuthenticationLayout />}>
-                  <Route path="login" element={<LoginForm />}></Route>
-                  <Route path="register" element={<RegisterForm />}></Route>
-                  <Route path="unactivated" element={<UnactivatedWarning />}></Route>
-                  <Route path="forgot-password" element={<ForgotPasswordForm />}></Route>
-                  <Route path="reset-password" element={<ResetPasswordForm />}></Route>
-                  <Route path="activate" element={<ActivationForm />}></Route>
-                </Route>
-
-                <Route path="/unauthorized" element={<ErrorPage />} />
-                {/* <RouterProvider router={router} /> */}
-                <Route path="*" element={<ErrorPage />} />
-                <Route path="/test" element={<TestPage />} />
-              </Routes>
-            </BrowserRouter>
-          </AuthProvider>
-          {/* <RouterProvider router={router} /> */}
-        </TooltipProvider>
-      </Provider>
-    </QueryClientProvider>
-  </GoogleOAuthProvider>
+                  <Route path="/unauthorized" element={<ErrorPage />} />
+                  {/* <RouterProvider router={router} /> */}
+                  <Route path="*" element={<ErrorPage />} />
+                  <Route path="/test" element={<TestPage />} />
+                </Routes>
+              </BrowserRouter>
+            </AuthProvider>
+            {/* <RouterProvider router={router} /> */}
+          </TooltipProvider>
+        </Provider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
+  </ThemeProvider>
 
 
 );

@@ -11,23 +11,26 @@ import { Link, redirect } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
-import {useAuth} from "@/AuthProvider.tsx";
-import {useAppSelector} from "@/redux/hooks.tsx";
-import {logout} from "@/services/AuthService.ts";
+import { useAuth } from "@/AuthProvider.tsx";
+import { useAppSelector } from "@/redux/hooks.tsx";
+import { logout } from "@/services/AuthService.ts";
+import { removeCookie } from "@/utils/cookies";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
 
   const handleSignout = function () {
-    logout().then(function() {
-      redirect("/");
+    logout().then(function () {
+      removeCookie("user");
+      removeCookie('token')
+      window.location.href = '/auth/login';
     })
   };
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow w-full">
+      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-2 bg-background text-foreground ">
         <Link className="flex items-center justify-center" to="/">
           <GavelIcon className="h-6 w-6" />
           <span className="font-semibold text-lg">Biddify</span>
@@ -36,7 +39,7 @@ export default function NavBar() {
 
           {auth.isAuthenticated() ? '' : (
             <Button
-              className="flex items-center gap-2 bg-green-500 text-white"
+              className="flex items-center gap-2  "
               variant="default"
               asChild
             >
@@ -69,7 +72,7 @@ export default function NavBar() {
             Contact
           </Link>
           {
-              auth.isAuthenticated() &&
+            auth.isAuthenticated() &&
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -105,7 +108,7 @@ export default function NavBar() {
                   <Link to={'/dashboard'}>Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem style={{pointerEvents: "none"}}>
+                <DropdownMenuItem style={{ pointerEvents: "none" }}>
                   <div className="flex justify-between items-center gap-2">
                     <div className="basis-1/2">
                       Balance:
