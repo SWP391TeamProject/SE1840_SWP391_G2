@@ -78,7 +78,7 @@ const ProfileDetail = () => {
           <CardContent className="space-y-4">
             <div className="flex flex-col items-start gap-4">
               <Avatar className="w-[80px] h-[80px]">
-                <AvatarImage src={formData.avatar ? formData.avatar.link : '/placeholder.svg'} alt="Avatar" />
+                <AvatarImage src={formData.avatar ? formData.avatar.link : `https://ui-avatars.com/api/?name=${formData.nickname}`} alt="Avatar" />
                 <AvatarFallback>
                   <Car />
                 </AvatarFallback>
