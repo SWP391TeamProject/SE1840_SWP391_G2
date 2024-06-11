@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -93,8 +94,15 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
+        if(auctionDTO.getStartDate().isBefore(LocalDateTime.now())){
+            throw new InvalidInputException("Start date must be in the future");
+        }
+        if(auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())){
+            throw new InvalidInputException("End date must be after start date");
+        }
         try {
             AuctionSession auctionSession = new AuctionSession();
+            auctionSession.setTitle(auctionDTO.getTitle());
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
             auctionSession.setCreateDate(auctionDTO.getCreateDate());
