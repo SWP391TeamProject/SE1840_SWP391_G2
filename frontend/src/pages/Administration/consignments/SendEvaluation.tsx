@@ -39,7 +39,12 @@ const formSchema = z.object({
         message: "Evaluation must be at least 10 characters long"
 
     }),
-    price: z.string(),
+    price: z.string().regex(/^\d+(\.\d+)?$/, {
+        message: "Price must be a number"
+    }).min(2, {
+        message: "Price must be at least 10"
+    }),
+    
     consignmentId: z.number(),
     files: z.any()
 }).required({
@@ -86,6 +91,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
     // 1. Define your form.
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
+
         setIsLoading(true);
         // Remove FormData creation and file handling
         if (consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {
