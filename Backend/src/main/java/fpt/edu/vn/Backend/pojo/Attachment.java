@@ -32,7 +32,7 @@ public class Attachment {
         JPG, PNG, MP4
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
