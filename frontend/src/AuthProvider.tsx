@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: Props) => {
             const userCookie = getCookie("user");
             console.log(userCookie);
             const userData = JSON.parse(userCookie || "{}") as AuthResponse;
-            if (userData.id == 0 || userData.accessToken === undefined)
+            if (userData?.id == 0 || userData?.accessToken === undefined)
                 return;
             try {
                 await axios
@@ -84,9 +84,9 @@ export const AuthProvider = ({ children }: Props) => {
             });
         }
 
-        // fake loading
-        const delay = Math.random() < 0.3 ? 500 : 0;
-
+        // fake loadingA
+        // const delay = Math.random() < 0.3 ? 5000 : 0;
+        const delay = 0;
         setLoading(true);
         fetchProfile()
             .then(() => fetchUnreadNotification())
