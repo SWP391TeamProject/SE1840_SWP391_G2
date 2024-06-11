@@ -7,31 +7,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {Link, redirect} from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "../ui/navigation-menu";
-import {useAuth} from "@/AuthProvider.tsx";
-import {useAppSelector} from "@/redux/hooks.tsx";
-import {logout} from "@/services/AuthService.ts";
-import {GavelIcon, MenuIcon} from "lucide-react";
+import { useAuth } from "@/AuthProvider.tsx";
+import { useAppSelector } from "@/redux/hooks.tsx";
+import { logout } from "@/services/AuthService.ts";
+import { GavelIcon, MenuIcon } from "lucide-react";
 
 export default function DashBoardNavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
 
   const handleSignout = function () {
-    logout().then(function() {
+    logout().then(function () {
       redirect("/");
     })
   };
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow w-full">
+      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow w-full dark:bg-black text-foreground dark:shadow-gray-800">
         <Link className="flex items-center justify-center" to="/">
-          <GavelIcon className="h-6 w-6" />
-          <span className="font-semibold text-lg">Biddify</span>
+          <img src="https://github.com/SWP391TeamProject/SE1840_SWP391_G2/raw/develop/images/logo-cut.svg" className="w-16 h-10 object-contain" alt="logo" />
         </Link>
         <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
           <NavigationMenuList>
@@ -58,16 +57,16 @@ export default function DashBoardNavBar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full relative"
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full relative"
                 >
                   <img
-                      src={auth.user.avatar ?? './placeholder.svg'}
-                      width={36}
-                      height={36}
-                      alt="Avatar"
-                      className="overflow-hidden rounded-full"
+                    src={auth.user.avatar ?? './placeholder.svg'}
+                    width={36}
+                    height={36}
+                    alt="Avatar"
+                    className="overflow-hidden rounded-full"
                   />
                   {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
                 </Button>
@@ -90,7 +89,7 @@ export default function DashBoardNavBar() {
                   <Link to={'/'}>Switch to auctioning</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem style={{pointerEvents: "none"}}>
+                <DropdownMenuItem style={{ pointerEvents: "none" }}>
                   <div className="flex justify-between items-center gap-2">
                     <div className="basis-1/2">
                       Balance:

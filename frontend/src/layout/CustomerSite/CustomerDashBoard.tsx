@@ -9,10 +9,10 @@ export default function CustomerDashBoard() {
         <div className="sticky top-0 z-10 w-full">
             <DashBoardNavBar />
         </div>
-        <div className="min-h-screen">
+        <div className="w-full">
             <Outlet></Outlet>
         </div>
-        <div className="sticky min z-10 w-full">
+        <div className="min z-10 w-full text-foreground">
             <Footer />
         </div>
     </div>
