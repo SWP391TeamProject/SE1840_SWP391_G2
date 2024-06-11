@@ -87,6 +87,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    public String placePreBid(int auctionSessionId, int accountId, double amount) {
+        return "";
+    }
+
+    @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
         try {
             AuctionSession auctionSession = new AuctionSession();
