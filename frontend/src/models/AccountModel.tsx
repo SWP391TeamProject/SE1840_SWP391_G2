@@ -1,4 +1,4 @@
-import { AccountStatus, RoleName } from "@/constants/enums";
+import {AccountStatus, Roles} from "@/constants/enums";
 
 export interface Account {
   accountId: number;
@@ -9,32 +9,8 @@ export interface Account {
   avatar?: string;
   accessToken?: string;
   balance?: number;
-  role: Role;
+  role: Roles;
   createDate?: Date;
   updateDate?: Date;
   status: AccountStatus
 }
-
-export interface Role {
-  roleId: number;
-  roleName: string;
-}
-
-export const roles: Role[] = [
-  {
-    roleId: 1,
-    roleName: "MEMBER"
-  },
-  {
-    roleId: 2,
-    roleName: "STAFF"
-  },
-  {
-    roleId: 3,
-    roleName: "MANAGER"
-  },
-  {
-    roleId: 4,
-    roleName: "ADMIN"
-  }
-];
