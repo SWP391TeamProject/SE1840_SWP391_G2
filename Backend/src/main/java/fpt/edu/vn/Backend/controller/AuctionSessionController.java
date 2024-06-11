@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
@@ -79,13 +80,12 @@ public class AuctionSessionController {
 
     @PostMapping("/")
     public ResponseEntity<AuctionSessionDTO> createAuctionSession(@RequestBody AuctionCreateDTO auctionDTO) {
+
         AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
         auctionSessionDTO.setTitle(auctionDTO.getTitle());
         auctionSessionDTO.setStartDate(auctionDTO.getStartDate());
         auctionSessionDTO.setEndDate(auctionDTO.getEndDate());
-        auctionSessionDTO.setStatus("SCHEDULED");
-        auctionSessionDTO.setCreateDate(LocalDateTime.now());
-        auctionSessionDTO.setUpdateDate(LocalDateTime.now());
+        auctionSessionDTO.setStatus(String.valueOf(AuctionSession.Status.SCHEDULED));
         auctionSessionDTO=auctionSessionService.createAuctionSession(auctionSessionDTO);
         if(auctionDTO.getFiles()!=null){
             try {
