@@ -26,11 +26,13 @@ type IAuthContecxt = {
 const initalUser: Account = {
     accessToken: undefined,
     accountId: -1,
-    avatar: undefined,
+    avatar: {
+        link: undefined
+    },
     balance: 0,
     createDate: undefined,
     email: "",
-    nickname: undefined,
+    nickname: "Guest",
     phone: "",
     role: Roles.GUEST,
     status: AccountStatus.ACTIVE,
@@ -71,6 +73,7 @@ export const AuthProvider = ({ children }: Props) => {
                     }
                 })
                 .then((res) => {
+                    res.data.accessToken = userData?.accessToken;
                     setUser(res.data);
                 })
                 .catch((err) => {

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {ChangeEvent, useEffect, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -10,144 +10,187 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { fetchAccountById } from "@/services/AccountsServices";
-import { get } from "http";
-import { getCookie } from "@/utils/cookies";
-import { useNavigate } from "react-router-dom";
-import { Car } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {Loader2} from "lucide-react";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {useAuth} from "@/AuthProvider.tsx";
+import {SubmitHandler, useForm} from "react-hook-form";
+import {API_SERVER} from "@/constants/domain.ts";
+import {toast} from "react-toastify";
+import axios from "axios";
 
-interface ProfileData {
-  id: number;
-  accessToken: string;
-  username: string;
-  role: string;
-  refreshToken: string | null;
-  email: string;
-  phone: string | null;
-  nickname: string | null;
-  avatar: string | null;
-  address: string | null;
+type ProfileAvatar = {
+  files?: FileList;
 }
 
-
+type ProfileDetails = {
+  nickname: string;
+  phone: string;
+}
 
 const ProfileDetail = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<ProfileData>({} as ProfileData);
-  const nav = useNavigate();
-  const handleInputChange = (field: keyof ProfileData, value: string) => {
-    setFormData((prevData) => ({ ...prevData, [field]: value }));
-  };
-
-  const handleSave = () => {
-    setIsEditing(false);
-  };
+  const auth = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string>();
+  const {
+    register: profileAvatarForm,
+    handleSubmit: handleProfileAvatarForm
+  } = useForm<ProfileAvatar>({
+    defaultValues: {
+      files: undefined
+    }
+  });
+  const {
+    register: profileDetailForm,
+    handleSubmit: handleProfileDetailForm
+  } = useForm<ProfileDetails>({
+    defaultValues: {
+      nickname: auth.user.nickname,
+      phone: auth.user.phone
+    }
+  });
 
   useEffect(() => {
-    const accountId = JSON.parse(getCookie("user"));
+    if (auth.user.avatar)
+      setAvatarPreview(auth.user.avatar.link)
+  }, []);
 
-    if (!accountId) {
-      nav("/auth/login");
-
-    } else {
-      fetchAccountById(accountId.id)
-        .then((response) => {
-          if (response && response.data) {
-            setFormData(response.data);
-          } else {
-            console.error('No data found');
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+  const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setAvatarPreview(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
     }
-  }, [])
+  };
+
+  const onSubmitProfileAvatar: SubmitHandler<ProfileAvatar> = (data) => {
+    if (data.files === undefined) return;
+    setIsSaving(true);
+    const formData = new FormData();
+    formData.append("file", data.files[0]);
+    axios.post<any>(API_SERVER + "/accounts/avatar/" + auth.user.accountId, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Access-Control-Allow-Origin": "*",
+          "Authorization": "Bearer " + auth.user.accessToken,
+        },
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error('Update avatar failed!');
+        setIsSaving(false);
+      }).then((res) => {
+        auth.setUser({
+          ...auth.user,
+          avatar: res.data
+        });
+        toast.success('Update avatar successfully!');
+        setIsSaving(false);
+    })
+  };
+
+  const onSubmitProfileDetails: SubmitHandler<ProfileDetails> = (data) => {
+    setIsSaving(true);
+  };
 
   return (
     <>
       <div className="flex flex-col gap-12">
         <Card>
-          <CardHeader>
-            <CardTitle>Avatar</CardTitle>
-            <CardDescription>
-              Update your avatar.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col items-start gap-4">
-              <Avatar className="w-[80px] h-[80px]">
-                <AvatarImage src={formData.avatar ? formData.avatar.link : `https://ui-avatars.com/api/?name=${formData.nickname}`} alt="Avatar" />
-                <AvatarFallback>
-                  <Car />
-                </AvatarFallback>
-              </Avatar>
-              <Button>Change Avatar</Button>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Details</CardTitle>
-            <CardDescription>
-              View and manage your personal information.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-
-            <Label>Username</Label>
-            <Input
-              value={formData.username}
-              onChange={(e) => handleInputChange("username", e.target.value)}
-              disabled={!isEditing}
-            />
-
-            <Label>Email</Label>
-            <Input
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              disabled={!isEditing}
-            />
-
-            <Label>Phone</Label>
-            <Input
-              value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              disabled={!isEditing}
-            />
-
-            <Label>Nickname</Label>
-            <Input
-              value={formData.nickname || ""}
-              onChange={(e) => handleInputChange("nickname", e.target.value)}
-              disabled={!isEditing}
-            />
-
-            <Label>Address</Label>
-            <Input
-              value={formData.address || ""}
-              onChange={(e) => handleInputChange("address", e.target.value)}
-              disabled={!isEditing}
-            />
-          </CardContent>
-          <CardFooter>
-            <div className="flex gap-4">
-              {isEditing ? (
-                <>
-                  <Button onClick={handleSave}>Save</Button>
-                  <Button
-                    onClick={() => setIsEditing(false)}
-                    variant="outline"
-                  >
-                    Cancel
+          <form
+            onSubmit={handleProfileAvatarForm(onSubmitProfileAvatar)}>
+            <CardHeader>
+              <CardTitle>Avatar</CardTitle>
+              <CardDescription>
+                Update your avatar.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="inline-block relative">
+                <Avatar className="w-[80px] h-[80px]">
+                  <AvatarImage src={avatarPreview} alt="avatar"/>
+                  <AvatarFallback>{auth.user.nickname.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <Input
+                  id="avatar"
+                  type="file"
+                  accept="image/*"
+                  {...profileAvatarForm("files")}
+                  onChange={handleAvatarChange}
+                  required
+                  className="absolute opacity-0 w-full h-full top-0 left-0 cursor-pointer"
+                />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <div className="flex gap-4">
+                {isSaving
+                  ?
+                  <Button disabled className="bg-orange-600">
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin"/>
+                    Please wait
                   </Button>
-                </>
-              ) : (
-                <Button onClick={() => setIsEditing(true)}>Edit</Button>
-              )}
-            </div>
-          </CardFooter>
+                  : <Button
+                    type="submit"
+                    className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
+                  >Save avatar</Button>}
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+
+        <Card>
+          <form
+            onSubmit={handleProfileDetailForm(onSubmitProfileDetails)}>
+            <CardHeader>
+              <CardTitle>Profile Details</CardTitle>
+              <CardDescription>
+                View and manage your personal information.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="nickname">Nickname</Label>
+                  <Input
+                    id="nickname"
+                    type="text"
+                    {...profileDetailForm("nickname")}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="phone"
+                    {...profileDetailForm("phone")}
+                    required
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <div className="flex gap-4">
+                {isSaving
+                  ?
+                  <Button disabled className="bg-orange-600">
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin"/>
+                    Please wait
+                  </Button>
+                  : <Button
+                    type="submit"
+                    className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
+                  >Save details</Button>}
+              </div>
+            </CardFooter>
+          </form>
         </Card>
 
         <Card>
@@ -159,13 +202,13 @@ const ProfileDetail = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <Label>Current Password</Label>
-            <Input type="password" />
+            <Input type="password"/>
 
             <Label>New Password</Label>
-            <Input type="password" />
+            <Input type="password"/>
 
             <Label>Confirm Password</Label>
-            <Input type="password" />
+            <Input type="password"/>
           </CardContent>
           <CardFooter>
             <Button>Change Password</Button>
@@ -181,7 +224,7 @@ const ProfileDetail = () => {
           <CardContent className="space-y-4">
             <Label>Two-factor Authentication</Label>
             <div className="flex items-center gap-4">
-              <input type="checkbox" />
+              <input type="checkbox"/>
               <span>Enable two-factor authentication</span>
             </div>
           </CardContent>
@@ -199,7 +242,8 @@ const ProfileDetail = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <Label>Confirm Deletion</Label>
-            <Input type="password" placeholder="Enter your password to confirm deletion" />
+            <Input type="password"
+                   placeholder="Enter your password to confirm deletion"/>
           </CardContent>
           <CardFooter>
             <Button>Delete Account</Button>
