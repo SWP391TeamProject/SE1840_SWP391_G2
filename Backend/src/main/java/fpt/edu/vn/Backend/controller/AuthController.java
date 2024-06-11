@@ -63,9 +63,8 @@ public class AuthController {
     @PostMapping("/refresh")
     ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest request)
             throws ParseException, JOSEException {
-        String result = String.valueOf(tokenProvider.refreshToken(request));
-        AuthenticationResponse authenticationResponse = AuthenticationResponse.builder().accessToken(result).authenticated(true).build();
-        return ResponseEntity.ok(authenticationResponse);
+        AuthenticationResponse result = tokenProvider.refreshToken(request);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/login-with-google")
