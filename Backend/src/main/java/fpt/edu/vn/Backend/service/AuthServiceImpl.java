@@ -218,9 +218,9 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public boolean changePassword(String email, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
-        Account a = accountRepos.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
+    public boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
+        Account a = accountRepos.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id));
         if (!a.getPassword().equals(changePasswordDTO.getOldPassword()))
             throw new InvalidInputException("Old password is incorrect!");
         if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword()))

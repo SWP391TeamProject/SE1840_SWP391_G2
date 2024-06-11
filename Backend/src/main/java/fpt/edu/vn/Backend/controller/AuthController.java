@@ -134,4 +134,12 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/change-password/{id}")
+    public ResponseEntity<?> changePassword(@PathVariable int id,@RequestBody ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
+        if(!authService.changePassword(id,changePasswordDTO)){
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
