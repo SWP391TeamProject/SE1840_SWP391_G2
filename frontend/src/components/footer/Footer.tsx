@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function Footer() {
   return (
     <>
-      <footer className="w-full bg-gray-100 py-8 dark:bg-gray-800">
+      <footer className="w-full bg-gray-100 py-8 dark:bg-gray-800 text-foreground">
         <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:flex-row md:gap-0">
           <div className="flex items-center gap-2">
             <GavelIcon className="h-6 w-6" />

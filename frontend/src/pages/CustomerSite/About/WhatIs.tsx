@@ -2,14 +2,14 @@ import React from 'react'
 
 export const WhatIs = () => {
     return (
-        <div className="flex flex-col px-20 pt-8 pb-20 rounded shadow-sm max-md:px-5 bg-gray-100 dark:bg-gray-800">
-            <div className="text-5xl font-bold leading-[62.04px] text-zinc-900 max-md:max-w-full">
+        <div className="flex flex-col px-20 pt-8 pb-20 rounded-xl shadow-sm max-md:px-5 bg-gray-100 dark:bg-gray-800 dark:text-foreground">
+            <div className="text-5xl font-bold leading-[62.04px] max-md:max-w-full">
                 What is Biddify?
             </div>
             <div className="mt-24 max-md:mt-8 max-md:max-w-full">
                 <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                     <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col text-zinc-900 max-md:mt-10">
+                        <div className="flex flex-col max-md:mt-10">
                             <img
                                 loading="lazy"
                                 src="https://cdn-icons-png.flaticon.com/128/3815/3815711.png"
@@ -25,7 +25,7 @@ export const WhatIs = () => {
                         </div>
                     </div>
                     <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col text-zinc-900 max-md:mt-10">
+                        <div className="flex flex-col max-md:mt-10">
                             <img
                                 loading="lazy"
                                 src="https://cdn-icons-png.flaticon.com/128/15722/15722759.png"
@@ -43,7 +43,7 @@ export const WhatIs = () => {
                 <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                     
                     <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col text-zinc-900 max-md:mt-10">
+                        <div className="flex flex-col max-md:mt-10">
                             <img
                                 loading="lazy"
                                 src="https://cdn-icons-png.flaticon.com/128/4233/4233834.png"
@@ -56,7 +56,7 @@ export const WhatIs = () => {
                         </div>
                     </div>
                     <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                        <div className="flex flex-col text-zinc-900 max-md:mt-10">
+                        <div className="flex flex-col max-md:mt-10">
                             <img
                                 loading="lazy"
                                 src="https://cdn-icons-png.flaticon.com/128/10838/10838355.png"

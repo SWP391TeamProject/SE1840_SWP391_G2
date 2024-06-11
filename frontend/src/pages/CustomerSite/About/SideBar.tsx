@@ -2,9 +2,9 @@
 
 export const  Sidebar = ({about,ourTeam,buy,sell }:{about:number,ourTeam:number,buy:number,sell:number })=> {
     return (
-        <aside className="w-28 top-16 h-screen sm:w-40 md:w-56" aria-label="Sidebar">
-            <div className="overflow-y-auto fixed w-28 md:w-56 sm:w-40 py-4 px-3 bg-gray-50 rounded dark:bg-gray-800 h-dvh">
-                <ul className="space-y-4 h-5/6">
+        <aside className="w-28 top-16 h-96 sm:w-40 md:w-56 sticky mt-4" aria-label="Sidebar">
+            <div className="overflow-y-auto  w-28 md:w-56 sm:w-40 py-4 px-3 bg-gray-50 rounded-xl dark:bg-gray-800 h-96 ">
+                <ul className="space-y-4 h-5/6 px-4">
                     <li>
                     <button onClick={()=>scrollTo({top:0,behavior:"smooth"})} className="text-lg font-semibold text-gray-700 dark:text-gray-100 mb-4">What is Biddify?</button>
                     </li>

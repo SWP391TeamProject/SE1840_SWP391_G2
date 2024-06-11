@@ -2,7 +2,7 @@ import React from 'react'
 
 export const OurTeam = () => {
     return (
-        <section className="py-20 bg-gray-100 dark:bg-gray-800">
+        <section className="py-20 bg-gray-100 dark:bg-gray-800 rounded-xl">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid gap-10 sm:px-10 md:gap-16 md:grid-cols-2">
 
