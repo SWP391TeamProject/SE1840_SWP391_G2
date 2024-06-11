@@ -12,19 +12,16 @@ export default function Footer() {
             <span className="font-semibold text-lg">Biddify</span>
           </div>
           <nav className="flex gap-4 text-sm font-medium">
-            <Link className="hover:underline underline-offset-4" to="#">
-              About
-            </Link>
-            <Link className="hover:underline underline-offset-4" to="#">
+            <Link className="hover:underline underline-offset-4" to="/auctions">
               Auctions
             </Link>
-            <Link className="hover:underline underline-offset-4" to="#">
-              Categories
+            <Link className="hover:underline underline-offset-4" to="/about">
+              About
             </Link>
-            <Link className="hover:underline underline-offset-4" to="#">
+            <Link className="hover:underline underline-offset-4" to="/blog">
               Blog
             </Link>
-            <Link className="hover:underline underline-offset-4" to="#">
+            <Link className="hover:underline underline-offset-4" to="/contact">
               Contact
             </Link>
           </nav>
