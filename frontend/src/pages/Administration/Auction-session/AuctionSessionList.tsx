@@ -185,10 +185,10 @@ export default function AuctionSessionList() {
                     <TableHead className="hidden md:table-cell">
                       End Date
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="hidden md:table-cell text-center">
                       Participant
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="hidden md:table-cell text-center">
                       number of lots
                     </TableHead>
                     {/* <TableHead className="hidden md:table-cell">
@@ -220,13 +220,13 @@ export default function AuctionSessionList() {
                       <TableCell className="hidden md:table-cell">
                         {new Date(auctionSession.endDate).toLocaleDateString("en-US")}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="hidden md:table-cell text-center">
                         {/* {auctionSession.role[0]?.roleName} */}
-                        {/* {auctionSession.deposits.length}
-                         */}
+                        {auctionSession.deposits?.length}
+                        
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {auctionSession.auctionsItems}
+                      <TableCell className="hidden md:table-cell text-center">
+                        {auctionSession.auctionItems?.length}
 
                         {/* {auctionSession.status == AuctionSessionStatus.ACTIVE ? 
                         {auctionSession.deposits.length}

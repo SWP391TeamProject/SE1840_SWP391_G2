@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: Props) => {
         }
 
         // fake loading
-        const delay = Math.random() < 0.3 ? 5000 : 0;
+        const delay = Math.random() < 0.3 ? 500 : 0;
 
         setLoading(true);
         fetchProfile()

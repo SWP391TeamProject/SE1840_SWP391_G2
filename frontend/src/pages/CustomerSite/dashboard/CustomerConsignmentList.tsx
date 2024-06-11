@@ -59,6 +59,7 @@ export default function CustomerConsignmentList() {
                     .then((response) => {
                         console.log(response.data);
                         setConsignments(response.data.content);
+                        consignments.sort((a, b) => { return b.consignmentId - a.consignmentId });
                     })
                     .catch((err) => {
                         console.error(err);
@@ -66,88 +67,90 @@ export default function CustomerConsignmentList() {
             } catch (err) {
                 console.error("Failed to parse user cookie:", err);
             }
-
+            consignments.sort((a, b) => { return b.consignmentId - a.consignmentId });
 
         }
 
 
     }, []);
     return (
-        <>
-            <div className="flex flex-col gap-5 container p-10">
-                <div className="flex flex-row items-center justify-between">
-                    <div>
-                        <h2 className="text-4xl font-bold">Your Consignments</h2>
-                        <p>We will reach you within 2 businesses days after submitting your consignments request</p>
-                    </div>
-                    <div>
-                        <NavigationMenu className="flex items-center gap-2">
-                            <NavigationMenuList>
-                                <NavigationMenuItem>
-                                    <NavigationMenuLink asChild className="hover:cursor-pointer rounded-full hover:bg-gray-400 ">
+        <div className="flex flex-col gap-5 container p-10">
+            <div className="flex flex-row items-center justify-between">
+                <div>
+                    <h2 className="text-4xl font-bold">Your Consignments</h2>
+                    <p>We will reach you within 2 businesses days after submitting your consignments request</p>
+                </div>
+                <div>
+                    <NavigationMenu className="flex items-center gap-2">
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink asChild className="hover:cursor-pointer rounded-full hover:bg-gray-400 ">
+                                    <div className="h-8 w-8 rounded-full flex items-center justify-center">
+                                        <PlusCircleIcon className="h-6 w-6 " onClick={() => {
+                                            nav('/create-consignment');
+                                        }} />
+                                    </div>
+                                </NavigationMenuLink>
+
+
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink asChild className="hover:cursor-pointer rounded-full hover:bg-gray-400 " onClick={() => {
+                                    setLayout(prev => {
+                                        return prev === layoutType.CARD ? layoutType.TABLE : layoutType.CARD;
+                                    });
+                                }}>
+                                    {layout === layoutType.CARD ?
                                         <div className="h-8 w-8 rounded-full flex items-center justify-center">
-                                            <PlusCircleIcon className="h-6 w-6 " onClick={() => {
-                                                nav('/create-consignment');
-                                            }} />
+                                            <Grid2x2Icon className="sad" />
                                         </div>
-                                    </NavigationMenuLink>
+                                        :
+                                        <WalletCards className="h-8 w-8 rounded-full flex items-center justify-center" />
+
+                                    }
+                                </NavigationMenuLink>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
 
 
-                                </NavigationMenuItem>
-                                <NavigationMenuItem>
-                                    <NavigationMenuLink asChild className="hover:cursor-pointer rounded-full hover:bg-gray-400 " onClick={() => {
-                                        setLayout(prev => {
-                                            return prev === layoutType.CARD ? layoutType.TABLE : layoutType.CARD;
-                                        });
-                                    }}>
-                                        {layout === layoutType.CARD ?
-                                            <div className="h-8 w-8 rounded-full flex items-center justify-center">
-                                                <Grid2x2Icon className="sad" />
-                                            </div>
-                                            :
-                                            <WalletCards className="h-8 w-8 rounded-full flex items-center justify-center" />
-
-                                        }
-                                    </NavigationMenuLink>
-                                </NavigationMenuItem>
-                            </NavigationMenuList>
-
-
-                        </NavigationMenu>
-                    </div>
+                    </NavigationMenu>
                 </div>
-                {layout === layoutType.TABLE && consignments && consignments.length > 0 &&
-                    <Table data={consignments} >
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>
-                                    Id
-                                </TableHead>
-                                <TableHead>
-                                    Create Date
-                                </TableHead>
-                                <TableHead>
-                                    Status
-                                </TableHead>
+            </div>
+            {layout === layoutType.TABLE && consignments && consignments.length > 0 &&
+                <Table data={consignments} >
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>
+                                Id
+                            </TableHead>
+                            <TableHead>
+                                Create Date
+                            </TableHead>
+                            <TableHead>
+                                Status
+                            </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {consignments.map((consignment) => (
+                            <TableRow key={consignment.consignmentId}>
+                                <TableCell >{consignment.consignmentId}</TableCell >
+                                <TableCell >{consignment.createDate}</TableCell >
+                                <TableCell >{consignment.status == ConsignmentStatus.WAITING_STAFF ? 'Evaluating' : 'Terminated'}</TableCell >
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {consignments.map((consignment) => (
-                                <TableRow key={consignment.consignmentId}>
-                                    <TableCell >{consignment.consignmentId}</TableCell >
-                                    <TableCell >{consignment.createDate}</TableCell >
-                                    <TableCell >{consignment.status == ConsignmentStatus.WAITING_STAFF ? 'Evaluating' : 'Terminated'}</TableCell >
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                        ))}
+                    </TableBody>
+                </Table>
 
-                }
-                <div className={`flex flex-row flex-wrap gap-16 ${layout === layoutType.CARD ? 'block' : 'hidden'}`}>
-                    {layout === layoutType.CARD && consignments && consignments.map((consignment) => <CustomerConsigmentCard key={consignment.consignmentId} consignment={consignment} />)}
-                </div>
-            </div >
+            }
+            <div className={`flex flex-row flex-wrap gap-16 ${layout === layoutType.CARD ? 'block' : 'hidden'}`}>
+                {layout === layoutType.CARD && consignments &&
+                    consignments.sort((a, b) => { return b.consignmentId - a.consignmentId })
+                        .map((consignment) =>
+                            <CustomerConsigmentCard key={consignment.consignmentId} consignment={consignment} />)}
+            </div>
+        </div >
 
 
-        </>);
+    );
 }

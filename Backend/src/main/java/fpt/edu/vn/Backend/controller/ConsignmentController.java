@@ -56,6 +56,8 @@ public class ConsignmentController {
             }
             switch (accountService.getAccountByEmail(authentication.getName()).getRole()){
                 case STAFF: {
+                    Pageable pageable1 = Pageable.unpaged();
+                    consignments = consignmentService.getAllConsignments(pageable1);
                     List<ConsignmentDTO> listStaffPage=consignments.stream().filter(consignmentDTO -> consignmentDTO.getStatus().equals(String.valueOf(Consignment.Status.WAITING_STAFF))||consignmentDTO.getStaff()==null||consignmentDTO.getStaff().getEmail().equals(authentication.getName())).toList();
                     Page<ConsignmentDTO> staffPage= new PageImpl(listStaffPage,pageable,listStaffPage.size());
 
