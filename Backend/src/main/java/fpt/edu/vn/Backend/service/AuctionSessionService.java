@@ -20,4 +20,7 @@ public interface AuctionSessionService {
 
     AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId);
 
+    String placePreBid(int auctionSessionId, int accountId, double amount);
+
+
 }

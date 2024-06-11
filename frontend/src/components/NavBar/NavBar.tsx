@@ -14,14 +14,22 @@ import { GavelIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
 import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
-import { removeCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
+import { useEffect } from "react";
+import { fetchAccountById } from "@/services/AccountsServices";
+import { useDispatch } from "react-redux";
+import { setUnreadNotificationCount } from "@/redux/reducers/UnreadNotificationCountReducer";
+import { countUnreadNotifications } from "@/services/NotificationService";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
+  const loc = useLocation();
+  const dispatch = useDispatch();
   const handleSignout = function () {
     logout().then(function () {
       removeCookie("user");
@@ -29,6 +37,32 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
+  useEffect(() => {
+
+    async function fetchUnreadNotification() {
+      countUnreadNotifications().then((res) => {
+        console.log('noti service')
+        console.log("noti service" + res?.data);
+        dispatch(setUnreadNotificationCount(res?.data));
+      }).catch((err) => {
+        console.error(err);
+      })
+    }
+    if (!loc?.state) {
+      let cookie = getCookie('user');
+      if (cookie) {
+        const data = JSON.parse(cookie)?.id;
+        if (data) {
+          fetchAccountById(data).then(res => {
+            console.log('hehehe')
+            auth.setUser(res?.data)
+          }).then(() => {
+            fetchUnreadNotification()
+          })
+        }
+      }
+    }
+  }, [])
 
 
   return (
@@ -52,6 +86,9 @@ export default function NavBar() {
                     <Link to="/auth/login">Login</Link>
                   </Button>
                 ) : ''}
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <ModeToggle/>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
@@ -105,6 +142,10 @@ export default function NavBar() {
                         size="icon"
                         className="rounded-full relative"
                       >
+                        <Avatar>
+                          <AvatarImage src={auth?.user?.avatar ? auth?.user?.avatar?.link : './placeholder.svg'} alt="Avatar" />
+                          <AvatarFallback>{auth?.user.nickname[0]}</AvatarFallback>
+                        </Avatar>
                         <img
                           src={auth?.user.avatar ? auth?.user.avatar : './placeholder.svg'}
                           width={36}
@@ -159,48 +200,49 @@ export default function NavBar() {
 
 
 
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button className="lg:hidden ml-auto" size="icon" variant="outline">
-            <MenuIcon className="h-6 w-6" />
-            <span className="sr-only">Toggle navigation menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent className="bg-white" side="right">
-          <div className="grid gap-2 py-6">
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Put your item for auction
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Auctions
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              About
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Blog
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Contact
-            </Link>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </header>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button className="lg:hidden ml-auto" size="icon" variant="outline">
+              <MenuIcon className="h-6 w-6" />
+              <span className="sr-only">Toggle navigation menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="bg-white" side="right">
+            <div className="grid gap-2 py-6">
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Put your item for auction
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Auctions
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                About
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Blog
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Contact
+              </Link>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </header>
+    </>
   );
 }
