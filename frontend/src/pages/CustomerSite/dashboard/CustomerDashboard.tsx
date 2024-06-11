@@ -8,7 +8,7 @@ export default function CustomerDashboard() {
 
   return (
     <>
-      <div className=" gap-2 flex flex-col justify-center items-start mb-3">
+      <div className=" gap-2 flex flex-col justify-center items-start text-foreground dark:bg-black">
         <section className="body-font h-96 p-20">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
             Welcome back, Customer
@@ -18,7 +18,7 @@ export default function CustomerDashboard() {
           </p>
         </section>
 
-        <section className=" body-font h-96 bg-red-200 w-full p-20">
+        <section className=" body-font h-96 bg-red-200 w-full p-20 dark:bg-red-800">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
             Your next steps
           </h2>

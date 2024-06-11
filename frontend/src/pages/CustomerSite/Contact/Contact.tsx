@@ -30,24 +30,24 @@ export const Contact = () => {
 
     return (
         <>
-            <div className="contact-us flex flex-col items-center justify-center bg-gradient-to-r h-full p-8  ">
-                <h1 className="text-5xl font-bold text-center text-black mb-8">Biddify - Contact Us</h1>
+            <div className="contact-us flex flex-col items-center justify-center bg-gradient-to-r p-8  text-foreground">
+                <h1 className="text-5xl font-bold text-center  mb-8">Biddify - Contact Us</h1>
                 <div className="block sm:flex justify-center md:flex-row md:space-x-16 w-full mb-16">
                     <div className="contact-info flex flex-col space-y-4 w-5/12 ">
                         <img src="https://github.com/SWP391TeamProject/SE1840_SWP391_G2/raw/develop/images/logo-cut.svg" alt="Biddify Logo" className=" mx-auto mb-4" />
                     </div>
-                    <div className="contact-form mx-auto  sm:mx-0  w-4/12">
-                        <h3 className="text-3xl font-semibold text-black mb-4">Have a Question?</h3>
+                    {/* <div className="contact-form mx-auto  sm:mx-0  w-4/12">
+                        <h3 className="text-3xl font-semibold  mb-4">Have a Question?</h3>
                         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
                             <div className="flex items-center space-x-2">
-                                <label htmlFor="contact-method" className='text-black font-medium'>Contact By:</label>
+                                <label htmlFor="contact-method" className=' font-medium'>Contact By:</label>
                                 <select id="contact-method" value={contactMethod} onChange={handleContactChange}>
                                     <option value="phone">Phone</option>
                                     <option value="email">Email</option>
                                 </select>
                             </div>
                             <label className="flex items-center space-x-2">
-                                <span className="text-black font-medium">{contactMethod === 'phone' ? 'Phone:' : 'Email:'}</span>
+                                <span className=" font-medium">{contactMethod === 'phone' ? 'Phone:' : 'Email:'}</span>
                                 <input
                                     type={contactMethod === 'phone' ? 'phone' : 'email'}
                                     name={contactMethod}
@@ -56,34 +56,34 @@ export const Contact = () => {
                                 />
                             </label>
                             <label className="flex items-center space-x-2">
-                                <span className="text-black font-medium">Inquiry:</span>
+                                <span className=" font-medium">Inquiry:</span>
                                 <textarea
                                     name="message"
                                     className="rounded-md border border-gray-700 px-3 py-2 h-24  focus:outline-none focus:border-indigo-500"
                                     required
                                 ></textarea>
                             </label>
-                            <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-black font-bold py-2 px-4 rounded-md shadow-sm w-72">
+                            <button type="submit" className="bg-indigo-500 hover:bg-indigo-700  font-bold py-2 px-4 rounded-md shadow-sm w-72">
                                 Submit Inquiry
                             </button>
                         </form>
-                    </div>
+                    </div> */}
                 </div>
                 <div className='block sm:flex justify-evenly w-full'>
-                    <address className="font-medium text-black sm:mr-8">
+                    <address className="font-medium  sm:mr-8">
                         <p>
-                            <span className="text-black font-bold">Address:</span> Lot E2a-7, Street D1 High-Tech Park, Long Thanh My Ward, City. Thu Duc, City. Ho Chi Minh
+                            <span className=" font-bold">Address:</span> Lot E2a-7, Street D1 High-Tech Park, Long Thanh My Ward, City. Thu Duc, City. Ho Chi Minh
                         </p>
                         <p>
-                            <span className="text-black font-bold">Hours:</span> Mon-Fri 10am-6pm EST
+                            <span className=" font-bold">Hours:</span> Mon-Fri 10am-6pm EST
                         </p>
                     </address>
-                    <ul className="list-none space-y-2 text-black sm:mr-8">
+                    <ul className="list-none space-y-2  sm:mr-8">
                         <li>
-                            <span className="text-black font-bold">Phone:</span> (+84) 123-456-789
+                            <span className=" font-bold">Phone:</span> (+84) 123-456-789
                         </li>
                         <li>
-                            <span className="text-black font-bold">Email:</span> info@BiddifyAuction.com
+                            <span className=" font-bold">Email:</span> info@BiddifyAuction.com
                         </li>
                     </ul>
                 </div>

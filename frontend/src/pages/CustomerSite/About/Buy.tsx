@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button'
 import React from 'react'
 
 export const Buy = () => {
@@ -6,7 +7,7 @@ export const Buy = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
       {/* Step 1: Register to Participate */}
-      <div className="rounded-lg shadow-md p-6 ">
+      <div className="rounded-lg shadow-md p-6 border dark:border-white ">
         <h3 className="text-xl font-medium mb-2">Step 1: Register to Participate</h3>
         <ul className="list-disc space-y-2 ml-7">
           <li>Make sure that you have enough balance to register</li>
@@ -14,13 +15,13 @@ export const Buy = () => {
             (The deposit may not be the same in different auctions)
             <br /> (the deposit will be refunded if you lose and will be deducted directly from the amount of the item to be paid for if you win)</li>
         </ul>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4">
+        <Button variant={'default'} className='m-4'>
           Register
-        </button>
+        </Button>
       </div>
 
       {/* Step 3: Participate in the Live Auction */}
-      <div className="rounded-lg shadow-md p-6 ">
+      <div className="rounded-lg shadow-md p-6  border dark:border-white ">
         <h3 className="text-xl font-medium mb-2">Step 2: Participate in the Live Auction</h3>
         <ul className="list-disc space-y-2 ml-7">
           <li>Join the live auction session for real-time bidding.</li>
@@ -36,7 +37,7 @@ export const Buy = () => {
       </div>
 
       {/* Step 4: Auction Outcome Notification */}
-      <div className="rounded-lg shadow-md p-6 ">
+      <div className="rounded-lg shadow-md p-6  border dark:border-white ">
         <h3 className="text-xl font-medium mb-2">Step 3: Auction Outcome Notification</h3>
         <ul className="list-disc space-y-2 ml-7">
           <li>Wait for notification about the auction's result.</li>
@@ -45,7 +46,7 @@ export const Buy = () => {
       </div>
 
       {/* Step 5: Payment Process */}
-      <div className="rounded-lg shadow-md p-6 ">
+      <div className="rounded-lg shadow-md p-6  border dark:border-white ">
         <h3 className="text-xl font-medium mb-2">Step 5: Payment Process</h3>
         <ul className="list-disc space-y-2 ml-7">
           <li>Complete your payment through the specified method.</li>
@@ -54,7 +55,7 @@ export const Buy = () => {
       </div>
 
       {/* Step 6: Receiving the Jewelry */}
-      <div className="rounded-lg shadow-md p-6 ">
+      <div className="rounded-lg shadow-md p-6  border dark:border-white ">
         <h3 className="text-xl font-medium mb-2">Step 6: Receiving the Jewelry</h3>
         <ul className="list-disc space-y-2 ml-7">
           <li>Coordinate the receipt of your jewelry piece.</li>

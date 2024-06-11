@@ -1,4 +1,5 @@
 import CountDownTime from "@/components/countdownTimer/CountDownTime";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAuctionSessions, setCurrentAuctionSession } from "@/redux/reducers/AuctionSession";
@@ -26,14 +27,14 @@ export default function AuctionList() {
 
   const handleViewDetailsClick = (id: any) => {
     let session = auctionSessionList.value.find(s => s.auctionSessionId == id);
-    if (session){
+    if (session) {
       dispatch(setCurrentAuctionSession(session));
     }
   }
 
   useEffect(() => {
     console.log(data?.data.content);
-    if(data){
+    if (data) {
       dispatch(setAuctionSessions(data?.data.content));
     }
   }, [data]);
@@ -61,7 +62,7 @@ export default function AuctionList() {
             {auctionSessionList.value.map((session) => (
               <Card key={session.auctionSessionId}>
                 <CardContent className="grid gap-4">
-                  <div className="grid gap-2">
+                  <div className="grid gap-2 mt-3">
                     <h3 className="font-semibold text-lg">{session.title}</h3>
                     <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{session.title}</p>
                   </div>
@@ -81,16 +82,17 @@ export default function AuctionList() {
                     <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                      {session.endDate ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> : <CountDownTime end={date}></CountDownTime>}
+                        {session.endDate ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> : <CountDownTime end={date}></CountDownTime>}
                       </div>
                     </div>
-                    <Link
-                      to={`${session.auctionSessionId}`}
-                      className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-gray-900/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
-                      onClick={() => {handleViewDetailsClick(session.auctionSessionId)}}
-                    >
-                      View Details
-                    </Link>
+                    <Button variant={"default"} asChild>
+                      <Link
+                        to={`${session.auctionSessionId}`}
+                        onClick={() => { handleViewDetailsClick(session.auctionSessionId) }}
+                      >
+                        View Details
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

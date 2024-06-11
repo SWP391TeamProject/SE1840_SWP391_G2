@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button'
 import React from 'react'
 
 export const Sell = () => {
@@ -7,20 +8,20 @@ export const Sell = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Step 1: Submit Your Jewelry */}
-                <div className="rounded-lg shadow-md p-6 ">
+                <div className="rounded-lg shadow-md p-6  border dark:border-white ">
                     <h3 className="text-xl font-medium mb-2">Step 1: Submit a Jewelry Auction Request</h3>
                     <ul className="list-disc space-y-2 ml-7">
                         <li>Visit our website and go to create Consignment page </li>
                         <li>The form will ask for your contact information, a detailed description of your jewelry and your desired selling price.</li>
                         <li>You can upload multiple pictures from different angles to help valuers accurately assess your jewelry's worth.</li>
                     </ul>
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4">
+                    <Button variant={'default'} className='m-4'>
                         Submit Jewelry
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Step 2: Prepare Your Listing */}
-                <div className="rounded-lg shadow-md p-6 ">
+                <div className="rounded-lg shadow-md p-6  border dark:border-white ">
                     <h3 className="text-xl font-medium mb-2">Step 2: Receive Initial Valuation and Send Your Jewelry</h3>
                     <ul className="list-disc space-y-2 ml-7">
                         <li>After receiving your request, a customer service representative will contact you to confirm details and gather additional information if needed.</li>
@@ -31,7 +32,7 @@ export const Sell = () => {
                 </div>
 
                 {/* Step 3: Finalize Your Auction */}
-                <div className="rounded-lg shadow-md p-6 ">
+                <div className="rounded-lg shadow-md p-6  border dark:border-white ">
                     <h3 className="text-xl font-medium mb-2">Step 3: Receive Confirmation of Jewelry Receipt</h3>
                     <ul className="list-disc space-y-2 ml-7">
                         <li>Once your jewelry has been received by the auction house, you will receive a confirmation notification.</li>
@@ -41,7 +42,7 @@ export const Sell = () => {
                 </div>
 
                 {/* Step 4: Participate in the Auction */}
-                <div className="rounded-lg shadow-md p-6 ">
+                <div className="rounded-lg shadow-md p-6  border dark:border-white ">
                     <h3 className="text-xl font-medium mb-2">Step 4: Receive Final Appraisal and Confirmation of Acceptance</h3>
                     <ul className="list-disc space-y-2 ml-7">
                         <li>Upon the manager's approval, the final appraisal report will be sent to you for your review and acceptance.</li>
@@ -50,7 +51,7 @@ export const Sell = () => {
                 </div>
 
                 {/* Step 5: Auction End */}
-                <div className="rounded-lg shadow-md p-6 ">
+                <div className="rounded-lg shadow-md p-6  border dark:border-white ">
                     <h3 className="text-xl font-medium mb-2">Step 5: Manager Selects Auction for Your Jewelry</h3>
                     <ul className="list-disc space-y-2 ml-7">
                         <li>The auction house manager will consider factors such as the value, rarity, and appeal of your jewelry to determine the most suitable auction for its sale.</li>

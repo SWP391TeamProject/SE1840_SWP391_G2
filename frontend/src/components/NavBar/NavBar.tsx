@@ -18,8 +18,6 @@ import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
-import { useEffect } from "react";
-import { fetchAccountById } from "@/services/AccountsServices";
 
 export default function NavBar() {
   const auth = useAuth();
@@ -31,7 +29,7 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
- 
+
 
   return (
     <>
@@ -161,50 +159,48 @@ export default function NavBar() {
 
 
 
-
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button className="lg:hidden ml-auto" size="icon" variant="outline">
-              <MenuIcon className="h-6 w-6" />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="bg-white" side="right">
-            <div className="grid gap-2 py-6">
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Put your item for auction
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Auctions
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                About
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Blog
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Contact
-              </Link>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </header>
-    </>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button className="lg:hidden ml-auto" size="icon" variant="outline">
+            <MenuIcon className="h-6 w-6" />
+            <span className="sr-only">Toggle navigation menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent className="bg-white" side="right">
+          <div className="grid gap-2 py-6">
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Put your item for auction
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Auctions
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              About
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Blog
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Contact
+            </Link>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </header>
   );
 }
