@@ -48,7 +48,7 @@ export default function FeaturedAuctions() {
               <CarouselContent>
                 {featuredAuctions &&
                   featuredAuctions.map((item) => (
-                    <CarouselItem className="basis-1/3 ">
+                    <CarouselItem className="basis-1/3 " key={item.auctionSessionId}>
                       <Card className="w-[300px] h-full">
                         <CardHeader>
                           <img

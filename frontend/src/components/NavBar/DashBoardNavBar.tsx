@@ -14,7 +14,7 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuL
 import { useAuth } from "@/AuthProvider.tsx";
 import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
-import { GavelIcon, MenuIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 
 export default function DashBoardNavBar() {
   const auth = useAuth();

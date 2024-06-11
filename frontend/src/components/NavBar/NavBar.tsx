@@ -7,29 +7,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, redirect, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
 import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
-import { getCookie, removeCookie } from "@/utils/cookies";
+import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
-import { useEffect } from "react";
-import { fetchAccountById } from "@/services/AccountsServices";
-import { useDispatch } from "react-redux";
-import { setUnreadNotificationCount } from "@/redux/reducers/UnreadNotificationCountReducer";
-import { countUnreadNotifications } from "@/services/NotificationService";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
-  const loc = useLocation();
-  const dispatch = useDispatch();
   const handleSignout = function () {
     logout().then(function () {
       removeCookie("user");
@@ -37,33 +29,6 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
-  useEffect(() => {
-
-    async function fetchUnreadNotification() {
-      countUnreadNotifications().then((res) => {
-        console.log('noti service')
-        console.log("noti service" + res?.data);
-        dispatch(setUnreadNotificationCount(res?.data));
-      }).catch((err) => {
-        console.error(err);
-      })
-    }
-    if (!loc?.state) {
-      let cookie = getCookie('user');
-      if (cookie) {
-        const data = JSON.parse(cookie)?.id;
-        if (data) {
-          fetchAccountById(data).then(res => {
-            console.log('hehehe')
-            auth.setUser(res?.data)
-          }).then(() => {
-            fetchUnreadNotification()
-          })
-        }
-      }
-    }
-  }, [])
-
 
   return (
     <>
@@ -74,10 +39,10 @@ export default function NavBar() {
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
 
-          <NavigationMenu>
+          <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
             <NavigationMenuList>
               <NavigationMenuItem>
-                {auth && !auth.isAuthenticated() ? (
+                {!auth.isAuthenticated() ? (
                   <Button
                     className="flex items-center gap-2  "
                     variant="default"
@@ -113,25 +78,19 @@ export default function NavBar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/about" >
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    About
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/about">About</Link>
                   </NavigationMenuLink>
-                </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/blog" >
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Blog
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                  <Link to="/blog">Blog</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/contact" >
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Contact
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                  <Link to="/contact">Contact</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               {auth?.isAuthenticated() &&
                 <NavigationMenuItem>
@@ -142,18 +101,14 @@ export default function NavBar() {
                         size="icon"
                         className="rounded-full relative"
                       >
-                        <Avatar>
-                          <AvatarImage src={auth?.user?.avatar ? auth?.user?.avatar?.link : './placeholder.svg'} alt="Avatar" />
-                          <AvatarFallback>{auth?.user.nickname[0]}</AvatarFallback>
-                        </Avatar>
                         <img
-                          src={auth?.user.avatar ? auth?.user.avatar : './placeholder.svg'}
-                          width={36}
-                          height={36}
-                          alt="Avatar"
-                          className="overflow-hidden rounded-full"
+                            src={auth.user.avatar ?? './placeholder.svg'}
+                            width={36}
+                            height={36}
+                            alt="Avatar"
+                            className="overflow-hidden rounded-full"
                         />
-                        {unreadNoti?.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+                        {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-fit p-4">

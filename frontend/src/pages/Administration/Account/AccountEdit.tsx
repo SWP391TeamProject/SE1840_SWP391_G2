@@ -57,7 +57,7 @@ export default function AccountEdit() {
             email: account?.email,
             phone: account?.phone ?? "",
             balance: account?.balance ?? 0,
-            role: account ? account.role[0].roleName as RoleName : RoleName.MEMBER,
+            role: account ? account.role : RoleName.MEMBER,
         },
     });
 
