@@ -15,6 +15,7 @@ import { useAuth } from "@/AuthProvider.tsx";
 import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
 import { removeCookie } from "@/utils/cookies";
+import ModeToggle from "../component/ModeToggle";
 
 export default function NavBar() {
   const auth = useAuth();
@@ -37,7 +38,7 @@ export default function NavBar() {
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
 
-          {auth.isAuthenticated() ? '' : (
+          {auth && auth?.isAuthenticated() ? '' : (
             <Button
               className="flex items-center gap-2  "
               variant="default"
@@ -46,7 +47,7 @@ export default function NavBar() {
               <Link to="/auth/login">Login</Link>
             </Button>
           )}
-
+          <ModeToggle/>
           <Link
             className="text-sm font-medium hover:underline underline-offset-4 flex items-center gap-2 scroll-smooth"
             to="/Auctions"

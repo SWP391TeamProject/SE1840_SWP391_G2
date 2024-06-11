@@ -33,7 +33,7 @@ export default function FeaturedAuctions() {
 
   return (
     <>
-      <section className="w-full py-12 md:py-24 lg:py-32 ">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-background text-foreground ">
         <div className="w-full flex justify-center">
           <div className="w-screen mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-1 ">
             <div className="space-y-4 text-center">

@@ -6,8 +6,8 @@ export default function AuctionProcessSection() {
   return (
     <>
       {" "}
-      <section className="">
-        <div className="container space-y-12 px-4 md:px-6 py-12 md:py-24 lg:py-32">
+      <section className="bg-background dark:bg-slate-900 text-foreground bg-inherit">
+        <div className="container space-y-12 px-4 md:px-6 py-12 md:py-24 lg:py-32 ">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <div className="inline-block rounded-lg  px-3 py-1 text-sm dark:bg-gray-800">

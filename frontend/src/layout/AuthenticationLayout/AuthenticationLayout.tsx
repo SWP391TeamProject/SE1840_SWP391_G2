@@ -6,7 +6,7 @@ export default function AuthenticationLayout() {
     return (
         <>
 
-            <div className="flex flex-col w-screen min-h-full justify-start align-middle  items-center ">
+            <div className="flex flex-col w-screen min-h-screen justify-start align-middle  items-center bg-background text-foreground ">
                 <NavBar />
 
                 <Suspense fallback={<div>Loading...</div>}>

@@ -16,8 +16,8 @@ export default function CustomerLayout() {
   //   // fetchConsignmentsService();
   // }, [nav]);  
   return (
-    <div>
-      <div className="sticky top-0 z-10 w-full">
+    <div className="bg-background text-foreground ">
+      <div className="sticky top-0 z-10 w-full ">
         <NavBar />
       </div>
       

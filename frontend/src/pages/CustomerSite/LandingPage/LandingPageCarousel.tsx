@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 export default function LandingPageCarousel() {
   return (
     <>
-      <Carousel className="w-full flex justify-center content-center "
+      <Carousel className="w-full flex justify-center content-center  bg-background text-foreground  "
         plugins={[
           Autoplay({
             delay: 3000,

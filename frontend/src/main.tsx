@@ -71,7 +71,7 @@ const router = createBrowserRouter(routes);
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme" >
+  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" >
     <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
       <QueryClientProvider client={queryClient}>
         <ToastContainer />
