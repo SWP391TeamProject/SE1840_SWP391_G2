@@ -59,10 +59,11 @@ export default function DashBoardNavBar() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="rounded-full relative"
+                  className="rounded-full relative select-none"
+                  style={{boxShadow:"none"}}
                 >
                   <img
-                    src={auth.user.avatar ?? './placeholder.svg'}
+                      src={auth.user.avatar ?? `https://ui-avatars.com/api/?name=${auth.user.nickname}`}
                     width={36}
                     height={36}
                     alt="Avatar"
