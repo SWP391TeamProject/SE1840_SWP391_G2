@@ -9,7 +9,7 @@ export interface Account {
   avatar?: string;
   accessToken?: string;
   balance?: number;
-  role: Role[];
+  role: Role;
   createDate?: Date;
   updateDate?: Date;
   status: AccountStatus

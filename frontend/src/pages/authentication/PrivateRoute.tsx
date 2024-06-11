@@ -1,4 +1,4 @@
-import AuthContext from "@/AuthProvider";
+import AuthContext, { useAuth } from "@/AuthProvider";
 import { Roles } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
@@ -15,21 +15,6 @@ const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
   const userCookie = getCookie("user");
   const nav = useNavigate();
   let parsedUser = null;
-  axios.interceptors.response.use(
-    function (response) {
-      // If the response was successful, just return it
-      return response;
-    },
-    function (error) {
-      // If the response had a status of 401, redirect to /auth/login and remove the cookie
-      if (error.response && error.response.status === 401) {
-        // removeCookie('user');
-        redirect('/auth/login');
-      }
-      return Promise.reject(error);
-    }
-  );
-
   if (userCookie) {
     try {
       parsedUser = JSON.parse(userCookie);

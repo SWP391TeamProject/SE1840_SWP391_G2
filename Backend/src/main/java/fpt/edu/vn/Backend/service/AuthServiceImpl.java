@@ -185,8 +185,8 @@ public class AuthServiceImpl implements AuthService{
                             .account(account)
                             .tokenType("Bearer")
                             .build();
-            tokenProvider.cleanupExpiredTokens();
-            invalidatedTokenRepos.save(invalidatedToken);
+//            tokenProvider.cleanupExpiredTokens();
+//            invalidatedTokenRepos.save(invalidatedToken);
         } catch (AppException exception){
             logger.info("Token already expired");
         }

@@ -7,8 +7,10 @@ import { fetchConsignmentsService } from "@/services/ConsignmentService";
 import { getCookie } from "@/utils/cookies";
 import React, { useEffect } from "react";
 import { Outlet, redirect, useNavigate } from "react-router-dom";
+import { useAuth } from "@/AuthProvider";
 
 export default function CustomerLayout() {
+  const auth = useAuth();
   // const nav = useNavigate();
   // useEffect(() => {
   //   document.title = "Consignment | Biddify";
@@ -16,11 +18,11 @@ export default function CustomerLayout() {
   //   // fetchConsignmentsService();
   // }, [nav]);  
   return (
+
     <div className="bg-background text-foreground ">
       <div className="sticky top-0 z-10 w-full ">
         <NavBar />
       </div>
-      
       <Outlet></Outlet>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, redirect } from "react-router-dom";
+import { Link, redirect, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
@@ -18,11 +18,12 @@ import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
+import { useEffect } from "react";
+import { fetchAccountById } from "@/services/AccountsServices";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
-
   const handleSignout = function () {
     logout().then(function () {
       removeCookie("user");
@@ -30,6 +31,7 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
+ 
 
   return (
     <>
@@ -39,64 +41,11 @@ export default function NavBar() {
           <span className="font-semibold text-lg">Biddify</span>
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
-          {
-            auth.isAuthenticated() &&
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full relative"
-                >
-                  <img
-                    src={auth?.user.avatar ?? './placeholder.svg'}
-                    width={36}
-                    height={36}
-                    alt="Avatar"
-                    className="overflow-hidden rounded-full"
-                  />
-                  {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-fit p-4">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to={'/profile'}>Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to={'/profile/notification'} className="flex gap-2">
-                    <div>Notification</div>
-                    <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
-                      <div>{unreadNoti.count}</div>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to={'/dashboard'}>Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem style={{ pointerEvents: "none" }}>
-                  <div className="flex justify-between items-center gap-2">
-                    <div className="basis-1/2">
-                      Balance:
-                    </div>
-                    <div className="basis-1/2 font-medium text-left block">
-                      <p >
-                        {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
-                      </p>
-                    </div>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          }
+
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                {auth && auth?.isAuthenticated() ? '' : (
+                {auth && !auth.isAuthenticated() ? (
                   <Button
                     className="flex items-center gap-2  "
                     variant="default"
@@ -104,7 +53,7 @@ export default function NavBar() {
                   >
                     <Link to="/auth/login">Login</Link>
                   </Button>
-                )}
+                ) : ''}
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
@@ -149,60 +98,60 @@ export default function NavBar() {
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="rounded-full relative"
-                    >
-                      <img
-                        src={auth?.user.avatar ?? './placeholder.svg'}
-                        width={36}
-                        height={36}
-                        alt="Avatar"
-                        className="overflow-hidden rounded-full"
-                      />
-                      {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-fit p-4">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/profile'}>Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/profile/notification'} className="flex gap-2">
-                        <div>Notification</div>
-                        <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
-                          <div>{unreadNoti.count}</div>
+              {auth?.isAuthenticated() &&
+                <NavigationMenuItem>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-full relative"
+                      >
+                        <img
+                          src={auth?.user.avatar ? auth?.user.avatar : './placeholder.svg'}
+                          width={36}
+                          height={36}
+                          alt="Avatar"
+                          className="overflow-hidden rounded-full"
+                        />
+                        {unreadNoti?.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-fit p-4">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/profile'}>Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/profile/notification'} className="flex gap-2">
+                          <div>Notification</div>
+                          <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
+                            <div>{unreadNoti.count}</div>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/dashboard'}>Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem style={{ pointerEvents: "none" }}>
+                        <div className="flex justify-between items-center gap-2">
+                          <div className="basis-1/2">
+                            Balance:
+                          </div>
+                          <div className="basis-1/2 font-medium text-left block">
+                            <p >
+                              {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                            </p>
+                          </div>
                         </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/dashboard'}>Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem style={{ pointerEvents: "none" }}>
-                      <div className="flex justify-between items-center gap-2">
-                        <div className="basis-1/2">
-                          Balance:
-                        </div>
-                        <div className="basis-1/2 font-medium text-left block">
-                          <p >
-                            {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
-                          </p>
-                        </div>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </NavigationMenuItem>
-
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </NavigationMenuItem>}
             </NavigationMenuList>
           </NavigationMenu>
         </nav>

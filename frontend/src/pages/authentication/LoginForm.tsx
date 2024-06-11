@@ -36,7 +36,6 @@ function LoginForm() {
     axios.post("http://localhost:8080/auth/login", data, {
       headers: {
         "Content-Type": "application/json",
-        // Authorization: "Bearer " + localStorage.getItem("token"),
       }
     })
       .then((res) => {
@@ -54,6 +53,7 @@ function LoginForm() {
           navigate("/admin/accounts");
         } else {
           navigate(from, { replace: true });
+          
         }
         toast.success('logged in succesfully')
       })
