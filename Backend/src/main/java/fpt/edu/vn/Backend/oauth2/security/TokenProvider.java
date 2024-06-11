@@ -13,9 +13,9 @@ import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
 import fpt.edu.vn.Backend.oauth2.exception.ErrorCode;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.InvalidatedToken;
+import fpt.edu.vn.Backend.pojo.Token;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.InvalidatedTokenRepos;
+import fpt.edu.vn.Backend.repository.TokenRepos;
 import fpt.edu.vn.Backend.security.SecurityConstants;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -59,7 +59,7 @@ public class TokenProvider {
     protected long REFRESHABLE_DURATION;
 
     @Autowired
-    private InvalidatedTokenRepos invalidatedTokenRepos;
+    private TokenRepos tokenRepos;
 
     @Autowired
     private AccountRepos accountRepos;
@@ -119,7 +119,7 @@ public class TokenProvider {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if (invalidatedTokenRepos.existsByToken(signedJWT.getJWTClaimsSet().getJWTID()))
+        if (tokenRepos.existsByToken(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         return signedJWT;
     }
@@ -140,28 +140,24 @@ public class TokenProvider {
     @Transactional
     public void cleanupExpiredTokens() {
         Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-        invalidatedTokenRepos.deleteByExpiryTimeBefore(now);
+        tokenRepos.deleteByExpiryTimeBefore(now);
         System.out.println("Expired tokens cleaned up at " + new Date());
     }
     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         var signedJWT = verifyToken(request.getToken(), true);
         var email = signedJWT.getJWTClaimsSet().getSubject();
 
-        Optional<Account> accountOptional = accountRepos.findByEmail(email);
-        Account account = accountOptional.get();
-
         var jit = signedJWT.getJWTClaimsSet().getJWTID();
         var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        InvalidatedToken invalidatedToken =
-                InvalidatedToken.builder()
+        Token tokens =
+                Token.builder()
                         .token(jit)
                         .expiryTime(expiryTime)
                         .tokenType("Bearer")
-                        .account(account)
                         .build();
 
-        invalidatedTokenRepos.save(invalidatedToken);
+        tokenRepos.save(tokens);
 
 
 
