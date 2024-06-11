@@ -28,7 +28,8 @@ public interface AuthService {
     void requestActivateAccount(@NotNull String email) throws MessagingException, IllegalAccessException;
     boolean confirmActivateAccount(@NotNull String activateCode);
 
-    boolean changePassword(String email, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException;
+    boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException;
 
     boolean uploadAvatar(String email, MultipartFile file) throws IllegalAccessException;
+
 }

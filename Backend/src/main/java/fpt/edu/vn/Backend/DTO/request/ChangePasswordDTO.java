@@ -1,12 +1,12 @@
 package fpt.edu.vn.Backend.DTO.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class ChangePasswordDTO {
     String oldPassword;
     String newPassword;
