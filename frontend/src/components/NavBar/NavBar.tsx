@@ -18,6 +18,7 @@ import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function NavBar() {
   const auth = useAuth();
@@ -53,7 +54,7 @@ export default function NavBar() {
                 ) : ''}
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <ModeToggle/>
+                <ModeToggle />
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
@@ -78,9 +79,9 @@ export default function NavBar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                    <Link to="/about">About</Link>
-                  </NavigationMenuLink>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                  <Link to="/about">About</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
@@ -96,109 +97,100 @@ export default function NavBar() {
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full relative select-none"
-                        style={{boxShadow:"none"}}
-                      >
-                        <img
-                            src={auth.user.avatar ?? `https://ui-avatars.com/api/?name=${auth.user.nickname}`}
-                            width={36}
-                            height={36}
-                            alt="Avatar"
-                            className="overflow-hidden rounded-full"
-                        />
-                        {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
-                      </Button>
+                    <Avatar className="hover:cursor-pointer">
+                      <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
+                      <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
+                       </Avatar>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-fit p-4">
-                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to={'/profile'}>Profile</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to={'/profile/notification'} className="flex gap-2">
-                          <div>Notification</div>
-                          <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
-                            <div>{unreadNoti.count}</div>
-                          </div>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to={'/dashboard'}>Dashboard</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem style={{ pointerEvents: "none" }}>
-                        <div className="flex justify-between items-center gap-2">
-                          <div className="basis-1/2">
-                            Balance:
-                          </div>
-                          <div className="basis-1/2 font-medium text-left block">
-                            <p >
-                              {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
-                            </p>
-                          </div>
+                    {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+                
+                  <DropdownMenuContent align="end" className="w-fit p-4">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to={'/profile'}>Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to={'/profile/notification'} className="flex gap-2">
+                        <div>Notification</div>
+                        <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
+                          <div>{unreadNoti.count}</div>
                         </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to={'/dashboard'}>Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem style={{ pointerEvents: "none" }}>
+                      <div className="flex justify-between items-center gap-2">
+                        <div className="basis-1/2">
+                          Balance:
+                        </div>
+                        <div className="basis-1/2 font-medium text-left block">
+                          <p >
+                            {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                          </p>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 </NavigationMenuItem>}
-            </NavigationMenuList>
-          </NavigationMenu>
-        </nav>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </nav>
 
 
 
 
 
 
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button className="lg:hidden ml-auto" size="icon" variant="outline">
-              <MenuIcon className="h-6 w-6" />
-              <span className="sr-only">Toggle navigation menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="bg-white" side="right">
-            <div className="grid gap-2 py-6">
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Put your item for auction
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Auctions
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                About
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Blog
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Contact
-              </Link>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </header>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button className="lg:hidden ml-auto" size="icon" variant="outline">
+            <MenuIcon className="h-6 w-6" />
+            <span className="sr-only">Toggle navigation menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent className="bg-white" side="right">
+          <div className="grid gap-2 py-6">
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Put your item for auction
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Auctions
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              About
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Blog
+            </Link>
+            <Link
+              className="flex w-full items-center py-2 text-lg font-semibold"
+              to="#"
+            >
+              Contact
+            </Link>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </header >
     </>
   );
 }

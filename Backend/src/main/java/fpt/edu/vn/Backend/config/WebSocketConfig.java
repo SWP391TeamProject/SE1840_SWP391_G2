@@ -28,8 +28,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/auction-join").addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, accountService)).setAllowedOrigins("http://localhost:5173");
         registry.addEndpoint("/auction-join")
                 .addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, accountService))
+
                 .setAllowedOrigins("http://localhost:5173");
     }
+
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
