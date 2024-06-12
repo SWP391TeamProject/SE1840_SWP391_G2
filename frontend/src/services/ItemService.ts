@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Item, ItemStatus } from "@/models/Item.ts";
 import { Page } from "@/models/Page.ts";
-import { getCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import { API_SERVER } from "@/constants/domain";
 
 // Service methods
@@ -44,7 +44,14 @@ export const getItemsByStatus = async (status: ItemStatus, page: number, size: n
     return await axios.get<Page<Item>>(`${baseUrl}/status/${status}`, {
         ...authHeader(),
         params: { page, size },
-    });
+    })
+        .catch((err) => {
+            console.log(err);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
+        });;
 };
 
 export const getItemsByOwnerId = async (ownerId: number, page: number, size: number) => {
