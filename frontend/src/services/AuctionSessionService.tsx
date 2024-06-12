@@ -5,14 +5,20 @@ import { toast } from "react-toastify";
 const controller = "auction-sessions";
 
 export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
+    let params = {
+        page: page,
+        size: size,
+    }
+
+    console.log(params);
 
     return await axios
         .get("http://localhost:8080/api/auction-sessions/", {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-
-            }
+            },
+            params: params
         })
         .catch((err) => {
             toast.error(err.response.data.message);
@@ -23,13 +29,38 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         });
 };
 
-export const fetchFeaturedAuctionSessions = async () => {
+export const fetchFeaturedAuctionSessions = async (page?: number, size?: number) => {
+    let params = {
+        page: page,
+        size: size,
+    }
+
     return await axios
         .get("http://localhost:8080/api/auction-sessions/featured", {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-            }
+            },
+            params: params
+        })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+        });
+}
+
+export const fetchPastAuctionSessions = async (page?: number, size?: number) => {
+    let params = {
+        pageNumb: page,
+        pageSize: size,
+    }
+
+    return await axios
+        .get("http://localhost:8080/api/auction-sessions/completed", {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+            params: params
         })
         .catch((err) => {
             toast.error(err.response.data.message);

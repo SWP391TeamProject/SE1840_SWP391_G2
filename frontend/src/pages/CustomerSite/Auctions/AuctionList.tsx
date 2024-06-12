@@ -2,7 +2,7 @@ import CountDownTime from "@/components/countdownTimer/CountDownTime";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAuctionSessions, setCurrentAuctionSession } from "@/redux/reducers/AuctionSession";
+import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
 import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ export default function AuctionList() {
 
   const { isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
-    queryFn: fetchAllAuctionSessions,
+    queryFn: () => fetchAllAuctionSessions(auctionSessionList.currentPageNumber, 10),
   });
 
   const [timeLeft, setTimeLeft] = useState({
@@ -33,10 +33,15 @@ export default function AuctionList() {
   }
 
   useEffect(() => {
+    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}))
+  }, [])
+
+  useEffect(() => {
 
     if (data) {
       console.log('data', data);
       dispatch(setAuctionSessions(data?.data.content));
+      dispatch(setCurrentPageNumber({pageNumber: data?.data.number, totalPages: data?.data.totalPages}));
     }
   }, [data]);
 
@@ -54,7 +59,7 @@ export default function AuctionList() {
       <div className="container px-4 md:px-6">
         <div className="grid gap-8">
           <div className="grid gap-2">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">Upcoming Auction Sessions</h1>
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">All Auction Sessions</h1>
             <p className="text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
               Explore our upcoming auction sessions and find your next treasure.
             </p>

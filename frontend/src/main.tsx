@@ -67,6 +67,8 @@ import ThemeProvider from "./components/component/ThemeProvider.tsx";
 import AssignAuctionItem from "./pages/Administration/Auction-session/AssignAuctionItem.tsx";
 import ToBeImplemented from "./pages/ToBeImplemented.tsx";
 import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction-Session-Detail/AuctionSessionDetail.tsx";
+import FeaturedAuctionsList from "./pages/CustomerSite/Auctions/FeaturedAuctionsList.tsx";
+import PastAuctionSessionsList from "./pages/CustomerSite/Auctions/PastAuctionSessionsList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -95,6 +97,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="payment-status" element={<PaymentStatus />}></Route>
                     <Route path="blog" element={<ToBeImplemented />}></Route>
                     <Route path="Auctions" element={<AuctionList />}></Route>
+                    <Route path="Auctions/featured" element={<FeaturedAuctionsList />}></Route>PastAuctionSessionsList
+                    <Route path="Auctions/past" element={<PastAuctionSessionsList />}></Route>
                     <Route path="Auctions/details" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
