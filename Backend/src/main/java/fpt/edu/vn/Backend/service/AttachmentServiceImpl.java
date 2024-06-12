@@ -154,8 +154,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         Attachment attachment = new Attachment();
         attachment.setBlobId(blobId);
         attachment.setLink(blobClient.getBlobUrl());
-        attachment.setAccount(account);
+        account.setAvatarUrl(attachment);
         attachmentRepository.save(attachment);
+
         return mapEntityToDTO(attachment);
     }
 

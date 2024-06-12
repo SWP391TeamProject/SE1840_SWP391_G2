@@ -32,10 +32,6 @@ public class Attachment {
         JPG, PNG, MP4
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    private Account account;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;
