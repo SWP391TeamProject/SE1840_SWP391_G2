@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.serviceTest;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
@@ -191,5 +192,135 @@ public class ConsignmentServiceImplTest {
         consignmentService.updateConsignment(1, updatedConsignment);
 
         verify(consignmentRepos, times(1)).save(any(Consignment.class));
+    }
+
+    @Test
+    public void takeConsignment_HappyPath() {
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setRole(Account.Role.STAFF);
+        Consignment consignment = new Consignment();
+        consignment.setConsignmentId(1);
+        consignment.setStatus(Consignment.Status.WAITING_STAFF);
+
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
+        when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
+
+        ConsignmentDTO result = consignmentService.takeConsignment(1, 1);
+
+        assertNotNull(result);
+        assertEquals(Consignment.Status.IN_INITIAL_EVALUATION.toString(), result.getStatus());
+        assertEquals(account.getAccountId(), result.getStaff().getAccountId());
+    }
+
+    @Test
+    public void takeConsignment_NotStaffRole() {
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setRole(Account.Role.MANAGER);
+        Consignment consignment = new Consignment();
+        consignment.setConsignmentId(1);
+        consignment.setStatus(Consignment.Status.WAITING_STAFF);
+
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.takeConsignment(1, 1));
+    }
+
+    @Test
+    public void receivedConsignment_HappyPath() {
+        Consignment consignment = new Consignment();
+        consignment.setConsignmentId(1);
+        consignment.setStatus(Consignment.Status.SENDING);
+
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
+
+        ConsignmentDTO result = consignmentService.receivedConsignment(1);
+
+        assertNotNull(result);
+        assertEquals(Consignment.Status.IN_FINAL_EVALUATION.toString(), result.getStatus());
+    }
+
+    @Test
+    public void receivedConsignment_NotSendingStatus() {
+        Consignment consignment = new Consignment();
+        consignment.setConsignmentId(1);
+        consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.receivedConsignment(1));
+    }
+
+    @Test
+    public void requestConsignmentCreate_UserNotFound() {
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        ConsignmentDetailDTO consignmentDetails = new ConsignmentDetailDTO();
+        consignmentDetails.setDescription("description");
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.requestConsignmentCreate(1, "email", consignmentDetails));
+    }
+
+    @Test
+    public void submitInitialEvaluation_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.submitInitialEvaluation(2, "evaluation", BigDecimal.valueOf(1000), 1));
+    }
+
+    @Test
+    public void submitFinalEvaluationUpdate_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.submitFinalEvaluationUpdate(1, "evaluation", BigDecimal.valueOf(1000), 1));
+    }
+
+    @Test
+    public void confirmJewelryReceived_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.confirmJewelryReceived(1));
+    }
+
+    @Test
+    public void approveFinalEvaluation_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.approveFinalEvaluation(1, 1, "description"));
+    }
+
+    @Test
+    public void rejectFinalEvaluation_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.rejectFinalEvaluation(1, 1, "rejectionReason"));
+    }
+
+    @Test
+    public void updateConsignment_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        ConsignmentDTO updatedConsignment = new ConsignmentDTO();
+        updatedConsignment.setPreferContact("email");
+        updatedConsignment.setStatus("WAITING_STAFF");
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.updateConsignment(1, updatedConsignment));
+    }
+
+    @Test
+    public void takeConsignment_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.takeConsignment(1, 1));
+    }
+
+    @Test
+    public void receivedConsignment_ConsignmentNotFound() {
+        when(consignmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.receivedConsignment(1));
     }
 }

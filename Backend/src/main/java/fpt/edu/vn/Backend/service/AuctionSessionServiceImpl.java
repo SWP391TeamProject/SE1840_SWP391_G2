@@ -241,38 +241,35 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        try {
             Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
             if (pastAuctionSessions.isEmpty()) {
                 logger.warn("No past auction sessions found");
                 throw new ResourceNotFoundException("No past auction sessions found");
             }
             return pastAuctionSessions.map(AuctionSessionDTO::new);
-        } catch (Exception e) {
-            logger.error("Error retrieving past auction sessions", e);
-            throw new RuntimeException("Error retrieving past auction sessions", e);
-        }
+
 
     }
 
     @Override
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
-        return auctionSessionRepos.findByTitleContaining(title, pageable)
+        Page<AuctionSessionDTO> a= auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
+        if (a.isEmpty()) {
+            logger.warn("No auction sessions with title:"+title+" found");
+            throw new ResourceNotFoundException("No auction sessions with title:"+title+" found");
+        }
+        return a;
     }
 
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
-        try {
             Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
             if (upcomingAuctionSessions.isEmpty()) {
                 logger.warn("No upcoming auction sessions found");
                 throw new ResourceNotFoundException("No upcoming auction sessions found");
             }
             return upcomingAuctionSessions.map(AuctionSessionDTO::new);
-        } catch (Exception e) {
-            logger.error("Error retrieving upcoming auction sessions", e);
-            throw new RuntimeException("Error retrieving upcoming auction sessions", e);
-        }
+
     }
 }
