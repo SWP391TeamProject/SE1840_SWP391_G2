@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class AuctionSessionServiceImpl implements AuctionSessionService {
@@ -141,6 +144,33 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         updateAuctionSession(auctionSessionDTO);
     }
 
+    @Override
+    public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
+        List<AuctionSession> auctionSessionList = auctionSessionRepos.findAll();
+
+        BigDecimal evaluationThreshold = new BigDecimal(2);
+
+        List<AuctionSessionDTO> featuredAuctionSessions = auctionSessionList.stream().filter(
+                auctionSession -> {
+                    BigDecimal totalEvaluation = auctionSession.getAuctionItems().stream()
+                            .map(auctionItem -> auctionItem.getItem().getReservePrice())
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    return auctionSession.getStartDate().isAfter(LocalDateTime.now())
+//                            && auctionSession.getStartDate().isBefore(LocalDateTime.now().plusDays(7))
+                            && !auctionSession.getAuctionItems().isEmpty()
+                            && !auctionSession.getDeposits().isEmpty()
+                            && totalEvaluation.compareTo(evaluationThreshold) >= 0;
+                }
+        ).map(AuctionSessionDTO::new).
+                collect(Collectors.toList());
+
+        logger.info("Featured auction sessions: " + featuredAuctionSessions.size());
+        // Provide a default value for pageable if it's null
+        if (pageable == null) {
+            pageable = PageRequest.of(0, 5);
+        }
+        return new PageImpl<>(featuredAuctionSessions, pageable, featuredAuctionSessions.size());
+    }
 
     @Override
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {

@@ -25,4 +25,6 @@ public interface AuctionSessionService {
 
     void finishAuction(int auctionSessionId);
 
+    Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable);
+
 }

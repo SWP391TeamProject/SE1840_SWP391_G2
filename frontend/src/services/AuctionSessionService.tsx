@@ -5,17 +5,13 @@ import { toast } from "react-toastify";
 const controller = "auction-sessions";
 
 export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
-    let params = {
-        page: 0,
-        size: 10,
-    }
+
     return await axios
         .get("http://localhost:8080/api/auction-sessions/", {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-                Authorization:
-                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+   
             }
         })
         .catch((err) => {
@@ -26,6 +22,19 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
             }
         });
 };
+
+export const fetchFeaturedAuctionSessions = async () => {
+    return await axios
+        .get("http://localhost:8080/api/auction-sessions/featured", {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            }
+        })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+        });
+}
 
 
 export const fetchAuctionSessionById = async (id: number) => {

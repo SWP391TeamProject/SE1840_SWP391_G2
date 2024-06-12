@@ -79,6 +79,11 @@ public class AuctionSessionController {
         return new ResponseEntity<>(auctionSessionService.getPastAuctionSessions(pageable), HttpStatus.OK);
     }
 
+    @GetMapping("/featured")
+    public ResponseEntity<Page<AuctionSessionDTO>> getFeaturedAuctionSession(@RequestParam(required = false) @PageableDefault(size = 50) Pageable pageable) {
+        return new ResponseEntity(auctionSessionService.getFeaturedAuctionSessions(pageable), HttpStatus.OK);
+    }
+
     @GetMapping("/current")
     public ResponseEntity<AuctionSessionDTO> getCurrentAuctionSession() {
         return null;

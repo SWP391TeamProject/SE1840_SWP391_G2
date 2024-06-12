@@ -59,7 +59,6 @@ export default function NavBar() {
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent  >
-                  <ul>
                     <li className={navigationMenuTriggerStyle()}>
                       <Link to="/auctions">Auctions</Link>
                     </li>
@@ -72,10 +71,8 @@ export default function NavBar() {
                       <Link to="/auctions">Past Auctions</Link>
                     </li>
                     <Separator />
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Upcoming</Link>
-                    </li>
-                  </ul>
+                 
+                      <Link className={navigationMenuTriggerStyle()} to="/auctions">Upcoming</Link>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -108,7 +105,7 @@ export default function NavBar() {
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/profile'}>Profile</Link>
+                      <Link to={'/profile/overview'}>Profile</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild className="cursor-pointer">
                       <Link to={'/profile/notification'} className="flex gap-2">

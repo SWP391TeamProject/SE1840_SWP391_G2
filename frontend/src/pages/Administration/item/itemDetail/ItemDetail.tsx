@@ -67,7 +67,7 @@ export default function ItemDetail() {
             itemCategoryId: item.category?.itemCategoryId.toString()
           },
           name: item.name,
-          status: "QUEUE",
+          status: item?.status,
         });
       });
 
@@ -81,7 +81,7 @@ export default function ItemDetail() {
           itemCategoryId: item.category?.itemCategoryId.toString()
         },
         name: item.name,
-        status: "QUEUE",
+        status: item?.status,
       });
     }
   }, []);
