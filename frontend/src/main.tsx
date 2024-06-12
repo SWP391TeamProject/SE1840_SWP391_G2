@@ -78,7 +78,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
     <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
       <QueryClientProvider client={queryClient}>
-        <ToastContainer />
+      <ToastContainer autoClose={3000} pauseOnHover={false} closeOnClick />
         <Provider store={store}>
           <AuthProvider>
             <TooltipProvider>
@@ -92,6 +92,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/" element={<LandingPage />}></Route>
                     <Route path="contact" element={<Contact />}></Route>
                     <Route path="about" element={<AboutScreen />}></Route>
+                    <Route path="payment-status" element={<PaymentStatus />}></Route>
+                    <Route path="blog" element={<ToBeImplemented />}></Route>
                     <Route path="Auctions" element={<AuctionList />}></Route>
                     <Route path="Auctions/details" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id" element={<AuctionSession />}></Route>

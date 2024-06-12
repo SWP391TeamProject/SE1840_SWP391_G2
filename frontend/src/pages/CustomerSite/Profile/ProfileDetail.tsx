@@ -1,7 +1,7 @@
-import {ChangeEvent, useEffect, useState} from "react";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -10,12 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {Loader2} from "lucide-react";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {useAuth} from "@/AuthProvider.tsx";
-import {SubmitHandler, useForm} from "react-hook-form";
-import {API_SERVER} from "@/constants/domain.ts";
-import {toast} from "react-toastify";
+import { Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/AuthProvider.tsx";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { API_SERVER } from "@/constants/domain.ts";
+import { toast } from "react-toastify";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
 
@@ -30,7 +30,7 @@ type ProfileDetails = {
 
 const ProfileDetail = () => {
   const auth = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string>();
   const {
     register: profileAvatarForm,
@@ -70,32 +70,32 @@ const ProfileDetail = () => {
 
   const onSubmitProfileAvatar: SubmitHandler<ProfileAvatar> = (data) => {
     if (data.files === undefined) return;
-    setIsSaving(true);
+    setisLoading(true);
     const formData = new FormData();
     formData.append("file", data.files[0]);
     axios.post<any>(API_SERVER + "/accounts/avatar/" + auth.user.accountId, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "Access-Control-Allow-Origin": "*",
-          "Authorization": "Bearer " + auth.user.accessToken,
-        },
-      })
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Access-Control-Allow-Origin": "*",
+        "Authorization": "Bearer " + auth.user.accessToken,
+      },
+    })
       .catch((err) => {
         console.log(err);
         toast.error('Update avatar failed!');
-        setIsSaving(false);
+        setisLoading(false);
       }).then((res) => {
         auth.setUser({
           ...auth.user,
           avatar: res.data
         });
         toast.success('Update avatar successfully!');
-        setIsSaving(false);
-    })
+        setisLoading(false);
+      })
   };
 
   const onSubmitProfileDetails: SubmitHandler<ProfileDetails> = (data) => {
-    setIsSaving(true);
+    setisLoading(true);
   };
 
   return (
@@ -113,7 +113,7 @@ const ProfileDetail = () => {
             <CardContent className="space-y-4">
               <div className="inline-block relative">
                 <Avatar className="w-[80px] h-[80px]">
-                  <AvatarImage src={avatarPreview} alt="avatar"/>
+                  <AvatarImage src={avatarPreview} alt="avatar" />
                   <AvatarFallback>{auth.user.nickname.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <Input
@@ -129,11 +129,11 @@ const ProfileDetail = () => {
             </CardContent>
             <CardFooter>
               <div className="flex gap-4">
-                {isSaving
+                {isLoading
                   ?
                   <Button disabled className="bg-orange-600">
                     <Loader2
-                      className="mr-2 h-4 w-4 animate-spin"/>
+                      className="mr-2 h-4 w-4 animate-spin" />
                     Please wait
                   </Button>
                   : <Button
@@ -178,11 +178,11 @@ const ProfileDetail = () => {
             </CardContent>
             <CardFooter>
               <div className="flex gap-4">
-                {isSaving
+                {isLoading
                   ?
                   <Button disabled className="bg-orange-600">
                     <Loader2
-                      className="mr-2 h-4 w-4 animate-spin"/>
+                      className="mr-2 h-4 w-4 animate-spin" />
                     Please wait
                   </Button>
                   : <Button
@@ -194,9 +194,9 @@ const ProfileDetail = () => {
           </form>
         </Card>
 
-        
-      {/* insert change password below here */}
-      <ChangePassword/>
+
+        {/* insert change password below here */}
+        <ChangePassword isLoading={isLoading} setIsLoading={setisLoading} />
 
         <Card>
           <CardHeader>
@@ -208,7 +208,7 @@ const ProfileDetail = () => {
           <CardContent className="space-y-4">
             <Label>Two-factor Authentication</Label>
             <div className="flex items-center gap-4">
-              <input type="checkbox"/>
+              <input type="checkbox" />
               <span>Enable two-factor authentication</span>
             </div>
           </CardContent>
@@ -227,7 +227,7 @@ const ProfileDetail = () => {
           <CardContent className="space-y-4">
             <Label>Confirm Deletion</Label>
             <Input type="password"
-                   placeholder="Enter your password to confirm deletion"/>
+              placeholder="Enter your password to confirm deletion" />
           </CardContent>
           <CardFooter>
             <Button>Delete Account</Button>

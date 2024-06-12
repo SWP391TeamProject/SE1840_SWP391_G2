@@ -1,13 +1,6 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-const formSchema = z.object({
-    oldPassword: z.string().min(2).max(50),
-    newPassword: z.string().min(2).max(50),
-    confirmPassword: z.string().min(2).max(50),
-})
-
-import React from "react";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,9 +8,32 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { requestChangePassword } from "@/services/AuthService";
 import { useAuth } from "@/AuthProvider";
 import { toast } from "react-toastify";
+import { Loader2 } from "lucide-react";
 
-export default function ChangePassword() {
-    const [isLoading, setIsLoading] = React.useState(false)
+const formSchema = z.object({
+    oldPassword: z.string({
+        message: "Old password is required",
+    }).min(2).max(50),
+    newPassword: z.string({
+        message: "New password is required",
+    }).min(2).max(50),
+    confirmPassword: z.string(),
+}).superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+        // Pushing an error if passwords do not match
+        ctx.addIssue({
+            path: ["confirmPassword"], // Path of the field that failed validation
+            message: "Passwords do not match",
+            // Adjusting the code to 'custom' or another appropriate value
+            code: "custom", // Assuming 'custom' is a valid code for your use case
+            // If Zod expects 'expected' and 'received' properties, you might need to add them, 
+            // but based on your use case, it seems you're creating a custom validation error, 
+            // so they might not be strictly necessary.
+        });
+    }
+});
+
+export default function ChangePassword({ setIsLoading, isLoading }) {
     const auth = useAuth()
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -99,7 +115,14 @@ export default function ChangePassword() {
                         />
                     </CardContent>
                     <CardFooter>
-                        <Button type="submit">Change Password</Button>
+                        {
+                            isLoading ?
+                                <Button disabled>
+                                    <Loader2 className="animate-spin" />
+                                </Button>
+                                : <Button type="submit">Change Password</Button>
+                        }
+
                     </CardFooter>
                 </Card>
 
