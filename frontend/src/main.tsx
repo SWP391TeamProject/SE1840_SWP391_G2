@@ -48,7 +48,6 @@ import CustomerLayout from "./layout/CustomerSite/CustomerLayout.tsx";
 import { LandingPage } from "./pages/CustomerSite/LandingPage/LandingPage.tsx";
 import Consignment from "./pages/CustomerSite/Consignment/Consignment.tsx";
 import AuctionSession from "./pages/CustomerSite/Auctions/AuctionSession.tsx";
-import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
 import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
 import ResetPasswordForm from "@/pages/authentication/ResetPasswordForm.tsx";
@@ -65,6 +64,9 @@ import ItemCreate from "./pages/Administration/item/ItemCreate.tsx";
 import Balance from "./pages/CustomerSite/Profile/Balance.tsx";
 import PaymentStatus from "./pages/CustomerSite/Profile/PaymentStatus.tsx";
 import ThemeProvider from "./components/component/ThemeProvider.tsx";
+import AssignAuctionItem from "./pages/Administration/Auction-session/AssignAuctionItem.tsx";
+import ToBeImplemented from "./pages/ToBeImplemented.tsx";
+import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction-Session-Detail/AuctionSessionDetail.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -79,7 +81,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <ToastContainer />
         <Provider store={store}>
           <AuthProvider>
-
             <TooltipProvider>
               <BrowserRouter>
                 <Routes>
@@ -126,7 +127,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     }
                   >
                     <Route path="/admin" element={<Administration />}>
-                      <Route path="dashboard" element={<DashBoard />}></Route>
+                      <Route path="dashboard" element={<ToBeImplemented />}></Route>
                       <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
                         <Route path="accounts" element={<AccountsList />}></Route>
                         <Route path="accounts/:id" element={<AccountEdit />}></Route>
@@ -136,6 +137,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
                         <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
                         <Route path="auction-sessions/:id" element={<AuctionSessionDetail />}></Route>
+                        <Route path="auction-sessions/:id/assign-items" element={<AssignAuctionItem />}></Route>
 
                         {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                       </Route>

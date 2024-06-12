@@ -64,6 +64,20 @@ export const createAuctionSession = async (data: any) => {
             }
         });
 }
+
+
+export const updateAuctionSession = async (data: any) => {
+    return await axios
+        .put(`http://localhost:8080/api/${controller}/${data.auctionSessionId}`, data, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        })
+}
+
 export const registerAuctionSession = async (id: number) => {
     return await axios
         .get(`http://localhost:8080/api/auction-sessions/register/${id}`, {

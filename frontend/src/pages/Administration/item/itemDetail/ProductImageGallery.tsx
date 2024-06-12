@@ -12,7 +12,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 
 
 
-export default function ProductImageGallery() {
+export default function ProductImageGallery({...props}) {
     return (
         <Card className="overflow-hidden  w-full h-[400px]">
             <CardHeader>
@@ -24,13 +24,13 @@ export default function ProductImageGallery() {
             <CardContent className="flex justify-center items-center">
                 <Carousel className="w-full max-w-xs">
                     <CarouselContent className="w-full">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                            <CarouselItem key={index} className="basis-1/2 ">
+                        {props.images && props.images?.map((image) => (
+                            <CarouselItem key={image.attachmentId} className="basis-1/2 ">
 
                                 <img
                                     alt="Product image"
                                     className="aspect-square object-cover"
-                                    src='https://placehold.co/400'
+                                    src={image.link}
                                 />
 
                             </CarouselItem>

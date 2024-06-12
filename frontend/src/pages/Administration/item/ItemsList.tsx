@@ -128,7 +128,7 @@ export default function ItemsList() {
     setStatusFilter(filter);
   }
 
-  useEffect(() => {}, [itemsList]);
+  useEffect(() => { }, [itemsList]);
 
   useEffect(() => {
     fetchItems(itemsList.currentPageNumber);
@@ -140,7 +140,7 @@ export default function ItemsList() {
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION, ItemStatus.QUEUE,ItemStatus.UNSOLD, ItemStatus.SOLD,ItemStatus.VALUATING], "all")} value="all">All</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION, ItemStatus.QUEUE, ItemStatus.UNSOLD, ItemStatus.SOLD, ItemStatus.VALUATING], "all")} value="all">All</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION], "in_auction")} value="in_auction">IN_AUCTION</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([ItemStatus.QUEUE], "queue")} value="queue">QUEUE</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([ItemStatus.UNSOLD], "unsold")} value="unsold">UNSOLD</TabsTrigger>
@@ -173,7 +173,7 @@ export default function ItemsList() {
                                         Export
                                     </span>
                                 </Button> */}
-            <Button size="sm" className="h-8 gap-1" onClick={() => {handleCreateClick()}}>
+            <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Add ItemsetCurrentItem
@@ -234,7 +234,9 @@ export default function ItemsList() {
                         {item.status}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {item.description}
+                          <div dangerouslySetInnerHTML={{__html: item.description}}></div>
+                            
+                       
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
@@ -264,22 +266,22 @@ export default function ItemsList() {
                     </TableRow>
 
                   ))}
-                </TableBody>
-              </Table>
-              <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-            </CardContent>
-            <CardFooter>
-              {/* <div className="text-xs text-muted-foreground">
+              </TableBody>
+            </Table>
+            <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+          </CardContent>
+          <CardFooter>
+            {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          </CardFooter>
+        </Card>
+      </TabsContent>
+    </Tabs>
       {/* {itemsList.value.map((item) => (
         <EditAcc item={item} key={item.itemId} hidden={true} />
       ))} */}
-    </main>
+    </main >
   );
 }

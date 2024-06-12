@@ -4,6 +4,8 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import {
     Select,
@@ -18,7 +20,7 @@ type ProductStatus = {
     status: ItemStatus;
 };
 
-export default function ProductStatus({ status }: ProductStatus) {
+export default function ProductStatus({ ...props }) {
     return (
         <Card>
             <CardHeader>
@@ -28,20 +30,29 @@ export default function ProductStatus({ status }: ProductStatus) {
                 <div className="grid gap-6">
                     <div className="grid gap-3">
                         <Label htmlFor="status">Status</Label>
-                        <Select defaultValue={ItemStatus.QUEUE}>
-                            <SelectTrigger id="status" aria-label="Select status">
-                                <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {Object.keys(ItemStatus).map((item: any) => {
-                                    return <SelectItem value={item}>{item}</SelectItem>
-
-
-                                }
-
-                                )}
-                            </SelectContent>
-                        </Select>
+                        <FormField
+                            control={props.form.control}
+                            name="status"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Username</FormLabel>
+                                    <FormControl >
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <SelectTrigger id="status" aria-label="Select status">
+                                                <SelectValue placeholder="Select status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {Object.keys(ItemStatus).map((item: any) => {
+                                                    return <SelectItem value={item}>{item}</SelectItem>
+                                                }
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </div>
                 </div>
             </CardContent>

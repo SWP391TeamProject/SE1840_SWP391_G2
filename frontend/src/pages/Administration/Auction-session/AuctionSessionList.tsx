@@ -44,7 +44,7 @@ export default function AuctionSessionList() {
 
   const fetchAuctionSessions = async (pageNumber: number) => {
     try {
-      const res = await fetchAllAuctionSessions(pageNumber, 5);
+      const res = await fetchAllAuctionSessions(pageNumber, 10);
       if (res) {
         console.log(res?.data.content);
         // dispatch(setAuctionSessions(list.data.content));
@@ -60,6 +60,14 @@ export default function AuctionSessionList() {
       console.log(error);
     }
   };
+
+  const handleAssignAuctionItemClick = (auctionSessionId: number) => {
+    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+    console.log(auctionSession);
+    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
+    dispatch(setCurrentAuctionSession(auctionSession));
+    navigate(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
+  }
 
   const handleEditClick = (auctionSessionId: number) => {
     let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
@@ -87,8 +95,9 @@ export default function AuctionSessionList() {
     // })
   }
   const handleDetailClick = (auctionSessionId: number) => {
+    console.log(auctionSessionId);
 
-    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId === auctionSessionId);
     console.log(auctionSession);
     dispatch(setCurrentAuctionSession(auctionSession));
     navigate(`/admin/auction-sessions/${auctionSessionId}`);
@@ -248,10 +257,10 @@ export default function AuctionSessionList() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession.auctionSessionId) }}>Detail</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession.auctionSessionId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession.auctionSessionId) }}>Manage Live Auctions</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleSuspendClick(auctionSession.auctionSessionId) }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession?.auctionSessionId) }}>Detail</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession?.auctionSessionId) }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession?.auctionSessionId) }}>Manage Live Auctions</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(auctionSession?.auctionSessionId) }}>Assign Items</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
