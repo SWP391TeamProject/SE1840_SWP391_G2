@@ -20,7 +20,7 @@ export default function CustomerLayout() {
   return (
 
     <div className="bg-background text-foreground min-h-screen">
-      <div className="sticky top-0 z-10 w-full ">
+      <div className="sticky top-0 z-20 w-full ">
         <NavBar />
       </div>
       <Outlet></Outlet>

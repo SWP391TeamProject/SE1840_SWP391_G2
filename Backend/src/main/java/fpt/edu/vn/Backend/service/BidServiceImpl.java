@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.pojo.Payment;
@@ -117,6 +118,24 @@ public class BidServiceImpl implements BidService {
                 () -> new IllegalArgumentException("Invalid bid id: " + id)
         );
         bidRepos.deleteById(id);
+    }
+
+    @Override
+    public List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId) {
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        List<BidDTO> result = new ArrayList<>();
+        for (Bid bid : bids) {
+            if (bids.get(0).equals(bid)){
+                result.add(new BidDTO(bid));
+                continue;
+            }
+            log.info("Bid " + bid.getBidId() + " failed");
+            Payment payment = bid.getPayment();
+            payment.setStatus(Payment.Status.FAILED);
+            paymentRepos.save(payment);
+            result.add(new BidDTO(bid));
+        }
+        return result;
     }
 
     @Override

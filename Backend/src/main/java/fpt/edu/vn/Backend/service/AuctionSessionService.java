@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
 public interface AuctionSessionService {
 
     AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO);
@@ -22,5 +23,6 @@ public interface AuctionSessionService {
 
     String placePreBid(int auctionSessionId, int accountId, double amount);
 
+    void finishAuction(int auctionSessionId);
 
 }

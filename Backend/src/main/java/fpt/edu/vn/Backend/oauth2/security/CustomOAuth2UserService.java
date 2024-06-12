@@ -85,7 +85,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         Attachment attachment=new Attachment();
         attachment.setLink(oAuth2UserInfo.getImageUrl());
-        attachment.setAccount(account);
         attachment.setCreateDate(LocalDateTime.now());
         attachment.setUpdateDate(LocalDateTime.now());
         attachment=attachmentRepos.save(attachment);

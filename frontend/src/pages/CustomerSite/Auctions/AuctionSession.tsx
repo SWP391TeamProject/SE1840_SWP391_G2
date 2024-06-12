@@ -81,22 +81,38 @@ export default function AuctionSession() {
         }).catch(() => { toast.error("Failed to Register") });
     }
     const ConfirmRegister = () => {
+        let fee = Number.MAX_VALUE;
+        if (auctionSession?.auctionItems) {
+            auctionSession.auctionItems.forEach((item: any) => {
+                if(item.itemDTO.reservePrice < fee){
+                    fee = item.itemDTO.reservePrice;
+                }
+            });
+        }
+        fee = fee * 0.045;
+        if(fee<100){
+            fee = 100;
+        }
+        if(fee>1000){
+            fee = 1000;
+        }
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default">Register to bid</Button>
+                    <Button variant="default" >Register to bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
-                    <AlertDialogHeader>
+                    <AlertDialogHeader className='text-foreground'>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will
                             directly remove your balance from your
                             account and remove your data from our servers.
+                            (Auction Registration Fee: ${fee})
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className='text-foreground'>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => handleRegister()}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -105,6 +121,21 @@ export default function AuctionSession() {
 
     }
     const RegisterAlert = () => {
+        let fee = Number.MAX_VALUE;
+        if (auctionSession?.auctionItems) {
+            auctionSession.auctionItems.forEach((item: any) => {
+                if(item.itemDTO.reservePrice < fee){
+                    fee = item.itemDTO.reservePrice;
+                }
+            });
+        }
+        fee = fee * 0.045;
+        if(fee<100){
+            fee = 100;
+        }
+        if(fee>1000){
+            fee = 1000;
+        }
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
@@ -117,6 +148,7 @@ export default function AuctionSession() {
                             You need to register to this auction first
                             if you want to place a bid.
                             Do you want to continue?
+                            (Auction Registration Fee: ${fee})
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
