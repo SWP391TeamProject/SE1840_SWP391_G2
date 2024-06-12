@@ -132,9 +132,9 @@ export default function ItemsList() {
     window.history.replaceState(null, "", url.toString());
     search = null;
 
-    let filteredList = itemsList.value.filter(x => status.includes(x.status));
-    console.log(filteredList);
-    dispatch(setCurrentPageList(filteredList));
+    // let filteredList = itemsList.value.filter(x => status.includes(x.status));
+    // console.log(filteredList);
+    // dispatch(setCurrentPageList(filteredList));
     setStatusFilter(filter);
   }
 
@@ -209,19 +209,19 @@ export default function ItemsList() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Id</TableHead>
-                    <TableHead>User Name</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Email
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Phone
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Role
+                      Price
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
                       Status
                     </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Description
+                    </TableHead>
+                    {/* <TableHead className="hidden md:table-cell">
+                      Status
+                    </TableHead> */}
                     {/* <TableHead className="hidden md:table-cell">
                                                     Created at
                                                 </TableHead> */}
