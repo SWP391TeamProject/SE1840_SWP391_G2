@@ -20,4 +20,7 @@ public interface AccountRepos extends JpaRepository<Account, Integer> {
     Optional<Account> findByEmail(String email);
 
     Optional<Account> findByEmailAndPassword(String email, String password);
+
+    @Query("SELECT a FROM Account a WHERE a.nickname LIKE %:name% OR a.email LIKE %:name%")
+    Page<Account> findByNicknameContainingOrEmailContaining(String name, Pageable pageable);
 }

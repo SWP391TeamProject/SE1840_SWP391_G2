@@ -20,6 +20,7 @@ public interface AccountService {
 
     @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable);
     @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles);
+    @NotNull Page<AccountDTO> getAccountsByNameOrEmail(@NotNull Pageable pageable, String name);
 
     @Nullable AccountDTO getAccountById(int accountId);
     @Nullable AccountDTO getAccountByEmail(@NotNull String email);
@@ -29,4 +30,6 @@ public interface AccountService {
     @NotNull AccountDTO updateAccount(@NotNull AccountDTO account);
 
     @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file);
+
+
 }

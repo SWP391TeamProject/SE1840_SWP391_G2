@@ -81,6 +81,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public @NotNull Page<AccountDTO> getAccountsByNameOrEmail(@NotNull Pageable pageable, String name) {
+        var a = accountRepos.findByNicknameContainingOrEmailContaining(name, pageable);
+        a = a == null ? Page.empty(pageable) : a;
+        return a.map(this::mapEntityToDTO);
+    }
+
+    @Override
     public @Nullable AccountDTO getAccountById(int accountId) {
         return accountRepos.findById(accountId).map(this::mapEntityToDTO).orElse(null);
     }

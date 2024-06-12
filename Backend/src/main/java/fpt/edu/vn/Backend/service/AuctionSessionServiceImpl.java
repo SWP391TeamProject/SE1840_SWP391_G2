@@ -1,8 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
-import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
-import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
@@ -39,9 +37,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final BidRepos bidRepos;
     private final BidService bidService;
     private final PaymentService paymentService;
+    private final AccountServiceImpl accountServiceImpl;
 
     @Autowired
-    public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos, BidRepos bidRepos, BidService bidService, PaymentService paymentServiceImpl) {
+    public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos, BidRepos bidRepos, BidService bidService, PaymentService paymentServiceImpl, AccountServiceImpl accountServiceImpl) {
         this.auctionSessionRepos = auctionSessionRepos;
         this.accountRepos = accountRepos;
         this.depositRepos = depositRepos;
@@ -49,6 +48,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         this.bidRepos = bidRepos;
         this.bidService = bidService;
         this.paymentService = paymentServiceImpl;
+        this.accountServiceImpl = accountServiceImpl;
     }
 
 
@@ -132,12 +132,28 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     public void finishAuction(int auctionSessionId) {
         AuctionSessionDTO auctionSessionDTO = getAuctionSessionById(auctionSessionId);
+        List<AccountDTO> accounts = new ArrayList<>();
         logger.info("Finishing auction session " + auctionSessionId);
+        if (auctionSessionDTO.getStatus().equals("FINISHED")) {
+            logger.warn("Auction session " + auctionSessionId + " already finished");
+            return;
+        }
         for(AuctionItemDTO auctionItem:auctionSessionDTO.getAuctionItems()){
+            AccountDTO account = new AccountDTO();
+            account=accountServiceImpl.getAccountById(bidService.getHighestBid(auctionItem.getId()).getPayment().getAccountId());
             for(BidDTO bid:bidService.finishAuctionItem(auctionItem.getId())){
                 logger.info("Finishing bid " + bid.getBidId());
             }
+            accounts.add(account);
+        }
+        for (DepositDTO deposit : auctionSessionDTO.getDeposits()) {
 
+            if (accounts.stream().noneMatch(account -> account.getAccountId() == deposit.getPayment().getAccountId())) {
+                deposit.getPayment().setStatus(Payment.Status.FAILED);
+                paymentService.updatePayment(deposit.getPayment());
+
+
+            }
         }
         auctionSessionDTO.setStatus("FINISHED");
         logger.info("Auction session " + auctionSessionId + " finished");
@@ -237,6 +253,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new RuntimeException("Error retrieving past auction sessions", e);
         }
 
+    }
+
+    @Override
+    public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
+        return auctionSessionRepos.findByTitleContaining(title, pageable)
+                .map(AuctionSessionDTO::new);
     }
 
     @Override

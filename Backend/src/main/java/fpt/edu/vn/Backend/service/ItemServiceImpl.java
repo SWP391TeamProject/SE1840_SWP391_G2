@@ -167,6 +167,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name) {
+        return itemRepos.findItemByNameContaining(name, pageable).map(this::mapEntityToDTO);
+    }
+
+    @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {
         return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(this::mapEntityToDTO);
     }

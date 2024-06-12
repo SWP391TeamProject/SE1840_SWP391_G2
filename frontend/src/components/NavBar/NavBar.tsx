@@ -33,10 +33,10 @@ export default function NavBar() {
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-2 bg-background text-foreground ">
+      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-2 bg-background text-foreground  dark:shadow-slate-700">
         <Link className="flex items-center justify-center" to="/">
-          <GavelIcon className="h-6 w-6" />
-          <span className="font-semibold text-lg">Biddify</span>
+        <img src="https://github.com/SWP391TeamProject/SE1840_SWP391_G2/raw/develop/images/logo-cut.svg" className="w-16 h-10 object-contain" alt="logo" />
+
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
 

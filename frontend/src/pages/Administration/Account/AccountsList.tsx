@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAccounts, setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
-import { fetchAccountsService, deleteAccountService } from "@/services/AccountsServices.ts";
+import { fetchAccountsService, deleteAccountService, fetchAccountsByName } from "@/services/AccountsServices.ts";
 import {
   Home,
   LineChart,
@@ -67,17 +67,27 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AccountStatus, Roles } from "@/constants/enums";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
+import { set } from "date-fns";
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [roleFilter, setRoleFilter] = useState("");
+  const url = new URL(window.location.href);
+  let search = url.searchParams.get("search");
 
   const fetchAccounts = async (pageNumber: number, role?: Roles) => {
     try {
       console.log(role);
-      const res = await fetchAccountsService(pageNumber, 5, role);
+      let res;
+      res = await fetchAccountsService(pageNumber, 5, role);
+      if (search && search?.length > 0) {
+        res = await fetchAccountsByName(pageNumber, 5, search);
+      }
+      if (role != undefined) {
+        res = await fetchAccountsService(pageNumber, 5, role);
+      }
       if (res) {
         console.log(res);
         dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
@@ -91,6 +101,8 @@ export default function AccountsList() {
       console.log(error);
     }
   };
+
+
 
   const handleEditClick = (accountId: number) => {
     let account = accountsList.value.find(account => account.accountId == accountId);
@@ -113,25 +125,31 @@ export default function AccountsList() {
     deleteAccountService(accountId.toString()).then((res) => {
       console.log(res);
     })
+    fetchAccounts(0);
+    fetchAccounts(0);
   }
 
   const handleFilterClick = (roles: Roles[], filter: string) => {
     // let filteredList = accountsList.value.filter(x => status.includes(x.status));
     // dispatch(setCurrentPageList(filteredList));
     // if (filter != roleFilter) {
-      if (filter == "all") {
-        fetchAccounts(0);
-        setRoleFilter(filter);
-      } 
-      else {
-        console.log(roles);
-        fetchAccounts(0, roles[0]);
-        setRoleFilter(filter);
-      }
+    url.searchParams.delete("search");
+    window.history.replaceState(null, "", url.toString());
+    search = null;
+    if (filter == "all") {
+      fetchAccounts(0);
+      setRoleFilter(filter);
+    }
+    else {
+      console.log(roles);
+      fetchAccounts(0, roles[0]);
+      setRoleFilter(filter);
+    }
+
     // }
   }
 
-  useEffect(() => {}, [accountsList.currentPageList]);
+  useEffect(() => { }, [accountsList.currentPageList]);
 
   const handlePageSelect = (pageNumber: number) => {
     fetchAccounts(pageNumber, accountsList.filter);
@@ -143,6 +161,7 @@ export default function AccountsList() {
     //   dispatch(setCurrentPageList(data.content));
     // })
     setRoleFilter("all");
+
   }, []);
 
   return (

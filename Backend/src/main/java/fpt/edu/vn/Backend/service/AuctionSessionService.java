@@ -19,6 +19,8 @@ public interface AuctionSessionService {
 
     Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable);
 
+    Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable,String title);
+
     AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId);
 
     String placePreBid(int auctionSessionId, int accountId, double amount);
