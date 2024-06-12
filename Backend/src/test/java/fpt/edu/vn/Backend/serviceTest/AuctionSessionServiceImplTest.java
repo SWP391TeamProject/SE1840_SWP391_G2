@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.serviceTest;
 
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.service.AuctionSessionServiceImpl;
@@ -74,16 +76,44 @@ public class AuctionSessionServiceImplTest {
     }
 
     @Test
-    public void testUpdateAuctionSession() {
+    @DisplayName("Should update auction session successfully")
+    public void shouldUpdateAuctionSessionSuccessfully() {
         when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
         when(auctionSessionRepos.save(any(AuctionSession.class))).thenReturn(auctionSession);
-
+        auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
+        auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         AuctionSessionDTO result = auctionSessionService.updateAuctionSession(auctionSessionDTO);
 
         assertNotNull(result);
         assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
         verify(auctionSessionRepos, times(1)).findById(1);
         verify(auctionSessionRepos, times(1)).save(any(AuctionSession.class));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when start date is in the past")
+    public void shouldThrowExceptionWhenStartDateIsInThePast() {
+        auctionSessionDTO.setStartDate(LocalDateTime.now().minusDays(1));
+
+        assertThrows(InvalidInputException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when end date is before start date")
+    public void shouldThrowExceptionWhenEndDateIsBeforeStartDate() {
+        auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
+        auctionSessionDTO.setEndDate(LocalDateTime.now());
+
+        assertThrows(InvalidInputException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when auction session not found")
+    public void shouldThrowExceptionWhenAuctionSessionNotFound() {
+        when(auctionSessionRepos.findById(1)).thenReturn(Optional.empty());
+        auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
+        auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
+        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
 
 

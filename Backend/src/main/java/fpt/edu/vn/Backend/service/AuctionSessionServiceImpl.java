@@ -144,18 +144,19 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
+        if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidInputException("Start date must be in the future");
+        }
+        if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
+            throw new InvalidInputException("End date must be after start date");
+        }
+
         try {
             Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
             if (!optionalAuctionSession.isPresent()) {
                 throw new ResourceNotFoundException("Auction session not found");
             }
-            if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
-                throw new InvalidInputException("Start date must be in the future");
-            }
-            if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
-                throw new InvalidInputException("End date must be after start date");
-            }
-            
+
 
             AuctionSession auctionSession = optionalAuctionSession.get();
             auctionSession.setStartDate(auctionDTO.getStartDate());
@@ -167,7 +168,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             auctionSessionRepos.save(auctionSession);
             return auctionDTO;
         } catch (Exception e) {
-            throw new RuntimeException("Error updating auction session", e);
+            throw new ResourceNotFoundException("Error updating auction session", e);
         }
     }
 

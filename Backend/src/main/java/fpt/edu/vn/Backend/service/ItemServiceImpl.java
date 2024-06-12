@@ -62,9 +62,12 @@ public class ItemServiceImpl implements ItemService {
         itemDTO.setStatus(item.getStatus());
         itemDTO.setCreateDate(item.getCreateDate());
         itemDTO.setUpdateDate(item.getUpdateDate());
-        itemDTO.setAttachments(item.getAttachments().stream().map(
-                attachment -> new AttachmentDTO(attachment)
-        ).collect(Collectors.toSet()));
+        if(item.getAttachments() != null){
+            itemDTO.setAttachments(item.getAttachments().stream().map(
+                    attachment -> new AttachmentDTO(attachment)
+            ).collect(Collectors.toSet()));
+        }
+
 
         if (item.getOwner() != null)
             itemDTO.setOwner(new AccountDTO(item.getOwner()));
