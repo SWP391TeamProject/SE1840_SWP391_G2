@@ -63,7 +63,7 @@ import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } from "@/redux/reducers/Items";
-import { getItems } from "@/services/ItemService";
+import { getItems, getItemsByName } from "@/services/ItemService";
 import { ItemStatus } from "@/constants/enums";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 
@@ -72,10 +72,15 @@ export default function ItemsList() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const url = new URL(window.location.href);
+  let search = url.searchParams.get("search");
 
   const fetchItems = async (pageNumber: number) => {
     try {
-      const res = await getItems(pageNumber, 5);
+      let res = await getItems(pageNumber, 5);
+      if(search != null) {
+        res = await getItemsByName(search, pageNumber, 5);
+      }
       console.log(res);
       if (res) {
         // dispatch(setItems(list.data.content));
@@ -122,6 +127,11 @@ export default function ItemsList() {
   }
 
   const handleFilterClick = (status: ItemStatus[], filter: string) => {
+
+    url.searchParams.delete("search");
+    window.history.replaceState(null, "", url.toString());
+    search = null;
+
     let filteredList = itemsList.value.filter(x => status.includes(x.status));
     console.log(filteredList);
     dispatch(setCurrentPageList(filteredList));

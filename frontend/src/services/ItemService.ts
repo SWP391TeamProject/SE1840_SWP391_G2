@@ -33,6 +33,12 @@ export const getItemsByCategoryId = async (categoryId: number, page: number, siz
         params: { page, size },
     });
 };
+export const getItemsByName = async (name: string, page: number, size: number) => {
+    return await axios.get<Page<Item>>(`${baseUrl}/search/${name}`, {
+        ...authHeader(),
+        params: { page, size },
+    });
+};
 
 export const getItemsByStatus = async (status: ItemStatus, page: number, size: number) => {
     return await axios.get<Page<Item>>(`${baseUrl}/status/${status}`, {

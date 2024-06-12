@@ -101,8 +101,8 @@ export default function AuctionSession() {
                 <AlertDialogTrigger>
                     <Button variant="default" >Register to bid</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader className='text-foreground'>
+                <AlertDialogContent className='text-foreground'>
+                    <AlertDialogHeader >
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will
@@ -112,7 +112,7 @@ export default function AuctionSession() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className='text-foreground'>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel >Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => handleRegister()}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -141,7 +141,7 @@ export default function AuctionSession() {
                 <AlertDialogTrigger>
                     <Button variant="default">Place Bid</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Register is needed</AlertDialogTitle>
                         <AlertDialogDescription>

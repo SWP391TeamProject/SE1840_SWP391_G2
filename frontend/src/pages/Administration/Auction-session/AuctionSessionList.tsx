@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
-import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
+import { fetchAllAuctionSessions, fetchAuctionSessionByTitle } from "@/services/AuctionSessionService";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function AuctionSessionList() {
@@ -41,10 +41,17 @@ export default function AuctionSessionList() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const url = new URL(window.location.href);
+  let search = url.searchParams.get("search");
 
   const fetchAuctionSessions = async (pageNumber: number) => {
     try {
-      const res = await fetchAllAuctionSessions(pageNumber, 10);
+      let res;
+      res = await fetchAllAuctionSessions(pageNumber, 10);
+      if (search && search?.length > 0) {
+        res = await fetchAuctionSessionByTitle(pageNumber, 10,search);
+      }
+
       if (res) {
         console.log(res?.data.content);
         // dispatch(setAuctionSessions(list.data.content));
@@ -108,6 +115,11 @@ export default function AuctionSessionList() {
   }
 
   const handleFilterClick = (filter: string) => {
+
+    url.searchParams.delete("search");
+    window.history.replaceState(null, "", url.toString());
+    search = null;
+
     let filteredList = [];
     if (filter === "all") filteredList = auctionSessionsList.value;
 

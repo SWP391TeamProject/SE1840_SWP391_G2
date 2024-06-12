@@ -14,8 +14,7 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-                Authorization:
-                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            
             }
         })
         .catch((err) => {
@@ -45,6 +44,28 @@ export const fetchAuctionSessionById = async (id: number) => {
         });
 }
 
+
+export const fetchAuctionSessionByTitle = async (page?: number, size?: number,title?:string) => {
+    let params = {
+        page: page ?? 0,
+        size: size ?? 10,
+    }
+    return await axios
+        .get(`http://localhost:8080/api/${controller}/search/${title}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+            params: params
+        })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
+        });
+}
 
 export const createAuctionSession = async (data: any) => {
     return await axios
