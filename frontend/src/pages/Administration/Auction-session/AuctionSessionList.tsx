@@ -189,7 +189,13 @@ export default function AuctionSessionList() {
         <TabsContent value={statusFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>AuctionSessions</CardTitle>
+              <CardTitle className="flex justify-between items-center">
+                AuctionSessions
+                <div className="w-full basis-1/2">
+                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
+              
               <CardDescription>
                 Manage Auctions and view auctions details.
               </CardDescription>
@@ -281,7 +287,7 @@ export default function AuctionSessionList() {
                   ))}
                 </TableBody>
               </Table>
-              <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+              
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">

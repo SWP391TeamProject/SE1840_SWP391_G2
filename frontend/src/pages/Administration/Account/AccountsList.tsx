@@ -211,11 +211,18 @@ export default function AccountsList() {
         </div>
         <TabsContent value={roleFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
-            <CardHeader>
-              <CardTitle>Accounts</CardTitle>
+            <CardHeader >
+
+              <CardTitle className="flex justify-between items-center">
+                Accounts
+                <div className="w-full basis-1/2">
+                  <PagingIndexes className="basis-1/2" pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
               <CardDescription>
                 Manage accounts and view their details.
               </CardDescription>
+
             </CardHeader>
             <CardContent>
               <Table>
@@ -300,7 +307,7 @@ export default function AccountsList() {
                   ))}
                 </TableBody>
               </Table>
-              <PagingIndexes pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+              
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">

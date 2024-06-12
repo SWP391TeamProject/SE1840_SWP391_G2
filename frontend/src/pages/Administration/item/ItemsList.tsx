@@ -194,7 +194,12 @@ export default function ItemsList() {
         <TabsContent value={statusFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle className="flex justify-between items-center">
+                Items
+                <div className="w-full basis-1/2">
+                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
               <CardDescription>
                 Manage items and view their details.
               </CardDescription>
@@ -278,7 +283,7 @@ export default function ItemsList() {
                   ))}
               </TableBody>
             </Table>
-            <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+            
           </CardContent>
           <CardFooter>
             {/* <div className="text-xs text-muted-foreground">
