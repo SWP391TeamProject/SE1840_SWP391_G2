@@ -17,6 +17,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {API_SERVER} from "@/constants/domain.ts";
 import {toast} from "react-toastify";
 import axios from "axios";
+import ChangePassword from "./profile-detail/ChangePassword";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -193,27 +194,10 @@ const ProfileDetail = () => {
           </form>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Change Password</CardTitle>
-            <CardDescription>
-              Update your password.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Label>Current Password</Label>
-            <Input type="password"/>
+        
+      {/* insert change password below here */}
+      <ChangePassword/>
 
-            <Label>New Password</Label>
-            <Input type="password"/>
-
-            <Label>Confirm Password</Label>
-            <Input type="password"/>
-          </CardContent>
-          <CardFooter>
-            <Button>Change Password</Button>
-          </CardFooter>
-        </Card>
         <Card>
           <CardHeader>
             <CardTitle>Two-factor Authentication</CardTitle>

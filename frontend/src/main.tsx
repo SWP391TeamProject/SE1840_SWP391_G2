@@ -105,7 +105,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         <Route path="consignments/:id" element={<CustomerConsignmentList />}></Route>
                       </Route>
                       <Route path="/profile" element={<ProfileLayout />}>
-                        <Route path="" element={<ProfileDetail />}></Route>
+                        <Route path="overview" element={<ProfileDetail />}></Route>
                         <Route path="/profile/settings" element={<ProfileSetting />}></Route>
                         <Route path="/profile/notification" element={<NotificationsList />}></Route>
                         <Route path="/profile/balance" element={<Balance />}></Route>

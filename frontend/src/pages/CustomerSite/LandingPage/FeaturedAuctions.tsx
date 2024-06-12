@@ -8,7 +8,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
+import { fetchAllAuctionSessions, fetchFeaturedAuctionSessions } from "@/services/AuctionSessionService";
 import { getItems } from "@/services/ItemService";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -24,7 +24,7 @@ export default function FeaturedAuctions() {
   };
 
   useEffect(() => {
-    fetchAllAuctionSessions().then((data) => {
+    fetchFeaturedAuctionSessions().then((data) => {
       console.log(data);
       // setFeaturedAuctions(data.data.content.filter((item) => item.status == "FEATURED"));
       setFeaturedAuctions(data.data.content);
@@ -79,9 +79,8 @@ export default function FeaturedAuctions() {
                               Ends in {getDaysLeft(new Date(item.endDate))} days
                             </div>
                             <Button variant="default" asChild>
-
                               <Link
-                                to="#"
+                                to={`auctions/${item.auctionSessionId}`}
                               >
                                 Bid Now
                               </Link>

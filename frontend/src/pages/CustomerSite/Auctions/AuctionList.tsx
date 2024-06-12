@@ -33,8 +33,9 @@ export default function AuctionList() {
   }
 
   useEffect(() => {
-    console.log(data?.data.content);
+
     if (data) {
+      console.log('data', data);
       dispatch(setAuctionSessions(data?.data.content));
     }
   }, [data]);
