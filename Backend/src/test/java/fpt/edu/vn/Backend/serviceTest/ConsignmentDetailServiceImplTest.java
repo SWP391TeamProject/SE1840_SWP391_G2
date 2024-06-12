@@ -213,6 +213,102 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(updatedConsignmentDetailDTO.getPrice(), result.getPrice());
         assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getStatus());
     }
+    @Test
+    void createConsignmentDetail_HappyPath() {
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(attachmentRepos.findById(anyInt())).thenReturn(Optional.of(attachment));
+        when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
+
+        ConsignmentDetailDTO result = consignmentDetailService.createConsignmentDetail(consignmentDetailDTO);
+
+        assertNotNull(result);
+        assertEquals(consignmentDetailDTO.getConsignmentDetailId(), result.getConsignmentDetailId());
+        assertEquals(consignmentDetailDTO.getDescription(), result.getDescription());
+        assertEquals(consignmentDetailDTO.getPrice(), result.getPrice());
+        assertEquals(consignmentDetailDTO.getStatus(), result.getStatus());
+    }
+
+    @Test
+    void createConsignmentDetail_ConsignmentNotFound() {
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentDetailDTO));
+    }
+
+    @Test
+    void updateConsignmentDetail_HappyPath() {
+        when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.of(consignmentDetail1));
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(attachmentRepos.findById(anyInt())).thenReturn(Optional.of(attachment));
+        when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
+
+        ConsignmentDetailDTO updatedConsignmentDetailDTO = new ConsignmentDetailDTO();
+        updatedConsignmentDetailDTO.setConsignmentDetailId(1);
+        updatedConsignmentDetailDTO.setConsignmentId(1);
+        updatedConsignmentDetailDTO.setAccount(new AccountDTO(account));
+        updatedConsignmentDetailDTO.setDescription("Updated Description");
+        updatedConsignmentDetailDTO.setPrice(BigDecimal.valueOf(150.0));
+        updatedConsignmentDetailDTO.setStatus("REQUEST");
+        updatedConsignmentDetailDTO.setAttachments(Arrays.asList(new AttachmentDTO(attachment)));
+
+        ConsignmentDetailDTO result = consignmentDetailService.updateConsignmentDetail(1, updatedConsignmentDetailDTO);
+
+        assertNotNull(result);
+        assertEquals(updatedConsignmentDetailDTO.getConsignmentDetailId(), result.getConsignmentDetailId());
+        assertEquals(updatedConsignmentDetailDTO.getDescription(), result.getDescription());
+        assertEquals(updatedConsignmentDetailDTO.getPrice(), result.getPrice());
+        assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getStatus());
+    }
+
+    @Test
+    void updateConsignmentDetail_ConsignmentDetailNotFound() {
+        when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentDetailDTO));
+    }
+
+    @Test
+    void testGetConsignmentDetailById_NotFound() {
+        when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.getConsignmentDetailById(1));
+    }
+
+    @Test
+    void testCreateConsignmentDetail_AccountNotFound() {
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentDetailDTO));
+    }
+
+    @Test
+    void testCreateConsignmentDetail_AttachmentNotFound() {
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(attachmentRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentDetailDTO));
+    }
+
+    @Test
+    void testUpdateConsignmentDetail_ConsignmentNotFound() {
+        when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.of(consignmentDetail1));
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentDetailDTO));
+    }
+
+    @Test
+    void testUpdateConsignmentDetail_AccountNotFound() {
+        when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.of(consignmentDetail1));
+        when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentDetailDTO));
+    }
 
 }
 

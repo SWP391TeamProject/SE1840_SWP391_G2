@@ -27,7 +27,9 @@ import java.util.List;
 public class BidServiceImpl implements BidService {
 
     private static final Logger log = LoggerFactory.getLogger(BidServiceImpl.class);
-    private final BidRepos bidRepos;
+
+    @Autowired
+    private BidRepos bidRepos;
 
     @Autowired
     private AuctionItemRepos auctionItemRepos;
@@ -38,10 +40,6 @@ public class BidServiceImpl implements BidService {
     @Autowired
     private AccountRepos accountRepos;
 
-    @Autowired
-    public BidServiceImpl(BidRepos auctionBidRepository) {
-        this.bidRepos = auctionBidRepository;
-    }
 
     @Override
     public List<BidDTO> getAllBids() {
@@ -73,20 +71,24 @@ public class BidServiceImpl implements BidService {
     public BidDTO createBid(BidDTO bid) {
         Bid newBid = new Bid();
         newBid.setBidId(bid.getBidId());
-        newBid.setAuctionItem(auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
+        AuctionItem auctionItem = auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + bid.getAuctionItemId())
-        ));
-        PaymentDTO payment = bid.getPayment();
-        payment.setType(Payment.Type.AUCTION_BID);
-        payment.setAmount(bid.getPayment().getAmount());
-        payment.setAccountId(bid.getPayment().getAccountId());
-        payment.setStatus(Payment.Status.PENDING);
+        );
+        newBid.setAuctionItem(auctionItem);
+        PaymentDTO paymentDTO = bid.getPayment();
+        if (paymentDTO == null) {
+            throw new IllegalArgumentException("Payment cannot be null");
+        }
+        paymentDTO.setType(Payment.Type.AUCTION_BID);
+        paymentDTO.setAmount(bid.getPayment().getAmount());
+        paymentDTO.setAccountId(bid.getPayment().getAccountId());
+        paymentDTO.setStatus(Payment.Status.PENDING);
         Payment newPayment = new Payment();
-        newPayment.setPaymentAmount(payment.getAmount());
-        newPayment.setCreateDate(payment.getDate());
-        newPayment.setType(payment.getType());
-        newPayment.setStatus(payment.getStatus());
-        newPayment.setAccount(accountRepos.findById(payment.getAccountId()).orElseThrow(
+        newPayment.setPaymentAmount(paymentDTO.getAmount());
+        newPayment.setCreateDate(paymentDTO.getDate());
+        newPayment.setType(paymentDTO.getType());
+        newPayment.setStatus(paymentDTO.getStatus());
+        newPayment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
         ));
         newBid.setPayment(newPayment);
