@@ -49,7 +49,15 @@ public class AuctionSessionController {
     public ResponseEntity<AuctionSessionDTO> getAuctionSessionById(@PathVariable int id) {
         return new ResponseEntity<>(auctionSessionService.getAuctionSessionById(id), HttpStatus.OK);
     }
-
+    @GetMapping("/search/{title}")
+    public ResponseEntity<Page<AuctionSessionDTO>> getAuctionsByNameAndEmail(@PageableDefault(size = 200) Pageable pageable,
+                                                                      @PathVariable String title) {
+        log.info("Get accounts with name: {}", title);
+        if (title == null) {
+            return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(auctionSessionService.getAuctionSessionsByTitle(pageable, title), HttpStatus.OK);
+    }
 
     @GetMapping("/active")
     public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession() {

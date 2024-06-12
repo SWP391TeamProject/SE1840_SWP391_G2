@@ -47,6 +47,13 @@ public class ItemController {
         return itemService.getItemsByCategoryId(pageable, categoryId);
     }
 
+    @GetMapping("/search/{name}")
+    public Page<ItemDTO> getItemsByName(
+            @PathVariable String name,
+            @PageableDefault(size = 30) Pageable pageable) {
+        return itemService.getItemsByName(pageable, name);
+    }
+
     @GetMapping("/status/{status}")
     public Page<ItemDTO> getItemsByStatus(
             @PathVariable Item.Status status,

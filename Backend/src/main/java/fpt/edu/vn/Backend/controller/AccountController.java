@@ -44,13 +44,23 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 30) Pageable pageable,
+    public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 50) Pageable pageable,
                                                         @RequestParam(required = false,name = "Role") Account.Role role) {
         log.info("Get accounts with role: {}", role);
         if (role == null) {
             return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
+    }
+
+    @GetMapping("/search/{name}")
+    public ResponseEntity<Page<AccountDTO>> getAccountsByNameAndEmail(@PageableDefault(size = 50) Pageable pageable,
+                                                        @PathVariable String name) {
+        log.info("Get accounts with name: {}", name);
+        if (name == null) {
+            return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(accountService.getAccountsByNameOrEmail(pageable, name), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
