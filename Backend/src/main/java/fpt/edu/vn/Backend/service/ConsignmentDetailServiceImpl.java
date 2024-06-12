@@ -99,13 +99,10 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
     @Override
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailDTO updatedConsignmentDetail) {
-        try {
             // Find the existing ConsignmentDetail object by ID
-            Optional<ConsignmentDetail> optionalConsignmentDetail = consignmentDetailRepos.findById(consignmentDetailId);
-            if (!optionalConsignmentDetail.isPresent()) {
-                throw new ResourceNotFoundException("ConsignmentDetail not found with id: " + consignmentDetailId);
-            }
-            ConsignmentDetail consignmentDetail = optionalConsignmentDetail.get();
+            ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
+                    .orElseThrow(() -> new ResourceNotFoundException("ConsignmentDetail not found with id: " + consignmentDetailId));
+
 
             // Update the fields with the provided data from updatedConsignmentDetail
             consignmentDetail.setDescription(updatedConsignmentDetail.getDescription());
@@ -139,10 +136,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             // Save the updated ConsignmentDetail
             ConsignmentDetail savedConsignmentDetail = consignmentDetailRepos.save(consignmentDetail);
             return new ConsignmentDetailDTO(savedConsignmentDetail);
-        } catch (Exception e) {
-            // Handle exceptions
-            throw new RuntimeException("Error updating consignment detail", e);
-        }
+
     }
 
     private ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
