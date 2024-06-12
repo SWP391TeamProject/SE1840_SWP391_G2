@@ -13,6 +13,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Autoplay from "embla-carousel-autoplay"
 import { toast } from 'react-toastify';
 import { parse } from 'path';
+import { delay } from 'node_modules/@reduxjs/toolkit/dist/utils';
 
 
 export default function AuctionJoin() {
@@ -24,23 +25,24 @@ export default function AuctionJoin() {
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
-  
+
   const [bids, setBids] = useState<YourBidType[]>([]);
   useEffect(() => {
     const newClient = new Client({
       brokerURL: 'ws://localhost:8080/auction-join?token=' + JSON.parse(getCookie("user")).accessToken,
       onConnect: () => {
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
-
-        newClient.publish({
-          destination: '/app/chat.addUser/' + auctionId + '/' + itemId,
-          body: JSON.stringify({
-            auctionItemId: location.state.id,
-            payment: {
-              accountId: JSON.parse(getCookie("user")).id
-            }
-          })
-        });
+        setTimeout(() => {
+          newClient.publish({
+            destination: '/app/chat.addUser/' + auctionId + '/' + itemId,
+            body: JSON.stringify({
+              auctionItemId: location.state.id,
+              payment: {
+                accountId: JSON.parse(getCookie("user")).id
+              }
+            })
+          });
+        }, 1000);
       },
       onStompError: (error) => {
         console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
@@ -58,16 +60,25 @@ export default function AuctionJoin() {
   }, [accountId]);
 
   useEffect(() => {
-    window.onpopstate = function() {
+    window.onpopstate = function () {
       client?.deactivate();
     };
   }, []);
 
   const onMessageReceived = (payload: IMessage) => {
     console.log(payload);
+    if (payload.body.includes("ERROR")) {
+      toast.error(payload.body.split(":")[0]);
+      client?.forceDisconnect();
+      client?.deactivate();
+      client?.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
+      window.history.back();
+      return;
+    }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
       toast.error(JSON.parse(payload.body).body);
       client?.deactivate();
+      client?.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
       return;
     }
     const message = JSON.parse(payload.body).body;
@@ -106,7 +117,6 @@ export default function AuctionJoin() {
   };
 
   useEffect(() => {
-    console.log("abc " + bids);
     fetchBidsByAuctionItemId(auctionId, itemId).then((res) => {
       console.log(res);
       setBids(res.data);
@@ -114,7 +124,6 @@ export default function AuctionJoin() {
     }).catch((err) => {
       console.log(err);
     });
-    console.log("abc " + bids);
 
   }, [price]);
 
@@ -136,7 +145,7 @@ export default function AuctionJoin() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-">
             <h1 className=" w-3/5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl   ">
               {itemDTO.name}
             </h1>

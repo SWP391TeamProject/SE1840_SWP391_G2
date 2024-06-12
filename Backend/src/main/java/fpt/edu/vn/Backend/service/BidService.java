@@ -18,4 +18,5 @@ public interface BidService {
     BidDTO getHighestBid(AuctionItemId auctionId);
     void deleteBid(int id);
     List<BidResponse> toBidResponse(List<BidDTO> bids);
+    List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId);
     }

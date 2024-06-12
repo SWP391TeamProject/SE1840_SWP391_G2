@@ -14,8 +14,9 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-            },
-            params: params
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            }
         })
         .catch((err) => {
             toast.error(err.response.data.message);
