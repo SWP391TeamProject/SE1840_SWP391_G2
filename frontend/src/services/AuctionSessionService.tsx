@@ -26,6 +26,25 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         });
 };
 
+
+export const fetchAuctionSessionById = async (id: number) => {
+    return await axios
+        .get(`http://localhost:8080/api/${controller}/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+        })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
+        });
+}
+
+
 export const createAuctionSession = async (data: any) => {
     return await axios
         .post(`http://localhost:8080/api/${controller}/`, data, {
