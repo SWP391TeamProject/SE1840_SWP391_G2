@@ -67,6 +67,25 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
         });
 }
 
+export const fetchUpcomingAuctionSessions = async (page?: number, size?: number) => {
+    let params = {
+        pageNumb: page,
+        pageSize: size,
+    }
+
+    return await axios
+        .get("http://localhost:8080/api/auction-sessions/upcoming", {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+            params: params
+        })
+        .catch((err) => {
+            toast.error(err.response.data.message);
+        });
+}
+
 
 export const fetchAuctionSessionById = async (id: number) => {
     return await axios
