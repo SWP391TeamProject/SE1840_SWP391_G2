@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -66,6 +67,6 @@ public class Item {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
-    private List<Attachment> attachments;
+    private Set<Attachment> attachments;
 
 }

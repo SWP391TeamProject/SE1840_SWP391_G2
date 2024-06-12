@@ -40,9 +40,10 @@ type Props = {
   value: string;
   placeholder: string;
   onChange: OnChangeHandler;
+  defaultValue?: string;
 };
  
-const TextEditor: React.FC<Props> = ({ value, onChange, placeholder }) => {
+const TextEditor: React.FC<Props> = ({ value, onChange, placeholder,defaultValue }) => {
   return (
     <>
       <ReactQuill className="text-foreground bg-background"
@@ -52,6 +53,7 @@ const TextEditor: React.FC<Props> = ({ value, onChange, placeholder }) => {
         formats={formats}
         onChange={onChange}
         placeholder={placeholder}
+        defaultValue={defaultValue}
       />
     </>
   );

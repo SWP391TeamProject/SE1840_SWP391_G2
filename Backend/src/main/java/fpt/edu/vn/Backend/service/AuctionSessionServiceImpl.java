@@ -149,6 +149,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (!optionalAuctionSession.isPresent()) {
                 throw new ResourceNotFoundException("Auction session not found");
             }
+            if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
+                throw new InvalidInputException("Start date must be in the future");
+            }
+            if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
+                throw new InvalidInputException("End date must be after start date");
+            }
+            
 
             AuctionSession auctionSession = optionalAuctionSession.get();
             auctionSession.setStartDate(auctionDTO.getStartDate());

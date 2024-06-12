@@ -55,7 +55,6 @@ public class ItemCategoryImplTest {
         itemCategoryDTO = new ItemCategoryDTO();
         itemCategoryDTO.setName("Category1");
         itemCategoryDTO.setCreateDate(LocalDateTime.now());
-        itemCategoryDTO.setUpdateDate(LocalDateTime.now());
 
         itemCategoryRequestDTO = new ItemCategoryRequestDTO();
         itemCategoryRequestDTO.setItemCategoryId(2);

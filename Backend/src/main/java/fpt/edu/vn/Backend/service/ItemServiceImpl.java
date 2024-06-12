@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
@@ -23,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -59,6 +62,10 @@ public class ItemServiceImpl implements ItemService {
         itemDTO.setStatus(item.getStatus());
         itemDTO.setCreateDate(item.getCreateDate());
         itemDTO.setUpdateDate(item.getUpdateDate());
+        itemDTO.setAttachments(item.getAttachments().stream().map(
+                attachment -> new AttachmentDTO(attachment)
+        ).collect(Collectors.toSet()));
+
         if (item.getOwner() != null)
             itemDTO.setOwner(new AccountDTO(item.getOwner()));
         Order order = item.getOrder();
