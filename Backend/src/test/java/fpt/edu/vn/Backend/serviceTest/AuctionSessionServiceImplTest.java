@@ -58,8 +58,14 @@ public class AuctionSessionServiceImplTest {
 
     @Test
     public void testCreateAuctionSession() {
-        when(auctionSessionRepos.save(any(AuctionSession.class))).thenReturn(auctionSession);
 
+
+        when(auctionSessionRepos.save(any(AuctionSession.class))).thenReturn(auctionSession);
+        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
+        auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
+        auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
+        auctionSessionDTO.setTitle("Test");
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
         AuctionSessionDTO result = auctionSessionService.createAuctionSession(auctionSessionDTO);
 
         assertNotNull(result);
