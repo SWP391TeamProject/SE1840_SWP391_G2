@@ -82,6 +82,15 @@ export default function Component() {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4 md:p-6">
+        <div className="flex justify-between items-center md:col-span-2">
+          <h2 className="text-2xl font-bold">Assign Items</h2>
+          <div className="flex space-x-2">
+            <Button variant="outline" disabled={selectedItems.length == 0} onClick={handleClear}>
+              Clear Selected
+            </Button>
+            <Button disabled={selectedItems.length == 0} onClick={handleSave}>Save Selected</Button>
+          </div>
+        </div>
         <div className="border rounded-lg shadow-sm">
           <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b rounded-t-lg">
             <h2 className="text-lg font-medium">Available Items</h2>
@@ -147,12 +156,6 @@ export default function Component() {
               </TableBody>
             </Table>
           </div>
-        </div>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleClear}>
-            Clear Selected
-          </Button>
-          <Button onClick={handleSave}>Save Selected</Button>
         </div>
       </div>
     </>
