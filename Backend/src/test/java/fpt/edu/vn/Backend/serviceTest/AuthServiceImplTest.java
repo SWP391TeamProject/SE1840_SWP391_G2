@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import fpt.edu.vn.Backend.service.AuthServiceImpl;
 import jakarta.mail.MessagingException;
@@ -20,14 +21,14 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @Nested
 class AuthServiceImplTest {
@@ -45,6 +46,8 @@ class AuthServiceImplTest {
     private JavaMailSender mailSender;
     @Mock
     private MimeMessageHelper mimeMessageHelper;
+    @Mock
+    private CustomUserDetailsService customUserDetailService;
 
     @BeforeEach
     public void setup() throws MessagingException {
@@ -61,6 +64,8 @@ class AuthServiceImplTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(jwtGenerator.generateToken(any())).thenReturn("someToken");
+        UserDetails userDetails = mock(UserDetails.class);
+        when(customUserDetailService.loadUserByUsername(anyString())).thenReturn(userDetails);
 
         Account account = new Account();
         account.setEmail("test@test.com");
@@ -191,6 +196,9 @@ class AuthServiceImplTest {
         account.setPassword("password");
         account.setRole(Account.Role.MEMBER);
         when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
+
+        UserDetails userDetails = mock(UserDetails.class);
+        when(customUserDetailService.loadUserByUsername(anyString())).thenReturn(userDetails);
 
         // Act
         AuthResponseDTO result = authService.login(loginDTO);
