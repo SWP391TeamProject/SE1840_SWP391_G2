@@ -3,29 +3,17 @@
  * @see https://v0.dev/t/TMzlSp5CzlB
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-"use client"
-
-import { useState, useMemo, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { getItemsByStatus } from "@/services/ItemService"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession"
-import { set } from "date-fns"
-import { fetchAllAuctionSessions, fetchAuctionSessionById } from "@/services/AuctionSessionService"
+import { fetchAuctionSessionById } from "@/services/AuctionSessionService"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
-import ItemCard from "./AssignAuctionItems/ItemCard"
 
-export default function Component() {
-  const [session, setSession] = useState({
-    id: "AUC-001",
-    name: "Summer Auction 2023",
-    date: "2023-06-30",
-    time: "7:00 PM",
-  })
+export default function AssignAuctionItem() {
+ 
   const auction = useAppSelector((state) => state.auctionSessions.currentAuctionSession)
   const [availableItems, setAvailableItems] = useState([])
   const param = useParams<{ id: string }>()

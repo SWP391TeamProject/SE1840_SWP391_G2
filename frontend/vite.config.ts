@@ -11,15 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },build: {
+    sourcemap: true,
     chunkSizeWarningLimit: 1024,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor'; // split vendor modules into a separate chunk
-          }
-        }
-      }
-    }
+    
   }
 });

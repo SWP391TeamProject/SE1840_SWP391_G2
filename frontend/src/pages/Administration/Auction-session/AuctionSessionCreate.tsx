@@ -1,5 +1,3 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { set, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -25,7 +23,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
-import { DatePickerWithRange } from "@/components/component/DateRangePicker"
 
 const FormSchema = z.object({
     title: z.string().min(2, {
@@ -48,8 +45,6 @@ export default function AuctionSessionCreate() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             title: "",
-            startDate: "",
-            endDate: "",
             files: [],
 
         },
@@ -192,7 +187,7 @@ export default function AuctionSessionCreate() {
                 <ScrollArea className="w-full h-64 overflow-hidden">
                     <FormField
                         control={form.control}
-                        name="attachments"
+                        name="files"
                         render={({ field }) => (
                             <DropzoneComponent {...field} control={form.control} />
                         )}
