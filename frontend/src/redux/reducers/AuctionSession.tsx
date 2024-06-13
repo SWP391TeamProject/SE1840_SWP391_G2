@@ -19,7 +19,7 @@ const initialState: AuctionSessionsState = {
     value: [],
     currentAuctionSession: undefined,
     currentPageList: [],
-    currentPageNumber: 1,
+    currentPageNumber: 0,
     pageSize: 10,
     totalItems: 0,
     totalPages: 0,

@@ -26,7 +26,7 @@ public class VnPayConfig {
 
     public final static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     private final static String vnp_Version = "2.1.0";
-    public final static String vnp_ReturnUrl = "http://localhost:5173/test";
+    public final static String vnp_ReturnUrl = "http://localhost:5173/payment-status";
     public final static String vnp_TmnCode = "RJEVXKZ2";
     public final static String secretKey = "3AOW0SHELFS5YVARN9KJRUS9QR4E4G79";
     public final static String vnp_CurrCode = "VND";
