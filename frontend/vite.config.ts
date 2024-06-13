@@ -11,6 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },build: {
+    outDir: 'build',  // Or 'frontend/build', depending on your setup
+    emptyOutDir: true,
     sourcemap: true,
     chunkSizeWarningLimit: 1024,
     
