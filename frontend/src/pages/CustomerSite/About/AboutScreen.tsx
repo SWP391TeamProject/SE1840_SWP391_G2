@@ -1,11 +1,8 @@
-import NavBar from "@/components/NavBar/NavBar";
-import AuctionProcessSection from "../LandingPage/AuctionProcessSection";
 import Footer from "@/components/footer/Footer";
 import { WhatIs } from "./WhatIs";
 import { useEffect, useRef, useState } from "react";
 import { OurTeam } from "./OurTeam";
 import { About } from "./About";
-import { set } from "react-hook-form";
 import { Buy } from "./Buy";
 import { Sell } from "./Sell";
 import { Sidebar } from "./SideBar";

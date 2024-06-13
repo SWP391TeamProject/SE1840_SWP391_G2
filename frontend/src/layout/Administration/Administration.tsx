@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Accounts from '@/pages/Administration/Account/AccountsList'
 import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
 import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
-import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, Backpack, User2, Menu } from 'lucide-react'
+import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, Backpack, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
 import React, { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
@@ -156,8 +156,22 @@ export default function Administration() {
                                 to="items"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
-                                <Backpack />
+                                <ShoppingBag />
                                 Manage Item
+                            </Link>
+                            <Link
+                                to="blogs"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <Newspaper />
+                                Manage Blogs
+                            </Link>
+                            <Link
+                                to="notifications"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <Bell />
+                                Manage Notification
                             </Link>
 
                         </nav>

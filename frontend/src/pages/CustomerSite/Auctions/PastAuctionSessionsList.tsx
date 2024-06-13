@@ -5,8 +5,8 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
 import { fetchPastAuctionSessions } from "@/services/AuctionSessionService";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function PastAuctionSessionsList() {
   const auctionSessionList = useAppSelector((state) => state.auctionSessions);
