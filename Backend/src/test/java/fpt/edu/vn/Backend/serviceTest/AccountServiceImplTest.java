@@ -162,7 +162,7 @@ public class AccountServiceImplTest {
         when(accountRepos.findById(accountDTO.getAccountId())).thenReturn(Optional.of(account));
         when(accountRepos.save(any())).thenReturn(account);
 
-        AccountDTO result = accountService.updateAccount(accountDTO);
+        AccountDTO result = accountService.updateAccount(accountDTO, Account.Role.ADMIN);
 
         assertNotNull(result);
         assertEquals("test@test.com", result.getEmail());
@@ -182,7 +182,7 @@ public class AccountServiceImplTest {
 
         when(accountRepos.findById(999)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> accountService.updateAccount(accountDTO));
+        assertThrows(ResourceNotFoundException.class, () -> accountService.updateAccount(accountDTO, Account.Role.ADMIN));
     }
 
     @Test

@@ -1,20 +1,17 @@
 package fpt.edu.vn.Backend.security;
 
-import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
-import fpt.edu.vn.Backend.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 @Component
@@ -22,11 +19,11 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(JwtHandshakeInterceptor.class);
     private final JWTGenerator jwtGenerator;
-    private final AccountService accountService;
+    private CustomUserDetailsService customUserDetailService;
 
-    public JwtHandshakeInterceptor(JWTGenerator jwtGenerator, AccountService accountService) {
+    public JwtHandshakeInterceptor(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailService) {
         this.jwtGenerator = jwtGenerator;
-        this.accountService = accountService;
+        this.customUserDetailService = customUserDetailService;
     }
 
     @Override
@@ -36,18 +33,21 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         // Validate the JWT and perform authentication
         if (jwtGenerator.validateToken(jwt)) {
-            String username = jwtGenerator.getEmailFromToken(jwt);
-            if(accountService.getAccountByEmail(username).getEmail()!=null){
-                // Create an Authentication object
-                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
-                // Set the Authentication in the SecurityContextHolder
+            String email = jwtGenerator.getEmailFromToken(jwt);
+            UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
+            if (userDetails != null) {
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        userDetails.getPassword(),
+                        userDetails.getAuthorities()
+                );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                attributes.put("username", username);
+                attributes.put("username", email);
                 return true;
-            }else {
+            } else {
                 return false;
             }
+
             // You can store the username or other user details in the WebSocket session attributes
 
         } else {

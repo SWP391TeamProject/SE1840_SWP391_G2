@@ -3,9 +3,9 @@ package fpt.edu.vn.Backend.config;
 
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
+import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import fpt.edu.vn.Backend.security.JwtHandshakeInterceptor;
-import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +29,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JWTGenerator jwtGenerator;
-    private final AccountService accountService;
-
-    @Autowired
+    private final CustomUserDetailsService customUserDetailsService;
     private AuctionSessionService auctionSessionService;
 
+    @Autowired
+    public WebSocketConfig(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService, AuctionSessionService auctionSessionService) {
+        this.jwtGenerator = jwtGenerator;
+        this.customUserDetailsService = customUserDetailsService;
+        this.auctionSessionService = auctionSessionService;
+    }
 
     public void startTimeout(int id, int delayInSeconds) {
         final Runnable timeout = new Runnable() {
@@ -56,17 +60,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         };
     }
-    @Autowired
-    public WebSocketConfig(JWTGenerator jwtGenerator, AccountService accountService) {
-        this.jwtGenerator = jwtGenerator;
-        this.accountService = accountService;
-    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/auction-join").addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, accountService)).setAllowedOrigins("http://localhost:5173");
+        registry.addEndpoint("/auction-join").addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, customUserDetailsService)).setAllowedOrigins("http://localhost:5173");
         registry.addEndpoint("/auction-join")
-                .addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, accountService))
+                .addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, customUserDetailsService))
 
                 .setAllowedOrigins("http://localhost:5173");
     }

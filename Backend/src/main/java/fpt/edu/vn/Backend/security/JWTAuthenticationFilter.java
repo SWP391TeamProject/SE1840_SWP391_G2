@@ -5,8 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +15,13 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
     @Autowired
     private JWTGenerator jwtGenerator;
-    private static final Logger logger = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
     @Autowired
     private CustomUserDetailsService customUserDetailService;
     @Autowired
@@ -39,9 +39,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 String email = jwtGenerator.getEmailFromToken(token);
                 UserDetails userDetails = customUserDetailService.loadUserByUsername(
                         email
-                );//chua fix
+                );
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails.getUsername(),
+                        userDetails,
                         userDetails.getPassword(),
                         userDetails.getAuthorities()
                 );
@@ -50,7 +50,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 );
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
         }
         filterChain.doFilter(request, response);
@@ -60,7 +60,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorization");
         // System.out.println("accessToken: " + bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
+            return bearerToken.substring(7);
         }
         return null;
     }
