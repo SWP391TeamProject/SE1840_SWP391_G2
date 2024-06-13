@@ -63,6 +63,7 @@
     "react-router-dom": "^6.23.1",
     "react-stately": "^3.31.1",
     "react-toastify": "^10.0.5",
+    "serve": "^14.2.3",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.1",
