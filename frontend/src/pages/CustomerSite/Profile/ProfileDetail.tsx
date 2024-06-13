@@ -96,6 +96,25 @@ const ProfileDetail = () => {
 
   const onSubmitProfileDetails: SubmitHandler<ProfileDetails> = (data) => {
     setisLoading(true);
+    axios.put<any>(API_SERVER + "/accounts/" + auth.user.accountId, data, {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Authorization": "Bearer " + auth.user.accessToken,
+      },
+    })
+      .catch((err) => {
+        console.log(err);
+        toast.error('Update details failed!');
+        setisLoading(false);
+      }).then(() => {
+      auth.setUser({
+        ...auth.user,
+        ...data
+      });
+      toast.success('Update details successfully!');
+      setisLoading(false);
+    })
   };
 
   return (
