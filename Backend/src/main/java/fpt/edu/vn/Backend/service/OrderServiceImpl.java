@@ -8,6 +8,8 @@ import fpt.edu.vn.Backend.repository.ItemRepos;
 import fpt.edu.vn.Backend.repository.OrderRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -61,9 +63,9 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public List<OrderDTO> getAllOrders() {
+    public Page<OrderDTO> getAllOrders(Pageable pageable) {
         try {
-            return orderRepository.findAll().stream().map(OrderDTO::new).collect(Collectors.toList());
+            return orderRepository.findAll(pageable).map(OrderDTO::new);
         } catch (Exception e) {
             System.err.println("An error occurred while fetching all orders: " + e.getMessage());
             throw new RuntimeException("Failed to fetch all orders", e);

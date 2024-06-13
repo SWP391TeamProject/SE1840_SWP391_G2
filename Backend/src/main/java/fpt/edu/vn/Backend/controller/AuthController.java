@@ -84,16 +84,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(registerDTO));
     }
 
-    @GetMapping("/auction-item/{id}")
-    public String joinAuction(Model model, HttpSession session, @PathVariable int id) {
-        if (session.getAttribute("account") == null) {
-            return "login failed!";
-        }
-        model.addAttribute("auction_item", id);
-        model.addAttribute("user_id", ((Account) session.getAttribute("account")).getAccountId());
-        return "index";
-    }
-
     @PostMapping("/request-reset-password/")
     public ResponseEntity<?> requestResetPassword(@RequestBody ResetPasswordRequestDTO dto) {
         try {
