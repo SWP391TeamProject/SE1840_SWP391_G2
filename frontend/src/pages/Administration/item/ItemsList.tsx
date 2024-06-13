@@ -132,9 +132,9 @@ export default function ItemsList() {
     window.history.replaceState(null, "", url.toString());
     search = null;
 
-    let filteredList = itemsList.value.filter(x => status.includes(x.status));
-    console.log(filteredList);
-    dispatch(setCurrentPageList(filteredList));
+    // let filteredList = itemsList.value.filter(x => status.includes(x.status));
+    // console.log(filteredList);
+    // dispatch(setCurrentPageList(filteredList));
     setStatusFilter(filter);
   }
 
@@ -194,7 +194,12 @@ export default function ItemsList() {
         <TabsContent value={statusFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>Items</CardTitle>
+              <CardTitle className="flex justify-between items-center">
+                Items
+                <div className="w-full basis-1/2">
+                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
               <CardDescription>
                 Manage items and view their details.
               </CardDescription>
@@ -204,19 +209,19 @@ export default function ItemsList() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Id</TableHead>
-                    <TableHead>User Name</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Email
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Phone
-                    </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Role
+                      Price
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
                       Status
                     </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Description
+                    </TableHead>
+                    {/* <TableHead className="hidden md:table-cell">
+                      Status
+                    </TableHead> */}
                     {/* <TableHead className="hidden md:table-cell">
                                                     Created at
                                                 </TableHead> */}
@@ -278,7 +283,7 @@ export default function ItemsList() {
                   ))}
               </TableBody>
             </Table>
-            <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+            
           </CardContent>
           <CardFooter>
             {/* <div className="text-xs text-muted-foreground">

@@ -199,7 +199,12 @@ export default function ConsignmentList() {
                 <TabsContent value={statusFilter}>
                     <Card x-chunk="dashboard-06-chunk-0">
                         <CardHeader>
-                            <CardTitle>Consignments</CardTitle>
+                            <CardTitle className="flex justify-between items-center">
+                                Consignments
+                                <div className="w-full basis-1/2">
+                                    <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} size={10} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                                </div>
+                            </CardTitle>
                             <CardDescription>
                                 Manage consignments and view their details.
                             </CardDescription>
@@ -310,7 +315,7 @@ export default function ConsignmentList() {
                                     ))}
                                 </TableBody>
                             </Table>
-                            <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} size={10} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                            
                         </CardContent>
                         <CardFooter>
                             {/* <div className="text-xs text-muted-foreground">

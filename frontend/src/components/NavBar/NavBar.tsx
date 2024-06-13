@@ -64,15 +64,14 @@ export default function NavBar() {
                     </li>
                     <Separator />
                     <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions/">Featured</Link>
+                      <Link to="/auctions/featured">Featured</Link>
                     </li>
                     <Separator />
                     <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Past Auctions</Link>
+                      <Link to="/auctions/past">Past Auctions</Link>
                     </li>
                     <Separator />
-                 
-                      <Link className={navigationMenuTriggerStyle()} to="/auctions">Upcoming</Link>
+                      <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
