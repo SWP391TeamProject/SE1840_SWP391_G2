@@ -10,5 +10,16 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
+  },build: {
+    chunkSizeWarningLimit: 1024,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor'; // split vendor modules into a separate chunk
+          }
+        }
+      }
+    }
+  }
 });
