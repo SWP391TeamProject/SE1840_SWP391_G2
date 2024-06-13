@@ -108,13 +108,13 @@ const ProfileDetail = () => {
         toast.error('Update details failed!');
         setisLoading(false);
       }).then(() => {
-      auth.setUser({
-        ...auth.user,
-        ...data
-      });
-      toast.success('Update details successfully!');
-      setisLoading(false);
-    })
+        auth.setUser({
+          ...auth.user,
+          ...data
+        });
+        toast.success('Update details successfully!');
+        setisLoading(false);
+      })
   };
 
   return (
@@ -150,14 +150,13 @@ const ProfileDetail = () => {
               <div className="flex gap-4">
                 {isLoading
                   ?
-                  <Button disabled className="bg-orange-600">
+                  <Button disabled >
                     <Loader2
                       className="mr-2 h-4 w-4 animate-spin" />
                     Please wait
                   </Button>
                   : <Button
                     type="submit"
-                    className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
                   >Save avatar</Button>}
               </div>
             </CardFooter>
@@ -199,14 +198,13 @@ const ProfileDetail = () => {
               <div className="flex gap-4">
                 {isLoading
                   ?
-                  <Button disabled className="bg-orange-600">
+                  <Button disabled >
                     <Loader2
                       className="mr-2 h-4 w-4 animate-spin" />
                     Please wait
                   </Button>
                   : <Button
                     type="submit"
-                    className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
                   >Save details</Button>}
               </div>
             </CardFooter>

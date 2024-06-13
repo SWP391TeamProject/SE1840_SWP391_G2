@@ -1,6 +1,5 @@
  import { getCookie } from "@/utils/cookies";
 import axios from "axios";
-import { toast } from "react-toastify";
 
 const URL = "http://localhost:8080/api/consignmentDetails/";
 

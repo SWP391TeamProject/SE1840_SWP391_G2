@@ -1,6 +1,5 @@
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
-import { toast } from "react-toastify";
 
 export const fetchBidsByAccount = async (id:number) => {
   return await axios
