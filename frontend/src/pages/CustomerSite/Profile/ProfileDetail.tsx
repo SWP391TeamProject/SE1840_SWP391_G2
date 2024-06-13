@@ -79,17 +79,17 @@ const ProfileDetail = () => {
         "Access-Control-Allow-Origin": "*",
         "Authorization": "Bearer " + auth.user.accessToken,
       },
-    })
-      .catch((err) => {
-        console.log(err);
-        toast.error('Update avatar failed!');
-        setisLoading(false);
-      }).then((res) => {
+    }).then((res) => {
         auth.setUser({
           ...auth.user,
           avatar: res.data
         });
         toast.success('Update avatar successfully!');
+        setisLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error('Update avatar failed!');
         setisLoading(false);
       })
   };
@@ -102,17 +102,16 @@ const ProfileDetail = () => {
         "Access-Control-Allow-Origin": "*",
         "Authorization": "Bearer " + auth.user.accessToken,
       },
-    })
-      .catch((err) => {
-        console.log(err);
-        toast.error('Update details failed!');
-        setisLoading(false);
-      }).then(() => {
+    }).then(() => {
         auth.setUser({
           ...auth.user,
           ...data
         });
         toast.success('Update details successfully!');
+        setisLoading(false);
+      }).catch((err) => {
+        console.log(err);
+        toast.error('Update details failed!');
         setisLoading(false);
       })
   };
