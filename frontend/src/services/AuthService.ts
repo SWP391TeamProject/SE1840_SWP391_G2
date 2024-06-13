@@ -80,3 +80,13 @@ export const activateAccount = async (code: string): Promise<void> => {
     params: { code },
   });
 };
+
+export const changePassword = async (id: number, dto: {
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}): Promise<void> => {
+  await axios.post(`${baseUrl}/change-password/${id}`, dto, {
+    ...authHeader
+  });
+};
