@@ -1,14 +1,23 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.EvaluationDTO;
+import fpt.edu.vn.Backend.exporter.ConsignmentDetailExporter;
+import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentDetailService;
+import fpt.edu.vn.Backend.service.ConsignmentService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -16,6 +25,11 @@ import java.util.List;
 @CrossOrigin("*")
 public class ConsignmentDetailController {
     private final ConsignmentDetailService consignmentDetailService;
+    @Autowired
+    private ConsignmentService consignmentService;
+    @Autowired
+    private AttachmentServiceImpl attachmentService;
+
     @Autowired
     public ConsignmentDetailController(ConsignmentDetailService consignmentDetailService) {
         this.consignmentDetailService = consignmentDetailService;
@@ -31,13 +45,47 @@ public class ConsignmentDetailController {
         return new ResponseEntity<>(consignmentDetailService.getConsignmentDetailById(consignmentDetailId), HttpStatus.OK);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<ConsignmentDetailDTO> createConsignmentDetail(@RequestBody ConsignmentDetailDTO consignmentDetailDTO) {
-        return new ResponseEntity<>(consignmentDetailService.createConsignmentDetail(consignmentDetailDTO), HttpStatus.OK);
+    @PostMapping("/createInitialEvaluation")
+    public ResponseEntity<ConsignmentDetailDTO> createInitialEvaluation(@ModelAttribute EvaluationDTO evaluationDTO) {
+        ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitInitialEvaluation(evaluationDTO.getConsignmentId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getAccountId());
+        if (evaluationDTO.getFiles() != null) {
+            for (MultipartFile f : evaluationDTO.getFiles()) {
+                attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+            }
+        }
+        return new ResponseEntity<>(consignmentDetailDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/createFinalEvaluation")
+    public ResponseEntity<ConsignmentDetailDTO> createFinalEvaluation(@ModelAttribute EvaluationDTO evaluationDTO) {
+        ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitFinalEvaluationUpdate(evaluationDTO.getConsignmentId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getAccountId());
+        if (evaluationDTO.getFiles() != null) {
+            for (MultipartFile f : evaluationDTO.getFiles()) {
+                attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+            }
+        }
+        return new ResponseEntity<>(consignmentDetailDTO, HttpStatus.OK);
     }
 
     @PutMapping("/update/{consignmentDetailId}")
     public ResponseEntity<ConsignmentDetailDTO> updateConsignmentDetail(@PathVariable int consignmentDetailId, @RequestBody ConsignmentDetailDTO updatedConsignmentDetail) {
-        return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId,updatedConsignmentDetail), HttpStatus.OK);
+        return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId, updatedConsignmentDetail), HttpStatus.OK);
+    }
+
+    @GetMapping("/export")
+    public void exportToExcel(HttpServletResponse response) {
+        response.setContentType("application/octet-stream");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=ConsignmentDetails_" + currentDateTime + ".xlsx";
+        response.setHeader(headerKey, headerValue);
+        Pageable pageable = Pageable.unpaged();
+        List<ConsignmentDetailDTO> listDetail = consignmentDetailService.getAllConsignmentsDetail(pageable).getContent();
+        listDetail.sort(Comparator.comparingInt(ConsignmentDetailDTO::getConsignmentId));
+        ConsignmentDetailExporter excelExporter = new ConsignmentDetailExporter(listDetail);
+
+        excelExporter.export(response);
     }
 }

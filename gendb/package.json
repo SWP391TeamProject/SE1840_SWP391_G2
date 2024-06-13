@@ -1,0 +1,17 @@
+{
+  "name": "gendb",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "gen": "npx tsx src/main.ts gen"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "dayjs": "^1.11.11",
+    "puppeteer": "^22.10.0"
+  }
+}

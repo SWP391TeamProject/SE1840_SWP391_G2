@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -27,7 +28,6 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
-
 
     @Column(length = 300)
     private String name;
@@ -61,12 +61,12 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
-    private List<Attachment> attachments;
+    private Set<Attachment> attachments;
 
 }

@@ -1,14 +1,15 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -35,6 +36,9 @@ public class AuctionSession {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
 
+//    @Column(name = "is_featured")
+//    private byte isFeatured;
+
     @CreationTimestamp
     @Column(name = "create_date")
     private LocalDateTime createDate;
@@ -42,19 +46,17 @@ public class AuctionSession {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-    //Relationships
-    @OneToMany
+
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private List<AuctionItem> auctionItems;
 
-    @OneToMany(mappedBy = "auctionSession")
-    private List<Deposit> deposits;
-
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private List<Attachment> attachments;
 
-
-
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_session_id")
+    private Set<Deposit> deposits;
 }
 

@@ -1,12 +1,18 @@
-import { Roles } from "@/constants/enums";
+import {AccountStatus, Roles} from "@/constants/enums";
 
 export interface Account {
-  userId: number;
-  username: string;
+  accountId: number;
+  // username: string;
   email: string;
-  nickname?: string;
+  nickname: string;
   phone: string;
-  avatar?: string;
+  avatar?: {
+    link?: string
+  };
   accessToken?: string;
+  balance?: number;
   role: Roles;
+  createDate?: Date;
+  updateDate?: Date;
+  status: AccountStatus
 }

@@ -1,10 +1,15 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Notification;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+
 @Data
+@AllArgsConstructor
+@Builder
 public class NotificationDTO {
     private int notificationId;
     private int userId;
@@ -14,8 +19,7 @@ public class NotificationDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    NotificationDTO(Notification notification)
-    {
+    public NotificationDTO(Notification notification) {
         this.notificationId = notification.getNotificationId();
         this.userId = notification.getAccount().getAccountId();
         this.message = notification.getMessage();
@@ -24,6 +28,4 @@ public class NotificationDTO {
         this.createDate = notification.getCreateDate();
         this.updateDate = notification.getUpdateDate();
     }
-    // getters and setters
-    // ...
 }

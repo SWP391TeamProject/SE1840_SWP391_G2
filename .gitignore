@@ -77,3 +77,13 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 /.idea/
 Backend/.env
+Backend/src/main/resources/application.properties
+gendb/data/account.json
+gendb/data/auction_session.json
+gendb/data/consignment.json
+gendb/data/item.json
+gendb/data/item_category.json
+gendb/data/notification.json
+gendb/data/transaction.json
+gendb/data/item_category.json
+gendb/data/notification.json

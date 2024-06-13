@@ -1,14 +1,14 @@
 export enum Roles {
+  MEMBER = "MEMBER",
+  STAFF = "STAFF",
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
-  STAFF = "STAFF",
-  MEMBER = "MEMBER",
   GUEST = "GUEST",
 } // enums.ts
 
 export enum AccountStatus {
-  ACTIVE = 1,
-  INACTIVE = 0,
+  ACTIVE = "ACTIVE",
+  DISABLED = "DISABLED",
   // Add more statuses if needed (e.g., BANNED, SUSPENDED)
 }
 
@@ -33,6 +33,7 @@ export enum ConsignmentStatus {
   SENDING = "SENDING",
   IN_INITIAL_EVALUATION = "IN_INITIAL_EVALUATION",
   WAITING_STAFF = "WAITING_STAFF",
+  WAITING_SELLER = "WAITING_SELLER",
 }
 
 export enum ConsignmentDetailType {
@@ -66,8 +67,8 @@ export enum PaymentType {
 }
 
 export enum RoleName {
+  MEMBER = "MEMBER",
   STAFF = "STAFF",
   MANAGER = "MANAGER",
-  MEMBER = "MEMBER",
   ADMIN = "ADMIN",
 }

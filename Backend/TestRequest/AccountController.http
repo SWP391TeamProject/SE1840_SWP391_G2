@@ -1,101 +1,95 @@
 
 ### Get all accounts
 GET http://localhost:8080/api/accounts/
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbkBsb2NhbGhvc3QiLCJpYXQiOjE3MTcwNTY5ODAsImV4cCI6MTcxNzA2MTk4MH0.WYZQvDcqtDEpoxb4jtbfXLIu0WUnIuAsXqthucjMTG2rrOVs2om4eN_yl-4teSuk94ZOxSzWbCQiQjeu-f3Fqw
 
 ###Response (HTTP/1.1 200 OK)
 Content-Type: application/json
 {
-    "content": [
-        {
-            "userId": 1,
-            "nickname": "bidder_bob",
-            "role": [
-                3
-            ],
-            "email": "user1@email.com",
-            "phone": "123-456-7890",
-            "balance": 1250.50,
-            "createDate": "2024-05-24T16:23:54.19",
-            "updateDate": "2024-05-24T16:23:54.19"
-        },
-        {
-            "userId": 2,
-            "nickname": "collectibles_sue",
-            "role": [
-                3
-            ],
-            "email": "seller_sue@email.com",
-            "phone": "987-654-3210",
-            "balance": 500.00,
-            "createDate": "2024-05-24T16:23:54.19",
-            "updateDate": "2024-05-24T16:23:54.19"
-        },
-        {
-            "userId": 3,
-            "nickname": "admin_ace",
-            "role": [
-                2
-            ],
-            "email": "admin_alice@email.com",
-            "phone": "555-121-2555",
-            "balance": 8888.88,
-            "createDate": "2024-05-24T16:23:54.19",
-            "updateDate": "2024-05-24T16:23:54.19"
-        },
-        {
-            "userId": 4,
-            "nickname": "arty_amanda",
-            "role": [
-                3
-            ],
-            "email": "artlover@email.com",
-            "phone": "111-222-3333",
-            "balance": 350.25,
-            "createDate": "2024-05-24T16:23:54.19",
-            "updateDate": "2024-05-24T16:23:54.19"
-        },
-        {
-            "userId": 5,
-            "nickname": "techno_tim",
-            "role": [
-                3
-            ],
-            "email": "gadget_guy@email.com",
-            "phone": "444-555-6666",
-            "balance": 999.99,
-            "createDate": "2024-05-24T16:23:54.19",
-            "updateDate": "2024-05-24T16:23:54.19"
-        }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 50,
-        "sort": {
-            "empty": false,
-            "sorted": true,
-            "unsorted": false
-        },
-        "offset": 0,
-        "unpaged": false,
-        "paged": true
+  "content": [
+    {
+      "accountId": 1,
+      "nickname": null,
+      "roles": null,
+      "avatar": null,
+      "email": null,
+      "phone": null,
+      "password": null,
+      "status": null,
+      "balance": 100.00,
+      "createDate": null,
+      "updateDate": null
     },
-    "last": true,
-    "totalElements": 5,
-    "totalPages": 1,
-    "size": 50,
-    "number": 0,
+    {
+      "accountId": 2,
+      "nickname": "admin",
+      "roles": [
+        "ADMIN"
+      ],
+      "avatar": null,
+      "email": "admin@localhost",
+      "phone": "1234567890",
+      "password": null,
+      "status": "ACTIVE",
+      "balance": null,
+      "createDate": "2024-05-30T14:08:11.400019",
+      "updateDate": "2024-05-30T14:08:11.401018"
+    },
+    {
+      "accountId": 3,
+      "nickname": null,
+      "roles": [
+        "MEMBER"
+      ],
+      "avatar": null,
+      "email": "vidz752204@gmail.com",
+      "phone": null,
+      "password": null,
+      "status": null,
+      "balance": null,
+      "createDate": "2024-05-30T14:40:39.343443",
+      "updateDate": "2024-05-30T14:40:39.343443"
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 30,
     "sort": {
-        "empty": false,
-        "sorted": true,
-        "unsorted": false
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
     },
-    "first": true,
-    "numberOfElements": 5,
-    "empty": false
+    "offset": 0,
+    "paged": true,
+    "unpaged": false
+  },
+  "last": true,
+  "totalElements": 3,
+  "totalPages": 1,
+  "size": 30,
+  "number": 0,
+  "sort": {
+    "empty": true,
+    "sorted": false,
+    "unsorted": true
+  },
+  "first": true,
+  "numberOfElements": 3,
+  "empty": false
 }
 
+### Get all MEMBER accounts
+GET http://localhost:8080/api/accounts/
+role: ADMIN
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbkBsb2NhbGhvc3QiLCJpYXQiOjE3MTcwNTU5MTgsImV4cCI6MTcxNzA2MDkxOH0.DYXmzwlKkH2J1ZV2e6hag_uC56wo0q6wdjt7jqu54f6blNUUdjvCtNa6ioXuJhDElMMWJ85HF6V-3PejVWNdKQ
+
+###Response (HTTP/1.1 200 OK)
+Content-Type: application/json
+
+
 ### Get account by id
-GET http://localhost:8080/api/accounts/2
+GET http://localhost:8080/api/accounts/1
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbkBsb2NhbGhvc3QiLCJpYXQiOjE3MTcwNTU5MTgsImV4cCI6MTcxNzA2MDkxOH0.DYXmzwlKkH2J1ZV2e6hag_uC56wo0q6wdjt7jqu54f6blNUUdjvCtNa6ioXuJhDElMMWJ85HF6V-3PejVWNdKQ
 
 ###Response (HTTP/1.1 200 OK)
 Content-Type: application/json
@@ -200,4 +194,3 @@ DELETE http://localhost:8080/api/accounts/6
 Content-Type: application/json
 
 ###Response (HTTP/1.1 200 OK)
-

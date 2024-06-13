@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -19,42 +19,57 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "account")
+@Table(name = "accounts")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
     private int accountId;
 
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private CitizenCard citizenCard;
+
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Attachment avatarUrl;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "role_account",
-            joinColumns = @JoinColumn(name = "account_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> authorities;
+    @Column(name = "provider",length = 30)
+    @Enumerated(EnumType.STRING)
+    public AuthProvider provider;
+
+    public enum AuthProvider{
+        LOCAL,FACEBOOK,GOOGLE
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role",length = 30)
+    private Role role;
+    public enum Role {
+        ADMIN,
+        MEMBER,
+        MANAGER,
+        STAFF;
+    }
 
     @Column(name = "email", length = 100)
+    @NaturalId
     private String email;
 
-    @Column(name = "password", length = 50) // Consider hashing passwords for security
+    @Column(name = "password", length = 50)
     private String password;
 
     @Column(name = "phone", length = 15)
     private String phone;
 
     @Column(name = "status")
-    @ColumnDefault("1") // 1 for true, 0 for false
-    private byte status;
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.DISABLED;
 
     @Column(name = "balance")
-    private BigDecimal balance;
+    private BigDecimal balance = new BigDecimal(0);
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -71,24 +86,20 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "author",cascade = CascadeType.ALL)
     private List<BlogPost> blogPosts;
 
-    @OneToMany(mappedBy = "account")
-    private List<Bid> bids;
-
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Item> items;
-
-
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<Payment> payments;
 
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
-    private Set<Deposit> deposits;
-
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<ConsignmentDetail> consignmentDetails;
 
+    public enum Status {
+        ACTIVE,
+        DISABLED
+    }
 
-    // ... (relationships)
+
 }
 

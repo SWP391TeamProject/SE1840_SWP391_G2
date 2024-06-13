@@ -21,30 +21,32 @@ public class Attachment {
     @NaturalId
     private String blobId;
 
-    @Column(length = 300,name = "link")
+    @Column(length = 300, name = "link")
     private String link;
 
+    @Column(length = 10)
+    @Enumerated(EnumType.STRING)
+    private FileType type; // jpg, png, mp4, etc.
 
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    private Item item;
+    public enum FileType {
+        JPG, PNG, MP4
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
-
-    @ManyToOne
-    @JoinColumn(name = "consignment_id")
-    private Consignment consignment;
-
-    @ManyToOne
-    @JoinColumn(name ="auction_session_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "consignment_detail_id")
     private ConsignmentDetail consignmentDetail;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id")
+    private BlogPost blogPost;
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -53,4 +55,6 @@ public class Attachment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
+
 }
+

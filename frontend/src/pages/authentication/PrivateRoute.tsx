@@ -1,8 +1,10 @@
-import AuthContext from "@/AuthProvider";
+import AuthContext, { useAuth } from "@/AuthProvider";
 import { Roles } from "@/constants/enums";
-import { getCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { useLocation, Navigate, Outlet, useNavigate, redirect } from "react-router-dom";
+import { toast } from "react-toastify";
 
 type RolesEnum = {
   allowedRoles: Roles[];
@@ -11,8 +13,8 @@ type RolesEnum = {
 const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
   const location = useLocation();
   const userCookie = getCookie("user");
+  const nav = useNavigate();
   let parsedUser = null;
-
   if (userCookie) {
     try {
       parsedUser = JSON.parse(userCookie);
@@ -20,6 +22,7 @@ const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
       console.error("Error parsing user cookie", error);
     }
   }
+  
   return allowedRoles?.includes(parsedUser?.role) ? (
     <Outlet />
   ) : parsedUser?.email ? (

@@ -1,13 +1,10 @@
 package fpt.edu.vn.Backend.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,27 +16,32 @@ import java.util.List;
 @Builder
 @Table(name = "consignment")
 public class Consignment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "consignment_id")
     private int consignmentId;
+
 
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
     public enum Status {
-        WAITING_STAFF, IN_INITIAL_EVALUATION,SENDING, IN_FINAL_EVALUATION, FINISHED, TERMINATED
+        WAITING_STAFF, IN_INITIAL_EVALUATION,SENDING, IN_FINAL_EVALUATION,WAITING_SELLER, FINISHED, TERMINATED
     }
 
     public enum preferContact {
-        EMAIL, PHONE , TEXT_MESSAGE , ANY
+        EMAIL, PHONE , TEXT , ANY
     }
+
     @Column(name = "prefer_contact")
     @Enumerated(EnumType.STRING)
     private preferContact preferContact;
 
-//    @Collumn(name ="assignedStaff")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "staff_id")
+    private Account staff;
 
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;
@@ -51,7 +53,6 @@ public class Consignment {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
 
 }
 

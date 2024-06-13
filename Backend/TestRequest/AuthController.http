@@ -3,17 +3,21 @@ POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-  "email":"user1@email.com",
-  "password":"hashed_password1"
+  "email":"admin@localhost",
+  "password":"admin"
 }
+
 ###Response (HTTP/1.1 200 OK)
 Content-Type: application/json
 {
-  "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBlbWFpbC5jb20iLCJpYXQiOjE3MTY1MjE4MjMsImV4cCI6MTcxNjUyNjgyM30.mg3m0SnghQGpqolH8AykD25LkkPRb3TZXzLp1OxSOMceqV680hlwmEN13SF7OK1dyp4JkrKUGnYl9GZky81qvw",
-  "username": "bidder_bob",
-  "role": "ADMIN",
+  "id": 2,
+  "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbkBsb2NhbGhvc3QiLCJpYXQiOjE3MTcwNTUxMDksImV4cCI6MTcxNzA2MDEwOX0.4n6pzcei4Fl3Vizz2esYrP7MW6MWjFq-QvuWONoKtvsYdK4PkkedxdFRETHTu3YBS8jYdpAoL-VE2boz4vym6A",
+  "username": "admin",
+  "roles": [
+    "ADMIN"
+  ],
   "refreshToken": null,
-  "email": "user1@email.com",
+  "email": "admin@localhost",
   "phone": null,
   "nickname": null,
   "avatar": null,
@@ -25,7 +29,7 @@ POST http://localhost:8080/auth/register
 Content-Type: application/json
 
 {
-    "email":"vidz752204@gmail.com",
+    "email":"anhhdse182336@fpt.edu.vn",
     "password":"cute123haha",
     "confirmPassword":"cute123haha"
 }
@@ -34,9 +38,12 @@ Content-Type: application/json
 Content-Type: application/json
 
 {
-  "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2aWR6NzUyMjA0QGdtYWlsLmNvbSIsImlhdCI6MTcxNjUyMjA5MiwiZXhwIjoxNzE2NTI3MDkyfQ.Jy5sMeBFuUZGDmsY6y46fhQj_lZONaMUezEMc3dAUmtVs0v4SqCyzaHpA8KFVTw5nt4VkW9_vguhWhuwrMo0qg",
+  "id": 0,
+  "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdXRob3JpdGllcyI6WyJNRU1CRVIiXSwic3ViIjoidmlkejc1MjIwNEBnbWFpbC5jb20iLCJpYXQiOjE3MTcwNTQ4MzksImV4cCI6MTcxNzA1OTgzOX0.4M8MLuOAD_W75bwRiWHTU-HYT3BaVaNhqDoa9eP6kQ4O_-1XTVFIyDntF0t7kUwei0s3I-vE0inzxBCyg6aX8g",
   "username": null,
-  "role": "STAFF",
+  "roles": [
+    "MEMBER"
+  ],
   "refreshToken": null,
   "email": "vidz752204@gmail.com",
   "phone": null,
@@ -45,5 +52,20 @@ Content-Type: application/json
   "address": null
 }
 
+### Activate account
+POST http://localhost:8080/auth/activate-account/
+Content-Type: application/x-www-form-urlencoded
 
+code=658566
 
+### Request reset password
+POST http://localhost:8080/auth/request-reset-password/
+Content-Type: application/x-www-form-urlencoded
+
+id=2
+
+### Reset password
+POST http://localhost:8080/auth/reset-password/
+Content-Type: application/x-www-form-urlencoded
+
+code=558064&newPassword=hehe

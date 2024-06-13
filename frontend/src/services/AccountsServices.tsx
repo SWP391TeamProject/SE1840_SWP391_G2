@@ -1,6 +1,8 @@
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
+import { toast } from "react-toastify";
 const m: string = "https://fakestoreapi.com/users";
+
 export const fetchAccountsService = async () => {
   return await axios
     .get("http://localhost:8080/api/accounts/", {
@@ -11,7 +13,9 @@ export const fetchAccountsService = async () => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      toast.error(err.response.data.message);
+    });
 };
 
 export const updateAccountService = async (data: any) => {
@@ -37,7 +41,7 @@ export const createAccountService = async (data: any) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
+    .catch((err) => toast.error(err.response.data.message));
 };
 
 export const deleteAccountService = async (id: string) => {

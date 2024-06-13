@@ -9,18 +9,17 @@ public class Deposit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int depositId;
 
-    private int depositAmount;
-    private String depositDate;
-
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_session_id")
     private AuctionSession auctionSession;
 
-    @OneToOne(mappedBy = "deposit")
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
+    @Override
+    public int hashCode() {
+        return depositId;
+    }
 }
