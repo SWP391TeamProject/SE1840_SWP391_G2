@@ -49,6 +49,12 @@ export default function Balance() {
             accountId: JSON.parse(getCookie("user"))?.id,
             ipAddr: "",
             orderInfoType: "DEPOSIT",
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
         }).then(response => {
             window.location.href = response.data;
         }).catch(error => {

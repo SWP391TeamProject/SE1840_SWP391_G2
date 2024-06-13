@@ -4,6 +4,8 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,9 +79,8 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         accountDTO.setAccountId(id);
-        JwtAuthenticationToken token = (JwtAuthenticationToken) principal;
-        Account.Role editorRole = Account.Role.valueOf(token.getAuthorities().iterator().next().getAuthority());
-        return new ResponseEntity<>(accountService.updateAccount(accountDTO, editorRole), HttpStatus.OK);
+        JwtUser jwtUser = Authorizer.expectAdminOrUserId(principal, id);
+        return new ResponseEntity<>(accountService.updateAccount(accountDTO, jwtUser.getRole()), HttpStatus.OK);
     }
 
     @PostMapping("/avatar/{id}")
