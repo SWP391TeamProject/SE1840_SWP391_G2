@@ -63,7 +63,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
     }
 
-    @Scheduled(fixedRate = 21600000 ,initialDelay = 0)
+    @Scheduled(fixedRate = 20000 ,initialDelay = 0)
     public void scheduleFixedRateTask() {
         for (AuctionSession session : auctionSessionRepos.findAll()) {
             if(session.getStatus().equals(AuctionSession.Status.FINISHED) ||

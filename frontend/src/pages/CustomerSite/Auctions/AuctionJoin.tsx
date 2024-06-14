@@ -72,9 +72,9 @@ export default function AuctionJoin() {
       return;
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
-      toast.error(JSON.parse(payload.body).body);
-      client?.deactivate();
-      client?.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
+      if (payload.headers["message-id"].includes(JSON.parse(payload.body).body.split(":")[0]))
+        toast.error(JSON.parse(payload.body).body.split(":")[1]);
+
       return;
     }
     const message = JSON.parse(payload.body).body;

@@ -54,6 +54,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         for (AuctionItem auctionItem : auctionSession.getAuctionItems()) {
             items.add(auctionItem.getItem());
         }
+        if(items.isEmpty()){
+            throw new ResourceNotFoundException("No items found in auction session");
+        }
         BigDecimal minPrice = new BigDecimal(100);
         BigDecimal maxPrice = new BigDecimal(1000);
         BigDecimal depositAmount = items.get(0).getReservePrice()

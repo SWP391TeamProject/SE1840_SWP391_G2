@@ -82,7 +82,7 @@ public class BidController {
                 auctionItemService.updateAuctionItem(a);
                 return ResponseEntity.ok(account.getNickname()+" bid "+bidDTO.getPayment().getAmount() + "  : " + (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) + ":BID");
             } else {
-                return new ResponseEntity<>("Your bid must be higher than the current bid by at least 5", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(headerAccessor.getSessionId()+":Your bid must be higher than the current bid by at least 5", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
