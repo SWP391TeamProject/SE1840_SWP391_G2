@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import { getCookie } from '@/utils/cookies'
 import { registerAuctionSession } from '@/services/AuctionSessionService'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { AuctionSessionStatus } from '@/constants/enums'
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
@@ -42,7 +43,7 @@ export default function AuctionSession() {
         if (param.id) {
             axios.get("http://localhost:8080/api/auction-sessions/" + param.id)
                 .then(res => {
-                    console.log(res.data.attachments);
+                    console.log(res.data);
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
                     toast.success("Auction Session Loaded");
@@ -173,13 +174,21 @@ export default function AuctionSession() {
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-sm font-medium dark:bg-gray-700">
                                     <ClockIcon className="h-5 w-5" />
-                                    <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>
+
+                                    {auctionSession?.status===AuctionSessionStatus.PROGRESSING &&
+                                    <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+                                    
+                                    {auctionSession?.status===AuctionSessionStatus.SCHEDULED &&
+                                    <span>Start in {auctionSession?.startDate ? <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+
                                 </div>
 
 
                                 {bidders.includes(userId) ? (
+                                    auctionSession?.status===AuctionSessionStatus.PROGRESSING &&
                                     <Button onClick={() => scrollTo({ top: (document.getElementById("auction-items")?.offsetTop), behavior: 'smooth' })}>Place Bid</Button>
                                 ) : (
+                                    auctionSession?.status===AuctionSessionStatus.SCHEDULED &&
                                     <ConfirmRegister></ConfirmRegister>
                                 )}
 

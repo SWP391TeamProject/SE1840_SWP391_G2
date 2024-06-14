@@ -15,7 +15,7 @@ export const Buy = () => {
             (The deposit may not be the same in different auctions)
             <br /> (the deposit will be refunded if you lose and will be deducted directly from the amount of the item to be paid for if you win)</li>
         </ul>
-        <Button variant={'default'} className='m-4'>
+        <Button variant={'default'} className='m-4' asChild>
           <Link to="/auctions">
           Register
           </Link>

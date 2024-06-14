@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
-import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
+import { fetchActiveAuctionSessions, fetchAllAuctionSessions } from "@/services/AuctionSessionService";
 import { useQuery } from "@tanstack/react-query";
 import  { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ export default function AuctionList() {
 
   const { isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
-    queryFn: () => fetchAllAuctionSessions(auctionSessionList.currentPageNumber, 10),
+    queryFn: () => fetchActiveAuctionSessions(auctionSessionList.currentPageNumber, 10),
   });
 
   const [timeLeft, setTimeLeft] = useState({
