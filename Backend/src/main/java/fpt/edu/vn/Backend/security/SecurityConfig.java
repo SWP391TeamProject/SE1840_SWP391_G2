@@ -101,7 +101,7 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","api/auction-sessions/**","/auction-join/**","/api/item-categories/**","/test").permitAll()
+                        .requestMatchers("/auth/**","api/auction-sessions/**","/auction-join/**","/api/item-categories/**","/test","/.well-known/**").permitAll()
                         .anyRequest().authenticated()
 
                 )

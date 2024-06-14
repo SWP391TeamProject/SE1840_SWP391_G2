@@ -10,7 +10,7 @@ RUN ./mvnw clean install
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /opt/app
 COPY .env.properties /opt/app/.env.properties
-EXPOSE 80
+EXPOSE 8080
 
 COPY --from=builder /opt/app/target/*.jar /opt/app/*.jar
 
