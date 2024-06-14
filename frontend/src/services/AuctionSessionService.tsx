@@ -1,6 +1,7 @@
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from '@/config/axiosConfig.ts';
 import { toast } from "react-toastify";
+import { SERVER_DOMAIN_URL } from "@/constants/domain";
 
 const controller = "auction-sessions";
 
@@ -13,7 +14,7 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
     console.log(params);
 
     return await axios
-        .get("http://localhost:8080/api/auction-sessions/", {
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -36,7 +37,7 @@ export const fetchFeaturedAuctionSessions = async (page?: number, size?: number)
     }
 
     return await axios
-        .get("http://localhost:8080/api/auction-sessions/featured", {
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/featured`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -55,7 +56,7 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
     }
 
     return await axios
-        .get("http://localhost:8080/api/auction-sessions/completed", {
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -74,7 +75,7 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
     }
 
     return await axios
-        .get("http://localhost:8080/api/auction-sessions/upcoming", {
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -89,7 +90,7 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
 
 export const fetchAuctionSessionById = async (id: number) => {
     return await axios
-        .get(`http://localhost:8080/api/${controller}/${id}`, {
+        .get(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -111,7 +112,7 @@ export const fetchAuctionSessionByTitle = async (page?: number, size?: number,ti
         size: size ?? 10,
     }
     return await axios
-        .get(`http://localhost:8080/api/${controller}/search/${title}`, {
+        .get(`${SERVER_DOMAIN_URL}/api/${controller}/search/${title}`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -129,7 +130,7 @@ export const fetchAuctionSessionByTitle = async (page?: number, size?: number,ti
 
 export const createAuctionSession = async (data: any) => {
     return await axios
-        .post(`http://localhost:8080/api/${controller}/`, data, {
+        .post(`${SERVER_DOMAIN_URL}/api/${controller}/`, data, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -149,7 +150,7 @@ export const createAuctionSession = async (data: any) => {
 
 export const updateAuctionSession = async (data: any) => {
     return await axios
-        .put(`http://localhost:8080/api/${controller}/${data.auctionSessionId}`, data, {
+        .put(`${SERVER_DOMAIN_URL}/api/${controller}/${data.auctionSessionId}`, data, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
@@ -161,7 +162,7 @@ export const updateAuctionSession = async (data: any) => {
 
 export const registerAuctionSession = async (id: number) => {
     return await axios
-        .get(`http://localhost:8080/api/auction-sessions/register/${id}`, {
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/register/${id}`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",

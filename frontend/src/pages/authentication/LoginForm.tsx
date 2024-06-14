@@ -197,7 +197,7 @@ function LoginForm() {
       <div className="hidden">
 
         <Button >
-          <a href={`http://localhost:8080/oauth2/authorize/facebook?redirect_uri=http://localhost:5173/auth/login?type=facebook`}>
+          <a href={`${SERVER_DOMAIN_URL}/oauth2/authorize/facebook?redirect_uri=http://localhost:5173/auth/login?type=facebook`}>
             login with Facebook
           </a>
         </Button>

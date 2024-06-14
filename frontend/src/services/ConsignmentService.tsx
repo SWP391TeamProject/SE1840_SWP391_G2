@@ -1,3 +1,4 @@
+import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -9,7 +10,7 @@ export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: 
   }
   console.log(params);
   return await axios
-    .get("http://localhost:8080/api/consignments/", {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -35,7 +36,7 @@ export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: 
 export const fetchConsignmentByConsignmentId = async (id: number) => {
 
   return await axios
-    .get(`http://localhost:8080/api/consignments/${id}`, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -56,7 +57,7 @@ export const fetchConsignmentByConsignmentId = async (id: number) => {
 
 export const updateConsignmentService = async (data: any) => {
   return await axios
-    .put("http://localhost:8080/api/consignments/", data, {
+    .put(`${SERVER_DOMAIN_URL}/api/consignments/`, data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -69,7 +70,7 @@ export const updateConsignmentService = async (data: any) => {
 
 export const createConsignmentService = async (data: any) => {
   return await axios
-    .post("http://localhost:8080/api/consignments/create", data, {
+    .post(`${SERVER_DOMAIN_URL}/api/consignments/create`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
         "Access-Control-Allow-Origin": "*",
@@ -151,7 +152,7 @@ export const acceptEvaluation = async (id: string,accountId:number) => {
 //customer
 export const acceptInitialEva = async (id: number) => {
   return await axios
-    .get("http://localhost:8080/api/consignments/acceptIniEva/"+id, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/acceptIniEva/`+id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -162,7 +163,7 @@ export const acceptInitialEva = async (id: number) => {
 };
 export const rejectInitialEva = async (id: number) => {
   return await axios
-    .get("http://localhost:8080/api/consignments/rejectIniEva/"+id, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/rejectIniEva/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -174,7 +175,7 @@ export const rejectInitialEva = async (id: number) => {
 
 export const acceptFinalEva = async (id: number) => {
   return await axios
-    .get("http://localhost:8080/api/consignments/acceptFinalEva/"+id, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/acceptFinalEva/`+id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -185,7 +186,7 @@ export const acceptFinalEva = async (id: number) => {
 };
 export const rejectFinalEva = async (id: number) => {
   return await axios
-    .get("http://localhost:8080/api/consignments/rejectFinalEva/"+id, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/rejectFinalEva/`+id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
