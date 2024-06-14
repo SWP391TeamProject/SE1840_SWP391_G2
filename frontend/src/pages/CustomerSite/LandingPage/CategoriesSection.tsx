@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { getAllItemCategories } from "@/services/ItemCategoryService";
 import {
   AntennaIcon,
   CrownIcon,
@@ -6,10 +7,20 @@ import {
   HotelIcon,
   VenetianMaskIcon,
 } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function CategoriesSection() {
+  const [categories, setCategories] = React.useState([]);
+  useEffect(() => {
+    getAllItemCategories(0,5).then((res) => {
+      setCategories(res.data.content);
+      console.log(res.data.content);
+    }).catch((err) => {
+      toast.error(err.response.data.message);
+    });
+  }, []);
   return (
     <>
       {" "}
@@ -27,58 +38,27 @@ export default function CategoriesSection() {
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            <Link
-              className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
-              to="#"
-            >
-              <AntennaIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
-              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
-                Antique
-              </span>
-            </Link>
-            <Link
-              className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
-              to="#"
-            >
-              <HistoryIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
-              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
-                Vintage
-              </span>
-            </Link>
-            <Link
-              className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
-              to="#"
-            >
-              <CrownIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
-              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
-                Edwardian
-              </span>
-            </Link>
-            <Link
-              className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
-              to="#"
-            >
-              <HotelIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
-              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
-                Art Deco
-              </span>
-            </Link>
-            <Link
-              className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
-              to="#"
-            >
-              <VenetianMaskIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
-              <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
-                Victorian
-              </span>
-            </Link>
+            {categories.map((category) => (
+
+              <Link key={category.id}
+                className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
+                to= {`/item/${category.name}`}
+              >
+                <CrownIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
+                <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
+                  {category.name}
+                </span>
+              </Link>
+            ))}
+
           </div>
           <div className="flex justify-center">
             <Button
               className="hover:bg-gray-100 dark:hover:bg-gray-800"
               variant="outline"
+              asChild
             >
-              View More
+              <Link to="/item">View More</Link>
             </Button>
           </div>
         </div>
