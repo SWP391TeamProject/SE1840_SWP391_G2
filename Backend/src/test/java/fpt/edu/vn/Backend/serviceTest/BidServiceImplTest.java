@@ -148,11 +148,36 @@ class BidServiceImplTest {
 
     @Test
     void getHighestBid_HappyPath() {
-        when(auctionItemRepos.findById(any())).thenReturn(Optional.of(new AuctionItem()));
+        AuctionItemId auctionItemId = new AuctionItemId(1, 1);
+        Item item = new Item();
+        item.setItemId(1);
+        AuctionItem auctionItem = new AuctionItem();
+        auctionItem.setItem(item);
+        when(auctionItemRepos.findById(any())).thenReturn(Optional.of(  auctionItem));
         when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(any())).thenReturn(new ArrayList<>());
-        assertNull(bidService.getHighestBid(new AuctionItemId()));
+        assertNotNull(bidService.getHighestBid(auctionItemId));
     }
 
+    @Test
+    void getHighestBid_AuctionItemNotFound() {
+        AuctionItemId auctionItemId = new AuctionItemId(1,1);
+        when(auctionItemRepos.findById(any())).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> bidService.getHighestBid(auctionItemId));
+    }
+
+    @Test
+    void getHighestBid_NoBids() {
+        AuctionItemId auctionItemId = new AuctionItemId(1, 1);
+        Item item = new Item();
+        item.setItemId(1);
+        item.setReservePrice(BigDecimal.valueOf(100));
+        AuctionItem auctionItem = new AuctionItem();
+        auctionItem.setItem(item);
+
+        when(auctionItemRepos.findById(any())).thenReturn(Optional.of(auctionItem));
+        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(any())).thenReturn(new ArrayList<>());
+        assertEquals(item.getReservePrice(),bidService.getHighestBid(auctionItemId).getPayment().getAmount());
+    }
     @Test
     void deleteBid_HappyPath() {
         when(bidRepos.findById(any())).thenReturn(Optional.of(new Bid()));

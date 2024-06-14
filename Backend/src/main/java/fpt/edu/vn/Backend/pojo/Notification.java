@@ -29,7 +29,7 @@ public class Notification {
     private String message;
 
     @Column(length = 20)
-    private String type; // news, system, support, etc.
+    private String type; // news, system, support, bid,  etc.
 
     @Column(name = "is_read")
     private boolean isRead; // Use boolean for read/unread status

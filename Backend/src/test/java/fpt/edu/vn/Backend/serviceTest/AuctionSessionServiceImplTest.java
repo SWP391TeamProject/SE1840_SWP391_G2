@@ -163,6 +163,14 @@ public class AuctionSessionServiceImplTest {
     @DisplayName("Test get upcoming auction sessions")
     void testGetUpcomingAuctionSessions() {
         Pageable pageable = PageRequest.of(0, 10);
+        auctionSession= new AuctionSession();
+        auctionSession.setAuctionSessionId(1);
+        auctionSession.setStartDate(LocalDateTime.now().plusDays(1));
+        auctionSession.setEndDate(LocalDateTime.now().plusDays(2));
+        auctionSession.setCreateDate(LocalDateTime.now().minusDays(2));
+        auctionSession.setUpdateDate(LocalDateTime.now());
+        auctionSession.setStatus(AuctionSession.Status.SCHEDULED);
+        
         Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
         when(auctionSessionRepos.findByStartDateAfter(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
 

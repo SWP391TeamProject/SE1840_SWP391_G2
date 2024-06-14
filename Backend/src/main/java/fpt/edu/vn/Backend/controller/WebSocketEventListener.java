@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class WebSocketEventListener {
     }
 
 
+
     @EventListener
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
@@ -47,10 +49,19 @@ public class WebSocketEventListener {
         if(auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])) == null) {
             logger.info("Auction session not found");
             messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3]+"/"+ topic.split("/")[4], "Auction session not found:0:ERROR");
+//            throw new ResourceNotFoundException("Auction session not found");
         }
         else if(auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus().equalsIgnoreCase("FINISHED")) {
             logger.info("Auction session ended");
             messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3]+"/"+ topic.split("/")[4], "Auction session has ended:0:ERROR");
+//            throw new ResourceNotFoundException("Auction session has ended");
+
+        }
+        else if(auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus().equalsIgnoreCase("SCHEDULED")) {
+            logger.info("Auction session not started");
+            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3]+"/"+ topic.split("/")[4], "Auction session not started:0:ERROR");
+//            throw new ResourceNotFoundException("Auction session not started");
+
         }
     }
 }

@@ -110,7 +110,12 @@ public class BidServiceImpl implements BidService {
                 () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
         );
         List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
-        if(bids.isEmpty()) return null;
+        BidDTO result= new BidDTO();
+        result.setPayment(new PaymentDTO());
+        result.getPayment().setAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
+                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
+        ).getItem().getReservePrice());
+        if(bids.isEmpty()) return result;
         return new BidDTO(bids.get(0));
     }
 
