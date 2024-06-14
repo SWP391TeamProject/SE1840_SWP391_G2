@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -60,8 +62,13 @@ public class AuctionSessionController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession() {
-        return null;
+    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession( @PageableDefault(size = 10) Pageable pageable) {
+        List<AuctionSessionDTO> listA=auctionSessionService.getAllAuctionSessions(pageable).stream().filter(
+                auctionSessionDTO ->
+                        !auctionSessionDTO.getStatus().equals("FINISHED")&&!auctionSessionDTO.getStatus().equals("TERMINATED")
+        ).toList();
+
+        return new ResponseEntity<>( new PageImpl<>(listA), HttpStatus.OK);
     }
 
     @GetMapping("/inactive")
@@ -89,7 +96,7 @@ public class AuctionSessionController {
 
     @GetMapping("/featured")
     public ResponseEntity<Page<AuctionSessionDTO>> getFeaturedAuctionSession(@RequestParam(required = false) @PageableDefault(size = 50) Pageable pageable) {
-        return new ResponseEntity(auctionSessionService.getFeaturedAuctionSessions(pageable), HttpStatus.OK);
+        return new ResponseEntity<>(auctionSessionService.getFeaturedAuctionSessions(pageable), HttpStatus.OK);
     }
 
     @GetMapping("/current")

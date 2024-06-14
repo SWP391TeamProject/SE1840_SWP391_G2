@@ -9,10 +9,9 @@ import fpt.edu.vn.Backend.security.JwtHandshakeInterceptor;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -30,16 +29,19 @@ import java.util.concurrent.TimeUnit;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JWTGenerator jwtGenerator;
     private final CustomUserDetailsService customUserDetailsService;
-    private AuctionSessionService auctionSessionService;
+    private final AuctionSessionService auctionSessionService;
+    private final AuctionSessionRepos auctionSessionRepos;
 
     @Autowired
-    public WebSocketConfig(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService, AuctionSessionService auctionSessionService) {
+    public WebSocketConfig(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService, AuctionSessionService auctionSessionService, AuctionSessionRepos auctionSessionRepos) {
         this.jwtGenerator = jwtGenerator;
         this.customUserDetailsService = customUserDetailsService;
         this.auctionSessionService = auctionSessionService;
+        this.auctionSessionRepos = auctionSessionRepos;
     }
 
-    public void startTimeout(int id, int delayInSeconds) {
+
+    public void finishAuction(int id, int delayInSeconds) {
         final Runnable timeout = new Runnable() {
             public void run() {
                 auctionSessionService.finishAuction(id);
@@ -50,16 +52,42 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
     }
 
-    @Bean
-    public ApplicationRunner applicationRunner(AuctionSessionRepos auctionSessionRepos) {
-        return args -> {
-            for(AuctionSession session : auctionSessionRepos.findAll()) {
-                int delay = (int) (session.getEndDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
-                startTimeout(session.getAuctionSessionId(), Math.max(delay, 0));
-                log.info("Auction session " + session.getAuctionSessionId() + " started with delay " + Math.max(delay, 0));
+    public void startAuction(int id, int delayInSeconds) {
+        final Runnable timeout = new Runnable() {
+            public void run() {
+                auctionSessionService.startAuction(id);
+                log.info("Start auction: " + id);
+
             }
         };
+        final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
     }
+
+    @Scheduled(fixedRate = 21600000 ,initialDelay = 0)
+    public void scheduleFixedRateTask() {
+        for (AuctionSession session : auctionSessionRepos.findAll()) {
+            if(session.getStatus().equals(AuctionSession.Status.FINISHED) ||
+                    session.getStatus().equals(AuctionSession.Status.TERMINATED)){
+                continue;
+            }
+            if(session.getEndDate().isBefore(LocalDateTime.now())){
+                finishAuction(session.getAuctionSessionId(), 1);
+                log.info("Auction session " + session.getAuctionSessionId() + " finished:"+session.getEndDate());
+            } else
+            if(session.getStatus().equals(AuctionSession.Status.SCHEDULED)){
+                int delay = (int) (session.getStartDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                startAuction(session.getAuctionSessionId(), Math.max(delay, 0));
+                log.info("Auction session " + session.getAuctionSessionId() + " start in "+delay+" seconds:"+session.getStartDate());
+            } else
+            if (session.getStatus().equals(AuctionSession.Status.PROGRESSING)){
+                int delay = (int) (session.getEndDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
+                log.info("Auction session " + session.getAuctionSessionId() + " will finish in " + Math.max(delay, 0));
+            }
+
+        }
+    }
+
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -79,13 +107,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public void startTimeout(String topic, int delayInSeconds) {
-        final Runnable timeout = new Runnable() {
-            public void run() {
-                // Code to unsubscribe the client from the topic or close the WebSocket session
-                System.out.println("Timeout for topic: " + topic);
-            }
-        };
-        final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
-    }
 }
