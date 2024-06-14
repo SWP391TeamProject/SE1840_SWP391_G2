@@ -9,6 +9,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { Button } from "@/components/ui/button";
+import thumbnail1 from "@/assets/thumnail1.jpg";
+import thumbnail2 from "@/assets/thumnail2.jpg";
+
 export default function LandingPageCarousel() {
   return (
     <>
@@ -58,7 +61,7 @@ export default function LandingPageCarousel() {
                             alt="Hero"
                             className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
                             height="550"
-                            src="src\assets\thumnail1.jpg"
+                            src={thumbnail1}
                             width="550"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
@@ -68,7 +71,7 @@ export default function LandingPageCarousel() {
                             alt="Hero"
                             className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
                             height="550"
-                            src="src\assets\thumnail2.jpg"
+                            src={thumbnail2}
                             width="550"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
@@ -115,7 +118,7 @@ export default function LandingPageCarousel() {
                               alt="Hero"
                               className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
                               height="550"
-                              src="src\assets\thumnail1.jpg"
+                              src={thumbnail1}
                               width="550"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />

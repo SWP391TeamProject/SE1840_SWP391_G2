@@ -9,7 +9,11 @@ import { toast } from 'react-toastify'
 import { getCookie } from '@/utils/cookies'
 import { registerAuctionSession } from '@/services/AuctionSessionService'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+
 import { AuctionSessionStatus } from '@/constants/enums'
+
+import { SERVER_DOMAIN_URL } from '@/constants/domain'
+
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
@@ -28,7 +32,7 @@ export default function AuctionSession() {
     useEffect(() => {
 
         if (auctionSession == null) {
-            axios.get("http://localhost:8080/api/auction-sessions/1")
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
                 .then(res => {
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
@@ -41,7 +45,7 @@ export default function AuctionSession() {
 
         }
         if (param.id) {
-            axios.get("http://localhost:8080/api/auction-sessions/" + param.id)
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
                     console.log(res.data);
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });

@@ -12,6 +12,7 @@ import fpt.edu.vn.Backend.security.JWTAuthEntryPoint;
 import fpt.edu.vn.Backend.security.JWTAuthenticationFilter;
 import org.apache.catalina.filters.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,7 +63,8 @@ public class SecurityConfig {
     private OAuth2AuthenticationSuccessHandler customOAuth2Success;
     @Autowired
     private OAuth2AuthenticationFailureHandler customOAuth2Failure;
-
+    @Value("${FRONTEND_CORS_SERVER}")
+    private  String FRONTEND_SERVER_URL;
     @Autowired
     public SecurityConfig(
             JWTAuthEntryPoint jwtAuthEntryPoint,
@@ -75,7 +77,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Corrected origin
+        configuration.setAllowedOrigins(List.of(FRONTEND_SERVER_URL,"http://localhost:5173")); // Corrected origin
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token", "access-control-allow-origin"));
         configuration.setExposedHeaders(List.of("x-auth-token"));
@@ -99,7 +101,7 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**","api/auction-sessions/**","/auction-join/**","/api/item-categories/**","/test").permitAll()
+                        .requestMatchers("/auth/**","api/auction-sessions/**","/auction-join/**","/api/item-categories/**","/test","/.well-known/**").permitAll()
                         .anyRequest().authenticated()
 
                 )

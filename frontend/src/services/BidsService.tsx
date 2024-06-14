@@ -1,9 +1,10 @@
+import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 
 export const fetchBidsByAccount = async (id:number) => {
   return await axios
-    .get("http://localhost:8080/api/bids/"+id, {
+    .get(`${SERVER_DOMAIN_URL}/api/bids/`+id, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -24,7 +25,7 @@ export const fetchBidsByAccount = async (id:number) => {
 
 export const fetchBidsByAuctionItemId = async (auctionId:number,itemId:number) => {
   return await axios
-    .get("http://localhost:8080/api/bids/"+auctionId+"/"+itemId, {
+    .get(`${SERVER_DOMAIN_URL}/api/bids/`+auctionId+`/`+itemId, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

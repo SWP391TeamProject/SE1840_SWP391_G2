@@ -1,11 +1,11 @@
-import { getCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 import { toast } from "react-toastify";
-const m: string = "https://fakestoreapi.com/users";
+import { SERVER_DOMAIN_URL } from "@/constants/domain";
 
 export const fetchAccountsService = async () => {
   return await axios
-    .get("http://localhost:8080/api/accounts/", {
+    .get(`${SERVER_DOMAIN_URL}/api/accounts/`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -20,7 +20,7 @@ export const fetchAccountsService = async () => {
 
 export const updateAccountService = async (data: any) => {
   return await axios
-    .put("http://localhost:8080/api/accounts/", data, {
+    .put(`${SERVER_DOMAIN_URL}/api/accounts/`, data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -33,7 +33,7 @@ export const updateAccountService = async (data: any) => {
 
 export const createAccountService = async (data: any) => {
   return await axios
-    .post("http://localhost:8080/api/accounts/", data, {
+    .post(`${SERVER_DOMAIN_URL}/api/accounts/`, data, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -46,7 +46,7 @@ export const createAccountService = async (data: any) => {
 
 export const deleteAccountService = async (id: string) => {
   return await axios
-    .delete(`http://localhost:8080/api/accounts/${id}`, {
+    .delete(`${SERVER_DOMAIN_URL}/api/accounts/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

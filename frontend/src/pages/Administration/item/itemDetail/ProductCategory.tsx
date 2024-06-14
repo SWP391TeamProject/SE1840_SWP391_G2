@@ -16,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { SERVER_DOMAIN_URL } from "@/constants/domain"
 import { getCookie } from "@/utils/cookies"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
@@ -30,7 +31,7 @@ export default function ProductCategory({ ...props }) {
 
     useEffect(() => {
 
-        fetch('http://localhost:8080/api/item-categories/', {
+        fetch(`${SERVER_DOMAIN_URL}/api/item-categories/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

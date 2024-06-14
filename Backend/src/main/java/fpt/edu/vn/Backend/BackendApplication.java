@@ -44,8 +44,10 @@ public class BackendApplication {
 					throw new RuntimeException(e);
 				}
 			});
+
 		}
 		builder.run(args);
+
 	}
 
 
