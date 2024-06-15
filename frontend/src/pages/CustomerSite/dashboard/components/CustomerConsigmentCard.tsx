@@ -4,10 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ConsignmentDetailType, ConsignmentStatus } from "@/constants/enums";
 import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from "@/services/ConsignmentService";
-import { Description, Dialog } from "@radix-ui/react-dialog";
-import { CheckIcon } from "lucide-react";
 import React from "react";
-import { set } from "react-hook-form";
 import { toast } from "react-toastify";
 
 export default function CustomerConsigmentCard({ consignment }) {

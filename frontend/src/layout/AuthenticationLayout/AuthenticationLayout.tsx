@@ -1,5 +1,5 @@
 import NavBar from "@/components/NavBar/NavBar";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 
 export default function AuthenticationLayout() {

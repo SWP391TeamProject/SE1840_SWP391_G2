@@ -170,9 +170,9 @@ function RegisterForm() {
 
             <div className="flex w-full justify-center">
               {
-                isLoading ? 
-                <Button disabled className="w-4/6   rounded-2xl">
-                  <Loader2 className="animate-spin"/>
+                isLoading ?
+                  <Button disabled className="w-4/6   rounded-2xl">
+                    <Loader2 className="animate-spin" />
 
                   </Button>
                   :

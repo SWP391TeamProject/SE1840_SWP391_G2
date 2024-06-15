@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useEffect } from "react";
 //   import { Progress } from "@/components/ui/progress"
 
 export default function TotalValuation({ ...props }) {

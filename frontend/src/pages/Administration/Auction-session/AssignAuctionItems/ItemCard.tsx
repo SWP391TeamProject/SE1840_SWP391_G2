@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import React from "react";
 
 export default function ItemCard({ ...props }) {
     return <Card className="w-[200px] h-[50]">

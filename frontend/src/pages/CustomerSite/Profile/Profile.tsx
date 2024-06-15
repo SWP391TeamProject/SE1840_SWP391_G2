@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
-import NavBar from "@/components/NavBar/NavBar";
 import Footer from "@/components/footer/Footer";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 

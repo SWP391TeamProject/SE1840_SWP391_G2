@@ -1,4 +1,3 @@
-import { Upload } from "lucide-react"
 
 import {
     Card,
@@ -7,7 +6,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 
 
