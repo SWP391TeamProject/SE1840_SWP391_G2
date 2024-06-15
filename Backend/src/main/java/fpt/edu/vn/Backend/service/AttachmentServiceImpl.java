@@ -40,7 +40,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     private AuctionSessionRepos auctionRepos;
     @Autowired
     private BlogPostRepos blogPostRepos;
-    @Value("${AZURE_STORAGE_CONNECTION_STRING}")
+    @Value("${AZURE_STORAGE_CONNECTION_STRING:}")
     private  String connectStr ;
     @Autowired
     public AttachmentServiceImpl(AttachmentRepos attachmentRepository, AccountRepos accountRepos, ConsignmentDetailRepos consignmentDetailRepos,ItemRepos itemRepository) {
