@@ -1,14 +1,12 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.BlogCategoryDTO;
 import fpt.edu.vn.Backend.DTO.BlogCreateDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
-import fpt.edu.vn.Backend.pojo.BlogCategory;
-import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
-import fpt.edu.vn.Backend.service.BlogService;
+import fpt.edu.vn.Backend.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -19,10 +17,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/blogs")
 public class BlogController {
+    private static final Logger log = LoggerFactory.getLogger(BlogController.class);
     @Autowired
     private BlogService blogService;
     @Autowired
-    private AttachmentServiceImpl attachmentServiceImpl;
+    private AttachmentService attachmentService;
+    @Autowired
+    private AccountService accountService;
+    @Autowired
+    private BlogCategoryService blogCategoryService;
 
     @GetMapping("/")
     public ResponseEntity<Page<BlogPostDTO>> getAllBlogs(@PageableDefault Pageable pageable) {
@@ -30,14 +33,12 @@ public class BlogController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<BlogPostDTO>> searchBlog(@RequestParam String keyword, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb, pageSize);
+    public ResponseEntity<Page<BlogPostDTO>> searchBlog(@RequestParam String keyword, @PageableDefault(size = 50) Pageable pageable) {
         return new ResponseEntity<>(blogService.searchBlog(keyword, pageable), HttpStatus.OK);
     }
 
     @GetMapping("/category")
-    public ResponseEntity<Page<BlogPostDTO>> getBlogByCategory(@RequestParam int categoryId, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb, pageSize);
+    public ResponseEntity<Page<BlogPostDTO>> getBlogByCategory(@RequestParam int categoryId, @PageableDefault(size = 50) Pageable pageable) {
         return new ResponseEntity<>(blogService.getBlogByCategory(categoryId, pageable), HttpStatus.OK);
     }
 
@@ -48,17 +49,20 @@ public class BlogController {
 
     @PostMapping("/")
     public ResponseEntity<BlogPostDTO> createBlog(@RequestBody BlogCreateDTO blogCreateDTO) {
+        log.info("Create blog: " + blogCreateDTO.getCategoryId());
         BlogPostDTO blogPostDTO = new BlogPostDTO();
         blogPostDTO.setTitle(blogCreateDTO.getTitle());
         blogPostDTO.setContent(blogCreateDTO.getContent());
-        blogPostDTO.setAuthorId(blogCreateDTO.getUserId());
+        blogPostDTO.setAuthor(accountService.getAccountById(blogCreateDTO.getUserId()));
         blogPostDTO.setCreateDate(blogCreateDTO.getCreateDate());
         blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
-        blogPostDTO.setCategoryId(blogCreateDTO.getCategoryId());
+        blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
         blogPostDTO = blogService.createBlog(blogPostDTO);
         try {
-            for (MultipartFile image : blogCreateDTO.getImages()) {
-                attachmentServiceImpl.uploadBlogAttachment(image, blogPostDTO.getPostId());
+            if (blogCreateDTO.getImages() != null && !blogCreateDTO.getImages().isEmpty()) {
+                for (MultipartFile image : blogCreateDTO.getImages()) {
+                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
+                }
             }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -69,17 +73,18 @@ public class BlogController {
     @PutMapping("/{id}")
     public ResponseEntity<BlogPostDTO> updateBlog(@PathVariable int id, @RequestBody BlogCreateDTO blogCreateDTO) {
         BlogPostDTO blogPostDTO = new BlogPostDTO();
+        blogPostDTO.setPostId(id);
         blogPostDTO.setTitle(blogCreateDTO.getTitle());
         blogPostDTO.setContent(blogCreateDTO.getContent());
-        blogPostDTO.setAuthorId(blogCreateDTO.getUserId());
+        blogPostDTO.setAuthor(accountService.getAccountById(blogCreateDTO.getUserId()));
         blogPostDTO.setCreateDate(blogCreateDTO.getCreateDate());
         blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
-        blogPostDTO.setCategoryId(blogCreateDTO.getCategoryId());
-        blogPostDTO = blogService.createBlog(blogPostDTO);
+        blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
+        blogPostDTO = blogService.updateBlog(blogPostDTO);
         if (blogCreateDTO.getImages() != null && !blogCreateDTO.getImages().isEmpty()) {
             try {
                 for (MultipartFile image : blogCreateDTO.getImages()) {
-                    attachmentServiceImpl.uploadBlogAttachment(image, blogPostDTO.getPostId());
+                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
                 }
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
