@@ -46,8 +46,8 @@ public class BlogServiceImpl implements BlogService{
         blogPost.setContent(blogPostDTO.getContent());
         blogPost.setCreateDate(blogPostDTO.getCreateDate());
         blogPost.setUpdateDate(blogPostDTO.getUpdateDate());
-        blogPost.setCategory(blogCategoryRepos.findById(blogPostDTO.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Invalid category id: " + blogPostDTO.getCategoryId())));
-        blogPost.setAuthor(accountRepos.findById(blogPostDTO.getAuthorId()).orElseThrow(() -> new ResourceNotFoundException("Invalid author id: " + blogPostDTO.getAuthorId())));
+        blogPost.setCategory(blogCategoryRepos.findById(blogPostDTO.getCategory().getBlogCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Invalid category id: " + blogPostDTO.getCategory())));
+        blogPost.setAuthor(accountRepos.findById(blogPostDTO.getAuthor().getAccountId()).orElseThrow(() -> new ResourceNotFoundException("Invalid author id: " + blogPostDTO.getAuthor())));
         return blogPost;
     }
     @Override

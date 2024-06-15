@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class BlogPostDTO {
     private int postId;
-    private int categoryId;
-    private int authorId;
+    private BlogCategoryDTO category;
+    private AccountDTO author;
     private String title;
     private String content;
     private LocalDateTime createDate;
@@ -22,8 +22,8 @@ public class BlogPostDTO {
 
     public BlogPostDTO(BlogPost blogPost) {
         this.postId = blogPost.getPostId();
-        this.categoryId = blogPost.getCategory().getBlogCategoryId();
-        this.authorId = blogPost.getAuthor().getAccountId();
+        this.category = new BlogCategoryDTO(blogPost.getCategory());
+        this.author = new AccountDTO(blogPost.getAuthor());
         this.title = blogPost.getTitle();
         this.content = blogPost.getContent();
         this.createDate = blogPost.getCreateDate();

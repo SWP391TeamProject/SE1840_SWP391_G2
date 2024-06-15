@@ -1,5 +1,10 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.DTO.ItemDTO;
+
 import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -12,10 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.querydsl.binding.OptionalValueBinding;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,7 +42,18 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final AccountServiceImpl accountServiceImpl;
 
     @Autowired
+
+    private ItemRepos itemRepos;
+
+    @Autowired
+    private AuctionItemRepos auctionItemRepos;
+
+
+    @Autowired
+    public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos) {
+
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos, BidRepos bidRepos, BidService bidService, PaymentService paymentServiceImpl, AccountServiceImpl accountServiceImpl) {
+
         this.auctionSessionRepos = auctionSessionRepos;
         this.accountRepos = accountRepos;
         this.depositRepos = depositRepos;
@@ -97,6 +118,36 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     public String placePreBid(int auctionSessionId, int accountId, double amount) {
         return "";
+    }
+
+    @Override
+    public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
+        try {
+            AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Auction Session not found: " + assign.getAuctionSessionId()));
+
+            List<AuctionItem> auctionItemList = new ArrayList<>();
+            for (Integer itemIds : assign.getItem()) {
+                Item item = itemRepos.findById(itemIds)
+                        .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
+
+                AuctionItem auctionItem = new AuctionItem();
+                auctionItem.setAuctionSession(auctionSession);
+                auctionItem.setItem(item);
+                auctionItem.setCreateDate(LocalDateTime.now());
+                auctionItem.setUpdateDate(LocalDateTime.now());
+                auctionItem.setCurrentPrice(item.getReservePrice()); // Buy in price
+
+                auctionItemRepos.save(auctionItem);
+                auctionItemList.add(auctionItem);
+            }
+
+            auctionSession.setAuctionItems(auctionItemList);
+            auctionSessionRepos.save(auctionSession);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -325,4 +376,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                     .map(AuctionSessionDTO::new).toList());
 
     }
+
+
+
 }

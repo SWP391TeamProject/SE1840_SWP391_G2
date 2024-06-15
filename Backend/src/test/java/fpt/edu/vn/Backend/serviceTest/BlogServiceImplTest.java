@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.serviceTest;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.BlogCategoryDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -65,8 +66,8 @@ public class BlogServiceImplTest {
         BlogPostDTO result = blogService.createBlog(BlogPostDTO.builder()
                 .title(blogPost.getTitle())
                 .content(blogPost.getContent())
-                .categoryId(blogPost.getCategory().getBlogCategoryId())
-                .authorId(blogPost.getAuthor().getAccountId())
+                .category(new BlogCategoryDTO(blogPost.getCategory()))
+                .author(new AccountDTO(blogPost.getAuthor()))
                 .createDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now())
                 .build());
@@ -109,8 +110,8 @@ public class BlogServiceImplTest {
                 .postId(blogPost2.getPostId())
                 .title(blogPost2.getTitle())
                 .content(blogPost2.getContent())
-                .categoryId(blogPost2.getCategory().getBlogCategoryId())
-                .authorId(blogPost2.getAuthor().getAccountId())
+                .category(new BlogCategoryDTO(blogPost2.getCategory()))
+                .author(new AccountDTO(blogPost2.getAuthor()))
                 .createDate(blogPost2.getCreateDate())
                 .updateDate(LocalDateTime.now())
                 .build());

@@ -1,7 +1,10 @@
+import { Account } from "../AccountModel";
+import { BlogCategory } from "./blogCategory";
+
 export interface BlogPost{
     postId?:number;
-    categoryId?:number;
-    authorId?:number;
+    category?:BlogCategory;
+    author?: Account;
     title?:string;
     content?:string;
     createDate?:Date;

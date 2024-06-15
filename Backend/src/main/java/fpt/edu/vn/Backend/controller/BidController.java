@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -49,8 +50,7 @@ public class BidController {
     private AuctionSessionService auctionSessionService;
 
     @GetMapping("/api/bids/{accountId}")
-    public ResponseEntity<Page<BidDTO>> getBidsByAccountId(@PathVariable int accountId, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb, pageSize);
+    public ResponseEntity<Page<BidDTO>> getBidsByAccountId(@PathVariable int accountId, @PageableDefault(size = 50) Pageable pageable) {
 
         return ResponseEntity.ok(bidService.getBidsByAccountId(accountId, pageable));
     }

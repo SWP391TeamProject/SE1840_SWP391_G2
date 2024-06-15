@@ -1,11 +1,11 @@
-import Consignment from "@/models/consignment";
+import { BlogPost } from "@/models/newModel/blogPost";
 import { createSlice } from "@reduxjs/toolkit"
 
-interface ConsignmentsState {
+interface BlogPostsState {
     loading: boolean,
-    value: Consignment[],
-    currentConsignment?: Consignment,
-    currentPageList: Consignment[],
+    value: BlogPost[],
+    currentBlogPost?: BlogPost,
+    currentPageList: BlogPost[],
     currentPageNumber: number,
     pageSize: number,
     totalItems: number,
@@ -14,10 +14,10 @@ interface ConsignmentsState {
 }
 
 // Define the initial state using that type
-const initialState: ConsignmentsState = {
+const initialState: BlogPostsState = {
     loading: true,
     value: [],
-    currentConsignment: undefined,
+    currentBlogPost: undefined,
     currentPageList: [],
     currentPageNumber: 0,
     pageSize: 10,
@@ -26,16 +26,16 @@ const initialState: ConsignmentsState = {
     error: ''
 }
 
-export const consignmentsSlice = createSlice({
-    name: 'consignments',
+export const blogPostsSlice = createSlice({
+    name: 'blogPosts',
     initialState,
     reducers: {
-        setConsignments: (state, action) => {
+        setBlogPosts: (state, action) => {
             state.value = action.payload;
             state.totalItems = action.payload.length;
         },
-        setCurrentConsignment: (state, action) => {
-            state.currentConsignment = action.payload;
+        setCurrentBlogPost: (state, action) => {
+            state.currentBlogPost = action.payload;
         },
         setCurrentPageNumber: (state, action) => {
             state.currentPageNumber = action.payload.pageNumber;
@@ -49,5 +49,5 @@ export const consignmentsSlice = createSlice({
 });
 
 
-export const { setConsignments, setCurrentConsignment, setCurrentPageList, setCurrentPageNumber, error } = consignmentsSlice.actions;
-export default consignmentsSlice.reducer
+export const { setBlogPosts, setCurrentBlogPost, setCurrentPageList, setCurrentPageNumber, error } = blogPostsSlice.actions;
+export default blogPostsSlice.reducer

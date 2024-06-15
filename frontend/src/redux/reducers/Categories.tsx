@@ -18,7 +18,7 @@ const initialState: CategoriesState = {
     value: [],
     currentCategory: undefined,
     currentPageList: [],
-    currentPageNumber: 1,
+    currentPageNumber: 0,
     pageSize: 10,
     totalItems: 0,
     error: ''
