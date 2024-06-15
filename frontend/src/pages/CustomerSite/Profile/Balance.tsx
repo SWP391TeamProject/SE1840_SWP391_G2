@@ -55,6 +55,7 @@ export default function Balance() {
                 Authorization: "Bearer " + JSON.parse(getCookie("user"))?.accessToken,
             },
         }).then(response => {
+            console.log(response.data);
             window.location.href = response.data;
         }).catch(error => {
             console.log(error);

@@ -28,6 +28,8 @@ export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
     const [user, setUser] = React.useState<any>();
+
+    const [consignments, setConsignments] = useState([]);    
     useEffect(() => {
         const userCookie = getCookie("user");
         if (userCookie) {

@@ -50,7 +50,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
 
     @Autowired
-    public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos) {
 
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos, BidRepos bidRepos, BidService bidService, PaymentService paymentServiceImpl, AccountServiceImpl accountServiceImpl) {
 

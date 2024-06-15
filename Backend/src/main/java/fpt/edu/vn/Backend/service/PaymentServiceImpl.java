@@ -43,9 +43,13 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
             // Find the account and handle if it's not found
-            Account account = accountRepos.findById(paymentRequest.getAccountId())
-                    .orElseThrow(() -> new InvalidInputException("Account not found"));
-            payment.setAccount(account);
+            Optional<Account> accountOptional = accountRepos.findById(paymentRequest.getAccountId());
+            if (accountOptional.isEmpty()) {
+                throw new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId());
+            }else {
+                Account account = accountOptional.get();
+                payment.setAccount(account);
+            }
 
             // Save the payment
             Payment savedPayment = paymentRepos.save(payment);
@@ -88,7 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
             return new PaymentDTO(updatedPayment);
         } catch (Exception e) {
             // Log the exception (using a logging framework is recommended)
-            System.err.println("An error occurred while updating payment: " + e.getMessage());
+            System.err.println("An error occurred while updating paymentsdsadsadadadad: " + e.getMessage());
 
             // Throw a custom exception or rethrow the caught exception
             throw new ResourceNotFoundException("Failed to update payment", e);

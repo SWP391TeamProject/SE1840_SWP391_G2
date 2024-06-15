@@ -42,4 +42,5 @@ public class DepositController {
         Page<DepositDTO> deposits = depositService.getAllDeposits(pageable);
         return ResponseEntity.ok(deposits);
     }
+
 }

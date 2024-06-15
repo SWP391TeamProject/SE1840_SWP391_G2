@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -27,12 +28,19 @@ public class VnPayConfig {
 
     public final static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     private final static String vnp_Version = "2.1.0";
-    @Value("${VNPAY_RETURN_URL}")
     public static String vnp_ReturnUrl;
 
-    public static   String vnp_TmnCode = "RJEVXKZ2";
+    public static String vnp_TmnCode = "RJEVXKZ2";
+    public static String secretKey;
+    @Value("${VNPAY_RETURN_URL}")
+    public void setVnp_ReturnUrl(String vnp_ReturnUrl) {
+        VnPayConfig.vnp_ReturnUrl = vnp_ReturnUrl;
+    }
+
     @Value("${VNPAY_SECRET_KEY}")
-    public static   String secretKey;
+    public void setSecretKey(String secretKey) {
+        VnPayConfig.secretKey = secretKey;
+    }
     public final static String vnp_CurrCode = "VND";
     public final static String vnp_Locale = "vn";
 

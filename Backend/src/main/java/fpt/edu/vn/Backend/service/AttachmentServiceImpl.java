@@ -10,6 +10,7 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
+import jakarta.annotation.PostConstruct;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -29,7 +30,7 @@ import java.util.UUID;
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepos attachmentRepository;
-    private final BlobContainerClient blobContainerClient;
+    private BlobContainerClient blobContainerClient;
     private final AccountRepos accountRepos;
 
     private final ItemRepos itemRepository;
@@ -46,7 +47,11 @@ public class AttachmentServiceImpl implements AttachmentService {
         this.attachmentRepository = attachmentRepository;
         this.accountRepos = accountRepos;
         this.itemRepository = itemRepository;
+        this.consignmentDetailRepos = consignmentDetailRepos;
+    }
 
+    @PostConstruct
+    public void init() {
         if (connectStr != null && !connectStr.isEmpty()) {
             BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                     .connectionString(connectStr)
@@ -56,7 +61,6 @@ public class AttachmentServiceImpl implements AttachmentService {
         } else {
             blobContainerClient = null;
         }
-        this.consignmentDetailRepos = consignmentDetailRepos;
     }
 
     @Override

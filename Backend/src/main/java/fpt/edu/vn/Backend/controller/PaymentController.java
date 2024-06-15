@@ -3,7 +3,9 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
+import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.service.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +20,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -48,14 +56,62 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPayment(Principal principal, @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) {
-        try {
-            Authorizer.expectAdminOrUserId(principal, paymentRequest.getAccountId());
+    public ResponseEntity<String> createPayment( @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) {
+//            Authorizer.expectAdminOrUserId(principal, paymentRequest.getAccountId());
             paymentRequest.setIpAddr(request.getRemoteAddr());
             String createdPayment = paymentService.createPayment(paymentRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+    @GetMapping("/vnpay_ipn")
+    public int orderReturn(HttpServletRequest request){
+        Map<String, String> fields = new HashMap<>();
+        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
+            String fieldName = null;
+            String fieldValue = null;
+            try {
+                fieldName = URLEncoder.encode(params.nextElement(), StandardCharsets.US_ASCII.toString());
+                fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                fields.put(fieldName, fieldValue);
+            }
+        }
+
+        String vnp_SecureHash = request.getParameter("vnp_SecureHash");
+        if (fields.containsKey("vnp_SecureHashType")) {
+            fields.remove("vnp_SecureHashType");
+        }
+        if (fields.containsKey("vnp_SecureHash")) {
+            fields.remove("vnp_SecureHash");
+        }
+        String signValue = VnPayConfig.hashAllFields(fields);
+        String paymentId = request.getParameter("vnp_TxnRef");
+
+        PaymentDTO paymentDTO;
+        if (signValue.equals(vnp_SecureHash)) {
+            if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
+                log.info("Payment success");
+
+                paymentService.updatePayment(new PaymentRequest().builder()
+                        .paymentId(Integer.parseInt(paymentId))
+                        .status(Payment.Status.SUCCESS)
+                        .build());
+                return 1;
+            } else {
+                paymentService.updatePayment(new PaymentRequest().builder()
+                        .paymentId(Integer.parseInt(paymentId))
+                        .status(Payment.Status.FAILED)
+                        .build());
+                return 0;
+            }
+        } else {
+            log.info("FAILED: Invalid signature");
+            return -1;
         }
     }
+
+
+
 }
