@@ -65,6 +65,8 @@ import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction
 import FeaturedAuctionsList from "./pages/CustomerSite/Auctions/FeaturedAuctionsList.tsx";
 import PastAuctionSessionsList from "./pages/CustomerSite/Auctions/PastAuctionSessionsList.tsx";
 import UpcomingAuctionSessionsList from "./pages/CustomerSite/Auctions/UpcomingAuctionSessionsList.tsx";
+import { CreateBlog } from "./pages/Administration/Blog/CreateBlog.tsx";
+import { BlogList } from "./pages/Administration/Blog/BlogList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -154,6 +156,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         <Route path="items" element={<ItemsList />}></Route>
                         <Route path="items/:id" element={<ItemDetail />}></Route>
                         <Route path="items/create" element={<ItemCreate />}></Route>
+                      </Route>
+                      <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
+                        <Route path="blogs" element={<BlogList />}></Route>
+                        <Route path="blogs/:id" element={<ConsignmentDetail />}></Route>
+                        <Route path="blogs/create" element={<CreateBlog />}></Route>
+                        {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
+                        {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                       </Route>
 
                     </Route>
