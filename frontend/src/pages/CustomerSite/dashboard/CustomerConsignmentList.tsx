@@ -3,13 +3,12 @@ import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 import React from "react";
 import CustomerConsigmentCard from "./components/CustomerConsigmentCard";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
-import { Button } from "@/components/ui/button";
 import { Grid2x2Icon, PlusCircleIcon, WalletCards } from "lucide-react";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "@/components/ui/navigation-menu";
 import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ConsignmentStatus } from "@/constants/enums";
+import { SERVER_DOMAIN_URL } from "@/constants/domain";
 
 
 const consignmentCard = (consignment: any) => {
@@ -50,7 +49,7 @@ export default function CustomerConsignmentList() {
                 }).catch((err) => {
                     console.log(err);
                 });
-                axios.get(`http://localhost:8080/api/consignments/user/${userData?.id}`, {
+                axios.get(`${SERVER_DOMAIN_URL}/api/consignments/user/${userData?.id}`, {
                     headers: {
                         Authorization: `Bearer ${userData.accessToken}`,
                     },

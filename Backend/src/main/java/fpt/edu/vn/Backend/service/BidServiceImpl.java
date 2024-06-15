@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.pojo.Payment;
@@ -26,7 +27,9 @@ import java.util.List;
 public class BidServiceImpl implements BidService {
 
     private static final Logger log = LoggerFactory.getLogger(BidServiceImpl.class);
-    private final BidRepos bidRepos;
+
+    @Autowired
+    private BidRepos bidRepos;
 
     @Autowired
     private AuctionItemRepos auctionItemRepos;
@@ -37,10 +40,6 @@ public class BidServiceImpl implements BidService {
     @Autowired
     private AccountRepos accountRepos;
 
-    @Autowired
-    public BidServiceImpl(BidRepos auctionBidRepository) {
-        this.bidRepos = auctionBidRepository;
-    }
 
     @Override
     public List<BidDTO> getAllBids() {
@@ -72,20 +71,24 @@ public class BidServiceImpl implements BidService {
     public BidDTO createBid(BidDTO bid) {
         Bid newBid = new Bid();
         newBid.setBidId(bid.getBidId());
-        newBid.setAuctionItem(auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
+        AuctionItem auctionItem = auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + bid.getAuctionItemId())
-        ));
-        PaymentDTO payment = bid.getPayment();
-        payment.setType(Payment.Type.AUCTION_BID);
-        payment.setAmount(bid.getPayment().getAmount());
-        payment.setAccountId(bid.getPayment().getAccountId());
-        payment.setStatus(Payment.Status.PENDING);
+        );
+        newBid.setAuctionItem(auctionItem);
+        PaymentDTO paymentDTO = bid.getPayment();
+        if (paymentDTO == null) {
+            throw new IllegalArgumentException("Payment cannot be null");
+        }
+        paymentDTO.setType(Payment.Type.AUCTION_BID);
+        paymentDTO.setAmount(bid.getPayment().getAmount());
+        paymentDTO.setAccountId(bid.getPayment().getAccountId());
+        paymentDTO.setStatus(Payment.Status.PENDING);
         Payment newPayment = new Payment();
-        newPayment.setPaymentAmount(payment.getAmount());
-        newPayment.setCreateDate(payment.getDate());
-        newPayment.setType(payment.getType());
-        newPayment.setStatus(payment.getStatus());
-        newPayment.setAccount(accountRepos.findById(payment.getAccountId()).orElseThrow(
+        newPayment.setPaymentAmount(paymentDTO.getAmount());
+        newPayment.setCreateDate(paymentDTO.getDate());
+        newPayment.setType(paymentDTO.getType());
+        newPayment.setStatus(paymentDTO.getStatus());
+        newPayment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
         ));
         newBid.setPayment(newPayment);
@@ -107,7 +110,12 @@ public class BidServiceImpl implements BidService {
                 () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
         );
         List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
-        if(bids.isEmpty()) return null;
+        BidDTO result= new BidDTO();
+        result.setPayment(new PaymentDTO());
+        result.getPayment().setAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
+                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
+        ).getItem().getReservePrice());
+        if(bids.isEmpty()) return result;
         return new BidDTO(bids.get(0));
     }
 
@@ -117,6 +125,24 @@ public class BidServiceImpl implements BidService {
                 () -> new IllegalArgumentException("Invalid bid id: " + id)
         );
         bidRepos.deleteById(id);
+    }
+
+    @Override
+    public List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId) {
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        List<BidDTO> result = new ArrayList<>();
+        for (Bid bid : bids) {
+            if (bids.get(0).equals(bid)){
+                result.add(new BidDTO(bid));
+                continue;
+            }
+            log.info("Bid " + bid.getBidId() + " failed");
+            Payment payment = bid.getPayment();
+            payment.setStatus(Payment.Status.FAILED);
+            paymentRepos.save(payment);
+            result.add(new BidDTO(bid));
+        }
+        return result;
     }
 
     @Override

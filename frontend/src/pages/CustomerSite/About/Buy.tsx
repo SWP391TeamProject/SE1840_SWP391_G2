@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Buy = () => {
   return (<div className="container mx-auto px-4 py-8">
@@ -15,8 +15,10 @@ export const Buy = () => {
             (The deposit may not be the same in different auctions)
             <br /> (the deposit will be refunded if you lose and will be deducted directly from the amount of the item to be paid for if you win)</li>
         </ul>
-        <Button variant={'default'} className='m-4'>
+        <Button variant={'default'} className='m-4' asChild>
+          <Link to="/auctions">
           Register
+          </Link>
         </Button>
       </div>
 

@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
-import { fetchAllAuctionSessions } from "@/services/AuctionSessionService";
+import { fetchAllAuctionSessions, fetchAuctionSessionByTitle } from "@/services/AuctionSessionService";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function AuctionSessionList() {
@@ -41,10 +41,17 @@ export default function AuctionSessionList() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const url = new URL(window.location.href);
+  let search = url.searchParams.get("search");
 
   const fetchAuctionSessions = async (pageNumber: number) => {
     try {
-      const res = await fetchAllAuctionSessions(pageNumber, 5);
+      let res;
+      res = await fetchAllAuctionSessions(pageNumber, 10);
+      if (search && search?.length > 0) {
+        res = await fetchAuctionSessionByTitle(pageNumber, 10,search);
+      }
+
       if (res) {
         console.log(res?.data.content);
         // dispatch(setAuctionSessions(list.data.content));
@@ -60,6 +67,14 @@ export default function AuctionSessionList() {
       console.log(error);
     }
   };
+
+  const handleAssignAuctionItemClick = (auctionSessionId: number) => {
+    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+    console.log(auctionSession);
+    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
+    dispatch(setCurrentAuctionSession(auctionSession));
+    navigate(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
+  }
 
   const handleEditClick = (auctionSessionId: number) => {
     let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
@@ -87,8 +102,9 @@ export default function AuctionSessionList() {
     // })
   }
   const handleDetailClick = (auctionSessionId: number) => {
+    console.log(auctionSessionId);
 
-    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId === auctionSessionId);
     console.log(auctionSession);
     dispatch(setCurrentAuctionSession(auctionSession));
     navigate(`/admin/auction-sessions/${auctionSessionId}`);
@@ -99,6 +115,11 @@ export default function AuctionSessionList() {
   }
 
   const handleFilterClick = (filter: string) => {
+
+    url.searchParams.delete("search");
+    window.history.replaceState(null, "", url.toString());
+    search = null;
+
     let filteredList = [];
     if (filter === "all") filteredList = auctionSessionsList.value;
 
@@ -117,7 +138,7 @@ export default function AuctionSessionList() {
   useEffect(() => { }, [auctionSessionsList]);
 
   useEffect(() => {
-    fetchAuctionSessions(auctionSessionsList.currentPageNumber);
+    fetchAuctionSessions(0);
     setStatusFilter("all");
   }, []);
 
@@ -168,7 +189,13 @@ export default function AuctionSessionList() {
         <TabsContent value={statusFilter}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle>AuctionSessions</CardTitle>
+              <CardTitle className="flex justify-between items-center">
+                AuctionSessions
+                <div className="w-full basis-1/2">
+                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
+              
               <CardDescription>
                 Manage Auctions and view auctions details.
               </CardDescription>
@@ -248,10 +275,10 @@ export default function AuctionSessionList() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession.auctionSessionId) }}>Detail</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession.auctionSessionId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession.auctionSessionId) }}>Manage Live Auctions</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleSuspendClick(auctionSession.auctionSessionId) }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession?.auctionSessionId) }}>Detail</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession?.auctionSessionId) }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession?.auctionSessionId) }}>Manage Live Auctions</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(auctionSession?.auctionSessionId) }}>Assign Items</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -260,7 +287,7 @@ export default function AuctionSessionList() {
                   ))}
                 </TableBody>
               </Table>
-              <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+              
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">

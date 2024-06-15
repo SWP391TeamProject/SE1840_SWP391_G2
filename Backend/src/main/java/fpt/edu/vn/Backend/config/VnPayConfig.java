@@ -2,6 +2,7 @@
 package fpt.edu.vn.Backend.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -26,9 +27,12 @@ public class VnPayConfig {
 
     public final static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     private final static String vnp_Version = "2.1.0";
-    public final static String vnp_ReturnUrl = "http://localhost:5173/test";
-    public final static String vnp_TmnCode = "RJEVXKZ2";
-    public final static String secretKey = "3AOW0SHELFS5YVARN9KJRUS9QR4E4G79";
+    @Value("${VNPAY_RETURN_URL}")
+    public static String vnp_ReturnUrl;
+
+    public static   String vnp_TmnCode = "RJEVXKZ2";
+    @Value("${VNPAY_SECRET_KEY}")
+    public static   String secretKey;
     public final static String vnp_CurrCode = "VND";
     public final static String vnp_Locale = "vn";
 
@@ -37,44 +41,9 @@ public class VnPayConfig {
 
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
-    public static String md5(String message) {
-        String digest = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder(2 * hash.length);
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            digest = sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            digest = "";
-        } catch (NoSuchAlgorithmException ex) {
-            digest = "";
-        }
-        return digest;
-    }
-
-    public static String Sha256(String message) {
-        String digest = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder(2 * hash.length);
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            digest = sb.toString();
-        } catch (UnsupportedEncodingException ex) {
-            digest = "";
-        } catch (NoSuchAlgorithmException ex) {
-            digest = "";
-        }
-        return digest;
-    }
 
     //Util for VNPAY
-    public static String hashAllFields(Map fields) {
+    public static   String hashAllFields(Map fields) {
         List fieldNames = new ArrayList(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
@@ -94,7 +63,7 @@ public class VnPayConfig {
         return hmacSHA512(secretKey,sb.toString());
     }
 
-    public static String hmacSHA512(final String key, final String data) {
+    public static   String hmacSHA512(final String key, final String data) {
         try {
 
             if (key == null || data == null) {

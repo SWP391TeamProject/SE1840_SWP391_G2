@@ -1,8 +1,8 @@
- import { getCookie } from "@/utils/cookies";
+ import { SERVER_DOMAIN_URL } from "@/constants/domain";
+import { getCookie } from "@/utils/cookies";
 import axios from "axios";
-import { toast } from "react-toastify";
 
-const URL = "http://localhost:8080/api/consignmentDetails/";
+const URL = `${SERVER_DOMAIN_URL}/api/consignmentDetails/`;
 
 export const fetchConsigntmentDetailByConsignmentId = async (id:number) => {
   return await axios

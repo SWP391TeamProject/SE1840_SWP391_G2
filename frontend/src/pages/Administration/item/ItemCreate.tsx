@@ -28,6 +28,7 @@ import { SelectGroup } from "@radix-ui/react-select"
 import axios from "axios"
 import { createItem } from "@/services/ItemService"
 import { getCookie } from "@/utils/cookies"
+import TextEditor from "@/components/component/TextEditor"
 const statusValues = Object.values(ItemStatus);
 
 const FormSchema = z.object({
@@ -181,7 +182,8 @@ export default function ItemCreate() {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="shadcn" {...field} />
+                                    <TextEditor {...field}/>
+                                    {/* // <Textarea placeholder="shadcn" {...field} /> */}
                                 </FormControl>
                                 <FormDescription>
                                     This is your public display name.

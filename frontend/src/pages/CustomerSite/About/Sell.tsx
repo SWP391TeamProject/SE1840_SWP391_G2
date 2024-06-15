@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Sell = () => {
     return (
@@ -15,8 +15,10 @@ export const Sell = () => {
                         <li>The form will ask for your contact information, a detailed description of your jewelry and your desired selling price.</li>
                         <li>You can upload multiple pictures from different angles to help valuers accurately assess your jewelry's worth.</li>
                     </ul>
-                    <Button variant={'default'} className='m-4'>
-                        Submit Jewelry
+                    <Button variant={'default'} className='m-4' asChild>
+                        <Link to="/create-consignment">
+                            Submit Jewelry
+                        </Link>
                     </Button>
                 </div>
 

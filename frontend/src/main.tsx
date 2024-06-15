@@ -11,7 +11,6 @@ import { store } from "./redux/store.tsx";
 import { TooltipProvider } from "./components/ui/tooltip.tsx";
 import Administration from "./layout/Administration/Administration.tsx";
 import AccountsList from "./pages/Administration/Account/AccountsList.tsx";
-import DashBoard from "./pages/Administration/dashboard/DashBoard.tsx";
 // import { LandingPageLayout } from "./layout/HomeLayout/landing-page-layout.tsx";
 import PrivateRoute from "./pages/authentication/PrivateRoute.tsx";
 import { AuthProvider } from "./AuthProvider.tsx";
@@ -34,12 +33,9 @@ import LoginForm from "./pages/authentication/LoginForm.tsx";
 import ConsignmentList from "./pages/Administration/consignments/ConsignmentList.tsx";
 import ConsignmentDetail from "./pages/Administration/consignments/ConsignmentDetail.tsx";
 import ItemsList from "./pages/Administration/item/ItemsList.tsx";
-import SendEvaluationForm from "./pages/Administration/consignments/SendEvaluation.tsx";
 import ProfileLayout from "./pages/CustomerSite/Profile/Profile.tsx";
 import ProfileSetting from "./pages/CustomerSite/Profile/ProfileSetting.tsx";
 import ProfileDetail from "./pages/CustomerSite/Profile/ProfileDetail.tsx";
-import { getCookie } from "./utils/cookies.ts";
-import AddAuctionItems from "./pages/Administration/Auction-session/AddAuctionItems.tsx";
 import ItemDetail from "./pages/Administration/item/itemDetail/ItemDetail.tsx";
 import AboutScreen from "./pages/CustomerSite/About/AboutScreen.tsx";
 import { Contact } from "./pages/CustomerSite/Contact/Contact.tsx";
@@ -48,7 +44,6 @@ import CustomerLayout from "./layout/CustomerSite/CustomerLayout.tsx";
 import { LandingPage } from "./pages/CustomerSite/LandingPage/LandingPage.tsx";
 import Consignment from "./pages/CustomerSite/Consignment/Consignment.tsx";
 import AuctionSession from "./pages/CustomerSite/Auctions/AuctionSession.tsx";
-import AuctionSessionDetail from "./pages/Administration/Auction-session/AuctionSessionDetail.tsx";
 import ForgotPasswordForm from "@/pages/authentication/ForgotPasswordForm.tsx";
 import ActivationForm from "@/pages/authentication/ActivationForm.tsx";
 import ResetPasswordForm from "@/pages/authentication/ResetPasswordForm.tsx";
@@ -58,13 +53,18 @@ import { ErrorPage } from "./components/component/error-page.tsx";
 import AuctionJoin from "./pages/CustomerSite/Auctions/AuctionJoin.tsx";
 import CustomerDashboard from "./pages/CustomerSite/dashboard/CustomerDashboard.tsx";
 import CustomerConsignmentList from "./pages/CustomerSite/dashboard/CustomerConsignmentList.tsx";
-import TestPage from "./pages/TestPage.tsx";
 import { Bids } from "./pages/CustomerSite/dashboard/bids/Bids.tsx";
 import NotificationsList from "@/pages/CustomerSite/Profile/Notification.tsx";
 import ItemCreate from "./pages/Administration/item/ItemCreate.tsx";
 import Balance from "./pages/CustomerSite/Profile/Balance.tsx";
 import PaymentStatus from "./pages/CustomerSite/Profile/PaymentStatus.tsx";
 import ThemeProvider from "./components/component/ThemeProvider.tsx";
+import AssignAuctionItem from "./pages/Administration/Auction-session/AssignAuctionItem.tsx";
+import ToBeImplemented from "./pages/ToBeImplemented.tsx";
+import AuctionSessionDetail from "./pages/Administration/Auction-session/Auction-Session-Detail/AuctionSessionDetail.tsx";
+import FeaturedAuctionsList from "./pages/CustomerSite/Auctions/FeaturedAuctionsList.tsx";
+import PastAuctionSessionsList from "./pages/CustomerSite/Auctions/PastAuctionSessionsList.tsx";
+import UpcomingAuctionSessionsList from "./pages/CustomerSite/Auctions/UpcomingAuctionSessionsList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -76,10 +76,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
     <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
       <QueryClientProvider client={queryClient}>
-        <ToastContainer />
+      <ToastContainer autoClose={3000} pauseOnHover={false} closeOnClick />
         <Provider store={store}>
           <AuthProvider>
-
             <TooltipProvider>
               <BrowserRouter>
                 <Routes>
@@ -91,7 +90,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/" element={<LandingPage />}></Route>
                     <Route path="contact" element={<Contact />}></Route>
                     <Route path="about" element={<AboutScreen />}></Route>
+                    <Route path="payment-status" element={<PaymentStatus />}></Route>
+                    <Route path="blog" element={<ToBeImplemented />}></Route>
                     <Route path="Auctions" element={<AuctionList />}></Route>
+                    <Route path="Auctions/featured" element={<FeaturedAuctionsList />}></Route>
+                    <Route path="Auctions/past" element={<PastAuctionSessionsList />}></Route>
+                    <Route path="Auctions/upcoming" element={<UpcomingAuctionSessionsList />}></Route>
                     <Route path="Auctions/details" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
@@ -104,7 +108,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         <Route path="consignments/:id" element={<CustomerConsignmentList />}></Route>
                       </Route>
                       <Route path="/profile" element={<ProfileLayout />}>
-                        <Route path="" element={<ProfileDetail />}></Route>
+                        <Route path="overview" element={<ProfileDetail />}></Route>
                         <Route path="/profile/settings" element={<ProfileSetting />}></Route>
                         <Route path="/profile/notification" element={<NotificationsList />}></Route>
                         <Route path="/profile/balance" element={<Balance />}></Route>
@@ -126,7 +130,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     }
                   >
                     <Route path="/admin" element={<Administration />}>
-                      <Route path="dashboard" element={<DashBoard />}></Route>
+                      <Route path="dashboard" element={<ToBeImplemented />}></Route>
                       <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />} >
                         <Route path="accounts" element={<AccountsList />}></Route>
                         <Route path="accounts/:id" element={<AccountEdit />}></Route>
@@ -136,6 +140,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
                         <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
                         <Route path="auction-sessions/:id" element={<AuctionSessionDetail />}></Route>
+                        <Route path="auction-sessions/:id/assign-items" element={<AssignAuctionItem />}></Route>
 
                         {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                       </Route>

@@ -16,17 +16,20 @@ public interface AccountService {
     @NotNull default AccountDTO mapEntityToDTO(@NotNull Account account) {
         return mapEntityToDTO(account, new AccountDTO());
     }
-    @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account);
+    @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole);
 
     @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable);
     @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles);
+    @NotNull Page<AccountDTO> getAccountsByNameOrEmail(@NotNull Pageable pageable, String name);
 
     @Nullable AccountDTO getAccountById(int accountId);
     @Nullable AccountDTO getAccountByEmail(@NotNull String email);
     @Nullable AccountDTO getAccountByEmailAndPassword(@NotNull String email, @NotNull String password);
 
     @NotNull AccountDTO createAccount(@NotNull AccountDTO account);
-    @NotNull AccountDTO updateAccount(@NotNull AccountDTO account);
+    @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole);
 
     @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file);
+
+
 }

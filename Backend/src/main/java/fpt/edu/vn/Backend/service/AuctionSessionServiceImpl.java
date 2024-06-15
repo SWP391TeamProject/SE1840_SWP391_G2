@@ -4,6 +4,9 @@ import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
+
+import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
@@ -11,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.OptionalValueBinding;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +36,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final AccountRepos accountRepos;
     private final DepositRepos depositRepos;
     private final PaymentRepos paymentRepos;
+    private final BidRepos bidRepos;
+    private final BidService bidService;
+    private final PaymentService paymentService;
+    private final AccountServiceImpl accountServiceImpl;
 
     @Autowired
+
     private ItemRepos itemRepos;
 
     @Autowired
@@ -40,22 +51,32 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos) {
+
+    public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos, BidRepos bidRepos, BidService bidService, PaymentService paymentServiceImpl, AccountServiceImpl accountServiceImpl) {
+
         this.auctionSessionRepos = auctionSessionRepos;
         this.accountRepos = accountRepos;
         this.depositRepos = depositRepos;
         this.paymentRepos = paymentRepos;
+        this.bidRepos = bidRepos;
+        this.bidService = bidService;
+        this.paymentService = paymentServiceImpl;
+        this.accountServiceImpl = accountServiceImpl;
     }
 
 
     @Override
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
-        Account a=accountRepos.findById(accountId).orElseThrow(
-                () -> new ResourceNotFoundException("Account not found:"+accountId));
+        Account a = accountRepos.findById(accountId).orElseThrow(
+                () -> new ResourceNotFoundException("Account not found:" + accountId));
         AuctionSession auctionSession = auctionSessionRepos.findById(auctionSessionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction session not found:" + auctionSessionId));
         List<Item> items = new ArrayList<>();
         for (AuctionItem auctionItem : auctionSession.getAuctionItems()) {
             items.add(auctionItem.getItem());
+        }
+        if(items.isEmpty()){
+            throw new ResourceNotFoundException("No items found in auction session");
         }
         BigDecimal minPrice = new BigDecimal(100);
         BigDecimal maxPrice = new BigDecimal(1000);
@@ -65,11 +86,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (depositAmount.compareTo(minPrice) < 0) {
             depositAmount = minPrice;
         }
-        if(depositAmount.compareTo(maxPrice)>0){
-            depositAmount=maxPrice;
+        if (depositAmount.compareTo(maxPrice) > 0) {
+            depositAmount = maxPrice;
         }
         items.sort(Comparator.comparing(Item::getReservePrice));
-        if(a.getBalance().compareTo(items.get(0).getReservePrice())>=0){
+        if (a.getBalance().compareTo(items.get(0).getReservePrice()) >= 0) {
             a.setBalance(a.getBalance().subtract(depositAmount));
             accountRepos.save(a);
             Payment payment = new Payment();
@@ -78,19 +99,18 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             payment.setType(Payment.Type.AUCTION_DEPOSIT);
             payment.setStatus(Payment.Status.PENDING);
             payment.setCreateDate(LocalDateTime.now());
-            payment=paymentRepos.save(payment);
+            payment = paymentRepos.save(payment);
 
             Deposit deposit = new Deposit();
             deposit.setAuctionSession(auctionSession);
             deposit.setPayment(payment);
-            deposit=depositRepos.save(deposit);
+            deposit = depositRepos.save(deposit);
 
             auctionSession.getDeposits().add(deposit);
             auctionSessionRepos.save(auctionSession);
 
             return new AuctionSessionDTO(auctionSession);
-        }
-        else{
+        } else {
             throw new ResourceNotFoundException("Account balance is not enough to register for auction session");
         }
     }
@@ -132,8 +152,15 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
+        if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidInputException("Start date must be in the future");
+        }
+        if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
+            throw new InvalidInputException("End date must be after start date");
+        }
         try {
             AuctionSession auctionSession = new AuctionSession();
+            auctionSession.setTitle(auctionDTO.getTitle());
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
             auctionSession.setCreateDate(auctionDTO.getCreateDate());
@@ -149,12 +176,45 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
+    public void finishAuction(int auctionSessionId) {
+        AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
+        List<AccountDTO> accounts = new ArrayList<>();
+        logger.info("Finishing auction session " + auctionSessionId);
+        if (auctionDTO.getStatus().equals("FINISHED")) {
+            logger.warn("Auction session " + auctionSessionId + " already finished");
+            return;
+        }
+        for (AuctionItemDTO auctionItem : auctionDTO.getAuctionItems()) {
+            AccountDTO account;
+            account = accountServiceImpl.getAccountById(bidService.getHighestBid(auctionItem.getId())
+                    .getPayment().getAccountId());
+            for (BidDTO bid : bidService.finishAuctionItem(auctionItem.getId())) {
+                logger.info("Finishing bid " + bid.getBidId());
+            }
+            accounts.add(account);
+        }
+        for (DepositDTO deposit : auctionDTO.getDeposits()) {
+
+            if (accounts.stream()
+                    .noneMatch(account ->
+                            account.getAccountId() == deposit.getPayment().getAccountId())) {
+                deposit.getPayment().setStatus(Payment.Status.FAILED);
+                accountRepos.findById(deposit.getPayment().getAccountId()).ifPresent(account -> {
+                    account.setBalance(account.getBalance().add(deposit.getPayment().getAmount()));
+                    accountRepos.save(account);
+                    logger.info("Refunding deposit for account " + account.getAccountId());
+                });
+                paymentService.updatePayment(deposit.getPayment());
+
+            }
+        }
+        auctionDTO.setStatus("FINISHED");
         try {
             Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
             if (!optionalAuctionSession.isPresent()) {
                 throw new ResourceNotFoundException("Auction session not found");
             }
+
 
             AuctionSession auctionSession = optionalAuctionSession.get();
             auctionSession.setStartDate(auctionDTO.getStartDate());
@@ -164,9 +224,96 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
 
             auctionSessionRepos.save(auctionSession);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error updating auction session", e);
+        }
+        logger.info("Auction session " + auctionSessionId + " finished :"+ getAuctionSessionById(auctionSessionId).getStatus());
+    }
+
+    @Override
+    public void startAuction(int auctionSessionId) {
+        AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
+        logger.info("Starting auction session " + auctionSessionId);
+        if (auctionDTO.getStatus().equals("PROGRESSING")) {
+            logger.warn("Auction session " + auctionSessionId + " already started");
+            return;
+        }
+        auctionDTO.setStatus("PROGRESSING");
+        try {
+            Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
+            if (!optionalAuctionSession.isPresent()) {
+                throw new ResourceNotFoundException("Auction session not found");
+            }
+
+
+            AuctionSession auctionSession = optionalAuctionSession.get();
+            auctionSession.setStartDate(auctionDTO.getStartDate());
+            auctionSession.setEndDate(auctionDTO.getEndDate());
+            auctionSession.setCreateDate(auctionDTO.getCreateDate());
+            auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
+            auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
+
+            auctionSessionRepos.save(auctionSession);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error updating auction session", e);
+        }
+        logger.info("Auction session " + auctionSessionId + " started");
+    }
+
+    @Override
+    public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
+        List<AuctionSession> auctionSessionList = auctionSessionRepos.findAll();
+
+        BigDecimal evaluationThreshold = new BigDecimal(2);
+
+        List<AuctionSessionDTO> featuredAuctionSessions = auctionSessionList.stream().filter(
+                        auctionSession -> {
+                            BigDecimal totalEvaluation = auctionSession.getAuctionItems().stream()
+                                    .map(auctionItem -> auctionItem.getItem().getReservePrice())
+                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                            return auctionSession.getStartDate().isAfter(LocalDateTime.now())
+//                            && auctionSession.getStartDate().isBefore(LocalDateTime.now().plusDays(7))
+                                    && !auctionSession.getAuctionItems().isEmpty()
+                                    && !auctionSession.getDeposits().isEmpty()
+                                    && totalEvaluation.compareTo(evaluationThreshold) >= 0;
+                        }
+                ).map(AuctionSessionDTO::new).
+                collect(Collectors.toList());
+
+        logger.info("Featured auction sessions: " + featuredAuctionSessions.size());
+        // Provide a default value for pageable if it's null
+        if (pageable == null) {
+            pageable = PageRequest.of(0, 5);
+        }
+        return new PageImpl<>(featuredAuctionSessions, pageable, featuredAuctionSessions.size());
+    }
+
+    @Override
+    public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
+        if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidInputException("Start date must be in the future");
+        }
+        if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
+            throw new InvalidInputException("End date must be after start date");
+        }
+
+        try {
+            Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
+            if (!optionalAuctionSession.isPresent()) {
+                throw new ResourceNotFoundException("Auction session not found");
+            }
+
+
+            AuctionSession auctionSession = optionalAuctionSession.get();
+            auctionSession.setStartDate(auctionDTO.getStartDate());
+            auctionSession.setEndDate(auctionDTO.getEndDate());
+            auctionSession.setCreateDate(auctionDTO.getCreateDate());
+            auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
+            auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
+            auctionSessionRepos.save(auctionSession);
             return auctionDTO;
         } catch (Exception e) {
-            throw new RuntimeException("Error updating auction session", e);
+            throw new ResourceNotFoundException("Error updating auction session", e);
         }
     }
 
@@ -193,33 +340,41 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        try {
             Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
             if (pastAuctionSessions.isEmpty()) {
                 logger.warn("No past auction sessions found");
                 throw new ResourceNotFoundException("No past auction sessions found");
             }
             return pastAuctionSessions.map(AuctionSessionDTO::new);
-        } catch (Exception e) {
-            logger.error("Error retrieving past auction sessions", e);
-            throw new RuntimeException("Error retrieving past auction sessions", e);
-        }
+
 
     }
 
     @Override
+    public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
+        Page<AuctionSessionDTO> a= auctionSessionRepos.findByTitleContaining(title, pageable)
+                .map(AuctionSessionDTO::new);
+        if (a.isEmpty()) {
+            logger.warn("No auction sessions with title:"+title+" found");
+            throw new ResourceNotFoundException("No auction sessions with title:"+title+" found");
+        }
+        return a;
+    }
+
+    @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
-        try {
             Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
+            List<AuctionSession> listA=upcomingAuctionSessions.stream().filter(
+                    auctionSession -> auctionSession.getStatus().equals(AuctionSession.Status.SCHEDULED)
+            ).toList();
+
             if (upcomingAuctionSessions.isEmpty()) {
                 logger.warn("No upcoming auction sessions found");
                 throw new ResourceNotFoundException("No upcoming auction sessions found");
             }
-            return upcomingAuctionSessions.map(AuctionSessionDTO::new);
-        } catch (Exception e) {
-            logger.error("Error retrieving upcoming auction sessions", e);
-            throw new RuntimeException("Error retrieving upcoming auction sessions", e);
-        }
+            return new PageImpl<>(listA.stream()
+                    .map(AuctionSessionDTO::new).toList());
+
     }
 
 

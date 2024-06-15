@@ -19,4 +19,5 @@ public interface ItemRepos extends JpaRepository<Item, Integer> {
     Page<Item> findItemByItemCategoryItemCategoryId(int itemCategoryId, Pageable pageable);
     Page<Item> findItemByStatus(Item.Status status, Pageable pageable);
     Page<Item> findItemByOwnerAccountId(int ownerId, Pageable pageable);
+    Page<Item> findItemByNameContaining(String name, Pageable pageable);
 }

@@ -1,6 +1,4 @@
-import NavBar from '@/components/NavBar/NavBar'
-import Footer from '@/components/footer/Footer'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 export const Contact = () => {
     const [contactMethod, setContactMethod] = useState('phone'); // Default contact method

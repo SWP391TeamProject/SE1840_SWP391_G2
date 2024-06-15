@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @CrossOrigin("*")
 @RestController
@@ -33,6 +40,8 @@ public class AuctionSessionController {
     private AttachmentService attachmentService;
     @Autowired
     private AccountService accountService;
+
+
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@PageableDefault(size = 50) Pageable pageable) {
         return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
@@ -43,11 +52,24 @@ public class AuctionSessionController {
     public ResponseEntity<AuctionSessionDTO> getAuctionSessionById(@PathVariable int id) {
         return new ResponseEntity<>(auctionSessionService.getAuctionSessionById(id), HttpStatus.OK);
     }
-
+    @GetMapping("/search/{title}")
+    public ResponseEntity<Page<AuctionSessionDTO>> getAuctionsByNameAndEmail(@PageableDefault(size = 200) Pageable pageable,
+                                                                      @PathVariable String title) {
+        log.info("Get accounts with name: {}", title);
+        if (title == null) {
+            return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(auctionSessionService.getAuctionSessionsByTitle(pageable, title), HttpStatus.OK);
+    }
 
     @GetMapping("/active")
-    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession() {
-        return null;
+    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession( @PageableDefault(size = 10) Pageable pageable) {
+        List<AuctionSessionDTO> listA=auctionSessionService.getAllAuctionSessions(pageable).stream().filter(
+                auctionSessionDTO ->
+                        !auctionSessionDTO.getStatus().equals("FINISHED")&&!auctionSessionDTO.getStatus().equals("TERMINATED")
+        ).toList();
+
+        return new ResponseEntity<>( new PageImpl<>(listA), HttpStatus.OK);
     }
 
     @GetMapping("/inactive")
@@ -73,6 +95,11 @@ public class AuctionSessionController {
         return new ResponseEntity<>(auctionSessionService.getPastAuctionSessions(pageable), HttpStatus.OK);
     }
 
+    @GetMapping("/featured")
+    public ResponseEntity<Page<AuctionSessionDTO>> getFeaturedAuctionSession(@RequestParam(required = false) @PageableDefault(size = 50) Pageable pageable) {
+        return new ResponseEntity<>(auctionSessionService.getFeaturedAuctionSessions(pageable), HttpStatus.OK);
+    }
+
     @GetMapping("/current")
     public ResponseEntity<AuctionSessionDTO> getCurrentAuctionSession() {
         return null;
@@ -80,13 +107,12 @@ public class AuctionSessionController {
 
     @PostMapping("/")
     public ResponseEntity<AuctionSessionDTO> createAuctionSession(@RequestBody AuctionCreateDTO auctionDTO) {
+
         AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
         auctionSessionDTO.setTitle(auctionDTO.getTitle());
         auctionSessionDTO.setStartDate(auctionDTO.getStartDate());
         auctionSessionDTO.setEndDate(auctionDTO.getEndDate());
-        auctionSessionDTO.setStatus("SCHEDULED");
-        auctionSessionDTO.setCreateDate(LocalDateTime.now());
-        auctionSessionDTO.setUpdateDate(LocalDateTime.now());
+        auctionSessionDTO.setStatus(String.valueOf(AuctionSession.Status.SCHEDULED));
         auctionSessionDTO=auctionSessionService.createAuctionSession(auctionSessionDTO);
         if(auctionDTO.getFiles()!=null){
             try {

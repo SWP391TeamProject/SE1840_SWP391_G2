@@ -33,7 +33,7 @@ public class Account {
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Attachment avatarUrl;
 
     @Column(name = "provider",length = 30)

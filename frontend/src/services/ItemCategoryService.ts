@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios from "axios";
 
 import { getCookie } from "../utils/cookies";
 import { API_SERVER } from "../constants/domain";

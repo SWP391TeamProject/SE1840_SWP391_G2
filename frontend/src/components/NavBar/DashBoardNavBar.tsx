@@ -15,6 +15,8 @@ import { useAuth } from "@/AuthProvider.tsx";
 import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
 import { MenuIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { removeCookie } from "@/utils/cookies";
 
 export default function DashBoardNavBar() {
   const auth = useAuth();
@@ -22,7 +24,9 @@ export default function DashBoardNavBar() {
 
   const handleSignout = function () {
     logout().then(function () {
-      redirect("/");
+      removeCookie("user");
+      removeCookie('token')
+      window.location.href = '/auth/login';
     })
   };
 
@@ -56,21 +60,15 @@ export default function DashBoardNavBar() {
             auth.isAuthenticated() &&
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full relative"
-                >
-                  <img
-                    src={auth.user.avatar ?? './placeholder.svg'}
-                    width={36}
-                    height={36}
-                    alt="Avatar"
-                    className="overflow-hidden rounded-full"
-                  />
-                  {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
-                </Button>
+                {auth &&
+                  <Avatar className="hover:cursor-pointer ">
+                    <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
+                    <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
+
+                  </Avatar>}
               </DropdownMenuTrigger>
+              {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+
               <DropdownMenuContent align="end" className="xmd:hidden lg:block w-fit p-4">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />

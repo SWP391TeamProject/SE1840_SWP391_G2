@@ -44,9 +44,7 @@ export const consignmentsSlice = createSlice({
         setCurrentPageList: (state, action) => {
             state.currentPageList = action.payload;
         },
-        error: (state, action) => {
 
-        }
     },
 });
 

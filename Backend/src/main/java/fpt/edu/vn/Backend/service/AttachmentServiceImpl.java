@@ -16,6 +16,7 @@ import org.apache.tika.mime.MimeTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,13 +39,14 @@ public class AttachmentServiceImpl implements AttachmentService {
     private AuctionSessionRepos auctionRepos;
     @Autowired
     private BlogPostRepos blogPostRepos;
+    @Value("${AZURE_STORAGE_CONNECTION_STRING}")
+    private  String connectStr ;
     @Autowired
     public AttachmentServiceImpl(AttachmentRepos attachmentRepository, AccountRepos accountRepos, ConsignmentDetailRepos consignmentDetailRepos,ItemRepos itemRepository) {
         this.attachmentRepository = attachmentRepository;
         this.accountRepos = accountRepos;
         this.itemRepository = itemRepository;
 
-        String connectStr = System.getenv("AZURE_STORAGE_CONNECTION_STRING");
         if (connectStr != null && !connectStr.isEmpty()) {
             BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                     .connectionString(connectStr)
@@ -154,8 +156,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         Attachment attachment = new Attachment();
         attachment.setBlobId(blobId);
         attachment.setLink(blobClient.getBlobUrl());
-        attachment.setAccount(account);
+        account.setAvatarUrl(attachment);
         attachmentRepository.save(attachment);
+
         return mapEntityToDTO(attachment);
     }
 

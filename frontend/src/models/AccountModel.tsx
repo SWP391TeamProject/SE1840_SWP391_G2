@@ -4,9 +4,11 @@ export interface Account {
   accountId: number;
   // username: string;
   email: string;
-  nickname?: string;
+  nickname: string;
   phone: string;
-  avatar?: string;
+  avatar?: {
+    link?: string
+  };
   accessToken?: string;
   balance?: number;
   role: Roles;

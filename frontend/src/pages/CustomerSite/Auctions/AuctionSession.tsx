@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { set } from 'react-hook-form'
-import { log } from 'console'
 import { getCookie } from '@/utils/cookies'
 import { registerAuctionSession } from '@/services/AuctionSessionService'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+
+import { AuctionSessionStatus } from '@/constants/enums'
+
+import { SERVER_DOMAIN_URL } from '@/constants/domain'
+
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
@@ -29,7 +32,7 @@ export default function AuctionSession() {
     useEffect(() => {
 
         if (auctionSession == null) {
-            axios.get("http://localhost:8080/api/auction-sessions/1")
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
                 .then(res => {
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
@@ -42,9 +45,9 @@ export default function AuctionSession() {
 
         }
         if (param.id) {
-            axios.get("http://localhost:8080/api/auction-sessions/" + param.id)
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
-                    console.log(res.data.attachments);
+                    console.log(res.data);
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
                     toast.success("Auction Session Loaded");
@@ -81,22 +84,38 @@ export default function AuctionSession() {
         }).catch(() => { toast.error("Failed to Register") });
     }
     const ConfirmRegister = () => {
+        let fee = Number.MAX_VALUE;
+        if (auctionSession?.auctionItems) {
+            auctionSession.auctionItems.forEach((item: any) => {
+                if(item.itemDTO.reservePrice < fee){
+                    fee = item.itemDTO.reservePrice;
+                }
+            });
+        }
+        fee = fee * 0.045;
+        if(fee<100){
+            fee = 100;
+        }
+        if(fee>1000){
+            fee = 1000;
+        }
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default">Register to bid</Button>
+                    <Button variant="default" >Register to bid</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
+                <AlertDialogContent className='text-foreground'>
+                    <AlertDialogHeader >
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will
                             directly remove your balance from your
                             account and remove your data from our servers.
+                            (Auction Registration Fee: ${fee})
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel >Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => handleRegister()}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -105,18 +124,34 @@ export default function AuctionSession() {
 
     }
     const RegisterAlert = () => {
+        let fee = Number.MAX_VALUE;
+        if (auctionSession?.auctionItems) {
+            auctionSession.auctionItems.forEach((item: any) => {
+                if(item.itemDTO.reservePrice < fee){
+                    fee = item.itemDTO.reservePrice;
+                }
+            });
+        }
+        fee = fee * 0.045;
+        if(fee<100){
+            fee = 100;
+        }
+        if(fee>1000){
+            fee = 1000;
+        }
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
                     <Button variant="default">Place Bid</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Register is needed</AlertDialogTitle>
                         <AlertDialogDescription>
                             You need to register to this auction first
                             if you want to place a bid.
                             Do you want to continue?
+                            (Auction Registration Fee: ${fee})
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -143,13 +178,21 @@ export default function AuctionSession() {
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-sm font-medium dark:bg-gray-700">
                                     <ClockIcon className="h-5 w-5" />
-                                    <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>
+
+                                    {auctionSession?.status===AuctionSessionStatus.PROGRESSING &&
+                                    <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+                                    
+                                    {auctionSession?.status===AuctionSessionStatus.SCHEDULED &&
+                                    <span>Start in {auctionSession?.startDate ? <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+
                                 </div>
 
 
                                 {bidders.includes(userId) ? (
+                                    auctionSession?.status===AuctionSessionStatus.PROGRESSING &&
                                     <Button onClick={() => scrollTo({ top: (document.getElementById("auction-items")?.offsetTop), behavior: 'smooth' })}>Place Bid</Button>
                                 ) : (
+                                    auctionSession?.status===AuctionSessionStatus.SCHEDULED &&
                                     <ConfirmRegister></ConfirmRegister>
                                 )}
 
@@ -266,22 +309,3 @@ function ClockIcon(props: any) {
     )
 }
 
-function ArrowRightIcon(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-        </svg>
-    )
-}

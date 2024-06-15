@@ -7,10 +7,33 @@ export const fetchAccountsService = async (pageNumber: number, pageSize: number,
   let params = {
     page: pageNumber,
     size: pageSize,
-    Role: role? role : "",
+    Role: role ? role : "",
   }
   return await axios
     .get(API_SERVER + "/accounts/", {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+      params: params
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+    });
+};
+export const fetchAccountsByName = async (pageNumber: number, pageSize: number, name: string) => {
+  let params = {
+    page: pageNumber,
+    size: pageSize,
+  }
+  return await axios
+    .get(API_SERVER + "/accounts/search/"+name, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
 import DropzoneComponent from "../../../components/drop-zone/DropZoneComponent";
 import { getCookie } from "@/utils/cookies";
 import { createConsignmentService } from "@/services/ConsignmentService";
@@ -23,7 +22,6 @@ import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "react-toastify";
 import { Separator } from "@/components/ui/separator";
-import { Description } from "@radix-ui/react-dialog";
 import { mailRegex, phoneRegex } from "@/constants/regex";
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [

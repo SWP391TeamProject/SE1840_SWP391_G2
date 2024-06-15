@@ -1,17 +1,10 @@
-import FetchButton from '@/components/button/FetchButton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import Accounts from '@/pages/Administration/Account/AccountsList'
-import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
-import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
-import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, Backpack, User2, Menu } from 'lucide-react'
+import { Bell, Home, LineChart, Package, Package2, ShoppingCart, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
 import React, { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -23,7 +16,6 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-    BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -42,7 +34,7 @@ export default function Administration() {
             try {
                 const userData = JSON.parse(userCookie);
                 fetchAccountById(userData?.id).then((res) => {
-                    console.log(res.data)
+                    console.log(res?.data)
                     setUser(res.data)
                 }).catch((err) => {
                     console.log(err);
@@ -52,7 +44,6 @@ export default function Administration() {
             }
         }
     }, []);
-    const [consignments, setConsignments] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
     const [arrayPath, setArrayPath] = useState([""]);
@@ -156,8 +147,22 @@ export default function Administration() {
                                 to="items"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
-                                <Backpack />
+                                <ShoppingBag />
                                 Manage Item
+                            </Link>
+                            <Link
+                                to="blogs"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <Newspaper />
+                                Manage Blogs
+                            </Link>
+                            <Link
+                                to="notifications"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <Bell />
+                                Manage Notification
                             </Link>
 
                         </nav>
@@ -225,12 +230,15 @@ export default function Administration() {
                             {loadBreadcrumbs()}
                         </Breadcrumb>
                         <div className="relative ml-auto flex-1 md:grow-0">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                type="search"
-                                placeholder="Search..."
-                                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-                            />
+                            <form action="" method="get">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    type="search"
+                                    placeholder="Search..."
+                                    className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+                                    name='search'
+                                />
+                            </form>
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

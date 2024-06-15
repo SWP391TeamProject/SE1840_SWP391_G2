@@ -1,12 +1,5 @@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Payment } from "@/models/newModel/payment";
-import React from "react";
 
-interface RegisterToBidProps {
-    accountId: number;
-    auctionId: number;
-    amount: number;
-}
 
 export default function RegisterToBid() {
 

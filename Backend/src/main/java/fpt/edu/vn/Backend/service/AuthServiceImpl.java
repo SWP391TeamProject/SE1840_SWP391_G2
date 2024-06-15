@@ -17,6 +17,7 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Token;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.TokenRepos;
+import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -34,6 +35,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,16 +67,19 @@ public class AuthServiceImpl implements AuthService{
     private final ExpiringMap<String, Integer> activationCodeCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<Integer, Object> activationCooldownCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
-    @Autowired
     private TokenProvider tokenProvider;
-    @Autowired
     private TokenRepos tokenRepos;
+    private CustomUserDetailsService customUserDetailService;
+
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
         this.mailSender = mailSender;
+        this.tokenProvider = tokenProvider;
+        this.tokenRepos = tokenRepos;
+        this.customUserDetailService = customUserDetailService;
     }
 
     @Override
@@ -119,10 +124,12 @@ public class AuthServiceImpl implements AuthService{
         }
 
         // After successful registration, log the user in and generate a token
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(newAccount.getEmail());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        registerDTO.getEmail(),
-                        registerDTO.getPassword()
+                        userDetails,
+                        userDetails.getPassword(),
+                        userDetails.getAuthorities()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -147,10 +154,12 @@ public class AuthServiceImpl implements AuthService{
         if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException ("Invalid email or password");
         }
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(loginDTO.getEmail());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDTO.getEmail(),
-                        loginDTO.getPassword()
+                        userDetails,
+                        userDetails.getPassword(),
+                        userDetails.getAuthorities()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -19,20 +18,11 @@ import DropzoneComponent from "@/components/drop-zone/DropZoneComponent";
 import Consignment from "@/models/consignment";
 import { toast } from "react-toastify";
 import { createFinalEvaluation, createInitialEvaluation } from "@/services/ConsignmentDetailService";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { on } from "events";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { log } from "console";
 import { fetchConsignmentByConsignmentId } from "@/services/ConsignmentService";
 import { ConsignmentStatus } from "@/constants/enums";
-const MAX_FILE_SIZE = 5000000;
-const ACCEPTED_IMAGE_TYPES = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-];
 const formSchema = z.object({
     accountId: z.number(),
     evaluation: z.string().min(10, {
@@ -222,7 +212,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                                                 </Button>
                                                 :
 
-                                                <Button variant={"destructive"} type="submit" className="w-[150px]" onClick={(event) => {
+                                                <Button variant={"destructive"} type="submit" className="w-[150px]" onClick={() => {
                                                     if (form.formState.isValid) {
                                                         console.log(form.getValues())
                                                         onSubmit(form.getValues()); // Wait for onSubmit to complete

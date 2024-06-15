@@ -50,7 +50,7 @@ export default function DropzoneComponent({ control, name }) {
 
         return (
           <section className="container min-h-[100px] flex justify-center items-center flex-col w-full ">
-            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full border rounded-xl  border-dotted h-[100px] hover:cursor-pointer hover:bg-gray-100" })}>
+            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full border rounded-xl  border-dotted h-[100px] hover:cursor-pointer hover:bg-accent" })}>
               <input {...getInputProps()} />
               <div className="w-full flex justify-center items-center gap-2">
                 <UploadCloudIcon />

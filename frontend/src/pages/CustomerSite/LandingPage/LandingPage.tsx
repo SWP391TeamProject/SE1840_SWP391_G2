@@ -24,16 +24,11 @@ To read more about using these font, please visit the Next.js documentation:
   --radius: 0.875rem;
 }
 **/
-import { Button } from "@/components/ui/button";
-import { SheetTrigger, SheetContent, Sheet } from "@/components/ui/sheet";
-import { Link } from "react-router-dom";
 import LandingPageCarousel from "@/pages/CustomerSite/LandingPage/LandingPageCarousel";
 import FeaturedAuctions from "@/pages/CustomerSite/LandingPage/FeaturedAuctions";
 import CategoriesSection from "@/pages/CustomerSite/LandingPage/CategoriesSection";
 import AuctionProcessSection from "@/pages/CustomerSite/LandingPage/AuctionProcessSection";
 import Footer from "../../../components/footer/Footer";
-import { GavelIcon, MenuIcon } from "lucide-react";
-import NavBar from "@/components/NavBar/NavBar";
 
 export function LandingPage() {
   return (

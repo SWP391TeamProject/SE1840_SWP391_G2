@@ -7,21 +7,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
-import { useAppSelector } from "@/redux/hooks.tsx";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
-import { removeCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useEffect } from "react";
+import { countUnreadNotifications } from "@/services/NotificationService";
+import { setUnreadNotificationCount } from "@/redux/reducers/UnreadNotificationCountReducer";
+import { fetchAccountById } from "@/services/AccountsServices";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
+  const loc = useLocation();
+  const dispatch = useAppDispatch();
   const handleSignout = function () {
     logout().then(function () {
       removeCookie("user");
@@ -29,6 +36,35 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
+//  this is neccessary as this nav bar doesn't rerender when the user logs in
+  useEffect(() => {
+
+    async function fetchUnreadNotification() {
+      countUnreadNotifications().then((res) => {
+        console.log('noti service')
+        console.log("noti service" + res?.data);
+        dispatch(setUnreadNotificationCount(res?.data));
+      }).catch((err) => {
+        console.error(err);
+      })
+    }
+    if (!loc?.state) {
+      let cookie = getCookie('user');
+      if (cookie) {
+        const data = JSON.parse(cookie)?.id;
+        if (data) {
+          fetchAccountById(data).then(res => {
+            console.log('hehehe')
+            auth.setUser(res?.data)
+          }).then(() => {
+            fetchUnreadNotification()
+          })
+        }
+      }
+    }
+  }, [])
+
+
 
   return (
     <>
@@ -53,34 +89,31 @@ export default function NavBar() {
                 ) : ''}
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <ModeToggle/>
+                <ModeToggle />
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent  >
-                  <ul>
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Auctions</Link>
-                    </li>
-                    <Separator />
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions/">Featured</Link>
-                    </li>
-                    <Separator />
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Past Auctions</Link>
-                    </li>
-                    <Separator />
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Upcoming</Link>
-                    </li>
-                  </ul>
+                  <li className={navigationMenuTriggerStyle()}>
+                    <Link to="/auctions">Auctions</Link>
+                  </li>
+                  <Separator />
+                  <li className={navigationMenuTriggerStyle()}>
+                    <Link to="/auctions/">Featured</Link>
+                  </li>
+                  <Separator />
+                  <li className={navigationMenuTriggerStyle()}>
+                    <Link to="/auctions">Past Auctions</Link>
+                  </li>
+                  <Separator />
+
+                  <Link className={navigationMenuTriggerStyle()} to="/auctions">Upcoming</Link>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                    <Link to="/about">About</Link>
-                  </NavigationMenuLink>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                  <Link to="/about">About</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
@@ -96,26 +129,18 @@ export default function NavBar() {
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full relative"
-                      >
-                        <img
-                            src={auth.user.avatar ?? './placeholder.svg'}
-                            width={36}
-                            height={36}
-                            alt="Avatar"
-                            className="overflow-hidden rounded-full"
-                        />
-                        {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-5 h-5 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
-                      </Button>
+                      <Avatar className="hover:cursor-pointer">
+                        <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
+                        <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
+                      </Avatar>
                     </DropdownMenuTrigger>
+                    {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+
                     <DropdownMenuContent align="end" className="w-fit p-4">
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to={'/profile'}>Profile</Link>
+                        <Link to={'/profile/overview'}>Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild className="cursor-pointer">
                         <Link to={'/profile/notification'} className="flex gap-2">
@@ -197,7 +222,7 @@ export default function NavBar() {
             </div>
           </SheetContent>
         </Sheet>
-      </header>
+      </header >
     </>
   );
 }

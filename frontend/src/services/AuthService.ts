@@ -67,9 +67,26 @@ export const requestActivateAccount = async (dto: { email: string }): Promise<vo
 };
 
 
+export const requestChangePassword = async (data, id): Promise<void> => {
+  await axios.post(`${baseUrl}/change-password/${id}`, data, {
+    ...authHeader
+  });
+};
+
+
 export const activateAccount = async (code: string): Promise<void> => {
   await axios.post(`${baseUrl}/activate-account/`, null, {
     ...authHeader,
     params: { code },
+  });
+};
+
+export const changePassword = async (id: number, dto: {
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}): Promise<void> => {
+  await axios.post(`${baseUrl}/change-password/${id}`, dto, {
+    ...authHeader
   });
 };

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ const formSchema = z.object({
 });
 
 export default function Balance() {
-    const { data: account, isLoading, isError } = useQuery({
+    const { data: account, isLoading } = useQuery({
         queryKey: ["balance"],
         queryFn: async () => {
             const userId = JSON.parse(getCookie("user"))?.id;
@@ -49,6 +48,12 @@ export default function Balance() {
             accountId: JSON.parse(getCookie("user"))?.id,
             ipAddr: "",
             orderInfoType: "DEPOSIT",
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                Authorization: "Bearer " + JSON.parse(getCookie("user"))?.accessToken,
+            },
         }).then(response => {
             window.location.href = response.data;
         }).catch(error => {

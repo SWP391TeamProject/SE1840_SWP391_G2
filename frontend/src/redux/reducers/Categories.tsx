@@ -1,3 +1,4 @@
+import { Category } from "@/models/Category";
 import { createSlice } from "@reduxjs/toolkit"
 
 interface CategoriesState {

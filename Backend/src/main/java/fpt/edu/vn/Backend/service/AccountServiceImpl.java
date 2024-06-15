@@ -51,20 +51,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account) {
+    public @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole) {
         // avatar dùng method riêng
-        // không set toàn bộ tránh exploit
         account.setAccountId(accountDTO.getAccountId());
-        if (accountDTO.getRole() != null && !String.valueOf(accountDTO.getRole()).isEmpty())
-            account.setRole(accountDTO.getRole());
         if (accountDTO.getNickname() != null)
             account.setNickname(accountDTO.getNickname());
         if (accountDTO.getPhone() != null)
             account.setPhone(accountDTO.getPhone());
-        if (accountDTO.getStatus() != null)
-            account.setStatus(accountDTO.getStatus());
-        if (accountDTO.getBalance() != null)
-            account.setBalance(accountDTO.getBalance());
+
+        if (editorRole == Account.Role.ADMIN) { // only admin can update these properties
+            if (accountDTO.getRole() != null && !String.valueOf(accountDTO.getRole()).isEmpty())
+                account.setRole(accountDTO.getRole());
+            if (accountDTO.getStatus() != null)
+                account.setStatus(accountDTO.getStatus());
+            if (accountDTO.getBalance() != null)
+                account.setBalance(accountDTO.getBalance());
+        }
+
         return account;
     }
 
@@ -76,6 +79,13 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles) {
         var a = accountRepos.findByRoleIn(roles, pageable);
+        a = a == null ? Page.empty(pageable) : a;
+        return a.map(this::mapEntityToDTO);
+    }
+
+    @Override
+    public @NotNull Page<AccountDTO> getAccountsByNameOrEmail(@NotNull Pageable pageable, String name) {
+        var a = accountRepos.findByNicknameContainingOrEmailContaining(name, pageable);
         a = a == null ? Page.empty(pageable) : a;
         return a.map(this::mapEntityToDTO);
     }
@@ -110,11 +120,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account) {
+    public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
         Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
         Account acc = accountRepos.findById(account.getAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
-        return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc)));
+        return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc, editorRole)));
     }
 
     @Override

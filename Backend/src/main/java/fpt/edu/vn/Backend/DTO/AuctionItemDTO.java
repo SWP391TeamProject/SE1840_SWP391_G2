@@ -5,12 +5,17 @@ import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+=======
+import lombok.NoArgsConstructor;
+
 
 import java.math.BigDecimal;
 
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
+
 public class AuctionItemDTO {
     private AuctionItemId id;
     private ItemDTO itemDTO;
@@ -21,4 +26,5 @@ public class AuctionItemDTO {
         this.itemDTO = new ItemDTO(auctionItem.getItem());
         this.currentPrice = auctionItem.getCurrentPrice();
     }
+
 }

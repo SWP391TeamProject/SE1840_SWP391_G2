@@ -1,5 +1,3 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { set, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -20,21 +18,25 @@ import { toast } from "react-toastify"
 import { createAuctionSession } from "@/services/AuctionSessionService"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { CalendarIcon, Loader2 } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
 
 const FormSchema = z.object({
     title: z.string().min(2, {
         message: "Title must be at least 2 characters.",
     }),
-    startDate: z.string(
+    startDate: z.date(
         {
             message: "Start date is required.",
         }),
-    endDate: z.string(
+    endDate: z.date(
         {
             message: "End date is required.",
         }),
-    attachments: z.any(),
+    files: z.any(),
 })
 
 export default function AuctionSessionCreate() {
@@ -43,9 +45,7 @@ export default function AuctionSessionCreate() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             title: "",
-            startDate: "",
-            endDate: "",
-            attachments: [],
+            files: [],
 
         },
     })
@@ -57,7 +57,7 @@ export default function AuctionSessionCreate() {
             setIsSubmitting(false)
             form.reset()
             toast.success("Auction session created successfully.")
-            
+
         })
             .catch((err) => {
                 setIsSubmitting(false)
@@ -94,14 +94,41 @@ export default function AuctionSessionCreate() {
                         control={form.control}
                         name="startDate"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col">
                                 <FormLabel>Start Date</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="datetime-local" {...field} />
-                                </FormControl>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-[240px] pl-3 text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
+                                            >
+                                                {field.value ? (
+                                                    format(field.value, "PPP")
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) =>
+                                                date > new Date() || date < new Date("1900-01-01")
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
                                 <FormDescription>
-                                    This is the date the auction session starts.
+                                    this is the start date of the auction session
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -113,14 +140,41 @@ export default function AuctionSessionCreate() {
                         control={form.control}
                         name="endDate"
                         render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="flex flex-col">
                                 <FormLabel>End Date</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        type="datetime-local" {...field} />
-                                </FormControl>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-[240px] pl-3 text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
+                                            >
+                                                {field.value ? (
+                                                    format(field.value, "PPP")
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) =>
+                                                date > new Date() || date < new Date("1900-01-01")
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
                                 <FormDescription>
-                                    This is the date the auction session ends.
+                                    this is the end of the auction session
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -133,7 +187,7 @@ export default function AuctionSessionCreate() {
                 <ScrollArea className="w-full h-64 overflow-hidden">
                     <FormField
                         control={form.control}
-                        name="attachments"
+                        name="files"
                         render={({ field }) => (
                             <DropzoneComponent {...field} control={form.control} />
                         )}

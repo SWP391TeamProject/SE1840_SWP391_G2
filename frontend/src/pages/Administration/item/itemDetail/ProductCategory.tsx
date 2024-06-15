@@ -5,15 +5,17 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { IItemCategory } from "@/constants/interfaces"
+import { SERVER_DOMAIN_URL } from "@/constants/domain"
 import { getCookie } from "@/utils/cookies"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
@@ -22,13 +24,13 @@ type ProductCategory = {
     categoryP: any;
 }
 
-export default function ProductCategory({ categoryP }: ProductCategory) {
+export default function ProductCategory({ ...props }) {
 
     const [category, setCategory] = useState([])
 
     useEffect(() => {
 
-        fetch('http://localhost:8080/api/item-categories/', {
+        fetch(`${SERVER_DOMAIN_URL}/api/item-categories/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -60,19 +62,36 @@ export default function ProductCategory({ categoryP }: ProductCategory) {
                     <CardContent>
                         <div className="grid gap-6 sm:grid-cols-3 w-full">
                             <div className="grid gap-3 w-full">
-                                <Label htmlFor="category">Category</Label>
-                                <Select >
-                                    <SelectTrigger id="category" aria-label="Select category">
-                                        <SelectValue placeholder="Select category" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {category?.map((item: any) => {
-                                            return <SelectItem value={parseInt(item?.itemCategoryId)}>{item.name}</SelectItem>
-                                        }
-                                        )}
-                                        <SelectItem value="accessories">Accessories</SelectItem>
-                                    </SelectContent>
-                                </Select>
+
+                                <FormField
+                                    control={props.form.control}
+                                    name="category.itemCategoryId"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Category</FormLabel>
+                                            <FormControl>
+                                                <Select onValueChange={field.onChange} 
+                                                defaultValue={field.value}
+                                                >
+                                                    <SelectTrigger id="category" aria-label="Select category">
+                                                        <SelectValue placeholder="Select category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectGroup label="Category">
+                                                            <SelectLabel>North America</SelectLabel>
+                                                            {category?.map((item: any,index) => {
+                                                                return <SelectItem key={index} value={item.itemCategoryId.toString()}>{item.name}</SelectItem>
+                                                            }
+                                                            )}
+                                                        </SelectGroup>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
                         </div>

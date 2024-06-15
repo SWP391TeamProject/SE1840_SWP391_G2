@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
@@ -28,7 +29,7 @@ public class AuctionItemServiceImpl implements AuctionItemService{
     @Override
     public AuctionItemDTO getAuctionItemById(AuctionItemId id) {
         return new AuctionItemDTO(auctionItemRepos.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction item id: " + id)
+                () -> new ResourceNotFoundException("Invalid auction item id: " + id)
         ));
     }
 
@@ -50,7 +51,7 @@ public class AuctionItemServiceImpl implements AuctionItemService{
     @Override
     public AuctionItemDTO updateAuctionItem(AuctionItemDTO auctionItemDTO) {
         AuctionItem newAuctionItem = auctionItemRepos.findById(auctionItemDTO.getId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemDTO.getId()));
+                () -> new ResourceNotFoundException("Invalid auction item id: " + auctionItemDTO.getId()));
         newAuctionItem.setCurrentPrice(auctionItemDTO.getCurrentPrice());
         auctionItemRepos.save(newAuctionItem);
         return new AuctionItemDTO(newAuctionItem);
