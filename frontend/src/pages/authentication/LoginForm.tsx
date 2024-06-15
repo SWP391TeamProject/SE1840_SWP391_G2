@@ -56,7 +56,7 @@ function LoginForm() {
           navigate(from, { replace: true });
           
         }
-        toast.success('logged in succesfully')
+        toast.success('logged in successfully')
       })
       .catch(err => {
         toast.error(err.response.data.message);
@@ -90,7 +90,7 @@ function LoginForm() {
           } else {
             navigate(from, { replace: true, });
           }
-          toast.success('logged in succesfully')
+          toast.success('logged in successfully')
         })
         .catch(err => {
           toast.error(err.response.data.message);
@@ -166,7 +166,7 @@ function LoginForm() {
                         } else {
                           navigate(from, { replace: true });
                         }
-                        toast.success('logged in succesfully')
+                        toast.success('logged in successfully')
                       }
                     )
                 }
