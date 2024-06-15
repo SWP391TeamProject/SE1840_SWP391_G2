@@ -182,7 +182,7 @@ export default function ItemCreate() {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <TextEditor {...field}/>
+                                    <TextEditor {...field} placeholder="description..."/>
                                     {/* // <Textarea placeholder="shadcn" {...field} /> */}
                                 </FormControl>
                                 <FormDescription>

@@ -19,7 +19,7 @@ const initialState: ItemsState = {
     value: [],
     currentItem: undefined,
     currentPageList: [],
-    currentPageNumber: 1,
+    currentPageNumber: 0,
     pageSize: 10,
     totalItems: 0,
     totalPages: 0,
