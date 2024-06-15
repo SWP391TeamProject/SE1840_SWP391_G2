@@ -1,9 +1,11 @@
 package fpt.edu.vn.Backend.security;
 
+import java.net.http.HttpClient;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.nimbusds.jose.util.Resource;
 import fpt.edu.vn.Backend.oauth2.security.*;
 
 import fpt.edu.vn.Backend.oauth2.security.*;
@@ -11,11 +13,16 @@ import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTAuthEntryPoint;
 import fpt.edu.vn.Backend.security.JWTAuthenticationFilter;
 import org.apache.catalina.filters.CorsFilter;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -40,9 +47,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.net.ssl.SSLContext;
 
 @Configuration
 @EnableWebSecurity
