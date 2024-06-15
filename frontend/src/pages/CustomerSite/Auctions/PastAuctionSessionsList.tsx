@@ -5,13 +5,12 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
 import { fetchPastAuctionSessions } from "@/services/AuctionSessionService";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function PastAuctionSessionsList() {
   const auctionSessionList = useAppSelector((state) => state.auctionSessions);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const date = new Date();
 
   const { isPending, isError, data, error } = useQuery({
@@ -19,11 +18,7 @@ export default function PastAuctionSessionsList() {
     queryFn: () => fetchPastAuctionSessions(auctionSessionList.currentPageNumber, 10),
   });
 
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
+
 
   const handleViewDetailsClick = (id: any) => {
     let session = auctionSessionList.value.find(s => s.auctionSessionId == id);

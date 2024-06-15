@@ -39,7 +39,7 @@ export const fetchActiveAuctionSessions = async (page?: number, size?: number) =
     console.log(params);
 
     return await axios
-        .get("http://localhost:8080/api/auction-sessions/active", {
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",

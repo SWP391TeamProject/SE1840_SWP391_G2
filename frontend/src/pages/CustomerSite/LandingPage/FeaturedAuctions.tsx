@@ -8,14 +8,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { fetchAllAuctionSessions, fetchFeaturedAuctionSessions } from "@/services/AuctionSessionService";
-import { getItems } from "@/services/ItemService";
+import { fetchFeaturedAuctionSessions } from "@/services/AuctionSessionService";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function FeaturedAuctions() {
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
-  const [daysLeft, setDaysLeft] = React.useState(0);
 
   const getDaysLeft = (endDate: Date) => {
     const difference = endDate.getTime() - new Date().getTime();
@@ -26,8 +24,8 @@ export default function FeaturedAuctions() {
   useEffect(() => {
     fetchFeaturedAuctionSessions().then((data) => {
       console.log(data);
-      // setFeaturedAuctions(data.data.content.filter((item) => item.status == "FEATURED"));
-      setFeaturedAuctions(data.data.content);
+      // setFeaturedAuctions(data.data.?content.filter((item) => item.status == "FEATURED"));
+      setFeaturedAuctions(data?.data?.content);
     });
   }, []);
 

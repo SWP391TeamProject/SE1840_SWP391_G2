@@ -1,17 +1,10 @@
-import FetchButton from '@/components/button/FetchButton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import Accounts from '@/pages/Administration/Account/AccountsList'
-import { fetchAllAuctionSessions } from '@/services/AuctionSessionService'
-import { fetchAllConsignmentsService } from '@/services/ConsignmentService'
-import { Bell, FolderMinus, Home, LineChart, Package, Package2, Settings, ShoppingCart, Users, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, Backpack, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
+import { Bell, Home, LineChart, Package, Package2, ShoppingCart, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
 import React, { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -23,7 +16,6 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-    BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -42,7 +34,7 @@ export default function Administration() {
             try {
                 const userData = JSON.parse(userCookie);
                 fetchAccountById(userData?.id).then((res) => {
-                    console.log(res.data)
+                    console.log(res?.data)
                     setUser(res.data)
                 }).catch((err) => {
                     console.log(err);
@@ -52,7 +44,6 @@ export default function Administration() {
             }
         }
     }, []);
-    const [consignments, setConsignments] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
     const [arrayPath, setArrayPath] = useState([""]);

@@ -1,16 +1,13 @@
-import React, { useEffect } from 'react'
-import { Account, Role } from '@/models/AccountModel'
+import { useEffect } from 'react'
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
@@ -19,8 +16,8 @@ import { z } from "zod";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { RoleName, Roles } from '@/constants/enums';
 import { updateAccountService } from "@/services/AccountsServices.ts";
-import { setCurrentAccount } from '@/redux/reducers/Accounts';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Role } from '@/models/newModel/account';
 
 const phoneRegex = new RegExp(
     /^[0-9\-\+]{10}$/
@@ -46,7 +43,6 @@ const roleSchema: z.ZodType<Role> = z.object({
 
 export default function AccountEdit() {
     const account = useAppSelector((state) => state.accounts.currentAccount);
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof formSchema>>({

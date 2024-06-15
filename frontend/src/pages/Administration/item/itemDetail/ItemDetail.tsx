@@ -1,12 +1,11 @@
 import { useAppSelector } from "@/redux/hooks";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import ProductDetail from "./ProductDetail";
 import ProductStatus from "./ProductStatus";
 import ProductCategory from "./ProductCategory";
 import ProductImageGallery from "./ProductImageGallery";
 import { useParams } from "react-router-dom";
 import { getItemById, updateItem } from "@/services/ItemService";
-import { it } from "node:test";
 import { Item } from "@/models/Item";
 import { Loader2 } from "lucide-react";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
@@ -15,14 +14,7 @@ import ProductPrice from "./ProductPrice";
 import { Button } from "@/components/ui/button"
 import {
   Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

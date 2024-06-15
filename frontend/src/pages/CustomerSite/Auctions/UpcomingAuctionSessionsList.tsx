@@ -11,7 +11,6 @@ import { Link, useNavigate } from "react-router-dom";
 export default function UpcomingAuctionSessionsList() {
   const auctionSessionList = useAppSelector((state) => state.auctionSessions);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const date = new Date();
 
   const { isPending, isError, data, error } = useQuery({

@@ -3,19 +3,16 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { IConsignmentDetail } from "@/constants/interfaces"
+import { ConsignmentDetail } from "@/constants/interfaces";
 
 interface consignmentDetaiDialog {
-    consignmentDetail: IConsignmentDetail;
+    consignmentDetail: ConsignmentDetail;
 }
 export default function ConsignmentDetailDialog(consignmentDetail: consignmentDetaiDialog) {
     return (

@@ -1,10 +1,6 @@
-import AuthContext, { useAuth } from "@/AuthProvider";
 import { Roles } from "@/constants/enums";
-import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useLocation, Navigate, Outlet, useNavigate, redirect } from "react-router-dom";
-import { toast } from "react-toastify";
+import { getCookie } from "@/utils/cookies";
+import { useLocation, Navigate, Outlet } from "react-router-dom";
 
 type RolesEnum = {
   allowedRoles: Roles[];
@@ -13,7 +9,6 @@ type RolesEnum = {
 const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
   const location = useLocation();
   const userCookie = getCookie("user");
-  const nav = useNavigate();
   let parsedUser = null;
   if (userCookie) {
     try {

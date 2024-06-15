@@ -1,17 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 import { fetchBidsByAccount } from '@/services/BidsService';
 import { getCookie } from '@/utils/cookies';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 export const Bids = () => {
-    const auctionSessionList = useAppSelector((state) => state.auctionSessions);
-    const dispatch = useAppDispatch();
     const [bids, setBids] = useState([]);
     var nav = useNavigate();
     useEffect(() => {

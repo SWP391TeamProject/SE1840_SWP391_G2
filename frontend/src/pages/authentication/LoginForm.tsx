@@ -7,7 +7,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import AuthContext from "@/AuthProvider";
-import { redirect, redirectDocument, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { AccountStatus, Roles } from "@/constants/enums";
 import { toast } from "react-toastify";
@@ -185,7 +185,7 @@ function LoginForm() {
             type="button"
             className="h-fit bg-white text-black border rounded-xl m-0 w-full hover:bg-gray-200 mt-2"
             onClick={() => {
-              window.location.href = `${SERVER_DOMAIN_URL}/oauth2/authorize/google?redirect_uri=http://localhost:5173/auth/login?type=google`;
+              window.location.href = `${SERVER_DOMAIN_URL}/oauth2/authorize/google?redirect_uri=${import.meta.env.VITE_FRONTEND_SERVER}/auth/login?type=google`;
             }}
           >
             <img src={googleIcon} alt="google icon" className="object-contain" width={'30px'} height={'30px'} />

@@ -1,11 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { getAllItemCategories } from "@/services/ItemCategoryService";
 import {
-  AntennaIcon,
   CrownIcon,
-  HistoryIcon,
-  HotelIcon,
-  VenetianMaskIcon,
 } from "lucide-react";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";

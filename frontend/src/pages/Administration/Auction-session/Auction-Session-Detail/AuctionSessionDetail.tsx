@@ -3,9 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AuctionSession } from "@/models/AuctionSessionModel";
 import { useAppSelector } from "@/redux/hooks";
 import { fetchAuctionSessionById, updateAuctionSession } from "@/services/AuctionSessionService";
-import { Separator } from "@radix-ui/react-dropdown-menu";
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Details from "./Details";
 import Status from "./Status";
 import TotalValuation from "./TotalValuation";

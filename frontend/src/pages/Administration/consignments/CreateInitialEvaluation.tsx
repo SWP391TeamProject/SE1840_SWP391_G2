@@ -1,19 +1,15 @@
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger, Drawer, DrawerClose } from "@/components/ui/drawer"
+import { DrawerContent, DrawerFooter, DrawerTrigger, Drawer, DrawerClose } from "@/components/ui/drawer"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ConsignmentStatus } from "@/constants/enums"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { updateConsignmentService } from "@/services/ConsignmentService"
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
-import { BarChart, Minus, Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export default function CreateInitialEvaluation({ id }: { id: number }) {
-    const dispatch = useAppDispatch();
     const consignmentList = useAppSelector((state) => state.consignments.currentPageList);
     const [status, setStatus] = useState<ConsignmentStatus>();
     useEffect(() => {

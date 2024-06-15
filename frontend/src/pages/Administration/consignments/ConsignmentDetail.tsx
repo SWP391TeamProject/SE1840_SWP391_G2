@@ -1,18 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
 import Consignment from "@/models/consignment";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setCurrentConsignment } from "@/redux/reducers/Consignments";
-import { RootState } from "@/redux/store";
-import { fetchConsigntmentDetailByConsignmentId } from "@/services/ConsignmentDetailService";
+import { useAppDispatch } from "@/redux/hooks";
 import { acceptEvaluation, fetchConsignmentByConsignmentId, receivedConsignment, rejectEvaluation, takeConsignment } from "@/services/ConsignmentService";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { UploadIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConsignmentDetailDialog from "./ConsignmentDetailDialog";
@@ -21,13 +13,11 @@ import { ConsignmentDetailType, ConsignmentStatus, Roles } from "@/constants/enu
 import { getCookie } from "@/utils/cookies";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { set } from "react-hook-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConsignmentDetail() {
     const param = useParams();
 
-    const dispatch = useAppDispatch();
 
     const [consignment, setConsignment] = useState<Consignment | undefined>(undefined);
     const [state, setState] = useState(false);

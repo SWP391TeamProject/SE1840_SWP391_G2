@@ -82,7 +82,7 @@ export const createConsignmentService = async (data: any) => {
 };
 export const deleteConsignmentService = async (id: string) => {
   return await axios
-    .get(`http://localhost:8080/api/consignments/take/${id}`, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -98,7 +98,7 @@ export const takeConsignment = async (id: string) => {
   const data=JSON.parse(getCookie("user"))?.id;
   
   return await axios
-    .put(`http://localhost:8080/api/consignments/take/${id}`, data,{
+    .put(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data,{
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -110,7 +110,7 @@ export const takeConsignment = async (id: string) => {
 };
 export const receivedConsignment = async (id: string) => {  
   return await axios
-    .get(`http://localhost:8080/api/consignments/received/${id}`,{
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/received/${id}`,{
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -125,7 +125,7 @@ export const receivedConsignment = async (id: string) => {
 export const rejectEvaluation = async (id: string,accountId:number,reason:any) => {  
   console.log({accountId: accountId,reason:reason})
   return await axios
-    .post(`http://localhost:8080/api/consignments/reject/${id}`,{accountId: accountId,reason:reason},{
+    .post(`${SERVER_DOMAIN_URL}/api/consignments/reject/${id}`,{accountId: accountId,reason:reason},{
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Access-Control-Allow-Origin": "*",
@@ -138,7 +138,7 @@ export const rejectEvaluation = async (id: string,accountId:number,reason:any) =
 export const acceptEvaluation = async (id: string,accountId:number) => {  
   console.log({accountId: accountId})
   return await axios
-    .post(`http://localhost:8080/api/consignments/approve/${id}`,{accountId: accountId},{
+    .post(`${SERVER_DOMAIN_URL}/api/consignments/approve/${id}`,{accountId: accountId},{
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Access-Control-Allow-Origin": "*",

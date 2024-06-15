@@ -53,7 +53,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({
     <section className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full">
         <article className="grow py-2.5 pr-6 pl-2.5 w-full bg-white rounded shadow-sm max-md:pr-5 max-md:mt-3 max-md:max-w-full">
             <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-                <img loading="lazy" src={src} alt={alt} className="flex flex-col w-[39%] max-md:ml-0 max-md:w-full grow shrink-0 max-w-full aspect-[0.76] w-[150px] max-md:mt-6" />
+                <img loading="lazy" src={src} alt={alt} className="flex flex-col w-[39%] max-md:ml-0 max-md:w-full grow shrink-0 max-w-full aspect-[0.76] max-md:mt-6" />
                 <div className="flex flex-col ml-5 w-[61%] max-md:ml-0 max-md:w-full">
                     <header className="flex flex-col max-md:mt-7">
                         <h3 className="text-xl font-bold leading-8 text-zinc-900">{title}</h3>

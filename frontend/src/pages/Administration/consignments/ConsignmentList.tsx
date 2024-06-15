@@ -1,14 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { PaginationPrevious, PaginationItem, PaginationLink, PaginationEllipsis, PaginationNext, PaginationContent, Pagination } from "@/components/ui/pagination";
 import {
     Card,
     CardContent,
@@ -19,15 +10,11 @@ import {
 } from "@/components/ui/card";
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
     Table,
     TableBody,
@@ -37,39 +24,17 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 import {
-    Home,
-    LineChart,
-    ListFilter,
-    Package,
-    Package2,
-    PanelLeft,
-    Search,
-    Settings,
-    ShoppingCart,
-    Users2,
-    File,
     PlusCircle,
     MoreHorizontal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { EditAcc } from "../popup/EditAcc";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ConsignmentContactPreference, ConsignmentStatus } from "@/constants/enums";
-import { deleteConsignmentService, fetchAllConsignmentsService, takeConsignment } from "@/services/ConsignmentService";
-import { setConsignments, setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
-import UpdateConsignmentStatus from "./UpdateConsignmentStatus";
-import CreateInitialEvaluation from "./CreateInitialEvaluation";
-import SendEvaluationForm from "./SendEvaluation";
-import { getCookie } from "@/utils/cookies";
+import { fetchAllConsignmentsService, takeConsignment } from "@/services/ConsignmentService";
+import { setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function ConsignmentList() {
