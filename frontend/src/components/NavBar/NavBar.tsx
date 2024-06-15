@@ -7,22 +7,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
-import { useAppSelector } from "@/redux/hooks.tsx";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
-import { removeCookie } from "@/utils/cookies";
+import { getCookie, removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useEffect } from "react";
+import { countUnreadNotifications } from "@/services/NotificationService";
+import { setUnreadNotificationCount } from "@/redux/reducers/UnreadNotificationCountReducer";
+import { fetchAccountById } from "@/services/AccountsServices";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
+  const loc = useLocation();
+  const dispatch = useAppDispatch();
   const handleSignout = function () {
     logout().then(function () {
       removeCookie("user");
@@ -30,6 +36,35 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
+//  this is neccessary as this nav bar doesn't rerender when the user logs in
+  useEffect(() => {
+
+    async function fetchUnreadNotification() {
+      countUnreadNotifications().then((res) => {
+        console.log('noti service')
+        console.log("noti service" + res?.data);
+        dispatch(setUnreadNotificationCount(res?.data));
+      }).catch((err) => {
+        console.error(err);
+      })
+    }
+    if (!loc?.state) {
+      let cookie = getCookie('user');
+      if (cookie) {
+        const data = JSON.parse(cookie)?.id;
+        if (data) {
+          fetchAccountById(data).then(res => {
+            console.log('hehehe')
+            auth.setUser(res?.data)
+          }).then(() => {
+            fetchUnreadNotification()
+          })
+        }
+      }
+    }
+  }, [])
+
+
 
   return (
     <>
@@ -59,20 +94,20 @@ export default function NavBar() {
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent  >
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Auctions</Link>
-                    </li>
-                    <Separator />
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions/">Featured</Link>
-                    </li>
-                    <Separator />
-                    <li className={navigationMenuTriggerStyle()}>
-                      <Link to="/auctions">Past Auctions</Link>
-                    </li>
-                    <Separator />
-                 
-                      <Link  className={navigationMenuTriggerStyle()} to="/auctions">Upcoming</Link>
+                  <li className={navigationMenuTriggerStyle()}>
+                    <Link to="/auctions">Auctions</Link>
+                  </li>
+                  <Separator />
+                  <li className={navigationMenuTriggerStyle()}>
+                    <Link to="/auctions/">Featured</Link>
+                  </li>
+                  <Separator />
+                  <li className={navigationMenuTriggerStyle()}>
+                    <Link to="/auctions">Past Auctions</Link>
+                  </li>
+                  <Separator />
+
+                  <Link className={navigationMenuTriggerStyle()} to="/auctions">Upcoming</Link>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -94,100 +129,100 @@ export default function NavBar() {
                 <NavigationMenuItem>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                    <Avatar className="hover:cursor-pointer">
-                      <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
-                      <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
-                       </Avatar>
+                      <Avatar className="hover:cursor-pointer">
+                        <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
+                        <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
+                      </Avatar>
                     </DropdownMenuTrigger>
                     {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
-                
-                  <DropdownMenuContent align="end" className="w-fit p-4">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/profile/overview'}>Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/profile/notification'} className="flex gap-2">
-                        <div>Notification</div>
-                        <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
-                          <div>{unreadNoti.count}</div>
+
+                    <DropdownMenuContent align="end" className="w-fit p-4">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/profile/overview'}>Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/profile/notification'} className="flex gap-2">
+                          <div>Notification</div>
+                          <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
+                            <div>{unreadNoti.count}</div>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/dashboard'}>Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem style={{ pointerEvents: "none" }}>
+                        <div className="flex justify-between items-center gap-2">
+                          <div className="basis-1/2">
+                            Balance:
+                          </div>
+                          <div className="basis-1/2 font-medium text-left block">
+                            <p >
+                              {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                            </p>
+                          </div>
                         </div>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to={'/dashboard'}>Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem style={{ pointerEvents: "none" }}>
-                      <div className="flex justify-between items-center gap-2">
-                        <div className="basis-1/2">
-                          Balance:
-                        </div>
-                        <div className="basis-1/2 font-medium text-left block">
-                          <p >
-                            {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
-                          </p>
-                        </div>
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </NavigationMenuItem>}
-          </NavigationMenuList>
-        </NavigationMenu>
-      </nav>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
 
 
 
 
 
 
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button className="lg:hidden ml-auto" size="icon" variant="outline">
-            <MenuIcon className="h-6 w-6" />
-            <span className="sr-only">Toggle navigation menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent className="bg-white" side="right">
-          <div className="grid gap-2 py-6">
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Put your item for auction
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Auctions
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              About
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Blog
-            </Link>
-            <Link
-              className="flex w-full items-center py-2 text-lg font-semibold"
-              to="#"
-            >
-              Contact
-            </Link>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </header >
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button className="lg:hidden ml-auto" size="icon" variant="outline">
+              <MenuIcon className="h-6 w-6" />
+              <span className="sr-only">Toggle navigation menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="bg-white" side="right">
+            <div className="grid gap-2 py-6">
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Put your item for auction
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Auctions
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                About
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Blog
+              </Link>
+              <Link
+                className="flex w-full items-center py-2 text-lg font-semibold"
+                to="#"
+              >
+                Contact
+              </Link>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </header >
     </>
   );
 }
