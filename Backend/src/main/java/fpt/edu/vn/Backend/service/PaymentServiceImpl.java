@@ -191,8 +191,8 @@ public class PaymentServiceImpl implements PaymentService {
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
-        Account account = accountRepos.findById(5)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + 1));
+        Account account = accountRepos.findByAccountId(paymentRequest.getAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " ));
         BillingDTO billing = new BillingDTO().builder()
                 .vnp_Bill_Address("123")
                 .vnp_Bill_City("Hanoi")

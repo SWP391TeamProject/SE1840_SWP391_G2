@@ -1,21 +1,30 @@
-# Choose ubuntu version
-FROM mcr.microsoft.com/mssql/server:2019-CU13-ubuntu-20.04
+FROM eclipse-temurin:17-jdk-jammy as builder
+WORKDIR /opt/app
+COPY ../mvn/ .mvn
+COPY ../mvnw pom.xml ./
+RUN .././mvnw dependency:go-offline
+COPY ../src ./src
+COPY .env.dev.properties /opt/app/.env.dev.properties
+COPY .env.properties /opt/app/.env.properties
+COPY src/main/resources/keystore/biddify.p12 /opt/app/src/main/resources/keystore/biddify.p12
 
-# Create app directory
-WORKDIR /usr/src/app
+RUN ./mvnw clean install -Pdev -DskipTests
 
-# Copy initialization scripts
-COPY . /usr/src/app
 
-# Set environment variables, not have to write them with the docker run command
-# Note: make sure that your password matches what is in the run-initialization script
-ENV SA_PASSWORD YourStrong!Passw0rd
-ENV ACCEPT_EULA Y
-ENV MSSQL_PID Express
 
-# Expose port 1433 in case accessing from other container
-# Expose port externally from docker-compose.yml
-EXPOSE 1433
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /opt/app
+COPY ../../gendb/data /opt/gendb/data
 
-# Run Microsoft SQL Server and initialization script (at the same time)
-CMD /bin/bash ./entrypoint.sh
+COPY ../.env.dev.properties /opt/app/.env.dev.properties
+COPY ../.env.properties /opt/app/.env.properties
+COPY --from=builder /opt/app/src/main/resources/keystore/biddify.p12 /opt/app/src/main/resources/keystore/biddify.p12
+
+
+
+
+EXPOSE 8080
+
+COPY --from=builder /opt/app/target/*.jar /opt/app/*.jar
+
+ENTRYPOINT ["java", "-jar", "/opt/app/*.jar","gendb"]

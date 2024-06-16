@@ -18,8 +18,13 @@ COPY .env.dev.properties /opt/app/.env.dev.properties
 COPY .env.properties /opt/app/.env.properties
 COPY --from=builder /opt/app/src/main/resources/keystore/biddify.p12 /opt/app/src/main/resources/keystore/biddify.p12
 
+
+
+#COPY ./output /opt/app/gendb/output
 EXPOSE 8080
 
 COPY --from=builder /opt/app/target/*.jar /opt/app/*.jar
-
 ENTRYPOINT ["java", "-jar", "/opt/app/*.jar"]
+#only run this one to get test data
+#ENTRYPOINT ["java", "-jar", "/opt/app/*.jar","gendb"]
+

@@ -88,3 +88,4 @@ gendb/data/transaction.json
 gendb/data/item_category.json
 gendb/data/notification.json
 Backend/.dockerignore
+*.json
