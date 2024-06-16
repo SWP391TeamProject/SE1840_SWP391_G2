@@ -56,7 +56,7 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPayment( @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) {
+    public ResponseEntity<String> createPayment( @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) throws UnsupportedEncodingException {
 //            Authorizer.expectAdminOrUserId(principal, paymentRequest.getAccountId());
             paymentRequest.setIpAddr(request.getRemoteAddr());
             String createdPayment = paymentService.createPayment(paymentRequest);

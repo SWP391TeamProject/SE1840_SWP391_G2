@@ -144,10 +144,25 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<active.profile>dev</active.profile>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<active.profile>prod</active.profile>
+			</properties>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>
 			<plugin>
+
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>

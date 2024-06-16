@@ -4,13 +4,17 @@ COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN ./mvnw dependency:go-offline
 COPY ./src ./src
+COPY .env.dev.properties /opt/app/.env.dev.properties
 COPY .env.properties /opt/app/.env.properties
 COPY ./src/main/resources/keystore/biddify.p12 /opt/app/src/main/resources/keystore/biddify.p12
 
-RUN ./mvnw clean install
+RUN ./mvnw clean install -Pdev -DskipTests
+
+
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /opt/app
+COPY .env.dev.properties /opt/app/.env.dev.properties
 COPY .env.properties /opt/app/.env.properties
 COPY --from=builder /opt/app/src/main/resources/keystore/biddify.p12 /opt/app/src/main/resources/keystore/biddify.p12
 

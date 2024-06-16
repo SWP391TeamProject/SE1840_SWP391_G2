@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 
 public interface PaymentService {
 
-    String createPayment(PaymentRequest paymentRequest);
+    String createPayment(PaymentRequest paymentRequest) throws UnsupportedEncodingException;
     PaymentDTO updatePayment(PaymentRequest paymentRequest);
     PaymentDTO getPaymentById(int id);
     Page<PaymentDTO> getAllPayment(Pageable pageable);

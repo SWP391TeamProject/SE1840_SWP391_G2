@@ -13,6 +13,8 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import java.util.*;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
     @Autowired
     private PaymentRepos paymentRepos;
 
@@ -37,18 +40,22 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
+
+        log.info("user id in payment request: " + paymentRequest.getAccountId());
+
         try {
             Payment payment = new Payment();
             payment.setPaymentAmount(paymentRequest.getAmount());
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
             // Find the account and handle if it's not found
-            Optional<Account> accountOptional = accountRepos.findById(paymentRequest.getAccountId());
+            Optional<Account> accountOptional = accountRepos.findByAccountId(paymentRequest.getAccountId());
             if (accountOptional.isEmpty()) {
-                throw new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId());
+                log.info("account not found: " + paymentRequest.getAccountId());
+                throw new ResourceNotFoundException("Account not found with issssd " + paymentRequest.getAccountId());
             }else {
-                Account account = accountOptional.get();
-                payment.setAccount(account);
+                log.info("account found: " + accountOptional.get().getAccountId());
+                payment.setAccount(accountOptional.get());
             }
 
             // Save the payment
