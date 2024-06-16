@@ -65,11 +65,13 @@ export const BlogList = () => {
     // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
     // dispatch(setCurrentBlog(blog));
     // navigate("/admin/blogs/edit");
+    let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
+    dispatch(setCurrentBlogPost(blog));
     navigate(`/admin/blogs/${blogId}`);
   }
 
   const handleFilterClick = (category: BlogCategory[], filter: string) => {
-    let filteredList = blogsList.value.filter(x => category.includes(x.category));
+    let filteredList = blogsList.currentPageList.filter(x => category.includes(x.category));
     console.log(filteredList);
     dispatch(setCurrentPageList(filteredList));
     setStatusFilter(filter);

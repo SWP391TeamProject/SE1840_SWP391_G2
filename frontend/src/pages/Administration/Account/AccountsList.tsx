@@ -89,7 +89,7 @@ export default function AccountsList() {
 
 
   const handleEditClick = (accountId: number) => {
-    let account = accountsList.value.find(account => account.accountId == accountId);
+    let account = accountsList.currentPageList.find(account => account.accountId == accountId);
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     dispatch(setCurrentAccount(account));
     navigate(`/admin/accounts/${accountId}`);

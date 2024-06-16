@@ -18,8 +18,8 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
 
-const FormSchema = z.object({
-    categoryId: z.string({
+const formSchema = z.object({
+    categoryId: z.any({
         required_error: "Please select category to display.",
     }),
     userId: z.number(),
@@ -30,15 +30,23 @@ const FormSchema = z.object({
     }),
     content: z.string().min(10, {
         message: "Description must be at least 10 characters long.",
-    }).max(500, {
-        message: "Description must not exceed 500 characters.",
+    }).max(100000, {
+        message: "Description must not exceed 100000 characters.",
     }),
     files: z.any(),
-});
+}).required(
+    {
+        categoryId: true,
+        userId: true,
+        title: true,
+        content: true,
+        files: true
+    }
+);
 export const CreateBlog = () => {
     const [category, setCategory] = useState<BlogCategory[]>([]);
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
         defaultValues: {
             categoryId: "",
             title: "",
@@ -58,8 +66,8 @@ export const CreateBlog = () => {
             toast.error('There was an error!', error);
         });
     }, [])
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        data.categoryId = category.find((blog) => blog.name === data.categoryId)?.blogCategoryId.toString();
+    function onSubmit(data: z.infer<typeof formSchema>) {
+        data.categoryId = category.find((blog) => blog.name === data.categoryId)?.blogCategoryId;
         data.userId = JSON.parse(getCookie('user') || '{}').id;
         console.log(data);
         BlogService.createBlog(data).then((res) => {
@@ -75,8 +83,8 @@ export const CreateBlog = () => {
     }
     return (
         <main className="flex-1 py-8 px-6">
-            <div className="container mx-auto max-w-2xl">
-                <h1 className="text-3xl font-bold mb-4">Create New Blog Post</h1>
+            <div className="container mx-auto max-w-6xl">
+                <h1 className="text-3xl font-bold mb-4 ">Create New Blog Post</h1>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
 
