@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +20,7 @@ public class BlogPostDTO {
     private AccountDTO author;
     private String title;
     private String content;
+    private List<AttachmentDTO> attachments;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
@@ -28,6 +32,7 @@ public class BlogPostDTO {
         this.content = blogPost.getContent();
         this.createDate = blogPost.getCreateDate();
         this.updateDate = blogPost.getUpdateDate();
+        this.attachments = blogPost.getAttachments()==null?new ArrayList<>():blogPost.getAttachments().stream().map(AttachmentDTO::new).toList();
     }
     // getters and setters
     // ...

@@ -48,8 +48,8 @@ public class BlogController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<BlogPostDTO> createBlog(@RequestBody BlogCreateDTO blogCreateDTO) {
-        log.info("Create blog: " + blogCreateDTO.getCategoryId());
+    public ResponseEntity<BlogPostDTO> createBlog(@ModelAttribute BlogCreateDTO blogCreateDTO) {
+        log.info("Create blog: " + blogCreateDTO);
         BlogPostDTO blogPostDTO = new BlogPostDTO();
         blogPostDTO.setTitle(blogCreateDTO.getTitle());
         blogPostDTO.setContent(blogCreateDTO.getContent());
@@ -58,9 +58,11 @@ public class BlogController {
         blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
         blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
         blogPostDTO = blogService.createBlog(blogPostDTO);
+
         try {
-            if (blogCreateDTO.getImages() != null && !blogCreateDTO.getImages().isEmpty()) {
-                for (MultipartFile image : blogCreateDTO.getImages()) {
+            log.info("Create blog: " + blogCreateDTO.getFiles().size());
+            if (blogCreateDTO.getFiles() != null && !blogCreateDTO.getFiles().isEmpty()){
+                for (MultipartFile image : blogCreateDTO.getFiles()) {
                     attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
                 }
             }
@@ -71,7 +73,7 @@ public class BlogController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BlogPostDTO> updateBlog(@PathVariable int id, @RequestBody BlogCreateDTO blogCreateDTO) {
+    public ResponseEntity<BlogPostDTO> updateBlog(@PathVariable int id, @ModelAttribute BlogCreateDTO blogCreateDTO) {
         BlogPostDTO blogPostDTO = new BlogPostDTO();
         blogPostDTO.setPostId(id);
         blogPostDTO.setTitle(blogCreateDTO.getTitle());
@@ -81,9 +83,9 @@ public class BlogController {
         blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
         blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
         blogPostDTO = blogService.updateBlog(blogPostDTO);
-        if (blogCreateDTO.getImages() != null && !blogCreateDTO.getImages().isEmpty()) {
+        if (blogCreateDTO.getFiles() != null && !blogCreateDTO.getFiles().isEmpty()) {
             try {
-                for (MultipartFile image : blogCreateDTO.getImages()) {
+                for (MultipartFile image : blogCreateDTO.getFiles()) {
                     attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
                 }
             } catch (Exception e) {
