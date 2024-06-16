@@ -67,6 +67,7 @@ import PastAuctionSessionsList from "./pages/CustomerSite/Auctions/PastAuctionSe
 import UpcomingAuctionSessionsList from "./pages/CustomerSite/Auctions/UpcomingAuctionSessionsList.tsx";
 import { CreateBlog } from "./pages/Administration/Blog/CreateBlog.tsx";
 import { BlogList } from "./pages/Administration/Blog/BlogList.tsx";
+import { BlogDetail } from "./pages/Administration/Blog/BlogDetail.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -159,7 +160,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                       </Route>
                       <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
                         <Route path="blogs" element={<BlogList />}></Route>
-                        <Route path="blogs/:id" element={<ConsignmentDetail />}></Route>
+                        <Route path="blogs/:id" element={<BlogDetail />}></Route>
                         <Route path="blogs/create" element={<CreateBlog />}></Route>
                         {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                         {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}

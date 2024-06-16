@@ -65,7 +65,7 @@ class BlogService {
     public static createBlog(blog: any) {
         return axios.post(this.BASE_URL+"/",blog, {
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
                 "Access-Control-Allow-Origin": "*",
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
