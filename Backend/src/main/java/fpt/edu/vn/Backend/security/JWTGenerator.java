@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.security;
 
+import fpt.edu.vn.Backend.oauth2.security.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -31,6 +32,14 @@ public class JWTGenerator {
         Date expireDate = new Date(
                 currentDate.getTime() + SecurityConstants.JWT_EXPIRATION
         );
+        Object tronVn = authentication.getPrincipal();
+        int id;
+        if (tronVn instanceof BiddifyUser u)
+            id = u.getUserID();
+        else if (tronVn instanceof UserPrincipal u)
+            id = Math.toIntExact(u.getId());
+        else
+            throw new RuntimeException("Bay acc");
         return Jwts
                 .builder()
                 .setHeaderParam("typ", "JWT")
@@ -40,7 +49,7 @@ public class JWTGenerator {
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList())
                 )
-                .claim("userId", ((BiddifyUser) authentication.getPrincipal()).getUserID())
+                .claim("userId", id)
                 .setSubject(email)
                 .setIssuedAt(currentDate)
                 .setExpiration(expireDate)
