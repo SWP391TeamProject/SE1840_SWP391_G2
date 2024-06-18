@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
-@CrossOrigin(origins = "http://localhost:5173/**")
 @EnableScheduling
 @Slf4j
 

@@ -64,6 +64,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(FRONTEND_SERVER_URL,"http://localhost:5173")); // Corrected origin
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token", "access-control-allow-origin"));
+        configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of("x-auth-token"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
