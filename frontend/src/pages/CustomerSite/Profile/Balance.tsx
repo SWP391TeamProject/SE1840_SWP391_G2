@@ -51,7 +51,7 @@ export default function Balance() {
         }, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization: "Bearer " + JSON.parse(getCookie("user"))?.accessToken,
             },
         }).then(response => {

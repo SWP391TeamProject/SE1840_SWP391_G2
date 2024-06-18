@@ -76,7 +76,7 @@ const ProfileDetail = () => {
     axios.post<any>(API_SERVER + "/accounts/avatar/" + auth.user.accountId, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*",
+          
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then((res) => {
@@ -99,7 +99,7 @@ const ProfileDetail = () => {
     axios.put<any>(API_SERVER + "/accounts/" + auth.user.accountId, data, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(() => {
