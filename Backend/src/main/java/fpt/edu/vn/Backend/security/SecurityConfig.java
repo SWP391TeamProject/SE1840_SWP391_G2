@@ -33,7 +33,8 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity(
         securedEnabled = true,
-        jsr250Enabled = true
+        jsr250Enabled = true,
+        prePostEnabled = false
 )
 public class SecurityConfig {
 
@@ -114,10 +115,10 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         ));
 
-        http.addFilterBefore(
-                jwtAuthenticationFilter(),
-                UsernamePasswordAuthenticationFilter.class
-        );
+//        http.addFilterBefore(
+//                jwtAuthenticationFilter(),
+//                UsernamePasswordAuthenticationFilter.class
+//        );
         return http.build();
     }
 

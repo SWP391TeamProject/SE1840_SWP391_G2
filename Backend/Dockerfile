@@ -8,7 +8,7 @@ COPY .env.dev.properties /opt/app/.env.dev.properties
 COPY .env.properties /opt/app/.env.properties
 COPY ./src/main/resources/keystore/biddify.p12 /opt/app/src/main/resources/keystore/biddify.p12
 
-RUN ./mvnw clean install -Pdefault -DSkipTests
+RUN ./mvnw clean install -Pdev -DskipTests
 
 
 
