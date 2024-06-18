@@ -8,10 +8,13 @@ import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
 import fpt.edu.vn.Backend.repository.BlogPostRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BlogServiceImpl implements BlogService{
@@ -24,7 +27,10 @@ public class BlogServiceImpl implements BlogService{
 
     @Override
     public Page<BlogPostDTO> getAllBlogs(Pageable pageable) {
-        return blogPostRepos.findAll(pageable).map(BlogPostDTO::new);
+        List<BlogPostDTO> blogPostDTOS = blogPostRepos.findAll().stream().map(BlogPostDTO::new).sorted(
+                (o1, o2) -> o2.getCreateDate().compareTo(o1.getCreateDate())
+        ).toList();
+        return new PageImpl<>(blogPostDTOS, pageable, blogPostDTOS.size());
     }
 
     @Override

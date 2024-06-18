@@ -66,8 +66,10 @@ import FeaturedAuctionsList from "./pages/CustomerSite/Auctions/FeaturedAuctions
 import PastAuctionSessionsList from "./pages/CustomerSite/Auctions/PastAuctionSessionsList.tsx";
 import UpcomingAuctionSessionsList from "./pages/CustomerSite/Auctions/UpcomingAuctionSessionsList.tsx";
 import { CreateBlog } from "./pages/Administration/Blog/CreateBlog.tsx";
-import { BlogList } from "./pages/Administration/Blog/BlogList.tsx";
-import { BlogDetail } from "./pages/Administration/Blog/BlogDetail.tsx";
+import { BlogList } from "./pages/CustomerSite/Blog/BlogList.tsx";
+import { BlogPostList } from "./pages/Administration/Blog/BlogPostList.tsx";
+import { BlogPostDetail } from "./pages/Administration/Blog/BlogPostDetail.tsx";
+import { BlogDetail } from "./pages/CustomerSite/Blog/BlogDetail.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -94,7 +96,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="contact" element={<Contact />}></Route>
                     <Route path="about" element={<AboutScreen />}></Route>
                     <Route path="payment-status" element={<PaymentStatus />}></Route>
-                    <Route path="blog" element={<ToBeImplemented />}></Route>
+                    <Route path="blogs" element={<BlogList />}></Route>
+                    <Route path="blogs/:id" element={<BlogDetail />}></Route>
                     <Route path="Auctions" element={<AuctionList />}></Route>
                     <Route path="Auctions/featured" element={<FeaturedAuctionsList />}></Route>
                     <Route path="Auctions/past" element={<PastAuctionSessionsList />}></Route>
@@ -159,8 +162,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         <Route path="items/create" element={<ItemCreate />}></Route>
                       </Route>
                       <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />} >
-                        <Route path="blogs" element={<BlogList />}></Route>
-                        <Route path="blogs/:id" element={<BlogDetail />}></Route>
+                        <Route path="blogs" element={<BlogPostList />}></Route>
+                        <Route path="blogs/:id" element={<BlogPostDetail />}></Route>
                         <Route path="blogs/create" element={<CreateBlog />}></Route>
                         {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                         {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}

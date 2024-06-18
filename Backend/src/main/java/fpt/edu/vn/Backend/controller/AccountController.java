@@ -103,6 +103,20 @@ public class AccountController {
         }
     }
 
+    @PutMapping("/activate/{id}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    public ResponseEntity<AccountDTO> activateAccount(@PathVariable int id) {
+        if (accountService.getAccountById(id) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            AccountDTO dto = new AccountDTO();
+            dto.setAccountId(id);
+            dto.setStatus(Account.Status.ACTIVE);
+            accountService.updateAccount(dto, Account.Role.ADMIN); // grant access as ADMIN
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
     @GetMapping("/export")
     public void exportToExcel(HttpServletResponse response){
         response.setContentType("application/octet-stream");

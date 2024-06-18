@@ -1,8 +1,6 @@
-import { BlogPost } from '@/models/newModel/blogPost'
 import { useAppSelector } from '@/redux/hooks';
-import React from 'react'
 
-export const BlogDetail = () => {
+export const BlogPostDetail = () => {
     const blog = useAppSelector((state) => state.blogs.currentBlogPost);
 
     let temp = blog?.content?.split('&lt;img/&gt;');

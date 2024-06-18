@@ -124,3 +124,16 @@ export const deleteAccountService = async (id: string) => {
     })
     .catch((err) => console.log(err));
 };
+
+export const activateAccountService = async (id: string) => {
+  return await axios
+    .put(API_SERVER + "/accounts/activate/" + id, null ,{
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    })
+    .catch((err) => console.log(err));
+};

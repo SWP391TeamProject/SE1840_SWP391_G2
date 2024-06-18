@@ -28,7 +28,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAccounts, setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
-import { fetchAccountsService, deleteAccountService, fetchAccountsByName } from "@/services/AccountsServices.ts";
+import { fetchAccountsService, deleteAccountService, fetchAccountsByName, activateAccountService } from "@/services/AccountsServices.ts";
 import {
   Home,
   LineChart,
@@ -60,6 +60,7 @@ export default function AccountsList() {
   const [roleFilter, setRoleFilter] = useState("");
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
+  const [reload, setReload] = useState(false);
 
   const fetchAccounts = async (pageNumber: number, role?: Roles) => {
     try {
@@ -109,8 +110,17 @@ export default function AccountsList() {
     deleteAccountService(accountId.toString()).then((res) => {
       console.log(res);
     })
-    fetchAccounts(0);
-    fetchAccounts(0);
+    setReload(!reload);
+  }
+  
+  const handleActiveClick = (accountId: number) => {
+    // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
+    // dispatch(setCurrentAccount(account));
+    // navigate("/admin/accounts/edit");
+    activateAccountService(accountId.toString()).then((res) => {
+      console.log(res);
+    })
+    setReload(!reload);
   }
 
   const handleFilterClick = (roles: Roles[], filter: string) => {
@@ -147,6 +157,12 @@ export default function AccountsList() {
     setRoleFilter("all");
 
   }, []);
+  useEffect(() => {
+    fetchAccounts(accountsList.currentPageNumber);
+    fetchAccounts(accountsList.currentPageNumber); 
+    setRoleFilter("all");
+
+  }, [reload]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -223,7 +239,7 @@ export default function AccountsList() {
                     <TableHead className="hidden md:table-cell">
                       Role
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="hidden md:table-cell w-28">
                       Status
                     </TableHead>
                     {/* <TableHead className="hidden md:table-cell">
@@ -282,7 +298,12 @@ export default function AccountsList() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => { handleEditClick(account.accountId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleSuspendClick(account.accountId) }}>Suspend</DropdownMenuItem>
+                            {
+                              account.status == AccountStatus.ACTIVE ?
+                              <DropdownMenuItem onClick={() => { handleSuspendClick(account.accountId) }}>Suspend</DropdownMenuItem>:
+                              <DropdownMenuItem onClick={() => { handleActiveClick(account.accountId) }}>Activate</DropdownMenuItem>
+                            }
+                            
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

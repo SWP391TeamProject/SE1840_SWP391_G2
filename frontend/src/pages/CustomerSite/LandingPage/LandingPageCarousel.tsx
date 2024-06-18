@@ -125,7 +125,7 @@ export default function LandingPageCarousel() {
                               alt="Hero"
                               className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
                               height="550"
-                              src="src\assets\thumnail2.jpg"
+                              src={thumbnail2}
                               width="550"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />

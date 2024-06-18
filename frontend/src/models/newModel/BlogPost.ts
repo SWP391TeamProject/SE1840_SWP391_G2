@@ -8,7 +8,7 @@ export interface BlogPost{
     author?: Account;
     title?:string;
     content?:string;
-    attaccments?:Attachment[];
+    attachments?:Attachment[];
     createDate?:Date;
     updateDate?:Date;
 }
