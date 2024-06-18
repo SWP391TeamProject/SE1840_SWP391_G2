@@ -52,6 +52,7 @@ const AuthContext = createContext<IAuthContecxt>(initialValue);
 
 export const AuthProvider = ({ children }: Props) => {
     const dispatch = useAppDispatch();
+    const [lastUserId, setLastUserId] = useState(initalUser.accountId);
     const [user, setUser] = useState(initialValue.user);
     const [loading, setLoading] = useState(false);
     const isAuthenticated = () => {
@@ -99,6 +100,10 @@ export const AuthProvider = ({ children }: Props) => {
         }
 
         const handleUserChange = () => {
+            if (lastUserId === user.accountId) {
+                return;
+            }
+            setLastUserId(user.accountId);
             if (isAuthenticated()) {
                 countUnreadNotifications().then((r) => {
                     dispatch(setUnreadNotificationCount(r.data));
