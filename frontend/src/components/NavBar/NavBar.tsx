@@ -117,7 +117,7 @@ export default function NavBar() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                  <Link to="/blog">Blog</Link>
+                  <Link to="/blogs">Blog</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>

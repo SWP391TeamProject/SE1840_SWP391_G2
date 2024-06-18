@@ -93,12 +93,11 @@ export const CreateBlog = () => {
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Item name</FormLabel>
+                                    <FormLabel>Blog's title</FormLabel>
                                     <FormControl>
                                         <Input placeholder="shadcn" {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        This is your public display name.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -140,7 +139,6 @@ export const CreateBlog = () => {
                                         {/* // <Textarea placeholder="shadcn" {...field} /> */}
                                     </FormControl>
                                     <FormDescription>
-                                        This is your public display name.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

@@ -14,7 +14,7 @@ import { ListFilter, MoreHorizontal, PlusCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-export const BlogList = () => {
+export const BlogPostList = () => {
   const blogsList = useAppSelector((state) => state.blogs);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
