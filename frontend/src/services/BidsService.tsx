@@ -7,7 +7,7 @@ export const fetchBidsByAccount = async (id:number) => {
     .get(`${SERVER_DOMAIN_URL}/api/bids/`+id, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -28,7 +28,7 @@ export const fetchBidsByAuctionItemId = async (auctionId:number,itemId:number) =
     .get(`${SERVER_DOMAIN_URL}/api/bids/`+auctionId+`/`+itemId, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },

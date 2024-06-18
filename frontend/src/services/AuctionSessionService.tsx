@@ -17,7 +17,7 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
             params: params
         })
@@ -42,7 +42,7 @@ export const fetchActiveAuctionSessions = async (page?: number, size?: number) =
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
             params: params
         })
@@ -64,7 +64,7 @@ export const fetchFeaturedAuctionSessions = async (page?: number, size?: number)
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/featured`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
             params: params
         })
@@ -83,7 +83,7 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
             params: params
         })
@@ -102,7 +102,7 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
             params: params
         })
@@ -117,7 +117,7 @@ export const fetchAuctionSessionById = async (id: number) => {
         .get(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
         })
         .catch((err) => {
@@ -139,7 +139,7 @@ export const fetchAuctionSessionByTitle = async (page?: number, size?: number,ti
         .get(`${SERVER_DOMAIN_URL}/api/${controller}/search/${title}`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
             },
             params: params
         })
@@ -157,7 +157,7 @@ export const createAuctionSession = async (data: any) => {
         .post(`${SERVER_DOMAIN_URL}/api/${controller}/`, data, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
@@ -177,7 +177,7 @@ export const updateAuctionSession = async (data: any) => {
         .put(`${SERVER_DOMAIN_URL}/api/${controller}/${data.auctionSessionId}`, data, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
@@ -189,7 +189,7 @@ export const registerAuctionSession = async (id: number) => {
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/register/${id}`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },

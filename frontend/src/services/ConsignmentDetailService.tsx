@@ -9,7 +9,7 @@ export const fetchConsigntmentDetailByConsignmentId = async (id:number) => {
     .get(URL+id, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -27,7 +27,7 @@ export const fetchConsigntmentDetailByConsignmentDetailId = async (id:number) =>
       .get(URL+"detail/"+id, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+            
           Authorization:
             "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
         },
@@ -45,7 +45,7 @@ export const updateConsignmentDetailService = async (data: any,id :number) => {
     .put(URL+"update/"+id, data, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -58,7 +58,7 @@ export const createInitialEvaluation = async (data: any) => {
     .post(URL+"createInitialEvaluation", data, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -69,7 +69,7 @@ export const createFinalEvaluation = async (data: any) => {
     .post(URL+"createFinalEvaluation", data, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },

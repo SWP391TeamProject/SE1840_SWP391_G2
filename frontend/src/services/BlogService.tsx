@@ -13,7 +13,7 @@ class BlogService {
         return axios.get(`${this.BASE_URL}/`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
             params: params
@@ -28,7 +28,7 @@ class BlogService {
         return axios.get(`${this.BASE_URL}/search?keyword=${keyword}`, {
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
 
             },
@@ -41,7 +41,7 @@ class BlogService {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
+                      
                     Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
     
                 },
@@ -54,7 +54,7 @@ class BlogService {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
+                      
                     Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
     
                 },
@@ -66,7 +66,7 @@ class BlogService {
         return axios.post(this.BASE_URL+"/",blog, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "Access-Control-Allow-Origin": "*",
+                  
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         });

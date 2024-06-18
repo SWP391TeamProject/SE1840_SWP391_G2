@@ -17,7 +17,7 @@ const baseUrl = API_SERVER + "/item-categories";
 const authHeader = {
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
+      
     "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
   },
 };

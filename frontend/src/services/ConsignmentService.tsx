@@ -13,7 +13,7 @@ export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: 
     .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -39,7 +39,7 @@ export const fetchConsignmentByConsignmentId = async (id: number) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -60,7 +60,7 @@ export const updateConsignmentService = async (data: any) => {
     .put(`${SERVER_DOMAIN_URL}/api/consignments/`, data, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -73,7 +73,7 @@ export const createConsignmentService = async (data: any) => {
     .post(`${SERVER_DOMAIN_URL}/api/consignments/create`, data, {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -85,7 +85,7 @@ export const deleteConsignmentService = async (id: string) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -101,7 +101,7 @@ export const takeConsignment = async (id: string) => {
     .put(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data,{
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
@@ -113,7 +113,7 @@ export const receivedConsignment = async (id: string) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/received/${id}`,{
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
@@ -128,7 +128,7 @@ export const rejectEvaluation = async (id: string,accountId:number,reason:any) =
     .post(`${SERVER_DOMAIN_URL}/api/consignments/reject/${id}`,{accountId: accountId,reason:reason},{
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
@@ -141,7 +141,7 @@ export const acceptEvaluation = async (id: string,accountId:number) => {
     .post(`${SERVER_DOMAIN_URL}/api/consignments/approve/${id}`,{accountId: accountId},{
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
@@ -155,7 +155,7 @@ export const acceptInitialEva = async (id: number) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/acceptIniEva/`+id, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -166,7 +166,7 @@ export const rejectInitialEva = async (id: number) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/rejectIniEva/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -178,7 +178,7 @@ export const acceptFinalEva = async (id: number) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/acceptFinalEva/`+id, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -189,7 +189,7 @@ export const rejectFinalEva = async (id: number) => {
     .get(`${SERVER_DOMAIN_URL}/api/consignments/rejectFinalEva/`+id, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
+          
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
