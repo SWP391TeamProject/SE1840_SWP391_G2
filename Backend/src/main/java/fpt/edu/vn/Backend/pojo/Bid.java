@@ -26,7 +26,7 @@ public class Bid {
     })
     private AuctionItem auctionItem;
 
-    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "payment_id")
     private Payment payment;

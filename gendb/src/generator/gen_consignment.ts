@@ -40,7 +40,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             updateDate: updateDate.toDate()
         });
 
-        if (status == ConsignmentStatus.WAITING_STAFF && faker.number.float() < 0.9) {
+        if (status == ConsignmentStatus.WAITING_STAFF && faker.number.float() < 0.95) {
             status = ConsignmentStatus.IN_INITIAL_EVALUATION;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
             details.push({
@@ -54,12 +54,12 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             });
         }
 
-        if (status == ConsignmentStatus.IN_INITIAL_EVALUATION && faker.number.float() < 0.9) {
+        if (status == ConsignmentStatus.IN_INITIAL_EVALUATION && faker.number.float() < 0.95) {
             status = ConsignmentStatus.SENDING;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
         }
 
-        if (status == ConsignmentStatus.SENDING && faker.number.float() < 0.9) {
+        if (status == ConsignmentStatus.SENDING && faker.number.float() < 0.95) {
             status = ConsignmentStatus.IN_FINAL_EVALUATION;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
             details.push({
@@ -73,8 +73,8 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             });
         }
 
-        if (status == ConsignmentStatus.IN_FINAL_EVALUATION && faker.number.float() < 0.9) {
-            const res = faker.number.float() < 0.9 ? ConsignmentDetailStatus.MANAGER_ACCEPTED : ConsignmentDetailStatus.MANAGER_REJECTED;
+        if (status == ConsignmentStatus.IN_FINAL_EVALUATION && faker.number.float() < 0.95) {
+            const res = faker.number.float() < 0.95 ? ConsignmentDetailStatus.MANAGER_ACCEPTED : ConsignmentDetailStatus.MANAGER_REJECTED;
             status = res == ConsignmentDetailStatus.MANAGER_ACCEPTED ? ConsignmentStatus.FINISHED : ConsignmentStatus.TERMINATED;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
             details.push({

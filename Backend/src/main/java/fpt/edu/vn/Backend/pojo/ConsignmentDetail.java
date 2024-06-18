@@ -23,7 +23,7 @@ public class ConsignmentDetail {
     @Column(name = "consignment_detail_id")
     private int consignmentDetailId;
 
-    @Column(name = "description", length = 5000)
+    @Column(name = "description", length = 10000)
     private String description;
 
     public enum ConsignmentStatus {
