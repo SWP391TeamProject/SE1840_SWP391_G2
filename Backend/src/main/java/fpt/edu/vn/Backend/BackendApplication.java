@@ -25,7 +25,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
-@EnableScheduling
+//@EnableScheduling
 @Slf4j
 
 public class BackendApplication {

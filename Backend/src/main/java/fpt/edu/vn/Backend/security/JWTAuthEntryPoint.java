@@ -22,7 +22,6 @@ public class JWTAuthEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException authException
     ) throws IOException, ServletException {
         logger.error("Responding with unauthorized error. Message - {}", authException.getMessage());
-        authException.printStackTrace();
         response.sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
                 authException.getLocalizedMessage()

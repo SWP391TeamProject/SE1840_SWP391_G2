@@ -15,7 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns(FRONTEND_SERVER_URL,"http://localhost:5173/")
                 .allowedMethods("GET","POST","PUT","DELETE","HEAD","PATCH")
                 .allowedHeaders("Authorization", "Content-Type", "X-Auth-Token", "Access-Control-Allow-Origin")
-//                .allowCredentials(true)
         ;
     }
 }
