@@ -30,7 +30,7 @@ public class VnPayConfig {
     private final static String vnp_Version = "2.1.0";
     public static String vnp_ReturnUrl;
 
-    public static String vnp_TmnCode = "RJEVXKZ2";
+    public static String vnp_TmnCode;
     public static String secretKey;
     @Value("${VNPAY_RETURN_URL}")
     public void setVnp_ReturnUrl(String vnp_ReturnUrl) {
