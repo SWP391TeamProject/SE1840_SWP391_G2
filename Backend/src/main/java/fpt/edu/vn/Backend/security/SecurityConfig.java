@@ -33,8 +33,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity(
         securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = false
+        jsr250Enabled = true
 )
 public class SecurityConfig {
 
@@ -169,8 +168,5 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    @Bean
-    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        return new GrantedAuthorityDefaults("");
-    }
+
 }
