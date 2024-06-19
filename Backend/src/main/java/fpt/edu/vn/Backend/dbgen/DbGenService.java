@@ -8,6 +8,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -107,7 +110,15 @@ public class DbGenService {
     }
 
     private void generateAccount(JsonArray e) {
+        if (accountRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating accounts: %d/%d exists", accountRepos.count(), e.size()));
+            return;
+        }
         LOGGER.info("Generate accounts...");
+
+        Map<Integer, Account> preparedAccounts = new HashMap<>();
+        Map<Integer, CitizenCard> preparedCards = new HashMap<>();
+
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
 
@@ -120,98 +131,113 @@ public class DbGenService {
             account.setPassword(obj.get("password").getAsString());
             account.setStatus(Account.Status.valueOf(obj.get("status").getAsString()));
             account.setBalance(obj.get("balance").getAsBigDecimal());
-            account = accountRepos.save(account);
-            {
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));
-                paramMap.put("updateDate", parseDate(obj.get("updateDate").getAsString()));
-                paramMap.put("id", account.getAccountId());
-                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        jdbcTemplate.update("UPDATE accounts SET create_date = :createDate, update_date = :updateDate WHERE account_id = :id", paramMap);
-                    }
-                });
-            }
+            account.setCreateDate(parseDate(obj.get("createDate").getAsString()));
+            account.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
+            preparedAccounts.put(account.getAccountId(), account);
 
             if (obj.has("citizenCard") && obj.get("citizenCard").isJsonObject()) {
                 obj = obj.getAsJsonObject("citizenCard");
 
                 CitizenCard citizenCard = new CitizenCard();
                 citizenCard.setUserId(account.getAccountId());
-                citizenCard.setAccount(account);
                 citizenCard.setCardId(obj.get("cardId").getAsString());
                 citizenCard.setFullName(obj.get("fullName").getAsString());
                 citizenCard.setBirthday(parseDate(obj.get("birthday").getAsString()).toLocalDate());
                 citizenCard.setGender(obj.get("gender").getAsBoolean());
                 citizenCard.setAddress(obj.get("address").getAsString());
                 citizenCard.setCity(obj.get("city").getAsString());
-                account.setCitizenCard(citizenCard);
-                citizenCard = citizenCardRepos.save(citizenCard);
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));
-                paramMap.put("updateDate", parseDate(obj.get("updateDate").getAsString()));
-                paramMap.put("id", citizenCard.getUserId());
-                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        jdbcTemplate.update("UPDATE citizen_card SET create_date = :createDate, update_date = :updateDate WHERE account_id = :id", paramMap);
-                    }
-                });
+                citizenCard.setCreateDate(parseDate(obj.get("createDate").getAsString()));
+                citizenCard.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
+                preparedCards.put(citizenCard.getUserId(), citizenCard);
             }
         }
+
+        ///////////////////////////
+
+        Map<String, Object>[] accountParams = new Map[preparedAccounts.size()];
+        int i = 0;
+        for (Account account : preparedAccounts.values()) {
+            accountParams[i++] = Map.of(
+                    "createDate", account.getCreateDate(),
+                    "updateDate", account.getUpdateDate(),
+                    "id", account.getAccountId()
+            );
+        }
+
+        for (Account account : accountRepos.saveAllAndFlush(preparedAccounts.values())) {
+            preparedAccounts.put(account.getAccountId(), account);
+        }
+
+        transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE accounts SET create_date = :createDate, update_date = :updateDate WHERE account_id = :id", accountParams));
+
+        /////////////////////////
+
+        Map<String, Object>[] cardParams = new Map[preparedCards.size()];
+        i = 0;
+        for (CitizenCard card : preparedCards.values()) {
+            cardParams[i++] = Map.of(
+                    "createDate", card.getCreateDate(),
+                    "updateDate", card.getUpdateDate(),
+                    "id", card.getUserId()
+            );
+            Account account = preparedAccounts.get(card.getUserId());
+            if (account != null) {
+                card.setAccount(account);
+                account.setCitizenCard(card);
+            }
+        }
+
+        for (CitizenCard card : citizenCardRepos.saveAllAndFlush(preparedCards.values())) {
+            preparedCards.put(card.getUserId(), card);
+        }
+
+        transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE citizen_card SET create_date = :createDate, update_date = :updateDate WHERE account_id = :id", cardParams));
     }
 
     private void generateConsignment(JsonArray e) {
+        if (consignmentRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating consignments: %d/%d exists", consignmentRepos.count(), e.size()));
+            return;
+        }
         LOGGER.info("Generate consignments...");
+
+        @Data
+        @AllArgsConstructor
+        class Tuple {
+            ConsignmentDetail first;
+            Attachment[] second;
+        }
+
+        Map<Integer, Consignment> preparedConsignments = new HashMap<>();
+        Map<Integer, Tuple> preparedConsignmentDetails = new HashMap<>();
+        int consignmentDetailId = 1;
+
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
             Consignment consignment = new Consignment();
             consignment.setConsignmentId(obj.get("id").getAsInt());
-            consignment.setStaff(accountRepos.findById(obj.get("staffId").getAsInt()).get());
+            consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
             consignment.setStatus(Consignment.Status.valueOf(obj.get("status").getAsString()));
             consignment.setPreferContact(Consignment.preferContact.valueOf(obj.get("preferContact").getAsString()));
-            consignment = consignmentRepos.save(consignment);
-            {
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));
-                paramMap.put("updateDate", parseDate(obj.get("updateDate").getAsString()));
-                paramMap.put("id", consignment.getConsignmentId());
-                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        jdbcTemplate.update("UPDATE consignment SET create_date = :createDate, update_date = :updateDate WHERE consignment_id = :id", paramMap);
-                    }
-                });
-            }
-
-            int senderId = obj.get("senderId").getAsInt();
+            consignment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
+            consignment.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
+            preparedConsignments.put(consignment.getConsignmentId(), consignment);
 
             if (obj.has("details") && obj.get("details").isJsonArray()) {
-                JsonArray consignmentDetails = obj.getAsJsonArray("details");
-                for (JsonElement consignmentDetail : consignmentDetails) {
+                int senderId = obj.get("senderId").getAsInt();
+                for (JsonElement consignmentDetail : obj.getAsJsonArray("details")) {
                     obj = consignmentDetail.getAsJsonObject();
                     ConsignmentDetail detail = new ConsignmentDetail();
+                    detail.setConsignmentDetailId(consignmentDetailId++);
                     detail.setConsignment(consignment);
-                    detail.setAccount(accountRepos.findById(senderId).get());
+                    detail.setAccount(accountRepos.getReferenceById(senderId));
                     detail.setDescription(obj.get("description").getAsString());
                     detail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(obj.get("status").getAsString()));
                     detail.setPrice(obj.get("price").getAsBigDecimal());
-                    detail = consignmentDetailRepos.save(detail);
-                    {
-                        Map<String, Object> paramMap = new HashMap<>();
-                        paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));
-                        paramMap.put("updateDate", parseDate(obj.get("updateDate").getAsString()));
-                        paramMap.put("id", detail.getConsignmentDetailId());
-                        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                            @Override
-                            protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    detail.setCreateDate(parseDate(obj.get("createDate").getAsString()));
+                    detail.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
 
-                                jdbcTemplate.update("UPDATE consignment_detail SET create_date = :createDate, update_date = :updateDate WHERE consignment_detail_id = :id", paramMap);
-                            }
-                        });
-                    }
-
+                    List<Attachment> attachments = new ArrayList<>();
 
                     if (obj.has("imageURLs") && obj.get("imageURLs").isJsonArray()) {
                         JsonArray imageUrls = obj.getAsJsonArray("imageURLs");
@@ -220,26 +246,80 @@ public class DbGenService {
                             attachment.setLink(imageUrl.getAsString());
                             attachment.setType(Attachment.FileType.JPG);
                             attachment.setBlobId(UUID.randomUUID().toString());
-                            attachment.setConsignmentDetail(detail);
-                            attachment = attachmentRepos.save(attachment);
-                            Map<String, Object> paramMap = new HashMap<>();
-                            paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));
-                            paramMap.put("updateDate", parseDate(obj.get("updateDate").getAsString()));
-                            paramMap.put("id", attachment.getAttachmentId());
-                            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                                @Override
-                                protected void doInTransactionWithoutResult(TransactionStatus status) {
-                                    jdbcTemplate.update("UPDATE attachment SET create_date = :createDate, update_date = :updateDate WHERE attachment_id = :id", paramMap);
-                                }
-                            });
+                            attachment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
+                            attachment.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
+                            attachments.add(attachment);
                         }
                     }
+
+                    preparedConsignmentDetails.put(detail.getConsignmentDetailId(), new Tuple(
+                            detail,
+                            attachments.toArray(Attachment[]::new)
+                    ));
                 }
             }
         }
+
+        /////////////////////////////////////
+
+        Map<String, Object>[] consignmentParams = new Map[preparedConsignments.size()];
+        int i = 0;
+        for (Consignment csn : preparedConsignments.values()) {
+            consignmentParams[i++] = Map.of(
+                    "createDate", csn.getCreateDate(),
+                    "updateDate", csn.getUpdateDate(),
+                    "id", csn.getConsignmentId()
+            );
+        }
+
+        for (Consignment csn : consignmentRepos.saveAllAndFlush(preparedConsignments.values())) {
+            preparedConsignments.put(csn.getConsignmentId(), csn);
+        }
+
+        transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE consignment SET create_date = :createDate, update_date = :updateDate WHERE consignment_id = :id", consignmentParams));
+
+        ////////////////////////////////////////
+
+        Map<String, Object>[] consignmentDetailsParams = new Map[preparedConsignmentDetails.size()];
+        i = 0;
+        for (Tuple p : preparedConsignmentDetails.values()) {
+            consignmentDetailsParams[i++] = Map.of(
+                    "createDate", p.getFirst().getCreateDate(),
+                    "updateDate", p.getFirst().getUpdateDate(),
+                    "id", p.getFirst().getConsignmentDetailId()
+            );
+        }
+
+        for (ConsignmentDetail cd : consignmentDetailRepos.saveAllAndFlush(preparedConsignmentDetails.values().stream()
+                .map(Tuple::getFirst).collect(Collectors.toList()))) {
+            preparedConsignmentDetails.get(cd.getConsignmentDetailId()).setFirst(cd);
+            for (Attachment a : preparedConsignmentDetails.get(cd.getConsignmentDetailId()).getSecond()) {
+                a.setConsignmentDetail(cd);
+            }
+        }
+
+        transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE consignment_detail SET create_date = :createDate, update_date = :updateDate WHERE consignment_detail_id = :id", consignmentDetailsParams));
+
+        //////////////////////////////////
+        List<Attachment> attachments = preparedConsignmentDetails.values().stream()
+                .map(Tuple::getSecond).flatMap(Arrays::stream).toList();
+        Map<String, Object>[] attachmentParams = new Map[attachments.size()];
+        i = 0;
+        for (Attachment a : attachments) {
+            attachmentParams[i++] = Map.of(
+                    "createDate", a.getCreateDate(),
+                    "updateDate", a.getUpdateDate(),
+                    "id", attachmentRepos.saveAndFlush(a).getAttachmentId()
+            );
+        }
+        transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE attachment SET create_date = :createDate, update_date = :updateDate WHERE attachment_id = :id", attachmentParams));
     }
 
     private void generateItemCategory(JsonArray e) {
+        if (itemCategoryRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating item categories: %d/%d exists", itemCategoryRepos.count(), e.size()));
+            return;
+        }
         LOGGER.info("Generate item categories...");
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
@@ -261,18 +341,22 @@ public class DbGenService {
     }
 
     private void generateItem(JsonArray e) {
+        if (itemRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating items: %d/%d exists", itemRepos.count(), e.size()));
+            return;
+        }
         LOGGER.info("Generate items...");
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
             Item item = new Item();
             item.setItemId(obj.get("id").getAsInt());
-            item.setItemCategory(itemCategoryRepos.findById(obj.get("categoryId").getAsInt()).get());
+            item.setItemCategory(itemCategoryRepos.getReferenceById(obj.get("categoryId").getAsInt()));
             item.setName(obj.get("name").getAsString());
             item.setDescription(obj.get("description").getAsString());
             item.setReservePrice(obj.get("reservePrice").getAsBigDecimal());
             item.setBuyInPrice(obj.get("buyInPrice").getAsBigDecimal());
             item.setStatus(Item.Status.valueOf(obj.get("status").getAsString()));
-            item.setOwner(accountRepos.findById(obj.get("ownerId").getAsInt()).get());
+            item.setOwner(accountRepos.getReferenceById(obj.get("ownerId").getAsInt()));
             item = itemRepos.save(item);
             {
                 Map<String, Object> paramMap = new HashMap<>();
@@ -312,6 +396,10 @@ public class DbGenService {
     }
 
     private void generateAuction(JsonArray e) {
+        if (auctionSessionRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating auctions: %d/%d exists", auctionSessionRepos.count(), e.size()));
+            return;
+        }
         LOGGER.info("Generate auctions...");
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
@@ -366,7 +454,7 @@ public class DbGenService {
                     AuctionItem auctionItem = new AuctionItem();
                     auctionItem.setAuctionItemId(new AuctionItemId(auctionSession.getAuctionSessionId(), obj.get("itemId").getAsInt()));
                     auctionItem.setAuctionSession(auctionSession);
-                    auctionItem.setItem(itemRepos.findById(obj.get("itemId").getAsInt()).get());
+                    auctionItem.setItem(itemRepos.getReferenceById(obj.get("itemId").getAsInt()));
                     auctionItem.setCurrentPrice(obj.get("currentPrice").getAsBigDecimal());
                     auctionItem = auctionItemRepos.save(auctionItem);
                     {
@@ -388,8 +476,15 @@ public class DbGenService {
     }
 
     private void generateTransaction(JsonArray e) {
+        if (paymentRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating transactions: %d/%d exists", paymentRepos.count(), e.size()));
+            return;
+        }
         LOGGER.info("Generate transactions...");
-        Multimap<Integer, Integer> depositSet = HashMultimap.create();
+
+        //Multimap<Integer, Integer> depositSet = HashMultimap.create();
+        Map<Integer, Pair<Payment, Object>> preparedPayments = new HashMap<>();
+
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
             Payment payment = new Payment();
@@ -397,64 +492,99 @@ public class DbGenService {
             payment.setPaymentAmount(obj.get("amount").getAsBigDecimal());
             payment.setStatus(Payment.Status.valueOf(obj.get("status").getAsString()));
             payment.setType(Payment.Type.valueOf(obj.get("type").getAsString()));
-            payment.setAccount(accountRepos.findById(obj.get("accountId").getAsInt()).get());
+            payment.setAccount(accountRepos.getReferenceById(obj.get("accountId").getAsInt()));
+            payment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
 
-            if (payment.getType() == Payment.Type.AUCTION_DEPOSIT) {
-                JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
-                int auctionId = auctionItem.get("auctionId").getAsInt();
-                if (depositSet.get(auctionId).contains(obj.get("accountId").getAsInt())) {
-                    continue;
-                }
-                depositSet.put(auctionId, obj.get("accountId").getAsInt());
-            }
+//            if (payment.getType() == Payment.Type.AUCTION_DEPOSIT) {
+//                JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
+//                int auctionId = auctionItem.get("auctionId").getAsInt();
+//                if (depositSet.get(auctionId).contains(obj.get("accountId").getAsInt())) {
+//                    continue;
+//                }
+//                depositSet.put(auctionId, obj.get("accountId").getAsInt());
+//            }
 
-            payment = paymentRepos.save(payment);
-            {
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));
-                paramMap.put("id", payment.getPaymentId());
-                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-                    @Override
-                    protected void doInTransactionWithoutResult(TransactionStatus status) {
-                        jdbcTemplate.update("UPDATE payment SET create_date = :createDate WHERE payment_id = :id", paramMap);
-                    }
-                });
-            }
+            Object meta = null;
 
             switch (payment.getType()) {
                 case AUCTION_BID -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Bid bid = new Bid();
-                    bid.setAuctionItem(auctionItemRepos.findById(new AuctionItemId(
+                    bid.setAuctionItem(auctionItemRepos.getReferenceById(new AuctionItemId(
                                     auctionItem.get("auctionId").getAsInt(),
                                     auctionItem.get("itemId").getAsInt()
                             )
-                    ).get());
-                    bid.setPayment(payment);
-                    payment.setBid(bid);
-                    paymentRepos.save(payment);
+                    ));
+                    meta = bid;
                 }
                 case AUCTION_DEPOSIT -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Deposit deposit = new Deposit();
-                    deposit.setAuctionSession(auctionSessionRepos.findById(auctionItem.get("auctionId").getAsInt()).get());
-                    deposit.setPayment(payment);
-                    payment.setDeposit(deposit);
-                    paymentRepos.save(payment);
+                    deposit.setAuctionSession(auctionSessionRepos.getReferenceById(auctionItem.get("auctionId").getAsInt()));
+                    meta = deposit;
                 }
                 case AUCTION_ORDER -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Order order = new Order();
-                    order.setItems(itemRepos.findById(auctionItem.get("itemId").getAsInt()).stream().collect(Collectors.toSet()));
-                    order.setPayment(payment);
-                    payment.setOrder(order);
-                    paymentRepos.save(payment);
+                    order.setItems(Set.of(itemRepos.getReferenceById(auctionItem.get("itemId").getAsInt())));
+                    meta = order;
                 }
             }
+
+            preparedPayments.put(payment.getPaymentId(), Pair.create(payment, meta));
         }
+
+        /////////////////////////////
+
+        Map<String, Object>[] paymentParams = new Map[preparedPayments.size()];
+        int i = 0;
+        for (Pair<Payment, Object> csn : preparedPayments.values()) {
+            paymentParams[i++] = Map.of(
+                    "createDate", csn.getFirst().getCreateDate(),
+                    "id", csn.getFirst().getPaymentId()
+            );
+        }
+
+        paymentRepos.saveAllAndFlush(preparedPayments.values()
+                .stream().map(Pair::getFirst)
+                .collect(Collectors.toList()));
+
+        transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE payment SET create_date = :createDate WHERE payment_id = :id", paymentParams));
+
+        /////////////////////////////
+
+        List<Payment> paymentToSave = new ArrayList<>();
+
+        for (Pair<Payment, Object> p : preparedPayments.values()) {
+            Object o = p.getSecond();
+            if (o instanceof Bid bid) {
+                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+                bid.setPayment(payment);
+                payment.setBid(bid);
+                paymentToSave.add(payment);
+            }
+            if (o instanceof Deposit deposit) {
+                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+                deposit.setPayment(payment);
+                payment.setDeposit(deposit);
+                paymentToSave.add(payment);
+            }
+            if (o instanceof Order order) {
+                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+                order.setPayment(payment);
+                payment.setOrder(order);
+                paymentToSave.add(payment);
+            }
+        }
+
+        paymentRepos.saveAllAndFlush(paymentToSave);
     }
 
     private void generateNotification(JsonObject jsonObject) {
+        if (notificationRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating notifications: %d/%d exists", notificationRepos.count(), jsonObject.getAsJsonArray("notification").size()));
+            return;
+        }
         LOGGER.info("Generate notifications...");
         String[] notificationList = jsonObject.getAsJsonArray("notification").asList()
                 .stream().map(JsonElement::getAsString).toArray(String[]::new);
@@ -467,7 +597,7 @@ public class DbGenService {
             for (int i : where) {
                 Notification notification = new Notification();
                 notification.setMessage(notificationList[i]);
-                notification.setAccount(accountRepos.findById(accountId).get());
+                notification.setAccount(accountRepos.getReferenceById(accountId));
                 notifications.add(notification);
             }
         }
