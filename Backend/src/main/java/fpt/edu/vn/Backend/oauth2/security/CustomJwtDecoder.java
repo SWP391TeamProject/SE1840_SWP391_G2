@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.nimbusds.jose.JOSEException;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
+import fpt.edu.vn.Backend.security.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${jwt.signerKey}")//dang loi cho nay
-    private String signerKey;
+//    @Value("${jwt.signerKey}")//dang loi cho nay
+    private String signerKey = SecurityConstants.JWT_SECRET;
 
     @Autowired
     private TokenProvider tokenProvider;
