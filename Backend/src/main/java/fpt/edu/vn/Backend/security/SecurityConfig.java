@@ -40,7 +40,7 @@ public class SecurityConfig {
     private CustomOAuth2UserService customOAuth2UserService;
 
     @Autowired
-//    private CustomJwtDecoder customJwtDecoder;
+    private CustomJwtDecoder customJwtDecoder;
 
     private JWTAuthEntryPoint jwtAuthEntryPoint;
     @Autowired
@@ -109,7 +109,7 @@ public class SecurityConfig {
                         .failureHandler(customOAuth2Failure)
                 ).oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer -> jwtConfigurer
-//                                .decoder(customJwtDecoder)
+                                .decoder(customJwtDecoder)
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         ));
 
