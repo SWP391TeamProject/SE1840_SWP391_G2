@@ -69,7 +69,6 @@ export const AuthProvider = ({ children }: Props) => {
                 .get(API_SERVER + "/accounts/" + userData?.id, {
                     headers: {
                         "Content-Type": "application/json",
-                        "Access-Control-Allow-Origin": "*",
                         "Authorization": "Bearer " + userData?.accessToken || "",
                     }
                 })
