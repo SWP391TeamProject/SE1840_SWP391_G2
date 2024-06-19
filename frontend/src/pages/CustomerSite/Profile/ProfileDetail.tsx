@@ -18,6 +18,7 @@ import { API_SERVER } from "@/constants/domain.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
+import { getCookie } from "@/utils/cookies";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -59,6 +60,8 @@ const ProfileDetail = () => {
     useEffect(() => {
     if (auth.user.avatar)
       setAvatarPreview(auth.user.avatar.link)
+
+
   }, []);
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +86,7 @@ const ProfileDetail = () => {
       headers: {
         "Content-Type": "multipart/form-data",
           
-        "Authorization": "Bearer " + auth.user.accessToken,
+        "Authorization": "Bearer " +JSON.parse(getCookie("user")).accessToken || "",
       },
     }).then((res) => {
         auth.setUser({
@@ -106,7 +109,7 @@ const ProfileDetail = () => {
       headers: {
         "Content-Type": "application/json",
           
-        "Authorization": "Bearer " + auth.user.accessToken,
+        "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     }).then(() => {
         auth.setUser({

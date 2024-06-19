@@ -16,14 +16,14 @@ type Props = {
     children?: ReactNode;
 }
 
-type IAuthContecxt = {
+type IAuthContext = {
     user: Account;
     setUser: (newState: Account) => void;
     isAuthenticated: () => boolean;
     fetchProfile: () => void;
 }
 
-const initalUser: Account = {
+const initialUser: Account = {
     accessToken: undefined,
     accountId: -1,
     avatar: {
@@ -40,7 +40,7 @@ const initalUser: Account = {
 }
 
 const initialValue = {
-    user: initalUser,
+    user: initialUser,
     setUser: () => { },
     isAuthenticated: () => {
         return false;
@@ -52,7 +52,7 @@ const AuthContext = createContext<IAuthContecxt>(initialValue);
 
 export const AuthProvider = ({ children }: Props) => {
     const dispatch = useAppDispatch();
-    const [lastUserId, setLastUserId] = useState(initalUser.accountId);
+    const [lastUserId, setLastUserId] = useState(initialUser.accountId);
     const [user, setUser] = useState(initialValue.user);
     const [loading, setLoading] = useState(false);
     const isAuthenticated = () => {
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }: Props) => {
     useEffect(() => {
         // Check if user is null and reset to initialUser if so
         if (user === null) {
-            setUser(initalUser);
+            setUser(initialUser);
             return;
         }
 
