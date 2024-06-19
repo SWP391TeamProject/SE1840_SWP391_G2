@@ -158,7 +158,7 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>test</id>
+			<id>prod</id>
 			<properties>
 				<active.profile>prod</active.profile>
 			</properties>
