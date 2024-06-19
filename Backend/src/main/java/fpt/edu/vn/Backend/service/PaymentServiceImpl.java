@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -182,9 +183,10 @@ public class PaymentServiceImpl implements PaymentService {
         vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        String vnp_CreateDate = formatter.format(cld.getTime());
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String formatDateTime = now.format(formatter);
+        String vnp_CreateDate = formatDateTime;
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
         cld.add(Calendar.MINUTE, 15);
