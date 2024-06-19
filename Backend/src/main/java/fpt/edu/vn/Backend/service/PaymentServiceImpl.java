@@ -189,8 +189,9 @@ public class PaymentServiceImpl implements PaymentService {
         String vnp_CreateDate = formatDateTime;
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
 
-        cld.add(Calendar.MINUTE, 15);
-        String vnp_ExpireDate = formatter.format(cld.getTime());
+
+
+        String vnp_ExpireDate = formatter.format(now.plusMinutes(15));
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
         Account account = accountRepos.findByAccountId(paymentRequest.getAccountId())
