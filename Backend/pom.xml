@@ -146,6 +146,12 @@
     </dependencies>
 	<profiles>
 		<profile>
+			<id>test</id>
+			<properties>
+				<active.profile>test</active.profile>
+			</properties>
+		</profile>
+		<profile>
 			<id>dev</id>
 			<properties>
 				<active.profile>dev</active.profile>
