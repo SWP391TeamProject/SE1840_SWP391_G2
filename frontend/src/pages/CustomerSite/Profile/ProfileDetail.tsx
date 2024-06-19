@@ -52,7 +52,7 @@ const ProfileDetail = () => {
 
   useEffect(() => {
     if (auth.user.avatar)
-      setAvatarPreview(auth.user.avatar.link)
+      setAvatarPreview(auth?.user?.avatar?.link)
   }, []);
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +77,7 @@ const ProfileDetail = () => {
       headers: {
         "Content-Type": "multipart/form-data",
           
-        "Authorization": "Bearer " + auth.user.accessToken,
+        "Authorization": "Bearer " + auth?.user?.accessToken,
       },
     }).then((res) => {
         auth.setUser({
@@ -96,11 +96,11 @@ const ProfileDetail = () => {
 
   const onSubmitProfileDetails: SubmitHandler<ProfileDetails> = (data) => {
     setisLoading(true);
-    axios.put<any>(API_SERVER + "/accounts/" + auth.user.accountId, data, {
+    axios.put<any>(API_SERVER + "/accounts/" + auth?.user?.accountId, data, {
       headers: {
         "Content-Type": "application/json",
           
-        "Authorization": "Bearer " + auth.user.accessToken,
+        "Authorization": "Bearer " + auth?.user?.accessToken,
       },
     }).then(() => {
         auth.setUser({
