@@ -17,7 +17,7 @@ jobs:
         with:
           accept-eula: true
           sqlserver-version: 2022
-      - run: sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q 'CREATE DATABASE BIDDIFY'
+      - run: sqlcmd -U SA -P 'Y0urStr0ng!Passw0rd' -Q 'CREATE DATABASE BIDDIFY'
       # - run: sqlcmd -U SA -P 'YourStrong!Passw0rd' -Q "ALTER LOGIN sa WITH PASSWORD = '12345678';"
       
 
