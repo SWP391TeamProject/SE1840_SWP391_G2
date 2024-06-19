@@ -36,6 +36,10 @@ public class VnPayConfig {
     public void setVnp_ReturnUrl(String vnp_ReturnUrl) {
         VnPayConfig.vnp_ReturnUrl = vnp_ReturnUrl;
     }
+    @Value("${VNPAY_TMN_CODE}")
+    public void setVnp_TmnCode(String vnp_TmnCode) {
+        VnPayConfig.vnp_TmnCode = vnp_TmnCode;
+    }
 
     @Value("${VNPAY_SECRET_KEY}")
     public void setSecretKey(String secretKey) {
