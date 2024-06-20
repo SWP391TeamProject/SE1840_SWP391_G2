@@ -99,7 +99,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/auction-join")
                 .addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, customUserDetailsService))
 
-                .setAllowedOrigins(allowedOrigins,"https://biddify.fun","https://www.biddify.fun");
+                .setAllowedOrigins(allowedOrigins,"https://biddify.fun","https://www.biddify.fun","https://biddify.southeastasia.cloudapp.azure.com","https://www.biddify.southeastasia.cloudapp.azure.com");
     }
 
 
