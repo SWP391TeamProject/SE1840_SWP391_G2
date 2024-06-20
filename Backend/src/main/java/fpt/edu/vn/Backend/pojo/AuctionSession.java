@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.pojo;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -24,8 +25,10 @@ public class AuctionSession {
 
     private String title;
 
+    @NotBlank(message = "Start date is mandatory")
     private LocalDateTime startDate;
 
+    @NotBlank(message = "End Date is mandatory")
     private LocalDateTime endDate;
 
     @Column(length = 30)

@@ -151,22 +151,19 @@ public class AuthServiceImpl implements AuthService{
         if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
             throw new InvalidInputException("Email or password is empty!");
         }
-
         Optional<Account> userOptional = accountRepos.findByEmail(loginDTO.getEmail());
-
-        if (userOptional.isEmpty()) {
-            throw new ResourceNotFoundException ("invalid email or password!");
-        }
         Account user = userOptional.get();
-        if (!passwordEncoder.bcryptEncoder().matches(loginDTO.getPassword(), user.getPassword())) {
+        if(userOptional.isEmpty()){
             throw new InvalidInputException("invalid email or password!");
         }
+
         UserDetails userDetails = customUserDetailService.loadUserByUsername(loginDTO.getEmail());
         Authentication authentication = authenticationManager.authenticate(
                new  UsernamePasswordAuthenticationToken(userDetails, loginDTO.getPassword(), userDetails.getAuthorities())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
+
 
         return AuthResponseDTO
                 .builder()

@@ -17,6 +17,8 @@ import { logout } from "@/services/AuthService.ts";
 import { MenuIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { removeCookie } from "@/utils/cookies";
+import logo from "@/assets/icon.png";
+
 
 export default function DashBoardNavBar() {
   const auth = useAuth();
@@ -32,9 +34,12 @@ export default function DashBoardNavBar() {
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-14 flex items-center bg-white text-gray-900 shadow-md drop-shadow w-full dark:bg-black text-foreground dark:shadow-gray-800">
-        <Link className="flex items-center justify-center" to="/">
-          <img src="https://github.com/SWP391TeamProject/SE1840_SWP391_G2/raw/develop/images/logo-cut.svg" className="w-16 h-10 object-contain" alt="logo" />
+      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground ">
+      <Link className="flex items-center justify-center" to="/">
+          <div className="flex items-center justify-center gap-2">
+            <img src={logo} className="w-8 h-8" alt="logo" />
+            <span className="font-semibold text-lg text-orange-700 text-center">Biddify</span>
+          </div>
         </Link>
         <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
           <NavigationMenuList>

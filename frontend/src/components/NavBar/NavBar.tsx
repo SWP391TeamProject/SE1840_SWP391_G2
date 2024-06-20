@@ -19,6 +19,7 @@ import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import logo from "@/assets/icon.png";
 
 export default function NavBar() {
   const auth = useAuth();
@@ -33,10 +34,12 @@ export default function NavBar() {
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-2 bg-background text-foreground ">
+      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground ">
         <Link className="flex items-center justify-center" to="/">
-          <GavelIcon className="h-6 w-6" />
-          <span className="font-semibold text-lg">Biddify</span>
+        <div className="flex items-center justify-center gap-2">
+            <img src={logo} className="w-8 h-8" alt="logo" />
+            <span className="font-semibold text-lg text-orange-700 text-center">Biddify</span>
+          </div>
         </Link>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
 
