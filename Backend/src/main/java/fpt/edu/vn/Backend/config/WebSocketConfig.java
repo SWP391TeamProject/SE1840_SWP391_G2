@@ -9,6 +9,7 @@ import fpt.edu.vn.Backend.security.JwtHandshakeInterceptor;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,7 +32,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomUserDetailsService customUserDetailsService;
     private final AuctionSessionService auctionSessionService;
     private final AuctionSessionRepos auctionSessionRepos;
-
+    @Value("${FRONTEND_CORS_SERVER:}")
+    private String allowedOrigins="http://localhost:5173";
     @Autowired
     public WebSocketConfig(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService, AuctionSessionService auctionSessionService, AuctionSessionRepos auctionSessionRepos) {
         this.jwtGenerator = jwtGenerator;
@@ -95,7 +97,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/auction-join")
                 .addInterceptors(new JwtHandshakeInterceptor(jwtGenerator, customUserDetailsService))
 
-                .setAllowedOrigins("http://localhost:5173");
+                .setAllowedOrigins(allowedOrigins);
     }
 
 
