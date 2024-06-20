@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +44,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
+        if(paymentRequest.getAmount().compareTo(new BigDecimal(5000)) <= 0){
+            throw new InvalidInputException("Amount must be greater than 5,000 VND");
+        }
+        if(paymentRequest.getType() == null){
+            throw new InvalidInputException("Payment type must not be null");
+        }
+        if(paymentRequest.getAmount().compareTo(new BigDecimal(500000000)) > 0){
+            throw new InvalidInputException("Amount must be smaller than 500,000,000 VND");
+        }
+
+
+
         log.info("createPayment: " + paymentRequest);
         try {
             Payment payment = new Payment();

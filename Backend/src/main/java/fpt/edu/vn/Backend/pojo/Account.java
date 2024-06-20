@@ -58,7 +58,7 @@ public class Account {
     @NaturalId
     private String email;
 
-    @Column(name = "password", length = 50)
+    @Column(name = "password", length = 255 ,columnDefinition = "NVARCHAR(255)")
     private String password;
 
     @Column(name = "phone", length = 15)

@@ -1,11 +1,13 @@
 package fpt.edu.vn.Backend.security;
 
 import fpt.edu.vn.Backend.oauth2.security.*;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -47,6 +50,11 @@ public class SecurityConfig {
     private OAuth2AuthenticationSuccessHandler customOAuth2Success;
     @Autowired
     private OAuth2AuthenticationFailureHandler customOAuth2Failure;
+    @Autowired
+    private  CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private PasswordEncoderConfig passwordEncoderConfig;
+
     @Value("${FRONTEND_CORS_SERVER}")
     private  String FRONTEND_SERVER_URL;
     @Autowired
@@ -72,8 +80,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS and use corsConfigurationSource
                 .csrf(csrf -> csrf.disable()
@@ -89,6 +95,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
 
                 )
+                .authenticationProvider(daoAuthenticationProvider())
+
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authz -> authz
                                 .baseUri("/oauth2/authorize")
@@ -104,6 +112,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
+
 
                         .successHandler(customOAuth2Success)
                         .failureHandler(customOAuth2Failure)
@@ -121,25 +130,19 @@ public class SecurityConfig {
     }
 
     @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoderConfig.bcryptEncoder());
+        daoAuthenticationProvider.setUserDetailsService(customUserDetailsService);
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence charSequence) {
-                return charSequence.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence charSequence, String s) {
-                return true;
-            }
-        };
-    }
 
     @Bean
     public JWTAuthenticationFilter jwtAuthenticationFilter() {
