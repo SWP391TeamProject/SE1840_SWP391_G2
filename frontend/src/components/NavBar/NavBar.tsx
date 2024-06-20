@@ -7,30 +7,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { GavelIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks.tsx";
+import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
-import { getCookie, removeCookie } from "@/utils/cookies";
+import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useEffect } from "react";
-import { countUnreadNotifications } from "@/services/NotificationService";
-import { setUnreadNotificationCount } from "@/redux/reducers/UnreadNotificationCountReducer";
-import { fetchAccountById } from "@/services/AccountsServices";
 
 export default function NavBar() {
   const auth = useAuth();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
-
-  const loc = useLocation();
-  const dispatch = useAppDispatch();
-
   const handleSignout = function () {
     logout().then(function () {
       removeCookie("user");
@@ -38,34 +30,6 @@ export default function NavBar() {
       window.location.href = '/auth/login';
     })
   };
-  //  this is neccessary as this nav bar doesn't rerender when the user logs in
-  // delete this if you find a better way to do this or else you're gay
-  useEffect(() => {
-
-    async function fetchUnreadNotification() {
-      countUnreadNotifications().then((res) => {
-        console.log('noti service')
-        console.log("noti service" + res?.data);
-        dispatch(setUnreadNotificationCount(res?.data));
-      }).catch((err) => {
-        console.error(err);
-      })
-    }
-    if (!loc?.state) {
-      let cookie = getCookie('user');
-      if (cookie) {
-        const data = JSON.parse(cookie)?.id;
-        if (data) {
-          fetchAccountById(data).then(res => {
-            console.log('hehehe')
-            auth.setUser(res?.data)
-          }).then(() => {
-            fetchUnreadNotification()
-          })
-        }
-      }
-    }
-  }, [])
 
   return (
     <>
