@@ -25,7 +25,7 @@ export default function AuctionJoin() {
   const [bids, setBids] = useState<YourBidType[]>([]);
   useEffect(() => {
     const newClient = new Client({
-      brokerURL: `wss://${import.meta.env.VITE_BACKEND_DNS}:8080/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
+      brokerURL: `wss://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
       onConnect: () => {
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
         setTimeout(() => {
