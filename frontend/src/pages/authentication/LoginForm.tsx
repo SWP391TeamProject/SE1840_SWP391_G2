@@ -6,7 +6,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import AuthContext from "@/AuthProvider";
+import AuthContext, {useAuth} from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { AccountStatus, Roles } from "@/constants/enums";
@@ -32,6 +32,7 @@ function LoginForm() {
   // const {authenticated, role} = useContext(AuthContext);
   const { user, setUser } = useContext(AuthContext);
   const { register, handleSubmit } = useForm<FormValues>();
+  const auth = useAuth();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     setIsLogin(true);
     axios.post(`${AUTH_SERVER}/login`, data, {
@@ -46,15 +47,13 @@ function LoginForm() {
           return
         }
         setIsLogin(false);
-        console.log(res.data);
         setCookie("token", res.data.accessToken, 30000);
         setCookie("user", JSON.stringify(res.data), 30000);
-        setUser(res.data);
+        auth.fetchProfile();
         if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
           navigate("/admin/accounts");
         } else {
           navigate(from, { replace: true });
-          
         }
         toast.success('logged in successfully')
       })
@@ -84,7 +83,7 @@ function LoginForm() {
           console.log(res.data);
           setCookie("token", res.data.accessToken, 30000);
           setCookie("user", JSON.stringify(res.data), 30000);
-          setUser(res.data);
+          auth.fetchProfile();
           if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
             navigate("/admin/accounts");
           } else {
