@@ -48,7 +48,7 @@ const initialValue = {
     fetchProfile: () => {},
 }
 
-const AuthContext = createContext<IAuthContecxt>(initialValue);
+const AuthContext = createContext<IAuthContext>(initialValue);
 
 export const AuthProvider = ({ children }: Props) => {
     const dispatch = useAppDispatch();
@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }: Props) => {
 
 export default AuthContext;
 
-export const useAuth = (): IAuthContecxt => {
+export const useAuth = (): IAuthContext => {
     const context = useContext(AuthContext);
     if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');

@@ -50,18 +50,10 @@ const ProfileDetail = () => {
       phone: auth.user.phone
     }
   });
-  useEffect(() => {
-    if(!auth.user) {
-      return;
-    
-    }
-  }, [auth.user]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (auth.user.avatar)
       setAvatarPreview(auth.user.avatar.link)
-
-
   }, []);
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
