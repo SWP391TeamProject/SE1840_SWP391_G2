@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -23,6 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -176,4 +182,19 @@ public class AccountServiceImpl implements AccountService {
             mailSender.send(message);
         } catch (MessagingException ignored) {}
     }
+
+    @Override
+    public List<MonthlyBalanceDTO> getMonthlyBalances(int year) {
+        List<MonthlyBalanceDTO> monthlyBalances = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            YearMonth yearMonth = YearMonth.of(year, month);
+            LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+            BigDecimal balance = accountRepos.findBalanceByDate(endOfMonth);
+            monthlyBalances.add(new MonthlyBalanceDTO(yearMonth, balance));
+        }
+        return monthlyBalances;
+    }
+
+
 }
