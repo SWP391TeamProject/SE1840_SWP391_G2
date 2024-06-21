@@ -10,6 +10,8 @@ import { fetchBidsByAuctionItemId } from '@/services/BidsService';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay"
 import { toast } from 'react-toastify';
+import { set } from 'date-fns';
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 
 
 export default function AuctionJoin() {
@@ -23,11 +25,13 @@ export default function AuctionJoin() {
   let itemDTO = location.state.itemDTO;
 
   const [bids, setBids] = useState<YourBidType[]>([]);
+  const [isJoin, setIsJoin] = useState(false);
   useEffect(() => {
     const newClient = new Client({
       brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
 
       onConnect: () => {
+        setIsJoin(true);
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
         setTimeout(() => {
           newClient.publish({
@@ -63,9 +67,10 @@ export default function AuctionJoin() {
   }, []);
 
   const onMessageReceived = (payload: IMessage) => {
+    setIsJoin(false);
     console.log(payload);
 
-    if (payload.body.split(":")[payload.body.split(":").length-1]=="ERROR") {
+    if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
       toast.error(payload.body.split(":")[0]);
       client?.forceDisconnect();
       client?.deactivate();
@@ -127,95 +132,100 @@ export default function AuctionJoin() {
     setAcccountId(JSON.parse(getCookie("user")).id);
   }
   return (
-    <div className="flex flex-col min-h-screen">
-      <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
-        <Carousel className="flex w-5/6" plugins={[
-          Autoplay({
-            delay: 2000,
-          }),
-        ]}>
-          <CarouselContent className=' w-full'>
-            {itemDTO?.attachments.map((image) => (
-              <CarouselItem key={image.attachmentId} className="basis-1/3 rounded-full border overflow-hidden border-gray-700">
-                <img src={image.link} alt={itemDTO?.name} className="mx-auto " />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-">
-            <h1 className=" w-3/5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl   ">
-              {itemDTO.name}
-            </h1>
-            <p className="mt-4 max-w-3xl text-lg md:text-xl">
-              Discover the timeless elegance of this beautifully crafted vintage leather armchair, a true statement piece
-              for your home.
-            </p>
-          </div>
+    <>
+      {isJoin ? <LoadingAnimation /> :
+        <div className="flex flex-col min-h-screen">
+          <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
+            <Carousel className="flex w-5/6" plugins={[
+              Autoplay({
+                delay: 2000,
+              }),
+            ]}>
+              <CarouselContent className=' w-full'>
+                {itemDTO?.attachments.map((image) => (
+                  <CarouselItem key={image.attachmentId} className="basis-1/3 rounded-full border overflow-hidden border-gray-700">
+                    <img src={image.link} alt={itemDTO?.name} className="mx-auto " />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-">
+                <h1 className=" w-3/5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl   ">
+                  {itemDTO.name}
+                </h1>
+                <p className="mt-4 max-w-3xl text-lg md:text-xl">
+                  Discover the timeless elegance of this beautifully crafted vintage leather armchair, a true statement piece
+                  for your home.
+                </p>
+              </div>
 
-          <CarouselPrevious />
-          <CarouselNext />
+              <CarouselPrevious />
+              <CarouselNext />
 
-        </Carousel>
+            </Carousel>
 
-      </section>
-      <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-4">Item Details</h2>
-            <div className="space-y-4">
-              <div
-                dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
-              />
+          </section>
+          <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight mb-4">Item Details</h2>
+                <div className="space-y-4">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
+                  />
 
-            </div>
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight mb-4">Bidding History</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
-                  <p className="text-2xl font-bold">${price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400">Bid Count</p>
-                  <p className="text-2xl font-bold">{bids.length}</p>
                 </div>
               </div>
-              <div className="space-y-2">
-                <ScrollArea className="h-48 overflow-hidden p-4" css={{ width: 400 }}>
-                  {bids?.map((bid) => (
-                    <div className="flex items-center justify-between" key={bid?.bidId}>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="w-8 h-8 border">
-                          <img src={bid?.account.avatar?.link} alt="@username" />
-                          <AvatarFallback>N/A</AvatarFallback>
-                        </Avatar>
-                        <p>{bid?.account.nickname}</p>
-                      </div>
-                      <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
-                    </div>
-                  ))}
-                </ScrollArea>
-
-              </div>
-              <div className="mt-12 md:mt-16 lg:mt-20">
-                <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
-                <form className="max-w-md mx-auto" onSubmit={sendMessage}>
-                  <div className="grid gap-4">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight mb-4">Bidding History</h2>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
+                      <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
+                      <p className="text-2xl font-bold">${price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)}</p>
                     </div>
-                    <Button type="submit" className="w-full">
-                      Place Bid
-                    </Button>
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">Bid Count</p>
+                      <p className="text-2xl font-bold">{bids.length}</p>
+                    </div>
                   </div>
-                </form>
+                  <div className="space-y-2">
+                    <ScrollArea className="h-48 overflow-hidden p-4" css={{ width: 400 }}>
+                      {bids?.map((bid) => (
+                        <div className="flex items-center justify-between" key={bid?.bidId}>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-8 h-8 border">
+                              <img src={bid?.account.avatar?.link} alt="@username" />
+                              <AvatarFallback>N/A</AvatarFallback>
+                            </Avatar>
+                            <p>{bid?.account.nickname}</p>
+                          </div>
+                          <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
+                        </div>
+                      ))}
+                    </ScrollArea>
+
+                  </div>
+                  <div className="mt-12 md:mt-16 lg:mt-20">
+                    <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
+                    <form className="max-w-md mx-auto" onSubmit={sendMessage}>
+                      <div className="grid gap-4">
+                        <div>
+                          <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
+                        </div>
+                        <Button type="submit" className="w-full">
+                          Place Bid
+                        </Button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
+      }
+    </>
 
-      </div>
-    </div>
   );
 }
