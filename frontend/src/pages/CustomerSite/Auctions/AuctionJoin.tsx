@@ -25,7 +25,7 @@ export default function AuctionJoin() {
   const [bids, setBids] = useState<YourBidType[]>([]);
   useEffect(() => {
     const newClient = new Client({
-      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}:8080/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
+      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
 
       onConnect: () => {
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
@@ -64,7 +64,8 @@ export default function AuctionJoin() {
 
   const onMessageReceived = (payload: IMessage) => {
     console.log(payload);
-    if (payload.body.includes("ERROR")) {
+
+    if (payload.body.split(":")[payload.body.split(":").length-1]=="ERROR") {
       toast.error(payload.body.split(":")[0]);
       client?.forceDisconnect();
       client?.deactivate();
@@ -73,20 +74,18 @@ export default function AuctionJoin() {
       return;
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
-      if (payload.headers["message-id"].includes(JSON.parse(payload.body).body.split(":")[0]))
-        toast.error(JSON.parse(payload.body).body.split(":")[1]);
-
+      if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
+        toast.error(JSON.parse(payload.body)?.body?.message);
+      }
       return;
     }
     const message = JSON.parse(payload.body).body;
     console.log(message);
-    let content = '';
-    if (message.split(":")[2] === 'JOIN' || message.split(":")[2] === 'BID') {
-      content = `${message.split(":")[0]}`;
-      setPrice(parseFloat(message.split(":")[1]).toString());
+    if (message?.status == "JOIN" || message?.status == "BID") {
+      toast.info(message?.message);
+      setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
     setIsReceived(!isReceived);
-    toast.info(content);
   };
 
   const sendMessage = (event: React.FormEvent) => {

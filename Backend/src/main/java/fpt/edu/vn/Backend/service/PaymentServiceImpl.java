@@ -13,6 +13,7 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -43,35 +44,41 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
+        if(paymentRequest.getAmount().compareTo(new BigDecimal(5000)) <= 0){
+            throw new InvalidInputException("Amount must be greater than 5,000 VND");
+        }
+        if(paymentRequest.getType() == null){
+            throw new InvalidInputException("Payment type must not be null");
+        }
+        if(paymentRequest.getAmount().compareTo(new BigDecimal(500000000)) > 0){
+            throw new InvalidInputException("Amount must be smaller than 500,000,000 VND");
+        }
 
-        log.info("user id in payment request: " + paymentRequest.getAccountId());
 
+
+        log.info("createPayment: " + paymentRequest);
         try {
             Payment payment = new Payment();
             payment.setPaymentAmount(paymentRequest.getAmount());
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
-            // Find the account and handle if it's not found
             Optional<Account> accountOptional = accountRepos.findByAccountId(paymentRequest.getAccountId());
             if (accountOptional.isEmpty()) {
-                log.info("account not found: " + paymentRequest.getAccountId());
-                throw new ResourceNotFoundException("Account not found with issssd " + paymentRequest.getAccountId());
-            }else {
-                log.info("account found: " + accountOptional.get().getAccountId());
+                throw new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId());
+            } else {
                 payment.setAccount(accountOptional.get());
             }
 
-            // Save the payment
             Payment savedPayment = paymentRepos.save(payment);
-            VnPayPaymentRequestDTO vnPayPaymentRequestDTO = new VnPayPaymentRequestDTO().builder()
+            VnPayPaymentRequestDTO vnPayPaymentRequestDTO = VnPayPaymentRequestDTO.builder()
                     .accountId(savedPayment.getAccount().getAccountId())
                     .vnp_txnRef(savedPayment.getPaymentId())
                     .vnp_Amount(savedPayment.getPaymentAmount())
                     .vnp_OrderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
                     .build();
-            // Return the saved payment as a DTO
             return createVNPayPayment(vnPayPaymentRequestDTO, paymentRequest.getIpAddr());
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("An error occurred while creating payment: " + e.getMessage());
             throw new InvalidInputException("Failed to create payment", e);
         }
@@ -156,55 +163,32 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr) throws UnsupportedEncodingException {
-        String vnp_Version = "2.1.0";
-        String vnp_Command = "pay";
-        String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
-
-//        String vnp_IpAddr = VnPayConfig.getIpAddress(req);
-
-        BigDecimal amount = paymentRequest.getVnp_Amount().multiply(BigDecimal.valueOf(100));
-        Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", vnp_Version);
-        vnp_Params.put("vnp_Command", vnp_Command);
-        vnp_Params.put("vnp_TmnCode", VnPayConfig.vnp_TmnCode);
-        vnp_Params.put("vnp_Amount", String.valueOf(amount));
-        vnp_Params.put("vnp_CurrCode", "VND");
-
-//        if (VnPayConfig.getVnp_BankCode() != null ) {
-//            vnp_Params.put("vnp_BankCode", String.valueOf(paymentRequest.getVnp_BankCode()));
-//        }
-
-        vnp_Params.put("vnp_TxnRef", String.valueOf(paymentRequest.getVnp_txnRef()));
-        vnp_Params.put("vnp_OrderInfo", paymentRequest.getVnp_OrderInfo());
-        vnp_Params.put("vnp_OrderType", !paymentRequest.getVnp_OrderInfo().equals("DEPOSIT") ? "200000" : "Other");
-
-        if (VnPayConfig.vnp_Locale != null && !VnPayConfig.vnp_Locale.isEmpty()) {
-            vnp_Params.put("vnp_Locale", VnPayConfig.vnp_Locale);
-        }
-
-        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl);
-        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 
-//        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        String formatDateTime = now.format(formatter);
-        String vnp_CreateDate = formatDateTime;
-        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-
-
-
-        String vnp_ExpireDate = formatter.format(now.plusMinutes(15));
-        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_Version", "2.1.0");
+        vnp_Params.put("vnp_Command", "pay");
+        vnp_Params.put("vnp_TmnCode", VnPayConfig.vnp_TmnCode);
+        vnp_Params.put("vnp_Amount", paymentRequest.getVnp_Amount().toBigInteger().multiply(BigInteger.valueOf(100)).toString());
+        vnp_Params.put("vnp_CreateDate", formatter.format(now));
+        vnp_Params.put("vnp_CurrCode", "VND");
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+        vnp_Params.put("vnp_Locale", VnPayConfig.vnp_Locale);
+        vnp_Params.put("vnp_OrderInfo", paymentRequest.getVnp_OrderInfo());
+        vnp_Params.put("vnp_OrderType", "250000");
+        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_ReturnUrl);
+        vnp_Params.put("vnp_ExpireDate", formatter.format(now.plusMinutes(15)));
+        vnp_Params.put("vnp_TxnRef", String.valueOf(paymentRequest.getVnp_txnRef()));
 
         Account account = accountRepos.findByAccountId(paymentRequest.getAccountId())
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " ));
-        BillingDTO billing = new BillingDTO().builder()
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id "));
+        BillingDTO billing = BillingDTO.builder()
                 .vnp_Bill_Address("123")
                 .vnp_Bill_City("Hanoi")
                 .vnp_Bill_Country("Vietnam")
                 .vnp_Bill_Email(account.getEmail())
-                .vnp_Bill_FullName(account.getNickname())
+                .vnp_Bill_FullName(normalize(account.getNickname()))
                 .vnp_Bill_Mobile("0123456789")
                 .vnp_Bill_State("Hanoi")
                 .build();
@@ -221,10 +205,10 @@ public class PaymentServiceImpl implements PaymentService {
             vnp_Params.put("vnp_Bill_LastName", lastName);
         }
 
-        InvoiceDTO invoice = new InvoiceDTO().builder()
+        InvoiceDTO invoice = InvoiceDTO.builder()
                 .vnp_Inv_Address("123")
                 .vnp_Inv_Company("FPT")
-                .vnp_Inv_Customer("FPT")
+                .vnp_Inv_Customer(normalize(account.getNickname()))
                 .vnp_Inv_Email(account.getEmail())
                 .vnp_Inv_Taxcode("123456")
                 .vnp_Inv_Type("1")
@@ -253,30 +237,38 @@ public class PaymentServiceImpl implements PaymentService {
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
 
-        for (String fieldName : fieldNames) {
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
             String fieldValue = vnp_Params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 //Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 //Build query
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
                 query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                if (fieldNames.indexOf(fieldName) != fieldNames.size() - 1) {
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                if (itr.hasNext()) {
                     query.append('&');
                     hashData.append('&');
                 }
             }
         }
+        log.info("Hash data: " + hashData);
 
         String queryUrl = query.toString();
         String vnp_SecureHash = VnPayConfig.hmacSHA512(VnPayConfig.secretKey, hashData.toString());
-        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        String paymentUrl = VnPayConfig.vnp_PayUrl + "?" + queryUrl;
+        String paymentUrl = VnPayConfig.vnp_PayUrl + "?" + queryUrl + "&vnp_SecureHash=" + vnp_SecureHash;
+
+        log.info("VnPay URL: " + paymentUrl);
 
         return paymentUrl;
+    }
+
+    private String normalize(String str) {
+        return StringUtils.stripAccents(str).replaceAll("[^\\w ]", "");
     }
 
     @Override

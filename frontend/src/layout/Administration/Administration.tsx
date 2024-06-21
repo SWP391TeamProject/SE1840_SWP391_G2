@@ -129,7 +129,7 @@ export default function Administration() {
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <User2 />
-                                Accounts
+                                Manage Accounts
                             </Link>
                             <Link
                                 to="consignments"
@@ -143,14 +143,14 @@ export default function Administration() {
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <AreaChartIcon />
-                                Auction Session
+                                Manage Auction Session
                             </Link>
                             <Link
                                 to="items"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <ShoppingBag />
-                                Manage Item
+                                Manage Items
                             </Link>
                             <Link
                                 to="blogs"
@@ -164,7 +164,7 @@ export default function Administration() {
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <Bell />
-                                Manage Notification
+                                Manage Notifications
                             </Link>
 
                         </nav>

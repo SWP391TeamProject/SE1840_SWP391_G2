@@ -1,6 +1,9 @@
 package fpt.edu.vn.Backend.pojo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,13 +61,17 @@ public class Account {
         STAFF;
     }
 
-    @Column(name = "email", length = 100)
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Email should be valid")
     @NaturalId
     private String email;
 
-    @Column(name = "password", length = 50)
+    @NotBlank(message = "Password is mandatory")
+    @Size(max = 255, message = "Password must be less than 255 characters")
+    @Column(name = "password", length = 255 ,columnDefinition = "NVARCHAR(255)")
     private String password;
 
+    @Size(max = 15, message = "Phone must be less than 15 characters")
     @Column(name = "phone", length = 15)
     private String phone;
 

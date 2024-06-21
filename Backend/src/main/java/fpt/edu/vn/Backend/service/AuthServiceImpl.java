@@ -19,6 +19,7 @@ import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.TokenRepos;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
+import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +57,8 @@ public class AuthServiceImpl implements AuthService{
     private final AccountRepos accountRepos;
     private final JWTGenerator jwtGenerator;
     private final AuthenticationManager authenticationManager;
+    // Password regex: at least 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character
+    private final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
     private final JavaMailSender mailSender;
     @Value("${app.email}")
     private String systemEmail;
@@ -73,7 +77,8 @@ public class AuthServiceImpl implements AuthService{
     private TokenProvider tokenProvider;
     private TokenRepos tokenRepos;
     private CustomUserDetailsService customUserDetailService;
-
+    @Autowired
+    private PasswordEncoderConfig passwordEncoder;
     @Autowired
     public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService) {
         this.accountRepos = accountRepos;
@@ -93,17 +98,15 @@ public class AuthServiceImpl implements AuthService{
                 throw new InvalidInputException("Name or Email or password is empty!");
             }
 
-            if (registerDTO.getName().length() < 5) {
-                throw new InvalidInputException("Name is too short!");
-            }
-
             if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
                 throw new InvalidInputException("Password and confirm password do not match!");
             }
 
-            if (registerDTO.getPassword().length() < 6) {
-                throw new InvalidInputException("Password is too short!");
-            }
+
+//            if (!registerDTO.getPassword().matches(PASSWORD_REGEX)) {
+//            throw new InvalidInputException("Password must be at least 8 characters long" +
+//                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+//        }
 
             accountRepos.findByEmail(registerDTO.getEmail()).ifPresent(account -> {
                 throw new InvalidInputException("Email already exists! try login instead.");
@@ -112,7 +115,7 @@ public class AuthServiceImpl implements AuthService{
             newAccount = new Account();
             newAccount.setNickname(registerDTO.getName());
             newAccount.setEmail(registerDTO.getEmail());
-            newAccount.setPassword(registerDTO.getPassword()); // Consider hashing the password before saving
+            newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword()).toString()); // Consider hashing the password before saving
             newAccount.setRole(Account.Role.MEMBER);
             newAccount.setProvider(Account.AuthProvider.LOCAL);
             newAccount = accountRepos.save(newAccount);
@@ -131,7 +134,7 @@ public class AuthServiceImpl implements AuthService{
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         userDetails,
-                        userDetails.getPassword(),
+                        registerDTO.getPassword(),
                         userDetails.getAuthorities()
                 )
         );
@@ -262,12 +265,14 @@ public class AuthServiceImpl implements AuthService{
     public boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
         Account a = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id));
-        if (!a.getPassword().equals(changePasswordDTO.getOldPassword()))
+        if (!passwordEncoder.bcryptEncoder().matches(a.getPassword(),changePasswordDTO.getOldPassword()))
             throw new InvalidInputException("Old password is incorrect!");
         if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword()))
             throw new InvalidInputException("New password and confirm password do not match!");
-        if (changePasswordDTO.getNewPassword().length() < 8)
-            throw new InvalidInputException("Password is too short!");
+//        if (!changePasswordDTO.getNewPassword().matches(PASSWORD_REGEX)) {
+//            throw new InvalidInputException("Password must be at least 8 characters long" +
+//                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+//        }
         a.setPassword(changePasswordDTO.getNewPassword());
         accountRepos.save(a);
         return true;
@@ -313,9 +318,10 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword) {
-        if (newPassword.length() < 8) {
-            throw new InvalidInputException("Password is too short!");
-        }
+//        if (!newPassword.matches(PASSWORD_REGEX)) {
+//            throw new InvalidInputException("Password must be at least 8 characters long" +
+//                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+//        }
         Integer id = resetPasswordCodeCache.get(resetCode);
         if (id == null)
             return false;

@@ -54,6 +54,7 @@ class AuthServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
     @Test
     @DisplayName("Should login successfully when valid email and password are provided")
     public void shouldLoginSuccessfullyWhenValidEmailAndPasswordAreProvided() {
@@ -61,20 +62,28 @@ class AuthServiceImplTest {
         loginDTO.setEmail("test@test.com");
         loginDTO.setPassword("password");
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
-        when(authenticationManager.authenticate(any())).thenReturn(authentication);
-        when(jwtGenerator.generateToken(any())).thenReturn("someToken");
+        Account account = new Account();
+        account.setAccountId(1);
+        account.setNickname("test");
+        account.setEmail("test@test.com");
+        account.setRole(Account.Role.MEMBER);
+        account.setStatus(Account.Status.ACTIVE);
+
+        when(accountRepos.findByEmail(anyString())).thenReturn(Optional.of(account));
+
         UserDetails userDetails = mock(UserDetails.class);
         when(customUserDetailService.loadUserByUsername(anyString())).thenReturn(userDetails);
 
-        Account account = new Account();
-        account.setEmail("test@test.com");
-        account.setRole(Account.Role.MEMBER);
-        when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, loginDTO.getPassword(), userDetails.getAuthorities());
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+
+        when(jwtGenerator.generateToken(any())).thenReturn("someToken");
+
         AuthResponseDTO result = authService.login(loginDTO);
 
         assertNotNull(result);
         assertEquals("test@test.com", result.getEmail());
+        assertEquals("someToken", result.getAccessToken());
     }
 
     @Test
@@ -179,34 +188,5 @@ class AuthServiceImplTest {
         assertThrows(RuntimeException.class, () -> authService.register(registerDTO));
     }
 
-    @Test
-    @DisplayName("Should return accessToken when user logged in successfully")
-    public void shouldReturnAccessTokenWhenUserLoggedInSuccessfully() {
-        // Arrange
-        LoginDTO loginDTO = new LoginDTO();
-        loginDTO.setEmail("sdfsdf@sda.cc");
-        loginDTO.setPassword("password");
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
-        when(authenticationManager.authenticate(any())).thenReturn(authentication);
-        when(jwtGenerator.generateToken(any())).thenReturn("someToken");
-
-        Account account = new Account();
-        account.setEmail("sdfsdf@sda.cc");
-        account.setPassword("password");
-        account.setRole(Account.Role.MEMBER);
-        when(accountRepos.findByEmailAndPassword(anyString(), anyString())).thenReturn(Optional.of(account));
-
-        UserDetails userDetails = mock(UserDetails.class);
-        when(customUserDetailService.loadUserByUsername(anyString())).thenReturn(userDetails);
-
-        // Act
-        AuthResponseDTO result = authService.login(loginDTO);
-
-        // Assert
-        assertNotNull(result);
-        assertNotNull(result.getAccessToken());
-        System.out.println(result.getAccessToken());
-        assertEquals("someToken", result.getAccessToken());
-    }
 }

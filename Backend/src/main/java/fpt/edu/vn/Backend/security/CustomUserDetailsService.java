@@ -17,7 +17,6 @@ import java.util.Collections;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final AccountRepos accountRepos;
-
     @Autowired
     public CustomUserDetailsService(AccountRepos accountRepos) {
         this.accountRepos = accountRepos;
