@@ -13,8 +13,6 @@ class BlogCategoryService {
         return axios.get(`${this.BASE_URL}/`, {
             headers: {
                 "Content-Type": "application/json",
-                  
-                Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
             params: params
         });
