@@ -133,7 +133,7 @@ export default function AuctionJoin() {
   }
   return (
     <>
-      {isJoin ? <LoadingAnimation /> :
+      {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
         <div className="flex flex-col min-h-screen">
           <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
             <Carousel className="flex w-5/6" plugins={[
