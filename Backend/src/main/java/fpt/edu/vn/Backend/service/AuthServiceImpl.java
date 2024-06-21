@@ -315,7 +315,7 @@ public class AuthServiceImpl implements AuthService{
         helper.setTo(a.getEmail());
         helper.setSubject("[Biddify] Reset Password");
         // Read the HTML file into a String
-        String htmlContent = new String(Files.readAllBytes(Paths.get("src/main/resources/templates/resetpasswordEmail.html")));
+        String htmlContent = new String(Files.readAllBytes(Paths.get("/src/main/resources/templates/resetpasswordEmail.html")));
 
         // Replace placeholders in the HTML content with actual values
         htmlContent = htmlContent.replace("{code}", code);
