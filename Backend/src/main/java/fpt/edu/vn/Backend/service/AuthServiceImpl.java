@@ -180,12 +180,10 @@ public class AuthServiceImpl implements AuthService{
 
     private AuthResponseDTO forceLogin(Account user) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        userDetails.getPassword(),
-                        userDetails.getAuthorities()
-                )
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null, // password is not needed here
+                userDetails.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
@@ -198,13 +196,28 @@ public class AuthServiceImpl implements AuthService{
             throw new InvalidInputException("Email or password is empty!");
         }
 
-        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
+        Optional<Account> userOptional = accountRepos.findByEmail(loginDTO.getEmail());
 
         if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException ("Invalid email or password");
         }
 
         Account user = userOptional.get();
+
+        try{
+            UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            loginDTO.getPassword(),
+                            userDetails.getAuthorities()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }catch (Exception e){
+            throw new InvalidInputException("Invalid email or password");
+        }
+
         if (user.isRequire2fa()) {
             try {
                 request2fa(user);

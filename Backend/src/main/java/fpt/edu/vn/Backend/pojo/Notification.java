@@ -41,4 +41,6 @@ public class Notification {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
+
+   
 }
