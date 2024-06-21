@@ -4,6 +4,7 @@ import { Login } from "@/models/Login";
 import { Register } from "@/models/Register";
 import { getCookie } from "@/utils/cookies";
 import { AUTH_SERVER } from "@/constants/domain";
+import {AxiosResponse} from "axios";
 
 const baseUrl = AUTH_SERVER;
 
@@ -76,6 +77,14 @@ export const requestChangePassword = async (data, id): Promise<void> => {
 
 export const activateAccount = async (code: string): Promise<void> => {
   await axios.post(`${baseUrl}/activate-account/`, null, {
+    ...authHeader,
+    params: { code },
+  });
+};
+
+
+export const verify2fa = async (code: string): Promise<AxiosResponse<AuthResponse>> => {
+  return axios.post<AuthResponse>(`${baseUrl}/verify-2fa/`, null, {
     ...authHeader,
     params: { code },
   });

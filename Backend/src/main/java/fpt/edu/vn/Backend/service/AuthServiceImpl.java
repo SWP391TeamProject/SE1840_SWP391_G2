@@ -66,10 +66,13 @@ public class AuthServiceImpl implements AuthService{
     private String resetEmailLink;
     @Value("${app.activate-account-link}")
     private String activateAccountLink;
+    @Value("${app.verify-2fa-link}")
+    private String verify2faLink;
     private final ExpiringMap<String, Integer> resetPasswordCodeCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<Integer, Object> resetPasswordCooldownCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<String, Integer> activationCodeCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<Integer, Object> activationCooldownCache = ExpiringMap.builder().variableExpiration().build();
+    private final ExpiringMap<String, Integer> verify2faCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
     private TokenProvider tokenProvider;
     private TokenRepos tokenRepos;
@@ -146,34 +149,72 @@ public class AuthServiceImpl implements AuthService{
                 .build();
     }
 
+    public void request2fa(@NotNull Account a) throws MessagingException {
+        String code;
+        do {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 6; i++)
+                sb.append((int) (Math.random() * 10));
+            code = sb.toString();
+        } while (verify2faCache.containsKey(code));
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, false);
+        helper.setFrom(systemEmail);
+        helper.setTo(a.getEmail());
+        helper.setSubject("[Biddify] Two-factor Authentication code");
+        String link = String.format(verify2faLink, code);
+        helper.setText("""
+                <p>There was a request to log in into your account</p>
+                <p>Your 2FA code: %s</p>
+                <p>Click here to verify your log-in request: <a href="%s">Verify 2FA</a></p>
+                <p>The code will expire after 10 minutes.</p>
+                <p>If that was not your request, your password might have been leaked. Please ignore this email.</p>
+                <p>- Biddify</p>
+                """.formatted(code, link), true);
+        mailSender.send(message);
+
+        verify2faCache.put(code, a.getAccountId(), 10, TimeUnit.MINUTES);
+        logger.info("Sending 2FA code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
+    }
+
+    private AuthResponseDTO forceLogin(Account user) {
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        userDetails.getPassword(),
+                        userDetails.getAuthorities()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtGenerator.generateToken(authentication);
+        return new AuthResponseDTO(user, token);
+    }
+
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
         if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
             throw new InvalidInputException("Email or password is empty!");
         }
-        Optional<Account> userOptional = accountRepos.findByEmail(loginDTO.getEmail());
-        Account user = userOptional.get();
-        if(userOptional.isEmpty()){
-            throw new InvalidInputException("invalid email or password!");
+
+        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
+
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException ("Invalid email or password");
         }
 
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(loginDTO.getEmail());
-        Authentication authentication = authenticationManager.authenticate(
-               new  UsernamePasswordAuthenticationToken(userDetails, loginDTO.getPassword(), userDetails.getAuthorities())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtGenerator.generateToken(authentication);
+        Account user = userOptional.get();
+        if (user.isRequire2fa()) {
+            try {
+                request2fa(user);
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+            return AuthResponseDTO.builder().redirect2fa(true).build();
+        }
 
-
-        return AuthResponseDTO
-                .builder()
-                .id(user.getAccountId())
-                .accessToken(token)
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .status(user.getStatus())
-                .build();
+        return forceLogin(user);
     }
 
     @Override
@@ -203,11 +244,6 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public String forgotPassword(String email) {
-        return "";
-    }
-
-    @Override
     public AuthResponseDTO loginWithGoogle(String token) {
         String email = jwtGenerator.getEmailFromToken(token);
         Optional<Account> userOptional = accountRepos.findByEmail(email);
@@ -225,7 +261,6 @@ public class AuthServiceImpl implements AuthService{
         return new AuthResponseDTO(user, token);
     }
 
-
     @Override
     public boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
         Account a = accountRepos.findById(id)
@@ -241,16 +276,6 @@ public class AuthServiceImpl implements AuthService{
         a.setPassword(changePasswordDTO.getNewPassword());
         accountRepos.save(a);
         return true;
-    }
-
-    @Override
-    public boolean uploadAvatar(String email, MultipartFile file) throws IllegalAccessException {
-        Account a = accountRepos.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", email));
-        // Save the file to the server
-        // a.setAvatarUrl("http://localhost:8080/avatars/" + file.getOriginalFilename());
-        accountRepos.save(a);
-        return false;
     }
 
     @Override
@@ -362,5 +387,17 @@ public class AuthServiceImpl implements AuthService{
         activationCodeCache.remove(activateCode);
         logger.info("Activated account {} with code {} successfully", id, activateCode);
         return true;
+    }
+
+    @Override
+    public AuthResponseDTO confirm2fa(@NotNull String activateCode) {
+        Integer id = verify2faCache.get(activateCode);
+        if (id == null)
+            return null;
+        Account acc = accountRepos.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
+        verify2faCache.remove(activateCode);
+        logger.info("Verified 2FA for account {} with code {} successfully", id, activateCode);
+        return forceLogin(acc);
     }
 }

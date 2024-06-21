@@ -132,4 +132,13 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/verify-2fa/")
+    public ResponseEntity<AuthResponseDTO> verify2fa(@RequestParam String code) {
+        AuthResponseDTO authResponseDTO = authService.confirm2fa(code);
+        if (authResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok(authResponseDTO);
+    }
+
 }

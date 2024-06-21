@@ -70,6 +70,7 @@ import { BlogList } from "./pages/CustomerSite/Blog/BlogList.tsx";
 import { BlogPostList } from "./pages/Administration/Blog/BlogPostList.tsx";
 import { BlogPostDetail } from "./pages/Administration/Blog/BlogPostDetail.tsx";
 import { BlogDetail } from "./pages/CustomerSite/Blog/BlogDetail.tsx";
+import TwoFactorAuthForm from "@/pages/authentication/TwoFactorAuthForm.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -179,6 +180,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="forgot-password" element={<ForgotPasswordForm />}></Route>
                     <Route path="reset-password" element={<ResetPasswordForm />}></Route>
                     <Route path="activate" element={<ActivationForm />}></Route>
+                    <Route path="verify-2fa" element={<TwoFactorAuthForm />}></Route>
                   </Route>
 
                   <Route path="/unauthorized" element={<ErrorPage />} />

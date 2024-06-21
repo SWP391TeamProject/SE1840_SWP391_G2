@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.security.UserPrincipal;
@@ -13,6 +14,7 @@ import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -91,8 +93,25 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         accountDTO.setAccountId(id);
+        /*
+            NOTE: Các trường có thể cập nhật
+            - Nickname, Phone
+            - Yêu cầu role ADMIN: role, status, balance
+
+            Cập nhật dùng endpoint riêng:
+            - Avatar
+            - Password
+            - 2FA
+        */
         JwtUser jwtUser = Authorizer.expectAdminOrUserId(principal, id);
         return new ResponseEntity<>(accountService.updateAccount(accountDTO, jwtUser.getRole()), HttpStatus.OK);
+    }
+
+    @PostMapping("/change-2fa/{id}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    public ResponseEntity<?> change2fa(@RequestBody TwoFactorAuthChangeDTO dto, @PathVariable int id) {
+        accountService.change2fa(id, dto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/avatar/{id}")

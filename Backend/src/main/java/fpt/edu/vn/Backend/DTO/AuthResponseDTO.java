@@ -25,6 +25,7 @@ public class AuthResponseDTO {
     private String address;
     private Account.Status status;
     private BigDecimal balance;
+    private boolean redirect2fa;
 
     public AuthResponseDTO(Account account, String accessToken) {
         Random random = new Random();

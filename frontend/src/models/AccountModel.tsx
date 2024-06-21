@@ -5,6 +5,7 @@ export interface Account {
   // username: string;
   email: string;
   nickname: string;
+  require2fa: boolean;
   phone: string;
   avatar?: {
     link?: string
