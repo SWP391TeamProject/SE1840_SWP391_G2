@@ -1,4 +1,5 @@
 import CountDownTime from "@/components/countdownTimer/CountDownTime";
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AuctionSessionStatus } from "@/models/newModel/auctionSession";
@@ -14,7 +15,7 @@ export default function AuctionList() {
   const dispatch = useAppDispatch();
   const date = new Date();
 
-  const { isPending, isError, data, error } = useQuery({
+  const {isLoading, isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
     queryFn: () => fetchActiveAuctionSessions(auctionSessionList.currentPageNumber, 10),
   });
@@ -41,9 +42,12 @@ export default function AuctionList() {
   }, [data]);
 
   if (isPending) {
-    return <span>Loading...</span>
+    return <LoadingAnimation/>
   }
 
+  if(isLoading){
+    return <LoadingAnimation/>
+  }
   if (isError) {
     return <span>Error: {error.message}</span>
   }

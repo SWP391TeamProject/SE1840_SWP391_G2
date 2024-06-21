@@ -32,8 +32,8 @@ import Footer from "../../../components/footer/Footer";
 
 export function LandingPage() {
   return (
-    <div key="1" className="flex flex-col min-h-[100dvh] bg-background text-foreground">
-      <main className="flex flex-col gap-y-16 md:gap-y-32">
+    <div key="1" className="flex flex-col min-h-dvh bg-background text-foreground">
+      <main className="flex flex-col gap-y-10 md:gap-y-10">
         {/* Start Carouesel Sections */}
         <LandingPageCarousel />
         {/* End Carousel Section */}
