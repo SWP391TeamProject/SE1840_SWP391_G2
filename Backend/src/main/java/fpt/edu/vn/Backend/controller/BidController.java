@@ -72,6 +72,11 @@ public class BidController {
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
             log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
 
+            if(bidDTO.getPayment().getAccountId() == bidService.getHighestBid(auctionItemId).getPayment().getAccountId()){
+                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),"Right now, you are the highest bidder.\n" +
+                        "Hold off until someone outbids you.",null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+            }
+
             if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
                 bidDTO = bidService.createBid(bidDTO);
                 AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
