@@ -68,7 +68,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
