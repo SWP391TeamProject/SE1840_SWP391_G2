@@ -34,7 +34,7 @@ export default function NavBar() {
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground ">
+      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground dark:shadow-gray-600">
         <Link className="flex items-center justify-center" to="/">
         <div className="flex items-center justify-center gap-2">
             <img src={logo} className="w-8 h-8" alt="logo" />

@@ -87,16 +87,16 @@ export default function AuctionSession() {
         let fee = Number.MAX_VALUE;
         if (auctionSession?.auctionItems) {
             auctionSession.auctionItems.forEach((item: any) => {
-                if(item.itemDTO.reservePrice < fee){
+                if (item.itemDTO.reservePrice < fee) {
                     fee = item.itemDTO.reservePrice;
                 }
             });
         }
         fee = fee * 0.045;
-        if(fee<100){
+        if (fee < 100) {
             fee = 100;
         }
-        if(fee>1000){
+        if (fee > 1000) {
             fee = 1000;
         }
         return (
@@ -127,16 +127,16 @@ export default function AuctionSession() {
         let fee = Number.MAX_VALUE;
         if (auctionSession?.auctionItems) {
             auctionSession.auctionItems.forEach((item: any) => {
-                if(item.itemDTO.reservePrice < fee){
+                if (item.itemDTO.reservePrice < fee) {
                     fee = item.itemDTO.reservePrice;
                 }
             });
         }
         fee = fee * 0.045;
-        if(fee<100){
+        if (fee < 100) {
             fee = 100;
         }
-        if(fee>1000){
+        if (fee > 1000) {
             fee = 1000;
         }
         return (
@@ -179,20 +179,30 @@ export default function AuctionSession() {
                                 <div className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-sm font-medium dark:bg-gray-700">
                                     <ClockIcon className="h-5 w-5" />
 
-                                    {auctionSession?.status===AuctionSessionStatus.PROGRESSING &&
-                                    <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
-                                    
-                                    {auctionSession?.status===AuctionSessionStatus.SCHEDULED &&
-                                    <span>Start in {auctionSession?.startDate ? <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+                                    {auctionSession?.status === AuctionSessionStatus.PROGRESSING && new Date(auctionSession?.endDate) > new Date() &&
+                                        <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+
+                                    {auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) <= new Date() &&
+                                        <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                                            Auction Ended
+                                        </div>}
+
+                                    {auctionSession?.status === AuctionSessionStatus.TERMINATED &&
+                                        <div className="text-red-500 dark:text-red-400 font-semibold">
+                                            Auction has been terminated
+                                        </div>}
+
+                                    {auctionSession?.status === AuctionSessionStatus.SCHEDULED &&
+                                        <span>Start in {auctionSession?.startDate ? <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
 
                                 </div>
 
 
                                 {bidders.includes(userId) ? (
-                                    auctionSession?.status===AuctionSessionStatus.PROGRESSING &&
+                                    auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
                                     <Button onClick={() => scrollTo({ top: (document.getElementById("auction-items")?.offsetTop), behavior: 'smooth' })}>Place Bid</Button>
                                 ) : (
-                                    auctionSession?.status===AuctionSessionStatus.SCHEDULED &&
+                                    auctionSession?.status === AuctionSessionStatus.SCHEDULED &&
                                     <ConfirmRegister></ConfirmRegister>
                                 )}
 

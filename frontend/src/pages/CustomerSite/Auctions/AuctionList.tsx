@@ -1,11 +1,12 @@
 import CountDownTime from "@/components/countdownTimer/CountDownTime";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AuctionSessionStatus } from "@/models/newModel/auctionSession";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService";
 import { useQuery } from "@tanstack/react-query";
-import  { useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function AuctionList() {
@@ -27,7 +28,7 @@ export default function AuctionList() {
   }
 
   useEffect(() => {
-    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}))
+    dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }))
   }, [])
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function AuctionList() {
     if (data) {
       console.log('data', data);
       dispatch(setAuctionSessions(data?.data.content));
-      dispatch(setCurrentPageNumber({pageNumber: data?.data.number, totalPages: data?.data.totalPages}));
+      dispatch(setCurrentPageNumber({ pageNumber: data?.data.number, totalPages: data?.data.totalPages }));
     }
   }, [data]);
 
@@ -81,9 +82,20 @@ export default function AuctionList() {
                     </div>
                     <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <div className="text-sm font-medium">
-                        {session.endDate ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> : <CountDownTime end={date}></CountDownTime>}
-                      </div>
+
+                      {session?.status === AuctionSessionStatus.TERMINATED ?
+                        <div className="text-red-500 dark:text-red-400 font-semibold">
+                          Auction has been terminated
+                        </div> :
+                        <div className="text-sm font-medium">
+                          {session.endDate && new Date(session.endDate) > date
+                            ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> :
+                            <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                              Auction Ended
+                            </div>
+                          }
+                        </div>
+                      }
                     </div>
                     <Button variant={"default"} asChild>
                       <Link
