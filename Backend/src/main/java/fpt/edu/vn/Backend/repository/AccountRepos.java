@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.pojo.Account;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,6 @@ public interface AccountRepos extends JpaRepository<Account, Integer> {
     Page<Account> findByNicknameContainingOrEmailContaining(String name, Pageable pageable);
 
     Optional<Account> findByAccountId(int accountId);
+
+    Optional<Account> findByAccountIdAndPassword(int accountId, String password);
 }

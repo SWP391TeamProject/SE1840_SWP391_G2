@@ -33,6 +33,7 @@ const initialUser: Account = {
     createDate: undefined,
     email: "",
     nickname: "Guest",
+    require2fa: false,
     phone: "",
     role: Roles.GUEST,
     status: AccountStatus.ACTIVE,

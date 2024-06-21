@@ -13,12 +13,12 @@ import {
 import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/AuthProvider.tsx";
-import { SubmitHandler, useForm } from "react-hook-form";
+import {Controller, SubmitHandler, useForm} from "react-hook-form";
 import { API_SERVER } from "@/constants/domain.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
-import { getCookie } from "@/utils/cookies";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -29,9 +29,14 @@ type ProfileDetails = {
   phone: string;
 }
 
+type TwoFactorAuth = {
+  enable2fa: boolean;
+  currentPassword: string;
+}
+
 const ProfileDetail = () => {
   const auth = useAuth();
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string>();
   const {
     register: profileAvatarForm,
@@ -48,6 +53,17 @@ const ProfileDetail = () => {
     defaultValues: {
       nickname: auth.user.nickname,
       phone: auth.user.phone
+    }
+  });
+  const {
+    register: twoFactorAuthForm,
+    handleSubmit: handleTwoFactorAuthForm,
+    reset: resetTwoFactorAuthForm,
+    control: controlTwoFactorAuth
+  } = useForm<TwoFactorAuth>({
+    defaultValues: {
+      enable2fa: auth.user.require2fa,
+      currentPassword: ""
     }
   });
 
@@ -71,14 +87,13 @@ const ProfileDetail = () => {
 
   const onSubmitProfileAvatar: SubmitHandler<ProfileAvatar> = (data) => {
     if (data.files === undefined) return;
-    setisLoading(true);
+    setIsLoading(true);
     const formData = new FormData();
     formData.append("file", data.files[0]);
     axios.post<any>(API_SERVER + "/accounts/avatar/" + auth.user.accountId, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-          
-        "Authorization": "Bearer " +JSON.parse(getCookie("user")).accessToken || "",
+        "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then((res) => {
         auth.setUser({
@@ -86,22 +101,21 @@ const ProfileDetail = () => {
           avatar: res.data
         });
         toast.success('Update avatar successfully!');
-        setisLoading(false);
+        setIsLoading(false);
       })
       .catch((err) => {
         console.log(err);
         toast.error('Update avatar failed!');
-        setisLoading(false);
+        setIsLoading(false);
       })
   };
 
   const onSubmitProfileDetails: SubmitHandler<ProfileDetails> = (data) => {
-    setisLoading(true);
+    setIsLoading(true);
     axios.put<any>(API_SERVER + "/accounts/" + auth.user.accountId, data, {
       headers: {
         "Content-Type": "application/json",
-          
-        "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(() => {
         auth.setUser({
@@ -109,12 +123,41 @@ const ProfileDetail = () => {
           ...data
         });
         toast.success('Update details successfully!');
-        setisLoading(false);
+        setIsLoading(false);
       }).catch((err) => {
         console.log(err);
         toast.error('Update details failed!');
-        setisLoading(false);
+        setIsLoading(false);
       })
+  };
+
+  const onSubmitTwoFactorAuth: SubmitHandler<TwoFactorAuth> = (data) => {
+    if (data.enable2fa === auth.user.require2fa) {
+      toast.warning("Settings stay unchanged!");
+      return;
+    }
+    setIsLoading(true);
+    axios.post<any>(API_SERVER + "/accounts/change-2fa/" + auth.user.accountId, data, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + auth.user.accessToken,
+      },
+    }).then(() => {
+      toast.success('Changed 2FA settings successfully!');
+      setIsLoading(false);
+      resetTwoFactorAuthForm({
+        enable2fa: data.enable2fa,
+        currentPassword: ""
+      });
+    }).catch((err) => {
+      console.log(err);
+      toast.error('Changed 2FA settings failed!');
+      setIsLoading(false);
+      resetTwoFactorAuthForm({
+        enable2fa: auth.user.require2fa,
+        currentPassword: ""
+      });
+    })
   };
 
   return (
@@ -213,25 +256,59 @@ const ProfileDetail = () => {
 
 
         {/* insert change password below here */}
-        <ChangePassword isLoading={isLoading} setIsLoading={setisLoading} />
+        <ChangePassword isLoading={isLoading} setIsLoading={setIsLoading} />
 
         <Card>
-          <CardHeader>
-            <CardTitle>Two-factor Authentication</CardTitle>
-            <CardDescription>
-              Enable or disable two-factor authentication.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Label>Two-factor Authentication</Label>
-            <div className="flex items-center gap-4">
-              <input type="checkbox" />
-              <span>Enable two-factor authentication</span>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button>Save</Button>
-          </CardFooter>
+          <form
+            onSubmit={handleTwoFactorAuthForm(onSubmitTwoFactorAuth)}>
+            <CardHeader>
+              <CardTitle>Two-factor Authentication</CardTitle>
+              <CardDescription>
+                Enable or disable two-factor authentication.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                <div className="flex gap-2">
+                  <Controller
+                  control={controlTwoFactorAuth}
+                  name="enable2fa"
+                  render={({ field }) => (
+                    <Checkbox
+                      id="enable2fa"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+                  <Label htmlFor="enable2fa">Enable two-factor authentication</Label>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password2fa">Current password</Label>
+                  <Input
+                    id="password2fa"
+                    type="password"
+                    {...twoFactorAuthForm("currentPassword")}
+                    required
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <div className="flex gap-4">
+                {isLoading
+                  ?
+                  <Button disabled >
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </Button>
+                  : <Button
+                    type="submit"
+                  >Save</Button>}
+              </div>
+            </CardFooter>
+          </form>
         </Card>
 
         <Card>

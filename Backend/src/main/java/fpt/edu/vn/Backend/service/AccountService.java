@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +31,5 @@ public interface AccountService {
     @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole);
 
     @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file);
-
-
+    void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto);
 }

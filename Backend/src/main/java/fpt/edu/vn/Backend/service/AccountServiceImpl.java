@@ -3,16 +3,22 @@ package fpt.edu.vn.Backend.service;
 import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,13 +28,17 @@ import java.util.Set;
 @Service
 public class AccountServiceImpl implements AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
+    @Value("${app.email}")
+    private String systemEmail;
     private final AccountRepos accountRepos;
     private final AttachmentServiceImpl attachmentServiceImpl;
+    private final JavaMailSender mailSender;
 
     @Autowired
-    public AccountServiceImpl(AccountRepos accountRepos, AttachmentServiceImpl attachmentServiceImpl) {
+    public AccountServiceImpl(AccountRepos accountRepos, AttachmentServiceImpl attachmentServiceImpl, JavaMailSender mailSender) {
         this.accountRepos = accountRepos;
         this.attachmentServiceImpl = attachmentServiceImpl;
+        this.mailSender = mailSender;
     }
 
     @Override
@@ -47,6 +57,7 @@ public class AccountServiceImpl implements AccountService {
         // accountDTO.setPassword(account.getPassword()); // DO NOT RETURN PASSWORD
         accountDTO.setCreateDate(account.getCreateDate());
         accountDTO.setUpdateDate(account.getUpdateDate());
+        accountDTO.setRequire2fa(account.isRequire2fa());
         return accountDTO;
     }
 
@@ -134,5 +145,35 @@ public class AccountServiceImpl implements AccountService {
         } catch (IOException e) {
             throw new ResourceNotFoundException("Account", "accountId", accountId);
         }
+    }
+
+    @Override
+    public void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto) {
+        Account a = accountRepos.findByAccountIdAndPassword(id, dto.getCurrentPassword())
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
+        a.setRequire2fa(dto.isEnable2fa());
+        accountRepos.save(a);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+            helper.setFrom(systemEmail);
+            helper.setTo(a.getEmail());
+            helper.setSubject("[Biddify] Security Warning");
+            if (a.isRequire2fa()) {
+                helper.setText("""
+                        <p>Two-factor authentication has been enabled for your account.</p>
+                        <p>Contact us immediately if the request is not initiated by you.</p>
+                        <p>- Biddify</p>
+                        """, true);
+            } else {
+                helper.setText("""
+                        <p>Two-factor authentication has been disabled for your account.</p>
+                        <p>Contact us immediately if the request is not initiated by you.</p>
+                        <p>- Biddify</p>
+                        """, true);
+            }
+            mailSender.send(message);
+        } catch (MessagingException ignored) {}
     }
 }

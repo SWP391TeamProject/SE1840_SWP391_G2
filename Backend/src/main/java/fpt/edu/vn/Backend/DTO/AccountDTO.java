@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class AccountDTO {
     private Integer accountId;
     private String nickname;
+    private boolean require2fa;
     private Account.Role role;
     private AttachmentDTO avatar;
     private String email;
@@ -27,6 +28,7 @@ public class AccountDTO {
     public AccountDTO(Account account) {
         this.accountId = account.getAccountId();
         this.nickname = account.getNickname();
+        this.require2fa = account.isRequire2fa();
         this.role = account.getRole();
         this.avatar = account.getAvatarUrl()==null? null : new AttachmentDTO(account.getAvatarUrl());
         this.email = account.getEmail();
