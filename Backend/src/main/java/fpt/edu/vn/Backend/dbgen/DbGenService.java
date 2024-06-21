@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
+import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.math3.util.Pair;
@@ -69,6 +70,9 @@ public class DbGenService {
     @Autowired
     private NotificationRepos notificationRepos;
 
+    @Autowired
+    private PasswordEncoderConfig passwordEncoderConfig;
+
     public void generate() throws IOException {
         DATA = new File("../gendb/output");
         if (!DATA.exists())
@@ -128,7 +132,7 @@ public class DbGenService {
             account.setRole(Account.Role.valueOf(obj.get("role").getAsString()));
             account.setEmail(obj.get("email").getAsString());
             account.setPhone(obj.get("phone").getAsString());
-            account.setPassword(obj.get("password").getAsString());
+            account.setPassword(passwordEncoderConfig.bcryptEncoder().encode(obj.get("password").getAsString()));
             account.setStatus(Account.Status.valueOf(obj.get("status").getAsString()));
             account.setBalance(obj.get("balance").getAsBigDecimal());
             account.setCreateDate(parseDate(obj.get("createDate").getAsString()));

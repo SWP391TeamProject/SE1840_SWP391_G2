@@ -156,6 +156,12 @@
     </dependencies>
 	<profiles>
 		<profile>
+			<id>local</id>
+			<properties>
+				<active.profile>local</active.profile>
+			</properties>
+		</profile>
+		<profile>
 			<id>test</id>
 			<properties>
 				<active.profile>test</active.profile>

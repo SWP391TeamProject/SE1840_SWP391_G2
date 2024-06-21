@@ -230,7 +230,7 @@ public class AuthServiceImpl implements AuthService{
     public boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
         Account a = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id));
-        if (!passwordEncoder.bcryptEncoder().matches(a.getPassword(),changePasswordDTO.getOldPassword()))
+        if (!passwordEncoder.bcryptEncoder().matches(changePasswordDTO.getOldPassword(),a.getPassword()))
             throw new InvalidInputException("Old password is incorrect!");
         if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword()))
             throw new InvalidInputException("New password and confirm password do not match!");
