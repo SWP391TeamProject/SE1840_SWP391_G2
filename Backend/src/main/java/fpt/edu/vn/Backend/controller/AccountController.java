@@ -3,8 +3,12 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
+import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.oauth2.security.UserPrincipal;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.CurrentUser;
 import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,7 +36,8 @@ import java.util.Set;
 @Slf4j
 public class AccountController {
     private final AccountService accountService;
-
+    @Autowired
+    private AccountRepos accountRepos;
     @Autowired
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
@@ -64,6 +69,13 @@ public class AccountController {
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/me")
+    @PreAuthorize("hasRole('USER')")
+    public Account getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
+        return accountRepos.findByEmail(userPrincipal.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userPrincipal.getEmail()));
     }
 
     @PostMapping("/")
