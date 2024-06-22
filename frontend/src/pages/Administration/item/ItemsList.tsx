@@ -210,19 +210,19 @@ export default function ItemsList() {
                   <TableRow>
                     <TableHead>Id</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Price
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Status
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Description
                     </TableHead>
-                    {/* <TableHead className="hidden md:table-cell">
+                    {/* <TableHead className="md:table-cell">
                       Status
                     </TableHead> */}
-                    {/* <TableHead className="hidden md:table-cell">
+                    {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
                     <TableHead>
@@ -239,21 +239,21 @@ export default function ItemsList() {
                       {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {item.name}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {item.buyInPrice}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {item.status}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                           <div dangerouslySetInnerHTML={{__html: item.description}}></div>
                             
                        
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
                         <Badge variant="default" className="bg-green-500">{ItemsetCurrentItemStatus[item.status]}</Badge> : 
                         <Badge variant="destructive">{ItemsetCurrentItemStatus[item.status]}</Badge>} */}

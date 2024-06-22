@@ -180,22 +180,22 @@ export default function ConsignmentList() {
                                     <TableRow>
                                         <TableHead>Id</TableHead>
                                         <TableHead>preferContact</TableHead>
-                                        <TableHead className="hidden md:table-cell">
+                                        <TableHead className="md:table-cell">
                                             create Date
                                         </TableHead>
-                                        <TableHead className="hidden md:table-cell">
+                                        <TableHead className="md:table-cell">
                                             Assigned Staff
                                         </TableHead>
-                                        <TableHead className="hidden md:table-cell">
+                                        <TableHead className="md:table-cell">
                                             Phone
                                         </TableHead>
-                                        <TableHead className="hidden md:table-cell">
+                                        <TableHead className="md:table-cell">
                                             Status
                                         </TableHead>
-                                        {/* <TableHead className="hidden md:table-cell">
+                                        {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                                        <TableHead className="hidden md:table-cell">
+                                        <TableHead className="md:table-cell">
                                             Action
                                         </TableHead>
                                         <TableHead>
@@ -212,7 +212,7 @@ export default function ConsignmentList() {
                                             {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                                            <TableCell className="hidden md:table-cell">
+                                            <TableCell className="md:table-cell">
                                                 {(() => {
                                                     switch (consignment.preferContact) {
                                                         case ConsignmentContactPreference.EMAIL:
@@ -226,13 +226,13 @@ export default function ConsignmentList() {
                                                     }
                                                 })()}
                                             </TableCell>
-                                            <TableCell className="hidden md:table-cell">
+                                            <TableCell className="md:table-cell">
                                                 {new Date(consignment.createDate).toLocaleDateString('en-US')}
                                             </TableCell>
-                                            <TableCell className="hidden md:table-cell">
+                                            <TableCell className="md:table-cell">
                                                 {consignment.staff ? consignment.staff.nickname : "Not assigned"}
                                             </TableCell>
-                                            <TableCell className="hidden md:table-cell">
+                                            <TableCell className="md:table-cell">
                                                 {consignment.staffId}
                                             </TableCell>
                                             <TableCell>
