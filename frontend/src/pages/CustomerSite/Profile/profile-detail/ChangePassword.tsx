@@ -13,10 +13,10 @@ import { Loader2 } from "lucide-react";
 const formSchema = z.object({
     oldPassword: z.string({
         message: "Old password is required",
-    }).min(8).max(50),
+    }).min(8, "Old password must contain at leats 8 characters").max(50, "Old password must contain at most 50 characters"),
     newPassword: z.string({
         message: "New password is required",
-    }).min(8).max(50),
+    }).min(8, "New password must contain at leats 8 characters").max(50, "New password must contain at most 50 characters"),
     confirmPassword: z.string(),
 }).superRefine((data, ctx) => {
     if (data.oldPassword === data.newPassword) {
