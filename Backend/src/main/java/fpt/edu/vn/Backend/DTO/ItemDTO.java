@@ -41,5 +41,8 @@ public class ItemDTO {
         this.owner = new AccountDTO(item.getOwner());
         this.orderId = item.getOrder()==null?null:item.getOrder().getOrderId();
         this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
+        if(owner!=null){
+            owner.setPassword(null);
+        }
     }
 }
