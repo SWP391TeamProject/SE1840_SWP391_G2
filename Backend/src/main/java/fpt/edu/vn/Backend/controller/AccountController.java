@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
@@ -54,6 +55,10 @@ public class AccountController {
             return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
+    }
+    @GetMapping("/monthly/{year}")
+    public List<MonthlyBalanceDTO> getMonthlyBalances(@PathVariable int year) {
+        return accountService.getMonthlyBalances(year);
     }
 
     @GetMapping("/search/{name}")
