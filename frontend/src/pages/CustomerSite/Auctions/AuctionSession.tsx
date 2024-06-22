@@ -224,8 +224,8 @@ export default function AuctionSession() {
                     <div id='auction-items'>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item, index) => (
-                                <Card key={index}>
+                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => (
+                                <Card key={item.id.itemId}>
                                     <img
                                         src={item.itemDTO.attachments[0].link}
                                         width={300}
@@ -237,14 +237,25 @@ export default function AuctionSession() {
                                         <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
                                         <div className="flex items-center justify-between">
                                             <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
-                                            {bidders.includes(userId) ? (
-                                                <Button onClick={() => {
-                                                    let name = item?.itemDTO.name;
-                                                    navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO } });
-                                                }}>Place Bid</Button>
-                                            ) : (
-                                                <RegisterAlert></RegisterAlert>
-                                            )}
+
+                                            {
+                                                auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
+                                                    <div className="rounded-md bg-yellow-300 p-2 text-red-500">
+                                                        Won: {currencyFormatter.format(item.currentPrice)}
+                                                    </div> :
+                                                    <>
+                                                        {bidders.includes(userId) ? (
+                                                            <Button onClick={() => {
+                                                                let name = item?.itemDTO.name;
+                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO } });
+                                                            }}>Place Bid</Button>
+                                                        ) : (
+                                                            <RegisterAlert></RegisterAlert>
+                                                        )}
+                                                    </>
+
+                                            }
+
                                             {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
                                         </div>
                                     </CardContent>
