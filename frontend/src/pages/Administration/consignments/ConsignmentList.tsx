@@ -167,7 +167,7 @@ export default function ConsignmentList() {
                             <CardTitle className="flex justify-between items-center">
                                 Consignments
                                 <div className="w-full basis-1/2">
-                                    <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} size={10} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                                    <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                                 </div>
                             </CardTitle>
                             <CardDescription>

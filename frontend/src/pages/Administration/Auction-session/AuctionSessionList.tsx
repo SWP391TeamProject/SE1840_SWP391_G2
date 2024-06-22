@@ -192,7 +192,7 @@ export default function AuctionSessionList() {
               <CardTitle className="flex justify-between items-center">
                 AuctionSessions
                 <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                 </div>
               </CardTitle>
               

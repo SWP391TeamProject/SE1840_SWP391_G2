@@ -197,7 +197,7 @@ export default function ItemsList() {
               <CardTitle className="flex justify-between items-center">
                 Items
                 <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                 </div>
               </CardTitle>
               <CardDescription>

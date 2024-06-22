@@ -2,7 +2,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, Pagi
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 
-export default function PagingIndexes(props: any) {
+export default function PagingIndexes(props: {pageNumber: number, totalPages: number, pageSelectCallback: any}) {
   const indexButtons = [];
 
   const loadIndexButtons = () => {

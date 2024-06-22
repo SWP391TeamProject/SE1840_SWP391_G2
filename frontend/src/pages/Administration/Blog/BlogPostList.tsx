@@ -157,7 +157,7 @@ export const BlogPostList = () => {
               <CardTitle className="flex justify-between items-center">
                 Blogs
                 <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} size={10} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                 </div>
               </CardTitle>
               <CardDescription>

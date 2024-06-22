@@ -33,6 +33,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {useAppDispatch, useAppSelector} from "@/redux/hooks";
 import {
     setCurrentPageList,
+    setCurrentPageNumber,
     setNotifications
 } from "@/redux/reducers/Notifications";
 import {
@@ -44,6 +45,7 @@ import {MoreHorizontal} from "lucide-react";
 import {
     decreaseUnreadNotificationCount
 } from "@/redux/reducers/UnreadNotificationCountReducer.ts";
+import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function NotificationsList() {
     const notificationsList = useAppSelector((state) => state.notifications);
@@ -55,6 +57,11 @@ export default function NotificationsList() {
             if (list) {
                 dispatch(setNotifications(list.data));
                 dispatch(setCurrentPageList(list.data.content));
+                // let paging: any = {
+                //     pageNumber: list.data.number,
+                //     totalPages: list.data.totalPages
+                // }
+                // dispatch(setCurrentPageNumber(paging));
             }
         } catch (error) {
             console.log(error);
@@ -70,6 +77,10 @@ export default function NotificationsList() {
         } catch (error) {
             console.log(error);
         }
+    }
+
+    const handlePageSelect = (pageNumber: number) => {
+        fetchAllNotifications(pageNumber);
     }
 
     useEffect(() => {
@@ -146,27 +157,7 @@ export default function NotificationsList() {
                                 </TableBody>
                             </Table>
                             <div className="flex justify-center mt-6">
-                                <Pagination>
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <PaginationPrevious href="#"
-                                                                onClick={() => fetchAllNotifications(notificationsList.currentPageNumber - 1, notificationsList.pageSize)}/>
-                                        </PaginationItem>
-                                        {[...Array(notificationsList.totalPages)].map((_, index) => (
-                                            <PaginationItem key={index}>
-                                                <PaginationLink href="#"
-                                                                isActive={index === notificationsList.currentPageNumber}
-                                                                onClick={() => fetchAllNotifications(index, notificationsList.pageSize)}>
-                                                    {index + 1}
-                                                </PaginationLink>
-                                            </PaginationItem>
-                                        ))}
-                                        <PaginationItem>
-                                            <PaginationNext href="#"
-                                                            onClick={() => fetchAllNotifications(notificationsList.currentPageNumber + 1, notificationsList.pageSize)}/>
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
+                                <PagingIndexes pageNumber={notificationsList.currentPageNumber ? notificationsList.currentPageNumber : 0} totalPages={notificationsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                             </div>
                         </CardContent>
                         <CardFooter></CardFooter>
