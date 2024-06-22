@@ -27,13 +27,12 @@ public interface AccountService {
 
     @Nullable AccountDTO getAccountById(int accountId);
     @Nullable AccountDTO getAccountByEmail(@NotNull String email);
-    @Nullable AccountDTO getAccountByEmailAndPassword(@NotNull String email, @NotNull String password);
 
     @NotNull AccountDTO createAccount(@NotNull AccountDTO account);
     @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole);
 
     @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file);
-    void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto);
+    void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto) throws IllegalAccessException;
 
     List<MonthlyBalanceDTO> getMonthlyBalances(int year);
 

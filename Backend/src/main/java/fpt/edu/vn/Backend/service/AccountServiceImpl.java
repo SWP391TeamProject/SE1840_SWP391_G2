@@ -8,6 +8,7 @@ import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.jetbrains.annotations.NotNull;
@@ -39,12 +40,14 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepos accountRepos;
     private final AttachmentServiceImpl attachmentServiceImpl;
     private final JavaMailSender mailSender;
+    private final PasswordEncoderConfig passwordEncoder;
 
     @Autowired
-    public AccountServiceImpl(AccountRepos accountRepos, AttachmentServiceImpl attachmentServiceImpl, JavaMailSender mailSender) {
+    public AccountServiceImpl(AccountRepos accountRepos, AttachmentServiceImpl attachmentServiceImpl, JavaMailSender mailSender, PasswordEncoderConfig passwordEncoder) {
         this.accountRepos = accountRepos;
         this.attachmentServiceImpl = attachmentServiceImpl;
         this.mailSender = mailSender;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -118,11 +121,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public @Nullable AccountDTO getAccountByEmailAndPassword(@NotNull String email, @NotNull String password) {
-        return accountRepos.findByEmailAndPassword(email, password).map(this::mapEntityToDTO).orElse(null);
-    }
-
-    @Override
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
         Account a = new Account();
         // avatar dùng method riêng
@@ -132,7 +130,7 @@ public class AccountServiceImpl implements AccountService {
         a.setEmail(account.getEmail());
         a.setPhone(account.getPhone());
         a.setStatus(Account.Status.ACTIVE);
-        a.setPassword(account.getPassword());
+        a.setPassword(passwordEncoder.bcryptEncoder().encode(account.getPassword()));
         return mapEntityToDTO(accountRepos.save(a));
     }
 
@@ -154,9 +152,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto) {
-        Account a = accountRepos.findByAccountIdAndPassword(id, dto.getCurrentPassword())
+    public void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto) throws IllegalAccessException {
+        Account a = accountRepos.findByAccountId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
+        if (!passwordEncoder.bcryptEncoder().matches(dto.getCurrentPassword(), a.getPassword()))
+            throw new IllegalAccessException("Wrong password");
         a.setRequire2fa(dto.isEnable2fa());
         accountRepos.save(a);
 

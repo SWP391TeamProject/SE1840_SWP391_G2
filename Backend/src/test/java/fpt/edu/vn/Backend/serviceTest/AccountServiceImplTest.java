@@ -205,32 +205,4 @@ public class AccountServiceImplTest {
         when(accountRepos.findByEmail("invalid@test.com")).thenReturn(Optional.empty());
         assertNull(accountService.getAccountByEmail("invalid@test.com"));
     }
-
-    @Test
-    @DisplayName("Should return account when valid email and password are provided")
-    public void shouldReturnAccountWhenValidEmailAndPasswordAreProvided() {
-        Account account = new Account();
-        account.setEmail("test@test.com");
-        account.setPassword("password");
-        account.setRole(Account.Role.STAFF);
-        when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
-
-        AccountDTO result = accountService.getAccountByEmailAndPassword("test@test.com", "password");
-
-        assertNotNull(result);
-        assertEquals("test@test.com", result.getEmail());
-    }
-
-    @Test
-    @DisplayName("Should throw ResourceNotFoundException when invalid email or password are provided")
-    public void shouldThrowResourceNotFoundExceptionWhenInvalidEmailOrPasswordAreProvided() {
-        Account account = new Account();
-        account.setEmail("test@test.com");
-        account.setPassword("password");
-
-        when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
-
-        assertNull(accountService.getAccountByEmailAndPassword("invalid@test.com", "password"));
-        assertNull(accountService.getAccountByEmailAndPassword("test@test.com", "invalid"));
-    }
 }
