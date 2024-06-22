@@ -105,7 +105,7 @@ export default function ItemDetail() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           {currentItem?.name === undefined
-            ? <LoadingAnimation />
+            ? <LoadingAnimation message="loading item detail..." />
             : <div className="container flex flex-row flex-nowrap">
 
               <div className="basis-8/12 p-3 flex flex-col gap-3">
