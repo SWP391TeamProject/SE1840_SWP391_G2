@@ -14,6 +14,9 @@ public class BidResponse {
         this.bidId = bidId;
         this.account = account;
         this.price = price;
+        if(account != null){
+            this.account.setPassword(null);
+        }
     }
 
 
