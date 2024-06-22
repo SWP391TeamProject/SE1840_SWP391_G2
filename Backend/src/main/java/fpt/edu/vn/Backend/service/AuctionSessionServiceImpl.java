@@ -80,7 +80,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         BigDecimal minPrice = new BigDecimal(100);
         BigDecimal maxPrice = new BigDecimal(1000);
         BigDecimal depositAmount = items.get(0).getReservePrice()
-                .multiply(new BigDecimal(4.5))
+                .multiply(new BigDecimal("4.5"))
                 .divide(new BigDecimal(100));
         if (depositAmount.compareTo(minPrice) < 0) {
             depositAmount = minPrice;
@@ -90,6 +90,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         items.sort(Comparator.comparing(Item::getReservePrice));
         if (a.getBalance().compareTo(items.get(0).getReservePrice()) >= 0) {
+            auctionSession.getDeposits().stream().filter(deposit -> deposit.getPayment().getAccount().getAccountId() == accountId)
+                    .findFirst().ifPresent(deposit -> {
+                throw new InvalidInputException("Account already registered for auction session");
+            });
             a.setBalance(a.getBalance().subtract(depositAmount));
             accountRepos.save(a);
             Payment payment = new Payment();
