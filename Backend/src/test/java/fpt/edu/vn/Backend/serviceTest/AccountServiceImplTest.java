@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import fpt.edu.vn.Backend.service.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,6 +32,9 @@ public class AccountServiceImplTest {
 
     @Mock
     private AccountRepos accountRepos;
+
+    @Mock
+    private PasswordEncoderConfig passwordEncoderConfig;
 
     @InjectMocks
     private AccountServiceImpl accountService;
@@ -120,6 +125,7 @@ public class AccountServiceImplTest {
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
         accountDTO.setRole(Account.Role.ADMIN);
+        accountDTO.setPassword("123456");
 
         Account account = new Account();
         account.setNickname(accountDTO.getNickname());
@@ -131,11 +137,12 @@ public class AccountServiceImplTest {
         account.setRole(Account.Role.ADMIN);
 
         when(accountRepos.save(any())).thenReturn(account);
+        when(passwordEncoderConfig.bcryptEncoder()).thenReturn(new BCryptPasswordEncoder(10));
 
-        //AccountDTO result = accountService.createAccount(accountDTO);
+        AccountDTO result = accountService.createAccount(accountDTO);
 
-        //assertNotNull(result);
-        //assertEquals("test@test.com", result.getEmail());
+        assertNotNull(result);
+        assertEquals("test@test.com", result.getEmail());
     }
 
     @Test
