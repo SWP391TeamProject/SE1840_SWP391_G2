@@ -30,20 +30,6 @@ export default function AuctionSession() {
     const userId = user == null ? -1 : user.id;
 
     useEffect(() => {
-
-        if (auctionSession == null) {
-            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
-                .then(res => {
-                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
-                    setSessionAttachments(res.data.attachments);
-                    toast.success("Auction Session Loaded");
-                })
-                .catch(err => {
-                    toast.error("Failed to load Auction Session");
-                    console.log(err);
-                })
-
-        }
         if (param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
@@ -57,8 +43,19 @@ export default function AuctionSession() {
                     console.log(err);
                 })
         }
-
-
+        else if (auctionSession == null) {
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
+                .then(res => {
+                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setSessionAttachments(res.data.attachments);
+                    toast.success("Auction Session Loaded");
+                })
+                .catch(err => {
+                    toast.error("Failed to load Auction Session");
+                    console.log(err);
+                })
+        }
+        
     }, []);
 
     useEffect(() => {
