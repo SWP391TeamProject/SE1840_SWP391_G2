@@ -38,7 +38,7 @@ export default function AboutScreen() {
     return (
         <>
             <div className="flex container">
-                <div className="p-3 basis-3/10">
+                <div className="p-3 basis-3/10 hidden md:flex flex-col">
                     <Sidebar
                         about={aboutPosition}
                         ourTeam={ourTeamPosition}
