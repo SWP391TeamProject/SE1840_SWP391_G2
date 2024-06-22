@@ -166,10 +166,7 @@ public class AuctionSessionController {
             log.error("Auction session has finished");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(auctionSessionService.getAuctionSessionById(id).getStatus().equals("PROGRESSING")){
-            log.error("Auction session is in progress");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+
         if(auctionSessionService.getAuctionSessionById(id).getDeposits().stream()
                 .anyMatch(depositDTO -> depositDTO.getPayment().getAccountId()==a.getAccountId())){
             log.error("Account has already registered for this auction session");
