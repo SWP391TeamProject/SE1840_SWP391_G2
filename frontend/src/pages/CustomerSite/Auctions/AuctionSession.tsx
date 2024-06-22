@@ -80,7 +80,7 @@ export default function AuctionSession() {
                 }
             });
             toast.success("Registered Successfully");
-        }).catch(() => { toast.error("Failed to Register") });
+        })
     }
     const ConfirmRegister = () => {
         let fee = Number.MAX_VALUE;
