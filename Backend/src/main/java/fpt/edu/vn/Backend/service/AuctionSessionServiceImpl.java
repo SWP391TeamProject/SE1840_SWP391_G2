@@ -179,8 +179,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         List<AccountDTO> accounts = new ArrayList<>();
         logger.info("Finishing auction session " + auctionSessionId);
-        if (auctionDTO.getStatus().equals("FINISHED")) {
-            logger.warn("Auction session " + auctionSessionId + " already finished");
+        if (auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")) {
+            logger.warn("Auction session " + auctionSessionId + " already ended");
             return;
         }
         for (AuctionItemDTO auctionItem : auctionDTO.getAuctionItems()) {
@@ -210,12 +210,25 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         auctionDTO.setStatus("FINISHED");
         try {
             Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
-            if (!optionalAuctionSession.isPresent()) {
+            if (optionalAuctionSession.isEmpty()) {
                 throw new ResourceNotFoundException("Auction session not found");
             }
 
 
             AuctionSession auctionSession = optionalAuctionSession.get();
+            for (Item item : auctionSession.getAuctionItems().stream().map(AuctionItem::getItem).toList()) {
+                auctionSession.getAuctionItems().stream()
+                        .filter(auctionItem -> Objects.equals(auctionItem.getItem().getItemId(), item.getItemId()))
+                        .findFirst().ifPresent(auctionItem -> {
+                    if(bidService.getBidsByAuctionItemId(auctionItem.getAuctionItemId()).isEmpty()){
+                        item.setStatus(Item.Status.QUEUE);
+                        itemRepos.save(item);
+                    }else {
+                        item.setStatus(Item.Status.SOLD);
+                        itemRepos.save(item);
+                    }
+                });
+            }
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
             auctionSession.setCreateDate(auctionDTO.getCreateDate());
