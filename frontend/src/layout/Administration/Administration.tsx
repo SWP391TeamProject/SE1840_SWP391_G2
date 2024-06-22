@@ -29,7 +29,7 @@ export const ConsignmentsContext = createContext([]);
 export default function Administration() {
     const [user, setUser] = React.useState<any>();
 
-    const [consignments, setConsignments] = useState([]);    
+    const [consignments, setConsignments] = useState([]);
     useEffect(() => {
         const userCookie = getCookie("user");
         if (userCookie) {
@@ -184,46 +184,54 @@ export default function Administration() {
                             <SheetContent side="left" className="sm:max-w-xs">
                                 <nav className="grid gap-6 text-lg font-medium">
                                     <Link
-                                        to=""
-                                        className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+                                        to="dashboard"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                                     >
-                                        <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
-                                        <span className="sr-only">BIDDIFY</span>
-                                    </Link>
-                                    <Link
-                                        to=""
-                                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                                    >
-                                        <Home className="h-5 w-5" />
+                                        <Menu />
                                         Dashboard
                                     </Link>
+
                                     <Link
-                                        to=""
-                                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                                        to="accounts"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                                     >
-                                        <ShoppingCart className="h-5 w-5" />
-                                        Orders
+                                        <User2 />
+                                        Manage Accounts
                                     </Link>
                                     <Link
-                                        to=""
-                                        className="flex items-center gap-4 px-2.5 text-foreground"
+                                        to="consignments"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                                     >
-                                        <Package className="h-5 w-5" />
-                                        Products
+                                        <FolderClosed />
+                                        Manage Consignments
                                     </Link>
                                     <Link
-                                        to=""
-                                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                                        to="auction-sessions"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                                     >
-                                        <Users2 className="h-5 w-5" />
-                                        Customers
+                                        <AreaChartIcon />
+                                        Manage Auction Session
                                     </Link>
                                     <Link
-                                        to=""
-                                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                                        to="items"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                                     >
-                                        <LineChart className="h-5 w-5" />
-                                        Settings
+                                        <ShoppingBag />
+                                        Manage Items
+                                    </Link>
+                                    <Link
+                                        to="blogs"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                    >
+                                        <Newspaper />
+                                        Manage Blogs
+                                    </Link>
+                                    <Link
+                                        to="notifications"
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                    >
+                                        <Bell />
+                                        Manage Notifications
                                     </Link>
                                 </nav>
                             </SheetContent>

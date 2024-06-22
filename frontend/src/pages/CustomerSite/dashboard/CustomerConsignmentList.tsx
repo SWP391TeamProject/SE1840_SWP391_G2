@@ -70,7 +70,7 @@ export default function CustomerConsignmentList() {
 
         }
 
-
+        window.scrollTo(0, 0);
     }, []);
     return (
         <div className="flex flex-col gap-5 container p-10">

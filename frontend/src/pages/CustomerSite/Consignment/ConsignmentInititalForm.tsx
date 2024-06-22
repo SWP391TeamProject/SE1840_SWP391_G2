@@ -68,6 +68,7 @@ export default function ConsignmentInititalForm() {
   useEffect(() => {
     setUser(JSON.parse(getCookie("user")));
     console.log(user);
+    window.scrollTo(0, 0)
   }, [])
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {

@@ -22,6 +22,7 @@ export default function AboutScreen() {
         setOurTeamPosition(ourTeam?.current?.offsetTop);
         setBuyPosition(buy?.current?.offsetTop);
         setSellPosition(sell?.current?.offsetTop);
+        window.scrollTo(0, 0)
     }, [])
     const scrollToElement = () => {
         let currentLocation = window.location.href;

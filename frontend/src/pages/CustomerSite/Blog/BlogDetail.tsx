@@ -30,6 +30,10 @@ export const BlogDetail = () => {
     let content = temp?.join('\n');
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    useEffect(() => {
         setNewBlogs(blogList?.filter((blog) => blog.postId != currentBlog?.postId));
         setRelatedBlogs(blogList?.filter((blog) => blog.category.blogCategoryId == currentBlog?.category.blogCategoryId && blog.postId != currentBlog?.postId));
     }, [reload]);

@@ -33,7 +33,8 @@ export default function UpcomingAuctionSessionsList() {
   }
 
   useEffect(() => {
-    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}))
+    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}));
+    window.scrollTo(0, 0)
   }, [])
 
   useEffect(() => {
