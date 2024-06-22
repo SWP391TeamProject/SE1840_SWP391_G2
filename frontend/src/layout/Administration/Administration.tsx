@@ -22,7 +22,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCookie, removeCookie } from "@/utils/cookies";
-import { fetchAccountById } from '@/services/AccountsServices'
+import { fetchAccountById } from '@/services/AccountsServices';
+import logo from "@/assets/icon.png";
 
 export const ConsignmentsContext = createContext([]);
 
@@ -103,7 +104,8 @@ export default function Administration() {
             <div className="hidden border-r bg-muted/40 md:block">
                 <div className="flex h-full max-h-screen flex-col gap-2">
                     <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 ">
-                        <Link to="" className="flex items-center gap-2 font-semibold">
+                        <Link to="#" className="flex items-center gap-2 font-semibold">
+                            <img src={logo} className="w-8 h-8" alt="logo" />
                             <Avatar>
                                 <AvatarImage src="src\assets\icon.png" />
                             </Avatar>
@@ -183,6 +185,13 @@ export default function Administration() {
                             </SheetTrigger>
                             <SheetContent side="left" className="sm:max-w-xs">
                                 <nav className="grid gap-6 text-lg font-medium">
+                                    <Link to="#" className="flex items-center gap-2 font-semibold">
+                                        <img src={logo} className="w-8 h-8" alt="logo" />
+                                        <Avatar>
+                                            <AvatarImage src="src\assets\icon.png" />
+                                        </Avatar>
+                                        <span className="">BIDDIFY</span>
+                                    </Link>
                                     <Link
                                         to="dashboard"
                                         className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
