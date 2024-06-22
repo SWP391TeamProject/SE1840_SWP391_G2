@@ -21,7 +21,20 @@ export default function PagingIndexes(props: any) {
           </PaginationItem>
         );
       }
-      else if (i == props.totalPages) {
+      else if (i == props.totalPages - 1) {
+        indexButtons.push(
+          <PaginationItem >
+            <PaginationLink
+              href="#"
+              className="px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+              onClick={() => props.pageSelectCallback(i)}
+            >
+              {i + 1}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+      else if (i == 0) {
         indexButtons.push(
           <PaginationItem >
             <PaginationLink
@@ -48,7 +61,7 @@ export default function PagingIndexes(props: any) {
           </PaginationItem>
         );
       }
-      else {
+      else if (i - props.pageNumber <= 5 && props.pageNumber - i <= 5){
         indexButtons.push(
           <PaginationItem >
             <PaginationLink
