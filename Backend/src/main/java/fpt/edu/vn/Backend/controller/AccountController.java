@@ -115,7 +115,11 @@ public class AccountController {
     @PostMapping("/change-2fa/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<?> change2fa(@RequestBody TwoFactorAuthChangeDTO dto, @PathVariable int id) {
-        accountService.change2fa(id, dto);
+        try {
+            accountService.change2fa(id, dto);
+        } catch (IllegalAccessException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
