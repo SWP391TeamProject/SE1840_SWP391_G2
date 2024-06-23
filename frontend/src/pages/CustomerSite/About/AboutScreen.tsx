@@ -22,6 +22,7 @@ export default function AboutScreen() {
         setOurTeamPosition(ourTeam?.current?.offsetTop);
         setBuyPosition(buy?.current?.offsetTop);
         setSellPosition(sell?.current?.offsetTop);
+        window.scrollTo(0, 0)
     }, [])
     const scrollToElement = () => {
         let currentLocation = window.location.href;
@@ -38,7 +39,7 @@ export default function AboutScreen() {
     return (
         <>
             <div className="flex container">
-                <div className="p-3 basis-3/10">
+                <div className="p-3 basis-3/10 hidden md:flex flex-col">
                     <Sidebar
                         about={aboutPosition}
                         ourTeam={ourTeamPosition}

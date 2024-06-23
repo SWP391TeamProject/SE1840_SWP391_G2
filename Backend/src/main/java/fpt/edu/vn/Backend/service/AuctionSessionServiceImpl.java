@@ -80,7 +80,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         BigDecimal minPrice = new BigDecimal(100);
         BigDecimal maxPrice = new BigDecimal(1000);
         BigDecimal depositAmount = items.get(0).getReservePrice()
-                .multiply(new BigDecimal(4.5))
+                .multiply(new BigDecimal("4.5"))
                 .divide(new BigDecimal(100));
         if (depositAmount.compareTo(minPrice) < 0) {
             depositAmount = minPrice;
@@ -90,6 +90,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         items.sort(Comparator.comparing(Item::getReservePrice));
         if (a.getBalance().compareTo(items.get(0).getReservePrice()) >= 0) {
+            auctionSession.getDeposits().stream().filter(deposit -> deposit.getPayment().getAccount().getAccountId() == accountId)
+                    .findFirst().ifPresent(deposit -> {
+                throw new InvalidInputException("Account already registered for auction session");
+            });
             a.setBalance(a.getBalance().subtract(depositAmount));
             accountRepos.save(a);
             Payment payment = new Payment();
@@ -179,8 +183,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         List<AccountDTO> accounts = new ArrayList<>();
         logger.info("Finishing auction session " + auctionSessionId);
-        if (auctionDTO.getStatus().equals("FINISHED")) {
-            logger.warn("Auction session " + auctionSessionId + " already finished");
+        if (auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")) {
+            logger.warn("Auction session " + auctionSessionId + " already ended");
             return;
         }
         for (AuctionItemDTO auctionItem : auctionDTO.getAuctionItems()) {
@@ -210,12 +214,25 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         auctionDTO.setStatus("FINISHED");
         try {
             Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
-            if (!optionalAuctionSession.isPresent()) {
+            if (optionalAuctionSession.isEmpty()) {
                 throw new ResourceNotFoundException("Auction session not found");
             }
 
 
             AuctionSession auctionSession = optionalAuctionSession.get();
+            for (Item item : auctionSession.getAuctionItems().stream().map(AuctionItem::getItem).toList()) {
+                auctionSession.getAuctionItems().stream()
+                        .filter(auctionItem -> Objects.equals(auctionItem.getItem().getItemId(), item.getItemId()))
+                        .findFirst().ifPresent(auctionItem -> {
+                    if(bidService.getBidsByAuctionItemId(auctionItem.getAuctionItemId()).isEmpty()){
+                        item.setStatus(Item.Status.QUEUE);
+                        itemRepos.save(item);
+                    }else {
+                        item.setStatus(Item.Status.SOLD);
+                        itemRepos.save(item);
+                    }
+                });
+            }
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
             auctionSession.setCreateDate(auctionDTO.getCreateDate());

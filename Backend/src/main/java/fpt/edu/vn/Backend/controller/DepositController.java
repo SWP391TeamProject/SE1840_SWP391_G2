@@ -37,7 +37,7 @@ public class DepositController {
     }
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<DepositDTO>> getAllDeposits(@PageableDefault(size = 50) Pageable pageable) {
         Page<DepositDTO> deposits = depositService.getAllDeposits(pageable);
         return ResponseEntity.ok(deposits);

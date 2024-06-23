@@ -37,7 +37,7 @@ public class PaymentController {
     private PaymentServiceImpl paymentService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(@PageableDefault(size = 50) Pageable pageable) {
         return ResponseEntity.ok(paymentService.getAllPayment(pageable));
     }

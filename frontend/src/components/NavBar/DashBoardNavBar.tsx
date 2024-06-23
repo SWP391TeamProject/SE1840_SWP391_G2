@@ -34,82 +34,83 @@ export default function DashBoardNavBar() {
 
   return (
     <>
-      <header className="  px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground ">
-      <Link className="flex items-center justify-center" to="/">
+      <header className="px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground dark:shadow-gray-600">
+        <Link className="flex items-center justify-center" to="/">
           <div className="flex items-center justify-center gap-2">
             <img src={logo} className="w-8 h-8" alt="logo" />
             <span className="font-semibold text-lg text-orange-700 text-center">Biddify</span>
           </div>
         </Link>
-        <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild >
-                <Link to="/dashboard" className={navigationMenuTriggerStyle()}>Home</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild >
-                <Link to="/dashboard/consignments" className={navigationMenuTriggerStyle()}>Consignments</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild >
-                <Link to="/dashboard/bids" className={navigationMenuTriggerStyle()}>Bids</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
         <nav className="hidden lg:flex items-center gap-6 ml-auto">
-          {
-            auth.isAuthenticated() &&
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                {auth &&
-                  <Avatar className="hover:cursor-pointer ">
-                    <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
-                    <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
+          <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild >
+                  <Link to="/dashboard" className={navigationMenuTriggerStyle()}>Home</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild >
+                  <Link to="/dashboard/consignments" className={navigationMenuTriggerStyle()}>Consignments</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild >
+                  <Link to="/dashboard/bids" className={navigationMenuTriggerStyle()}>Bids</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                {
+                  auth.isAuthenticated() &&
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      {auth &&
+                        <Avatar className="hover:cursor-pointer ">
+                          <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
+                          <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
 
-                  </Avatar>}
-              </DropdownMenuTrigger>
-              {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+                        </Avatar>}
+                    </DropdownMenuTrigger>
+                    {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
 
-              <DropdownMenuContent align="end" className="xmd:hidden lg:block w-fit p-4">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to={'/profile'}>Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to={'/profile/notification'} className="flex gap-2">
-                    <div>Notification</div>
-                    <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
-                      <div>{unreadNoti.count}</div>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link to={'/'}>Switch to auctioning</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem style={{ pointerEvents: "none" }}>
-                  <div className="flex justify-between items-center gap-2">
-                    <div className="basis-1/2">
-                      Balance:
-                    </div>
-                    <div className="basis-1/2 font-medium text-left block">
-                      <p >
-                        {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
-                      </p>
-                    </div>
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          }
-
+                    <DropdownMenuContent align="end" className="xmd:hidden lg:block w-fit p-4">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/profile'}>Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/profile/notification'} className="flex gap-2">
+                          <div>Notification</div>
+                          <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
+                            <div>{unreadNoti.count}</div>
+                          </div>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to={'/'}>Switch to auctioning</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem style={{ pointerEvents: "none" }}>
+                        <div className="flex justify-between items-center gap-2">
+                          <div className="basis-1/2">
+                            Balance:
+                          </div>
+                          <div className="basis-1/2 font-medium text-left block">
+                            <p >
+                              {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                            </p>
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                }
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </nav>
         <Sheet >
           <SheetTrigger asChild>
@@ -118,39 +119,71 @@ export default function DashBoardNavBar() {
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent className="bg-white" side="top">
+          <SheetContent className="bg-white" side="right">
+            {auth?.isAuthenticated() &&
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="hover:cursor-pointer h-16 w-16 ">
+                    <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
+                    <AvatarFallback > {auth?.user?.nickname[0]}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+
+                <DropdownMenuContent align="end" className="w-fit p-4">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to={'/profile/overview'}>Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to={'/profile/notification'} className="flex gap-2">
+                      <div>Notification</div>
+                      <div className="flex justify-center items-center w-5 h-5 bg-red-500 text-white rounded-full text-xs">
+                        <div>{unreadNoti.count}</div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to={'/dashboard'}>Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem style={{ pointerEvents: "none" }}>
+                    <div className="flex justify-between items-center gap-2">
+                      <div className="basis-1/2">
+                        Balance:
+                      </div>
+                      <div className="basis-1/2 font-medium text-left block">
+                        <p >
+                          {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                        </p>
+                      </div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
             <div className="grid gap-2 py-6">
               <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
+                className="flex w-full items-center py-2 text-lg font-semibold "
+                to="/dashboard"
               >
-                Put your item for auction
+                Home
               </Link>
               <Link
                 className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
+                to="/dashboard/consignments"
               >
-                Auctions
+                Consignments
               </Link>
               <Link
                 className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
+                to="/dashboard/bids"
               >
-                About
+                Bids
               </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Blog
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="#"
-              >
-                Contact
-              </Link>
-
             </div>
           </SheetContent>
         </Sheet>

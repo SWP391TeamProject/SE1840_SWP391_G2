@@ -157,7 +157,7 @@ export const BlogPostList = () => {
               <CardTitle className="flex justify-between items-center">
                 Blogs
                 <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} size={10} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                 </div>
               </CardTitle>
               <CardDescription>
@@ -170,19 +170,19 @@ export const BlogPostList = () => {
                   <TableRow>
                     <TableHead>Id</TableHead>
                     <TableHead>Title</TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       create Date
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Author
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Category
                     </TableHead>
-                    {/* <TableHead className="hidden md:table-cell">
+                    {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Action
                     </TableHead>
                     <TableHead>
@@ -199,16 +199,16 @@ export const BlogPostList = () => {
                       {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {blog.title}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {new Date(blog.createDate).toLocaleDateString('en-US')}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {blog.author ? blog.author.nickname : "Unknown"}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {blog.category ? blog.category.name : "Unknown"}
                       </TableCell>
 

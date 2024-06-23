@@ -24,7 +24,7 @@ export default function Profile() {
     <>
       <div className="container min-h-screen m-3 flex flex-row bg-background text-foreground">
         {/* Vertical Sidebar */}
-        <div className="w-64 lg:w-80 min-h-screen border-gray-200 bg-background text-foreground ">
+        <div className="w-64 lg:w-80 min-h-screen border-gray-200 bg-background text-foreground hidden md:flex flex-col">
           <aside className="w-64 lg:w-80   border-gray-200 p-4 hidden lg:block fixed bg-background text-foreground">
             <h2 className="text-lg font-semibold mb-4">Profile</h2>
             <Separator />
@@ -48,7 +48,7 @@ export default function Profile() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 lg:pl-8 xl:pl-16 bg-background text-foreground">
+        <div className="flex-1 lg:pl-8 xl:pl-16 bg-background text-foreground p-3">
           <Breadcrumb
             className="py-4"
             links={[

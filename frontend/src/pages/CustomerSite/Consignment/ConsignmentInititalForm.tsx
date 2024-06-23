@@ -44,7 +44,7 @@ const formSchema = z.object({
   }).max(500, {
     message: "Description must be between 10 and 500 characters"
   }),
-  files: z.array(z.any()).max(5, { message: "You can only upload up to 5 images" })
+  files: z.array(z.any()).min(1).max(5, { message: "You can only upload up to 5 images" })
 
 });
 
@@ -68,6 +68,7 @@ export default function ConsignmentInititalForm() {
   useEffect(() => {
     setUser(JSON.parse(getCookie("user")));
     console.log(user);
+    window.scrollTo(0, 0)
   }, [])
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
@@ -76,13 +77,13 @@ export default function ConsignmentInititalForm() {
     createConsignmentService(data).then((res) => {
       toast.success("Consignment created successfully");
       setIsLoading(false);
-    }).catch((err) => { 
+    }).catch((err) => {
       toast.error("Failed to create consignment");
       setIsLoading(false);
     }
     );
-
     console.log(data);
+
   };
 
   return (
@@ -235,6 +236,15 @@ export default function ConsignmentInititalForm() {
                       )}
                     />
                   </ScrollArea>
+                  {form.getFieldState("files").invalid && form.control._formValues["files"].length <= 0 ? <p className="text-red-400 font-bold">
+                    *You must include at least a image of your item
+                  </p> : <></>
+                  }
+
+                  {form.getFieldState("files").invalid && form.control._formValues["files"].length > 5 ? <p className="text-red-400 font-bold">
+                    *You can only upload up to 5 images
+                  </p> : <></>
+                  }
 
                   {/* <DropzoneComponent /> */}
                   {isLoading ?

@@ -33,6 +33,9 @@ public class BlogPostDTO {
         this.createDate = blogPost.getCreateDate();
         this.updateDate = blogPost.getUpdateDate();
         this.attachments = blogPost.getAttachments()==null?new ArrayList<>():blogPost.getAttachments().stream().map(AttachmentDTO::new).toList();
+        if(author!=null){
+            author.setPassword(null);
+        }
     }
     // getters and setters
     // ...

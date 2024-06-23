@@ -169,6 +169,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                         {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                       </Route>
+                      <Route path="notifications" element={<ToBeImplemented />}></Route>
 
                     </Route>
                   </Route>

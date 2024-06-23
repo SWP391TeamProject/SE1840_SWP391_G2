@@ -47,7 +47,7 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 50) Pageable pageable,
                                                         @RequestParam(required = false,name = "Role") Account.Role role) {
         log.info("Get accounts with role: {}", role);
@@ -62,7 +62,7 @@ public class AccountController {
     }
 
     @GetMapping("/search/{name}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> searchAccounts(@PageableDefault(size = 50) Pageable pageable,
                                                         @PathVariable String name) {
         log.info("Get accounts with name: {}", name);
@@ -73,26 +73,26 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
 
     @GetMapping("/user/me")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('USER')")
     public Account getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
         return accountRepos.findByEmail(userPrincipal.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", userPrincipal.getEmail()));
     }
 
     @PostMapping("/")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {
         return new ResponseEntity<>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> updateAccount(Principal principal, @RequestBody AccountDTO accountDTO, @PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -113,14 +113,18 @@ public class AccountController {
     }
 
     @PostMapping("/change-2fa/{id}")
-    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<?> change2fa(@RequestBody TwoFactorAuthChangeDTO dto, @PathVariable int id) {
-        accountService.change2fa(id, dto);
+        try {
+            accountService.change2fa(id, dto);
+        } catch (IllegalAccessException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/avatar/{id}")
-    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AttachmentDTO> addProfileImage(@PathVariable int id, @RequestParam("file") MultipartFile file) {
         return new ResponseEntity<>(accountService.setAvatar(id, file), HttpStatus.OK);
     }
@@ -140,7 +144,7 @@ public class AccountController {
     }
 
     @PutMapping("/activate/{id}")
-    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> activateAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

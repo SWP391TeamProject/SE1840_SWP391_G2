@@ -37,7 +37,7 @@ public class AuthResponseDTO {
         this.email = account.getEmail();
         this.phone = account.getPhone();
         this.nickname = account.getNickname();
-        this.attachment = new AttachmentDTO(account.getAvatarUrl());
+        this.attachment = account.getAvatarUrl() !=null ? new AttachmentDTO(account.getAvatarUrl()) : new AttachmentDTO();
         this.address =  random.nextInt(100) + " " + choice.get(random.nextInt(choice.size()));
         this.status = account.getStatus();
         this.balance = account.getBalance() == null ? BigDecimal.ZERO : account.getBalance();
