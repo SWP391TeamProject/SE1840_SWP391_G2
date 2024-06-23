@@ -9,8 +9,11 @@ import fpt.edu.vn.Backend.exporter.ItemExporter;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.service.ItemService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -28,6 +31,7 @@ import java.util.List;
 @RequestMapping("/api/items")
 @CrossOrigin("*")
 public class ItemController {
+    private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
 
     @Autowired
@@ -36,21 +40,52 @@ public class ItemController {
     }
 
     @GetMapping("/")
-    public Page<ItemDTO> getItems(@PageableDefault(size = 50) Pageable pageable) {
-        return itemService.getItems(pageable);
+    public Page<ItemDTO> getItems(@PageableDefault(size = 50,sort = "createDate") Pageable pageable ,
+                                  @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
+                                  @RequestParam(required = false) String order){
+        if(order != null){
+            if (order.equals("desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+            }
+        }
+        if (minPrice != null && maxPrice != null) {
+            return itemService.getItemsByPrice(pageable, minPrice, maxPrice);
+        }else {
+            return itemService.getItemsByStatus(pageable, Item.Status.IN_AUCTION);
+        }
     }
 
     @GetMapping("/category/{categoryId}")
     public Page<ItemDTO> getItemsByCategoryId(
             @PathVariable int categoryId,
-            @PageableDefault(size = 30) Pageable pageable) {
-        return itemService.getItemsByCategoryId(pageable, categoryId);
+            @PageableDefault(size = 30,sort = "createDate") Pageable pageable,
+            @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String order){
+        log.info("page: " + pageable.getPageNumber() + " size: " + pageable.getPageSize() + " sort: " + pageable.getSort());
+        if(order != null){
+            if (order.equals("desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+            }
+        }
+        if (minPrice != null && maxPrice != null) {
+            log.info("minPrice: " + minPrice + " maxPrice: " + maxPrice);
+            return itemService.getItemsByCategoryIdByPrice(pageable, categoryId, minPrice, maxPrice);
+        }else {
+            log.info("categoryId: " + categoryId);
+            return itemService.getItemsByCategoryId(pageable, categoryId);
+        }
     }
 
     @GetMapping("/search/{name}")
     public Page<ItemDTO> getItemsByName(
             @PathVariable String name,
-            @PageableDefault(size = 30) Pageable pageable) {
+            @PageableDefault(size = 30,sort = "createDate") Pageable pageable,
+            @RequestParam(required = false) String order) {
+        if(order != null){
+            if (order.equals("desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+            }
+        }
         return itemService.getItemsByName(pageable, name);
     }
 
