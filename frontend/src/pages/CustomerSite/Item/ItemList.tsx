@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { AuctionSession } from "@/models/newModel/auctionSession"
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import { set } from "date-fns"
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -29,6 +30,7 @@ export function ItemList() {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000000000);
   const [auctions, setAuctions] = useState<AuctionSession[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
 
 
@@ -95,146 +97,161 @@ export function ItemList() {
   }
 
   useEffect(() => {
+    setIsLoading(true);
     fetchActiveAuctionSessions().then((res) => {
       setAuctions(res?.data.content);
+      setIsLoading(false);
+
+
     });
     getAllItemCategories(0, 50).then((res) => {
       setItemCategories(res.data.content);
-    });     
+    });
     if (location.state?.category) {
       console.log(location.state.category);
-      fetchItems(0, location.state.category, minPrice, maxPrice);
+      fetchItems(0, location.state.category, minPrice, maxPrice).then(() => {
+        setIsLoading(false);
+      });
       setItemCategoryFilter(location.state.category);
-    }else {
+    } else {
       fetchItems(itemsList.currentPageNumber);
     }
 
+
   }, []);
-  return (  
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Jewelry Auction</h1>
-        <div className="flex items-center gap-4">
-          <Select value={sortBy} onValueChange={(value) => handleSortChange(value.split(":")[0], value.split(":")[1])}>
-            <SelectTrigger className="bg-background px-4 py-2 rounded-md">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="reservePrice:asc">Price: Low to High</SelectItem>
-              <SelectItem value="reservePrice:desc">Price: High to Low</SelectItem>
-              <SelectItem value="name:asc">Name: Ascending</SelectItem>
-              <SelectItem value="name:desc">Name: Descending</SelectItem>
-              <SelectItem value="createDate:asc">Newest Items</SelectItem>
+  return (
+    <>
+      {isLoading === true ?
+        <LoadingAnimation />
+        :
+        <div className="container mx-auto py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Jewelry Auction</h1>
+            <div className="flex items-center gap-4">
+              <Select value={sortBy} onValueChange={(value) => handleSortChange(value.split(":")[0], value.split(":")[1])}>
+                <SelectTrigger className="bg-background px-4 py-2 rounded-md">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="reservePrice:asc">Price: Low to High</SelectItem>
+                  <SelectItem value="reservePrice:desc">Price: High to Low</SelectItem>
+                  <SelectItem value="name:asc">Name: Ascending</SelectItem>
+                  <SelectItem value="name:desc">Name: Descending</SelectItem>
+                  <SelectItem value="createDate:asc">Newest Items</SelectItem>
 
-            </SelectContent>
-          </Select>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="px-4 py-2 rounded-md">
-                Filters
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="p-4 w-[300px]">
-              <div className="grid gap-4">
-                <div>
-                  <Label htmlFor="minBid">From:</Label>
-                  <Input
-                    id="minBid"
-                    type="number"
-                    value={minPrice}
-                    onChange={(event) => {
-                      try {
-                        setMinPrice(parseInt(event.target.value))
-                      } catch (e) {
-                        setMinPrice(0);
-                      }
-                    }}
-                    onKeyUp={(event) => {
-                      if (event.key == "Enter") { handleFilterClick(itemCategoryFilter.name) }
-                    }}
-                    className="bg-background px-4 py-2 rounded-md"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="maxBid">To:</Label>
-                  <Input
-                    id="maxBid"
-                    type="number"
-                    value={maxPrice}
-                    onChange={(event) => {
-                      setMaxPrice(parseInt(event.target.value));
-                      if (parseInt(event.target.value) < minPrice) {
-                        setMinPrice(parseInt(event.target.value));
-                      }
-                      if (parseInt(event.target.value) <= 0) {
-                        setMaxPrice(1000000000);
-                      }
+                </SelectContent>
+              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="px-4 py-2 rounded-md">
+                    Filters
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-4 w-[300px]">
+                  <div className="grid gap-4">
+                    <div>
+                      <Label htmlFor="minBid">From:</Label>
+                      <Input
+                        id="minBid"
+                        type="number"
+                        value={minPrice}
+                        onChange={(event) => {
+                          try {
+                            setMinPrice(parseInt(event.target.value))
+                          } catch (e) {
+                            setMinPrice(0);
+                          }
+                        }}
+                        onKeyUp={(event) => {
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter.name) }
+                        }}
+                        className="bg-background px-4 py-2 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="maxBid">To:</Label>
+                      <Input
+                        id="maxBid"
+                        type="number"
+                        value={maxPrice}
+                        onChange={(event) => {
+                          setMaxPrice(parseInt(event.target.value));
+                          if (parseInt(event.target.value) < minPrice) {
+                            setMinPrice(parseInt(event.target.value));
+                          }
+                          if (parseInt(event.target.value) <= 0) {
+                            setMaxPrice(1000000000);
+                          }
 
-                    }}
-                    onKeyUp={(event) => {
-                      if (event.key == "Enter") { handleFilterClick(itemCategoryFilter.name) }
-                    }}
-                    className="bg-background px-4 py-2 rounded-md"
-                  />
-                </div>
-                <div>
-                  <Label>Category</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <RadioGroup defaultValue={itemCategoryFilter?.name || "all"} onValueChange={(value) => { handleFilterClick(value) }}>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="all" id="r1" />
-                        <Label htmlFor="r1">All</Label>
+                        }}
+                        onKeyUp={(event) => {
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter.name) }
+                        }}
+                        className="bg-background px-4 py-2 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <Label>Category</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <RadioGroup defaultValue={itemCategoryFilter?.name || "all"} onValueChange={(value) => { handleFilterClick(value) }}>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="all" id="r1" />
+                            <Label htmlFor="r1">All</Label>
+                          </div>
+                          {itemCategories.map((category) => (
+                            <div className="flex items-center space-x-2" key={category.itemCategoryId}>
+                              <RadioGroupItem value={category.name} id="r1" />
+                              <Label htmlFor="r1">{category.name}</Label>
+                            </div>
+                          ))}
+                        </RadioGroup>
                       </div>
-                      {itemCategories.map((category) => (
-                        <div className="flex items-center space-x-2" key={category.itemCategoryId}>
-                          <RadioGroupItem value={category.name} id="r1" />
-                          <Label htmlFor="r1">{category.name}</Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {itemsList.currentPageList.map((item) => (
-          auctions.map((auction) => {
-            if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
-              return (
-                <div key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" onClick={() => {
-                  navigate(`/auctions/${auction.auctionSessionId}`);
-                }}>
-                  <img
-                    src={item.attachments[0].link}
-                    alt={item.name}
-                    width={400}
-                    height={300}
-                    className="w-full h-60 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold mb-2">{item.name}</h3>
-                    <div className="text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.description }}></div>
-                    <div className="flex justify-between items-center ">
-
-                      <div className="text-primary font-bold text-lg">${item.reservePrice.toLocaleString()}</div>
-                      <div className="text-muted-foreground text-sm">{item.category.name}</div>
                     </div>
                   </div>
-                </div>
-              )
-            }
-          }
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
 
-          )
-        ))
-        }
-      </div>
-      <div className="flex justify-center mt-8">
-        <PagingIndexes className="basis-1/2" pageNumber={itemsList.currentPageNumber || 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-      </div>
-    </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
+            {itemsList.currentPageList.map((item) => (
+              auctions.map((auction) => {
+                if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
+                  return (
+                    <div key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" onClick={() => {
+                      navigate(`/auctions/${auction.auctionSessionId}`);
+                    }}>
+                      <img
+                        src={item.attachments[0].link}
+                        alt={item.name}
+                        width={400}
+                        height={300}
+                        className="w-full h-60 object-cover"
+                      />
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold mb-2">{item.name}</h3>
+                        <div className="text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.description }}></div>
+                        <div className="flex justify-between items-center ">
+
+                          <div className="text-primary font-bold text-lg">${item.reservePrice.toLocaleString()}</div>
+                          <div className="text-muted-foreground text-sm">{item.category.name}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
+              }
+
+              )
+            ))}
+          </div>
+
+          <div className="flex justify-center mt-8">
+            <PagingIndexes className="basis-1/2" pageNumber={itemsList.currentPageNumber || 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+          </div>
+        </div>}
+    </>
+
   )
 }

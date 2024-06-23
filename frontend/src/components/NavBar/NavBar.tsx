@@ -41,9 +41,14 @@ export default function NavBar() {
             <span className="font-semibold text-lg text-orange-700 text-center">Biddify</span>
           </div>
         </Link>
-        <nav className="hidden lg:flex items-center gap-6 ml-auto">
+
+        <nav className="hidden lg:flex items-center gap-6 ml-auto w-fit">
+          <Button variant="outline" className="ml-auto" asChild>
+            <Link to="/create-consignment">Put Your Item For Auction</Link>
+          </Button>
           <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
             <NavigationMenuList>
+
               <NavigationMenuItem>
                 {!auth.isAuthenticated() ? (
                   <Button
@@ -55,19 +60,26 @@ export default function NavBar() {
                   </Button>
                 ) : ''}
               </NavigationMenuItem>
+
+
               <NavigationMenuItem>
                 <ModeToggle />
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent className="md:w-36">
-                  <Link to="/auctions" className={navigationMenuTriggerStyle()}>Auctions</Link>
-                  <Separator />
-                  <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>Featured</Link>
-                  <Separator />
-                  <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>Past Auctions</Link>
-                  <Separator />
-                  <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/auctions" className={navigationMenuTriggerStyle()} >Auctions</Link>
+                  </NavigationMenuLink>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>Featured</Link>
+                  </NavigationMenuLink>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>Past Auctions</Link>
+                  </NavigationMenuLink>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
+                  </NavigationMenuLink>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>

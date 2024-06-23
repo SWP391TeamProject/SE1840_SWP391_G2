@@ -38,7 +38,7 @@ export function LandingPage() {
 
   return (
     <div key="1" className="flex flex-col min-h-dvh bg-background text-foreground">
-      <main className="flex flex-col gap-y-10 md:gap-y-10">
+      <main className="flex flex-col gap-y-20 md:gap-y-30">
         {/* Start Carouesel Sections */}
         <LandingPageCarousel />
         {/* End Carousel Section */}

@@ -186,7 +186,7 @@ function RegisterForm() {
         </Form>
       </div>
       {/* <div className="hidden md:flex w-full h-full  bg-gray-200 rounded-2xl"> */}
-      <CardContent className="hidden md:flex justify-center items-center basis-1/2  h-full p-0 m-0 rounded-2xl">
+      <CardContent className="hidden md:flex justify-center items-center basis-1/2  h-full p-0 m-0 rounded-2xl my-auto">
         <img
           src={logo}
           className="w-full h-full object-contain rounded-2xl "
