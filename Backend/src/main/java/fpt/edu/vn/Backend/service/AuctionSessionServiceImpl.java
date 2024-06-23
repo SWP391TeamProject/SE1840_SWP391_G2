@@ -228,7 +228,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                         item.setStatus(Item.Status.QUEUE);
                         itemRepos.save(item);
                     }else {
-                        item.setStatus(Item.Status.SOLD);
+                        item.setStatus(Item.Status.UNSOLD);
                         itemRepos.save(item);
                     }
                 });
