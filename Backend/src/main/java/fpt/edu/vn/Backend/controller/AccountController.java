@@ -56,8 +56,8 @@ public class AccountController {
         }
         return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
     }
-    @GetMapping("/monthly/{year}")
-    public List<MonthlyBalanceDTO> getMonthlyBalances(@PathVariable int year) {
+    @GetMapping("/monthly")
+    public List<MonthlyBalanceDTO> getMonthlyBalances(@RequestParam int year) {
         return accountService.getMonthlyBalances(year);
     }
 
@@ -129,8 +129,8 @@ public class AccountController {
         return new ResponseEntity<>(accountService.setAvatar(id, file), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
+    @PostMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> deleteAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
