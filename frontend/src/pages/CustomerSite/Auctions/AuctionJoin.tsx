@@ -64,6 +64,7 @@ export default function AuctionJoin() {
     window.onpopstate = function () {
       client?.deactivate();
     };
+    window.scrollTo(0, 0);
   }, []);
 
   const onMessageReceived = (payload: IMessage) => {

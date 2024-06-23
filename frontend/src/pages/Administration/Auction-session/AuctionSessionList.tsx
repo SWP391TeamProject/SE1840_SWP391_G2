@@ -192,7 +192,7 @@ export default function AuctionSessionList() {
               <CardTitle className="flex justify-between items-center">
                 AuctionSessions
                 <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} size={10} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                 </div>
               </CardTitle>
               
@@ -206,19 +206,19 @@ export default function AuctionSessionList() {
                   <TableRow>
                     <TableHead>Id</TableHead>
                     <TableHead>Title</TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Start Date
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       End Date
                     </TableHead>
-                    <TableHead className="hidden md:table-cell text-center">
+                    <TableHead className="md:table-cell text-center">
                       Participant
                     </TableHead>
-                    <TableHead className="hidden md:table-cell text-center">
+                    <TableHead className="md:table-cell text-center">
                       number of lots
                     </TableHead>
-                    {/* <TableHead className="hidden md:table-cell">
+                    {/* <TableHead className=" md:table-cell">
                                                     Created at
                                                 </TableHead> */}
                     <TableHead>
@@ -235,24 +235,24 @@ export default function AuctionSessionList() {
                       {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {auctionSession.title}
 
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {/* {auctionSession.startDate} */}
                         {new Date(auctionSession.startDate).toLocaleDateString("en-US")}
 
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {new Date(auctionSession.endDate).toLocaleDateString("en-US")}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-center">
+                      <TableCell className="md:table-cell text-center">
                         {/* {auctionSession.role[0]?.roleName} */}
                         {auctionSession.deposits?.length}
                         
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-center">
+                      <TableCell className="md:table-cell text-center">
                         {auctionSession.auctionItems?.length}
 
                         {/* {auctionSession.status == AuctionSessionStatus.ACTIVE ? 

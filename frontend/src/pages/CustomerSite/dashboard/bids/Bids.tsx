@@ -16,7 +16,9 @@ export const Bids = () => {
             setBids(res.data.content);
         }).catch((err) => {
             toast.error(err);
-        })
+        });
+
+        window.scrollTo(0, 0);
     }, [])
     const handleViewItemDetailsClick = (id: any) => {
         nav("/item/" + id);

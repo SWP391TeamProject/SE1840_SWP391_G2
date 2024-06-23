@@ -40,8 +40,9 @@ export const notificationsSlice = createSlice({
             state.pageSize = action.payload.pageable.pageSize;
             state.loading = false;
         },
-        setCurrentPageNumber: (state, action: PayloadAction<number>) => {
-            state.currentPageNumber = action.payload;
+        setCurrentPageNumber: (state, action) => {
+            state.currentPageNumber = action.payload.pageNumber;
+            state.totalPages = action.payload.totalPages;
         },
         setCurrentPageList: (state, action: PayloadAction<Notification[]>) => {
             state.currentPageList = action.payload;
