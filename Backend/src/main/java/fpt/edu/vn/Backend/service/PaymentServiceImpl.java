@@ -277,6 +277,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public Page<PaymentDTO> filterPaymentByDate(String startDate, String endDate, Pageable pageable) {
+        return null;
+    }
+
+    @Override
     public PaymentDTO deleteById(int id) {
         try {
             Payment payment = paymentRepos.findById(id)

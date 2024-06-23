@@ -30,6 +30,7 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/webp",
 ];
+import sideImage from "@/assets/thumnail1.jpg"
 
 
 const formSchema = z.object({
@@ -265,7 +266,7 @@ export default function ConsignmentInititalForm() {
 
             <div className="hidden md:block basis-2/4 p-5">
               <img
-                src="src\assets\thumnail1.jpg"
+                src={sideImage}
                 alt=""
                 className="object-cover w-full h-full border rounded-lg shadow-lg"
               />
