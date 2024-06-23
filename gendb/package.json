@@ -12,6 +12,6 @@
   "dependencies": {
     "commander": "^12.1.0",
     "dayjs": "^1.11.11",
-    "puppeteer": "^22.10.0"
+    "puppeteer": "^22.12.0"
   }
 }
