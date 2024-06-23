@@ -157,6 +157,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public @NotNull Page<ItemDTO> getItemsByPrice(@NotNull Pageable pageable, int minPrice, int maxPrice) {
+        return itemRepos.findItemByReservePriceBetween(BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice), pageable)
+                .map(this::mapEntityToDTO);
+    }
+
+    @Override
     public @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status) {
         return itemRepos.findItemByStatus(status, pageable).map(this::mapEntityToDTO);
     }
@@ -174,5 +180,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {
         return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(this::mapEntityToDTO);
+    }
+
+    @Override
+    public @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice) {
+        return itemRepos.findItemByReservePriceBetweenAndItemCategory_ItemCategoryId( BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice),categoryId, pageable)
+                .map(this::mapEntityToDTO);
     }
 }

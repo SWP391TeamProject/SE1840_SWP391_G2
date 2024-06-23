@@ -100,6 +100,7 @@ public class SecurityConfig {
                                 "/.well-known/**",
                                 "/api/blog-categories/**",
                                 "/api/blogs/**",
+                                "/api/items/**",
                                 "/api/payments/vnpay_ipn")
                         .permitAll()
                         .anyRequest().authenticated()

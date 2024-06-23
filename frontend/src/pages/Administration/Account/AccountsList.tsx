@@ -66,12 +66,14 @@ export default function AccountsList() {
     try {
       console.log(role);
       let res;
-      res = await fetchAccountsService(pageNumber, 5, role);
       if (search && search?.length > 0) {
         res = await fetchAccountsByName(pageNumber, 5, search);
       }
-      if (role != undefined) {
+      else if (role != undefined) {
         res = await fetchAccountsService(pageNumber, 5, role);
+      }
+      else {
+        res = await fetchAccountsService(pageNumber, 5);
       }
       if (res) {
         console.log(res);
@@ -133,11 +135,13 @@ export default function AccountsList() {
     if (filter == "all") {
       fetchAccounts(0);
       setRoleFilter(filter);
+      accountsList.filter = undefined;
     }
     else {
       console.log(roles);
       fetchAccounts(0, roles[0]);
       setRoleFilter(filter);
+      accountsList.filter = roles[0];
     }
 
     // }
