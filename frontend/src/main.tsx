@@ -71,6 +71,7 @@ import { BlogPostList } from "./pages/Administration/Blog/BlogPostList.tsx";
 import { BlogPostDetail } from "./pages/Administration/Blog/BlogPostDetail.tsx";
 import { BlogDetail } from "./pages/CustomerSite/Blog/BlogDetail.tsx";
 import TwoFactorAuthForm from "@/pages/authentication/TwoFactorAuthForm.tsx";
+import { ItemList } from "./pages/CustomerSite/Item/ItemList.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -106,6 +107,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="Auctions/details" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id" element={<AuctionSession />}></Route>
                     <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
+                    <Route path="items" element={<ItemList />} />
+
                     <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>
                       <Route
                         path="create-consignment"
