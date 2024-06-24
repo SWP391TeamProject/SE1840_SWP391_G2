@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.EvaluationDTO;
+import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exporter.ConsignmentDetailExporter;
 import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentDetailService;
@@ -67,9 +68,14 @@ public class ConsignmentDetailController {
         return new ResponseEntity<>(consignmentDetailDTO, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{consignmentDetailId}")
-    public ResponseEntity<ConsignmentDetailDTO> updateConsignmentDetail(@PathVariable int consignmentDetailId, @RequestBody ConsignmentDetailDTO updatedConsignmentDetail) {
-        return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId, updatedConsignmentDetail), HttpStatus.OK);
+    @PostMapping("/create")
+    public ResponseEntity<ConsignmentDetailDTO> createConsignmentDetail(@RequestBody ConsignmentDetailRequestDTO consignmentRequestDetailDTO){
+        return new ResponseEntity<>(consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO),HttpStatus.CREATED);
+    }
+
+    @PostMapping("/update/{consignmentDetailId}")
+    public ResponseEntity<ConsignmentDetailDTO> updateConsignmentDetail(@PathVariable int consignmentDetailId, @RequestBody ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
+        return new ResponseEntity<>(consignmentDetailService.updateConsignmentDetail(consignmentDetailId, consignmentRequestDetailDTO), HttpStatus.OK);
     }
 
     @GetMapping("/export")

@@ -101,7 +101,9 @@ public class SecurityConfig {
                                 "/api/blog-categories/**",
                                 "/api/blogs/**",
                                 "/api/items/**",
-                                "/api/payments/vnpay_ipn")
+                                "/api/payments/vnpay_ipn",
+                                "/api/currency/**"
+                        )
                         .permitAll()
                         .anyRequest().authenticated()
 

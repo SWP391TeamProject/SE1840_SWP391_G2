@@ -66,6 +66,7 @@ import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } fr
 import { getItems, getItemsByName } from "@/services/ItemService";
 import { ItemStatus } from "@/constants/enums";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 export default function ItemsList() {
   const itemsList = useAppSelector((state) => state.items);
@@ -74,6 +75,7 @@ export default function ItemsList() {
   const [statusFilter, setStatusFilter] = useState("all");
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
+  const currency = useCurrency();
 
   const fetchItems = async (pageNumber: number) => {
     try {
@@ -243,7 +245,7 @@ export default function ItemsList() {
                         {item.name}
                       </TableCell>
                       <TableCell className="md:table-cell">
-                        {item.buyInPrice}
+                        {currency.format({amount: item.reservePrice})}
                       </TableCell>
                       <TableCell className="md:table-cell">
                         {item.status}

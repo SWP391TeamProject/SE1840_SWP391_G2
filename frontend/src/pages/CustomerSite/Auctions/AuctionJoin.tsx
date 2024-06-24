@@ -35,7 +35,7 @@ export default function AuctionJoin() {
       return;
     }
     const newClient = new Client({
-      brokerURL: `wss://${import.meta.env.VITE_BACKEND_DNS}:8080/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
+      brokerURL: `wss://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
       // onDisconnect: () => {
       //   toast.error('You have been disconnected from the auction');
       // },
@@ -68,7 +68,7 @@ export default function AuctionJoin() {
         newClient.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
       }
     };
-  }, [accountId, allow]);
+  }, [allow]);
 
   useEffect(() => {
     if (!getCookie("user")) {
@@ -108,7 +108,8 @@ export default function AuctionJoin() {
     const message = JSON.parse(payload.body).body;
     console.log(message);
     if (message?.status == "JOIN" || message?.status == "BID") {
-      toast.info(message?.message);
+      if (message?.status == "BID")
+        toast.info(message?.message);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
     setIsReceived(!isReceived);

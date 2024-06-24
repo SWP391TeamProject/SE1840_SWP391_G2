@@ -55,7 +55,7 @@ export default function CategoriesSection() {
             variant="outline"
             asChild
           >
-            <Link to="/item">View More</Link>
+            <Link to="/items">View More</Link>
           </Button>
         </div>
       </section>

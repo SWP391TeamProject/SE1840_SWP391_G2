@@ -163,7 +163,7 @@ export default function AccountEdit() {
                             name="balance"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Balance</FormLabel>
+                                    <FormLabel>Balance (in USD)</FormLabel>
                                     <FormControl>
                                         <Input {...field} type='number'/>
                                     </FormControl>

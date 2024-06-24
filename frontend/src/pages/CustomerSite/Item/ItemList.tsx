@@ -19,6 +19,7 @@ import { Search } from "lucide-react"
 import { Item, ItemStatus } from "@/models/Item"
 import { Card } from "@/components/ui/card"
 
+
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
   const dispatch = useAppDispatch();
@@ -130,7 +131,6 @@ export function ItemList() {
       });
       setItemCategoryFilter(location.state.category);
     } else {
-      console.log(itemsList.currentPageList.length);
       if (itemsList.currentPageList.length == 0) {
         fetchItems(itemsList.currentPageNumber);
       }

@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.serviceTest;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Attachment;
@@ -55,7 +56,7 @@ public class ConsignmentDetailServiceImplTest {
     private Consignment consignment;
     private Account account;
     private Attachment attachment;
-    private ConsignmentDetailDTO consignmentDetailDTO;
+    private ConsignmentDetailRequestDTO consignmentRequestDetailDTO;
 
     @BeforeEach
     void setUp() {
@@ -86,14 +87,13 @@ public class ConsignmentDetailServiceImplTest {
         consignmentDetail2.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
         consignmentDetail2.setAttachments(Arrays.asList(attachment));
 
-        consignmentDetailDTO = new ConsignmentDetailDTO();
-        consignmentDetailDTO.setConsignmentDetailId(1);
-        consignmentDetailDTO.setConsignmentId(consignment.getConsignmentId());
-        consignmentDetailDTO.setAccount(new AccountDTO(account));
-        consignmentDetailDTO.setDescription("Description 1");
-        consignmentDetailDTO.setPrice(BigDecimal.valueOf(100.0));
-        consignmentDetailDTO.setStatus("REQUEST");
-        consignmentDetailDTO.setAttachments(Arrays.asList(new AttachmentDTO(attachment)));
+        consignmentRequestDetailDTO = new ConsignmentDetailRequestDTO();
+        consignmentRequestDetailDTO.setConsignmentId(consignment.getConsignmentId());
+        consignmentRequestDetailDTO.setAccountId(1);
+        consignmentRequestDetailDTO.setDescription("Description 1");
+        consignmentRequestDetailDTO.setPrice(BigDecimal.valueOf(100.0));
+        consignmentRequestDetailDTO.setStatus("REQUEST");
+
     }
 
     @Test
@@ -166,21 +166,20 @@ public class ConsignmentDetailServiceImplTest {
     void testCreateConsignmentDetail() {
         when(consignmentRepos.findByConsignmentId(1)).thenReturn(consignment);
         when(accountRepos.findById(1)).thenReturn(Optional.of(account));
-        when(attachmentRepos.findById(1)).thenReturn(Optional.of(attachment));
+
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
 
-        ConsignmentDetailDTO result = consignmentDetailService.createConsignmentDetail(consignmentDetailDTO);
+        ConsignmentDetailDTO result = consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO);
 
         verify(consignmentRepos, times(1)).findByConsignmentId(1);
         verify(accountRepos, times(1)).findById(1);
-        verify(attachmentRepos, times(1)).findById(1);
+
         verify(consignmentDetailRepos, times(1)).save(any(ConsignmentDetail.class));
 
         assertNotNull(result);
-        assertEquals(consignmentDetailDTO.getConsignmentDetailId(), result.getConsignmentDetailId());
-        assertEquals(consignmentDetailDTO.getDescription(), result.getDescription());
-        assertEquals(consignmentDetailDTO.getPrice(), result.getPrice());
-        assertEquals(consignmentDetailDTO.getStatus(), result.getStatus());
+        assertEquals(consignmentRequestDetailDTO.getDescription(), result.getDescription());
+        assertEquals(consignmentRequestDetailDTO.getPrice(), result.getPrice());
+        assertEquals(consignmentRequestDetailDTO.getStatus(), result.getStatus());
     }
 
     @Test
@@ -188,27 +187,24 @@ public class ConsignmentDetailServiceImplTest {
         when(consignmentDetailRepos.findById(1)).thenReturn(Optional.of(consignmentDetail1));
         when(consignmentRepos.findByConsignmentId(1)).thenReturn(consignment);
         when(accountRepos.findById(1)).thenReturn(Optional.of(account));
-        when(attachmentRepos.findById(1)).thenReturn(Optional.of(attachment));
+
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
 
-        ConsignmentDetailDTO updatedConsignmentDetailDTO = new ConsignmentDetailDTO();
-        updatedConsignmentDetailDTO.setConsignmentDetailId(1);
+        ConsignmentDetailRequestDTO updatedConsignmentDetailDTO = new ConsignmentDetailRequestDTO();
         updatedConsignmentDetailDTO.setConsignmentId(1);
-        updatedConsignmentDetailDTO.setAccount(new AccountDTO(account));
+        updatedConsignmentDetailDTO.setAccountId(1);
         updatedConsignmentDetailDTO.setDescription("Updated Description");
         updatedConsignmentDetailDTO.setPrice(BigDecimal.valueOf(150.0));
         updatedConsignmentDetailDTO.setStatus("REQUEST");
-        updatedConsignmentDetailDTO.setAttachments(Arrays.asList(new AttachmentDTO(attachment)));
 
         ConsignmentDetailDTO result = consignmentDetailService.updateConsignmentDetail(1, updatedConsignmentDetailDTO);
 
         verify(consignmentDetailRepos, times(1)).findById(1);
         verify(consignmentRepos, times(1)).findByConsignmentId(1);
         verify(accountRepos, times(1)).findById(1);
-        verify(attachmentRepos, times(1)).findById(1);
+
         verify(consignmentDetailRepos, times(1)).save(any(ConsignmentDetail.class));
         assertNotNull(result);
-        assertEquals(updatedConsignmentDetailDTO.getConsignmentDetailId(), result.getConsignmentDetailId());
         assertEquals(updatedConsignmentDetailDTO.getDescription(), result.getDescription());
         assertEquals(updatedConsignmentDetailDTO.getPrice(), result.getPrice());
         assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getStatus());
@@ -217,23 +213,22 @@ public class ConsignmentDetailServiceImplTest {
     void createConsignmentDetail_HappyPath() {
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
-        when(attachmentRepos.findById(anyInt())).thenReturn(Optional.of(attachment));
+
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
 
-        ConsignmentDetailDTO result = consignmentDetailService.createConsignmentDetail(consignmentDetailDTO);
+        ConsignmentDetailDTO result = consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO);
 
         assertNotNull(result);
-        assertEquals(consignmentDetailDTO.getConsignmentDetailId(), result.getConsignmentDetailId());
-        assertEquals(consignmentDetailDTO.getDescription(), result.getDescription());
-        assertEquals(consignmentDetailDTO.getPrice(), result.getPrice());
-        assertEquals(consignmentDetailDTO.getStatus(), result.getStatus());
+        assertEquals(consignmentRequestDetailDTO.getDescription(), result.getDescription());
+        assertEquals(consignmentRequestDetailDTO.getPrice(), result.getPrice());
+        assertEquals(consignmentRequestDetailDTO.getStatus(), result.getStatus());
     }
 
     @Test
     void createConsignmentDetail_ConsignmentNotFound() {
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentDetailDTO));
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO));
     }
 
     @Test
@@ -241,22 +236,18 @@ public class ConsignmentDetailServiceImplTest {
         when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.of(consignmentDetail1));
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
-        when(attachmentRepos.findById(anyInt())).thenReturn(Optional.of(attachment));
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
 
-        ConsignmentDetailDTO updatedConsignmentDetailDTO = new ConsignmentDetailDTO();
-        updatedConsignmentDetailDTO.setConsignmentDetailId(1);
+        ConsignmentDetailRequestDTO updatedConsignmentDetailDTO = new ConsignmentDetailRequestDTO();
         updatedConsignmentDetailDTO.setConsignmentId(1);
-        updatedConsignmentDetailDTO.setAccount(new AccountDTO(account));
+        updatedConsignmentDetailDTO.setAccountId(1);
         updatedConsignmentDetailDTO.setDescription("Updated Description");
         updatedConsignmentDetailDTO.setPrice(BigDecimal.valueOf(150.0));
         updatedConsignmentDetailDTO.setStatus("REQUEST");
-        updatedConsignmentDetailDTO.setAttachments(Arrays.asList(new AttachmentDTO(attachment)));
 
         ConsignmentDetailDTO result = consignmentDetailService.updateConsignmentDetail(1, updatedConsignmentDetailDTO);
 
         assertNotNull(result);
-        assertEquals(updatedConsignmentDetailDTO.getConsignmentDetailId(), result.getConsignmentDetailId());
         assertEquals(updatedConsignmentDetailDTO.getDescription(), result.getDescription());
         assertEquals(updatedConsignmentDetailDTO.getPrice(), result.getPrice());
         assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getStatus());
@@ -266,7 +257,7 @@ public class ConsignmentDetailServiceImplTest {
     void updateConsignmentDetail_ConsignmentDetailNotFound() {
         when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentDetailDTO));
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentRequestDetailDTO));
     }
 
     @Test
@@ -281,16 +272,16 @@ public class ConsignmentDetailServiceImplTest {
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
         when(accountRepos.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentDetailDTO));
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO));
     }
 
     @Test
     void testCreateConsignmentDetail_AttachmentNotFound() {
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
-        when(attachmentRepos.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentDetailDTO));
+
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO));
     }
 
     @Test
@@ -298,7 +289,7 @@ public class ConsignmentDetailServiceImplTest {
         when(consignmentDetailRepos.findById(anyInt())).thenReturn(Optional.of(consignmentDetail1));
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(null);
 
-        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentDetailDTO));
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentRequestDetailDTO));
     }
 
     @Test
@@ -307,7 +298,7 @@ public class ConsignmentDetailServiceImplTest {
         when(consignmentRepos.findByConsignmentId(anyInt())).thenReturn(consignment);
         when(accountRepos.findById(anyInt())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentDetailDTO));
+        assertThrows(ResourceNotFoundException.class, () -> consignmentDetailService.updateConsignmentDetail(1, consignmentRequestDetailDTO));
     }
 
 }
