@@ -10,15 +10,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { CameraIcon, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/AuthProvider.tsx";
-import {Controller, SubmitHandler, useForm} from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { API_SERVER } from "@/constants/domain.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
+import { Checkbox } from "@/components/ui/checkbox.tsx";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -96,13 +96,13 @@ const ProfileDetail = () => {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then((res) => {
-        auth.setUser({
-          ...auth.user,
-          avatar: res.data
-        });
-        toast.success('Update avatar successfully!');
-        setIsLoading(false);
-      })
+      auth.setUser({
+        ...auth.user,
+        avatar: res.data
+      });
+      toast.success('Update avatar successfully!');
+      setIsLoading(false);
+    })
       .catch((err) => {
         console.log(err);
         toast.error('Update avatar failed!');
@@ -118,17 +118,17 @@ const ProfileDetail = () => {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(() => {
-        auth.setUser({
-          ...auth.user,
-          ...data
-        });
-        toast.success('Update details successfully!');
-        setIsLoading(false);
-      }).catch((err) => {
-        console.log(err);
-        toast.error('Update details failed!');
-        setIsLoading(false);
-      })
+      auth.setUser({
+        ...auth.user,
+        ...data
+      });
+      toast.success('Update details successfully!');
+      setIsLoading(false);
+    }).catch((err) => {
+      console.log(err);
+      toast.error('Update details failed!');
+      setIsLoading(false);
+    })
   };
 
   const onSubmitTwoFactorAuth: SubmitHandler<TwoFactorAuth> = (data) => {
@@ -175,6 +175,10 @@ const ProfileDetail = () => {
             <CardContent className="space-y-4">
               <div className="inline-block relative">
                 <Avatar className="w-[80px] h-[80px]">
+                  <div className="absolute inset-0 bg-black translate-y-12 bg-opacity-50 " >
+                    <CameraIcon className="w-6 h-6 m-auto text-white" />
+
+                  </div>
                   <AvatarImage src={avatarPreview} alt="avatar" />
                   <AvatarFallback>{auth.user.nickname.charAt(0)}</AvatarFallback>
                 </Avatar>
@@ -232,7 +236,6 @@ const ProfileDetail = () => {
                     id="phone"
                     type="phone"
                     {...profileDetailForm("phone")}
-                    required
                   />
                 </div>
               </div>
@@ -271,16 +274,16 @@ const ProfileDetail = () => {
               <div className="grid gap-4">
                 <div className="flex gap-2">
                   <Controller
-                  control={controlTwoFactorAuth}
-                  name="enable2fa"
-                  render={({ field }) => (
-                    <Checkbox
-                      id="enable2fa"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
+                    control={controlTwoFactorAuth}
+                    name="enable2fa"
+                    render={({ field }) => (
+                      <Checkbox
+                        id="enable2fa"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
                   <Label htmlFor="enable2fa">Enable two-factor authentication</Label>
                 </div>
                 <div className="grid gap-2">

@@ -21,24 +21,27 @@ const formatTime = (time: number) => {
 }
 
 const CountDownTime: React.FC<Props> = ({ end }) => {
-    const difference = end.getTime()- new Date().getTime();
+    const difference = end.getTime() - new Date().getTime();
     const [time, setTime] = useState(difference);
 
     useEffect(() => {
         console.log(time);
-        if(time > 0) {
+        if (time > 0) {
             const interval = setInterval(() => {
                 setTime(time => time - 1000);
             }, 1000);
-    
+
             return () => clearInterval(interval);
         }
         setTime(0);
     }, []);
-    
+
     return (
-        <div>
-            {formatTime(time)}
+        <div >
+            <p className='text-white opacity-100 '>
+                {formatTime(time)}
+            </p>
+
         </div>
     );
 };

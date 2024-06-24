@@ -17,6 +17,8 @@ import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import { ItemStatus } from "@/models/Item"
 import { Search } from "lucide-react"
+import { useCurrency } from "@/CurrencyProvider"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -33,6 +35,7 @@ export function ItemList() {
   const [auctions, setAuctions] = useState<AuctionSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
+  const currency = useCurrency();
 
 
   const fetchItems = async (pageNumber: number, itemCategory?: ItemCategory, minPrice?: number, maxPrice?: number, sortBy?: string, sortOrder?: string) => {
@@ -75,7 +78,7 @@ export function ItemList() {
     window.history.replaceState(null, "", url.toString());
     search = null;
     console.log(name);
-    if (name == "all"||name==null) {
+    if (name == "all" || name == null) {
       fetchItems(0, null, minPrice, maxPrice);
       setItemCategoryFilter(null);
       setSortBy(null);
@@ -174,7 +177,7 @@ export function ItemList() {
                           }
                         }}
                         onKeyUp={(event) => {
-                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name||null) }
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name || null) }
                         }}
                         className="bg-background px-4 py-2 rounded-md"
                       />
@@ -196,7 +199,7 @@ export function ItemList() {
 
                         }}
                         onKeyUp={(event) => {
-                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name||null) }
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name || null) }
                         }}
                         className="bg-background px-4 py-2 rounded-md"
                       />
@@ -230,26 +233,33 @@ export function ItemList() {
               auctions.map((auction) => {
                 if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
                   return (
-                    <div key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" onClick={() => {
+                    <Card key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" onClick={() => {
                       navigate(`/auctions/${auction.auctionSessionId}`);
                     }}>
-                      <img
-                        src={item.attachments[0].link}
-                        alt={item.name}
-                        width={400}
-                        height={300}
-                        className="w-full h-60 object-cover"
-                      />
-                      <div className="p-4">
-                        <h3 className="text-lg font-bold mb-2">{item.name}</h3>
-                        <div className="text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.description }}></div>
+                      <CardHeader>
+                        <img
+                          src={item.attachments[0].link}
+                          alt={item.name}
+                          width={400}
+                          height={300}
+                          className="w-full h-60 object-cover"
+                        />
+                      </CardHeader>
+
+                      <CardContent className="p-4 flex flex-col gap-3 ">
+                          <p className="text-sm font-bold mb-2 h-10">{item.name}</p>
                         <div className="flex justify-between items-center ">
 
-                          <div className="text-primary font-bold text-lg">${item.reservePrice.toLocaleString()}</div>
+                          <div className="text-primary font-bold text-lg">{currency.format({
+                            amount: item.reservePrice,
+                            currency: item.currency,
+                            compact: true
+
+                          })}</div>
                           <div className="text-muted-foreground text-sm">{item.category.name}</div>
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   )
                 }
               }

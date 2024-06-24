@@ -14,6 +14,7 @@ import { AuctionSessionStatus } from '@/constants/enums'
 
 import { SERVER_DOMAIN_URL } from '@/constants/domain'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrency } from '@/CurrencyProvider'
 
 
 export default function AuctionSession() {
@@ -25,6 +26,7 @@ export default function AuctionSession() {
         style: 'currency',
         currency: 'USD',
     });
+    const currency = useCurrency();
     const param = useParams();
     const [bidders, setBidders] = useState<number[]>([]);
     const user = JSON.parse(getCookie("user") || "null");
@@ -111,8 +113,9 @@ export default function AuctionSession() {
                             This action cannot be undone. This will
                             directly remove your balance from your
                             account and remove your data from our servers.
-                            (Auction Registration Fee: ${fee})
-                        </AlertDialogDescription>
+                            <span className='
+                            text-red-500 dark:text-red-400 font-semibold
+                            '>(Auction Registration Fee: ${fee})</span>                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel >Cancel</AlertDialogCancel>
@@ -151,7 +154,9 @@ export default function AuctionSession() {
                             You need to register to this auction first
                             if you want to place a bid.
                             Do you want to continue?
-                            (Auction Registration Fee: ${fee})
+                            <span className='
+                            text-red-500 dark:text-red-400 font-semibold
+                            '>(Auction Registration Fee: ${fee})</span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -211,9 +216,9 @@ export default function AuctionSession() {
                         </div>
                         {
                             !sessionAttachments[0]?.link ?
-                             < Skeleton
-                                className="mx-auto rounded-lg object-contain  w-[600px] h-[600px]"
-                            />
+                                < Skeleton
+                                    className="mx-auto rounded-lg object-contain  w-[600px] h-[600px]"
+                                />
                                 :
                                 <img
                                     src={sessionAttachments[0]?.link}
@@ -228,24 +233,33 @@ export default function AuctionSession() {
                     <div id='auction-items'>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item,index) => (
+                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item, index) => (
                                 <Card key={index}>
-                                    <img
-                                        src={item.itemDTO.attachments[0].link}
-                                        width={300}
-                                        height={200}
-                                        alt="Auction Item"
-                                        className="rounded-t-lg object-cover"
-                                    />
+                                    <CardHeader>
+                                        <img
+                                            src={item.itemDTO?.attachments[0].link}
+                                            width={300}
+                                            height={200}
+                                            alt="Auction Item"
+                                            className="rounded-t-lg object-cover"
+                                        />
+                                    </CardHeader>
+
                                     <CardContent className="space-y-2 p-4">
-                                        <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
+                                        <h3 className="text-sm font-semibold h-12">{item.itemDTO.name}</h3>
                                         <div className="flex items-center justify-between">
-                                            <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
+                                            <div className="text-primary-500 font-medium">{currency.format({
+                                                amount: item?.itemDTO.reservePrice,
+                                                compact: true,
+                                            })}</div>
 
                                             {
                                                 auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
                                                     <div className="rounded-md bg-yellow-300 p-2 text-red-500">
-                                                        Won: {currencyFormatter.format(item.currentPrice)}
+                                                        Won: {currency.format({
+                                                            amount: item?.currentPrice,
+                                                            compact: true,
+                                                        })}
                                                     </div> :
                                                     <>
                                                         {bidders.includes(userId) ? (

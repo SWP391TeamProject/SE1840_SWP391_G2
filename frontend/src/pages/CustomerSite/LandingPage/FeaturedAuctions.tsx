@@ -121,15 +121,13 @@ export default function FeaturedAuctions() {
                           <h3 className="text-lg font-semibold">
                             {item.title}
                           </h3>
-                          <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium dark:bg-gray-800 mx-auto">
+                          <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium mx-auto absolute -translate-y-14 translate-x-2">
                             <CountDownTime end={new Date(item.endDate)} />
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Ends in {getDaysLeft(new Date(item.endDate))} days
-                          </div>
+        
                           <Button variant="default" asChild>
                             <Link
                               to={`auctions/${item.auctionSessionId}`}
