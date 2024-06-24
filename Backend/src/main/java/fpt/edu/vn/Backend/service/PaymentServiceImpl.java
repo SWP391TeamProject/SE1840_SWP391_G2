@@ -44,7 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
-        if(paymentRequest.getAmount().compareTo(new BigDecimal(5000)) <= 0){
+        if(paymentRequest.getAmount().compareTo(new BigDecimal(5000)) < 0){
             throw new InvalidInputException("Amount must be greater than 5,000 VND");
         }
         if(paymentRequest.getType() == null){
