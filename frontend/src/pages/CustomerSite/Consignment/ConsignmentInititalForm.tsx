@@ -60,7 +60,7 @@ export default function ConsignmentInititalForm() {
       accountId: JSON.parse(getCookie("user"))?.id,
       email: JSON.parse(getCookie("user"))?.email || "",
       phone: JSON.parse(getCookie("user"))?.phone || "",
-      contactName: JSON.parse(getCookie("user"))?.username || "",
+      contactName: JSON.parse(getCookie("user"))?.nickname || "",
       preferContact: "any",
       description: "",
       files: [],
@@ -118,7 +118,8 @@ export default function ConsignmentInititalForm() {
                         <FormControl>
                           <Input
                             placeholder="enter your prefer contact name here"
-                            defaultValue={JSON.parse(getCookie("user"))?.username}
+                            defaultValue={JSON.parse(getCookie("user"))?.nickname}
+                            readOnly
                             {...field}
                           />
                         </FormControl>
@@ -136,8 +137,9 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="adasd"
+                          <Input placeholder="Your Email"
                             defaultValue={JSON.parse(getCookie("user"))?.email}
+                            readOnly
                             {...field}
                           />
                         </FormControl>
@@ -155,7 +157,10 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input placeholder="enter your phone number here" {...field} />
+                          <Input placeholder="enter your phone number here"
+                          defaultValue={JSON.parse(getCookie("user"))?.phone}
+                          readOnly
+                          {...field} />
                         </FormControl>
                         <FormDescription>
                           this is the phone we used to contact you
@@ -164,6 +169,8 @@ export default function ConsignmentInititalForm() {
                       </FormItem>
                     )}
                   />
+                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your profile.
+                  </h3>
                   <FormField
                     control={form.control}
                     name="preferContact"
