@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -28,7 +28,9 @@ export default function AuctionJoin() {
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(false);
   useEffect(() => {
-    if (!allow) {
+
+    if (!allow || !accountId) {
+      toast.dismiss();
       setClient(null);
       return;
     }
@@ -69,10 +71,20 @@ export default function AuctionJoin() {
   }, [accountId, allow]);
 
   useEffect(() => {
+    if (!getCookie("user")) {
+      setAllow(false);
+      return;
+    }
+    if (accountId === null && getCookie("user")) {
+      setAcccountId(JSON.parse(getCookie("user")).id);
+    }
     window.onpopstate = function () {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
+    if (accountId) {
+      setAllow(true);
+    }
   }, []);
 
   const onMessageReceived = (payload: IMessage) => {
@@ -137,9 +149,7 @@ export default function AuctionJoin() {
 
   }, [price]);
 
-  if (accountId === null) {
-    setAcccountId(JSON.parse(getCookie("user")).id);
-  }
+
   return (
     <>
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
@@ -214,7 +224,7 @@ export default function AuctionJoin() {
                     </ScrollArea>
 
                   </div>
-                  {allow &&
+                  {allow ?
                     <div className="mt-12 md:mt-16 lg:mt-20">
                       <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
                       <form className="max-w-md mx-auto" onSubmit={sendMessage}>
@@ -228,13 +238,25 @@ export default function AuctionJoin() {
                         </div>
                       </form>
                     </div>
+                    :
+                    <div className="mt-12 md:mt-16 lg:mt-20">
+                      <div className="grid gap-4">
+
+                        <Link to={`/auctions/${auctionId}`} >
+                          <Button type="submit" className="w-full">
+                            Go to Auction
+                          </Button>
+                        </Link>
+
+                      </div>
+                    </div>
                   }
                 </div>
               </div>
             </div>
 
           </div>
-        </div>
+        </div >
       }
     </>
 

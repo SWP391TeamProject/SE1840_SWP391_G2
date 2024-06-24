@@ -15,7 +15,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { AuctionSession } from "@/models/newModel/auctionSession"
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
-import { ItemStatus } from "@/models/Item"
+import { Search } from "lucide-react"
+import { Item, ItemStatus } from "@/models/Item"
+import { Card } from "@/components/ui/card"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -40,13 +42,13 @@ export function ItemList() {
       let res;
       if (search && search?.length > 0) {
         console.log(itemCategory);
-        res = await getItemsByName(pageNumber, 12, search, sortBy, sortOrder,ItemStatus.IN_AUCTION);
+        res = await getItemsByName(pageNumber, 12, search, sortBy, sortOrder, ItemStatus.IN_AUCTION);
       } else if (itemCategory != undefined && itemCategory != null && itemCategory.itemCategoryId != null) {
         console.log(itemCategory);
-        res = await getItemsByCategoryId(pageNumber, 12, itemCategory.itemCategoryId, minPrice, maxPrice, sortBy, sortOrder,ItemStatus.IN_AUCTION);
+        res = await getItemsByCategoryId(pageNumber, 12, itemCategory.itemCategoryId, minPrice, maxPrice, sortBy, sortOrder, ItemStatus.IN_AUCTION);
       } else {
         console.log(itemCategory);
-        res = await getItems(pageNumber, 12, minPrice, maxPrice, sortBy, sortOrder,ItemStatus.IN_AUCTION);
+        res = await getItems(pageNumber, 12, minPrice, maxPrice, sortBy, sortOrder, ItemStatus.IN_AUCTION);
       }
       if (res) {
         console.log(res);
@@ -96,6 +98,20 @@ export function ItemList() {
     fetchItems(pageNumber, itemsList.filter, minPrice, maxPrice, sortBy, sortOrder);
   }
 
+  const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
+    console.log(item, auctionId);
+    navigate(`/auctions/${auctionId}/${item.name}`, {
+      state: {
+        id: {
+          auctionSessionId: auctionId,
+          itemId: item.itemId
+        },
+        itemDTO: item,
+      }
+    });
+
+  }
+
   useEffect(() => {
     setIsLoading(true);
     fetchActiveAuctionSessions().then((res) => {
@@ -106,15 +122,18 @@ export function ItemList() {
     });
     getAllItemCategories(0, 50).then((res) => {
       setItemCategories(res.data.content);
-    });     
+    });
     if (location.state?.category) {
       console.log(location.state.category);
       fetchItems(0, location.state.category, minPrice, maxPrice).then(() => {
         setIsLoading(false);
       });
       setItemCategoryFilter(location.state.category);
-    }else {
-      fetchItems(itemsList.currentPageNumber);
+    } else {
+      console.log(itemsList.currentPageList.length);
+      if (itemsList.currentPageList.length == 0) {
+        fetchItems(itemsList.currentPageNumber);
+      }
     }
 
   }, []);
@@ -127,9 +146,20 @@ export function ItemList() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Jewelry Auction</h1>
             <div className="flex items-center gap-4">
+              <div className="relative ml-auto flex-1 md:grow-0">
+                <form action="" method="get">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+                    name='search'
+                  />
+                </form>
+              </div>
               <Select onValueChange={(value) => handleSortChange(value.split(":")[0], value.split(":")[1])}>
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue placeholder="Sort by" defaultValue={sortBy}/>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" defaultValue={sortBy} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="reservePrice:asc">Price: Low to High</SelectItem>
@@ -162,7 +192,7 @@ export function ItemList() {
                           }
                         }}
                         onKeyUp={(event) => {
-                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name||null) }
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name || null) }
                         }}
                         className="bg-background px-4 py-2 rounded-md"
                       />
@@ -184,7 +214,7 @@ export function ItemList() {
 
                         }}
                         onKeyUp={(event) => {
-                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name||null) }
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name || null) }
                         }}
                         className="bg-background px-4 py-2 rounded-md"
                       />
@@ -218,16 +248,22 @@ export function ItemList() {
               auctions.map((auction) => {
                 if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
                   return (
-                    <div key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" onClick={() => {
-                      navigate(`/auctions/${auction.auctionSessionId}`);
-                    }}>
-                      <img
-                        src={item.attachments[0].link}
-                        alt={item.name}
-                        width={400}
-                        height={300}
-                        className="w-full h-60 object-cover"
-                      />
+                    <Card key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" >
+
+                      <div className='group relative'>
+                        <img
+                          src={item.attachments[0].link}
+                          width={300}
+                          height={200}
+                          alt="Auction Item"
+                          className="rounded-t-lg object-cover w-full "
+                        />
+                        <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                          onClick={() => handleViewItemDetailsClick(item, auction.auctionSessionId)}
+                        >
+                          <Button >Detail</Button>
+                        </div>
+                      </div>
                       <div className="p-4">
                         <h3 className="text-lg font-bold mb-2">{item.name}</h3>
                         <div className="text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.description }}></div>
@@ -237,7 +273,7 @@ export function ItemList() {
                           <div className="text-muted-foreground text-sm">{item.category.name}</div>
                         </div>
                       </div>
-                    </div>
+                    </Card>
                   )
                 }
               }
