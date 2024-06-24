@@ -15,8 +15,6 @@ import { AuctionSessionStatus } from '@/constants/enums'
 import { SERVER_DOMAIN_URL } from '@/constants/domain'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrency } from '@/CurrencyProvider'
-import { Item } from '@/models/Item'
-
 
 
 export default function AuctionSession() {
@@ -88,27 +86,6 @@ export default function AuctionSession() {
         })
     }
     const ConfirmRegister = () => {
-        if (userId == -1) {
-            return (
-                <AlertDialog>
-                    <AlertDialogTrigger>
-                        <Button variant="default" >Register to bid</Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className='text-foreground'>
-                        <AlertDialogHeader >
-                            <AlertDialogTitle>You are not login </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                You need to login first in order to register to this auction !!!
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel >Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => navigate('/auth/login')}>Login</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )
-        }
         let fee = Number.MAX_VALUE;
         if (auctionSession?.auctionItems) {
             auctionSession.auctionItems.forEach((item: any) => {
@@ -150,27 +127,6 @@ export default function AuctionSession() {
 
     }
     const RegisterAlert = () => {
-        if (userId == -1) {
-            return (
-                <AlertDialog>
-                    <AlertDialogTrigger>
-                        <Button variant="default" >Place bid</Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className='text-foreground'>
-                        <AlertDialogHeader >
-                            <AlertDialogTitle>You are not login </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                You need to login first in order to register to this auction !!!
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel >Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => navigate('/auth/login')}>Login</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )
-        }
         let fee = Number.MAX_VALUE;
         if (auctionSession?.auctionItems) {
             auctionSession.auctionItems.forEach((item: any) => {
@@ -211,22 +167,6 @@ export default function AuctionSession() {
             </AlertDialog>
         )
     }
-
-    const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-        console.log(item, auctionId);
-        navigate(`/auctions/${auctionId}/${item.name}`, {
-            state: {
-                id: {
-                    auctionSessionId: auctionId,
-                    itemId: item.itemId
-                },
-                itemDTO: item,
-                allow: bidders.includes(userId)
-            }
-        });
-
-    }
-
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-gray-100 py-12 md:py-12 dark:bg-gray-800">
@@ -293,23 +233,17 @@ export default function AuctionSession() {
                     <div id='auction-items'>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => (
-                                <Card key={item.id.itemId}>
-
-                                    <div className='group relative'>
+                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item, index) => (
+                                <Card key={index}>
+                                    <CardHeader>
                                         <img
-                                            src={item.itemDTO.attachments[0].link}
+                                            src={item.itemDTO?.attachments[0].link}
                                             width={300}
                                             height={200}
                                             alt="Auction Item"
-                                            className="rounded-t-lg object-cover w-full "
+                                            className="rounded-t-lg object-cover"
                                         />
-                                        <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                                            onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession.auctionSessionId)}
-                                        >
-                                            <Button >Detail</Button>
-                                        </div>
-                                    </div>
+                                    </CardHeader>
 
                                     <CardContent className="space-y-2 p-4">
                                         <h3 className="text-sm font-semibold h-12">{item.itemDTO.name}</h3>
@@ -331,7 +265,7 @@ export default function AuctionSession() {
                                                         {bidders.includes(userId) ? (
                                                             <Button onClick={() => {
                                                                 let name = item?.itemDTO.name;
-                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO , allow:true} });
+                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO } });
                                                             }}>Place Bid</Button>
                                                         ) : (
                                                             <RegisterAlert></RegisterAlert>
