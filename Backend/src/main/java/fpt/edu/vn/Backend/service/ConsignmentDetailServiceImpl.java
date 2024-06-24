@@ -4,6 +4,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Attachment;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,35 +61,30 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
-    public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailDTO consignmentDetailDTO) {
+    public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
         try {
             ConsignmentDetail consignmentDetail = new ConsignmentDetail();
-            consignmentDetail.setConsignmentDetailId(consignmentDetailDTO.getConsignmentDetailId());
 
             // Fetch Consignment by ID
-            Consignment consignment = consignmentRepos.findByConsignmentId(consignmentDetailDTO.getConsignmentId());
+            Consignment consignment = consignmentRepos.findByConsignmentId(consignmentRequestDetailDTO.getConsignmentId());
             if (consignment == null) {
                 throw new ResourceNotFoundException("Consignment not found");
             }
             consignmentDetail.setConsignment(consignment);
 
-            consignmentDetail.setDescription(consignmentDetailDTO.getDescription());
-            consignmentDetail.setPrice(consignmentDetailDTO.getPrice());
-
+            consignmentDetail.setDescription(consignmentRequestDetailDTO.getDescription());
+            consignmentDetail.setPrice(consignmentRequestDetailDTO.getPrice());
+            consignmentDetail.setCreateDate(LocalDateTime.now());
+            consignmentDetail.setUpdateDate(LocalDateTime.now());
             // Fetch Account by ID
-            Account account = accountRepos.findById(consignmentDetailDTO.getAccount().getAccountId())
+            Account account = accountRepos.findById(consignmentRequestDetailDTO.getAccountId())
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
             consignmentDetail.setAccount(account);
 
             // Set ConsignmentStatus enum
-            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentDetailDTO.getStatus()));
+            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentRequestDetailDTO.getStatus()));
 
             // Fetch Attachments by IDs
-            List<Attachment> attachments = consignmentDetailDTO.getAttachments().stream()
-                    .map(attachmentDTO -> attachmentRepos.findById(attachmentDTO.getAttachmentId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Attachment not found: " + attachmentDTO.getAttachmentId())))
-                    .collect(Collectors.toList());
-            consignmentDetail.setAttachments(attachments);
 
             ConsignmentDetail savedConsignmentDetail = consignmentDetailRepos.save(consignmentDetail);
             return new ConsignmentDetailDTO(savedConsignmentDetail);
@@ -98,40 +95,30 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
 
     @Override
-    public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailDTO updatedConsignmentDetail) {
+    public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
             // Find the existing ConsignmentDetail object by ID
             ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
                     .orElseThrow(() -> new ResourceNotFoundException("ConsignmentDetail not found with id: " + consignmentDetailId));
 
 
             // Update the fields with the provided data from updatedConsignmentDetail
-            consignmentDetail.setDescription(updatedConsignmentDetail.getDescription());
-            consignmentDetail.setPrice(updatedConsignmentDetail.getPrice());
-            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(updatedConsignmentDetail.getStatus()));
-
+            consignmentDetail.setDescription(consignmentRequestDetailDTO.getDescription());
+            consignmentDetail.setPrice(consignmentRequestDetailDTO.getPrice());
+            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentRequestDetailDTO.getStatus()));
+            consignmentDetail.setUpdateDate(LocalDateTime.now());
             // Fetch Consignment by ID from DTO and set it in the ConsignmentDetail
-            Consignment consignment = consignmentRepos.findByConsignmentId(updatedConsignmentDetail.getConsignmentId());
+            Consignment consignment = consignmentRepos.findByConsignmentId(consignmentRequestDetailDTO.getConsignmentId());
             if (consignment == null) {
                 throw new ResourceNotFoundException("Consignment not found");
             }
             consignmentDetail.setConsignment(consignment);
 
             // Fetch Account by ID from DTO and set it in the ConsignmentDetail
-            Account account = accountRepos.findById(updatedConsignmentDetail.getAccount().getAccountId()).orElse(null);
+            Account account = accountRepos.findById(consignmentRequestDetailDTO.getAccountId()).orElse(null);
             if (account == null) {
                 throw new ResourceNotFoundException("Account not found");
             }
             consignmentDetail.setAccount(account);
-
-            // Fetch Attachments by IDs from DTO
-            List<AttachmentDTO> attachmentIds = updatedConsignmentDetail.getAttachments();
-            List<Attachment> attachments = attachmentIds.stream()
-                    .map(attachmentId -> attachmentRepos.findById(attachmentId.getAttachmentId()).orElse(null))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            consignmentDetail.setAttachments(attachments);
-
-            // Set other fields as needed
 
             // Save the updated ConsignmentDetail
             ConsignmentDetail savedConsignmentDetail = consignmentDetailRepos.save(consignmentDetail);
