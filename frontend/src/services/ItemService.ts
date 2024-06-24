@@ -8,14 +8,15 @@ import { API_SERVER } from "@/constants/domain";
 const baseUrl = API_SERVER + "/items";
 
 
-export const getItems = async (pageNumber: number, pageSize?: number, minPrice?: number, maxPrice?: number, sort? : string, order?:string) => {
+export const getItems = async (pageNumber: number, pageSize?: number, minPrice?: number, maxPrice?: number, sort? : string, order?:string,status?:ItemStatus) => {
     let params = {
         page: pageNumber,
         size: pageSize,
         minPrice: minPrice,
         maxPrice: maxPrice,
         sort: sort,
-        order: order
+        order: order,
+        status: status
     }
     return await axios.get<Page<Item>>(`${baseUrl}/`, {
         headers: {
@@ -26,22 +27,22 @@ export const getItems = async (pageNumber: number, pageSize?: number, minPrice?:
     });
 };
 
-export const getItemsByCategoryId = async (page: number, size: number, categoryId: number, minPrice?: number, maxPrice?: number, sort? : string, order?:string) => {
+export const getItemsByCategoryId = async (page: number, size: number, categoryId: number, minPrice?: number, maxPrice?: number, sort? : string, order?:string,status?:ItemStatus) => {
     return await axios.get<Page<Item>>(`${baseUrl}/category/${categoryId}`, {
         headers: {
             "Content-Type": "application/json",
 
         },
-        params: { page, size, minPrice, maxPrice , sort, order},
+        params: { page, size, minPrice, maxPrice , sort, order, status},
     });
 };
-export const getItemsByName = async (page: number, size: number, name: string, sort? : string, order?:string) => {
+export const getItemsByName = async (page: number, size: number, name: string, sort? : string, order?:string,status?:ItemStatus) => {
     return await axios.get<Page<Item>>(`${baseUrl}/search/${name}`, {
         headers: {
             "Content-Type": "application/json",
 
         },
-        params: { page, size, sort, order},
+        params: { page, size, sort, order, status},
     });
 };
 

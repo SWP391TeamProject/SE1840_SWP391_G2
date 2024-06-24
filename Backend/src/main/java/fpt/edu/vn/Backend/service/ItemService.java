@@ -28,6 +28,9 @@ public interface ItemService {
     @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status);
     @NotNull Page<ItemDTO> getItemsByOwnerId(@NotNull Pageable pageable, int ownerId);
     @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId);
+    @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId, Item.Status status);
     @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice);
     @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name);
+    @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name,Item.Status status);
+
 }

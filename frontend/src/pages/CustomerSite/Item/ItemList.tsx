@@ -7,15 +7,15 @@ import { Input } from "@/components/ui/input"
 import { getItems, getItemsByCategoryId, getItemsByName } from "@/services/ItemService"
 import PagingIndexes from "@/components/pagination/PagingIndexes"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { ItemCategory } from "@/models/newModel/itemCategory"
 import { setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Items"
 import { getAllItemCategories } from "@/services/ItemCategoryService"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { AuctionSession } from "@/models/newModel/auctionSession"
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
-import { set } from "date-fns"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
+import { ItemStatus } from "@/models/Item"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -40,13 +40,13 @@ export function ItemList() {
       let res;
       if (search && search?.length > 0) {
         console.log(itemCategory);
-        res = await getItemsByName(pageNumber, 12, search, sortBy, sortOrder);
+        res = await getItemsByName(pageNumber, 12, search, sortBy, sortOrder,ItemStatus.IN_AUCTION);
       } else if (itemCategory != undefined && itemCategory != null && itemCategory.itemCategoryId != null) {
         console.log(itemCategory);
-        res = await getItemsByCategoryId(pageNumber, 12, itemCategory.itemCategoryId, minPrice, maxPrice, sortBy, sortOrder);
+        res = await getItemsByCategoryId(pageNumber, 12, itemCategory.itemCategoryId, minPrice, maxPrice, sortBy, sortOrder,ItemStatus.IN_AUCTION);
       } else {
         console.log(itemCategory);
-        res = await getItems(pageNumber, 12, minPrice, maxPrice, sortBy, sortOrder);
+        res = await getItems(pageNumber, 12, minPrice, maxPrice, sortBy, sortOrder,ItemStatus.IN_AUCTION);
       }
       if (res) {
         console.log(res);
@@ -106,17 +106,16 @@ export function ItemList() {
     });
     getAllItemCategories(0, 50).then((res) => {
       setItemCategories(res.data.content);
-    });
+    });     
     if (location.state?.category) {
       console.log(location.state.category);
       fetchItems(0, location.state.category, minPrice, maxPrice).then(() => {
         setIsLoading(false);
       });
       setItemCategoryFilter(location.state.category);
-    } else {
+    }else {
       fetchItems(itemsList.currentPageNumber);
     }
-
 
   }, []);
   return (
@@ -128,9 +127,9 @@ export function ItemList() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Jewelry Auction</h1>
             <div className="flex items-center gap-4">
-              <Select value={sortBy} onValueChange={(value) => handleSortChange(value.split(":")[0], value.split(":")[1])}>
-                <SelectTrigger className="bg-background px-4 py-2 rounded-md">
-                  <SelectValue placeholder="Sort by" />
+              <Select onValueChange={(value) => handleSortChange(value.split(":")[0], value.split(":")[1])}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue placeholder="Sort by" defaultValue={sortBy}/>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="reservePrice:asc">Price: Low to High</SelectItem>
