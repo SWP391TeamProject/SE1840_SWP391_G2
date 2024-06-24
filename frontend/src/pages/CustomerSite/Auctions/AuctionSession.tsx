@@ -13,6 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { AuctionSessionStatus } from '@/constants/enums'
 
 import { SERVER_DOMAIN_URL } from '@/constants/domain'
+import { Skeleton } from '@/components/ui/skeleton'
 
 
 export default function AuctionSession() {
@@ -57,7 +58,7 @@ export default function AuctionSession() {
         }
 
         window.scrollTo(0, 0);
-        
+
     }, []);
 
     useEffect(() => {
@@ -208,13 +209,17 @@ export default function AuctionSession() {
 
                             </div>
                         </div>
-                        <img
-                            src={sessionAttachments[0]?.link}
-                            width={600}
-                            height={400}
-                            alt="Auction Hero"
-                            className="mx-auto rounded-lg object-cover"
-                        />
+                        {
+                            !sessionAttachments[0]?.link ?
+                             < Skeleton
+                                className="mx-auto rounded-lg object-contain  w-[600px] h-[600px]"
+                            />
+                                :
+                                <img
+                                    src={sessionAttachments[0]?.link}
+                                    alt="Auction Hero"
+                                    className="mx-auto rounded-lg object-contain  w-[600px] h-[600px]"
+                                />}
                     </div>
                 </div>
             </section>
@@ -223,8 +228,8 @@ export default function AuctionSession() {
                     <div id='auction-items'>
                         <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => (
-                                <Card key={item.id.itemId}>
+                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item,index) => (
+                                <Card key={index}>
                                     <img
                                         src={item.itemDTO.attachments[0].link}
                                         width={300}

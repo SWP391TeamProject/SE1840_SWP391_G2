@@ -1,8 +1,6 @@
 import { HdmiPort, Loader2, LoaderPinwheel, LucideAlignHorizontalDistributeCenter, LucideGavel } from "lucide-react";
 const messages = [
-  "Loading...",
   "Please wait...",
-  "Did you know? The average human attention span is 8 seconds.",
   "The quick brown fox jumps over the lazy dog.",
   "If you're waiting for a sign, this is it.",
   "The best things come to those who wait.",
@@ -15,6 +13,10 @@ const messages = [
   "The early bird catches the worm.",
   "The best is yet to come.",
   "You're almost there.",
+  "Keep calm and carry on.",
+  "Don't rush perfection.",
+  "Slow and steady wins ",
+  "Keep calm and wait.",
 ]
 export default function LoadingAnimation({ message = "Loading..." }) {
   const loadingScreenMessage = messages[Math.floor(Math.random() * messages.length)];

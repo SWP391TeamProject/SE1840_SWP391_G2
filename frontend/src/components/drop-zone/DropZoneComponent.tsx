@@ -15,7 +15,7 @@ export default function DropzoneComponent({ control, name }) {
       name={name}
       render={({ field: { onChange, resetFields } }) => {
         const [acceptedFiles, setAcceptedFiles] = useState<AcceptedFile[]>([]); // Explicit typing
-        const { getRootProps, getInputProps, fileRejections } = useDropzone({
+        const { getRootProps, getInputProps } = useDropzone({
           accept: { "image/*": [] },
           onDrop: (newAcceptedFiles) => {
             console.log(newAcceptedFiles);
