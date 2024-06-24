@@ -19,7 +19,7 @@ const messages = [
 export default function LoadingAnimation({ message = "Loading..." }) {
   const loadingScreenMessage = messages[Math.floor(Math.random() * messages.length)];
 
-  return <div className="w-full max-w-screen-5xl  h-[80%] bg-transparent flex flex-col justify-center items-center absolute mx-auto my-auto absolute">
+  return <div className="w-full max-w-screen-5xl  h-[80%] bg-transparent flex flex-col justify-center items-center absolute mx-auto my-auto">
     <div className="w-auto relative"> {/* Add relative here */}
       <div className="rotate-25 -translate-y-5 -translate-x-4">
         <LucideGavel className="w-10 h-10 animate-bounce text-primary m-0 p-0 absolute " /> {/* Adjust translate-y here */}
