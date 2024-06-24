@@ -310,23 +310,6 @@ const ProfileDetail = () => {
             </CardFooter>
           </form>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Delete Account</CardTitle>
-            <CardDescription>
-              Permanently delete your account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Label>Confirm Deletion</Label>
-            <Input type="password"
-              placeholder="Enter your password to confirm deletion" />
-          </CardContent>
-          <CardFooter>
-            <Button>Delete Account</Button>
-          </CardFooter>
-        </Card>
       </div>
 
 
