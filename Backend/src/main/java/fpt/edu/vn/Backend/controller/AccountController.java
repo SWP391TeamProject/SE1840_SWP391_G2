@@ -128,7 +128,7 @@ public class AccountController {
     }
 
     @PostMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or authentication.token.claims['userId'] == #id")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountDTO> deleteAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
