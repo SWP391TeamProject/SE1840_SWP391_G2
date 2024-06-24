@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -16,20 +16,20 @@ import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 
 export default function AuctionJoin() {
   const [isReceived, setIsReceived] = useState(false);
-  const [accountId, setAcccountId] = useState<number | null>(null);
+  const [accountId, setAccountId] = useState<number | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
-  const [allow, setAllow] = useState(true);
-
+  const [allow, setAllow] = useState(location.state.allow || false);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(false);
   useEffect(() => {
-    if (!allow) {
+    if (allow===false || !accountId ) {
       setClient(null);
+      toast.dismiss();
       return;
     }
     const newClient = new Client({
@@ -69,10 +69,20 @@ export default function AuctionJoin() {
   }, [allow]);
 
   useEffect(() => {
+    if (!getCookie("user")) {
+      setAllow(false);
+      return;
+    }
+    if (accountId === null && getCookie("user")) {
+      setAccountId(JSON.parse(getCookie("user")).id);
+    }
     window.onpopstate = function () {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
+    if (accountId) {
+      setAllow(true);
+    }
   }, []);
 
   const onMessageReceived = (payload: IMessage) => {
@@ -138,9 +148,7 @@ export default function AuctionJoin() {
 
   }, [price]);
 
-  if (accountId === null) {
-    setAcccountId(JSON.parse(getCookie("user")).id);
-  }
+
   return (
     <>
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
@@ -215,7 +223,7 @@ export default function AuctionJoin() {
                     </ScrollArea>
 
                   </div>
-                  {allow &&
+                  {allow ?
                     <div className="mt-12 md:mt-16 lg:mt-20">
                       <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
                       <form className="max-w-md mx-auto" onSubmit={sendMessage}>
@@ -229,13 +237,25 @@ export default function AuctionJoin() {
                         </div>
                       </form>
                     </div>
+                    :
+                    <div className="mt-12 md:mt-16 lg:mt-20">
+                      <div className="grid gap-4">
+
+                        <Link to={`/auctions/${auctionId}`} >
+                          <Button type="submit" className="w-full">
+                            Go to Auction
+                          </Button>
+                        </Link>
+
+                      </div>
+                    </div>
                   }
                 </div>
               </div>
             </div>
 
           </div>
-        </div>
+        </div >
       }
     </>
 
