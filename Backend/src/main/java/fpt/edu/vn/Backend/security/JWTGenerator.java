@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.security;
 
-import fpt.edu.vn.Backend.oauth2.security.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -36,8 +35,6 @@ public class JWTGenerator {
         int id;
         if (tronVn instanceof BiddifyUser u)
             id = u.getUserID();
-        else if (tronVn instanceof UserPrincipal u)
-            id = Math.toIntExact(u.getId());
         else
             throw new RuntimeException("Bay acc");
         return Jwts
