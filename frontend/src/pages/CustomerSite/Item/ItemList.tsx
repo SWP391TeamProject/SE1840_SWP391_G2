@@ -74,7 +74,7 @@ export function ItemList() {
     window.history.replaceState(null, "", url.toString());
     search = null;
     console.log(name);
-    if (name == "all") {
+    if (name == "all"||name==null) {
       fetchItems(0, null, minPrice, maxPrice);
       setItemCategoryFilter(null);
       setSortBy(null);
@@ -162,7 +162,7 @@ export function ItemList() {
                           }
                         }}
                         onKeyUp={(event) => {
-                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter.name) }
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name||null) }
                         }}
                         className="bg-background px-4 py-2 rounded-md"
                       />
@@ -184,7 +184,7 @@ export function ItemList() {
 
                         }}
                         onKeyUp={(event) => {
-                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter.name) }
+                          if (event.key == "Enter") { handleFilterClick(itemCategoryFilter?.name||null) }
                         }}
                         className="bg-background px-4 py-2 rounded-md"
                       />
