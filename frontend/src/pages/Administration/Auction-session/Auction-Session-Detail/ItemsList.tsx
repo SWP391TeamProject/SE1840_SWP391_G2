@@ -13,8 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 export default function ItemsList({ ...props }) {
+  const currency = useCurrency();
+
   return (
     <Card>
       <CardHeader className="px-7">
@@ -38,8 +41,12 @@ export default function ItemsList({ ...props }) {
               <TableRow className="bg-accent" key={item?.id.itemId}>
                 <TableCell>{item?.id.itemId}</TableCell>
                 <TableCell className="hidden sm:table-cell">{item?.itemDTO.name}</TableCell>
-                <TableCell className="hidden sm:table-cell">{item?.itemDTO.reservePrice}</TableCell>
-                <TableCell className="hidden md:table-cell">{item?.currentPrice}</TableCell>
+                <TableCell className="hidden sm:table-cell">{currency.format({
+                  amount: item?.itemDTO.reservePrice
+                })}</TableCell>
+                <TableCell className="hidden md:table-cell">{currency.format({
+                  amount: item?.currentPrice
+                })}</TableCell>
               </TableRow>
             ))}
             

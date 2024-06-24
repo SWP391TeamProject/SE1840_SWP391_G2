@@ -18,10 +18,12 @@ import { MenuIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { removeCookie } from "@/utils/cookies";
 import logo from "@/assets/icon.png";
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 
 export default function DashBoardNavBar() {
   const auth = useAuth();
+  const currency = useCurrency();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
 
   const handleSignout = function () {
@@ -97,8 +99,11 @@ export default function DashBoardNavBar() {
                             Balance:
                           </div>
                           <div className="basis-1/2 font-medium text-left block">
-                            <p >
-                              {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                            <p>
+                              {currency.format({
+                                amount: auth.user.balance,
+                                compact: true
+                              })}
                             </p>
                           </div>
                         </div>
