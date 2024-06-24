@@ -23,13 +23,20 @@ export default function AuctionJoin() {
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
+  const [allow, setAllow] = useState(true);
 
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(false);
   useEffect(() => {
+    if (!allow) {
+      setClient(null);
+      return;
+    }
     const newClient = new Client({
-      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
-
+      brokerURL: `wss://${import.meta.env.VITE_BACKEND_DNS}:8080/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
+      // onDisconnect: () => {
+      //   toast.error('You have been disconnected from the auction');
+      // },
       onConnect: () => {
         setIsJoin(true);
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
@@ -56,9 +63,10 @@ export default function AuctionJoin() {
     return () => {
       if (newClient.connected) {
         newClient.deactivate();
+        newClient.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
       }
     };
-  }, [accountId]);
+  }, [accountId, allow]);
 
   useEffect(() => {
     window.onpopstate = function () {
@@ -74,9 +82,9 @@ export default function AuctionJoin() {
     if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
       toast.error(payload.body.split(":")[0]);
       client?.forceDisconnect();
-      client?.deactivate();
-      client?.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
-      window.history.back();
+      client?.deactivate({ force: true });
+      setClient(null);
+      setAllow(false);
       return;
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
@@ -206,19 +214,21 @@ export default function AuctionJoin() {
                     </ScrollArea>
 
                   </div>
-                  <div className="mt-12 md:mt-16 lg:mt-20">
-                    <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
-                    <form className="max-w-md mx-auto" onSubmit={sendMessage}>
-                      <div className="grid gap-4">
-                        <div>
-                          <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
+                  {allow &&
+                    <div className="mt-12 md:mt-16 lg:mt-20">
+                      <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
+                      <form className="max-w-md mx-auto" onSubmit={sendMessage}>
+                        <div className="grid gap-4">
+                          <div>
+                            <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
+                          </div>
+                          <Button type="submit" className="w-full">
+                            Place Bid
+                          </Button>
                         </div>
-                        <Button type="submit" className="w-full">
-                          Place Bid
-                        </Button>
-                      </div>
-                    </form>
-                  </div>
+                      </form>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
