@@ -13,7 +13,7 @@ interface LinkProps {
 const profileNavItems = [
   { title: "Overview", href: "/profile/overview" },
   { title: "Notification", href: "/profile/notification" },
-  { title: "Settings", href: "/profile/settings" },
+  { title: "Preferences", href: "/profile/preferences" },
   { title: "Balance", href: "/profile/balance" },
 ];
 
