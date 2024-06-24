@@ -16,6 +16,7 @@ import { AuctionSession } from "@/models/newModel/auctionSession"
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import { ItemStatus } from "@/models/Item"
+import { Search } from "lucide-react"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -40,13 +41,13 @@ export function ItemList() {
       let res;
       if (search && search?.length > 0) {
         console.log(itemCategory);
-        res = await getItemsByName(pageNumber, 12, search, sortBy, sortOrder,ItemStatus.IN_AUCTION);
+        res = await getItemsByName(pageNumber, 12, search, sortBy, sortOrder, ItemStatus.IN_AUCTION);
       } else if (itemCategory != undefined && itemCategory != null && itemCategory.itemCategoryId != null) {
         console.log(itemCategory);
-        res = await getItemsByCategoryId(pageNumber, 12, itemCategory.itemCategoryId, minPrice, maxPrice, sortBy, sortOrder,ItemStatus.IN_AUCTION);
+        res = await getItemsByCategoryId(pageNumber, 12, itemCategory.itemCategoryId, minPrice, maxPrice, sortBy, sortOrder, ItemStatus.IN_AUCTION);
       } else {
         console.log(itemCategory);
-        res = await getItems(pageNumber, 12, minPrice, maxPrice, sortBy, sortOrder,ItemStatus.IN_AUCTION);
+        res = await getItems(pageNumber, 12, minPrice, maxPrice, sortBy, sortOrder, ItemStatus.IN_AUCTION);
       }
       if (res) {
         console.log(res);
@@ -106,14 +107,14 @@ export function ItemList() {
     });
     getAllItemCategories(0, 50).then((res) => {
       setItemCategories(res.data.content);
-    });     
+    });
     if (location.state?.category) {
       console.log(location.state.category);
       fetchItems(0, location.state.category, minPrice, maxPrice).then(() => {
         setIsLoading(false);
       });
       setItemCategoryFilter(location.state.category);
-    }else {
+    } else {
       fetchItems(itemsList.currentPageNumber);
     }
 
@@ -127,9 +128,20 @@ export function ItemList() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Jewelry Auction</h1>
             <div className="flex items-center gap-4">
+              <div className="relative ml-auto flex-1 md:grow-0">
+                <form action="" method="get">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+                    name='search'
+                  />
+                </form>
+              </div>
               <Select onValueChange={(value) => handleSortChange(value.split(":")[0], value.split(":")[1])}>
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue placeholder="Sort by" defaultValue={sortBy}/>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" defaultValue={sortBy} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="reservePrice:asc">Price: Low to High</SelectItem>
