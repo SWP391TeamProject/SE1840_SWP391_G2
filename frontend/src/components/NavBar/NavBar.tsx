@@ -10,19 +10,20 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { ChevronDownIcon, GavelIcon, MenuIcon } from "lucide-react";
+import { ChevronDownIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
 import { useAppSelector } from "@/redux/hooks.tsx";
 import { logout } from "@/services/AuthService.ts";
 import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
-import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import logo from "@/assets/icon.png";
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 export default function NavBar() {
   const auth = useAuth();
+  const currency = useCurrency();
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
   const handleSignout = function () {
     logout().then(function () {
@@ -137,8 +138,11 @@ export default function NavBar() {
                             Balance:
                           </div>
                           <div className="basis-1/2 font-medium text-left block">
-                            <p >
-                              {auth.user && auth.user.balance !== null ? auth.user.balance : '0'}
+                            <p>
+                              {currency.format({
+                                amount: auth.user.balance,
+                                compact: true
+                              })}
                             </p>
                           </div>
                         </div>

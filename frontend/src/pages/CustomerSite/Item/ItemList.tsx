@@ -22,6 +22,7 @@ import { toast } from "react-toastify"
 import { boolean } from "zod"
 import { getCookie } from "@/utils/cookies"
 
+
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
   const dispatch = useAppDispatch();
@@ -139,7 +140,6 @@ export function ItemList() {
       });
       setItemCategoryFilter(location.state.category);
     } else {
-      console.log(itemsList.currentPageList.length);
       if (itemsList.currentPageList.length == 0) {
         fetchItems(itemsList.currentPageNumber);
       }

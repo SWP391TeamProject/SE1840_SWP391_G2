@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Item } from '@/models/Item'
 
 
+
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
     const dispatch = useAppDispatch();
@@ -59,7 +60,7 @@ export default function AuctionSession() {
         }
 
         window.scrollTo(0, 0);
-        
+
     }, []);
 
     useEffect(() => {
@@ -304,6 +305,7 @@ export default function AuctionSession() {
                                             <Button >Detail</Button>
                                         </div>
                                     </div>
+
                                     <CardContent className="space-y-2 p-4">
                                         <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
                                         <div className="flex items-center justify-between">
