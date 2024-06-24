@@ -9,6 +9,8 @@ import fpt.edu.vn.Backend.pojo.Account.Role;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,14 +94,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         account.setNickname(info.getName());
         account.setEmail(info.getEmail());
         account.setRole(Role.MEMBER);
-        account.setPassword("");
+        account.setPassword(RandomStringUtils.randomAlphanumeric(12));
         account.setStatus(Account.Status.ACTIVE);
 
         Attachment attachment = new Attachment();
         attachment.setLink(info.getImageUrl());
         attachment.setCreateDate(LocalDateTime.now());
         attachment.setUpdateDate(LocalDateTime.now());
-        attachment = attachmentRepos.save(attachment);
         account.setAvatarUrl(attachment);
 
         return accountRepos.save(account);
