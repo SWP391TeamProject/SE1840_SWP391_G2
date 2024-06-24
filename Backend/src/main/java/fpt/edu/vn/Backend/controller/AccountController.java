@@ -6,7 +6,7 @@ import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.oauth2.security.UserPrincipal;
+import fpt.edu.vn.Backend.oauth2.security.OAuth2BiddifyUser;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.Authorizer;
@@ -15,7 +15,6 @@ import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,7 +64,6 @@ public class AccountController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> searchAccounts(@PageableDefault(size = 50) Pageable pageable,
                                                         @PathVariable String name) {
-        log.info("Get accounts with name: {}", name);
         if (name == null) {
             return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
         }
@@ -80,9 +78,9 @@ public class AccountController {
 
     @GetMapping("/user/me")
     @PreAuthorize("hasAuthority('USER')")
-    public Account getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
-        return accountRepos.findByEmail(userPrincipal.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userPrincipal.getEmail()));
+    public Account getCurrentUser(@CurrentUser OAuth2BiddifyUser userPrincipal) {
+        return accountRepos.findByEmail(userPrincipal.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userPrincipal.getUsername()));
     }
 
     @PostMapping("/")
