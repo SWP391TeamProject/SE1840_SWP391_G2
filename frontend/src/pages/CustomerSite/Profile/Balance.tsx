@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
+import {useAuth} from "@/AuthProvider.tsx";
 
 const formSchema = z.object({
     amount: z.string().min(1, {message: "Please enter amount"}),
@@ -34,21 +34,8 @@ const formSchema = z.object({
 });
 
 export default function Balance() {
+    const auth = useAuth();
     const [isOtherAmount, setIsOtherAmount] = useState(true);
-    const { data: account, isLoading } = useQuery({
-        queryKey: ["balance"],
-        queryFn: async () => {
-            const userId = JSON.parse(getCookie("user"))?.id;
-            const response = await fetch(`${API_SERVER}/accounts/${userId}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getCookie("token")}`,
-                },
-            });
-            const data = await response.json();
-            return data;
-        },
-    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -86,8 +73,6 @@ export default function Balance() {
         }
     }
 
-    if (isLoading) return <div className="w-full h-full"><LoadingAnimation /></div>;
-
     return (
         <>
             <Card className="mb-4">
@@ -96,7 +81,7 @@ export default function Balance() {
                 </CardHeader>
                 <CardContent>
                     <CardDescription className="text-2xl">
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(account?.balance || 0)}
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(auth.user.balance)}
                     </CardDescription>
                 </CardContent>
             </Card>
