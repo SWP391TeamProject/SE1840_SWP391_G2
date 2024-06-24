@@ -215,6 +215,7 @@ export default function AuctionSession() {
                     itemId: item.itemId
                 },
                 itemDTO: item,
+                allow: bidders.includes(userId)
             }
         });
 
@@ -317,7 +318,7 @@ export default function AuctionSession() {
                                                         {bidders.includes(userId) ? (
                                                             <Button onClick={() => {
                                                                 let name = item?.itemDTO.name;
-                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO } });
+                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO , allow:true} });
                                                             }}>Place Bid</Button>
                                                         ) : (
                                                             <RegisterAlert></RegisterAlert>

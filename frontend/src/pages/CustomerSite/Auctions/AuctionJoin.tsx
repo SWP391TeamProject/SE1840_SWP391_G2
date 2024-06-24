@@ -16,22 +16,20 @@ import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 
 export default function AuctionJoin() {
   const [isReceived, setIsReceived] = useState(false);
-  const [accountId, setAcccountId] = useState<number | null>(null);
+  const [accountId, setAccountId] = useState<number | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
-  const [allow, setAllow] = useState(true);
-
+  const [allow, setAllow] = useState(location.state.allow || false);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(false);
   useEffect(() => {
-
-    if (!allow || !accountId) {
-      toast.dismiss();
+    if (allow===false || !accountId ) {
       setClient(null);
+      toast.dismiss();
       return;
     }
     const newClient = new Client({
@@ -76,7 +74,7 @@ export default function AuctionJoin() {
       return;
     }
     if (accountId === null && getCookie("user")) {
-      setAcccountId(JSON.parse(getCookie("user")).id);
+      setAccountId(JSON.parse(getCookie("user")).id);
     }
     window.onpopstate = function () {
       client?.deactivate();

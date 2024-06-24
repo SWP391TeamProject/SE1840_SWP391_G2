@@ -12,12 +12,15 @@ import { ItemCategory } from "@/models/newModel/itemCategory"
 import { setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Items"
 import { getAllItemCategories } from "@/services/ItemCategoryService"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { AuctionSession } from "@/models/newModel/auctionSession"
+import { AuctionSession } from "@/models/AuctionSessionModel"
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import { Search } from "lucide-react"
 import { Item, ItemStatus } from "@/models/Item"
 import { Card } from "@/components/ui/card"
+import { toast } from "react-toastify"
+import { boolean } from "zod"
+import { getCookie } from "@/utils/cookies"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -76,7 +79,7 @@ export function ItemList() {
     window.history.replaceState(null, "", url.toString());
     search = null;
     console.log(name);
-    if (name == "all"||name==null) {
+    if (name == "all" || name == null) {
       fetchItems(0, null, minPrice, maxPrice);
       setItemCategoryFilter(null);
       setSortBy(null);
@@ -98,15 +101,21 @@ export function ItemList() {
     fetchItems(pageNumber, itemsList.filter, minPrice, maxPrice, sortBy, sortOrder);
   }
 
-  const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-    console.log(item, auctionId);
-    navigate(`/auctions/${auctionId}/${item.name}`, {
+  const handleViewItemDetailsClick = async (item: Item, auction: AuctionSession) => {
+    let registered = false;
+    auction?.deposits.forEach((deposit: any) => {
+      if (deposit.payment.accountId == JSON.parse(getCookie("user"))?.id) {
+        registered = true;
+      }
+    });
+    navigate(`/auctions/${auction.auctionSessionId}/${item.name}`, {
       state: {
         id: {
-          auctionSessionId: auctionId,
+          auctionSessionId: auction.auctionSessionId,
           itemId: item.itemId
         },
         itemDTO: item,
+        allow: registered
       }
     });
 
@@ -259,7 +268,7 @@ export function ItemList() {
                           className="rounded-t-lg object-cover w-full "
                         />
                         <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                          onClick={() => handleViewItemDetailsClick(item, auction.auctionSessionId)}
+                          onClick={() => handleViewItemDetailsClick(item, auction)}
                         >
                           <Button >Detail</Button>
                         </div>
