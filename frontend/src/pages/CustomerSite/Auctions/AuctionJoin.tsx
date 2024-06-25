@@ -12,7 +12,7 @@ import Autoplay from "embla-carousel-autoplay"
 import { toast } from 'react-toastify';
 import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
-import {useCurrency} from "@/CurrencyProvider.tsx";
+import { useCurrency } from "@/CurrencyProvider.tsx";
 
 
 export default function AuctionJoin() {
@@ -25,17 +25,38 @@ export default function AuctionJoin() {
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
-  const [allow, setAllow] = useState(location.state.allow || false);
+  const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(false);
+
   useEffect(() => {
-    if (allow===false || !accountId ) {
+    if (!getCookie("user")) {
+      setAllow(false);
+      return;
+    }
+    if (accountId === null && getCookie("user")) {
+      setAccountId(JSON.parse(getCookie("user"))?.id);
+    }
+    window.onpopstate = function () {
+      client?.deactivate();
+    };
+    window.scrollTo(0, 0);
+    if (getCookie("user")&&JSON.parse(getCookie("user"))) {
+      
+      setAllow(true);
+    } else {
+      setAllow(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (allow === false || !getCookie("user")) {
       setClient(null);
       toast.dismiss();
       return;
     }
     const newClient = new Client({
-      brokerURL: `wss://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
+      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
       // onDisconnect: () => {
       //   toast.error('You have been disconnected from the auction');
       // },
@@ -70,29 +91,16 @@ export default function AuctionJoin() {
     };
   }, [allow]);
 
-  useEffect(() => {
-    if (!getCookie("user")) {
-      setAllow(false);
-      return;
-    }
-    if (accountId === null && getCookie("user")) {
-      setAccountId(JSON.parse(getCookie("user")).id);
-    }
-    window.onpopstate = function () {
-      client?.deactivate();
-    };
-    window.scrollTo(0, 0);
-    if (accountId) {
-      setAllow(true);
-    }
-  }, []);
+
 
   const onMessageReceived = (payload: IMessage) => {
     setIsJoin(false);
     console.log(payload);
 
     if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
-      toast.error(payload.body.split(":")[0]);
+      toast.error(payload.body.split(":")[0],{
+        position: "bottom-right",
+      });
       client?.forceDisconnect();
       client?.deactivate({ force: true });
       setClient(null);
@@ -101,7 +109,9 @@ export default function AuctionJoin() {
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
       if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
-        toast.error(JSON.parse(payload.body)?.body?.message);
+        toast.error(JSON.parse(payload.body)?.body?.message,{
+          position: "bottom-right",
+        });
       }
       return;
     }
@@ -109,7 +119,9 @@ export default function AuctionJoin() {
     console.log(message);
     if (message?.status == "JOIN" || message?.status == "BID") {
       if (message?.status == "BID")
-        toast.info(message?.message);
+        toast.info(message?.message,{
+          position: "bottom-right",
+        });
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
     setIsReceived(!isReceived);
@@ -121,7 +133,9 @@ export default function AuctionJoin() {
     if (client != null) {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
-        toast.error("Please enter a valid number");
+        toast.error("Please enter a valid number", {
+          position: "bottom-right",
+        });
         return;
       }
       client.publish({
@@ -201,7 +215,7 @@ export default function AuctionJoin() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
-                      <p className="text-2xl font-bold">${currency.format({
+                      <p className="text-2xl font-bold">{currency.format({
                         amount: price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice),
                         fractionDigits: 0
                       })}</p>
@@ -212,7 +226,7 @@ export default function AuctionJoin() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <ScrollArea className="h-48 overflow-hidden p-4" css={{ width: 400 }}>
+                    <ScrollArea className="h-48 overflow-hidden p-4" style={{ width: 400 }}>
                       {bids?.map((bid) => (
                         <div className="flex items-center justify-between" key={bid?.bidId}>
                           <div className="flex items-center gap-2">

@@ -49,12 +49,18 @@ function ActivationForm() {
         activateAccount(data.code).then(() => {
             setLocked(false);
             navigate("/auth/login");
-            toast.success("Account activated successfully");
+            toast.success("Account activated successfully",{
+                position:"bottom-right",
+            });
         }).catch(err => {
             if (err.response.status == 406) {
-                toast.error("Invalid activation code!");
+                toast.error("Invalid activation code!",{
+                    position:"bottom-right",
+                });
             } else {
-                toast.error(err.message);
+                toast.error(err.message,{
+                    position:"bottom-right",
+                });
             }
             setLocked(false);
         });

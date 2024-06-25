@@ -38,9 +38,13 @@ export default function ProductCategory({ ...props }) {
             }
         }).then(response => response.json()).then(data => {
             setCategory(data.content)
-            toast.success('Category fetched successfully!');
+            toast.success('Category fetched successfully!', {
+                position: "bottom-right",
+            });
         }).catch(error => {
-            toast.error('There was an error!', error);
+            toast.error(error, {
+                position: "bottom-right",
+            });
         });
 
         console.log(category)
@@ -70,8 +74,8 @@ export default function ProductCategory({ ...props }) {
                                         <FormItem>
                                             <FormLabel>Category</FormLabel>
                                             <FormControl>
-                                                <Select onValueChange={field.onChange} 
-                                                defaultValue={field.value}
+                                                <Select onValueChange={field.onChange}
+                                                    defaultValue={field.value}
                                                 >
                                                     <SelectTrigger id="category" aria-label="Select category">
                                                         <SelectValue placeholder="Select category" />
@@ -79,7 +83,7 @@ export default function ProductCategory({ ...props }) {
                                                     <SelectContent>
                                                         <SelectGroup label="Category">
                                                             <SelectLabel>North America</SelectLabel>
-                                                            {category?.map((item: any,index) => {
+                                                            {category?.map((item: any, index) => {
                                                                 return <SelectItem key={index} value={item.itemCategoryId.toString()}>{item.name}</SelectItem>
                                                             }
                                                             )}

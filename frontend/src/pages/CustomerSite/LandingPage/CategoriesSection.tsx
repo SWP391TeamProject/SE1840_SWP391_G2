@@ -15,7 +15,9 @@ export default function CategoriesSection() {
       setCategories(res.data.content);
       console.log(res.data.content);
     }).catch((err) => {
-      toast.error(err.response.data.message);
+      toast.error(err.response.data.message, {
+        position: "bottom-right",
+      });
     });
   }, []);
   return (

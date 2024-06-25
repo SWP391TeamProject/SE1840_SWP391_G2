@@ -11,7 +11,7 @@ export default function CustomerConsigmentCard({ consignment }) {
 
     const [custConsignment, setCusConsignment] = React.useState<any>(consignment);
     console.log(custConsignment);
-    if(consignment.status === ConsignmentStatus.WAITING_SELLER){
+    if (consignment.status === ConsignmentStatus.WAITING_SELLER) {
         consignment.status = ConsignmentStatus.IN_FINAL_EVALUATION;
         setCusConsignment(consignment);
     }
@@ -21,17 +21,25 @@ export default function CustomerConsigmentCard({ consignment }) {
             acceptInitialEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Initial Evaluation Accepted");
+                toast.success("Initial Evaluation Accepted", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in accepting Initial Evaluation");
+                toast.error("Error in accepting Initial Evaluation", {
+                    position: "bottom-right",
+                });
             });
         } else if (custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
             acceptFinalEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Final Evaluation Accepted");
+                toast.success("Final Evaluation Accepted", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in accepting Final Evaluation");
+                toast.error("Error in accepting Final Evaluation", {
+                    position: "bottom-right",
+                });
             });
         }
     }
@@ -40,17 +48,25 @@ export default function CustomerConsigmentCard({ consignment }) {
             rejectInitialEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Initial Evaluation Rejected");
+                toast.success("Initial Evaluation Rejected", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in Rejecting Initial Evaluation");
+                toast.error("Error in Rejecting Initial Evaluation", {
+                    position: "bottom-right",
+                });
             });
         } else if (custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
             rejectFinalEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Final Evaluation Rejected");
+                toast.success("Final Evaluation Rejected", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in Rejecting Final Evaluation");
+                toast.error("Error in Rejecting Final Evaluation", {
+                    position: "bottom-right",
+                });
             });
         }
     }
@@ -95,7 +111,7 @@ export default function CustomerConsigmentCard({ consignment }) {
 
                             <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null ? "Your consignment is in evaluation process. Please wait for the result." : "Description"}</h1>
                             {custConsignmentDetail?.description}
-                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null || custConsignmentDetail.status=== ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
+                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null || custConsignmentDetail.status === ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
                             {custConsignmentDetail?.price}
                             <div className="flex justify-end">
                                 {custConsignmentDetail?.attachments?.map((attachment: any, index: number) => {

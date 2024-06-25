@@ -18,7 +18,7 @@ export const BlogList = () => {
     const dispatch = useAppDispatch();
     const [blogCategories, setBlogCategories] = useState([] as any);
 
-    const { isPending, isError, data, error,isLoading } = useQuery({
+    const { isPending, isError, data, error, isLoading } = useQuery({
         queryKey: ['blogs'],
         queryFn: () => BlogService.getAllBlogs(0, 200),
     });
@@ -40,7 +40,11 @@ export const BlogList = () => {
 
                 }
 
-            ).catch((error) => { toast.error(error.message) });
+            ).catch((error) => {
+                toast.error(error.message, {
+                    position: "bottom-right",
+                })
+            });
         dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }));
         window.scrollTo(0, 0)
     }, [])
@@ -53,7 +57,7 @@ export const BlogList = () => {
             dispatch(setCurrentPageNumber({ pageNumber: data?.data.number, totalPages: data?.data.totalPages }));
         }
     }, [data]);
-    if(isLoading){
+    if (isLoading) {
         return <LoadingAnimation />
     }
 

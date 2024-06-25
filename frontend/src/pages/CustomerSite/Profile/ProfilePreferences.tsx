@@ -51,7 +51,9 @@ export default function ProfilePreferences() {
     setCookie("themeMode", JSON.stringify(data.themeMode), 2147483647);
     setTheme(data.themeMode);
     currency.setCurrencyType(data.currencyType);
-    toast.success('Update preferences successfully!');
+    toast.success('Update preferences successfully!',{
+      position:"bottom-right",
+  });
   };
 
   return <div>

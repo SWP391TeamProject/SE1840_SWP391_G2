@@ -76,10 +76,14 @@ export default function ConsignmentInititalForm() {
     setIsLoading(true);
     // Remove FormData creation and file handling
     createConsignmentService(data).then((res) => {
-      toast.success("Consignment created successfully");
+      toast.success("Consignment created successfully", {
+        position: "bottom-right",
+      });
       setIsLoading(false);
     }).catch((err) => {
-      toast.error("Failed to create consignment");
+      toast.error("Failed to create consignment", {
+        position: "bottom-right",
+      });
       setIsLoading(false);
     }
     );
@@ -158,9 +162,9 @@ export default function ConsignmentInititalForm() {
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
                           <Input placeholder="enter your phone number here"
-                          defaultValue={JSON.parse(getCookie("user"))?.phone}
-                          readOnly
-                          {...field} />
+                            defaultValue={JSON.parse(getCookie("user"))?.phone}
+                            readOnly
+                            {...field} />
                         </FormControl>
                         <FormDescription>
                           this is the phone we used to contact you

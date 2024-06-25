@@ -1,6 +1,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { getCookie } from '@/utils/cookies';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 class BlogCategoryService {
     private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;
@@ -15,6 +16,10 @@ class BlogCategoryService {
                 "Content-Type": "application/json",
             },
             params: params
+        }).catch((error) => {
+            toast.error(error,{
+                position:"bottom-right",
+            });
         });
     }
 

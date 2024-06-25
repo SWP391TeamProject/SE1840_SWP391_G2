@@ -18,7 +18,9 @@ export const Bids = () => {
             console.log(res.data);
             setBids(res.data.content);
         }).catch((err) => {
-            toast.error(err);
+            toast.error(err,{
+                position:"bottom-right",
+            });
         });
 
         window.scrollTo(0, 0);
@@ -33,7 +35,9 @@ export const Bids = () => {
                 nav(`/auctions/${bid.auctionItemId.auctionSessionId}/${itemDTO.name}`, { state: { id: bid.auctionItemId, itemDTO: itemDTO } });
 
             }).catch((err) => {
-                toast.error(err);
+                toast.error(err,{
+                    position:"bottom-right",
+                });
             });
 
         }

@@ -13,12 +13,12 @@ import {
 import { CameraIcon, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/AuthProvider.tsx";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import {Controller, SubmitHandler, useForm} from "react-hook-form";
 import { API_SERVER } from "@/constants/domain.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
-import { Checkbox } from "@/components/ui/checkbox.tsx";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -100,12 +100,16 @@ const ProfileDetail = () => {
         ...auth.user,
         avatar: res.data
       });
-      toast.success('Update avatar successfully!');
+      toast.success('Update avatar successfully!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
     })
       .catch((err) => {
         console.log(err);
-        toast.error('Update avatar failed!');
+        toast.error('Update avatar failed!', {
+          position: "bottom-right",
+        });
         setIsLoading(false);
       })
   };
@@ -122,18 +126,24 @@ const ProfileDetail = () => {
         ...auth.user,
         ...data
       });
-      toast.success('Update details successfully!');
+      toast.success('Update details successfully!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
     }).catch((err) => {
       console.log(err);
-      toast.error('Update details failed!');
+      toast.error('Update details failed!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
     })
   };
 
   const onSubmitTwoFactorAuth: SubmitHandler<TwoFactorAuth> = (data) => {
     if (data.enable2fa === auth.user.require2fa) {
-      toast.warning("Settings stay unchanged!");
+      toast.warning("Settings stay unchanged!", {
+        position: "bottom-right",
+      });
       return;
     }
     setIsLoading(true);
@@ -143,7 +153,9 @@ const ProfileDetail = () => {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(() => {
-      toast.success('Changed 2FA settings successfully!');
+      toast.success('Changed 2FA settings successfully!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
       resetTwoFactorAuthForm({
         enable2fa: data.enable2fa,
@@ -151,7 +163,9 @@ const ProfileDetail = () => {
       });
     }).catch((err) => {
       console.log(err);
-      toast.error('Changed 2FA settings failed!');
+      toast.error('Changed 2FA settings failed!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
       resetTwoFactorAuthForm({
         enable2fa: auth.user.require2fa,
@@ -236,6 +250,7 @@ const ProfileDetail = () => {
                     id="phone"
                     type="phone"
                     {...profileDetailForm("phone")}
+                    required
                   />
                 </div>
               </div>

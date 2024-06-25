@@ -29,8 +29,6 @@ export const fetchBidsByAuctionItemId = async (auctionId:number,itemId:number) =
       headers: {
         "Content-Type": "application/json",
           
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
     .then((res) => {

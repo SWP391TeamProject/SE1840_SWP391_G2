@@ -90,11 +90,15 @@ export default function ItemDetail() {
     updateItem(values).then((res) => {
 
       console.log(res)
-      toast.success('Item updated successfully!');
+      toast.success('Item updated successfully!',{
+        position:"bottom-right",
+    });
       setIsLoading(false);
     }).catch((err) => {
       setIsLoading(false);
-      toast.error('There was an error!', err.response.data.message);
+      toast.error(err.response.data.message, {
+        position: "bottom-right",
+      });
       console.error(err)
     })
 
@@ -115,7 +119,7 @@ export default function ItemDetail() {
               <div className="basis-4/12 p-3 flex flex-col gap-3">
                 {isloading
                   ? <Button type="submit" disabled>
-                    <Loader2 className="animate-spin"/>
+                    <Loader2 className="animate-spin" />
                   </Button>
                   : <Button type="submit" >
                     save

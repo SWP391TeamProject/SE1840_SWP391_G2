@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import {useAuth} from "@/AuthProvider";
+import { useAuth } from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { AccountStatus, Roles } from "@/constants/enums";
@@ -58,10 +58,14 @@ function LoginForm() {
         } else {
           navigate(from, { replace: true });
         }
-        toast.success("Logged in successfully!");
+        toast.success("Logged in successfully!", {
+          position: "bottom-right",
+        });
       })
       .catch(err => {
-        toast.error(err.response.data.message);
+        toast.error(err.response.data.message, {
+          position: "bottom-right",
+        });
         setIsLogin(false);
       });
   };
@@ -80,7 +84,7 @@ function LoginForm() {
   useEffect(() => {
     console.log(token)
     if (token !== null) {
-      axios.get(AUTH_SERVER+"/login-with-google?token=" + token)
+      axios.get(AUTH_SERVER + "/login-with-google?token=" + token)
         .then(res => {
           setIsLogin(false);
           console.log(res.data);
@@ -92,10 +96,14 @@ function LoginForm() {
           } else {
             navigate(from, { replace: true, });
           }
-          toast.success("Logged in successfully!");
+          toast.success("Logged in successfully!", {
+            position: "bottom-right",
+          });
         })
         .catch(err => {
-          toast.error(err.response.data.message);
+          toast.error(err.response.data.message, {
+            position: "bottom-right",
+          });
           setIsLogin(false);
         })
     }
@@ -168,7 +176,9 @@ function LoginForm() {
                         } else {
                           navigate(from, { replace: true });
                         }
-                        toast.success('logged in successfully')
+                        toast.success('logged in successfully',{
+                position:"bottom-right",
+            })
                       }
                     )
                 }
