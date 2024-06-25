@@ -24,31 +24,28 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import { fetchAccountById } from '@/services/AccountsServices';
 import logo from "@/assets/icon.png";
+import {useAuth} from "@/AuthProvider.tsx";
+import {useCurrency} from "@/CurrencyProvider.tsx";
+import {useAppSelector} from "@/redux/hooks.tsx";
+import {logout} from "@/services/AuthService.ts";
+import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
 
 export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
-    const [user, setUser] = React.useState<any>();
-
-    const [consignments, setConsignments] = useState([]);
-    useEffect(() => {
-        const userCookie = getCookie("user");
-        if (userCookie) {
-            try {
-                const userData = JSON.parse(userCookie);
-                fetchAccountById(userData?.id).then((res) => {
-                    console.log(res?.data)
-                    setUser(res.data)
-                }).catch((err) => {
-                    console.log(err);
-                });
-            } catch (err) {
-                console.error("Failed to parse user cookie:", err);
-            }
-        }
-    }, []);
     const location = useLocation();
-    const navigate = useNavigate();
+    const auth = useAuth();
+    const currency = useCurrency();
+    const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
+    const handleSignout = function () {
+        logout().then(function () {
+            removeCookie("user");
+            removeCookie('token')
+            window.location.href = '/auth/login';
+        })
+    };
+
+    const [consignments] = useState([]);
     const [arrayPath, setArrayPath] = useState([""]);
     const breadcrumbs = [
         <BreadcrumbItem key={1}>
@@ -80,24 +77,12 @@ export default function Administration() {
         );
     }
 
-    const handleSignout = () => {
-        removeCookie("user");
-        removeCookie("token");
-        navigate("/admin");
-        // nav("/auth/login");
-    };
-
     useEffect(() => {
         // console.log(location);
         let tempArrayPath = location.pathname.split("/");
         setArrayPath(tempArrayPath);
         console.log(breadcrumbs);
     }, [location])
-
-
-    useEffect(() => {
-        console.log(consignments);
-    }, [consignments])
 
     return (
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] bg-background text-foreground">
@@ -257,24 +242,10 @@ export default function Administration() {
                                 />
                             </form>
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Avatar className="mr-5 hover:cursor-pointer">
-                                    <AvatarImage src={user != null ? user?.avatar?.link : 'https://github.com/shadcn.png'} />
-                                    <AvatarFallback>SOS</AvatarFallback>
-                                </Avatar>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>Settings</DropdownMenuItem>
-                                <DropdownMenuItem>Support</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleSignout}>Logout</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <ProfileDropdownMenu></ProfileDropdownMenu>
                     </header>
-                    <Outlet ></Outlet></div>
+                    <Outlet></Outlet>
+                </div>
             </ConsignmentsContext.Provider>
         </div>
     )

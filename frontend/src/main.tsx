@@ -140,15 +140,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                                  element={<CustomerConsignmentList/>}></Route>
                         </Route>
                         <Route path="/profile" element={<ProfileLayout/>}>
+                          <Route path="" element={<ProfileDetail/>}></Route>
                           <Route path="overview"
                                  element={<ProfileDetail/>}></Route>
-                          <Route path="/profile/preferences"
+                          <Route path="preferences"
                                  element={<ProfilePreferences/>}></Route>
-                          <Route path="/profile/notification"
+                          <Route path="notification"
                                  element={<NotificationsList/>}></Route>
-                          <Route path="/profile/balance"
+                          <Route path="balance"
                                  element={<Balance/>}></Route>
-
                         </Route>
                       </Route>
                     </Route>
