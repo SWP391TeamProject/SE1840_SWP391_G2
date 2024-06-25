@@ -10,6 +10,7 @@ import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.CurrencyType;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -42,6 +44,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private AccountRepos accountRepos;
 
+    @Autowired
+    private CurrencyService currencyService;
+
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
         if(paymentRequest.getAmount().compareTo(new BigDecimal(5000)) < 0){
@@ -59,7 +64,8 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("createPayment: " + paymentRequest);
         try {
             Payment payment = new Payment();
-            payment.setPaymentAmount(paymentRequest.getAmount());
+            BigDecimal exchangeRate = BigDecimal.valueOf(currencyService.getExchangeRate(CurrencyType.VND));
+            payment.setPaymentAmount(paymentRequest.getAmount().divide(exchangeRate, RoundingMode.DOWN));
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
             Optional<Account> accountOptional = accountRepos.findByAccountId(paymentRequest.getAccountId());
@@ -73,7 +79,7 @@ public class PaymentServiceImpl implements PaymentService {
             VnPayPaymentRequestDTO vnPayPaymentRequestDTO = VnPayPaymentRequestDTO.builder()
                     .accountId(savedPayment.getAccount().getAccountId())
                     .vnp_txnRef(savedPayment.getPaymentId())
-                    .vnp_Amount(savedPayment.getPaymentAmount())
+                    .vnp_Amount(paymentRequest.getAmount())
                     .vnp_OrderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
                     .build();
             return createVNPayPayment(vnPayPaymentRequestDTO, paymentRequest.getIpAddr());

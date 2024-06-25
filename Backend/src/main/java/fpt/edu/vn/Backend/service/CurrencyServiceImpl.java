@@ -1,9 +1,13 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.pojo.CurrencyType;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,6 +37,12 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Value("${currencyfreaks.apikey}")
     private String apiKey;
 
+    @EventListener(ApplicationReadyEvent.class)
+    @Async
+    public void initialize() {
+        fetchExchangeRates();
+    }
+
     @Override
     public Map<CurrencyType, Double> getExchangeRates() {
         fetchExchangeRates();
@@ -54,7 +64,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         return System.currentTimeMillis() - lastFetchTime > TimeUnit.HOURS.toMillis(12);
     }
 
-    private void fetchExchangeRates() {
+    private synchronized void fetchExchangeRates() {
         if (!shouldFetchFromAPI())
             return;
 
