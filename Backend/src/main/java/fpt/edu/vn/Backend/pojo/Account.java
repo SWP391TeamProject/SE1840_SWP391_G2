@@ -37,7 +37,7 @@ public class Account {
     @Column(columnDefinition="bit default 0", nullable = false)
     private boolean require2fa = false;
 
-    @Column(name = "nickname", length = 100)
+    @Column(name = "nickname", length = 100,columnDefinition = "NVARCHAR(100)")
     private String nickname;
 
     @OneToOne(cascade = CascadeType.ALL)

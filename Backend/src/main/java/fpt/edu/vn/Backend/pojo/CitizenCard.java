@@ -29,7 +29,7 @@ public class CitizenCard {
     @Column(unique = true , length = 12,name = "card_id")
     private String cardId;
 
-    @Column(length = 100,name = "full_name")
+    @Column(length = 100,name = "full_name",columnDefinition = "NVARCHAR(100)")
     private String fullName;
 
     private LocalDate birthday;
@@ -37,7 +37,7 @@ public class CitizenCard {
     @Column(length = 20)
     private boolean gender;
 
-    @Column(length = 200)
+    @Column(length = 200,columnDefinition = "NVARCHAR(100)")
     private String address;
 
     @Column(length = 30)

@@ -23,6 +23,8 @@ public class AuctionSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int auctionSessionId;
 
+
+    @Column(name = "title", length = 100, columnDefinition = "NVARCHAR(100)")
     private String title;
 
     private LocalDateTime startDate;

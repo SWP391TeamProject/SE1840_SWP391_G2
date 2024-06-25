@@ -29,10 +29,10 @@ public class Item {
     @JoinColumn(name = "item_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
 
-    @Column(length = 500)
+    @Column(length = 500,columnDefinition = "NVARCHAR(100)")
     private String name;
 
-    @Column(length = 10000)
+    @Column(length = 10000,columnDefinition = "NVARCHAR(10000)")
     private String description;
 
     @Column(name = "reserve_price")
