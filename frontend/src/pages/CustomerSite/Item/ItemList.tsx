@@ -12,11 +12,16 @@ import { ItemCategory } from "@/models/newModel/itemCategory"
 import { setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Items"
 import { getAllItemCategories } from "@/services/ItemCategoryService"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { AuctionSession } from "@/models/newModel/auctionSession"
+import { AuctionSession } from "@/models/AuctionSessionModel"
 import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
-import { ItemStatus } from "@/models/Item"
 import { Search } from "lucide-react"
+import { Item, ItemStatus } from "@/models/Item"
+import { Card } from "@/components/ui/card"
+import { toast } from "react-toastify"
+import { boolean } from "zod"
+import { getCookie } from "@/utils/cookies"
+
 import { useCurrency } from "@/CurrencyProvider"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
@@ -100,6 +105,26 @@ export function ItemList() {
     fetchItems(pageNumber, itemsList.filter, minPrice, maxPrice, sortBy, sortOrder);
   }
 
+  const handleViewItemDetailsClick = async (item: Item, auction: AuctionSession) => {
+    let registered = false;
+    auction?.deposits.forEach((deposit: any) => {
+      if (deposit.payment.accountId == JSON.parse(getCookie("user"))?.id) {
+        registered = true;
+      }
+    });
+    navigate(`/auctions/${auction.auctionSessionId}/${item.name}`, {
+      state: {
+        id: {
+          auctionSessionId: auction.auctionSessionId,
+          itemId: item.itemId
+        },
+        itemDTO: item,
+        allow: registered
+      }
+    });
+
+  }
+
   useEffect(() => {
     setIsLoading(true);
     fetchActiveAuctionSessions().then((res) => {
@@ -118,7 +143,9 @@ export function ItemList() {
       });
       setItemCategoryFilter(location.state.category);
     } else {
-      fetchItems(itemsList.currentPageNumber);
+      if (itemsList.currentPageList.length == 0) {
+        fetchItems(itemsList.currentPageNumber);
+      }
     }
 
   }, []);
@@ -233,21 +260,27 @@ export function ItemList() {
               auctions.map((auction) => {
                 if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
                   return (
-                    <Card key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" onClick={() => {
-                      navigate(`/auctions/${auction.auctionSessionId}`);
-                    }}>
-                      <CardHeader>
+                    <Card key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" >
+                      <div className='group relative'>
+                        <CardHeader>
+
                         <img
                           src={item.attachments[0].link}
-                          alt={item.name}
-                          width={400}
-                          height={300}
-                          className="w-full h-60 object-cover"
+                          width={300}
+                          height={200}
+                          alt="Auction Item"
+                          className="rounded-t-lg object-cover w-full "
                         />
-                      </CardHeader>
-
-                      <CardContent className="p-4 flex flex-col gap-3 ">
-                          <p className="text-sm font-bold mb-2 h-10">{item.name}</p>
+                        </CardHeader>
+                        <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                          onClick={() => handleViewItemDetailsClick(item, auction)}
+                        >
+                          <Button >Detail</Button>
+                        </div>
+                      </div>
+                      <CardContent className="p-4 flex flex-col gap-3">
+                        <h3 className="text-lg font-bold mb-2">{item.name}</h3>
+                        <div className="text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.description }}></div>
                         <div className="flex justify-between items-center ">
 
                           <div className="text-primary font-bold text-lg">{currency.format({
@@ -260,6 +293,7 @@ export function ItemList() {
                         </div>
                       </CardContent>
                     </Card>
+
                   )
                 }
               }
