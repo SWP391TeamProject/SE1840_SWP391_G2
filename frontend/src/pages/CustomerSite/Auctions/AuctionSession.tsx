@@ -35,25 +35,23 @@ export default function AuctionSession() {
     const userId = user == null ? -1 : user.id;
 
     useEffect(() => {
-        if (param.id) {
+        if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
                     console.log(res.data);
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
-                    toast.success("Auction Session Loaded");
                 })
                 .catch(err => {
                     toast.error("Failed to load Auction Session");
                     console.log(err);
                 })
         }
-        else if (auctionSession == null) {
+        else if (!param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
                 .then(res => {
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
-                    toast.success("Auction Session Loaded");
                 })
                 .catch(err => {
                     toast.error("Failed to load Auction Session");
@@ -213,7 +211,7 @@ export default function AuctionSession() {
     }
 
     const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-        console.log(item, auctionId);
+        console.log(item, auctionId,bidders.includes(userId) );
         navigate(`/auctions/${auctionId}/${item.name}`, {
             state: {
                 id: {
@@ -221,7 +219,7 @@ export default function AuctionSession() {
                     itemId: item.itemId
                 },
                 itemDTO: item,
-                allow: bidders.includes(userId)
+                allow: bidders.includes(userId) 
             }
         });
 

@@ -56,12 +56,16 @@ export default function AuctionSessionCreate() {
         createAuctionSession(data).then(() => {
             setIsSubmitting(false)
             form.reset()
-            toast.success("Auction session created successfully.")
+            toast.success("Auction session created successfully.",{
+                position:"bottom-right",
+            })
 
         })
             .catch((err) => {
                 setIsSubmitting(false)
-                toast.error('An error occurred while creating the auction session.')
+                toast.error('An error occurred while creating the auction session.',{
+                    position:"bottom-right",
+                })
             })
     }
 

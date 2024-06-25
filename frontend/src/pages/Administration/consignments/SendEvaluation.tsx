@@ -75,7 +75,9 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
             form.setValue('consignmentId', res.data.consignmentId);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message);
+            toast.error(error.response.data.message,{
+                position:"bottom-right",
+            });
         })
     }, []);
     // 1. Define your form.
@@ -86,13 +88,17 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
         // Remove FormData creation and file handling
         if (consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {
             createInitialEvaluation(data).then((res) => {
-                toast.success("Evaluation sent successfully");
+                toast.success("Evaluation sent successfully",{
+                    position:"bottom-right",
+                });
                 setOpen(false);
                 console.log(res);
                 setIsLoading(false);
 
             }).catch((error) => {
-                toast.error(error.response.data.message);
+                toast.error(error.response.data.message,{
+                    position:"bottom-right",
+                });
                 setOpen(true);
                 setIsLoading(false);
 
@@ -101,14 +107,18 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
         else {
 
             createFinalEvaluation(data).then((res) => {
-                toast.success("Evaluation sent successfully");
+                toast.success("Evaluation sent successfully",{
+                    position:"bottom-right",
+                });
                 setOpen(false);
                 console.log(res);
                 setIsLoading(false);
 
 
             }).catch((error) => {
-                toast.error(error.response.data.message);
+                toast.error(error.response.data.message,{
+                    position:"bottom-right",
+                });
                 setOpen(true);
                 setIsLoading(false);
 
@@ -219,7 +229,9 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                                                     } else {
                                                         console.log(form.getValues())
                                                         console.log(form.formState) // Log the errors
-                                                        toast.error("Please fill out the form correctly");
+                                                        toast.error("Please fill out the form correctly",{
+                                                            position:"bottom-right",
+                                                        });
                                                         setOpen(true);
                                                     }
                                                 }}>

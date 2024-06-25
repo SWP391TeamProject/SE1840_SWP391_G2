@@ -67,7 +67,7 @@ function RegisterForm() {
     register(values).then((res) => {
       console.log(res);
       toast.success("Account created successfully. Please login.", {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -83,7 +83,7 @@ function RegisterForm() {
       setIsLoading(false)
       console.log(err)
       toast.error(err.response.data.message, {
-        position: "top-right",
+        position: "bottom-right",
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,

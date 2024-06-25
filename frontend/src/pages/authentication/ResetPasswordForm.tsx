@@ -60,12 +60,18 @@ function ResetPasswordForm() {
         resetPassword(data).then(() => {
             setLocked(false);
             navigate("/auth/login");
-            toast.success("Password reset successfully");
+            toast.success("Password reset successfully",{
+                position:"bottom-right",
+            });
         }).catch(err => {
             if (err.response.status == 406) {
-                toast.error("Invalid reset code!");
+                toast.error("Invalid reset code!",{
+                    position:"bottom-right",
+                });
             } else {
-                toast.error(err.message);
+                toast.error(err.message,{
+                    position:"bottom-right",
+                });
             }
             setLocked(false);
         });

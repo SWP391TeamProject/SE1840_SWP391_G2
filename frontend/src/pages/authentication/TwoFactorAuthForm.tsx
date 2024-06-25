@@ -67,12 +67,18 @@ function TwoFactorAuthForm() {
             } else {
                 navigate(from, { replace: true });
             }
-            toast.success('logged in successfully')
+            toast.success('logged in successfully',{
+                position:"bottom-right",
+            })
         }).catch(err => {
             if (err.response.status == 400) {
-                toast.error("Invalid activation code!");
+                toast.error("Invalid activation code!",{
+                    position:"bottom-right",
+                });
             } else {
-                toast.error(err.message);
+                toast.error(err.message,{
+                    position:"bottom-right",
+                });
             }
             setLocked(false);
         });

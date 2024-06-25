@@ -51,14 +51,18 @@ export default function ChangePassword({ setIsLoading, isLoading }) {
         changePassword(auth?.user?.accountId, values).then(res => {
             console.log(res)
             setIsLoading(false)
-            toast.success('Password changed successfully!')
+            toast.success('Password changed successfully!',{
+                position:"bottom-right",
+            })
             form.reset({
                 oldPassword: "",
                 newPassword: "",
                 confirmPassword: "",
             });
         }).catch(err => {
-            toast.error(err.response.data.message)
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            })
             console.log(err)
             setIsLoading(false)
         })
