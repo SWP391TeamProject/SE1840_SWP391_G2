@@ -12,9 +12,11 @@ import Autoplay from "embla-carousel-autoplay"
 import { toast } from 'react-toastify';
 import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 
 export default function AuctionJoin() {
+  const currency = useCurrency();
   const [isReceived, setIsReceived] = useState(false);
   const [accountId, setAcccountId] = useState<number | null>(null);
   const [client, setClient] = useState<Client | null>(null);
@@ -191,7 +193,10 @@ export default function AuctionJoin() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
-                      <p className="text-2xl font-bold">${price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)}</p>
+                      <p className="text-2xl font-bold">${currency.format({
+                        amount: price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice),
+                        fractionDigits: 0
+                      })}</p>
                     </div>
                     <div>
                       <p className="text-gray-500 dark:text-gray-400">Bid Count</p>

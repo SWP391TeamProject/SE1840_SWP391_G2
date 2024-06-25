@@ -102,7 +102,7 @@ export const CurrencyProvider: React.FC<{
 
   const format = ({
                     amount: number,
-                    fractionDigits = 3,
+                    fractionDigits = 6,
                     baseCurrency = StandardCurrency,
                     currency = currencyType,
                     compact = false,

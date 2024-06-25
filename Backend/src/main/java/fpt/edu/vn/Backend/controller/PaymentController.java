@@ -95,13 +95,13 @@ public class PaymentController {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 log.info("Payment success");
 
-                paymentService.updatePayment(new PaymentRequest().builder()
+                paymentService.updatePayment(PaymentRequest.builder()
                         .paymentId(Integer.parseInt(paymentId))
                         .status(Payment.Status.SUCCESS)
                         .build());
                 return 1;
             } else {
-                paymentService.updatePayment(new PaymentRequest().builder()
+                paymentService.updatePayment(PaymentRequest.builder()
                         .paymentId(Integer.parseInt(paymentId))
                         .status(Payment.Status.FAILED)
                         .build());
