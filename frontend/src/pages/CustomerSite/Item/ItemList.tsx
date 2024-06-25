@@ -17,7 +17,6 @@ import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import { Search } from "lucide-react"
 import { Item, ItemStatus } from "@/models/Item"
-import { Card } from "@/components/ui/card"
 import { toast } from "react-toastify"
 import { boolean } from "zod"
 import { getCookie } from "@/utils/cookies"
@@ -107,11 +106,13 @@ export function ItemList() {
 
   const handleViewItemDetailsClick = async (item: Item, auction: AuctionSession) => {
     let registered = false;
-    auction?.deposits.forEach((deposit: any) => {
-      if (deposit.payment.accountId == JSON.parse(getCookie("user"))?.id) {
-        registered = true;
-      }
-    });
+    if (getCookie("user").length > 0){
+      auction?.deposits.forEach((deposit: any) => {
+        if (deposit.payment.accountId == JSON.parse(getCookie("user"))?.id) {
+          registered = true;
+        }
+      });
+    }
     navigate(`/auctions/${auction.auctionSessionId}/${item.name}`, {
       state: {
         id: {
@@ -264,13 +265,13 @@ export function ItemList() {
                       <div className='group relative'>
                         <CardHeader>
 
-                        <img
-                          src={item.attachments[0].link}
-                          width={300}
-                          height={200}
-                          alt="Auction Item"
-                          className="rounded-t-lg object-cover w-full "
-                        />
+                          <img
+                            src={item.attachments[0].link}
+                            width={300}
+                            height={200}
+                            alt="Auction Item"
+                            className="rounded-t-lg object-cover w-full "
+                          />
                         </CardHeader>
                         <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
                           onClick={() => handleViewItemDetailsClick(item, auction)}
@@ -278,11 +279,10 @@ export function ItemList() {
                           <Button >Detail</Button>
                         </div>
                       </div>
-                      <CardContent className="p-4 flex flex-col gap-3">
-                        <h3 className="text-lg font-bold mb-2">{item.name}</h3>
-                        <div className="text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: item.description }}></div>
-                        <div className="flex justify-between items-center ">
-
+                      <CardContent className="p-4 flex flex-col gap-2 ">
+                        <h3 className="text-sm font-bold h-6 mb-6">{item.name}</h3>
+                        {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
+                        <div className="flex justify-between items-center h-6">
                           <div className="text-primary font-bold text-lg">{currency.format({
                             amount: item.reservePrice,
                             currency: item.currency,
