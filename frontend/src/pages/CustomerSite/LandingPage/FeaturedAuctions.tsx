@@ -17,6 +17,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 
 export default function FeaturedAuctions() {
+  const date = new Date();
+
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -123,7 +125,18 @@ export default function FeaturedAuctions() {
                             {item.title}
                           </h3>
                           <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium mx-auto absolute -translate-y-14 translate-x-2">
-                            <CountDownTime end={new Date(item.endDate)} />
+                            {item.startDate && new Date(item.startDate) > date ?
+                              <>
+                                Starts in <CountDownTime end={new Date(item.startDate)}></CountDownTime>
+                              </> :
+                              item.endDate && new Date(item.endDate) > date
+                                ? <>
+                                  Ends in <CountDownTime end={new Date(item.endDate)}></CountDownTime>
+                                </> :
+                                <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                                  Auction Ended
+                                </div>
+                            }
                           </div>
                         </div>
 
