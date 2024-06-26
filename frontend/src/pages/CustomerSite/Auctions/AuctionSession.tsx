@@ -16,6 +16,8 @@ import { SERVER_DOMAIN_URL } from '@/constants/domain'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrency } from '@/CurrencyProvider'
 import { Item } from '@/models/Item'
+import { getAllItemCategories } from '@/services/ItemCategoryService'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 
 
@@ -23,6 +25,8 @@ export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
     const dispatch = useAppDispatch();
     const [sessionAttachments, setSessionAttachments] = useState([]);
+    const [items, setItems] = useState([]);
+    const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -59,6 +63,16 @@ export default function AuctionSession() {
                 })
         }
 
+        getAllItemCategories(0, 50).then((res) => {
+            console.log(res.data.content);
+            setCategories(res.data.content)
+        }
+        ).catch(error => {
+            toast.error(error,{
+                position:"bottom-right",
+            });
+        });
+
         window.scrollTo(0, 0);
 
     }, []);
@@ -72,6 +86,7 @@ export default function AuctionSession() {
                     setBidders(prevBidders => [...prevBidders, deposit?.payment.accountId]);
                 });
             }
+            setItems(auctionSession.auctionItems);
         }
     }, [auctionSession])
 
@@ -225,6 +240,10 @@ export default function AuctionSession() {
 
     }
 
+    const handleCategoryFilter = (...event: any) => {
+        setItems(auctionSession.auctionItems.filter(item => item.itemDTO.category.name == event[0]));
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-gray-100 py-12 md:py-12 dark:bg-gray-800">
@@ -289,9 +308,25 @@ export default function AuctionSession() {
             <main className="container px-4 py-12 md:px-6 md:py-20">
                 <div className="grid gap-12 md:grid-cols-[1fr_300px]">
                     <div id='auction-items'>
-                        <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
+                        <div className='flex justify-between items-center'>
+                            <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
+                            <div className='w-full mb-5 basis-1/3'>
+                            <Select onValueChange={handleCategoryFilter} defaultValue="All">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a theme to display" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="All" key={0}>All</SelectItem>
+                                    {categories && categories.map((category) => (
+                                        <SelectItem value={category.name} key={category.itemCategoryId}>{category.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            </div>
+                        </div>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => (
+                            {/* {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => ( */}
+                            {items ? items.map((item) => (
                                 <Card key={item.id.itemId}>
 
                                     <div className='group relative'>
