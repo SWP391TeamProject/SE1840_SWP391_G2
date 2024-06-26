@@ -1,16 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Bell, Home, LineChart, Package, Package2, ShoppingCart, Users2, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
-import React, { createContext, useEffect, useState } from 'react'
+import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
+import{ createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -20,30 +12,13 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getCookie, removeCookie } from "@/utils/cookies";
-import { fetchAccountById } from '@/services/AccountsServices';
-import logo from "@/assets/icon.png";
-import {useAuth} from "@/AuthProvider.tsx";
-import {useCurrency} from "@/CurrencyProvider.tsx";
-import {useAppSelector} from "@/redux/hooks.tsx";
-import {logout} from "@/services/AuthService.ts";
+import { useLocation } from "react-router-dom";
 import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
 
 export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
     const location = useLocation();
-    const auth = useAuth();
-    const currency = useCurrency();
-    const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
-    const handleSignout = function () {
-        logout().then(function () {
-            removeCookie("user");
-            removeCookie('token')
-            window.location.href = '/auth/login';
-        })
-    };
 
     const [consignments] = useState([]);
     const [arrayPath, setArrayPath] = useState([""]);

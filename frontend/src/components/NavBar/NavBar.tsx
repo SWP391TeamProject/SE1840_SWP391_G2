@@ -3,8 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -12,32 +10,17 @@ import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ChevronDownIcon, MenuIcon } from "lucide-react";
 import { useAuth } from "@/AuthProvider.tsx";
-import { useAppSelector } from "@/redux/hooks.tsx";
-import { logout } from "@/services/AuthService.ts";
-import { removeCookie } from "@/utils/cookies";
 import ModeToggle from "../component/ModeToggle";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import logo from "@/assets/icon.png";
-import {useCurrency} from "@/CurrencyProvider.tsx";
 import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
-import React from "react";
 
 export default function NavBar() {
   const auth = useAuth();
-  const currency = useCurrency();
-  const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
-  const handleSignout = function () {
-    logout().then(function () {
-      removeCookie("user");
-      removeCookie('token')
-      window.location.href = '/auth/login';
-    })
-  };
 
   return (
     <>
-      <header className="px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground dark:shadow-gray-600">
+      <header className="z-10 px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground dark:shadow-gray-600">
         <Link className="flex items-center justify-center" to="/">
           <div className="flex items-center justify-center gap-2">
             <img src={logo} className="w-8 h-8" alt="logo" />
