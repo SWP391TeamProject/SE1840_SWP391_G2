@@ -130,8 +130,7 @@ function RegisterForm() {
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input id="name" type="text"
-                               placeholder="Your name" {...field} />
+                        <Input type="text" placeholder="Your name" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -145,7 +144,7 @@ function RegisterForm() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your email" {...field} />
+                        <Input type="email" placeholder="Your email" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -159,8 +158,7 @@ function RegisterForm() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password"
-                               placeholder="******" {...field} />
+                        <Input type="password" placeholder="******" {...field} />
                       </FormControl>
                       <FormMessage/>
                     </FormItem>
@@ -175,8 +173,7 @@ function RegisterForm() {
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input type="password"
-                               placeholder="******" {...field} />
+                        <Input type="password" placeholder="******" {...field} />
                       </FormControl>
                       <FormMessage/>
                     </FormItem>
