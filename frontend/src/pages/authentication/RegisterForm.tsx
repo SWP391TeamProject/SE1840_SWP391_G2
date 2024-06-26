@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useRef, useState } from "react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {useRef, useState} from "react";
 import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { useForm } from "react-hook-form";
+import {useGSAP} from "@gsap/react";
+import {useForm} from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -13,14 +13,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { register } from "@/services/AuthService";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import logo from '../../assets/registration_logo.jpg';
-import { setCookie } from "@/utils/cookies.ts";
-import { Loader2 } from "lucide-react";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {z} from "zod";
+import {register} from "@/services/AuthService";
+import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
+import {setCookie} from "@/utils/cookies.ts";
+import {Loader2} from "lucide-react";
 
 gsap.registerPlugin(useGSAP);
 
@@ -47,6 +46,7 @@ const formSchema = z
       path: ["confirmPassword"],
     }
   );
+
 function RegisterForm() {
   const RegisterForm = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
@@ -96,6 +96,7 @@ function RegisterForm() {
 
     console.log(values);
   }
+
   useGSAP(
     () => {
       gsap.from(RegisterForm.current, {
@@ -104,98 +105,106 @@ function RegisterForm() {
         ease: "power2.inOut",
       });
     },
-    { scope: RegisterForm }
+    {scope: RegisterForm}
   );
 
   return (
     <Card
-      className="w-3/6 h-3/5 mt-10 border drop-shadow-md rounded-xl flex "
+      className="login-form mx-auto min-w-[360px] w-1/3 my-16 h-fit border drop-shadow-md rounded-xl"
       ref={RegisterForm}
     >
-      <div className="flex  basis-full md:basis-1/2 w-full p-3 items-center">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-            <p className="text-2xl font-bold text-center">Register</p>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="enter your name here" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="enter your email here" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="******" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="******" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Link to="/auth/login" className="text-center text-blue-500"> Already have an account? Login</Link>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardHeader className="">
+            <CardTitle className="text-4xl text-center text-bold">
+              Register 👋
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input type="text" placeholder="Your name" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="Your email" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="******" {...field} />
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <div className="flex w-full justify-center">
-              {
-                isLoading ?
-                  <Button disabled className="w-4/6   rounded-2xl">
-                    <Loader2 className="animate-spin" />
-
-                  </Button>
-                  :
-                  < Button type="submit" className="w-4/6   rounded-2xl">
-                    Register
-                  </Button>
-              }
-
+              {isLoading
+                ? <Button disabled className="bg-orange-600">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                  Please wait
+                </Button>
+                : <Button
+                  type="submit"
+                  className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
+                >
+                  Register
+                </Button>}
             </div>
-          </form>
-        </Form>
-      </div>
-      {/* <div className="hidden md:flex w-full h-full  bg-gray-200 rounded-2xl"> */}
-      <CardContent className="hidden md:flex justify-center items-center basis-1/2  h-full p-0 m-0 rounded-2xl my-auto">
-        <img
-          src={logo}
-          className="w-full h-full object-contain rounded-2xl "
-          alt="auction registration logo"
-        />
+            <div className="mt-4 text-center text-sm">
+              Already have an account?&nbsp;
+              <a href="/auth/login" className="underline hover:text-blue-700">
+                Sign in
+              </a>
+            </div>
+          </CardContent>
 
-      </CardContent>
-      {/* </div> */}
-    </Card >
+        </form>
+      </Form>
+    </Card>
   );
 }
+
 export default RegisterForm;
