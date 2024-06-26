@@ -286,8 +286,6 @@ export function ItemList() {
                           <div className="text-primary font-bold text-lg">{currency.format({
                             amount: item.reservePrice,
                             currency: item.currency,
-                            compact: true
-
                           })}</div>
                           <div className="text-muted-foreground text-sm">{item.category.name}</div>
                         </div>

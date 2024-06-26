@@ -132,11 +132,11 @@ export default function AuctionSession() {
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will
-                            directly remove your balance from your
-                            account and remove your data from our servers.
-                            <span className='
+                            directly withdraw your balance.
+                            <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>(Auction Registration Fee: ${fee})</span>                        </AlertDialogDescription>
+                            '>Auction Registration Fee: {currency.format({amount: fee})}</p>
+                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel >Cancel</AlertDialogCancel>
@@ -196,9 +196,9 @@ export default function AuctionSession() {
                             You need to register to this auction first
                             if you want to place a bid.
                             Do you want to continue?
-                            <span className='
+                            <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>(Auction Registration Fee: ${fee})</span>
+                            '>Auction Registration Fee: {currency.format({amount: fee})}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -313,16 +313,14 @@ export default function AuctionSession() {
                                         <h3 className="text-sm font-semibold h-12">{item.itemDTO.name}</h3>
                                         <div className="flex items-center justify-between">
                                             <div className="text-primary-500 font-medium">{currency.format({
-                                                amount: item?.itemDTO.reservePrice,
-                                                compact: true,
+                                                amount: item?.itemDTO.reservePrice
                                             })}</div>
 
                                             {
                                                 auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
                                                     <div className="rounded-md bg-yellow-300 p-2 text-red-500">
                                                         Won: {currency.format({
-                                                            amount: item?.currentPrice,
-                                                            compact: true,
+                                                            amount: item?.currentPrice
                                                         })}
                                                     </div> :
                                                     <>

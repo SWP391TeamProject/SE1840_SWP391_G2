@@ -113,18 +113,18 @@ export default function ProfilePreferences() {
                       <ul className="list-disc list-inside">
                         <li>Exchange rate: 1 USD = {currency.format({
                           amount: 1,
-                          currency: field.value,
-                          fractionDigits: 8,
+                          currency: field.value
                         })}</li>
-                        <li>Standard format: {currency.format({
+                        <li>Full format: {currency.format({
                           amount: 123456.789,
                           currency: field.value,
+                          format: 'full',
                           exchangeMoney: false
                         })}</li>
                         <li>Compact format: {currency.format({
                           amount: 123456.789,
                           currency: field.value,
-                          compact: true,
+                          format: 'compact',
                           exchangeMoney: false
                         })}</li>
                       </ul>
