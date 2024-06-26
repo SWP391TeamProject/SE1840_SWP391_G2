@@ -6,6 +6,7 @@ import {genConsignment} from "./gen_consignment";
 import {simulateAuction} from "./auction_simulator";
 import {PaymentType} from "../model/transaction";
 import {genNotification} from "./gen_notification";
+import {genPosts} from "./gen_blog";
 
 /*
 1. account, citizen_card
@@ -80,6 +81,9 @@ export async function generate() {
     // tạo noti
     const [noti, notiCount] = genNotification(accountList);
 
+    // tạo blog
+    const [blogCategory, blogPost] = await genPosts(roleToAccounts);
+
     fs.writeFile(`./output/account.json`, JSON.stringify(accountList), (err) => {
         if (err) throw err;
     });
@@ -114,4 +118,14 @@ export async function generate() {
         if (err) throw err;
     });
     console.log(`Generated ${notiCount} notifications!`);
+
+    fs.writeFile(`./output/blog_category.json`, JSON.stringify(blogCategory), (err) => {
+        if (err) throw err;
+    });
+    console.log(`Generated ${blogCategory.length} blog categories!`);
+
+    fs.writeFile(`./output/blog_post.json`, JSON.stringify(blogPost), (err) => {
+        if (err) throw err;
+    });
+    console.log(`Generated ${blogPost.length} blog posts!`);
 }

@@ -15,6 +15,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
 import {Link} from "react-router-dom";
 import React, {ReactNode} from "react";
 import {Roles} from "@/constants/enums.tsx";
+import {WalletIcon} from "lucide-react";
 
 interface ProfileDropdownMenuProps {
   children?: ReactNode;
@@ -68,20 +69,16 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem style={{ pointerEvents: "none" }}>
-            <div className="flex justify-between items-center gap-2">
-              <div className="basis-1/2">
-                Balance:
+          <DropdownMenuItem>
+            <Link to={'/profile/balance'}>
+              <div className="flex gap-2">
+                <WalletIcon className="w-4" />
+                {currency.format({
+                  amount: auth.user.balance,
+                  format: 'compact'
+                })}
               </div>
-              <div className="basis-1/2 font-medium text-left block">
-                <p>
-                  {currency.format({
-                    amount: auth.user.balance,
-                    compact: true
-                  })}
-                </p>
-              </div>
-            </div>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           {React.Children.count(children) > 0 && (

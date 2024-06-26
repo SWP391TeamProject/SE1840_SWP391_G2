@@ -216,8 +216,7 @@ export default function AuctionJoin() {
                     <div>
                       <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
                       <p className="text-2xl font-bold">{currency.format({
-                        amount: price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice),
-                        fractionDigits: 0
+                        amount: price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)
                       })}</p>
                     </div>
                     <div>

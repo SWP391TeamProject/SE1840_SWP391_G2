@@ -57,10 +57,12 @@ export const StandardCurrency = CurrencyType.USD;
 
 export type FormatOptions = {
   amount: number;
-  fractionDigits?: number;
+  minFractionDigits?: number;
+  maxFractionDigits?: number;
   baseCurrency?: CurrencyType;
   currency?: CurrencyType;
-  compact?: boolean;
+  format?: 'full' | 'compact' | 'auto';
+  fractionDigits?: 'always' | 'zero';
   exchangeMoney?: boolean;
 }
 
@@ -102,10 +104,12 @@ export const CurrencyProvider: React.FC<{
 
   const format = ({
                     amount: number,
-                    fractionDigits = 6,
+                    minFractionDigits = 1,
+                    maxFractionDigits = 8,
                     baseCurrency = StandardCurrency,
                     currency = currencyType,
-                    compact = false,
+                    format = 'auto',
+                    fractionDigits = 'zero',
                     exchangeMoney = true
                   }: FormatOptions) => {
     let suffix = "";
@@ -114,7 +118,11 @@ export const CurrencyProvider: React.FC<{
       number /= exchangeRates[baseCurrency];
     }
 
-    if (compact) {
+    if (format == 'auto' && Math.log10(number) + 1 > 15) {
+      format = 'compact';
+    }
+
+    if (format == 'compact') {
       const SI_SYMBOL = ["", "k", "M", "G", "T", "P", "E"];
 
       const tier = Math.log10(Math.abs(number)) / 3 | 0;
@@ -125,17 +133,28 @@ export const CurrencyProvider: React.FC<{
       }
     }
 
+    if (fractionDigits == 'zero' && number >= 1) {
+      minFractionDigits = 0;
+      maxFractionDigits = 0;
+    }
+
     let formatted;
     if (currencySymbol[currency] === undefined) {
       formatted = new Intl.NumberFormat("en-US", {
         style: 'currency',
         currency: currency,
-        minimumFractionDigits: fractionDigits,
-        maximumFractionDigits: fractionDigits,
+        minimumFractionDigits: minFractionDigits,
+        maximumFractionDigits: maxFractionDigits,
         useGrouping: true
       }).format(number);
     } else {
-      formatted = currencySymbol[currency] + " " + number.toFixed(fractionDigits);
+      formatted = currencySymbol[currency] + " " + new Intl.NumberFormat("en-US", {
+        style: 'currency',
+        currency: CurrencyType.USD,
+        minimumFractionDigits: minFractionDigits,
+        maximumFractionDigits: maxFractionDigits,
+        useGrouping: true
+      }).format(number).substring(1);
     }
 
     function removeTrailingZeros(numStr: string) {
