@@ -76,14 +76,25 @@ export default function ConsignmentInititalForm() {
     setIsLoading(true);
     // Remove FormData creation and file handling
     createConsignmentService(data).then((res) => {
-      toast.success("Consignment created successfully", {
-        position: "bottom-right",
-      });
+      console.log(res);
+      if (res.status >= 200 && res.status < 300) {
+        form.resetField("files");
+        form.resetField("description");
+        toast.success("Consignment created successfully", {
+          position: "bottom-right",
+        });
+      }  
       setIsLoading(false);
     }).catch((err) => {
-      toast.error("Failed to create consignment", {
-        position: "bottom-right",
-      });
+      if (err.response.status === 413) {
+        toast.error("File size is too large", {
+          position: "bottom-right",
+        });
+      } else {
+        toast.error("Failed to create consignment", {
+          position: "bottom-right",
+        });
+      }
       setIsLoading(false);
     }
     );
