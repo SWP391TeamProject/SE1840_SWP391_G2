@@ -78,7 +78,6 @@ export const createConsignmentService = async (data: any) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => console.log(err));
 };
 export const deleteConsignmentService = async (id: string) => {
   return await axios

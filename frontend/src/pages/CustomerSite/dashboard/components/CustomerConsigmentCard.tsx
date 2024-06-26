@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 import { ConsignmentDetailType, ConsignmentStatus } from "@/constants/enums";
 import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from "@/services/ConsignmentService";
 import React from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function CustomerConsigmentCard({ consignment }) {
@@ -73,8 +74,8 @@ export default function CustomerConsigmentCard({ consignment }) {
     const ActionButton = () => {
         return (
             <div className="flex justify-evenly">
-                <Button className="w-1/3 bg-red-500" onClick={rejectEvaluation}>Decline</Button>
-                <Button className="w-1/3 bg-green-500" onClick={acceptEvaluation}>Accept</Button>
+                <Button className="w-1/3 bg-red-500 text-foreground" onClick={rejectEvaluation}>Decline</Button>
+                <Button className="w-1/3 bg-green-500 text-foreground" onClick={acceptEvaluation}>Accept</Button>
             </div>
         )
     }
@@ -102,25 +103,29 @@ export default function CustomerConsigmentCard({ consignment }) {
                 </DialogTrigger>
                 <DialogContent>
                     <AlertDialogHeader>
-                        <DialogTitle className=" text-2xl font-bold text-black">
+                        <DialogTitle className=" text-2xl font-bold text-foreground">
                             {custConsignmentDetail?.status === ConsignmentDetailType.REQUEST && "Your Consignment Request"}
                             {custConsignmentDetail?.status === ConsignmentDetailType.INITIAL_EVALUATION && "Initial Evaluation of Your Consignment"}
                             {custConsignmentDetail?.status === ConsignmentDetailType.MANAGER_ACCEPTED && "Final Evaluation of Your Consignment"}
                         </DialogTitle>
                         <DialogDescription>
 
-                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null ? "Your consignment is in evaluation process. Please wait for the result." : "Description"}</h1>
+                            <h1 className="block text-xl font-medium text-foreground">{custConsignmentDetail == null ? "Your consignment is in evaluation process. Please wait for the result." : "Description"}</h1>
                             {custConsignmentDetail?.description}
-                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null || custConsignmentDetail.status === ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
+                            <h1 className="block text-xl font-medium text-foreground">{custConsignmentDetail == null || custConsignmentDetail.status === ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
                             {custConsignmentDetail?.price}
-                            <div className="flex justify-end">
+                            <div className="flex justify-center flex-wrap">
                                 {custConsignmentDetail?.attachments?.map((attachment: any, index: number) => {
                                     return (
-                                        <img key={index} src={attachment.link} alt="attachment" className="w-1/4 h-1/4" />
+                                        <Link key={index} to={attachment.link} target="_blank" className="w-1/4 h-1/4 m-1 rounded-sm">
+                                            <img src={attachment.link} alt="attachment" className="rounded-md" />
+                                        </Link>
                                     )
                                 })}
                             </div>
-
+                            <div className="text-foreground opacity-50">
+                                *Click on the image to download
+                            </div>
                             {custConsignmentDetail?.status === ConsignmentDetailType.INITIAL_EVALUATION
                                 || custConsignmentDetail?.status === ConsignmentDetailType.MANAGER_ACCEPTED ?
                                 <ActionButton /> : null}
