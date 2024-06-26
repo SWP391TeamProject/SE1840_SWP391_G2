@@ -38,7 +38,7 @@ const CountDownTime: React.FC<Props> = ({ end }) => {
 
     return (
         <div >
-            <p className='text-white opacity-100 '>
+            <p className='text-foreground opacity-100 '>
                 {formatTime(time)}
             </p>
 

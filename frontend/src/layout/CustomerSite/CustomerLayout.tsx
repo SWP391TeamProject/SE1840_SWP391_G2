@@ -14,9 +14,7 @@ export default function CustomerLayout() {
   //   // fetchConsignmentsService();
   // }, [nav]);  
   useEffect(() => {
-    // console.log(JSON.parse(theme));
     if (theme) {
-      console.log(theme)
       setTheme(JSON.parse(theme));
     }
   }, []);
