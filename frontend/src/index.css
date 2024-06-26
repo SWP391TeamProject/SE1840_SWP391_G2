@@ -95,4 +95,14 @@
     --input: 0 0% 80%;
     --ring: 0 0% 60%;
   }
+
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
 }
