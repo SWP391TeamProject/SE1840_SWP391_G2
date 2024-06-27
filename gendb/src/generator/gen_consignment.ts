@@ -14,6 +14,10 @@ import dayjs from "dayjs";
 import {NUMBER_OF_CONSIGNMENT} from "../config";
 
 export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: CrawledItem[]): Consignment[] {
+    items = items
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
     const consignmentList: Consignment[] = [];
     let itemIndex = 0;
 
