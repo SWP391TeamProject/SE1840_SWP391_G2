@@ -5,10 +5,11 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 import { ConsignmentDetailType, ConsignmentStatus } from "@/constants/enums";
 import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from "@/services/ConsignmentService";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function CustomerConsigmentCard({ consignment }) {
+    const navigate = useNavigate();
 
     const [custConsignment, setCusConsignment] = React.useState<any>(consignment);
     console.log(custConsignment);
@@ -136,6 +137,16 @@ export default function CustomerConsigmentCard({ consignment }) {
         )
     }
 
+    const handleViewDetailsClick = (consignment: any, consignmentId: number) => {
+        console.log(consignment, consignmentId);
+        navigate(`${consignmentId}`, {
+            state: {
+                consignmentId: consignmentId,
+                consignment: consignment,
+            }
+        });
+    }
+
     return (
         <>
             <Card className="w-[350px]  ">
@@ -157,7 +168,7 @@ export default function CustomerConsigmentCard({ consignment }) {
                             (custConsignment.status === ConsignmentStatus.WAITING_STAFF ||
                                 custConsignment.status === ConsignmentStatus.IN_INITIAL_EVALUATION ||
                                 custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION
-                            ) && <OpenConsignmentDetail />
+                            ) && <Button onClick={() => {handleViewDetailsClick(consignment, consignment.consignmentId)}} className="w-full">View Detail</Button>
                         }
                     </div>
                 </CardContent>

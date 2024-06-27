@@ -84,6 +84,7 @@ import {BlogDetail} from "./pages/CustomerSite/Blog/BlogDetail.tsx";
 import TwoFactorAuthForm from "@/pages/authentication/TwoFactorAuthForm.tsx";
 import {ItemList} from "./pages/CustomerSite/Item/ItemList.tsx";
 import {CurrencyProvider} from "@/CurrencyProvider.tsx";
+import CustomerConsignmentDetail from "./pages/CustomerSite/dashboard/CustomerConsignmentDetail.tsx";
 
 
 const router = createBrowserRouter(routes);
@@ -152,11 +153,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         </Route>
                       </Route>
                     </Route>
-                    <Route path="/dashboard" element={<CustomerDashBoard/>}>
-                      <Route path="" element={<CustomerDashboard/>}></Route>
+                    <Route path="/dashboard" element={<CustomerDashBoard />}>
+                      <Route path="" element={<CustomerDashboard />}></Route>
                       <Route path="consignments"
-                             element={<CustomerConsignmentList/>}></Route>
-                      <Route path="bids" element={<Bids/>}></Route>
+                        element={<CustomerConsignmentList />}></Route>
+                      <Route path="consignments/:id" element={<CustomerConsignmentDetail/>}></Route>
+                      <Route path="bids" element={<Bids />}></Route>
                     </Route>
                     {/* Administration */}
                     <Route

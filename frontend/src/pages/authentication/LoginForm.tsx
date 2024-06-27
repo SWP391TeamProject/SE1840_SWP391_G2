@@ -54,7 +54,7 @@ function LoginForm() {
         setCookie("user", JSON.stringify(res.data), 30000);
         auth.fetchProfile();
         if ([Roles.ADMIN, Roles.STAFF, Roles.MANAGER].includes(res.data.role)) {
-          navigate("/admin/accounts");
+          navigate("/admin");
         } else {
           navigate(from, { replace: true });
         }

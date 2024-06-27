@@ -14,10 +14,13 @@ import { Link } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { set } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 
 export default function FeaturedAuctions() {
+  const date = new Date();
+
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const getDaysLeft = (endDate: Date) => {
     const difference = endDate.getTime() - new Date().getTime();
@@ -59,50 +62,50 @@ export default function FeaturedAuctions() {
               align: "center",
             }}  >
             <CarouselContent className="-ml-2 md:-ml-4"  >
-              {isLoading &&
-
-                Array.from({ length: 6 }).map((_, index) => (
-                  <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3 " key={index}>
-                    <Card className="w-72 lg:w-64  h-full ">
-                      <CardHeader>
-                        <Skeleton
-                          className="rounded-t-lg object-cover w-full h-56"
-
-                        />
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold">
-                            Loading...
-                          </h3>
-                          <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium dark:bg-gray-800">
-                            Loading...
+              {isLoading && (
+                <>
+                  <LoadingAnimation message="loading..." />
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3" key={index}>
+                      <Card className="w-72 lg:w-64  h-full ">
+                        <CardHeader>
+                          <Skeleton
+                            className="rounded-t-lg object-cover w-full h-56"
+                          />
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold">
+                              Loading...
+                            </h3>
+                            <div className="inline-block rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium dark:bg-gray-800">
+                              Loading...
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Loading...
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              Loading...
+                            </div>
+                            <Button variant="default" asChild>
+                              <Link
+                                to="/auctions"
+                              >
+                                Bid Now
+                              </Link>
+                            </Button>
                           </div>
-                          <Button variant="default" asChild>
-                            <Link
-                              to="/auctions"
-                            >
-                              Bid Now
-                            </Link>
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))
-
-
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </>
+              )
               }
               {featuredAuctions &&
                 featuredAuctions.map((item) => (
                   <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3 " key={item.auctionSessionId}>
-                    <Card className="w-72 lg:w-64  h-full ">
+                    <Card className="w-72 lg:w-64 h-full ">
                       <CardHeader>
                         <img
 
@@ -122,12 +125,23 @@ export default function FeaturedAuctions() {
                             {item.title}
                           </h3>
                           <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium mx-auto absolute -translate-y-14 translate-x-2">
-                            <CountDownTime end={new Date(item.endDate)} />
+                            {item.startDate && new Date(item.startDate) > date ?
+                              <>
+                                Starts in <CountDownTime end={new Date(item.startDate)}></CountDownTime>
+                              </> :
+                              item.endDate && new Date(item.endDate) > date
+                                ? <>
+                                  Ends in <CountDownTime end={new Date(item.endDate)}></CountDownTime>
+                                </> :
+                                <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                                  Auction Ended
+                                </div>
+                            }
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
-        
+
                           <Button variant="default" asChild>
                             <Link
                               to={`auctions/${item.auctionSessionId}`}

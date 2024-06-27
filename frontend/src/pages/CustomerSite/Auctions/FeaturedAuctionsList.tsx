@@ -88,7 +88,18 @@ export default function FeaturedAuctionsList() {
                     <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.endDate ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> : <CountDownTime end={date}></CountDownTime>}
+                        {session.startDate && new Date(session.startDate) > date ?
+                          <>
+                            Starts in <CountDownTime end={new Date(session.startDate)}></CountDownTime>
+                          </> :
+                          session.endDate && new Date(session.endDate) > date
+                            ? <>
+                              Ends in <CountDownTime end={new Date(session.endDate)}></CountDownTime>
+                            </> :
+                            <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                              Auction Ended
+                            </div>
+                        }
                       </div>
                     </div>
                     <Button variant={"default"} asChild>
