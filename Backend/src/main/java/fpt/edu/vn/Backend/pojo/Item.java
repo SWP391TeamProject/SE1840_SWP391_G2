@@ -32,7 +32,7 @@ public class Item {
     @Column(length = 500,columnDefinition = "NVARCHAR(100)")
     private String name;
 
-    @Column(length = 10000,columnDefinition = "NVARCHAR(10000)")
+    @Column(length = 10000,columnDefinition = "NVARCHAR(max)")
     private String description;
 
     @Column(name = "reserve_price")
