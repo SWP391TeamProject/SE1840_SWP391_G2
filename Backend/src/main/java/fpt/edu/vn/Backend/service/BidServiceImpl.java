@@ -146,6 +146,20 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
+    public List<BidDTO> terminateAuctionItem(AuctionItemId auctionItemId) {
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        List<BidDTO> result = new ArrayList<>();
+        for (Bid bid : bids) {
+            log.info("Bid " + bid.getBidId() + " failed");
+            Payment payment = bid.getPayment();
+            payment.setStatus(Payment.Status.FAILED);
+            paymentRepos.save(payment);
+            result.add(new BidDTO(bid));
+        }
+        return result;
+    }
+
+    @Override
     public List<BidResponse> toBidResponse(List<BidDTO> bids) {
         List<BidResponse> responses = new ArrayList<>();
         for (BidDTO bid : bids) {

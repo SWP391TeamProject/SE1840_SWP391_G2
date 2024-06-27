@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Item } from '@/models/newModel/item';
 import { fetchBidsByAccount } from '@/services/BidsService';
+import { getItemById } from '@/services/ItemService';
 import { getCookie } from '@/utils/cookies';
+import { set } from 'date-fns';
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,11 +18,29 @@ export const Bids = () => {
             console.log(res.data);
             setBids(res.data.content);
         }).catch((err) => {
-            toast.error(err);
-        })
+            toast.error(err,{
+                position:"bottom-right",
+            });
+        });
+
+        window.scrollTo(0, 0);
     }, [])
-    const handleViewItemDetailsClick = (id: any) => {
-        nav("/item/" + id);
+    const handleViewItemDetailsClick = async (bid: any) => {
+        let itemDTO: Item;
+        if (bid.auctionItemId.auctionSessionId == null || bid.auctionItemId.itemId == null) {
+            return;
+        } else {
+            await getItemById(bid.auctionItemId.itemId).then((res) => {
+                itemDTO = (res.data);
+                nav(`/auctions/${bid.auctionItemId.auctionSessionId}/${itemDTO.name}`, { state: { id: bid.auctionItemId, itemDTO: itemDTO } });
+
+            }).catch((err) => {
+                toast.error(err,{
+                    position:"bottom-right",
+                });
+            });
+
+        }
     }
     const handleViewAuctionDetailsClick = (id: any) => {
         nav("/Auctions/" + id);
@@ -36,12 +57,12 @@ export const Bids = () => {
                 <div className="overflow-x-auto">
                     {bids.length != 0 ? <Table>
                         <TableHeader>
-                            <TableRow>
+                            <TableRow >
                                 <TableHead>ID</TableHead>
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Date</TableHead>
-                                <TableHead>Auction</TableHead>
-                                <TableHead>Item</TableHead>
+                                <TableHead className='text-center'>Auction</TableHead>
+                                <TableHead  className='text-center'>Item</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -52,15 +73,15 @@ export const Bids = () => {
                                     <TableCell>{bid.payment.date}</TableCell>
                                     {/* <TableCell>{bid.auctionItemId.auctionId}</TableCell>
                             <TableCell>{bid.auctionItemId.itemId}</TableCell> */}
-                                    <TableCell>
+                                    <TableCell className='text-center'>
                                         <Button variant="outline" size="sm" onClick={() => handleViewAuctionDetailsClick(bid.auctionItemId.auctionSessionId)}>
-                                            Details
+                                            View Auction
                                         </Button>
                                     </TableCell>
-                                    <TableCell>
-                                        <Button variant="outline" size="sm">
-                                            {/* onClick={() => handleViewItemDetailsClick(bid.auctionItemId.itemId)}> */}
-                                            Details
+                                    <TableCell className='text-center'>
+                                        <Button  variant="outline" size='sm' onClick={() => {
+                                            handleViewItemDetailsClick(bid)
+                                        }}>View Item
                                         </Button>
                                     </TableCell>
                                 </TableRow>

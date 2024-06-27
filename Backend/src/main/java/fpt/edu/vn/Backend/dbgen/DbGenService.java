@@ -69,6 +69,10 @@ public class DbGenService {
     private PaymentRepos paymentRepos;
     @Autowired
     private NotificationRepos notificationRepos;
+    @Autowired
+    private BlogCategoryRepos blogCategoryRepos;
+    @Autowired
+    private BlogPostRepos blogPostRepos;
 
     @Autowired
     private PasswordEncoderConfig passwordEncoderConfig;
@@ -91,6 +95,8 @@ public class DbGenService {
         generateAuction(loadArray("auction_session.json"));
         generateTransaction(loadArray("transaction.json"));
         generateNotification(loadObject("notification.json"));
+        generateBlogCategory(loadArray("blog_category.json"));
+        generateBlogPost(loadArray("blog_post.json"));
 
         System.exit(0);
     }
@@ -606,6 +612,61 @@ public class DbGenService {
             }
         }
         notificationRepos.saveAllAndFlush(notifications);
+    }
+
+    private void generateBlogCategory(JsonArray e) {
+        if (blogCategoryRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating blog categories: %d/%d exists", blogCategoryRepos.count(), e.size()));
+            return;
+        }
+        LOGGER.info("Generate blog categories...");
+        for (JsonElement element : e) {
+            JsonObject obj = element.getAsJsonObject();
+            BlogCategory blogCategory = new BlogCategory();
+            blogCategory.setBlogCategoryId(obj.get("id").getAsInt());
+            blogCategory.setName(obj.get("name").getAsString());
+            blogCategory = blogCategoryRepos.save(blogCategory);
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("createDate", parseDate(obj.get("date").getAsString()));
+            paramMap.put("updateDate", parseDate(obj.get("date").getAsString()));
+            paramMap.put("id", blogCategory.getBlogCategoryId());
+            transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                @Override
+                protected void doInTransactionWithoutResult(TransactionStatus status) {
+                    jdbcTemplate.update("UPDATE blog_category SET create_date = :createDate, update_date = :updateDate WHERE blog_category_id = :id", paramMap);
+                }
+            });
+        }
+    }
+
+    private void generateBlogPost(JsonArray e) {
+        if (blogPostRepos.count() > 0) {
+            LOGGER.info(String.format("Skipped generating blog posts: %d/%d exists", blogPostRepos.count(), e.size()));
+            return;
+        }
+        LOGGER.info("Generate blog posts...");
+        for (JsonElement element : e) {
+            JsonObject obj = element.getAsJsonObject();
+            BlogPost blogPost = new BlogPost();
+            blogPost.setPostId(obj.get("id").getAsInt());
+            blogPost.setCategory(blogCategoryRepos.getReferenceById(obj.get("categoryId").getAsInt()));
+            blogPost.setTitle(obj.get("title").getAsString());
+            blogPost.setContent(obj.get("content").getAsString());
+            blogPost.setAuthor(accountRepos.getReferenceById(obj.get("authorId").getAsInt()));
+            blogPost = blogPostRepos.save(blogPost);
+            {
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("createDate", parseDate(obj.get("date").getAsString()));
+                paramMap.put("updateDate", parseDate(obj.get("date").getAsString()));
+                paramMap.put("id", blogPost.getPostId());
+                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus status) {
+                        jdbcTemplate.update("UPDATE blog_post SET create_date = :createDate, update_date = :updateDate WHERE post_id = :id", paramMap);
+                    }
+                });
+            }
+        }
     }
 
 }

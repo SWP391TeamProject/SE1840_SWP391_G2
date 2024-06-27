@@ -36,10 +36,6 @@ const formSchema = z.object({
     balance: z.coerce.number().optional(),
 });
 
-const roleSchema: z.ZodType<Role> = z.object({
-    roleId: z.number(),
-    roleName: z.string()
-});
 
 export default function AccountEdit() {
     const account = useAppSelector((state) => state.accounts.currentAccount);
@@ -67,10 +63,8 @@ export default function AccountEdit() {
             phone: data.phone,
             avatar: null,
             balance: data.balance,
-            role: [{
-                roleId: Object.keys(RoleName).indexOf(data.role) + 1,
-                roleName: data.role,
-            }],
+            role: data.role,
+       
             status: account?.status
         }
         updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
@@ -169,7 +163,7 @@ export default function AccountEdit() {
                             name="balance"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Balance</FormLabel>
+                                    <FormLabel>Balance (in USD)</FormLabel>
                                     <FormControl>
                                         <Input {...field} type='number'/>
                                     </FormControl>

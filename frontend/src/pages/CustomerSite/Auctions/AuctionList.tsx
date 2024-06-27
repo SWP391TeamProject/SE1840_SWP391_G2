@@ -29,7 +29,8 @@ export default function AuctionList() {
   }
 
   useEffect(() => {
-    dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }))
+    dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }));
+    window.scrollTo(0, 0)
   }, [])
 
   useEffect(() => {
@@ -92,11 +93,17 @@ export default function AuctionList() {
                           Auction has been terminated
                         </div> :
                         <div className="text-sm font-medium">
-                          {session.endDate && new Date(session.endDate) > date
-                            ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> :
-                            <div className="text-pink-500 dark:text-pink-400 font-semibold">
-                              Auction Ended
-                            </div>
+                          {session.startDate && new Date(session.startDate) > date ?
+                            <>
+                              Starts in <CountDownTime end={new Date(session.startDate)}></CountDownTime>
+                            </> :
+                            session.endDate && new Date(session.endDate) > date
+                              ? <>
+                                Ends in <CountDownTime end={new Date(session.endDate)}></CountDownTime>
+                              </> :
+                              <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                                Auction Ended
+                              </div>
                           }
                         </div>
                       }

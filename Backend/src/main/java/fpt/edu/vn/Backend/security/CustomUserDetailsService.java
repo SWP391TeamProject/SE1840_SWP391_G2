@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -29,12 +30,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new BiddifyUser(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singletonList(mapRolesToAuthorities(user.getRole())),
+                List.of(new SimpleGrantedAuthority(user.getRole().toString())),
                 user.getAccountId()
         );
-    }
-
-    private GrantedAuthority mapRolesToAuthorities(Account.Role role) {
-        return new SimpleGrantedAuthority(role.toString());
     }
 }

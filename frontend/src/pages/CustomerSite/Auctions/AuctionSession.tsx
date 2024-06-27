@@ -13,44 +13,49 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { AuctionSessionStatus } from '@/constants/enums'
 
 import { SERVER_DOMAIN_URL } from '@/constants/domain'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrency } from '@/CurrencyProvider'
+import { Item } from '@/models/Item'
+import { getAllItemCategories } from '@/services/ItemCategoryService'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
 
 
 export default function AuctionSession() {
     const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
     const dispatch = useAppDispatch();
     const [sessionAttachments, setSessionAttachments] = useState([]);
+    const [items, setItems] = useState([]);
+    const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
     });
+    const currency = useCurrency();
     const param = useParams();
     const [bidders, setBidders] = useState<number[]>([]);
     const user = JSON.parse(getCookie("user") || "null");
     const userId = user == null ? -1 : user.id;
 
     useEffect(() => {
-
-        if (auctionSession == null) {
-            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
-                .then(res => {
-                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
-                    setSessionAttachments(res.data.attachments);
-                    toast.success("Auction Session Loaded");
-                })
-                .catch(err => {
-                    toast.error("Failed to load Auction Session");
-                    console.log(err);
-                })
-
-        }
-        if (param.id) {
+        if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
                     console.log(res.data);
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
-                    toast.success("Auction Session Loaded");
+                })
+                .catch(err => {
+                    toast.error("Failed to load Auction Session");
+                    console.log(err);
+                })
+        }
+        else if (!param.id) {
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
+                .then(res => {
+                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setSessionAttachments(res.data.attachments);
                 })
                 .catch(err => {
                     toast.error("Failed to load Auction Session");
@@ -58,6 +63,17 @@ export default function AuctionSession() {
                 })
         }
 
+        getAllItemCategories(0, 50).then((res) => {
+            console.log(res.data.content);
+            setCategories(res.data.content)
+        }
+        ).catch(error => {
+            toast.error(error,{
+                position:"bottom-right",
+            });
+        });
+
+        window.scrollTo(0, 0);
 
     }, []);
 
@@ -70,6 +86,7 @@ export default function AuctionSession() {
                     setBidders(prevBidders => [...prevBidders, deposit?.payment.accountId]);
                 });
             }
+            setItems(auctionSession.auctionItems);
         }
     }, [auctionSession])
 
@@ -81,9 +98,30 @@ export default function AuctionSession() {
                 }
             });
             toast.success("Registered Successfully");
-        }).catch(() => { toast.error("Failed to Register") });
+        })
     }
     const ConfirmRegister = () => {
+        if (userId == -1) {
+            return (
+                <AlertDialog>
+                    <AlertDialogTrigger>
+                        <Button variant="default" >Register to bid</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className='text-foreground'>
+                        <AlertDialogHeader >
+                            <AlertDialogTitle>You are not login </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                You need to login first in order to register to this auction !!!
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel >Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => navigate('/auth/login')}>Login</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )
+        }
         let fee = Number.MAX_VALUE;
         if (auctionSession?.auctionItems) {
             auctionSession.auctionItems.forEach((item: any) => {
@@ -109,9 +147,10 @@ export default function AuctionSession() {
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will
-                            directly remove your balance from your
-                            account and remove your data from our servers.
-                            (Auction Registration Fee: ${fee})
+                            directly withdraw your balance.
+                            <p className='
+                            text-red-500 dark:text-red-400 font-semibold
+                            '>Auction Registration Fee: {currency.format({amount: fee})}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -124,6 +163,27 @@ export default function AuctionSession() {
 
     }
     const RegisterAlert = () => {
+        if (userId == -1) {
+            return (
+                <AlertDialog>
+                    <AlertDialogTrigger>
+                        <Button variant="default" >Place bid</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className='text-foreground'>
+                        <AlertDialogHeader >
+                            <AlertDialogTitle>You are not login </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                You need to login first in order to register to this auction !!!
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel >Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => navigate('/auth/login')}>Login</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )
+        }
         let fee = Number.MAX_VALUE;
         if (auctionSession?.auctionItems) {
             auctionSession.auctionItems.forEach((item: any) => {
@@ -151,7 +211,9 @@ export default function AuctionSession() {
                             You need to register to this auction first
                             if you want to place a bid.
                             Do you want to continue?
-                            (Auction Registration Fee: ${fee})
+                            <p className='
+                            text-red-500 dark:text-red-400 font-semibold
+                            '>Auction Registration Fee: {currency.format({amount: fee})}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -162,6 +224,26 @@ export default function AuctionSession() {
             </AlertDialog>
         )
     }
+
+    const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
+        console.log(item, auctionId,bidders.includes(userId) );
+        navigate(`/auctions/${auctionId}/${item.name}`, {
+            state: {
+                id: {
+                    auctionSessionId: auctionId,
+                    itemId: item.itemId
+                },
+                itemDTO: item,
+                allow: bidders.includes(userId) 
+            }
+        });
+
+    }
+
+    const handleCategoryFilter = (...event: any) => {
+        setItems(auctionSession.auctionItems.filter(item => item.itemDTO.category.name == event[0]));
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-gray-100 py-12 md:py-12 dark:bg-gray-800">
@@ -209,42 +291,86 @@ export default function AuctionSession() {
 
                             </div>
                         </div>
-                        <img
-                            src={sessionAttachments[0]?.link}
-                            width={600}
-                            height={400}
-                            alt="Auction Hero"
-                            className="mx-auto rounded-lg object-cover"
-                        />
+                        {
+                            !sessionAttachments[0]?.link ?
+                                < Skeleton
+                                    className="mx-auto rounded-lg object-contain  w-[600px] h-[600px]"
+                                />
+                                :
+                                <img
+                                    src={sessionAttachments[0]?.link}
+                                    alt="Auction Hero"
+                                    className="mx-auto rounded-lg object-contain  w-[600px] h-[600px]"
+                                />}
                     </div>
                 </div>
             </section>
             <main className="container px-4 py-12 md:px-6 md:py-20">
                 <div className="grid gap-12 md:grid-cols-[1fr_300px]">
                     <div id='auction-items'>
-                        <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
+                        <div className='flex justify-between items-center'>
+                            <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
+                            <div className='w-full mb-5 basis-1/3'>
+                            <Select onValueChange={handleCategoryFilter} defaultValue="All">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a theme to display" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="All" key={0}>All</SelectItem>
+                                    {categories && categories.map((category) => (
+                                        <SelectItem value={category.name} key={category.itemCategoryId}>{category.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            </div>
+                        </div>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item, index) => (
-                                <Card key={index}>
-                                    <img
-                                        src={item.itemDTO.attachments[0].link}
-                                        width={300}
-                                        height={200}
-                                        alt="Auction Item"
-                                        className="rounded-t-lg object-cover"
-                                    />
+                            {/* {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => ( */}
+                            {items ? items.map((item) => (
+                                <Card key={item.id.itemId}>
+
+                                    <div className='group relative'>
+                                        <img
+                                            src={item.itemDTO.attachments[0].link}
+                                            width={300}
+                                            height={200}
+                                            alt="Auction Item"
+                                            className="rounded-t-lg object-cover w-full "
+                                        />
+                                        <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                                            onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession.auctionSessionId)}
+                                        >
+                                            <Button >Detail</Button>
+                                        </div>
+                                    </div>
+
                                     <CardContent className="space-y-2 p-4">
-                                        <h3 className="text-lg font-semibold">{item.itemDTO.name}</h3>
+                                        <h3 className="text-sm font-semibold h-12">{item.itemDTO.name}</h3>
                                         <div className="flex items-center justify-between">
-                                            <div className="text-primary-500 font-medium">{currencyFormatter.format(item.itemDTO.reservePrice)}</div>
-                                            {bidders.includes(userId) ? (
-                                                <Button onClick={() => {
-                                                    let name = item?.itemDTO.name;
-                                                    navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO } });
-                                                }}>Place Bid</Button>
-                                            ) : (
-                                                <RegisterAlert></RegisterAlert>
-                                            )}
+                                            <div className="text-primary-500 font-medium">{currency.format({
+                                                amount: item?.itemDTO.reservePrice
+                                            })}</div>
+
+                                            {
+                                                auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
+                                                    <div className="rounded-md bg-yellow-300 p-2 text-red-500">
+                                                        Won: {currency.format({
+                                                            amount: item?.currentPrice
+                                                        })}
+                                                    </div> :
+                                                    <>
+                                                        {bidders.includes(userId) ? (
+                                                            <Button onClick={() => {
+                                                                let name = item?.itemDTO.name;
+                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO , allow:true} });
+                                                            }}>Place Bid</Button>
+                                                        ) : (
+                                                            <RegisterAlert></RegisterAlert>
+                                                        )}
+                                                    </>
+
+                                            }
+
                                             {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
                                         </div>
                                     </CardContent>

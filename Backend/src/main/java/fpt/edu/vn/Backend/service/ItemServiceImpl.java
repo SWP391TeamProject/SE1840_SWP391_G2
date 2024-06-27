@@ -157,6 +157,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public @NotNull Page<ItemDTO> getItemsByPrice(@NotNull Pageable pageable, int minPrice, int maxPrice) {
+        return itemRepos.findItemByReservePriceBetweenAndStatus(BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice), Item.Status.IN_AUCTION, pageable)
+                .map(this::mapEntityToDTO);
+    }
+
+    @Override
     public @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status) {
         return itemRepos.findItemByStatus(status, pageable).map(this::mapEntityToDTO);
     }
@@ -172,7 +178,23 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name, Item.Status status) {
+        return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(this::mapEntityToDTO);
+    }
+
+    @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {
         return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(this::mapEntityToDTO);
+    }
+
+    @Override
+    public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId, Item.Status status) {
+        return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(this::mapEntityToDTO);
+    }
+
+    @Override
+    public @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice) {
+        return itemRepos.findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus( BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice),categoryId,Item.Status.IN_AUCTION, pageable)
+                .map(this::mapEntityToDTO);
     }
 }

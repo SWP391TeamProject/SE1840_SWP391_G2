@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,14 @@ import java.util.Optional;
 @Repository
 public interface ItemRepos extends JpaRepository<Item, Integer> {
     Page<Item> findItemByItemCategoryItemCategoryId(int itemCategoryId, Pageable pageable);
+    Page<Item> findItemByItemCategoryItemCategoryIdAndStatus(int itemCategoryId,Item.Status status, Pageable pageable);
+
     Page<Item> findItemByStatus(Item.Status status, Pageable pageable);
     Page<Item> findItemByOwnerAccountId(int ownerId, Pageable pageable);
     Page<Item> findItemByNameContaining(String name, Pageable pageable);
+    Page<Item> findItemByNameContainingAndStatus(String name,Item.Status status, Pageable pageable);
+    Page<Item> findItemByReservePriceBetweenAndStatus(BigDecimal minPrice, BigDecimal maxPrice, Item.Status status, Pageable pageable);
+
+
+    Page<Item> findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus(BigDecimal reservePrice, BigDecimal reservePrice2, int itemCategory_itemCategoryId, Item.Status status, Pageable pageable);
 }

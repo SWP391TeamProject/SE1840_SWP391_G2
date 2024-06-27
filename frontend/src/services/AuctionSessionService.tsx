@@ -17,12 +17,14 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message, {
+                position: "bottom-right",
+            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -42,12 +44,14 @@ export const fetchActiveAuctionSessions = async (page?: number, size?: number) =
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message, {
+                position: "bottom-right",
+            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -64,12 +68,14 @@ export const fetchFeaturedAuctionSessions = async (page?: number, size?: number)
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/featured`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
         });
 }
 
@@ -83,12 +89,14 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
         });
 }
 
@@ -102,12 +110,14 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
         });
 }
 
@@ -117,11 +127,13 @@ export const fetchAuctionSessionById = async (id: number) => {
         .get(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -130,7 +142,7 @@ export const fetchAuctionSessionById = async (id: number) => {
 }
 
 
-export const fetchAuctionSessionByTitle = async (page?: number, size?: number,title?:string) => {
+export const fetchAuctionSessionByTitle = async (page?: number, size?: number, title?: string) => {
     let params = {
         page: page ?? 0,
         size: size ?? 10,
@@ -139,12 +151,14 @@ export const fetchAuctionSessionByTitle = async (page?: number, size?: number,ti
         .get(`${SERVER_DOMAIN_URL}/api/${controller}/search/${title}`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
             },
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -157,13 +171,15 @@ export const createAuctionSession = async (data: any) => {
         .post(`${SERVER_DOMAIN_URL}/api/${controller}/`, data, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -177,7 +193,7 @@ export const updateAuctionSession = async (data: any) => {
         .put(`${SERVER_DOMAIN_URL}/api/${controller}/${data.auctionSessionId}`, data, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
@@ -189,13 +205,15 @@ export const registerAuctionSession = async (id: number) => {
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/register/${id}`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         })
         .catch((err) => {
-            toast.error(err.response.data.message);
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");

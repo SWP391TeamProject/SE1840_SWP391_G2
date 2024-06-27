@@ -114,7 +114,7 @@ export const updateAccountService = async (data: any, id: number) => {
 
 export const deleteAccountService = async (id: string) => {
   return await axios
-    .delete(API_SERVER + "/accounts/" + id, {
+    .post(API_SERVER + "/accounts/" + id, {
       headers: {
         "Content-Type": "application/json",
          

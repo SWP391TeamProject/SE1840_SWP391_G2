@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 export const Buy = () => {
   return (<div className="container mx-auto px-4 py-8">
     <h2 className="text-3xl font-bold mb-8">Buying Jewelry</h2>
+
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
       {/* Step 1: Register to Participate */}
@@ -17,7 +18,7 @@ export const Buy = () => {
         </ul>
         <Button variant={'default'} className='m-4' asChild>
           <Link to="/auctions">
-          Register
+            Register
           </Link>
         </Button>
       </div>
@@ -64,9 +65,18 @@ export const Buy = () => {
           <li>Confirm delivery or pickup arrangements with the auction house.</li>
         </ul>
       </div>
+      <div className="rounded-lg shadow-md p-6  border dark:border-white ">
+        <h3 className="text-xl font-medium mb-2">Important Notice Before Bidding:</h3>
+        <ul className="list-disc space-y-2 ml-7">
+          <li>Winning bidders are required to pay Biddify a <strong>4.5% buyer's fee</strong> on top of the winning bid amount.</li>
+          <li>The buyer's fee is subject to a minimum of <strong>$225</strong> and a maximum of <strong>$4,500</strong>.</li>
+        </ul>
+
+      </div>
 
 
     </div>
+
   </div>
   )
 }

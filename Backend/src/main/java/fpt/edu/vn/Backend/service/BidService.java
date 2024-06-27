@@ -19,4 +19,5 @@ public interface BidService {
     void deleteBid(int id);
     List<BidResponse> toBidResponse(List<BidDTO> bids);
     List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId);
+    List<BidDTO> terminateAuctionItem(AuctionItemId auctionItemId);
     }

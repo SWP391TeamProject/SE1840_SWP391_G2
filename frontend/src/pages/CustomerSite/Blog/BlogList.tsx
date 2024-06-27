@@ -1,5 +1,6 @@
 
 import Footer from '@/components/footer/Footer';
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { BlogCategory } from '@/models/newModel/blogCategory';
 import { BlogPost } from '@/models/newModel/blogPost';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
@@ -17,7 +18,7 @@ export const BlogList = () => {
     const dispatch = useAppDispatch();
     const [blogCategories, setBlogCategories] = useState([] as any);
 
-    const { isPending, isError, data, error } = useQuery({
+    const { isPending, isError, data, error, isLoading } = useQuery({
         queryKey: ['blogs'],
         queryFn: () => BlogService.getAllBlogs(0, 200),
     });
@@ -39,8 +40,13 @@ export const BlogList = () => {
 
                 }
 
-            ).catch((error) => { toast.error(error.message) });
-        dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }))
+            ).catch((error) => {
+                toast.error(error.message, {
+                    position: "bottom-right",
+                })
+            });
+        dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }));
+        window.scrollTo(0, 0)
     }, [])
 
     useEffect(() => {
@@ -51,9 +57,12 @@ export const BlogList = () => {
             dispatch(setCurrentPageNumber({ pageNumber: data?.data.number, totalPages: data?.data.totalPages }));
         }
     }, [data]);
+    if (isLoading) {
+        return <LoadingAnimation />
+    }
 
     if (isPending) {
-        return <span>Loading...</span>
+        return <LoadingAnimation />
     }
 
     if (isError) {
@@ -146,62 +155,62 @@ export const BlogList = () => {
                     {blogCategories?.map((category: BlogCategory) => (
                         blogPosts?.currentPageList?.filter(
                             (blog: BlogPost) => blog.category.blogCategoryId == category.blogCategoryId
-                        ).length==0 ? null :
-                        <div key={category.blogCategoryId} className="grid grid-cols-1  gap-6 w-full mx-auto pt-12 pb-4  text-foreground">
-                            <h2 className="text-2xl font-bold mb-4 col-span-full m-2">
-                                <div className='my-2'>{category.name} Blogs</div>
-                                <hr />
-                                <hr />
-                            </h2>
-                            {blogPosts?.currentPageList.map((blog) => (
-                                blog.category.blogCategoryId != category.blogCategoryId ? null :
-                                    <div className="rounded-lg overflow-hidden shadow-lg my-5 border" key={blog.postId}>
+                        ).length == 0 ? null :
+                            <div key={category.blogCategoryId} className="grid grid-cols-1  gap-6 w-full mx-auto pt-12 pb-4  text-foreground">
+                                <h2 className="text-2xl font-bold mb-4 col-span-full m-2">
+                                    <div className='my-2'>{category.name} Blogs</div>
+                                    <hr />
+                                    <hr />
+                                </h2>
+                                {blogPosts?.currentPageList.map((blog) => (
+                                    blog.category.blogCategoryId != category.blogCategoryId ? null :
+                                        <div className="rounded-lg overflow-hidden shadow-lg my-5 border" key={blog.postId}>
 
-                                        <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-                                            <div className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full">
-                                                <img
-                                                    loading="lazy"
-                                                    alt=''
-                                                    src={blog?.attachments[0]?.link || "/placeholder.svg"}
-                                                    className="grow w-full aspect-[1.75] max-md:mt-1.5"
-                                                />
-                                            </div>
-                                            <div className="flex flex-col ml-5 w-[67%] max-md:ml-0 max-md:w-full">
-                                                <div className="flex flex-col self-stretch px-5 my-auto max-md:mt-3.5 max-md:max-w-full">
-                                                    <h3 className="text-lg font-bold mb-2">
-                                                        {blog?.title}
-                                                    </h3>
-                                                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2">
-                                                        <div dangerouslySetInnerHTML={{ __html: `${blog?.content.split('&lt;img/&gt;').join(' ')}` }} />
-                                                    </p>
-                                                    <Link
-                                                        onClick={() => handleViewDetailsClick(blog.postId)}
-                                                        to={`/blogs/${blog?.postId}`}
-                                                        className="inline-flex items-center gap-2 font-medium text-primary hover:underline"
-                                                    >
-                                                        Read More
-                                                        <ArrowRightIcon className="w-4 h-4" />
-                                                    </Link>
-                                                    <div className="flex gap-5 mt-10 w-full max-md:flex-wrap max-md:max-w-full">
-                                                        <div className="flex flex-auto gap-0 text-sm leading-5">
-                                                            <img
-                                                                loading="lazy"
-                                                                src={blog?.author?.avatar?.link || "/placeholder.svg"}
-                                                                alt=''
-                                                                className="shrink-0 self-start aspect-square w-6 rounded-full mr-2"
-                                                            />
-                                                            <div className="flex-auto">
-                                                                {blog?.author?.nickname} - Published on {new Date(blog?.updateDate).getDate()}/{new Date(blog?.updateDate).getMonth() < 9 ? '0' : ''}{new Date(blog?.updateDate).getMonth() + 1}/{new Date(blog?.updateDate).getFullYear()}
+                                            <div className="flex gap-5 max-md:flex-col max-md:gap-0">
+                                                <div className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full">
+                                                    <img
+                                                        loading="lazy"
+                                                        alt=''
+                                                        src={blog?.attachments[0]?.link || "/placeholder.svg"}
+                                                        className="grow w-full aspect-[1.75] max-md:mt-1.5"
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col ml-5 w-[67%] max-md:ml-0 max-md:w-full">
+                                                    <div className="flex flex-col self-stretch px-5 my-auto max-md:mt-3.5 max-md:max-w-full">
+                                                        <h3 className="text-lg font-bold mb-2">
+                                                            {blog?.title}
+                                                        </h3>
+                                                        <p className="text-gray-500 dark:text-gray-400 line-clamp-2">
+                                                            <div dangerouslySetInnerHTML={{ __html: `${blog?.content.split('&lt;img/&gt;').join(' ')}` }} />
+                                                        </p>
+                                                        <Link
+                                                            onClick={() => handleViewDetailsClick(blog.postId)}
+                                                            to={`/blogs/${blog?.postId}`}
+                                                            className="inline-flex items-center gap-2 font-medium text-primary hover:underline"
+                                                        >
+                                                            Read More
+                                                            <ArrowRightIcon className="w-4 h-4" />
+                                                        </Link>
+                                                        <div className="flex gap-5 mt-10 w-full max-md:flex-wrap max-md:max-w-full">
+                                                            <div className="flex flex-auto gap-0 text-sm leading-5">
+                                                                <img
+                                                                    loading="lazy"
+                                                                    src={blog?.author?.avatar?.link || "/placeholder.svg"}
+                                                                    alt=''
+                                                                    className="shrink-0 self-start aspect-square w-6 rounded-full mr-2"
+                                                                />
+                                                                <div className="flex-auto">
+                                                                    {blog?.author?.nickname} - Published on {new Date(blog?.updateDate).getDate()}/{new Date(blog?.updateDate).getMonth() < 9 ? '0' : ''}{new Date(blog?.updateDate).getMonth() + 1}/{new Date(blog?.updateDate).getFullYear()}
+                                                                </div>
                                                             </div>
-                                                        </div>
 
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
                     ))}
 
 

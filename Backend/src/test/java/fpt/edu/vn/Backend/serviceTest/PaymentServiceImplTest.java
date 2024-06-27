@@ -61,10 +61,7 @@ class PaymentServiceImplTest {
 
         when(accountRepos.findByAccountId(paymentRequest.getAccountId())).thenReturn(Optional.of(account));
 
-        // When
-            when(paymentService.createVNPayPayment(paymentRequest, vnp_IpAddr)).thenReturn(
-                    notNull( String.class)
-            );
+
 
     }
 

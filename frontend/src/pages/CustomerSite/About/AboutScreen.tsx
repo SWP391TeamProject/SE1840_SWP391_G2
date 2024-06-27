@@ -6,22 +6,27 @@ import { About } from "./About";
 import { Buy } from "./Buy";
 import { Sell } from "./Sell";
 import { Sidebar } from "./SideBar";
+// import Faq from "./Faq/Faq";
 
 export default function AboutScreen() {
     const about = useRef(null);
     const ourTeam = useRef(null);
     const buy = useRef(null);
     const sell = useRef(null);
+    const faq = useRef(null);
     const [aboutPosition, setAboutPosition] = useState(0);
     const [ourTeamPosition, setOurTeamPosition] = useState(0);
     const [buyPosition, setBuyPosition] = useState(0);
     const [sellPosition, setSellPosition] = useState(0);
+    const [faqPosition, setFaqPosition] = useState(0);
 
     useEffect(() => {
         setAboutPosition(about?.current?.offsetTop);
         setOurTeamPosition(ourTeam?.current?.offsetTop);
         setBuyPosition(buy?.current?.offsetTop);
         setSellPosition(sell?.current?.offsetTop);
+        setFaqPosition(faq?.current?.offsetTop);
+        window.scrollTo(0, 0)
     }, [])
     const scrollToElement = () => {
         let currentLocation = window.location.href;
@@ -38,12 +43,13 @@ export default function AboutScreen() {
     return (
         <>
             <div className="flex container">
-                <div className="p-3 basis-3/10">
+                <div className="p-3 basis-3/10 hidden md:flex flex-col">
                     <Sidebar
                         about={aboutPosition}
                         ourTeam={ourTeamPosition}
                         buy={buyPosition}
                         sell={sellPosition}
+                        faq={faqPosition}
                     />
                 </div>
                 <div className="p-3 text-foreground basis-7/10">
@@ -65,6 +71,9 @@ export default function AboutScreen() {
                     <div ref={sell}>
                         <Sell />
                     </div>
+                    {/* <div ref={faq}>
+                        <Faq/>
+                    </div> */}
                 </div>
 
             </div>

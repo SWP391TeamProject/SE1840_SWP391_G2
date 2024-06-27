@@ -29,11 +29,16 @@ import FeaturedAuctions from "@/pages/CustomerSite/LandingPage/FeaturedAuctions"
 import CategoriesSection from "@/pages/CustomerSite/LandingPage/CategoriesSection";
 import AuctionProcessSection from "@/pages/CustomerSite/LandingPage/AuctionProcessSection";
 import Footer from "../../../components/footer/Footer";
+import { useEffect } from "react";
 
 export function LandingPage() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   return (
     <div key="1" className="flex flex-col min-h-dvh bg-background text-foreground">
-      <main className="flex flex-col gap-y-10 md:gap-y-10">
+      <main className="flex flex-col gap-y-20 md:gap-y-30">
         {/* Start Carouesel Sections */}
         <LandingPageCarousel />
         {/* End Carousel Section */}

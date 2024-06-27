@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.*;
-import fpt.edu.vn.Backend.service.PaymentService;
 import fpt.edu.vn.Backend.service.StatisticService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@PreAuthorize("hasAuthority('ADMIN')")
 @RestController
 @RequestMapping("/api/statistics")
 @CrossOrigin("*")

@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { CameraIcon, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/AuthProvider.tsx";
 import {Controller, SubmitHandler, useForm} from "react-hook-form";
@@ -96,16 +96,20 @@ const ProfileDetail = () => {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then((res) => {
-        auth.setUser({
-          ...auth.user,
-          avatar: res.data
-        });
-        toast.success('Update avatar successfully!');
-        setIsLoading(false);
-      })
+      auth.setUser({
+        ...auth.user,
+        avatar: res.data
+      });
+      toast.success('Update avatar successfully!', {
+        position: "bottom-right",
+      });
+      setIsLoading(false);
+    })
       .catch((err) => {
         console.log(err);
-        toast.error('Update avatar failed!');
+        toast.error('Update avatar failed!', {
+          position: "bottom-right",
+        });
         setIsLoading(false);
       })
   };
@@ -118,22 +122,28 @@ const ProfileDetail = () => {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(() => {
-        auth.setUser({
-          ...auth.user,
-          ...data
-        });
-        toast.success('Update details successfully!');
-        setIsLoading(false);
-      }).catch((err) => {
-        console.log(err);
-        toast.error('Update details failed!');
-        setIsLoading(false);
-      })
+      auth.setUser({
+        ...auth.user,
+        ...data
+      });
+      toast.success('Update details successfully!', {
+        position: "bottom-right",
+      });
+      setIsLoading(false);
+    }).catch((err) => {
+      console.log(err);
+      toast.error('Update details failed!', {
+        position: "bottom-right",
+      });
+      setIsLoading(false);
+    })
   };
 
   const onSubmitTwoFactorAuth: SubmitHandler<TwoFactorAuth> = (data) => {
     if (data.enable2fa === auth.user.require2fa) {
-      toast.warning("Settings stay unchanged!");
+      toast.warning("Settings stay unchanged!", {
+        position: "bottom-right",
+      });
       return;
     }
     setIsLoading(true);
@@ -143,7 +153,9 @@ const ProfileDetail = () => {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(() => {
-      toast.success('Changed 2FA settings successfully!');
+      toast.success('Changed 2FA settings successfully!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
       resetTwoFactorAuthForm({
         enable2fa: data.enable2fa,
@@ -151,7 +163,9 @@ const ProfileDetail = () => {
       });
     }).catch((err) => {
       console.log(err);
-      toast.error('Changed 2FA settings failed!');
+      toast.error('Changed 2FA settings failed!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
       resetTwoFactorAuthForm({
         enable2fa: auth.user.require2fa,
@@ -175,6 +189,10 @@ const ProfileDetail = () => {
             <CardContent className="space-y-4">
               <div className="inline-block relative">
                 <Avatar className="w-[80px] h-[80px]">
+                  <div className="absolute inset-0 bg-black translate-y-12 bg-opacity-50 " >
+                    <CameraIcon className="w-6 h-6 m-auto text-white" />
+
+                  </div>
                   <AvatarImage src={avatarPreview} alt="avatar" />
                   <AvatarFallback>{auth.user.nickname.charAt(0)}</AvatarFallback>
                 </Avatar>
@@ -271,16 +289,16 @@ const ProfileDetail = () => {
               <div className="grid gap-4">
                 <div className="flex gap-2">
                   <Controller
-                  control={controlTwoFactorAuth}
-                  name="enable2fa"
-                  render={({ field }) => (
-                    <Checkbox
-                      id="enable2fa"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
+                    control={controlTwoFactorAuth}
+                    name="enable2fa"
+                    render={({ field }) => (
+                      <Checkbox
+                        id="enable2fa"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
                   <Label htmlFor="enable2fa">Enable two-factor authentication</Label>
                 </div>
                 <div className="grid gap-2">
@@ -309,23 +327,6 @@ const ProfileDetail = () => {
               </div>
             </CardFooter>
           </form>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Delete Account</CardTitle>
-            <CardDescription>
-              Permanently delete your account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Label>Confirm Deletion</Label>
-            <Input type="password"
-              placeholder="Enter your password to confirm deletion" />
-          </CardContent>
-          <CardFooter>
-            <Button>Delete Account</Button>
-          </CardFooter>
         </Card>
       </div>
 

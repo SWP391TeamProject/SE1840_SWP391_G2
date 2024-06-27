@@ -37,9 +37,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -77,10 +75,10 @@ public class AuthServiceImpl implements AuthService{
     private TokenProvider tokenProvider;
     private TokenRepos tokenRepos;
     private CustomUserDetailsService customUserDetailService;
-    @Autowired
     private PasswordEncoderConfig passwordEncoder;
+
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService, PasswordEncoderConfig passwordEncoder) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
@@ -88,6 +86,7 @@ public class AuthServiceImpl implements AuthService{
         this.tokenProvider = tokenProvider;
         this.tokenRepos = tokenRepos;
         this.customUserDetailService = customUserDetailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -115,7 +114,7 @@ public class AuthServiceImpl implements AuthService{
             newAccount = new Account();
             newAccount.setNickname(registerDTO.getName());
             newAccount.setEmail(registerDTO.getEmail());
-            newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword()).toString()); // Consider hashing the password before saving
+            newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword())); // Consider hashing the password before saving
             newAccount.setRole(Account.Role.MEMBER);
             newAccount.setProvider(Account.AuthProvider.LOCAL);
             newAccount = accountRepos.save(newAccount);
@@ -180,12 +179,10 @@ public class AuthServiceImpl implements AuthService{
 
     private AuthResponseDTO forceLogin(Account user) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        userDetails.getPassword(),
-                        userDetails.getAuthorities()
-                )
+        Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
@@ -198,13 +195,23 @@ public class AuthServiceImpl implements AuthService{
             throw new InvalidInputException("Email or password is empty!");
         }
 
-        Optional<Account> userOptional = accountRepos.findByEmailAndPassword(loginDTO.getEmail(), loginDTO.getPassword());
+        Account user = accountRepos.findByEmail(loginDTO.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Account", "email", loginDTO.getEmail()));
 
-        if (userOptional.isEmpty()) {
-            throw new ResourceNotFoundException ("Invalid email or password");
+        if (!passwordEncoder.bcryptEncoder().matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new InvalidInputException("Wrong password");
         }
 
-        Account user = userOptional.get();
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        loginDTO.getPassword(),
+                        userDetails.getAuthorities()
+                )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         if (user.isRequire2fa()) {
             try {
                 request2fa(user);
@@ -273,7 +280,7 @@ public class AuthServiceImpl implements AuthService{
 //            throw new InvalidInputException("Password must be at least 8 characters long" +
 //                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
 //        }
-        a.setPassword(changePasswordDTO.getNewPassword());
+        a.setPassword(passwordEncoder.bcryptEncoder().encode(changePasswordDTO.getNewPassword()));
         accountRepos.save(a);
         return true;
     }
@@ -302,7 +309,7 @@ public class AuthServiceImpl implements AuthService{
         helper.setTo(a.getEmail());
         helper.setSubject("[Biddify] Reset Password");
         // Read the HTML file into a String
-        String htmlContent = new String(Files.readAllBytes(Paths.get("src/main/resources/templates/resetpasswordEmail.html")));
+        String htmlContent = new String(Files.readAllBytes(Paths.get("/src/main/resources/templates/resetpasswordEmail.html")));
 
         // Replace placeholders in the HTML content with actual values
         htmlContent = htmlContent.replace("{code}", code);
@@ -327,7 +334,7 @@ public class AuthServiceImpl implements AuthService{
             return false;
         Account acc = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
-        acc.setPassword(newPassword);
+        acc.setPassword(passwordEncoder.bcryptEncoder().encode(newPassword));
         accountRepos.save(acc);
         resetPasswordCodeCache.remove(resetCode);
         logger.info("Reset password for account {} with code {} successfully", id, resetCode);

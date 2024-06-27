@@ -23,4 +23,5 @@ public interface PaymentService {
 
     PaymentDTO vnPayPaymentResponse(String token);
 
+    Page<PaymentDTO> filterPaymentByDate(String startDate, String endDate, Pageable pageable);
 }

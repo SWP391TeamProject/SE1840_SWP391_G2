@@ -30,6 +30,7 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/webp",
 ];
+import thumbnail1 from "@/assets/thumnail1.jpg";
 
 
 const formSchema = z.object({
@@ -44,7 +45,7 @@ const formSchema = z.object({
   }).max(500, {
     message: "Description must be between 10 and 500 characters"
   }),
-  files: z.array(z.any()).max(5, { message: "You can only upload up to 5 images" })
+  files: z.array(z.any()).min(1).max(5, { message: "You can only upload up to 5 images" })
 
 });
 
@@ -59,7 +60,7 @@ export default function ConsignmentInititalForm() {
       accountId: JSON.parse(getCookie("user"))?.id,
       email: JSON.parse(getCookie("user"))?.email || "",
       phone: JSON.parse(getCookie("user"))?.phone || "",
-      contactName: JSON.parse(getCookie("user"))?.username || "",
+      contactName: JSON.parse(getCookie("user"))?.nickname || "",
       preferContact: "any",
       description: "",
       files: [],
@@ -68,21 +69,37 @@ export default function ConsignmentInititalForm() {
   useEffect(() => {
     setUser(JSON.parse(getCookie("user")));
     console.log(user);
+    window.scrollTo(0, 0)
   }, [])
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     // Remove FormData creation and file handling
     createConsignmentService(data).then((res) => {
-      toast.success("Consignment created successfully");
+      console.log(res);
+      if (res.status >= 200 && res.status < 300) {
+        form.resetField("files");
+        form.resetField("description");
+        toast.success("Consignment created successfully", {
+          position: "bottom-right",
+        });
+      }  
       setIsLoading(false);
-    }).catch((err) => { 
-      toast.error("Failed to create consignment");
+    }).catch((err) => {
+      if (err.response.status === 413) {
+        toast.error("File size is too large", {
+          position: "bottom-right",
+        });
+      } else {
+        toast.error("Failed to create consignment", {
+          position: "bottom-right",
+        });
+      }
       setIsLoading(false);
     }
     );
-
     console.log(data);
+
   };
 
   return (
@@ -116,7 +133,8 @@ export default function ConsignmentInititalForm() {
                         <FormControl>
                           <Input
                             placeholder="enter your prefer contact name here"
-                            defaultValue={JSON.parse(getCookie("user"))?.username}
+                            defaultValue={JSON.parse(getCookie("user"))?.nickname}
+                            readOnly
                             {...field}
                           />
                         </FormControl>
@@ -134,8 +152,9 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="adasd"
+                          <Input placeholder="Your Email"
                             defaultValue={JSON.parse(getCookie("user"))?.email}
+                            readOnly
                             {...field}
                           />
                         </FormControl>
@@ -153,7 +172,10 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input placeholder="enter your phone number here" {...field} />
+                          <Input placeholder="enter your phone number here"
+                            defaultValue={JSON.parse(getCookie("user"))?.phone}
+                            readOnly
+                            {...field} />
                         </FormControl>
                         <FormDescription>
                           this is the phone we used to contact you
@@ -162,6 +184,8 @@ export default function ConsignmentInititalForm() {
                       </FormItem>
                     )}
                   />
+                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your profile.
+                  </h3>
                   <FormField
                     control={form.control}
                     name="preferContact"
@@ -235,6 +259,15 @@ export default function ConsignmentInititalForm() {
                       )}
                     />
                   </ScrollArea>
+                  {form.getFieldState("files").invalid && form.control._formValues["files"].length <= 0 ? <p className="text-red-400 font-bold">
+                    *You must include at least a image of your item
+                  </p> : <></>
+                  }
+
+                  {form.getFieldState("files").invalid && form.control._formValues["files"].length > 5 ? <p className="text-red-400 font-bold">
+                    *You can only upload up to 5 images
+                  </p> : <></>
+                  }
 
                   {/* <DropzoneComponent /> */}
                   {isLoading ?
@@ -255,8 +288,8 @@ export default function ConsignmentInititalForm() {
 
             <div className="hidden md:block basis-2/4 p-5">
               <img
-                src="src\assets\thumnail1.jpg"
-                alt=""
+                src={thumbnail1}
+                alt="Side Image"
                 className="object-cover w-full h-full border rounded-lg shadow-lg"
               />
             </div>

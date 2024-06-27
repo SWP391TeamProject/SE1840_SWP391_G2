@@ -34,7 +34,7 @@ public class BlogPost {
     @Column(length = 300)
     private String title;
 
-    @Column(length = 10000)
+    @Column(length = 10000,columnDefinition = "NVARCHAR(max)")
     private String content;
 
     @CreationTimestamp

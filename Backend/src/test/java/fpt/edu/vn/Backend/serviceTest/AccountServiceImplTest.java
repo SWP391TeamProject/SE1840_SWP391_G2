@@ -4,8 +4,8 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import fpt.edu.vn.Backend.service.AccountServiceImpl;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +15,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +32,9 @@ public class AccountServiceImplTest {
 
     @Mock
     private AccountRepos accountRepos;
+
+    @Mock
+    private PasswordEncoderConfig passwordEncoderConfig;
 
     @InjectMocks
     private AccountServiceImpl accountService;
@@ -118,6 +125,7 @@ public class AccountServiceImplTest {
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
         accountDTO.setRole(Account.Role.ADMIN);
+        accountDTO.setPassword("123456");
 
         Account account = new Account();
         account.setNickname(accountDTO.getNickname());
@@ -129,6 +137,7 @@ public class AccountServiceImplTest {
         account.setRole(Account.Role.ADMIN);
 
         when(accountRepos.save(any())).thenReturn(account);
+        when(passwordEncoderConfig.bcryptEncoder()).thenReturn(new BCryptPasswordEncoder(10));
 
         AccountDTO result = accountService.createAccount(accountDTO);
 
@@ -204,33 +213,5 @@ public class AccountServiceImplTest {
     public void shouldReturnNullWhenGettingAccountWithUnknownEmail() {
         when(accountRepos.findByEmail("invalid@test.com")).thenReturn(Optional.empty());
         assertNull(accountService.getAccountByEmail("invalid@test.com"));
-    }
-
-    @Test
-    @DisplayName("Should return account when valid email and password are provided")
-    public void shouldReturnAccountWhenValidEmailAndPasswordAreProvided() {
-        Account account = new Account();
-        account.setEmail("test@test.com");
-        account.setPassword("password");
-        account.setRole(Account.Role.STAFF);
-        when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
-
-        AccountDTO result = accountService.getAccountByEmailAndPassword("test@test.com", "password");
-
-        assertNotNull(result);
-        assertEquals("test@test.com", result.getEmail());
-    }
-
-    @Test
-    @DisplayName("Should throw ResourceNotFoundException when invalid email or password are provided")
-    public void shouldThrowResourceNotFoundExceptionWhenInvalidEmailOrPasswordAreProvided() {
-        Account account = new Account();
-        account.setEmail("test@test.com");
-        account.setPassword("password");
-
-        when(accountRepos.findByEmailAndPassword("test@test.com", "password")).thenReturn(Optional.of(account));
-
-        assertNull(accountService.getAccountByEmailAndPassword("invalid@test.com", "password"));
-        assertNull(accountService.getAccountByEmailAndPassword("test@test.com", "invalid"));
     }
 }

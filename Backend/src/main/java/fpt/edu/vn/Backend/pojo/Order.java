@@ -24,6 +24,9 @@ public class Order {
     @JoinColumn(name = "order_id")
     private Set<Item> items;
 
+    @Column(name = "total_price")
+    private String shippingAddress;
+
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "payment_id")

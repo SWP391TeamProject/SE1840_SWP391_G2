@@ -7,6 +7,7 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
+import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import fpt.edu.vn.Backend.service.AuthServiceImpl;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +50,8 @@ class AuthServiceImplTest {
     private MimeMessageHelper mimeMessageHelper;
     @Mock
     private CustomUserDetailsService customUserDetailService;
+    @Mock
+    private PasswordEncoderConfig passwordEncoderConfig;
 
     @BeforeEach
     public void setup() throws MessagingException {
@@ -60,7 +64,7 @@ class AuthServiceImplTest {
     public void shouldLoginSuccessfullyWhenValidEmailAndPasswordAreProvided() {
         LoginDTO loginDTO = new LoginDTO();
         loginDTO.setEmail("test@test.com");
-        loginDTO.setPassword("password");
+        loginDTO.setPassword("123456");
 
         Account account = new Account();
         account.setAccountId(1);
@@ -68,6 +72,7 @@ class AuthServiceImplTest {
         account.setEmail("test@test.com");
         account.setRole(Account.Role.MEMBER);
         account.setStatus(Account.Status.ACTIVE);
+        account.setPassword(new BCryptPasswordEncoder(10).encode(loginDTO.getPassword()));
 
         when(accountRepos.findByEmail(anyString())).thenReturn(Optional.of(account));
 
@@ -78,6 +83,7 @@ class AuthServiceImplTest {
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
 
         when(jwtGenerator.generateToken(any())).thenReturn("someToken");
+        when(passwordEncoderConfig.bcryptEncoder()).thenReturn(new BCryptPasswordEncoder(10));
 
         AuthResponseDTO result = authService.login(loginDTO);
 

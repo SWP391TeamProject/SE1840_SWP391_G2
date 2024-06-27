@@ -66,6 +66,7 @@ import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } fr
 import { getItems, getItemsByName } from "@/services/ItemService";
 import { ItemStatus } from "@/constants/enums";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 export default function ItemsList() {
   const itemsList = useAppSelector((state) => state.items);
@@ -74,6 +75,7 @@ export default function ItemsList() {
   const [statusFilter, setStatusFilter] = useState("all");
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
+  const currency = useCurrency();
 
   const fetchItems = async (pageNumber: number) => {
     try {
@@ -197,7 +199,7 @@ export default function ItemsList() {
               <CardTitle className="flex justify-between items-center">
                 Items
                 <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                 </div>
               </CardTitle>
               <CardDescription>
@@ -210,19 +212,19 @@ export default function ItemsList() {
                   <TableRow>
                     <TableHead>Id</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Price
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Status
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Description
                     </TableHead>
-                    {/* <TableHead className="hidden md:table-cell">
+                    {/* <TableHead className="md:table-cell">
                       Status
                     </TableHead> */}
-                    {/* <TableHead className="hidden md:table-cell">
+                    {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
                     <TableHead>
@@ -239,21 +241,21 @@ export default function ItemsList() {
                       {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {item.name}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {item.buyInPrice}
+                      <TableCell className="md:table-cell">
+                        {currency.format({amount: item.reservePrice})}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {item.status}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                           <div dangerouslySetInnerHTML={{__html: item.description}}></div>
                             
                        
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="md:table-cell">
                         {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
                         <Badge variant="default" className="bg-green-500">{ItemsetCurrentItemStatus[item.status]}</Badge> : 
                         <Badge variant="destructive">{ItemsetCurrentItemStatus[item.status]}</Badge>} */}

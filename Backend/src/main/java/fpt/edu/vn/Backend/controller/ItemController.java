@@ -1,16 +1,17 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
-import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.exporter.ItemExporter;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.service.ItemService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import java.util.List;
 @RequestMapping("/api/items")
 @CrossOrigin("*")
 public class ItemController {
+    private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
 
     @Autowired
@@ -36,21 +38,60 @@ public class ItemController {
     }
 
     @GetMapping("/")
-    public Page<ItemDTO> getItems(@PageableDefault(size = 50) Pageable pageable) {
-        return itemService.getItems(pageable);
+    public Page<ItemDTO> getItems(@PageableDefault(size = 50, sort = "createDate") Pageable pageable,
+                                  @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
+                                  @RequestParam(required = false) String order,@RequestParam(required = false) String status){
+        if (order != null) {
+            if (order.equals("desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+            }
+        }
+        if (minPrice != null && maxPrice != null) {
+            return itemService.getItemsByPrice(pageable, minPrice, maxPrice);
+        } else {
+            if (status != null) {
+                return itemService.getItemsByStatus(pageable, Item.Status.valueOf(status.toUpperCase()));
+            }
+            return itemService.getItems(pageable);
+        }
     }
 
     @GetMapping("/category/{categoryId}")
     public Page<ItemDTO> getItemsByCategoryId(
             @PathVariable int categoryId,
-            @PageableDefault(size = 30) Pageable pageable) {
-        return itemService.getItemsByCategoryId(pageable, categoryId);
+            @PageableDefault(size = 30, sort = "createDate") Pageable pageable,
+            @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) String status) {
+        if (order != null) {
+            if (order.equals("desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+            }
+        }
+        if (minPrice != null && maxPrice != null) {
+            return itemService.getItemsByCategoryIdByPrice(pageable, categoryId, minPrice, maxPrice);
+        } else {
+            if (status == null) {
+                return itemService.getItemsByCategoryId(pageable, categoryId);
+            }
+            return itemService.getItemsByCategoryId(pageable, categoryId, Item.Status.valueOf(status.toUpperCase()));
+        }
     }
 
     @GetMapping("/search/{name}")
     public Page<ItemDTO> getItemsByName(
             @PathVariable String name,
-            @PageableDefault(size = 30) Pageable pageable) {
+            @PageableDefault(size = 30, sort = "createDate") Pageable pageable,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) String status) {
+        if (order != null) {
+            if (order.equals("desc")) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+            }
+        }
+        if (status != null) {
+            return itemService.getItemsByName(pageable, name, Item.Status.valueOf(status.toUpperCase()));
+        }
         return itemService.getItemsByName(pageable, name);
     }
 
@@ -84,7 +125,7 @@ public class ItemController {
                 }
 
             }
-        }else {
+        } else {
             throw new InvalidInputException("File cannot be null");
         }
         return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
@@ -97,8 +138,9 @@ public class ItemController {
         }
         return new ResponseEntity<>(itemService.updateItem(itemDTO), HttpStatus.OK);
     }
+
     @GetMapping("/export")
-    public void exportToExcel(HttpServletResponse response){
+    public void exportToExcel(HttpServletResponse response) {
         response.setContentType("application/octet-stream");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());

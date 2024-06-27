@@ -7,6 +7,7 @@ import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.service.PaymentService;
 import fpt.edu.vn.Backend.service.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +35,10 @@ import java.util.Map;
 @Slf4j
 public class PaymentController {
     @Autowired
-    private PaymentServiceImpl paymentService;
+    private PaymentService paymentService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(@PageableDefault(size = 50) Pageable pageable) {
         return ResponseEntity.ok(paymentService.getAllPayment(pageable));
     }
@@ -94,13 +95,13 @@ public class PaymentController {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 log.info("Payment success");
 
-                paymentService.updatePayment(new PaymentRequest().builder()
+                paymentService.updatePayment(PaymentRequest.builder()
                         .paymentId(Integer.parseInt(paymentId))
                         .status(Payment.Status.SUCCESS)
                         .build());
                 return 1;
             } else {
-                paymentService.updatePayment(new PaymentRequest().builder()
+                paymentService.updatePayment(PaymentRequest.builder()
                         .paymentId(Integer.parseInt(paymentId))
                         .status(Payment.Status.FAILED)
                         .build());
@@ -110,6 +111,10 @@ public class PaymentController {
             log.info("FAILED: Invalid signature");
             return -1;
         }
+    }
+    @GetMapping("/filter/date")
+    public ResponseEntity<Page<PaymentDTO>> filterPaymentByDate(@RequestParam String startDate, @RequestParam String endDate, @PageableDefault(size = 50) Pageable pageable) {
+        return ResponseEntity.ok(paymentService.filterPaymentByDate(startDate, endDate, pageable));
     }
 
 

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -103,7 +104,12 @@ public class SecurityConfig {
                                 "/.well-known/**",
                                 "/api/blog-categories/**",
                                 "/api/blogs/**",
-                                "/api/payments/vnpay_ipn")
+                                "/api/items/**",
+                                "/api/payments/vnpay_ipn",
+                                "/api/currency/**",
+                                "/api/kyc/**",
+                                "/api/bids/{auctionSessionId}/{itemId}"
+                        )
                         .permitAll()
                         .anyRequest().permitAll()
 
@@ -198,6 +204,7 @@ public class SecurityConfig {
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(sessionRegistry());
     }
+
 
 
 }

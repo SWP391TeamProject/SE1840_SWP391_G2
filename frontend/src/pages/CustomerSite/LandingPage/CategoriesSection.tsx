@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ItemCategory } from "@/models/newModel/itemCategory";
 import { getAllItemCategories } from "@/services/ItemCategoryService";
 import {
   CrownIcon,
@@ -8,13 +9,15 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function CategoriesSection() {
-  const [categories, setCategories] = React.useState([]);
+  const [categories, setCategories] = React.useState<ItemCategory[]>([]);
   useEffect(() => {
-    getAllItemCategories(0,5).then((res) => {
+    getAllItemCategories(0, 5).then((res) => {
       setCategories(res.data.content);
       console.log(res.data.content);
     }).catch((err) => {
-      toast.error(err.response.data.message);
+      toast.error(err.response.data.message, {
+        position: "bottom-right",
+      });
     });
   }, []);
   return (
@@ -35,14 +38,15 @@ export default function CategoriesSection() {
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {categories.map((category) => (
 
-            <Link key={category.id}
-                  className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
-                  to= {`/item/${category.name}`}
+            <Link key={category.itemCategoryId}
+              to="items"
+              state={{ category: category }}
+              className="group flex flex-col items-center justify-center space-y-2 rounded-lg bg-white p-4 transition-colors hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-800"
             >
               <CrownIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50" />
               <span className="text-sm font-medium text-gray-500 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-50">
-                  {category.name}
-                </span>
+                {category.name}
+              </span>
             </Link>
           ))}
 
@@ -53,7 +57,7 @@ export default function CategoriesSection() {
             variant="outline"
             asChild
           >
-            <Link to="/item">View More</Link>
+            <Link to="/items">View More</Link>
           </Button>
         </div>
       </section>

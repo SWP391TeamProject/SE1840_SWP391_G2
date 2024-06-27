@@ -5,13 +5,15 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 import { ConsignmentDetailType, ConsignmentStatus } from "@/constants/enums";
 import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from "@/services/ConsignmentService";
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function CustomerConsigmentCard({ consignment }) {
+    const navigate = useNavigate();
 
     const [custConsignment, setCusConsignment] = React.useState<any>(consignment);
     console.log(custConsignment);
-    if(consignment.status === ConsignmentStatus.WAITING_SELLER){
+    if (consignment.status === ConsignmentStatus.WAITING_SELLER) {
         consignment.status = ConsignmentStatus.IN_FINAL_EVALUATION;
         setCusConsignment(consignment);
     }
@@ -21,17 +23,25 @@ export default function CustomerConsigmentCard({ consignment }) {
             acceptInitialEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Initial Evaluation Accepted");
+                toast.success("Initial Evaluation Accepted", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in accepting Initial Evaluation");
+                toast.error("Error in accepting Initial Evaluation", {
+                    position: "bottom-right",
+                });
             });
         } else if (custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
             acceptFinalEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Final Evaluation Accepted");
+                toast.success("Final Evaluation Accepted", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in accepting Final Evaluation");
+                toast.error("Error in accepting Final Evaluation", {
+                    position: "bottom-right",
+                });
             });
         }
     }
@@ -40,25 +50,33 @@ export default function CustomerConsigmentCard({ consignment }) {
             rejectInitialEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Initial Evaluation Rejected");
+                toast.success("Initial Evaluation Rejected", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in Rejecting Initial Evaluation");
+                toast.error("Error in Rejecting Initial Evaluation", {
+                    position: "bottom-right",
+                });
             });
         } else if (custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
             rejectFinalEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
-                toast.success("Final Evaluation Rejected");
+                toast.success("Final Evaluation Rejected", {
+                    position: "bottom-right",
+                });
             }).catch((err) => {
-                toast.error("Error in Rejecting Final Evaluation");
+                toast.error("Error in Rejecting Final Evaluation", {
+                    position: "bottom-right",
+                });
             });
         }
     }
     const ActionButton = () => {
         return (
             <div className="flex justify-evenly">
-                <Button className="w-1/3 bg-red-500" onClick={rejectEvaluation}>Decline</Button>
-                <Button className="w-1/3 bg-green-500" onClick={acceptEvaluation}>Accept</Button>
+                <Button className="w-1/3 bg-red-500 text-foreground" onClick={rejectEvaluation}>Decline</Button>
+                <Button className="w-1/3 bg-green-500 text-foreground" onClick={acceptEvaluation}>Accept</Button>
             </div>
         )
     }
@@ -86,25 +104,29 @@ export default function CustomerConsigmentCard({ consignment }) {
                 </DialogTrigger>
                 <DialogContent>
                     <AlertDialogHeader>
-                        <DialogTitle className=" text-2xl font-bold text-black">
+                        <DialogTitle className=" text-2xl font-bold text-foreground">
                             {custConsignmentDetail?.status === ConsignmentDetailType.REQUEST && "Your Consignment Request"}
                             {custConsignmentDetail?.status === ConsignmentDetailType.INITIAL_EVALUATION && "Initial Evaluation of Your Consignment"}
                             {custConsignmentDetail?.status === ConsignmentDetailType.MANAGER_ACCEPTED && "Final Evaluation of Your Consignment"}
                         </DialogTitle>
                         <DialogDescription>
 
-                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null ? "Your consignment is in evaluation process. Please wait for the result." : "Description"}</h1>
+                            <h1 className="block text-xl font-medium text-foreground">{custConsignmentDetail == null ? "Your consignment is in evaluation process. Please wait for the result." : "Description"}</h1>
                             {custConsignmentDetail?.description}
-                            <h1 className="block text-xl font-medium text-black">{custConsignmentDetail == null || custConsignmentDetail.status=== ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
+                            <h1 className="block text-xl font-medium text-foreground">{custConsignmentDetail == null || custConsignmentDetail.status === ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
                             {custConsignmentDetail?.price}
-                            <div className="flex justify-end">
+                            <div className="flex justify-center flex-wrap">
                                 {custConsignmentDetail?.attachments?.map((attachment: any, index: number) => {
                                     return (
-                                        <img key={index} src={attachment.link} alt="attachment" className="w-1/4 h-1/4" />
+                                        <Link key={index} to={attachment.link} target="_blank" className="w-1/4 h-1/4 m-1 rounded-sm">
+                                            <img src={attachment.link} alt="attachment" className="rounded-md" />
+                                        </Link>
                                     )
                                 })}
                             </div>
-
+                            <div className="text-foreground opacity-50">
+                                *Click on the image to download
+                            </div>
                             {custConsignmentDetail?.status === ConsignmentDetailType.INITIAL_EVALUATION
                                 || custConsignmentDetail?.status === ConsignmentDetailType.MANAGER_ACCEPTED ?
                                 <ActionButton /> : null}
@@ -113,6 +135,16 @@ export default function CustomerConsigmentCard({ consignment }) {
                 </DialogContent>
             </Dialog>
         )
+    }
+
+    const handleViewDetailsClick = (consignment: any, consignmentId: number) => {
+        console.log(consignment, consignmentId);
+        navigate(`${consignmentId}`, {
+            state: {
+                consignmentId: consignmentId,
+                consignment: consignment,
+            }
+        });
     }
 
     return (
@@ -136,7 +168,7 @@ export default function CustomerConsigmentCard({ consignment }) {
                             (custConsignment.status === ConsignmentStatus.WAITING_STAFF ||
                                 custConsignment.status === ConsignmentStatus.IN_INITIAL_EVALUATION ||
                                 custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION
-                            ) && <OpenConsignmentDetail />
+                            ) && <Button onClick={() => {handleViewDetailsClick(consignment, consignment.consignmentId)}} className="w-full">View Detail</Button>
                         }
                     </div>
                 </CardContent>

@@ -48,10 +48,14 @@ export default function AuctionSessionDetail() {
         console.log(values)
         updateAuctionSession(values).then((res) => {
             console.log(res);
-            toast.success('Auction Session Updated Successfully');
+            toast.success('Auction Session Updated Successfully',{
+                position:"bottom-right",
+            });
             setIsLoading(false);
         }).catch((err) => {
-            toast.error(err.response.data.message)
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            })
             setIsLoading(false)
         });
 

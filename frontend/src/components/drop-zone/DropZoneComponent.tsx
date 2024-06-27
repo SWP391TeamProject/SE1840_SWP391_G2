@@ -1,5 +1,5 @@
 import { UploadCloudIcon, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller } from "react-hook-form";
 
@@ -13,11 +13,12 @@ export default function DropzoneComponent({ control, name }) {
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange } }) => {
+      render={({ field: { onChange, resetFields } }) => {
         const [acceptedFiles, setAcceptedFiles] = useState<AcceptedFile[]>([]); // Explicit typing
-        const { getRootProps, getInputProps, fileRejections } = useDropzone({
+        const { getRootProps, getInputProps } = useDropzone({
           accept: { "image/*": [] },
           onDrop: (newAcceptedFiles) => {
+            console.log(newAcceptedFiles);
             // Rename to clarify the new files
             setAcceptedFiles((prevAcceptedFiles) => [
               ...prevAcceptedFiles, // Keep the existing files
@@ -25,12 +26,16 @@ export default function DropzoneComponent({ control, name }) {
                 Object.assign(file, { preview: URL.createObjectURL(file) })
               ),
             ]);
-            onChange(newAcceptedFiles); // Update the form value
           },
         });
         const removeFile = (fileToRemove) => {
           setAcceptedFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
+          console.log(acceptedFiles);
         };
+
+        useEffect(() => {
+          onChange(acceptedFiles);
+        }, [acceptedFiles])
 
         const acceptedFileItems = acceptedFiles.map((file, index) => (
           <li key={`${file.path}-${file.lastModified}`} className="flex flex-row gap-2 w-full ustify-between">

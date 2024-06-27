@@ -72,9 +72,9 @@ public class BidController {
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
             log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
 
-            if(bidDTO.getPayment().getAccountId() == bidService.getHighestBid(auctionItemId).getPayment().getAccountId()){
-                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),"Right now, you are the highest bidder.\n" +
-                        "Hold off until someone outbids you.",null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+            if (bidDTO.getPayment().getAccountId() == bidService.getHighestBid(auctionItemId).getPayment().getAccountId()) {
+                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Right now, you are the highest bidder.\n" +
+                        "Hold off until someone outbids you.", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
             }
 
             if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
@@ -84,7 +84,7 @@ public class BidController {
                 auctionItemService.updateAuctionItem(a);
                 return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getPayment().getAmount(), bidDTO.getPayment().getAmount(), BidReplyDTO.Status.BID));
             } else {
-                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),"Your bid must be higher than the current bid by at least 5",null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 5", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -95,14 +95,14 @@ public class BidController {
     @SendTo("/topic/public/{auctionSessionId}/{itemId}")
     @Transactional
     public ResponseEntity<BidReplyDTO> addUser(@Payload BidDTO bidDTO,
-                                          @DestinationVariable int auctionSessionId,
-                                          @DestinationVariable int itemId, Authentication authentication,
-                                          SimpMessageHeaderAccessor headerAccessor) {
+                                               @DestinationVariable int auctionSessionId,
+                                               @DestinationVariable int itemId, Authentication authentication,
+                                               SimpMessageHeaderAccessor headerAccessor) {
         AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
         AuctionSessionDTO auctionSessionDTO = auctionSessionService.getAuctionSessionById(auctionSessionId);
         // Add username in web socket session
         AccountDTO persistedAccount = accountService.getAccountByEmail(authentication.getName());
-        if(persistedAccount==null){
+        if (persistedAccount == null) {
             return new ResponseEntity<>(new BidReplyDTO("You are not login yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
         }
         if (auctionSessionDTO.getDeposits().stream().noneMatch(depositDTO -> depositDTO.getPayment().getAccountId() == persistedAccount.getAccountId())) {
@@ -112,7 +112,7 @@ public class BidController {
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
         // Create a new bid
 //            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", (bidService.getHighestBid(auctionItemId).getPayment().getAmount()) , BidReplyDTO.Status.JOIN));
+        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", (bidService.getHighestBid(auctionItemId).getPayment().getAmount()), BidReplyDTO.Status.JOIN));
 
 
     }

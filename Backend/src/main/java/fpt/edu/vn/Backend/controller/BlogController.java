@@ -60,7 +60,6 @@ public class BlogController {
         blogPostDTO = blogService.createBlog(blogPostDTO);
 
         try {
-            log.info("Create blog: " + blogCreateDTO.getFiles().size());
             if (blogCreateDTO.getFiles() != null && !blogCreateDTO.getFiles().isEmpty()){
                 for (MultipartFile image : blogCreateDTO.getFiles()) {
                     attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());

@@ -29,7 +29,8 @@ export default function PastAuctionSessionsList() {
   }
 
   useEffect(() => {
-    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}))
+    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}));
+    window.scrollTo(0, 0)
   }, [])
 
   useEffect(() => {
@@ -88,8 +89,13 @@ export default function PastAuctionSessionsList() {
                     <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.endDate ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> : <CountDownTime end={date}></CountDownTime>}
-                      </div>
+                          {session.endDate && new Date(session.endDate) > date
+                            ? <CountDownTime end={new Date(session.endDate)}></CountDownTime> :
+                            <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                              Auction Ended
+                            </div>
+                          }
+                        </div>
                     </div>
                     <Button variant={"default"} asChild>
                       <Link

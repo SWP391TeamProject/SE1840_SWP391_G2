@@ -78,7 +78,9 @@ export default function ItemCreate() {
             // toast.success('Category fetched successfully!');
         }
         ).catch(error => {
-            toast.error('There was an error!', error);
+            toast.error(error,{
+                position:"bottom-right",
+            });
         });
     }, [])
 
@@ -88,11 +90,15 @@ export default function ItemCreate() {
         console.log(data);
         createItem(data).then((res) => {
             console.log(res);
-            toast.success('Item created successfully!');
+            toast.success('Item created successfully!',{
+                position:"bottom-right",
+            });
         }
         ).catch(error => {
             console.log(error);
-            toast.error('There was an error!', error);
+            toast.error(error,{
+                position:"bottom-right",
+            });
         });
 
 

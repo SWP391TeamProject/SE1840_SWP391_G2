@@ -63,7 +63,9 @@ export const CreateBlog = () => {
             // toast.success('Category fetched successfully!');
         }
         ).catch(error => {
-            toast.error('There was an error!', error);
+            toast.error('There was an error!', {
+                position:"bottom-right",
+            });
         });
     }, [])
     function onSubmit(data: z.infer<typeof formSchema>) {
@@ -72,12 +74,16 @@ export const CreateBlog = () => {
         console.log(data);
         BlogService.createBlog(data).then((res) => {
             console.log(res);
-            toast.success('Blog created successfully!');
+            toast.success('Blog created successfully!',{
+                position:"bottom-right",
+            });
             form.reset();
         }
         ).catch(error => {
             console.log(error);
-            toast.error('There was an error!', error);
+            toast.error('There was an error!',{
+                position:"bottom-right",
+            });
         });
 
     }

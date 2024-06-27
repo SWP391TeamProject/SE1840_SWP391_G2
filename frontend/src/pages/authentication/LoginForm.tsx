@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import {useAuth} from "@/AuthProvider";
+import { useAuth } from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { AccountStatus, Roles } from "@/constants/enums";
@@ -54,14 +54,18 @@ function LoginForm() {
         setCookie("user", JSON.stringify(res.data), 30000);
         auth.fetchProfile();
         if ([Roles.ADMIN, Roles.STAFF, Roles.MANAGER].includes(res.data.role)) {
-          navigate("/admin/accounts");
+          navigate("/admin");
         } else {
           navigate(from, { replace: true });
         }
-        toast.success("Logged in successfully!");
+        toast.success("Logged in successfully!", {
+          position: "bottom-right",
+        });
       })
       .catch(err => {
-        toast.error(err.response.data.message);
+        toast.error(err.response.data.message, {
+          position: "bottom-right",
+        });
         setIsLogin(false);
       });
   };
@@ -80,7 +84,7 @@ function LoginForm() {
   useEffect(() => {
     console.log(token)
     if (token !== null) {
-      axios.get(AUTH_SERVER+"/login-with-google?token=" + token)
+      axios.get(AUTH_SERVER + "/login-with-google?token=" + token)
         .then(res => {
           setIsLogin(false);
           console.log(res.data);
@@ -92,10 +96,14 @@ function LoginForm() {
           } else {
             navigate(from, { replace: true, });
           }
-          toast.success("Logged in successfully!");
+          toast.success("Logged in successfully!", {
+            position: "bottom-right",
+          });
         })
         .catch(err => {
-          toast.error(err.response.data.message);
+          toast.error(err.response.data.message, {
+            position: "bottom-right",
+          });
           setIsLogin(false);
         })
     }
@@ -143,42 +151,18 @@ function LoginForm() {
 
             {isLogin
               ? <Button disabled className="bg-orange-600">
-                <Loader2 className=" mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Please wait
               </Button>
               : <Button
                 type="submit"
-                className=" w-full  bg-orange-600 rounded-xl text-white  hover:bg-orange-700"
+                className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
               >
                 Login
               </Button>}
-            <div className="grid gap-4">
-              {/* <GoogleLogin
-                onSuccess={credentialResponse => {
-                  console.log(credentialResponse);
-                  axios.get('http://localhost:8080/auth/login-with-google?token=' + credentialResponse.credential)
-                    .then(
-                      res => {
-                        console.log(res.data);
-                        setCookie("token", res.data.accessToken, 30000);
-                        setCookie("user", JSON.stringify(res.data), 30000);
-                        setUser(res.data);
-                        if (res.data.role.includes([Roles.ADMIN, Roles.STAFF, Roles.MANAGER])) {
-                          navigate("/admin/accounts");
-                        } else {
-                          navigate(from, { replace: true });
-                        }
-                        toast.success('logged in successfully')
-                      }
-                    )
-                }
-                } /> */}
-
-              {/* rest of your form */}
-            </div>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don't have an account?{" "}
+            Don't have an account?&nbsp;
             <a href="/auth/register" className="underline hover:text-blue-700">
               Sign up
             </a>
@@ -196,14 +180,6 @@ function LoginForm() {
         </CardContent>
 
       </form>
-      <div className="hidden">
-
-        <Button >
-          <a href={`${SERVER_DOMAIN_URL}/oauth2/authorize/facebook?redirect_uri=http://localhost:5173/auth/login?type=facebook`}>
-            login with Facebook
-          </a>
-        </Button>
-      </div>
     </Card>
   );
 }

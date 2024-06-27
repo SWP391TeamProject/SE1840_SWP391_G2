@@ -6,43 +6,52 @@ import { API_SERVER } from "@/constants/domain";
 
 // Service methods
 const baseUrl = API_SERVER + "/items";
-const authHeader = () => {
-    return {
-        headers: {
-            "Content-Type": "application/json",
-              
-            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
-        },
-    }
-};
 
-export const getItems = async (pageNumber: number, pageSize?: number) => {
+
+export const getItems = async (pageNumber: number, pageSize?: number, minPrice?: number, maxPrice?: number, sort? : string, order?:string,status?:ItemStatus) => {
     let params = {
         page: pageNumber,
         size: pageSize,
-      }
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        sort: sort,
+        order: order,
+        status: status
+    }
     return await axios.get<Page<Item>>(`${baseUrl}/`, {
-        ...authHeader(),
+        headers: {
+            "Content-Type": "application/json",
+
+        },
         params: params,
     });
 };
 
-export const getItemsByCategoryId = async (categoryId: number, page: number, size: number) => {
+export const getItemsByCategoryId = async (page: number, size: number, categoryId: number, minPrice?: number, maxPrice?: number, sort? : string, order?:string,status?:ItemStatus) => {
     return await axios.get<Page<Item>>(`${baseUrl}/category/${categoryId}`, {
-        ...authHeader(),
-        params: { page, size },
+        headers: {
+            "Content-Type": "application/json",
+
+        },
+        params: { page, size, minPrice, maxPrice , sort, order, status},
     });
 };
-export const getItemsByName = async (name: string, page: number, size: number) => {
+export const getItemsByName = async (page: number, size: number, name: string, sort? : string, order?:string,status?:ItemStatus) => {
     return await axios.get<Page<Item>>(`${baseUrl}/search/${name}`, {
-        ...authHeader(),
-        params: { page, size },
+        headers: {
+            "Content-Type": "application/json",
+
+        },
+        params: { page, size, sort, order, status},
     });
 };
 
 export const getItemsByStatus = async (status: ItemStatus, page: number, size: number) => {
     return await axios.get<Page<Item>>(`${baseUrl}/status/${status}`, {
-        ...authHeader(),
+        headers: {
+            "Content-Type": "application/json",
+
+        },
         params: { page, size },
     })
         .catch((err) => {
@@ -56,20 +65,28 @@ export const getItemsByStatus = async (status: ItemStatus, page: number, size: n
 
 export const getItemsByOwnerId = async (ownerId: number, page: number, size: number) => {
     return await axios.get<Page<Item>>(`${baseUrl}/owner/${ownerId}`, {
-        ...authHeader(),
+        headers: {
+            "Content-Type": "application/json",
+            
+        },
         params: { page, size },
     });
 };
 
 export const getItemById = async (id: number) => {
-    return await axios.get<Item>(`${baseUrl}/detail/${id}`, authHeader());
+    return await axios.get<Item>(`${baseUrl}/detail/${id}`, {
+        headers: {
+            "Content-Type": "application/json",
+
+        },
+    });
 };
 
 export const createItem = async (itemDTO: any) => {
     return await axios.post<Item>(`${baseUrl}/create`, itemDTO, {
         headers: {
             "Content-Type": "multipart/form-data",
-              
+
             "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
         }
     });
@@ -79,5 +96,11 @@ export const updateItem = async (itemDTO: Item) => {
     if (!itemDTO.itemId) {
         throw new Error("Item id cannot be null");
     }
-    return await axios.put<Item>(`${baseUrl}/update`, itemDTO, authHeader());
+    return await axios.put<Item>(`${baseUrl}/update`, itemDTO, {
+        headers: {
+            "Content-Type": "application/json",
+
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
+        },
+    });
 };

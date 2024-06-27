@@ -1,26 +1,19 @@
 package fpt.edu.vn.Backend.controller;
 
 import com.nimbusds.jose.JOSEException;
-import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
 import fpt.edu.vn.Backend.DTO.LoginDTO;
 import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.DTO.request.*;
 import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
-import fpt.edu.vn.Backend.exception.CooldownException;
-import fpt.edu.vn.Backend.exception.ErrorResponse;
-import fpt.edu.vn.Backend.oauth2.response.ApiResponse;
 import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
-import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;

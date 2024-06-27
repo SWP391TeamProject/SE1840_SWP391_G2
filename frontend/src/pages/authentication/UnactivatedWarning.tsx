@@ -40,10 +40,14 @@ function UnactivatedWarning() {
             .then(() => {
                 setLocked(false);
                 navigate("/auth/login");
-                toast.success('Sent activation code')
+                toast.success('Sent activation code',{
+                    position:"bottom-right",
+                })
             })
             .catch(err => {
-                toast.error(err.response.data.message);
+                toast.error(err.response.data.message,{
+                    position:"bottom-right",
+                });
                 setLocked(false);
             });
     };

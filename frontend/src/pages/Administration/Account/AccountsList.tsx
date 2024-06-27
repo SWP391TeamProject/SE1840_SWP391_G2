@@ -66,12 +66,14 @@ export default function AccountsList() {
     try {
       console.log(role);
       let res;
-      res = await fetchAccountsService(pageNumber, 5, role);
       if (search && search?.length > 0) {
         res = await fetchAccountsByName(pageNumber, 5, search);
       }
-      if (role != undefined) {
+      else if (role != undefined) {
         res = await fetchAccountsService(pageNumber, 5, role);
+      }
+      else {
+        res = await fetchAccountsService(pageNumber, 5);
       }
       if (res) {
         console.log(res);
@@ -133,11 +135,13 @@ export default function AccountsList() {
     if (filter == "all") {
       fetchAccounts(0);
       setRoleFilter(filter);
+      accountsList.filter = undefined;
     }
     else {
       console.log(roles);
       fetchAccounts(0, roles[0]);
       setRoleFilter(filter);
+      accountsList.filter = roles[0];
     }
 
     // }
@@ -230,16 +234,16 @@ export default function AccountsList() {
                   <TableRow>
                     <TableHead>Id</TableHead>
                     <TableHead>User Name</TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Email
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Phone
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
+                    <TableHead className="md:table-cell">
                       Role
                     </TableHead>
-                    <TableHead className="hidden md:table-cell w-28">
+                    <TableHead className="md:table-cell w-28">
                       Status
                     </TableHead>
                     {/* <TableHead className="hidden md:table-cell">
@@ -259,7 +263,7 @@ export default function AccountsList() {
                       {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         <div className="flex items-center ">
                           <Avatar className="mr-5">
                             <AvatarImage src={account.avatar != null ? account.avatar.link : 'https://github.com/shadcn.png'} />
@@ -269,16 +273,16 @@ export default function AccountsList() {
                         </div>
 
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         {account.email}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         {account.phone}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         {account.role}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className=" md:table-cell">
                         {account.status == AccountStatus.ACTIVE ?
                           <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> :
                           <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
@@ -312,7 +316,6 @@ export default function AccountsList() {
                   ))}
                 </TableBody>
               </Table>
-              
             </CardContent>
             <CardFooter>
               {/* <div className="text-xs text-muted-foreground">
