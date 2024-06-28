@@ -82,6 +82,8 @@ import {BlogPostList} from "./pages/Administration/Blog/BlogPostList.tsx";
 import {BlogPostDetail} from "./pages/Administration/Blog/BlogPostDetail.tsx";
 import {BlogDetail} from "./pages/CustomerSite/Blog/BlogDetail.tsx";
 import TwoFactorAuthForm from "@/pages/authentication/TwoFactorAuthForm.tsx";
+import App from "./scenes/App.tsx";
+import GeographyChart from "./components/component/GeographyChart.tsx";
 import {ItemList} from "./pages/CustomerSite/Item/ItemList.tsx";
 import {CurrencyProvider} from "@/CurrencyProvider.tsx";
 import CustomerConsignmentDetail from "./pages/CustomerSite/dashboard/CustomerConsignmentDetail.tsx";
@@ -241,13 +243,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                              element={<TwoFactorAuthForm/>}></Route>
                     </Route>
 
-                    <Route path="/unauthorized" element={<ErrorPage/>}/>
-                    {/* <RouterProvider router={router} /> */}
-                    <Route path="*" element={<ErrorPage/>}/>
-                    {/* <Route path="/test" element={<TestPage />} /> */}
-                  </Routes>
-                </BrowserRouter>
-                {/* <RouterProvider router={router} /> */}
+                  <Route path="/unauthorized" element={<ErrorPage />} />
+                  {/* <RouterProvider router={router} /> */}
+                  <Route path="*" element={<ErrorPage />} />
+                  <Route path="/test" element={<App />} />
+                  <Route path="/geography" element={<GeographyChart />} />
+                </Routes>
+              </BrowserRouter>
+              {/* <RouterProvider router={router} /> */}
 
               </TooltipProvider>
             </CurrencyProvider>
