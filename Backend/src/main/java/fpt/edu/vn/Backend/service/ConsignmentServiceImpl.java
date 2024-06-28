@@ -102,7 +102,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
             Notification notification = new Notification();
             notification.setAccount(consignment.getStaff());
-            notification.setMessage("Update Status To IN_INITIAL_EVALUATION By " + notification.getAccount().getNickname() + " " + notification.getAccount().getRole());
+            if (consignment.getStaff() != null) {
+                notification.setMessage("Update Status To IN_INITIAL_EVALUATION By" + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            } else {
+                notification.setMessage("Update Status To IN_INITIAL_EVALUATION By unknown staff");
+            }
             notification.setType("Update Info");
             notification.setRead(false);
             notification.setCreateDate(LocalDateTime.now());
@@ -155,7 +159,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
             Notification notification = new Notification();
             notification.setAccount(consignment.getStaff());
-            notification.setMessage("Update Status To FINAL_EVALUATION By " + notification.getAccount().getNickname() + " " + notification.getAccount().getRole());
+            if (consignment.getStaff() != null) {
+                notification.setMessage("Update Status To FINAL_EVALUATION By" + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            } else {
+                notification.setMessage("Update Status To FINAL_EVALUATION By unknown staff");
+            }
             notification.setType("Update Info");
             notification.setRead(false);
             notification.setCreateDate(LocalDateTime.now());
@@ -179,7 +187,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
                 Notification notification = new Notification();
                 notification.setAccount(consignment.getStaff());
-                notification.setMessage("Confirm Jewelry Received By" + notification.getAccount().getNickname() + " " + notification.getAccount().getRole());
+                if (consignment.getStaff() != null) {
+                    notification.setMessage("Confirm Jewelry Received By" + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+                } else {
+                    notification.setMessage("Confirm Jewelry Received By unknown staff");
+                }
                 notification.setType("Confirm");
                 notification.setRead(false);
                 notification.setCreateDate(LocalDateTime.now());
@@ -220,7 +232,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 // Save the consignment
                 Notification notification = new Notification();
                 notification.setAccount(consignment.getStaff());
-                notification.setMessage("Accepted By" + notification.getAccount().getNickname() + " " + notification.getAccount().getRole());
+                if (consignment.getStaff() != null) {
+                    notification.setMessage("Accepted By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+                } else {
+                    notification.setMessage("Accepted By unknown staff");
+                }
                 notification.setType("Accepted");
                 notification.setRead(false);
                 notification.setCreateDate(LocalDateTime.now());
@@ -265,7 +281,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 // Save the consignment
                 Notification notification = new Notification();
                 notification.setAccount(consignment.getStaff());
-                notification.setMessage("Rejected By" + notification.getAccount().getNickname() + " " + notification.getAccount().getRole());
+                if (consignment.getStaff() != null) {
+                    notification.setMessage("Rejected By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+                } else {
+                    notification.setMessage("Rejected By unknown staff");
+                }
                 notification.setType("Rejected");
                 notification.setRead(false);
                 notification.setCreateDate(LocalDateTime.now());
@@ -362,8 +382,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
             Notification notification = new Notification();
             notification.setAccount(consignment.getStaff());
-            notification.setMessage("Update Consignment By" + notification.getAccount().getNickname() + " " + notification.getAccount().getRole());
-            notification.setType("Update Info");
+            if (consignment.getStaff() != null) {
+                notification.setMessage("Update Consignment By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            } else {
+                notification.setMessage("Update Info By unknown staff");
+            }
             notification.setRead(false);
             notification.setCreateDate(LocalDateTime.now());
             notification.setUpdateDate(LocalDateTime.now());
