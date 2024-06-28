@@ -47,8 +47,8 @@ public class BlogController {
         return new ResponseEntity<>(blogService.getBlogById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<BlogPostDTO> createBlog(@ModelAttribute BlogCreateDTO blogCreateDTO) {
+    @PostMapping("/{notificationId}")
+    public ResponseEntity<BlogPostDTO> createBlog(@ModelAttribute BlogCreateDTO blogCreateDTO, @PathVariable int notificationId) {
         log.info("Create blog: " + blogCreateDTO);
         BlogPostDTO blogPostDTO = new BlogPostDTO();
         blogPostDTO.setTitle(blogCreateDTO.getTitle());
@@ -57,7 +57,7 @@ public class BlogController {
         blogPostDTO.setCreateDate(blogCreateDTO.getCreateDate());
         blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
         blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
-        blogPostDTO = blogService.createBlog(blogPostDTO);
+        blogPostDTO = blogService.createBlog(blogPostDTO,notificationId);
 
         try {
             if (blogCreateDTO.getFiles() != null && !blogCreateDTO.getFiles().isEmpty()){

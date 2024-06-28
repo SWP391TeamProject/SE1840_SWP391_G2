@@ -13,4 +13,6 @@ public interface NotificationService {
     @NotNull Page<NotificationDTO> getNotifications(@NotNull Pageable pageable, String userEmail);
 
     int countUnreadNotifications(String userEmail);
+
+    @NotNull NotificationDTO sendNotificationToAllMembers(@NotNull NotificationDTO dto);
 }

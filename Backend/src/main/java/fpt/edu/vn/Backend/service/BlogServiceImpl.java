@@ -1,11 +1,15 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
+import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.BlogPost;
+import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
 import fpt.edu.vn.Backend.repository.BlogPostRepos;
+import fpt.edu.vn.Backend.repository.NotificationRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BlogServiceImpl implements BlogService{
@@ -24,6 +27,13 @@ public class BlogServiceImpl implements BlogService{
     private AccountRepos accountRepos;
     @Autowired
     private BlogCategoryRepos blogCategoryRepos;
+
+    @Autowired
+    private NotificationServiceImpl notificationService;
+
+    @Autowired
+    private NotificationRepos notificationRepos;
+
 
     @Override
     public Page<BlogPostDTO> getAllBlogs(Pageable pageable) {
@@ -39,12 +49,26 @@ public class BlogServiceImpl implements BlogService{
     }
 
     @Override
-    public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
+    public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO, int notificationId) {
             BlogPost blogPost = toEntity(BlogPostDTO);
             blogPost.setCreateDate(LocalDateTime.now());
             blogPost.setUpdateDate(LocalDateTime.now());
+
+        Notification notifications = notificationRepos.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notificationId));
+
+        Account account = notifications.getAccount();
+        if (account.getRole().equals(Account.Role.ADMIN)) {
+            // Send notification to all members
+            Notification notification = notificationRepos.findById(notificationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notificationId));
+            NotificationDTO notificationDTO = new NotificationDTO(notification);
+            notificationService.sendNotificationToAllMembers(notificationDTO);
+        }
+
             return new BlogPostDTO(blogPostRepos.save(blogPost));
     }
+
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {
         BlogPost blogPost = new BlogPost();
         blogPost.setPostId(blogPostDTO.getPostId());

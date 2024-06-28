@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,4 +33,7 @@ public interface AccountRepos extends JpaRepository<Account, Integer> {
 
     @Query("SELECT a.balance FROM Account a WHERE a.updateDate = (SELECT MAX(a2.updateDate) FROM Account a2 WHERE a2.updateDate <= :date)")
     BigDecimal findBalanceByDate(@Param("date") LocalDateTime date);
+
+    List<Account> findByRole(Account.Role role);
+
 }
