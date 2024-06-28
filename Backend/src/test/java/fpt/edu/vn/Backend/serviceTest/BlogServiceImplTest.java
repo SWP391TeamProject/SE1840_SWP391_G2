@@ -20,12 +20,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,9 +43,9 @@ public class BlogServiceImplTest {
     @Mock
     private BlogCategoryRepos blogCategoryRepos;
 
-
     @Mock
     private NotificationRepos notificationRepos;
+
 
 
     @BeforeEach
@@ -66,8 +63,8 @@ public class BlogServiceImplTest {
         account.setAccountId(1);
         blogCategory.setBlogCategoryId(1);
         blogCategory.setName("Test Category");
-        notification.setNotificationId(1);
         notification.setAccount(account);
+        notification.setNotificationId(1);
         BlogPost blogPost = new BlogPost();
         blogPost.setPostId(1);
         blogPost.setTitle("Test Title");
@@ -91,7 +88,7 @@ public class BlogServiceImplTest {
                 .updateDate(LocalDateTime.now())
                 .build();
 
-        BlogPostDTO result = blogService.createBlog(blogPostDTO, 1);
+        BlogPostDTO result = blogService.createBlog(blogPostDTO);
 
         assertEquals(blogPost.getTitle(), result.getTitle());
         verify(blogPostRepos, times(1)).save(any(BlogPost.class));
@@ -102,11 +99,6 @@ public class BlogServiceImplTest {
     @DisplayName("Should update blog successfully")
     public void updateBlogSuccess() {
         BlogCategory blogCategory = new BlogCategory();
-        Notification notification = new Notification();
-        Account account = new Account();
-        account.setAccountId(1);
-        notification.setNotificationId(1);
-        notification.setAccount(account);
         blogCategory.setBlogCategoryId(1);
         blogCategory.setName("Test Category");
 
@@ -132,7 +124,7 @@ public class BlogServiceImplTest {
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
         when(blogPostRepos.save(any(BlogPost.class))).thenReturn(blogPost2);
         when(blogPostRepos.findById(anyInt())).thenReturn(Optional.of(blogPost));
-        when(notificationRepos.findById(anyInt())).thenReturn(Optional.of(notification));
+
 
 
         BlogPostDTO blogPostDTO = BlogPostDTO.builder()
@@ -144,7 +136,7 @@ public class BlogServiceImplTest {
                 .createDate(blogPost2.getCreateDate())
                 .updateDate(LocalDateTime.now())
                 .build();
-        BlogPostDTO result = blogService.createBlog(blogPostDTO, 1);
+        BlogPostDTO result = blogService.createBlog(blogPostDTO);
 
         assertEquals(blogPost2.getTitle(), result.getTitle());
         verify(blogPostRepos, times(1)).save(any(BlogPost.class));

@@ -49,19 +49,17 @@ public class BlogServiceImpl implements BlogService{
     }
 
     @Override
-    public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO, int notificationId) {
+    public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
             BlogPost blogPost = toEntity(BlogPostDTO);
             blogPost.setCreateDate(LocalDateTime.now());
             blogPost.setUpdateDate(LocalDateTime.now());
+        Account account = blogPost.getAuthor();
 
-        Notification notifications = notificationRepos.findById(notificationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notificationId));
-
-        Account account = notifications.getAccount();
         if (account.getRole() == Account.Role.ADMIN) {
-            // Send notification to all members
-            Notification notification = notificationRepos.findById(notificationId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notificationId));
+            Notification notifications = notificationRepos.findByAccount_AccountId(account.getAccountId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account", "id", account.getAccountId()));
+            Notification notification = notificationRepos.findById(notifications.getNotificationId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notifications.getNotificationId()));
             NotificationDTO notificationDTO = new NotificationDTO(notification);
             notificationService.sendNotificationToAllMembers(notificationDTO);
         }

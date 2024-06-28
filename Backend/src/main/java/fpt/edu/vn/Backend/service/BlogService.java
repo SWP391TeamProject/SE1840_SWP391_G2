@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 public interface BlogService {
     Page<BlogPostDTO> getAllBlogs(Pageable pageable);
     BlogPostDTO getBlogById(int id);
-    BlogPostDTO createBlog(BlogPostDTO BlogPostDTO, int notificationId);
+    BlogPostDTO createBlog(BlogPostDTO BlogPostDTO);
     BlogPostDTO updateBlog(BlogPostDTO BlogPostDTO);
     void deleteBlog(int id);
     Page<BlogPostDTO> searchBlog(String keyword, Pageable pageable);
