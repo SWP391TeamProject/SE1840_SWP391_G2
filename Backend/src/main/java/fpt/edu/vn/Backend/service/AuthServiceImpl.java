@@ -15,8 +15,10 @@ import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
 import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.pojo.Token;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.NotificationRepos;
 import fpt.edu.vn.Backend.repository.TokenRepos;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
@@ -45,7 +47,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -77,9 +81,10 @@ public class AuthServiceImpl implements AuthService{
     private TokenRepos tokenRepos;
     private CustomUserDetailsService customUserDetailService;
     private PasswordEncoderConfig passwordEncoder;
+    private NotificationRepos notificationRepos;
 
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService, PasswordEncoderConfig passwordEncoder) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService, PasswordEncoderConfig passwordEncoder, NotificationRepos notificationRepos) {
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
@@ -88,6 +93,7 @@ public class AuthServiceImpl implements AuthService{
         this.tokenRepos = tokenRepos;
         this.customUserDetailService = customUserDetailService;
         this.passwordEncoder = passwordEncoder;
+        this.notificationRepos = notificationRepos;
     }
 
     @Override
@@ -112,6 +118,7 @@ public class AuthServiceImpl implements AuthService{
             newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword()));
             newAccount.setRole(Account.Role.MEMBER);
             newAccount.setProvider(Account.AuthProvider.LOCAL);
+
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -386,6 +393,15 @@ public class AuthServiceImpl implements AuthService{
             throw new IllegalStateException("Account already activated");
         acc.setStatus(Account.Status.ACTIVE);
         accountRepos.save(acc);
+        List<Account> memberAccounts = accountRepos.findByRole(Account.Role.ADMIN);
+        for (Account account : memberAccounts) {
+            Notification notification = new Notification();
+            notification.setAccount(account);
+            notification.setMessage("New User Registered");
+            notification.setType("Registration");
+            notification.setRead(false);
+            notificationRepos.save(notification);
+        }
         activationCodeCache.remove(activateCode);
         logger.info("Activated account {} with code {} successfully", id, activateCode);
         return true;
