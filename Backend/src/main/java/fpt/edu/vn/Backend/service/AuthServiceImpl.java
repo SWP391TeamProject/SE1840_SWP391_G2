@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 
+import com.google.common.base.Preconditions;
 import com.nimbusds.jose.JOSEException;
 
 import fpt.edu.vn.Backend.DTO.AuthResponseDTO;
@@ -24,6 +25,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpiringMap;
+import org.apache.commons.lang3.RegExUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +48,16 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService{
-
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
 
     private final AccountRepos accountRepos;
     private final JWTGenerator jwtGenerator;
     private final AuthenticationManager authenticationManager;
-    // Password regex: at least 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character
-    private final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
     private final JavaMailSender mailSender;
     @Value("${app.email}")
     private String systemEmail;
@@ -93,28 +94,22 @@ public class AuthServiceImpl implements AuthService{
     public AuthResponseDTO register(RegisterDTO registerDTO) {
         Account newAccount ;
         try {
-            if(registerDTO.getName().isEmpty() || registerDTO.getEmail().isEmpty() || registerDTO.getPassword().isEmpty()){
-                throw new InvalidInputException("Name or Email or password is empty!");
-            }
-
-            if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
-                throw new InvalidInputException("Password and confirm password do not match!");
-            }
-
-
-//            if (!registerDTO.getPassword().matches(PASSWORD_REGEX)) {
-//            throw new InvalidInputException("Password must be at least 8 characters long" +
-//                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
-//        }
+            Preconditions.checkState(EMAIL_PATTERN.matcher(registerDTO.getEmail()).matches(), "Email must be valid");
+            Preconditions.checkState(registerDTO.getName().length() >= 5, "Nickname must be at least 5 characters");
+            Preconditions.checkState(registerDTO.getName().length() <= 20, "Nickname must not be longer than 20 characters");
+            Preconditions.checkState(registerDTO.getPassword().strip().equals(registerDTO.getPassword()), "Password must not contain spaces");
+            Preconditions.checkState(registerDTO.getPassword().length() >= 8, "Password must be at least 8 characters long");
+            Preconditions.checkState(registerDTO.getPassword().length() <= 30, "Password must not be longer than 30 characters");
+            Preconditions.checkState(registerDTO.getPassword().equals(registerDTO.getConfirmPassword()), "Password and confirm password do not match");
 
             accountRepos.findByEmail(registerDTO.getEmail()).ifPresent(account -> {
                 throw new InvalidInputException("Email already exists! try login instead.");
             });
 
             newAccount = new Account();
-            newAccount.setNickname(registerDTO.getName());
-            newAccount.setEmail(registerDTO.getEmail());
-            newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword())); // Consider hashing the password before saving
+            newAccount.setNickname(registerDTO.getName().strip());
+            newAccount.setEmail(registerDTO.getEmail().strip());
+            newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword()));
             newAccount.setRole(Account.Role.MEMBER);
             newAccount.setProvider(Account.AuthProvider.LOCAL);
             newAccount = accountRepos.save(newAccount);
@@ -269,18 +264,19 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException {
+    public boolean changePassword(int id, ChangePasswordDTO dto) {
         Account a = accountRepos.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", id));
-        if (!passwordEncoder.bcryptEncoder().matches(changePasswordDTO.getOldPassword(),a.getPassword()))
+        Preconditions.checkState(dto.getOldPassword().strip().equals(dto.getOldPassword()), "Password must not contain spaces");
+        Preconditions.checkState(dto.getNewPassword().strip().equals(dto.getNewPassword()), "Password must not contain spaces");
+        Preconditions.checkState(dto.getNewPassword().length() >= 8, "Password must be at least 8 characters long");
+        Preconditions.checkState(dto.getNewPassword().length() <= 30, "Password must not be longer than 30 characters");
+        Preconditions.checkState(dto.getNewPassword().equals(dto.getConfirmPassword()), "New password and confirm password must match");
+
+        if (!passwordEncoder.bcryptEncoder().matches(dto.getOldPassword(),a.getPassword()))
             throw new InvalidInputException("Old password is incorrect!");
-        if (!changePasswordDTO.getNewPassword().equals(changePasswordDTO.getConfirmPassword()))
-            throw new InvalidInputException("New password and confirm password do not match!");
-//        if (!changePasswordDTO.getNewPassword().matches(PASSWORD_REGEX)) {
-//            throw new InvalidInputException("Password must be at least 8 characters long" +
-//                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
-//        }
-        a.setPassword(passwordEncoder.bcryptEncoder().encode(changePasswordDTO.getNewPassword()));
+
+        a.setPassword(passwordEncoder.bcryptEncoder().encode(dto.getNewPassword()));
         accountRepos.save(a);
         return true;
     }
@@ -325,10 +321,9 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword) {
-//        if (!newPassword.matches(PASSWORD_REGEX)) {
-//            throw new InvalidInputException("Password must be at least 8 characters long" +
-//                    ", contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
-//        }
+        Preconditions.checkState(newPassword.strip().equals(newPassword), "Password must not contain spaces");
+        Preconditions.checkState(newPassword.length() >= 8, "Password must be at least 8 characters long");
+        Preconditions.checkState(newPassword.length() <= 30, "Password must not be longer than 30 characters");
         Integer id = resetPasswordCodeCache.get(resetCode);
         if (id == null)
             return false;

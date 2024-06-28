@@ -76,9 +76,9 @@ public class AccountServiceImpl implements AccountService {
         // avatar dùng method riêng
         account.setAccountId(accountDTO.getAccountId());
         if (accountDTO.getNickname() != null)
-            account.setNickname(accountDTO.getNickname());
+            account.setNickname(accountDTO.getNickname().strip());
         if (accountDTO.getPhone() != null)
-            account.setPhone(accountDTO.getPhone());
+            account.setPhone(accountDTO.getPhone().strip());
 
         if (editorRole == Account.Role.ADMIN) { // only admin can update these properties
             if (accountDTO.getRole() != null && !String.valueOf(accountDTO.getRole()).isEmpty())
@@ -125,14 +125,21 @@ public class AccountServiceImpl implements AccountService {
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
         if(accountRepos.findByEmail(account.getEmail()).isPresent())
             throw new InvalidInputException("Email already exists");
-        
+
+        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
+        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
+        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
+        Preconditions.checkState(account.getBalance().signum() >= 0, "Balance must not be negative");
+        Preconditions.checkState(account.getPassword().strip().equals(account.getPassword()), "Password must not contain spaces");
+        Preconditions.checkState(account.getPassword().length() >= 8, "Password must be at least 8 characters long");
+        Preconditions.checkState(account.getPassword().length() <= 30, "Password must not be longer than 30 characters");
         Account a = new Account();
         // avatar dùng method riêng
         // không set trực tiếp từ DTO tránh exploit
-        a.setNickname(account.getNickname());
+        a.setNickname(account.getNickname().strip());
         a.setRole(account.getRole());
-        a.setEmail(account.getEmail());
-        a.setPhone(account.getPhone());
+        a.setEmail(account.getEmail().strip());
+        a.setPhone(account.getPhone().strip());
         a.setStatus(Account.Status.ACTIVE);
         a.setPassword(passwordEncoder.bcryptEncoder().encode(account.getPassword()));
         return mapEntityToDTO(accountRepos.save(a));
@@ -141,6 +148,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
         Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
+        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
+        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
+        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
+        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
         Account acc = accountRepos.findById(account.getAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
         return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc, editorRole)));
