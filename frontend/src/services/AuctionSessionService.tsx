@@ -73,9 +73,7 @@ export const fetchFeaturedAuctionSessions = async (page?: number, size?: number)
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
+
         });
 }
 
@@ -94,9 +92,7 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
+
         });
 }
 
@@ -115,9 +111,7 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
+
         });
 }
 
@@ -131,9 +125,7 @@ export const fetchAuctionSessionById = async (id: number) => {
             },
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
+
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -156,9 +148,7 @@ export const fetchAuctionSessionByTitle = async (page?: number, size?: number, t
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
+
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -177,9 +167,6 @@ export const createAuctionSession = async (data: any) => {
             },
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");
@@ -211,9 +198,7 @@ export const registerAuctionSession = async (id: number) => {
             },
         })
         .catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            });
+
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");

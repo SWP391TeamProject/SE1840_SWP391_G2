@@ -30,7 +30,7 @@ import { AuctionSessionStatus } from "@/models/newModel/auctionSession"
                   <FormItem>
                     <FormLabel>Status</FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field?.value} >
+                      <Select onValueChange={field.onChange} defaultValue={field?.value} value={field?.value}>
                         <SelectTrigger id="status" aria-label="Select status">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>

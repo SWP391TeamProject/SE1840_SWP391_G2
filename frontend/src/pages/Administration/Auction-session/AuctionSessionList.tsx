@@ -276,8 +276,6 @@ export default function AuctionSessionList() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession?.auctionSessionId) }}>Detail</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession?.auctionSessionId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleEditClick(auctionSession?.auctionSessionId) }}>Manage Live Auctions</DropdownMenuItem>
                             <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(auctionSession?.auctionSessionId) }}>Assign Items</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
