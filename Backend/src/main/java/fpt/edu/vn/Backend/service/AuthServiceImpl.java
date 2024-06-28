@@ -177,6 +177,16 @@ public class AuthServiceImpl implements AuthService{
 
         verify2faCache.put(code, a.getAccountId(), 10, TimeUnit.MINUTES);
         logger.info("Sending 2FA code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
+
+            Notification notification = new Notification();
+            notification.setAccount(a);
+            notification.setMessage("Two Face Authentication Code");
+            notification.setType("2FA");
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            notificationRepos.save(notification);
+
     }
 
     private AuthResponseDTO forceLogin(Account user) {
@@ -284,6 +294,17 @@ public class AuthServiceImpl implements AuthService{
             throw new InvalidInputException("Old password is incorrect!");
 
         a.setPassword(passwordEncoder.bcryptEncoder().encode(dto.getNewPassword()));
+
+            Notification notification = new Notification();
+            notification.setAccount(a);
+            notification.setMessage("Changed Password Successfully");
+            notification.setType("Change Password");
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            notificationRepos.save(notification);
+
+
         accountRepos.save(a);
         return true;
     }
@@ -400,6 +421,8 @@ public class AuthServiceImpl implements AuthService{
             notification.setMessage("New User Registered");
             notification.setType("Registration");
             notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
             notificationRepos.save(notification);
         }
         activationCodeCache.remove(activateCode);
