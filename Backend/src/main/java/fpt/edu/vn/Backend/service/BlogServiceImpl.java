@@ -58,7 +58,7 @@ public class BlogServiceImpl implements BlogService{
                 .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notificationId));
 
         Account account = notifications.getAccount();
-        if (account.getRole().equals(Account.Role.ADMIN)) {
+        if (account.getRole() == Account.Role.ADMIN) {
             // Send notification to all members
             Notification notification = notificationRepos.findById(notificationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notificationId));
