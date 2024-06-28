@@ -31,14 +31,12 @@ const formSchema = z.object({
     nickname: z.string(),
     email: z.string().regex(emailRegex, 'Invalid email!'),
     phone: z.string().regex(phoneRegex, 'Invalid Number!'),
+    password: z.string().min(6,'Password must be at least 6 characters long'),
     role: z.enum([RoleName.MEMBER, RoleName.STAFF, RoleName.MANAGER, RoleName.ADMIN]),
     balance: z.coerce.number().optional(),
 });
 
-const roleSchema: z.ZodType<Role> = z.object({
-    roleId: z.number(),
-    roleName: z.string()
-});
+
 
 export default function AccountCreate() {
     // const account = useAppSelector((state) => state.accounts.currentAccount);
@@ -58,7 +56,6 @@ export default function AccountCreate() {
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         // Remove FormData creation and file handling
-
         let createdAccount = {
             // accountId: data.accountId,
             email: data.email,
@@ -66,19 +63,15 @@ export default function AccountCreate() {
             phone: data.phone,
             avatar: null,
             balance: data.balance,
-            role: [{
-                roleId: Object.keys(RoleName).indexOf(data.role) + 1,
-                roleName: data.role,
-            }],
+            role: data.role,
+            password: data.password,
             status: AccountStatus.ACTIVE,
         }
         createAccountService(createdAccount).then((res) => {
             console.log(res);
-            // dispatch(setCurrentAccount(res))
             navigate("/admin/accounts/");
         })
 
-        // console.log(updatedAccount);
     };
 
     useEffect(() => {
@@ -150,6 +143,19 @@ export default function AccountCreate() {
                                 </FormItem>
                             )}
                         />
+                         <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} type='password'/>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <FormField
                             control={form.control}
                             name="phone"
@@ -176,6 +182,7 @@ export default function AccountCreate() {
                                 </FormItem>
                             )}
                         />
+                        
                         <FormField
                             control={form.control}
                             name="role"

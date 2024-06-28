@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -122,6 +123,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
+        if(accountRepos.findByEmail(account.getEmail()).isPresent())
+            throw new InvalidInputException("Email already exists");
+        
         Account a = new Account();
         // avatar dùng method riêng
         // không set trực tiếp từ DTO tránh exploit
