@@ -2,6 +2,7 @@ import PagingIndexes from '@/components/pagination/PagingIndexes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,9 +11,10 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCurrentBlogPost, setCurrentPageList, setCurrentPageNumber } from '@/redux/reducers/Blogs';
 import BlogCategoryService from '@/services/BlogCategoryService';
 import BlogService from '@/services/BlogService';
-import { ListFilter, MoreHorizontal, PlusCircle } from 'lucide-react';
+import { ListFilter, MinusCircle, MoreHorizontal, PlusCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export const BlogPostList = () => {
   const blogsList = useAppSelector((state) => state.blogs);
@@ -20,7 +22,7 @@ export const BlogPostList = () => {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
   const [categories, setCategories] = useState<BlogCategory[]>([]);
-  const [filtered,setFiltered]=useState("all");
+  const [filtered, setFiltered] = useState("all");
   const fetchBlogs = async (pageNumber: number) => {
     try {
       const res = await BlogService.getAllBlogs(pageNumber, 5);
@@ -87,36 +89,87 @@ export const BlogPostList = () => {
     setStatusFilter("all");
     BlogCategoryService.getAllBlogCategories(0, 50).then((res) => {
       setCategories(res.data.content)
+      console.log(res.data.content);
     }).catch(error => {
       console.log(error);
     });
   }, []);
 
+  const createCategory = () => {
+    let newCategoy = (document.getElementById("newCategory") as HTMLInputElement).value;
+    console.log(newCategoy);
+    BlogCategoryService.createBlogCategory(newCategoy).then((res) => {
+      setCategories([...categories, res.data]);
+      toast.success("Create success", {
+        position: "bottom-right"
+      });
+      (document.getElementById("newCategory") as HTMLInputElement).value = "";
+    }).catch(error => {
+      toast.error("Create failed", {
+        position: "bottom-right"
+      });
+    });
+  }
+  const deleteCategory = (id: number) => {
+    BlogCategoryService.deleteBlogCategory(id).then((res) => {
+      console.log(res);
+      if (res.status == 204) {
+        let newCategories = categories.filter(x => x.blogCategoryId != id);
+        setCategories(newCategories);
+        toast.success("Delete success", {
+          position: "bottom-right"
+        });
+      } else {
+        toast.error("Delete failed", {
+          position: "bottom-right"
+        });
+      }
+    }).catch(error => {
+      toast.error("Delete failed", {
+        position: "bottom-right"
+      });
+    });
+  }
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 ">
       <Tabs defaultValue="all">
         <div className="flex items-center ">
-          
+
           <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-1">
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Filter
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Category</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked={filtered=='all'?true:false} onClick={() => handleFilterClick(categories, 'all')}>
-                  All
-                </DropdownMenuCheckboxItem>
-                {categories.map((category) => (
-                  <DropdownMenuCheckboxItem checked={filtered==category.name?true:false} key={category.blogCategoryId}  onClick={() => handleFilterClick([category], category.name)} >{category.name}</DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 gap-1">
+                <ListFilter className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Filter
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuLabel>Category</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem className='w-9/12' checked={filtered == 'all'} onClick={() => handleFilterClick(categories, 'all')}>
+                All
+              </DropdownMenuCheckboxItem>
+
+
+              {categories.map((category) => (
+                <div className="flex m-1 items-center justify-between" key={category.blogCategoryId} >
+                  <DropdownMenuCheckboxItem className='w-9/12' checked={filtered == category.name} onClick={() => handleFilterClick([category], category.name)} >{category.name}</DropdownMenuCheckboxItem>
+                  <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={() => deleteCategory(category.blogCategoryId)}>
+                    <MinusCircle className="h-full w-full" />
+                  </Button>
+                </div>
+              ))}
+
+
+            </DropdownMenuContent>
+            <div className="flex m-1 items-center justify-start ">
+              <Input placeholder="new category" className='w-9/12 h-8 mx-2' id='newCategory' />
+              <Button size="sm" variant="ghost" className="gap-1 w-2/12 h-8" onClick={createCategory}>
+                <PlusCircle className="h-full w-full" />
+              </Button>
+            </div>
+          </DropdownMenu>
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuctionSession } from "@/models/AuctionSessionModel";
 import { useAppSelector } from "@/redux/hooks";
-import { fetchAuctionSessionById, updateAuctionSession } from "@/services/AuctionSessionService";
+import { fetchAuctionSessionById, finishAuctionSession, terminateAuctionSession, updateAuctionSession } from "@/services/AuctionSessionService";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Details from "./Details";
@@ -83,8 +83,33 @@ export default function AuctionSessionDetail() {
         }
     }, [auctionSession]);
 
+    const handleFinishSession = () => {
+        finishAuctionSession(currentAuctionSession?.auctionSessionId).then((res) => {
+            console.log(res);
+            toast.success('Auction Session Finished Successfully',{
+                position:"bottom-right",
+            });
+        }).catch((err) => {
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            })
+        });
+    }
 
-    return <>
+    const handleTerminateSession = () => {
+        terminateAuctionSession(currentAuctionSession?.auctionSessionId).then((res) => {
+            console.log(res);
+            toast.success('Auction Session Terminated Successfully',{
+                position:"bottom-right",
+            });
+        }).catch((err) => {
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            })
+        });
+    }
+
+    return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="flex flex-col w-full gap-3 p-3">
@@ -101,25 +126,20 @@ export default function AuctionSessionDetail() {
                                     <CardTitle>Actions</CardTitle>
                                     <CardDescription>Actions that can be performed on the auction session</CardDescription>
                                 </CardHeader>
-                                <CardContent className="block">
+                                <CardContent className="flex">
                                     {
                                         isloading ? <Button><Loader2 className="animate-spin" /></Button>
-                                            : <Button type="submit">Save</Button>
+                                            : <Button type="submit" className="m-2">Save</Button>
                                     }
 
                                     {
-                                        currentAuctionSession?.status === AuctionSessionStatus.ACTIVE
-                                            ? <Button>Pause Session</Button>
-                                            : <Button>Resume Session</Button>
+                                        currentAuctionSession?.status === AuctionSessionStatus.PROGRESSING
+                                           && <Button type="button" onClick={handleFinishSession} className="m-2">Finish Session</Button>
                                     }
 
                                     {
                                         isloading ? <Button><Loader2 className="animate-spin" /></Button>
-                                            : <Button>Extend Duration</Button>
-                                    }
-                                    {
-                                        isloading ? <Button><Loader2 className="animate-spin" /></Button>
-                                            : <Button>End Session Immedietly </Button>
+                                            : <Button type="button" onClick={handleTerminateSession} className="m-2">Terminate Session</Button>
 
                                     }
                                 </CardContent>
@@ -138,5 +158,5 @@ export default function AuctionSessionDetail() {
                 </div>
             </form>
         </Form>
-    </>;
+    );
 }

@@ -220,3 +220,26 @@ export const registerAuctionSession = async (id: number) => {
             }
         });
 }
+
+export const finishAuctionSession = async (auctionSessionID: number) => {
+    return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/${controller}/finish/${auctionSessionID}`, {
+            headers: {
+                "Content-Type": "application/json",
+
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        })
+}
+export const terminateAuctionSession = async (auctionSessionId: number) => {
+    return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/${controller}/terminate/${auctionSessionId}`, {
+            headers: {
+                "Content-Type": "application/json",
+
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        })
+}

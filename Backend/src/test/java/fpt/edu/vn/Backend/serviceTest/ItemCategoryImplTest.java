@@ -92,7 +92,8 @@ public class ItemCategoryImplTest {
 
     @Test
     public void testDeleteItemCategory() {
-        when(itemCategoryRepos.existsById(anyInt())).thenReturn(true);
+        when(itemCategoryRepos.findItemCategoryByItemCategoryId(anyInt())).thenReturn(itemCategory);
+        when(itemCategoryRepos.findById(anyInt())).thenReturn(Optional.of(itemCategory));
 
         ResponseEntity<ItemCategoryDTO> response = itemCategoryService.deleteItemCategory(1);
 

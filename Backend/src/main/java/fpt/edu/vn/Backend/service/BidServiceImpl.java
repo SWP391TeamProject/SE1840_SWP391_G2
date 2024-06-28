@@ -133,6 +133,10 @@ public class BidServiceImpl implements BidService {
         List<BidDTO> result = new ArrayList<>();
         for (Bid bid : bids) {
             if (bids.get(0).equals(bid)){
+                log.info("Bid " + bid.getBidId() + " succeeded");
+                Payment payment = bid.getPayment();
+                payment.setStatus(Payment.Status.SUCCESS);
+                paymentRepos.save(payment);
                 result.add(new BidDTO(bid));
                 continue;
             }

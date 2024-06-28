@@ -1,11 +1,15 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.BlogCategory;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BlogCategoryDTO {
     private int blogCategoryId;
     private String name;
@@ -18,6 +22,9 @@ public class BlogCategoryDTO {
         this.createDate = blogCategory.getCreateDate();
         this.updateDate = blogCategory.getUpdateDate();
     }
+
+
+
     // getters and setters
     // ...
 }

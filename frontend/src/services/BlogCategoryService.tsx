@@ -17,8 +17,8 @@ class BlogCategoryService {
             },
             params: params
         }).catch((error) => {
-            toast.error(error,{
-                position:"bottom-right",
+            toast.error(error, {
+                position: "bottom-right",
             });
         });
     }
@@ -27,8 +27,20 @@ class BlogCategoryService {
         return axios.get(`${this.BASE_URL}/${id}`);
     }
 
-    public static createBlogCategory(blogCategory: any) {
-        return axios.post(this.BASE_URL, blogCategory);
+    public static createBlogCategory(name: string) {
+
+        return axios.post(`${this.BASE_URL}/`
+            ,{blogCategoryId:-1,name: name,createDate:new Date(),updateDate:new Date()}, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            }
+        }).catch((error) => {
+            toast.error(error, {
+                position: "bottom-right",
+            });
+        });
     }
 
     public static updateBlogCategory(id: number, blogCategory: any) {
@@ -36,7 +48,17 @@ class BlogCategoryService {
     }
 
     public static deleteBlogCategory(id: number) {
-        return axios.delete(`${this.BASE_URL}/${id}`);
+        return axios.post(`${this.BASE_URL}/delete/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            }
+        }).catch((error) => {
+            toast.error(error, {
+                position: "bottom-right",
+            });
+        });
     }
 }
 

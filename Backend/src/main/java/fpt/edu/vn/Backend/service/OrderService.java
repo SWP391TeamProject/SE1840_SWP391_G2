@@ -6,9 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface OrderService {
-    OrderDTO createOrder(OrderRequest orderRequest);
+    OrderDTO createOrder(int accountId, Set<Integer> itemIds, int auctionId);
     OrderDTO getOrderById(int orderId);
     Page<OrderDTO> getAllOrders(Pageable pageable);
     OrderDTO updateOrder(OrderRequest orderRequest);
