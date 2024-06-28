@@ -10,9 +10,10 @@ import java.util.List;
 public interface BlogCategoryService {
     public Page<BlogCategoryDTO> getAllBlogCategories(Pageable pageable) ;
     public BlogCategoryDTO getBlogCategoryById(int id);
-    public BlogCategoryDTO createBlogCategory(BlogCategory blogCategory);
+    public BlogCategoryDTO createBlogCategory(String name);
     public BlogCategoryDTO updateBlogCategory(int id, BlogCategory blogCategory);
 
+    public BlogCategoryDTO getBlogCategoryByName(String name);
 
     public void deleteBlogCategory(int id);
 }

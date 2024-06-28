@@ -39,8 +39,21 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    public BlogCategoryDTO createBlogCategory(BlogCategory blogCategory) {
+    public BlogCategoryDTO createBlogCategory(String name) {
+        BlogCategory blogCategory = new BlogCategory();
+        blogCategory.setName(name);
+        blogCategory.setCreateDate(java.time.LocalDateTime.now());
+        blogCategory.setUpdateDate(java.time.LocalDateTime.now());
         return new BlogCategoryDTO(blogCategoryRepos.save(blogCategory));
+    }
+
+    @Override
+    public BlogCategoryDTO getBlogCategoryByName(String name) {
+        BlogCategory blogCategory = blogCategoryRepos.findBlogCategoryByName(name);
+        if(blogCategory != null) {
+            return new BlogCategoryDTO(blogCategory);
+        }
+        return null;
     }
 
     @Override
