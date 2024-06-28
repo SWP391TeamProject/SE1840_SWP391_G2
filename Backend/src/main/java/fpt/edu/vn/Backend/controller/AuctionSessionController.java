@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -175,6 +176,19 @@ public class AuctionSessionController {
         return new ResponseEntity<>(auctionSessionService.registerAuctionSession(id, a.getAccountId()), HttpStatus.OK);
     }
 
+    @GetMapping("/finish/{id}")
+    @PreAuthorize("hasAuthority('MANAGER')")
+    public ResponseEntity<String> finishAuctionSession(@PathVariable int id) {
+        auctionSessionService.finishAuction(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/terminate/{id}")
+    @PreAuthorize("hasAuthority('MANAGER')")
+    public ResponseEntity<String> terminateAuctionSession(@PathVariable int id) {
+        auctionSessionService.terminateAuction(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 }

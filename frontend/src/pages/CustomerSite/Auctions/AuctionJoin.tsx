@@ -27,7 +27,7 @@ export default function AuctionJoin() {
   let itemDTO = location.state.itemDTO;
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
-  const [isJoin, setIsJoin] = useState(false);
+  const [isJoin, setIsJoin] = useState(true);
 
   useEffect(() => {
     if (!getCookie("user")) {
@@ -41,8 +41,7 @@ export default function AuctionJoin() {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
-    if (getCookie("user")&&JSON.parse(getCookie("user"))) {
-      
+    if (getCookie("user")&&JSON.parse(getCookie("user")) && allow !== false) {
       setAllow(true);
     } else {
       setAllow(false);
@@ -50,18 +49,18 @@ export default function AuctionJoin() {
   }, []);
 
   useEffect(() => {
+    setIsJoin(true);
     if (allow === false || !getCookie("user")) {
+      setIsJoin(false);
       setClient(null);
       toast.dismiss();
       return;
     }
     const newClient = new Client({
-      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
       // onDisconnect: () => {
       //   toast.error('You have been disconnected from the auction');
       // },
       onConnect: () => {
-        setIsJoin(true);
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
         setTimeout(() => {
           newClient.publish({
@@ -73,6 +72,7 @@ export default function AuctionJoin() {
               }
             })
           });
+          setIsJoin(false);
         }, 1000);
       },
       onStompError: (error) => {

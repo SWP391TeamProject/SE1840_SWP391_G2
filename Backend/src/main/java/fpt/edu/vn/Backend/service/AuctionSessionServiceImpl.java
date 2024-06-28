@@ -37,6 +37,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Autowired
     private AuctionItemRepos auctionItemRepos;
+    @Autowired
+    private OrderServiceImpl orderServiceImpl;
 
 
     @Autowired
@@ -171,22 +173,44 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     public void finishAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
-        List<AccountDTO> accounts = new ArrayList<>();
+        Map<AccountDTO, List<Integer>> winAccounts = new HashMap<>();
         logger.info("Finishing auction session " + auctionSessionId);
         if (auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")) {
             logger.warn("Auction session " + auctionSessionId + " already ended");
             return;
         }
         for (AuctionItemDTO auctionItem : auctionDTO.getAuctionItems()) {
+            bidService.finishAuctionItem(auctionItem.getId());
             AccountDTO account;
             account = accountServiceImpl.getAccountById(bidService.getHighestBid(auctionItem.getId())
                     .getPayment().getAccountId());
-            bidService.finishAuctionItem(auctionItem.getId());
-            accounts.add(account);
+            if(account == null){
+                continue;
+            }
+            List<Integer> winItems = winAccounts.get(account);
+            if (winItems == null || winItems.isEmpty()) {
+                winItems = new ArrayList<>();
+                winItems.add(auctionItem.getItemDTO().getItemId());
+            }else {
+                winItems.add(auctionItem.getItemDTO().getItemId());
+            }
+            winAccounts.put(account, winItems);
         }
+        winAccounts.forEach((account, items) -> {
+            logger.info("Winning account: " + account.getAccountId() + " items: " + items);
+        });
         for (DepositDTO deposit : auctionDTO.getDeposits()) {
-
-            if (accounts.stream()
+            if(deposit.getPayment().getStatus().equals(Payment.Status.SUCCESS)){
+                continue;
+            }
+            if(winAccounts.keySet().stream()
+                    .anyMatch(account ->
+                            account.getAccountId() == deposit.getPayment().getAccountId())){
+                deposit.getPayment().setStatus(Payment.Status.SUCCESS);
+                paymentService.updatePayment(deposit.getPayment());
+                continue;
+            }
+            if (!winAccounts.isEmpty() && winAccounts.keySet().stream()
                     .noneMatch(account ->
                             account.getAccountId() == deposit.getPayment().getAccountId())) {
                 deposit.getPayment().setStatus(Payment.Status.FAILED);
@@ -196,10 +220,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                     logger.info("Refunding deposit for account " + account.getAccountId());
                 });
                 paymentService.updatePayment(deposit.getPayment());
-
             }
         }
         auctionDTO.setStatus("FINISHED");
+        for(AccountDTO account: winAccounts.keySet()){
+            orderServiceImpl.createOrder(account.getAccountId(), new HashSet<>(winAccounts.get(account)), auctionSessionId);
+        }
         try {
             Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
             if (optionalAuctionSession.isEmpty()) {
