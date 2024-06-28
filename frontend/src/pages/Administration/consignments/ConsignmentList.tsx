@@ -257,23 +257,9 @@ export default function ConsignmentList() {
                                             </TableCell>
 
                                             <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            aria-haspopup="true"
-                                                            size="icon"
-                                                            variant="ghost"
-                                                        >
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                            <span className="sr-only">Toggle menu</span>
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                        <DropdownMenuItem onClick={() => { handleEditClick(consignment.consignmentId) }}>Edit</DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => { handleDetailClick(consignment.consignmentId) }}>Detail</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <Button variant="outline" size="sm" onClick={() => { handleDetailClick(consignment.consignmentId) }}>
+                                                    Detail
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
 
