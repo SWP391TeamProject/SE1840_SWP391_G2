@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class ItemCategoryImpl implements ItemCategoryService{
+public class ItemCategoryImpl implements ItemCategoryService {
     @Autowired
     private ItemCategoryRepos itemCategoryRepos;
 
@@ -26,7 +26,7 @@ public class ItemCategoryImpl implements ItemCategoryService{
         itemCategory.setName(itemCategoryRequestDTO.getName());
         itemCategory.setCreateDate(LocalDateTime.now());
         itemCategory.setUpdateDate(LocalDateTime.now());
-        if(itemCategoryRepos.findByName(itemCategory.getName()) != null){
+        if (itemCategoryRepos.findByName(itemCategory.getName()) != null) {
             throw new ResourceNotFoundException("ItemCategory already exists with name " + itemCategory.getName());
         }
         ItemCategory savedItemCategory = itemCategoryRepos.save(itemCategory);
@@ -51,14 +51,15 @@ public class ItemCategoryImpl implements ItemCategoryService{
 
     @Override
     public ResponseEntity<ItemCategoryDTO> deleteItemCategory(int id) {
-            if(!itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems().isEmpty()){
-                throw new ResourceNotFoundException("ItemCategory has items");
-            }
-            if(itemCategoryRepos.findById(id).isEmpty()){
-                throw new ResourceNotFoundException("ItemCategory not found with id " + id);
-            }
-            itemCategoryRepos.deleteById(id);
-            return ResponseEntity.ok().build();
+        if (itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems() != null
+                && !itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems().isEmpty()) {
+            throw new ResourceNotFoundException("ItemCategory has items");
+        }
+        if (itemCategoryRepos.findById(id).isEmpty()) {
+            throw new ResourceNotFoundException("ItemCategory not found with id " + id);
+        }
+        itemCategoryRepos.deleteById(id);
+        return ResponseEntity.ok().build();
 
     }
 
