@@ -46,4 +46,7 @@ public class NotificationController {
     public ResponseEntity<Integer> countUnreadNotifications(Principal principal) {
         return new ResponseEntity<>(notificationService.countUnreadNotifications(principal.getName()), HttpStatus.OK);
     }
+
+
+
 }
