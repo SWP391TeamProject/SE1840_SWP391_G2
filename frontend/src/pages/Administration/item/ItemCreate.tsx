@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area"
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
 import { useEffect, useState } from "react"
-import { getAllItemCategories } from "@/services/ItemCategoryService"
+import { ItemCategoryRequestDTO, createItemCategory, deleteItemCategory, getAllItemCategories } from "@/services/ItemCategoryService"
 import { toast } from "react-toastify"
 import { ItemCategory } from "@/models/newModel/itemCategory"
 import { SelectGroup } from "@radix-ui/react-select"
@@ -29,6 +29,8 @@ import axios from "axios"
 import { createItem } from "@/services/ItemService"
 import { getCookie } from "@/utils/cookies"
 import TextEditor from "@/components/component/TextEditor"
+import { MinusCircle, PlusCircle } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 const statusValues = Object.values(ItemStatus);
 
 const FormSchema = z.object({
@@ -42,19 +44,18 @@ const FormSchema = z.object({
     }),
     description: z.string().min(3, {
         message: "Description must be at least 3 characters long.",
-    }).max(500, {
-        message: "Description must not exceed 500 characters.",
+    }).max(50000, {
+        message: "Description must not exceed 50000 characters.",
     }),
-    reservePrice: z.string().min(0, {
-        message: "Reserve price must be greater than or equal to 0.",
-    }),
+    reservePrice: z.string(),
     buyInPrice: z.string(),
     status: z.enum(statusValues),
     ownerId: z.number(),
     files: z.any(),
 });
 export default function ItemCreate() {
-    const [category, setCategory] = useState<ItemCategory[]>([]);
+    const nav = useNavigate();
+    const [categories, setCategories] = useState<ItemCategory[]>([]);
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -62,10 +63,9 @@ export default function ItemCreate() {
             description: "",
             status: ItemStatus.QUEUE,
             categoryId: "",
-            reservePrice: "",
-            buyInPrice: "",
-            ownerId: 1,
-
+            reservePrice: "0",
+            buyInPrice: "0",
+            ownerId: JSON.parse(getCookie("user"))?.id || -1,
 
             files: [],
         },
@@ -73,38 +73,74 @@ export default function ItemCreate() {
 
     useEffect(() => {
         getAllItemCategories(0, 50).then((res) => {
-            setCategory(res.data.content)
+            setCategories(res.data.content)
             console.log(res.data.content);
             // toast.success('Category fetched successfully!');
         }
         ).catch(error => {
-            toast.error(error,{
-                position:"bottom-right",
+            toast.error(error, {
+                position: "bottom-right",
             });
         });
     }, [])
 
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        data.categoryId = category.find((item) => item.name === data.categoryId)?.itemCategoryId;
+        data.categoryId = categories.find((item) => item.name === data.categoryId)?.itemCategoryId;
         console.log(data);
         createItem(data).then((res) => {
             console.log(res);
-            toast.success('Item created successfully!',{
-                position:"bottom-right",
+            toast.success('Item created successfully!', {
+                position: "bottom-right",
             });
+            nav("/admin/items");
         }
         ).catch(error => {
             console.log(error);
-            toast.error(error,{
-                position:"bottom-right",
+            toast.error(error.response.data.message, {
+                position: "bottom-right",
             });
         });
 
 
 
     }
-
+    const createCategory = () => {
+        let newCategoy = (document.getElementById("newCategory") as HTMLInputElement).value;
+        console.log(newCategoy);
+        let category:ItemCategoryRequestDTO = {itemCategoryId:-1,name:newCategoy};
+        createItemCategory(category).then((res) => {
+            setCategories([...categories, res.data]);
+            toast.success("Create success", {
+                position: "bottom-right"
+            });
+            (document.getElementById("newCategory") as HTMLInputElement).value = "";
+        }).catch(error => {
+            toast.error("Create failed", {
+                position: "bottom-right"
+            });
+        });
+    }
+    const deleteCategory = (id: number) => {
+        deleteItemCategory(id).then((res) => {
+            console.log(res);
+            if (res.status == 200) {
+                let newCategories = categories.filter(x => x.itemCategoryId != id);
+                setCategories(newCategories);
+                toast.success("Delete success", {
+                    position: "bottom-right"
+                });
+            } else {
+                toast.error("Delete failed", {
+                    position: "bottom-right"
+                });
+            }
+        }).catch(error => {
+            toast.error("Delete failed", {
+                position: "bottom-right"
+            });
+        });
+    }
     return (
         <div className="p-10">
 
@@ -132,7 +168,7 @@ export default function ItemCreate() {
                         name="status"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>Status</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={ItemStatus.QUEUE}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -152,6 +188,7 @@ export default function ItemCreate() {
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="categoryId"
@@ -165,11 +202,23 @@ export default function ItemCreate() {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {category?.map((item) => (
-                                            <SelectItem key={item.itemCategoryId} value={item.name} >
-                                                {item.name}
-                                            </SelectItem>
+                                        {categories?.map((item) => (
+                                            <div className="flex  items-center justify-evenly " key={item.itemCategoryId}>
+                                                <SelectItem className="w-9/12" value={item.name} >
+                                                    {item.name}
+                                                </SelectItem>
+                                                <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={()=>deleteCategory(item.itemCategoryId)}>
+                                                    <MinusCircle className="h-full w-6" />
+                                                </Button>
+                                            </div>
+
                                         ))}
+                                        <div className="flex items-center justify-evenly ">
+                                            <Input placeholder="create new category" className='w-9/12' id='newCategory' />
+                                            <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={createCategory}>
+                                                <PlusCircle className="h-full w-6" />
+                                            </Button>
+                                        </div>
                                     </SelectContent>
                                 </Select>
                                 <FormDescription>Select the category.</FormDescription>
@@ -188,7 +237,7 @@ export default function ItemCreate() {
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <TextEditor {...field} placeholder="description..."/>
+                                    <TextEditor {...field} placeholder="description..." />
                                     {/* // <Textarea placeholder="shadcn" {...field} /> */}
                                 </FormControl>
                                 <FormDescription>

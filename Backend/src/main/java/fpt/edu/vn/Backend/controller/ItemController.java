@@ -117,13 +117,20 @@ public class ItemController {
 
     @PostMapping("/create")
     public ResponseEntity<ItemDTO> createItem(@ModelAttribute CreateItemRequestDTO itemDTO) throws IOException {
-
+        if(itemDTO.getName() == null || itemDTO.getName().isEmpty()){
+            throw new InvalidInputException("Item name cannot be null");
+        }
+        if(itemDTO.getReservePrice()<0 || itemDTO.getBuyInPrice()<0){
+            throw new InvalidInputException("Item price cannot be negative");
+        }
+        if(itemDTO.getReservePrice()>itemDTO.getBuyInPrice()){
+            throw new InvalidInputException("Reserve price must be smaller than buy in price");
+        }
         if (itemDTO.getFiles() != null) {
             for (MultipartFile f : itemDTO.getFiles()) {
                 if (f.getSize() > 10000000) {
                     throw new InvalidInputException("File size must be less than 10MB");
                 }
-
             }
         } else {
             throw new InvalidInputException("File cannot be null");
