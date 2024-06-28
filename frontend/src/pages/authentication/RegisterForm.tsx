@@ -26,13 +26,17 @@ gsap.registerPlugin(useGSAP);
 const formSchema = z
   .object({
     name: z.string().min(5, {
-      message: "Name must be at least 5 characters.",
+      message: "Nickname must be at least 5 characters.",
+    }).max(20, {
+      message: "Nickname must not be longer than 20 characters.",
     }),
     email: z.string().email({
       message: "Invalid email address.",
     }),
     password: z.string().min(8, {
       message: "Password must be at least 8 characters.",
+    }).max(30, {
+      message: "Password must not be longer than 30 characters.",
     }),
     // rememberMe: z.boolean(),
     confirmPassword: z.string(),
@@ -132,6 +136,7 @@ function RegisterForm() {
                       <FormControl>
                         <Input type="text" placeholder="Your name" {...field} />
                       </FormControl>
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />
@@ -146,6 +151,7 @@ function RegisterForm() {
                       <FormControl>
                         <Input type="email" placeholder="Your email" {...field} />
                       </FormControl>
+                      <FormMessage/>
                     </FormItem>
                   )}
                 />

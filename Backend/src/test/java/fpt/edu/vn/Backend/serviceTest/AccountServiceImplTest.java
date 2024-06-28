@@ -118,14 +118,14 @@ public class AccountServiceImplTest {
     @DisplayName("Should create account successfully when valid account details are provided")
     public void shouldCreateAccountSuccessfullyWhenValidAccountDetailsAreProvided() {
         AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setNickname("test");
+        accountDTO.setNickname("test account");
         accountDTO.setEmail("test@test.com");
         accountDTO.setPhone("1234567890");
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
         accountDTO.setCreateDate(LocalDateTime.now());
         accountDTO.setUpdateDate(LocalDateTime.now());
         accountDTO.setRole(Account.Role.ADMIN);
-        accountDTO.setPassword("123456");
+        accountDTO.setPassword("12345678");
 
         Account account = new Account();
         account.setNickname(accountDTO.getNickname());
@@ -150,7 +150,7 @@ public class AccountServiceImplTest {
     public void shouldUpdateAccountSuccessfullyWhenValidAccountDetailsAreProvided() {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountId(1);
-        accountDTO.setNickname("test");
+        accountDTO.setNickname("test account");
         accountDTO.setEmail("test@test.com");
         accountDTO.setPhone("1234567890");
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));
@@ -182,7 +182,7 @@ public class AccountServiceImplTest {
     public void shouldThrowResourceNotFoundExceptionWhenInvalidAccountIdIsProvided() {
         AccountDTO accountDTO = new AccountDTO();
         accountDTO.setAccountId(999);
-        accountDTO.setNickname("test");
+        accountDTO.setNickname("test account");
         accountDTO.setEmail("test@test.com");
         accountDTO.setPhone("1234567890");
         accountDTO.setBalance(BigDecimal.valueOf(1000.0));

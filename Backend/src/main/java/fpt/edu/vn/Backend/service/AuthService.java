@@ -26,6 +26,6 @@ public interface AuthService {
     boolean confirmActivateAccount(@NotNull String activateCode);
     AuthResponseDTO confirm2fa(@NotNull String activateCode);
 
-    boolean changePassword(int id, ChangePasswordDTO changePasswordDTO) throws IllegalAccessException;
+    boolean changePassword(int id, ChangePasswordDTO changePasswordDTO);
 
 }

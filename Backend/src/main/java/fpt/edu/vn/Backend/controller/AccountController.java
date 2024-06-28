@@ -129,7 +129,7 @@ public class AccountController {
 
     @PostMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AccountDTO> deleteAccount(@PathVariable int id) {
+    public ResponseEntity<AccountDTO> disableAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
