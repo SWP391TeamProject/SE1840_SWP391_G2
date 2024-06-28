@@ -72,7 +72,7 @@ export const fetchAccountById = async (id: number) => {
 
 export const createAccountService = async (data: any) => {
   return await axios
-    .post(API_SERVER + "/accounts", data, {
+    .post(API_SERVER + "/accounts/", data, {
       headers: {
         "Content-Type": "application/json",
          

@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -122,6 +123,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
+        if(accountRepos.findByEmail(account.getEmail()).isPresent())
+            throw new InvalidInputException("Email already exists");
+
         Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
         Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
         Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
