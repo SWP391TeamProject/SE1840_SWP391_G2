@@ -61,7 +61,7 @@ export default function ProductCategory({ ...props }) {
                 :
                 <Card>
                     <CardHeader>
-                        <CardTitle>Product Category</CardTitle>
+                        <CardTitle>Category</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-6 sm:grid-cols-3 w-full">
@@ -72,7 +72,6 @@ export default function ProductCategory({ ...props }) {
                                     name="category.itemCategoryId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Category</FormLabel>
                                             <FormControl>
                                                 <Select onValueChange={field.onChange}
                                                     defaultValue={field.value}
@@ -82,7 +81,7 @@ export default function ProductCategory({ ...props }) {
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectGroup label="Category">
-                                                            <SelectLabel>North America</SelectLabel>
+                                                            <SelectLabel>Category</SelectLabel>
                                                             {category?.map((item: any, index) => {
                                                                 return <SelectItem key={index} value={item.itemCategoryId.toString()}>{item.name}</SelectItem>
                                                             }

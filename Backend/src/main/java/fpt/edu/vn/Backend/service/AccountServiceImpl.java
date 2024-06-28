@@ -125,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
         if(accountRepos.findByEmail(account.getEmail()).isPresent())
             throw new InvalidInputException("Email already exists");
-        
+
         Account a = new Account();
         // avatar dùng method riêng
         // không set trực tiếp từ DTO tránh exploit

@@ -66,7 +66,8 @@ import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } fr
 import { getItems, getItemsByName } from "@/services/ItemService";
 import { ItemStatus } from "@/constants/enums";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
-import {useCurrency} from "@/CurrencyProvider.tsx";
+import { useCurrency } from "@/CurrencyProvider.tsx";
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 
 export default function ItemsList() {
   const itemsList = useAppSelector((state) => state.items);
@@ -80,7 +81,7 @@ export default function ItemsList() {
   const fetchItems = async (pageNumber: number) => {
     try {
       let res = await getItems(pageNumber, 5);
-      if(search != null) {
+      if (search != null) {
         res = await getItemsByName(search, pageNumber, 5);
       }
       console.log(res);
@@ -233,69 +234,71 @@ export default function ItemsList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {itemsList.currentPageList.map((item) => (
-                    <TableRow key={item.itemId}>
-                      <TableCell className="font-medium">
-                        {item.itemId}
-                      </TableCell>
-                      {/* <TableCell>
+                  {itemsList
+                    ? <LoadingAnimation />
+                    : itemsList.currentPageList.map((item) => (
+                      <TableRow key={item.itemId}>
+                        <TableCell className="font-medium">
+                          {item.itemId}
+                        </TableCell>
+                        {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="md:table-cell">
-                        {item.name}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {currency.format({amount: item.reservePrice})}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {item.status}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                          <div dangerouslySetInnerHTML={{__html: item.description}}></div>
-                            
-                       
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
+                        <TableCell className="md:table-cell">
+                          {item.name}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {currency.format({ amount: item.reservePrice })}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {item.status}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          <div dangerouslySetInnerHTML={{ __html: item.description }}></div>
+
+
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
                         <Badge variant="default" className="bg-green-500">{ItemsetCurrentItemStatus[item.status]}</Badge> : 
                         <Badge variant="destructive">{ItemsetCurrentItemStatus[item.status]}</Badge>} */}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                aria-haspopup="true"
+                                size="icon"
+                                variant="ghost"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
 
-                            {/* <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem> */}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                              {/* <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem> */}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
 
-                  ))}
-              </TableBody>
-            </Table>
-            
-          </CardContent>
-          <CardFooter>
-            {/* <div className="text-xs text-muted-foreground">
+                    ))}
+                </TableBody>
+              </Table>
+
+            </CardContent>
+            <CardFooter>
+              {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-          </CardFooter>
-        </Card>
-      </TabsContent>
-    </Tabs>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
       {/* {itemsList.value.map((item) => (
         <EditAcc item={item} key={item.itemId} hidden={true} />
       ))} */}

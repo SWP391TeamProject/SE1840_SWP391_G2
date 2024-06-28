@@ -35,7 +35,6 @@ export default function ProductStatus({ ...props }) {
                             name="status"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Username</FormLabel>
                                     <FormControl >
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <SelectTrigger id="status" aria-label="Select status">
