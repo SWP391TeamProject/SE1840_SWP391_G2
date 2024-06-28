@@ -20,6 +20,7 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {z} from "zod"
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Input} from "@/components/ui/input.tsx";
+import {containsWhitespace} from "@/lib/validator.ts";
 
 const formSchema = z.object({
     code: z.string().length(6, {
@@ -29,6 +30,10 @@ const formSchema = z.object({
     }),
     password: z.string().min(8, {
         message: "Password must be at least 8 characters.",
+    }).max(30, {
+        message: "Password must not be longer than 30 characters.",
+    }).refine((val) => !containsWhitespace(val), {
+        message: "Password should not contain spaces.",
     }),
     confirmPassword: z.string()
 }).refine(

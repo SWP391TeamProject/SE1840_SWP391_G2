@@ -9,14 +9,20 @@ import {changePassword} from "@/services/AuthService";
 import { useAuth } from "@/AuthProvider";
 import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
+import {containsWhitespace} from "@/lib/validator.ts";
 
 const formSchema = z.object({
     oldPassword: z.string({
         message: "Old password is required",
-    }).min(8, "Old password must contain at leats 8 characters").max(50, "Old password must contain at most 50 characters"),
+    }).min(8, "Old password must contain at least 8 characters")
+      .max(50, "Old password must contain at most 50 characters"),
     newPassword: z.string({
         message: "New password is required",
-    }).min(8, "New password must contain at leats 8 characters").max(50, "New password must contain at most 50 characters"),
+    }).min(8, "New password must contain at least 8 characters")
+      .max(30, "New password must contain at most 30 characters")
+      .refine((val) => !containsWhitespace(val), {
+          message: "Password should not contain spaces.",
+      }),
     confirmPassword: z.string(),
 }).superRefine((data, ctx) => {
     if (data.oldPassword === data.newPassword) {

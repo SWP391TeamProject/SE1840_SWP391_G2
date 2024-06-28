@@ -1,7 +1,7 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {ChangeEvent, useEffect, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -10,29 +10,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CameraIcon, Loader2 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/AuthProvider.tsx";
+import {CameraIcon, Loader2} from "lucide-react";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {useAuth} from "@/AuthProvider.tsx";
 import {Controller, SubmitHandler, useForm} from "react-hook-form";
-import { API_SERVER } from "@/constants/domain.ts";
-import { toast } from "react-toastify";
+import {API_SERVER} from "@/constants/domain.ts";
+import {toast} from "react-toastify";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form.tsx";
 
 type ProfileAvatar = {
   files?: FileList;
 }
 
-type ProfileDetails = {
-  nickname: string;
-  phone: string;
-}
+const profileDetailsSchema = z.object({
+  nickname: z.string().min(5, "Nickname must be at least 5 characters")
+    .max(20, "Nickname must not be longer than 20 characters"),
+  phone: z.string().max(15, "Phone must not be longer than 15 characters").optional(),
+});
 
-type TwoFactorAuth = {
-  enable2fa: boolean;
-  currentPassword: string;
-}
+const twoFactorAuthSchema = z.object({
+  enable2fa: z.boolean(),
+  currentPassword: z.string({
+    message: "Current password is required",
+  }).min(8, "Current password must contain at least 8 characters")
+    .max(50, "Current password must contain at most 50 characters"),
+});
 
 const ProfileDetail = () => {
   const auth = useAuth();
@@ -46,21 +60,15 @@ const ProfileDetail = () => {
       files: undefined
     }
   });
-  const {
-    register: profileDetailForm,
-    handleSubmit: handleProfileDetailForm
-  } = useForm<ProfileDetails>({
+  const profileDetailForm = useForm<z.infer<typeof profileDetailsSchema>>({
+    resolver: zodResolver(profileDetailsSchema),
     defaultValues: {
       nickname: auth.user.nickname,
       phone: auth.user.phone
     }
   });
-  const {
-    register: twoFactorAuthForm,
-    handleSubmit: handleTwoFactorAuthForm,
-    reset: resetTwoFactorAuthForm,
-    control: controlTwoFactorAuth
-  } = useForm<TwoFactorAuth>({
+  const twoFactorAuthForm = useForm<z.infer<typeof twoFactorAuthSchema>>({
+    resolver: zodResolver(twoFactorAuthSchema),
     defaultValues: {
       enable2fa: auth.user.require2fa,
       currentPassword: ""
@@ -114,7 +122,7 @@ const ProfileDetail = () => {
       })
   };
 
-  const onSubmitProfileDetails: SubmitHandler<ProfileDetails> = (data) => {
+  const onSubmitProfileDetails: SubmitHandler<z.infer<typeof profileDetailsSchema>> = (data) => {
     setIsLoading(true);
     axios.put<any>(API_SERVER + "/accounts/" + auth.user.accountId, data, {
       headers: {
@@ -139,7 +147,7 @@ const ProfileDetail = () => {
     })
   };
 
-  const onSubmitTwoFactorAuth: SubmitHandler<TwoFactorAuth> = (data) => {
+  const onSubmitTwoFactorAuth: SubmitHandler<z.infer<typeof twoFactorAuthSchema>> = (data) => {
     if (data.enable2fa === auth.user.require2fa) {
       toast.warning("Settings stay unchanged!", {
         position: "bottom-right",
@@ -157,7 +165,7 @@ const ProfileDetail = () => {
         position: "bottom-right",
       });
       setIsLoading(false);
-      resetTwoFactorAuthForm({
+      twoFactorAuthForm.reset({
         enable2fa: data.enable2fa,
         currentPassword: ""
       });
@@ -167,7 +175,7 @@ const ProfileDetail = () => {
         position: "bottom-right",
       });
       setIsLoading(false);
-      resetTwoFactorAuthForm({
+      twoFactorAuthForm.reset({
         enable2fa: auth.user.require2fa,
         currentPassword: ""
       });
@@ -189,11 +197,12 @@ const ProfileDetail = () => {
             <CardContent className="space-y-4">
               <div className="inline-block relative">
                 <Avatar className="w-[80px] h-[80px]">
-                  <div className="absolute inset-0 bg-black translate-y-12 bg-opacity-50 " >
-                    <CameraIcon className="w-6 h-6 m-auto text-white" />
+                  <div
+                    className="absolute inset-0 bg-black translate-y-12 bg-opacity-50 ">
+                    <CameraIcon className="w-6 h-6 m-auto text-white"/>
 
                   </div>
-                  <AvatarImage src={avatarPreview} alt="avatar" />
+                  <AvatarImage src={avatarPreview} alt="avatar"/>
                   <AvatarFallback>{auth.user.nickname.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <Input
@@ -211,9 +220,9 @@ const ProfileDetail = () => {
               <div className="flex gap-4">
                 {isLoading
                   ?
-                  <Button disabled >
+                  <Button disabled>
                     <Loader2
-                      className="mr-2 h-4 w-4 animate-spin" />
+                      className="mr-2 h-4 w-4 animate-spin"/>
                     Please wait
                   </Button>
                   : <Button
@@ -225,108 +234,145 @@ const ProfileDetail = () => {
         </Card>
 
         <Card>
-          <form
-            onSubmit={handleProfileDetailForm(onSubmitProfileDetails)}>
-            <CardHeader>
-              <CardTitle>Profile Details</CardTitle>
-              <CardDescription>
-                View and manage your personal information.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="nickname">Nickname</Label>
-                  <Input
-                    id="nickname"
-                    type="text"
-                    {...profileDetailForm("nickname")}
-                    required
-                  />
+          <Form {...profileDetailForm}>
+            <form
+              onSubmit={profileDetailForm.handleSubmit(onSubmitProfileDetails)}>
+              <CardHeader>
+                <CardTitle>Profile Details</CardTitle>
+                <CardDescription>
+                  View and manage your personal information.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <FormField
+                      control={profileDetailForm.control}
+                      name="nickname"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Nickname</FormLabel>
+                          <FormControl>
+                            <Input
+                              id="nickname"
+                              type="text"
+                              {...field}
+                              required
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <FormField
+                      control={profileDetailForm.control}
+                      name="phone"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <Input
+                              id="phone"
+                              type="phone"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="phone"
-                    {...profileDetailForm("phone")}
-                    required
-                  />
+              </CardContent>
+              <CardFooter>
+                <div className="flex gap-4">
+                  {isLoading
+                    ?
+                    <Button disabled>
+                      <Loader2
+                        className="mr-2 h-4 w-4 animate-spin"/>
+                      Please wait
+                    </Button>
+                    : <Button
+                      type="submit"
+                    >Save details</Button>}
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <div className="flex gap-4">
-                {isLoading
-                  ?
-                  <Button disabled >
-                    <Loader2
-                      className="mr-2 h-4 w-4 animate-spin" />
-                    Please wait
-                  </Button>
-                  : <Button
-                    type="submit"
-                  >Save details</Button>}
-              </div>
-            </CardFooter>
-          </form>
+              </CardFooter>
+            </form>
+          </Form>
         </Card>
 
 
         {/* insert change password below here */}
-        <ChangePassword isLoading={isLoading} setIsLoading={setIsLoading} />
+        <ChangePassword isLoading={isLoading} setIsLoading={setIsLoading}/>
 
         <Card>
-          <form
-            onSubmit={handleTwoFactorAuthForm(onSubmitTwoFactorAuth)}>
-            <CardHeader>
-              <CardTitle>Two-factor Authentication</CardTitle>
-              <CardDescription>
-                Enable or disable two-factor authentication.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                <div className="flex gap-2">
-                  <Controller
-                    control={controlTwoFactorAuth}
-                    name="enable2fa"
-                    render={({ field }) => (
-                      <Checkbox
-                        id="enable2fa"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    )}
-                  />
-                  <Label htmlFor="enable2fa">Enable two-factor authentication</Label>
+          <Form {...twoFactorAuthForm}>
+            <form
+              onSubmit={twoFactorAuthForm.handleSubmit(onSubmitTwoFactorAuth)}>
+              <CardHeader>
+                <CardTitle>Two-factor Authentication</CardTitle>
+                <CardDescription>
+                  Enable or disable two-factor authentication.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4">
+                  <div className="flex gap-2">
+                    <Controller
+                      control={twoFactorAuthForm.control}
+                      name="enable2fa"
+                      render={({field}) => (
+                        <Checkbox
+                          id="enable2fa"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Label htmlFor="enable2fa">Enable two-factor
+                      authentication</Label>
+                  </div>
+                  <div className="grid gap-2">
+                    <FormField
+                      control={twoFactorAuthForm.control}
+                      name="currentPassword"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Current password</FormLabel>
+                          <FormControl>
+                            <Input
+                              id="password2fa"
+                              type="password"
+                              {...field}
+                              required
+                            />
+                          </FormControl>
+                          <FormMessage/>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password2fa">Current password</Label>
-                  <Input
-                    id="password2fa"
-                    type="password"
-                    {...twoFactorAuthForm("currentPassword")}
-                    required
-                  />
+              </CardContent>
+              <CardFooter>
+                <div className="flex gap-4">
+                  {isLoading
+                    ?
+                    <Button disabled>
+                      <Loader2
+                        className="mr-2 h-4 w-4 animate-spin"/>
+                      Please wait
+                    </Button>
+                    : <Button
+                      type="submit"
+                    >Save</Button>}
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <div className="flex gap-4">
-                {isLoading
-                  ?
-                  <Button disabled >
-                    <Loader2
-                      className="mr-2 h-4 w-4 animate-spin" />
-                    Please wait
-                  </Button>
-                  : <Button
-                    type="submit"
-                  >Save</Button>}
-              </div>
-            </CardFooter>
-          </form>
+              </CardFooter>
+            </form>
+          </Form>
         </Card>
       </div>
 
