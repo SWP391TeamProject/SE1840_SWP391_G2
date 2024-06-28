@@ -28,14 +28,8 @@ const FormSchema = z.object({
     title: z.string().min(2, {
         message: "Title must be at least 2 characters.",
     }),
-    startDate: z.date(
-        {
-            message: "Start date is required.",
-        }),
-    endDate: z.date(
-        {
-            message: "End date is required.",
-        }),
+    startDate: z.string(),
+    endDate: z.string(),
     files: z.any(),
 })
 
@@ -56,15 +50,15 @@ export default function AuctionSessionCreate() {
         createAuctionSession(data).then(() => {
             setIsSubmitting(false)
             form.reset()
-            toast.success("Auction session created successfully.",{
-                position:"bottom-right",
+            toast.success("Auction session created successfully.", {
+                position: "bottom-right",
             })
 
         })
             .catch((err) => {
                 setIsSubmitting(false)
-                toast.error('An error occurred while creating the auction session.',{
-                    position:"bottom-right",
+                toast.error('An error occurred while creating the auction session.', {
+                    position: "bottom-right",
                 })
             })
     }
@@ -100,37 +94,9 @@ export default function AuctionSessionCreate() {
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
                                 <FormLabel>Start Date</FormLabel>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <FormControl>
-                                            <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-[240px] pl-3 text-left font-normal",
-                                                    !field.value && "text-muted-foreground"
-                                                )}
-                                            >
-                                                {field.value ? (
-                                                    format(field.value, "PPP")
-                                                ) : (
-                                                    <span>Pick a date</span>
-                                                )}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={(date) =>
-                                            date < new Date("1900-01-01")
-                                            }
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                <FormControl>
+                                    <input type="datetime-local" className="cursor-pointer bg-background text-foreground" {...field} />
+                                </FormControl>
                                 <FormDescription>
                                     this is the start date of the auction session
                                 </FormDescription>
@@ -145,40 +111,12 @@ export default function AuctionSessionCreate() {
                         name="endDate"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                                <FormLabel>End Date</FormLabel>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <FormControl>
-                                            <Button
-                                                variant={"outline"}
-                                                className={cn(
-                                                    "w-[240px] pl-3 text-left font-normal",
-                                                    !field.value && "text-muted-foreground"
-                                                )}
-                                            >
-                                                {field.value ? (
-                                                    format(field.value, "PPP")
-                                                ) : (
-                                                    <span>Pick a date</span>
-                                                )}
-                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                            </Button>
-                                        </FormControl>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            disabled={(date) =>
-                                             date < new Date("1900-01-01")
-                                            }
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                <FormLabel>Start Date</FormLabel>
+                                <FormControl>
+                                    <input type="datetime-local" className="cursor-pointer bg-background text-foreground" {...field} />
+                                </FormControl>
                                 <FormDescription>
-                                    this is the end of the auction session
+                                    this is the start date of the auction session
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>

@@ -36,6 +36,7 @@ public class BlogPostDTO {
         if(author!=null){
             author.setPassword(null);
         }
+
     }
     // getters and setters
     // ...

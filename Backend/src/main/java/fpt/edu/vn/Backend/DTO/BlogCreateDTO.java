@@ -1,9 +1,6 @@
 package fpt.edu.vn.Backend.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -22,5 +19,4 @@ public class BlogCreateDTO {
     private List<MultipartFile> files;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-
 }

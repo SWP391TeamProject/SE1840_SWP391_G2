@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -42,7 +44,6 @@ public class NotificationServiceImpl implements NotificationService {
     public @NotNull NotificationDTO sendNotification(@NotNull NotificationDTO dto) {
         Account acc = accountRepos.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", dto.getUserId()));
-
         Notification noti = new Notification();
         noti.setAccount(acc);
         noti.setRead(dto.isRead());
@@ -50,6 +51,21 @@ public class NotificationServiceImpl implements NotificationService {
         noti.setType(dto.getType());
 
         return new NotificationDTO(notificationRepos.save(noti));
+    }
+
+    @Override
+    @Transactional
+    public @NotNull NotificationDTO sendNotificationToAllMembers(@NotNull NotificationDTO dto){
+        List<Account> memberAccounts = accountRepos.findByRole(Account.Role.MEMBER);
+        for (Account account : memberAccounts) {
+            Notification notification = new Notification();
+            notification.setAccount(account);
+            notification.setMessage(dto.getMessage());
+            notification.setType(dto.getType());
+            notification.setRead(dto.isRead());
+            notificationRepos.save(notification);
+        }
+        return dto;
     }
 
     @Override
