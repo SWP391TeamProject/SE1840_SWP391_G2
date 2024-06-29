@@ -35,10 +35,10 @@ public class Item {
     @Column(length = 10000,columnDefinition = "NVARCHAR(max)")
     private String description;
 
-    @Column(name = "reserve_price")
+    @Column(name = "reserve_price", precision = 20, scale = 8)
     private BigDecimal reservePrice;
 
-    @Column(name = "buy_in_price")
+    @Column(name = "buy_in_price", precision = 20, scale = 8)
     private BigDecimal buyInPrice;
 
     public enum Status {

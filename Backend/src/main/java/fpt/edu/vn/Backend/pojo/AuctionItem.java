@@ -29,7 +29,7 @@ public class AuctionItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @Column(name = "current_price")
+    @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
 
     @CreationTimestamp

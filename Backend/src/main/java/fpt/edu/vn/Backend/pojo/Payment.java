@@ -21,7 +21,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int paymentId;
 
-    @Column(name = "payment_amount")
+    @Column(name = "payment_amount", precision = 20, scale = 8)
     private BigDecimal paymentAmount;
 
     public enum Status {
