@@ -8,9 +8,11 @@ import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
+import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
+import fpt.edu.vn.Backend.repository.NotificationRepos;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,14 +40,16 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     ConsignmentRepos consignmentRepos;
     AccountRepos accountRepos;
     ConsignmentDetailRepos consignmentDetailRepos;
+    NotificationRepos notificationRepos;
     private static final Logger logger = LoggerFactory.getLogger(ConsignmentServiceImpl.class);
 
     @Autowired
-    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos) {
+    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos) {
         this.consignmentRepos = consignmentRepos;
         this.accountRepos = accountRepos;
         this.accountService = accountService;
         this.consignmentDetailRepos = consignmentDetailRepos;
+        this.notificationRepos = notificationRepos;
     }
 
 
@@ -94,6 +99,20 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.getConsignmentDetails().add(detail);
             consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
             consignmentRepos.save(consignment);
+
+            Notification notification = new Notification();
+            notification.setAccount(consignment.getStaff());
+            if (consignment.getStaff() != null) {
+                notification.setMessage("Update Status To IN_INITIAL_EVALUATION By" + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            } else {
+                notification.setMessage("Update Status To IN_INITIAL_EVALUATION By unknown staff");
+            }
+            notification.setType("Update Info");
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            notificationRepos.save(notification);
+
             return new ConsignmentDetailDTO(detail);
         } catch (Exception e) {
             logger.error("Error submitting initial evaluation", e);
@@ -137,6 +156,20 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.getConsignmentDetails().add(detail);
             consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
             consignmentRepos.save(consignment);
+
+            Notification notification = new Notification();
+            notification.setAccount(consignment.getStaff());
+            if (consignment.getStaff() != null) {
+                notification.setMessage("Update Status To FINAL_EVALUATION By" + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            } else {
+                notification.setMessage("Update Status To FINAL_EVALUATION By unknown staff");
+            }
+            notification.setType("Update Info");
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            notificationRepos.save(notification);
+
             return new ConsignmentDetailDTO(detail);
         } catch (Exception e) {
             logger.error("Error submitting final evaluation", e);
@@ -151,6 +184,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     .orElse(null);
             if (consignment.getStatus() == Consignment.Status.SENDING) {
                 consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
+
+                Notification notification = new Notification();
+                notification.setAccount(consignment.getStaff());
+                if (consignment.getStaff() != null) {
+                    notification.setMessage("Confirm Jewelry Received By" + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+                } else {
+                    notification.setMessage("Confirm Jewelry Received By unknown staff");
+                }
+                notification.setType("Confirm");
+                notification.setRead(false);
+                notification.setCreateDate(LocalDateTime.now());
+                notification.setUpdateDate(LocalDateTime.now());
                 consignmentRepos.save(consignment);
             } else {
                 throw new ConsignmentServiceException("Consignment is not SENDING");
@@ -185,6 +230,19 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
                 consignment.getConsignmentDetails().add(consignmentDetail);
                 // Save the consignment
+                Notification notification = new Notification();
+                notification.setAccount(consignment.getStaff());
+                if (consignment.getStaff() != null) {
+                    notification.setMessage("Accepted By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+                } else {
+                    notification.setMessage("Accepted By unknown staff");
+                }
+                notification.setType("Accepted");
+                notification.setRead(false);
+                notification.setCreateDate(LocalDateTime.now());
+                notification.setUpdateDate(LocalDateTime.now());
+                notificationRepos.save(notification);
+
                 consignmentRepos.save(consignment);
             } else {
                 throw new ConsignmentServiceException("Consignment is not in final evaluation status");
@@ -221,6 +279,19 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
                 consignment.getConsignmentDetails().add(consignmentDetail);
                 // Save the consignment
+                Notification notification = new Notification();
+                notification.setAccount(consignment.getStaff());
+                if (consignment.getStaff() != null) {
+                    notification.setMessage("Rejected By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+                } else {
+                    notification.setMessage("Rejected By unknown staff");
+                }
+                notification.setType("Rejected");
+                notification.setRead(false);
+                notification.setCreateDate(LocalDateTime.now());
+                notification.setUpdateDate(LocalDateTime.now());
+                notificationRepos.save(notification);
+
                 consignmentRepos.save(consignment);
             } else {
                 throw new ConsignmentServiceException("Consignment is not in final evaluation status");
@@ -308,6 +379,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
 
             consignment.setStaff(updatedConsignment.getStaff() == null ? null : accountRepos.findById(updatedConsignment.getStaff().getAccountId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
+
+            Notification notification = new Notification();
+            notification.setAccount(consignment.getStaff());
+            if (consignment.getStaff() != null) {
+                notification.setMessage("Update Consignment By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            } else {
+                notification.setMessage("Update Info By unknown staff");
+            }
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            notificationRepos.save(notification);
 
             consignmentRepos.save(consignment);
         } catch (Exception e) {
