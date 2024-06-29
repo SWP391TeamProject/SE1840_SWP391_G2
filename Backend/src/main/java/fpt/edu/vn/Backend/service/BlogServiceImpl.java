@@ -51,19 +51,24 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
-        BlogPost blogPost = toEntity(BlogPostDTO);
-        blogPost.setCreateDate(LocalDateTime.now());
-        blogPost.setUpdateDate(LocalDateTime.now());
-//        Account account = blogPost.getAuthor();
-//
-//        if (account.getRole() == Account.Role.ADMIN) {
-//            Notification notifications = notificationRepos.findByAccount_AccountId(account.getAccountId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Account", "id", account.getAccountId()));
-//            Notification notification = notificationRepos.findById(notifications.getNotificationId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notifications.getNotificationId()));
-//            NotificationDTO notificationDTO = new NotificationDTO(notification);
-//            notificationService.sendNotificationToAllMembers(notificationDTO);
-//        }
+
+            BlogPost blogPost = toEntity(BlogPostDTO);
+            blogPost.setCreateDate(LocalDateTime.now());
+            blogPost.setUpdateDate(LocalDateTime.now());
+        Account account = blogPost.getAuthor();
+
+        if (account.getRole() == Account.Role.ADMIN) {
+            Notification notification = new Notification();
+            notification.setAccount(account);
+            notification.setType("Admin");
+            notification.setMessage("Blog Created By " + account.getNickname() + " " + account.getRole());
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            NotificationDTO notificationDTO = new NotificationDTO(notification);
+            notificationService.sendNotificationToAllMembers(notificationDTO);
+        }
+
 
         return new BlogPostDTO(blogPostRepos.save(blogPost));
     }
