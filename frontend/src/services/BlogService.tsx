@@ -62,14 +62,19 @@ class BlogService {
         return axios.post(this.BASE_URL+"/",blog, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                  
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         });
     }
 
     public static updateBlog(id: number, blog: any) {
-        return axios.put(`${this.BASE_URL}/${id}`, blog);
+        return axios.put(`${this.BASE_URL}/${id}`, blog, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                  
+                Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        });
     }
 
     public static deleteBlog(id: number) {

@@ -6,10 +6,10 @@ import { toast } from 'react-toastify';
 class BlogCategoryService {
     private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;
 
-    public static getAllBlogCategories(page: number, size: number) {
+    public static getAllBlogCategories(page?: number, size?: number) {
         let params = {
-            page: page,
-            size: size,
+            page: page || 0,
+            size: size || 50,
         }
         return axios.get(`${this.BASE_URL}/`, {
             headers: {
