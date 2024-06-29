@@ -65,7 +65,9 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             Payment payment = new Payment();
             BigDecimal exchangeRate = BigDecimal.valueOf(currencyService.getExchangeRate(CurrencyType.VND));
-            payment.setPaymentAmount(paymentRequest.getAmount().divide(exchangeRate, RoundingMode.DOWN));
+            payment.setPaymentAmount(paymentRequest.getAmount().divide(exchangeRate, 10, RoundingMode.HALF_DOWN));
+            log.info("exchange rate: " + exchangeRate);
+            log.info("payment amount: " + payment.getPaymentAmount());
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
             Optional<Account> accountOptional = accountRepos.findByAccountId(paymentRequest.getAccountId());
