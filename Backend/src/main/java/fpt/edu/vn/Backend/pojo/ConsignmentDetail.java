@@ -33,7 +33,7 @@ public class ConsignmentDetail {
     @Enumerated(EnumType.STRING)
     private ConsignmentStatus status;
 
-    @Column(name = "price")
+    @Column(name = "price", precision = 20, scale = 8)
     private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)

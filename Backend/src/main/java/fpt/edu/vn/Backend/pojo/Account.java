@@ -79,7 +79,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Status status = Status.DISABLED;
 
-    @Column(name = "balance")
+    @Column(name = "balance", precision = 20, scale = 8)
     private BigDecimal balance = new BigDecimal(0);
 
     @CreationTimestamp
