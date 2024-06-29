@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import logo from "@/assets/icon.png";
 export const Contact = () => {
     const [contactMethod, setContactMethod] = useState('phone'); // Default contact method
 
@@ -27,14 +27,13 @@ export const Contact = () => {
     };
 
     return (
-        <>
-            <div className="contact-us flex flex-col items-center justify-center bg-gradient-to-r p-8  text-foreground">
-                <h1 className="text-5xl font-bold text-center  mb-8">Biddify - Contact Us</h1>
-                <div className="block sm:flex justify-center md:flex-row md:space-x-16 w-full mb-16">
-                    <div className="contact-info flex flex-col space-y-4 w-5/12 ">
-                        <img src="https://github.com/SWP391TeamProject/SE1840_SWP391_G2/raw/develop/images/logo-cut.svg" alt="Biddify Logo" className=" mx-auto mb-4" />
-                    </div>
-                    {/* <div className="contact-form mx-auto  sm:mx-0  w-4/12">
+        <div className="contact-us flex flex-col items-center justify-center bg-gradient-to-r p-8  text-foreground">
+            <h1 className="text-5xl font-bold text-center  mb-8">Biddify - Contact Us</h1>
+            <div className="block sm:flex justify-center md:flex-row md:space-x-16 w-full mb-16">
+                <div className="contact-info flex flex-col space-y-4 w-5/12 ">
+                    <img src={logo} alt="Biddify Logo" className=" mx-auto mb-4" />
+                </div>
+                {/* <div className="contact-form mx-auto  sm:mx-0  w-4/12">
                         <h3 className="text-3xl font-semibold  mb-4">Have a Question?</h3>
                         <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
                             <div className="flex items-center space-x-2">
@@ -66,8 +65,9 @@ export const Contact = () => {
                             </button>
                         </form>
                     </div> */}
-                </div>
-                <div className='block sm:flex justify-evenly w-full'>
+            </div>
+            <div className=' block md:flex justify-evenly w-full'>
+                <div className='md:w-2/5 mb-6'>
                     <address className="font-medium  sm:mr-8">
                         <p>
                             <span className=" font-bold">Address:</span> Lot E2a-7, Street D1 High-Tech Park, Long Thanh My Ward, City. Thu Duc, City. Ho Chi Minh
@@ -85,8 +85,9 @@ export const Contact = () => {
                         </li>
                     </ul>
                 </div>
+                <iframe className='rounded-sm border-2' src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.61001089798!2d106.80501207961838!3d10.841127561752279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752731176b07b1%3A0xb752b24b379bae5e!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBGUFQgVFAuIEhDTQ!5e0!3m2!1svi!2s!4v1719675100726!5m2!1svi!2s" width="400" height="300" loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Google Maps"></iframe>
             </div>
-        </>
+        </div>
 
     )
 }

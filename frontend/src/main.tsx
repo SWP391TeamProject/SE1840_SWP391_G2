@@ -127,7 +127,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id"
                         element={<AuctionSession />}></Route>
-                      <Route path="Auctions/:id/:id" element={<AuctionJoin />} />
+                      <Route path="Auctions/:id/*" element={<AuctionJoin />} />
                       <Route path="items" element={<ItemList />} />
 
                       <Route element={<PrivateRoute

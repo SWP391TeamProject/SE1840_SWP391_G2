@@ -12,12 +12,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 import { AuctionSessionStatus } from '@/constants/enums'
 
-import { SERVER_DOMAIN_URL } from '@/constants/domain'
+import { API_SERVER, SERVER_DOMAIN_URL } from '@/constants/domain'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useCurrency } from '@/CurrencyProvider'
+import { CurrencyType, useCurrency } from '@/CurrencyProvider'
 import { Item } from '@/models/Item'
 import { getAllItemCategories } from '@/services/ItemCategoryService'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { set } from 'date-fns'
 
 
 
@@ -37,7 +38,8 @@ export default function AuctionSession() {
     const [bidders, setBidders] = useState<number[]>([]);
     const user = JSON.parse(getCookie("user") || "null");
     const userId = user == null ? -1 : user.id;
-
+    const [alertBalance, setAlertBalance] = useState(null);
+    const [registerFee, setRegisterFee] = useState(0);
     useEffect(() => {
         if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
@@ -76,8 +78,8 @@ export default function AuctionSession() {
             setCategories(res.data.content)
         }
         ).catch(error => {
-            toast.error(error,{
-                position:"bottom-right",
+            toast.error(error, {
+                position: "bottom-right",
             });
         });
 
@@ -98,6 +100,27 @@ export default function AuctionSession() {
         }
     }, [auctionSession])
 
+    function deposit() {
+        axios.post(`${API_SERVER}/payments/create`, {
+            amount: registerFee * 25000,
+            type: "DEPOSIT",
+            status: "PENDING",
+            accountId: JSON.parse(getCookie("user"))?.id,
+            ipAddr: "",
+            orderInfoType: "DEPOSIT",
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+
+                Authorization: "Bearer " + JSON.parse(getCookie("user"))?.accessToken,
+            },
+        }).then(response => {
+            console.log(response.data);
+            window.location.href = response.data;
+        }).catch(error => {
+            console.log(error);
+        });
+    }
     const handleRegister = () => {
         registerAuctionSession(auctionSession?.auctionSessionId ?? -1).then(res => {
             res.data.deposits.forEach((deposit: any) => {
@@ -110,7 +133,35 @@ export default function AuctionSession() {
                     position: "bottom-right",
                 }
             );
-        })
+        }).catch(err => {
+            if (err.response.data.message === "Account balance is not enough to register for auction session") {
+                setAlertBalance(<div>
+                    <AlertDialog open={err}>
+                        <AlertDialogContent className='text-foreground'>
+                            <AlertDialogHeader >
+                                <AlertDialogTitle> Deposit Balance </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Account balance is not enough to register for auction session.
+                                    Do you want to deposit?
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setAlertBalance(null)} >Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deposit()}>Deposit</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+                );
+                // Usage:
+            };
+            toast.error(err.response.data.message,
+                {
+                    position: "bottom-right",
+                }
+            );
+
+        });
     }
     const ConfirmRegister = () => {
         if (userId == -1) {
@@ -149,6 +200,7 @@ export default function AuctionSession() {
         if (fee > 1000) {
             fee = 1000;
         }
+        setRegisterFee(fee);
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
@@ -162,7 +214,7 @@ export default function AuctionSession() {
                             directly withdraw your balance.
                             <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>Auction Registration Fee: {currency.format({amount: fee})}</p>
+                            '>Auction Registration Fee: {currency.format({ amount: fee })}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -211,6 +263,7 @@ export default function AuctionSession() {
         if (fee > 1000) {
             fee = 1000;
         }
+        setRegisterFee(fee);
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
@@ -225,7 +278,7 @@ export default function AuctionSession() {
                             Do you want to continue?
                             <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>Auction Registration Fee: {currency.format({amount: fee})}</p>
+                            '>Auction Registration Fee: {currency.format({ amount: fee })}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -238,7 +291,7 @@ export default function AuctionSession() {
     }
 
     const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-        console.log(item, auctionId,bidders.includes(userId) );
+        console.log(item, auctionId, bidders.includes(userId));
         navigate(`/auctions/${auctionId}/${item.name}`, {
             state: {
                 id: {
@@ -246,13 +299,17 @@ export default function AuctionSession() {
                     itemId: item.itemId
                 },
                 itemDTO: item,
-                allow: bidders.includes(userId) 
+                allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
             }
         });
 
     }
 
     const handleCategoryFilter = (...event: any) => {
+        if (event[0] === "All") {
+            setItems(auctionSession.auctionItems);
+            return;
+        }
         setItems(auctionSession.auctionItems.filter(item => item.itemDTO.category.name == event[0]));
     }
 
@@ -290,7 +347,7 @@ export default function AuctionSession() {
                                         <span>Start in {auctionSession?.startDate ? <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
 
                                 </div>
-
+                                {alertBalance}
 
                                 {bidders.includes(userId) ? (
                                     auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
@@ -323,17 +380,17 @@ export default function AuctionSession() {
                         <div className='flex justify-between items-center'>
                             <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
                             <div className='w-full mb-5 basis-1/3'>
-                            <Select onValueChange={handleCategoryFilter} defaultValue="All">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a theme to display" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="All" key={0}>All</SelectItem>
-                                    {categories && categories.map((category) => (
-                                        <SelectItem value={category.name} key={category.itemCategoryId}>{category.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                <Select onValueChange={handleCategoryFilter} defaultValue="All">
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a theme to display" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="All" key={0}>All</SelectItem>
+                                        {categories && categories.map((category) => (
+                                            <SelectItem value={category.name} key={category.itemCategoryId}>{category.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -374,7 +431,7 @@ export default function AuctionSession() {
                                                         {bidders.includes(userId) ? (
                                                             <Button onClick={() => {
                                                                 let name = item?.itemDTO.name;
-                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO , allow:true} });
+                                                                navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
                                                             }}>Place Bid</Button>
                                                         ) : (
                                                             <RegisterAlert></RegisterAlert>

@@ -196,13 +196,6 @@ export const registerAuctionSession = async (id: number) => {
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
-        })
-        .catch((err) => {
-
-            if (err?.response.status == 401) {
-                removeCookie("user");
-                removeCookie("token");
-            }
         });
 }
 

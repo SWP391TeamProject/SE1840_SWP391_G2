@@ -23,6 +23,7 @@ import { getCookie } from "@/utils/cookies"
 
 import { useCurrency } from "@/CurrencyProvider"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { AuctionSessionStatus } from "@/constants/enums"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -106,7 +107,7 @@ export function ItemList() {
 
   const handleViewItemDetailsClick = async (item: Item, auction: AuctionSession) => {
     let registered = false;
-    if (getCookie("user").length > 0){
+    if (getCookie("user").length > 0) {
       auction?.deposits.forEach((deposit: any) => {
         if (deposit.payment.accountId == JSON.parse(getCookie("user"))?.id) {
           registered = true;
@@ -120,7 +121,7 @@ export function ItemList() {
           itemId: item.itemId
         },
         itemDTO: item,
-        allow: registered
+        allow: registered && auction.status === AuctionSessionStatus.PROGRESSING
       }
     });
 
@@ -131,7 +132,6 @@ export function ItemList() {
     fetchActiveAuctionSessions().then((res) => {
       setAuctions(res?.data.content);
       setIsLoading(false);
-
 
     });
     getAllItemCategories(0, 50).then((res) => {

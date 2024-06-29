@@ -69,6 +69,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (items.isEmpty()) {
             throw new ResourceNotFoundException("No items found in auction session");
         }
+        items.sort(Comparator.comparing(Item::getReservePrice));
         BigDecimal minPrice = new BigDecimal(100);
         BigDecimal maxPrice = new BigDecimal(1000);
         BigDecimal depositAmount = items.get(0).getReservePrice()
