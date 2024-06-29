@@ -2,9 +2,12 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
+import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.BlogPost;
+import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,16 +55,18 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
 
-            BlogPost blogPost = toEntity(BlogPostDTO);
-            blogPost.setCreateDate(LocalDateTime.now());
-            blogPost.setUpdateDate(LocalDateTime.now());
+        BlogPost blogPost = toEntity(BlogPostDTO);
+        blogPost.setCreateDate(LocalDateTime.now());
+        blogPost.setUpdateDate(LocalDateTime.now());
+        blogPost = blogPostRepos.save(blogPost);
         Account account = blogPost.getAuthor();
 
         if (account.getRole() == Account.Role.ADMIN) {
             Notification notification = new Notification();
             notification.setAccount(account);
             notification.setType("Admin");
-            notification.setMessage("Blog Created By " + account.getNickname() + " " + account.getRole());
+            notification.setMessage("New Blog Was Created By " + account.getNickname() + " - " + account.getRole() + ".<br/>" +
+                    "<a href='/blogs/" + blogPost.getPostId() + "'><strong>Click here to view</strong></a>");
             notification.setRead(false);
             notification.setCreateDate(LocalDateTime.now());
             notification.setUpdateDate(LocalDateTime.now());
@@ -69,8 +74,7 @@ public class BlogServiceImpl implements BlogService {
             notificationService.sendNotificationToAllMembers(notificationDTO);
         }
 
-
-        return new BlogPostDTO(blogPostRepos.save(blogPost));
+        return new BlogPostDTO(blogPost);
     }
 
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {

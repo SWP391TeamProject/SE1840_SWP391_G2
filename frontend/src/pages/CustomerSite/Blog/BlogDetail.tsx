@@ -1,6 +1,6 @@
 import Footer from '@/components/footer/Footer';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setCurrentBlogPost } from '@/redux/reducers/Blogs';
+import { setCurrentBlogPost, setCurrentPageList } from '@/redux/reducers/Blogs';
 import BlogService from '@/services/BlogService';
 import { set } from 'date-fns';
 import React, { useEffect } from 'react'
@@ -30,6 +30,28 @@ export const BlogDetail = () => {
     let content = temp?.join('\n');
 
     useEffect(() => {
+        if (!currentBlog) {
+            BlogService.getBlogById(parseInt(param.id)).then((res) => {
+                dispatch(setCurrentBlogPost(res.data));
+            }).catch(error => {
+                toast.error('There was an error!', {
+                    position: "bottom-right",
+                });
+            });
+        };
+        if (!blogList || blogList.length == 0) {
+            BlogService.getAllBlogs().then((res) => {
+                dispatch(setCurrentPageList(res.data.content));
+                setNewBlogs(res.data.content.filter((blog) => blog.postId != currentBlog?.postId));
+                setRelatedBlogs(res.data.content.filter((blog) =>
+                    blog.category.blogCategoryId == currentBlog?.category.blogCategoryId
+                    && blog.postId != currentBlog?.postId));
+            }).catch(error => {
+                toast.error('There was an error!', {
+                    position: "bottom-right",
+                });
+            });
+        };
         window.scrollTo(0, 0);
     }, []);
 
@@ -88,7 +110,7 @@ export const BlogDetail = () => {
                                                 alt="Recent Blog Post"
                                                 className="w-full h-40 object-cover"
                                             />
-                                            <div className="p-4 bg-white dark:bg-gray-950">
+                                            <div className="p-4 bg-white dark:bg-gray-950 h-full">
                                                 <h3 className="text-lg font-bold mb-2">
                                                     {blog?.title}
                                                 </h3>
@@ -122,7 +144,7 @@ export const BlogDetail = () => {
                                                 alt="Recent Blog Post"
                                                 className="w-full h-40 object-cover"
                                             />
-                                            <div className="p-4 bg-white dark:bg-gray-950">
+                                            <div className="p-4 bg-white dark:bg-gray-950 h-full">
                                                 <h3 className="text-lg font-bold mb-2">
                                                     {blog?.title}
                                                 </h3>

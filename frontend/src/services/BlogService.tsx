@@ -5,10 +5,10 @@ import axios from 'axios';
 class BlogService {
     private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blogs`;
 
-    public static getAllBlogs(page: number, size: number) {
+    public static getAllBlogs(page?: number, size?: number) {
         let params = {
-            page: page,
-            size: size,
+            page: page || 0,
+            size: size || 50,
         }
         return axios.get(`${this.BASE_URL}/`, {
             headers: {
