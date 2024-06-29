@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
-import ProductPrice from "./ProductPrice";
+// import ProductPrice from "./ProductPrice";
 
 import { Button } from "@/components/ui/button"
 import {
