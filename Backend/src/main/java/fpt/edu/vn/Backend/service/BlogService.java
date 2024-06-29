@@ -12,4 +12,5 @@ public interface BlogService {
     void deleteBlog(int id);
     Page<BlogPostDTO> searchBlog(String keyword, Pageable pageable);
     Page<BlogPostDTO> getBlogByCategory(int categoryId, Pageable pageable);
+    BlogPostDTO deleteAttachment(int postId, int attachmentId);
 }

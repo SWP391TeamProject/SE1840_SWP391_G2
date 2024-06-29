@@ -1,9 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
-import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
-import fpt.edu.vn.Backend.pojo.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +24,7 @@ public interface AttachmentService {
 
     @Nullable AttachmentDTO getAttachmentById(int id);
 
-    boolean deleteAttachment(int attachmentId);
+    void deleteAttachment(int attachmentId);
 
     @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, int accountId) throws IOException;
     @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, int consignmentDetailId);

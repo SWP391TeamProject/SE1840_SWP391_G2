@@ -57,6 +57,7 @@ export default function AuctionJoin() {
       return;
     }
     const newClient = new Client({
+      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
       // onDisconnect: () => {
       //   toast.error('You have been disconnected from the auction');
       // },

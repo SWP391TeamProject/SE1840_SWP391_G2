@@ -47,11 +47,10 @@ export const BlogPostList = () => {
   }
 
   const handleEditClick = (blogId: number) => {
-    let blog = blogsList.value.find(blog => blog.postId == blogId);
-    console.log(blog);
+    let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
     // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
     dispatch(setCurrentBlogPost(blog));
-    navigate("/admin/blogs/edit");
+    navigate("/admin/blogs/"+blogId+"/edit");
   }
 
   const handleCreateClick = () => {

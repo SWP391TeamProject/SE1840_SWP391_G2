@@ -5,10 +5,10 @@ import axios from 'axios';
 class BlogService {
     private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blogs`;
 
-    public static getAllBlogs(page: number, size: number) {
+    public static getAllBlogs(page?: number, size?: number) {
         let params = {
-            page: page,
-            size: size,
+            page: page || 0,
+            size: size || 50,
         }
         return axios.get(`${this.BASE_URL}/`, {
             headers: {
@@ -62,14 +62,19 @@ class BlogService {
         return axios.post(this.BASE_URL+"/",blog, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                  
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         });
     }
 
     public static updateBlog(id: number, blog: any) {
-        return axios.put(`${this.BASE_URL}/${id}`, blog);
+        return axios.put(`${this.BASE_URL}/${id}`, blog, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                  
+                Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        });
     }
 
     public static deleteBlog(id: number) {

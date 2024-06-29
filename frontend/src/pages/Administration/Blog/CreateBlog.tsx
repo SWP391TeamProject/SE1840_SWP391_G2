@@ -15,6 +15,7 @@ import { getCookie } from '@/utils/cookies'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { z } from 'zod'
 
@@ -45,6 +46,7 @@ const formSchema = z.object({
 );
 export const CreateBlog = () => {
     const [category, setCategory] = useState<BlogCategory[]>([]);
+    const nav = useNavigate();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -64,7 +66,7 @@ export const CreateBlog = () => {
         }
         ).catch(error => {
             toast.error('There was an error!', {
-                position:"bottom-right",
+                position: "bottom-right",
             });
         });
     }, [])
@@ -74,15 +76,16 @@ export const CreateBlog = () => {
         console.log(data);
         BlogService.createBlog(data).then((res) => {
             console.log(res);
-            toast.success('Blog created successfully!',{
-                position:"bottom-right",
+            toast.success('Blog created successfully!', {
+                position: "bottom-right",
             });
             form.reset();
+            nav('/admin/blogs');
         }
         ).catch(error => {
             console.log(error);
-            toast.error('There was an error!',{
-                position:"bottom-right",
+            toast.error('There was an error!', {
+                position: "bottom-right",
             });
         });
 
@@ -138,7 +141,7 @@ export const CreateBlog = () => {
                             control={form.control}
                             name="content"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className='h-1/2'>
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
                                         <TextEditor {...field} placeholder="description..." />
@@ -160,10 +163,13 @@ export const CreateBlog = () => {
                             />
 
                         </ScrollArea>
-                        <Separator />
-                        <input type="hidden" {...form.register(`userId`)} />
 
-                        <Button className="sticky bottom-1" type="submit">Submit</Button>
+                        <input type="hidden" {...form.register(`userId`)} />
+                        <div className="sticky bottom-1">
+                            <Separator />
+                            <Button className='mt-2' type="submit">Submit</Button>
+                        </div>
+
                     </form>
                 </Form>
             </div>
