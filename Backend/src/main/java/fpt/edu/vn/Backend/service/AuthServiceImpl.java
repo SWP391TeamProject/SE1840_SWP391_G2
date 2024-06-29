@@ -43,6 +43,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -310,7 +312,8 @@ public class AuthServiceImpl implements AuthService {
         helper.setTo(a.getEmail());
         helper.setSubject("[Biddify] Reset Password");
         // Read the HTML file into a String
-        String htmlContent = new String(Files.readAllBytes(resourceLoader.getResource("classpath:templates/resetpasswordEmail.html").getFile().toPath()));
+        InputStream inputStream = resourceLoader.getResource("classpath:templates/resetpasswordEmail.html").getInputStream();
+        String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         // Replace placeholders in the HTML content with actual values
         htmlContent = htmlContent.replace("{code}", code);
         htmlContent = htmlContent.replace("{link}", String.format(resetEmailLink, code));
