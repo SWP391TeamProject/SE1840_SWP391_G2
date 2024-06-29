@@ -45,32 +45,21 @@ export default function ConsignmentList() {
 
     const fetchConsignments = async (pageNumber: number, status?: ConsignmentStatus) => {
         try {
+            let res;
             if (status) {
-                const res = await fetchConsignmentsByStatusService(pageNumber, 10, status);
-
-                if (res) {
-                    console.log(res);
-
-                    dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-                    let paging: any = {
-                        pageNumber: res.data.number,
-                        totalPages: res.data.totalPages
-                    }
-                    dispatch(setCurrentPageNumber(paging));
-                }
+                res = await fetchConsignmentsByStatusService(pageNumber, 10, status);
             } else {
-                const res = await fetchAllConsignmentsService(pageNumber, 10);
+                res = await fetchAllConsignmentsService(pageNumber, 10);
+            }
+            if (res) {
+                console.log(res);
 
-                if (res) {
-                    console.log(res);
-
-                    dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-                    let paging: any = {
-                        pageNumber: res.data.number,
-                        totalPages: res.data.totalPages
-                    }
-                    dispatch(setCurrentPageNumber(paging));
+                dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+                let paging: any = {
+                    pageNumber: res.data.number,
+                    totalPages: res.data.totalPages
                 }
+                dispatch(setCurrentPageNumber(paging));
             }
         } catch (error) {
             console.log(error);
