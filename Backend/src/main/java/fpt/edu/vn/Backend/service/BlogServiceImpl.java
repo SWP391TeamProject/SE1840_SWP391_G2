@@ -1,15 +1,14 @@
 package fpt.edu.vn.Backend.service;
 
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
 import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.BlogPost;
 import fpt.edu.vn.Backend.pojo.Notification;
-import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
-import fpt.edu.vn.Backend.repository.BlogPostRepos;
-import fpt.edu.vn.Backend.repository.NotificationRepos;
+import fpt.edu.vn.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,10 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class BlogServiceImpl implements BlogService{
+public class BlogServiceImpl implements BlogService {
     @Autowired
     private BlogPostRepos blogPostRepos;
     @Autowired
@@ -33,6 +33,10 @@ public class BlogServiceImpl implements BlogService{
 
     @Autowired
     private NotificationRepos notificationRepos;
+    @Autowired
+    private AttachmentService attachmentService;
+    @Autowired
+    private AttachmentRepos attachmentRepos;
 
 
     @Override
@@ -50,21 +54,27 @@ public class BlogServiceImpl implements BlogService{
 
     @Override
     public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
-            BlogPost blogPost = toEntity(BlogPostDTO);
-            blogPost.setCreateDate(LocalDateTime.now());
-            blogPost.setUpdateDate(LocalDateTime.now());
+
+        BlogPost blogPost = toEntity(BlogPostDTO);
+        blogPost.setCreateDate(LocalDateTime.now());
+        blogPost.setUpdateDate(LocalDateTime.now());
+        blogPost = blogPostRepos.save(blogPost);
         Account account = blogPost.getAuthor();
 
         if (account.getRole() == Account.Role.ADMIN) {
-            Notification notifications = notificationRepos.findByAccount_AccountId(account.getAccountId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account", "id", account.getAccountId()));
-            Notification notification = notificationRepos.findById(notifications.getNotificationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notifications.getNotificationId()));
+            Notification notification = new Notification();
+            notification.setAccount(account);
+            notification.setType("Admin");
+            notification.setMessage("New Blog Was Created By " + account.getNickname() + " - " + account.getRole() + ".<br/>" +
+                    "<a href='/blogs/" + blogPost.getPostId() + "'><strong>Click here to view</strong></a>");
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
             NotificationDTO notificationDTO = new NotificationDTO(notification);
             notificationService.sendNotificationToAllMembers(notificationDTO);
         }
 
-            return new BlogPostDTO(blogPostRepos.save(blogPost));
+        return new BlogPostDTO(blogPost);
     }
 
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {
@@ -78,14 +88,35 @@ public class BlogServiceImpl implements BlogService{
         blogPost.setAuthor(accountRepos.findById(blogPostDTO.getAuthor().getAccountId()).orElseThrow(() -> new ResourceNotFoundException("Invalid author id: " + blogPostDTO.getAuthor())));
         return blogPost;
     }
+
     @Override
     public BlogPostDTO updateBlog(BlogPostDTO BlogPostDTO) {
         return blogPostRepos.findById(BlogPostDTO.getPostId()).map(blogPost -> {
             blogPost.setTitle(BlogPostDTO.getTitle());
             blogPost.setContent(BlogPostDTO.getContent());
             blogPost.setUpdateDate(LocalDateTime.now());
+            blogPost.setCategory(blogCategoryRepos.findById(BlogPostDTO.getCategory().getBlogCategoryId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Invalid category id: " + BlogPostDTO.getCategory())));
             return new BlogPostDTO(blogPostRepos.save(blogPost));
         }).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + BlogPostDTO.getPostId()));
+    }
+
+    @Override
+    public BlogPostDTO deleteAttachment(int postId, int attachmentId) {
+        BlogPost blogPost = blogPostRepos.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + postId));
+        List<AttachmentDTO> attachmentDTOS = blogPost.getAttachments().stream().map(AttachmentDTO::new).toList();
+        List<Attachment> attachments = new ArrayList<>();
+        for (AttachmentDTO attachmentDTO : attachmentDTOS) {
+            if (attachmentDTO.getAttachmentId() != attachmentId) {
+                attachments.add(
+                        attachmentRepos.findById(attachmentDTO.getAttachmentId())
+                                .orElseThrow(
+                                        () -> new ResourceNotFoundException("Invalid attachment id: " + attachmentDTO.getAttachmentId())
+                                ));
+            }
+        }
+        blogPost.setAttachments(attachments);
+        return new BlogPostDTO(blogPostRepos.save(blogPost));
     }
 
     @Override
@@ -95,11 +126,11 @@ public class BlogServiceImpl implements BlogService{
 
     @Override
     public Page<BlogPostDTO> searchBlog(String keyword, Pageable pageable) {
-        return blogPostRepos.findAllByContentIsContainingIgnoreCase(keyword, pageable ).map(BlogPostDTO::new);
+        return blogPostRepos.findAllByContentIsContainingIgnoreCase(keyword, pageable).map(BlogPostDTO::new);
     }
 
     @Override
-    public Page<BlogPostDTO> getBlogByCategory(int categoryId,Pageable pageable) {
-        return blogPostRepos.findAllByCategoryBlogCategoryId(categoryId,pageable).map(BlogPostDTO::new);
+    public Page<BlogPostDTO> getBlogByCategory(int categoryId, Pageable pageable) {
+        return blogPostRepos.findAllByCategoryBlogCategoryId(categoryId, pageable).map(BlogPostDTO::new);
     }
 }

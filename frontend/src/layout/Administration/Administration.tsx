@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag } from 'lucide-react'
-import{ createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
     Breadcrumb,
@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "react-router-dom";
 import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
+import logo from "@/assets/icon.png";
 
 export const ConsignmentsContext = createContext([]);
 
@@ -65,10 +66,10 @@ export default function Administration() {
                 <div className="flex h-full max-h-screen flex-col gap-2">
                     <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 ">
                         <Link to="#" className="flex items-center gap-2 font-semibold">
-                            <Avatar>
-                                <AvatarImage src="src\assets\icon.png" />
-                            </Avatar>
-                            <span className="">BIDDIFY</span>
+                            <div className="flex items-center justify-center gap-2">
+                                <img src={logo} className="w-8 h-8" alt="logo" />
+                                <span className="font-semibold text-lg text-orange-700 text-center">Biddify</span>
+                            </div>
                         </Link>
                         <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
                             <Bell className="h-4 w-4" />

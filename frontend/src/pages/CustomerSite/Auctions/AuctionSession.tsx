@@ -47,7 +47,11 @@ export default function AuctionSession() {
                     setSessionAttachments(res.data.attachments);
                 })
                 .catch(err => {
-                    toast.error("Failed to load Auction Session");
+                    toast.error("Failed to load Auction Session",
+                        {
+                            position: "bottom-right",
+                        }
+                    );
                     console.log(err);
                 })
         }
@@ -58,7 +62,11 @@ export default function AuctionSession() {
                     setSessionAttachments(res.data.attachments);
                 })
                 .catch(err => {
-                    toast.error("Failed to load Auction Session");
+                    toast.error("Failed to load Auction Session",
+                        {
+                            position: "bottom-right",
+                        }
+                    );
                     console.log(err);
                 })
         }
@@ -97,7 +105,11 @@ export default function AuctionSession() {
                     setBidders(prevBidders => [...prevBidders, deposit.payment.accountId]);
                 }
             });
-            toast.success("Registered Successfully");
+            toast.success("Registered Successfully",
+                {
+                    position: "bottom-right",
+                }
+            );
         })
     }
     const ConfirmRegister = () => {

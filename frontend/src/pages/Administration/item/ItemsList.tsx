@@ -82,7 +82,7 @@ export default function ItemsList() {
     try {
       let res = await getItems(pageNumber, 5);
       if (search != null) {
-        res = await getItemsByName(search, pageNumber, 5);
+        res = await getItemsByName(pageNumber, 5,search);
       }
       console.log(res);
       if (res) {
@@ -234,7 +234,7 @@ export default function ItemsList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {itemsList
+                  {!itemsList
                     ? <LoadingAnimation />
                     : itemsList.currentPageList.map((item) => (
                       <TableRow key={item.itemId}>
