@@ -63,7 +63,7 @@ import { Link } from "react-router-dom";
 import { EditAcc } from "../popup/EditAcc";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } from "@/redux/reducers/Items";
-import { getItems, getItemsByName } from "@/services/ItemService";
+import { getItems, getItemsByName, getItemsByStatus } from "@/services/ItemService";
 import { ItemStatus } from "@/constants/enums";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 import { useCurrency } from "@/CurrencyProvider.tsx";
@@ -78,11 +78,15 @@ export default function ItemsList() {
   let search = url.searchParams.get("search");
   const currency = useCurrency();
 
-  const fetchItems = async (pageNumber: number) => {
+  const fetchItems = async (pageNumber: number, status?: ItemStatus) => {
     try {
-      let res = await getItems(pageNumber, 5);
+      let res;
       if (search != null) {
         res = await getItemsByName(pageNumber, 5,search);
+      } else if (status){
+        res = await getItemsByStatus(status, pageNumber, 5);
+      } else {
+        res = await getItems(pageNumber, 5);
       }
       console.log(res);
       if (res) {
@@ -108,7 +112,11 @@ export default function ItemsList() {
   }
 
   const handlePageSelect = (pageNumber: number) => {
-    fetchItems(pageNumber);
+    if(statusFilter === "all"){
+      fetchItems(pageNumber);
+    } else {
+      fetchItems(pageNumber, statusFilter as ItemStatus);
+    }
   }
 
   const handleCreateClick = () => {
@@ -129,11 +137,21 @@ export default function ItemsList() {
     // })
   }
 
-  const handleFilterClick = (status: ItemStatus[], filter: string) => {
+  const handleFilterClick = (status: ItemStatus[], filter: any) => {
+    console.log(filter);
+    console.log(statusFilter);
 
-    url.searchParams.delete("search");
-    window.history.replaceState(null, "", url.toString());
-    search = null;
+    if(filter.toString() != statusFilter){
+      url.searchParams.delete("search");
+      window.history.replaceState(null, "", url.toString());
+      search = null;
+
+      if (filter == "all"){
+        fetchItems(0);
+      } else {
+        fetchItems(0, status[0]);
+      }
+    }
 
     // let filteredList = itemsList.value.filter(x => status.includes(x.status));
     // console.log(filteredList);
@@ -154,11 +172,11 @@ export default function ItemsList() {
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION, ItemStatus.QUEUE, ItemStatus.UNSOLD, ItemStatus.SOLD, ItemStatus.VALUATING], "all")} value="all">All</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION], "in_auction")} value="in_auction">IN_AUCTION</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.QUEUE], "queue")} value="queue">QUEUE</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.UNSOLD], "unsold")} value="unsold">UNSOLD</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.SOLD], "sold")} value="sold">SOLD</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.VALUATING], "valuating")} value="valuating">VALUATING</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION], ItemStatus.IN_AUCTION)} value={ItemStatus.IN_AUCTION}>IN_AUCTION</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.QUEUE], ItemStatus.QUEUE)} value={ItemStatus.QUEUE}>QUEUE</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.UNSOLD], ItemStatus.UNSOLD)} value={ItemStatus.UNSOLD}>UNSOLD</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.SOLD], ItemStatus.SOLD)} value={ItemStatus.SOLD}>SOLD</TabsTrigger>
+            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.VALUATING], ItemStatus.VALUATING)} value={ItemStatus.VALUATING}>VALUATING</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>
