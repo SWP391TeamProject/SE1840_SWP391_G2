@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
-import { fetchAllAuctionSessions, fetchAuctionSessionByTitle } from "@/services/AuctionSessionService";
+import { fetchActiveAuctionSessions, fetchAllAuctionSessions, fetchAuctionSessionByTitle, fetchPastAuctionSessions, fetchUpcomingAuctionSessions } from "@/services/AuctionSessionService";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 
 export default function AuctionSessionList() {
@@ -44,12 +44,29 @@ export default function AuctionSessionList() {
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
 
-  const fetchAuctionSessions = async (pageNumber: number) => {
+  const fetchAuctionSessions = async (pageNumber: number, filter?: string) => {
     try {
       let res;
-      res = await fetchAllAuctionSessions(pageNumber, 10);
+      
       if (search && search?.length > 0) {
-        res = await fetchAuctionSessionByTitle(pageNumber, 10,search);
+        res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
+      } else {
+        switch (filter) {
+          case "all":
+            res = await fetchAllAuctionSessions(pageNumber, 10);
+            break;
+          case "upcoming":
+            res = await fetchUpcomingAuctionSessions(pageNumber, 10);
+            break;
+          case "past":
+            res = await fetchPastAuctionSessions(pageNumber, 10);
+            break;
+          case "live":
+            res = await fetchActiveAuctionSessions(pageNumber, 10);
+            break;
+          default:
+            res = await fetchAllAuctionSessions(pageNumber, 10);
+        }
       }
 
       if (res) {
@@ -111,7 +128,7 @@ export default function AuctionSessionList() {
   }
 
   const handlePageSelect = (pageNumber: number) => {
-    fetchAuctionSessions(pageNumber);
+    fetchAuctionSessions(pageNumber, statusFilter);
   }
 
   const handleFilterClick = (filter: string) => {
@@ -120,19 +137,11 @@ export default function AuctionSessionList() {
     window.history.replaceState(null, "", url.toString());
     search = null;
 
-    let filteredList = [];
-    if (filter === "all") filteredList = auctionSessionsList.value;
-
-    if (filter === "upcoming") filteredList = auctionSessionsList.value.filter(x => new Date(x.startDate) > new Date());
-
-    if (filter === "past") filteredList = auctionSessionsList.value.filter(x => new Date(x.endDate) < new Date());
-
-    if (filter === "live") filteredList = auctionSessionsList.value.filter(x => new Date(x.startDate) < new Date() && new Date(x.endDate) > new Date());
-
-
-    console.log(filteredList);
-    dispatch(setCurrentPageList(filteredList));
-    setStatusFilter(filter);
+    if (filter !== statusFilter){
+      fetchAuctionSessions(0, filter);
+      setStatusFilter(filter);
+    }
+    
   }
 
   useEffect(() => { }, [auctionSessionsList]);

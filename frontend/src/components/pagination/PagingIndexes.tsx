@@ -47,21 +47,21 @@ export default function PagingIndexes(props: {pageNumber: number, totalPages: nu
           </PaginationItem>
         );
       }
-      else if (props.pageNumber > 5 && i == props.pageNumber - 5) {
+      else if (props.pageNumber > 3 && i == props.pageNumber - 3) {
         indexButtons.push(
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
         );
       } 
-      else if (props.pageNumber < props.totalPages - 5 && i == props.pageNumber + 5) {
+      else if (props.pageNumber < props.totalPages - 3 && i == props.pageNumber + 3) {
         indexButtons.push(
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
         );
       }
-      else if (i - props.pageNumber <= 5 && props.pageNumber - i <= 5){
+      else if (i - props.pageNumber <= 3 && props.pageNumber - i <= 3){
         indexButtons.push(
           <PaginationItem >
             <PaginationLink

@@ -33,7 +33,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConsignmentContactPreference, ConsignmentStatus } from "@/constants/enums";
-import { fetchAllConsignmentsService, takeConsignment } from "@/services/ConsignmentService";
+import { fetchAllConsignmentsService, fetchConsignmentsByStatusService, takeConsignment } from "@/services/ConsignmentService";
 import { setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 
@@ -43,10 +43,14 @@ export default function ConsignmentList() {
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("all");
 
-    const fetchConsignments = async (pageNumber: number) => {
+    const fetchConsignments = async (pageNumber: number, status?: ConsignmentStatus) => {
         try {
-            const res = await fetchAllConsignmentsService(pageNumber, 5);
-
+            let res;
+            if (status) {
+                res = await fetchConsignmentsByStatusService(pageNumber, 10, status);
+            } else {
+                res = await fetchAllConsignmentsService(pageNumber, 10);
+            }
             if (res) {
                 console.log(res);
 
@@ -63,7 +67,14 @@ export default function ConsignmentList() {
     };
 
     const handlePageSelect = (pageNumber: number) => {
-        fetchConsignments(pageNumber);
+        
+        if(statusFilter === "all"){
+            console.log(pageNumber);
+            fetchConsignments(pageNumber);
+        } else {
+            console.log("here");
+            fetchConsignments(pageNumber, statusFilter as ConsignmentStatus);
+        }
     }
 
     const handleEditClick = (consignmentId: number) => {
@@ -91,10 +102,15 @@ export default function ConsignmentList() {
     }
 
     const handleFilterClick = (status: ConsignmentStatus[], filter: string) => {
-        let filteredList = consignmentsList.value.filter(x => status.includes(x.status));
-        console.log(filteredList);
-        dispatch(setCurrentPageList(filteredList));
-        setStatusFilter(filter);
+        if (filter !== statusFilter) {
+            if(filter === "all"){
+                fetchConsignments(0);
+            } else {
+                fetchConsignments(0, status[0]);
+            }
+            setStatusFilter(filter);
+        }
+
     }
 
     const handleEvaluateClick = (consignmentId: number) => {

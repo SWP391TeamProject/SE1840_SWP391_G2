@@ -1,16 +1,48 @@
 import { SERVER_DOMAIN_URL } from "@/constants/domain";
+import { ConsignmentStatus } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {
   let params = {
+    page: pageNumber || 0,
+    size: pageSize || 50,
+  }
+  console.log(params);
+  return await axios
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+      params: params
+    })
+    .then((res) => {
+      console.log(res.data.content);
+      return res
+    }) // return the data here
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+      throw err; // make sure to throw the error so it can be caught by the query
+    });
+};
+
+export const fetchConsignmentsByStatusService = async (pageNumber: number, pageSize: number, status: ConsignmentStatus) => {
+  let params = {
+    status: status,
     pageNumb: pageNumber,
     pageSize: pageSize,
   }
   console.log(params);
   return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/filter-by-status`, {
       headers: {
         "Content-Type": "application/json",
 
