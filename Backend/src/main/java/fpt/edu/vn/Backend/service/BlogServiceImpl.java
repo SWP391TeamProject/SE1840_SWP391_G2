@@ -56,10 +56,13 @@ public class BlogServiceImpl implements BlogService{
         Account account = blogPost.getAuthor();
 
         if (account.getRole() == Account.Role.ADMIN) {
-            Notification notifications = notificationRepos.findByAccount_AccountId(account.getAccountId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account", "id", account.getAccountId()));
-            Notification notification = notificationRepos.findById(notifications.getNotificationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Notification", "id", notifications.getNotificationId()));
+            Notification notification = new Notification();
+            notification.setAccount(account);
+            notification.setType("Admin");
+            notification.setMessage("Blog Created By " + account.getNickname() + " " + account.getRole());
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
             NotificationDTO notificationDTO = new NotificationDTO(notification);
             notificationService.sendNotificationToAllMembers(notificationDTO);
         }
