@@ -347,8 +347,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable", value = "auctionSession")
+    @Cacheable(key = "'featured'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
+        if (pageable == null) {
+            pageable = PageRequest.of(0, 5);
+        }
         List<AuctionSession> auctionSessionList = auctionSessionRepos.findAll();
 
         BigDecimal evaluationThreshold = new BigDecimal(2);
