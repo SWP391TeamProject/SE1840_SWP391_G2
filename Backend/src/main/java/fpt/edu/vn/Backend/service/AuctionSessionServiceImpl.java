@@ -59,7 +59,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession",allEntries = true)
+    @CacheEvict(value = "auctionSession", allEntries = true)
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
         Account a = accountRepos.findById(accountId).orElseThrow(
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
@@ -114,13 +114,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession",allEntries = true)
+    @CacheEvict(value = "auctionSession", allEntries = true)
     public String placePreBid(int auctionSessionId, int accountId, double amount) {
         return "";
     }
 
     @Override
-    @CacheEvict(value = "auctionSession",allEntries = true)
+    @CacheEvict(value = "auctionSession", allEntries = true)
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
@@ -149,7 +149,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return false;
         }
     }
-    @CacheEvict(value = "auctionSession",allEntries = true)
+
+    @CacheEvict(value = "auctionSession", allEntries = true)
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
@@ -176,7 +177,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession",allEntries = true)
+    @CacheEvict(value = "auctionSession", allEntries = true)
     public void finishAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         Map<AccountDTO, List<Integer>> winAccounts = new HashMap<>();
@@ -190,14 +191,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             AccountDTO account;
             account = accountServiceImpl.getAccountById(bidService.getHighestBid(auctionItem.getId())
                     .getPayment().getAccountId());
-            if(account == null){
+            if (account == null) {
                 continue;
             }
             List<Integer> winItems = winAccounts.get(account);
             if (winItems == null || winItems.isEmpty()) {
                 winItems = new ArrayList<>();
                 winItems.add(auctionItem.getItemDTO().getItemId());
-            }else {
+            } else {
                 winItems.add(auctionItem.getItemDTO().getItemId());
             }
             winAccounts.put(account, winItems);
@@ -206,12 +207,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.info("Winning account: " + account.getAccountId() + " items: " + items);
         });
         for (DepositDTO deposit : auctionDTO.getDeposits()) {
-            if(deposit.getPayment().getStatus().equals(Payment.Status.SUCCESS)){
+            if (deposit.getPayment().getStatus().equals(Payment.Status.SUCCESS)) {
                 continue;
             }
-            if(winAccounts.keySet().stream()
+            if (winAccounts.keySet().stream()
                     .anyMatch(account ->
-                            account.getAccountId() == deposit.getPayment().getAccountId())){
+                            account.getAccountId() == deposit.getPayment().getAccountId())) {
                 deposit.getPayment().setStatus(Payment.Status.SUCCESS);
                 paymentService.updatePayment(deposit.getPayment());
                 continue;
@@ -229,7 +230,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             }
         }
         auctionDTO.setStatus("FINISHED");
-        for(AccountDTO account: winAccounts.keySet()){
+        for (AccountDTO account : winAccounts.keySet()) {
             orderServiceImpl.createOrder(account.getAccountId(), new HashSet<>(winAccounts.get(account)), auctionSessionId);
         }
         try {
@@ -265,7 +266,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         logger.info("Auction session " + auctionSessionId + " finished :" + getAuctionSessionById(auctionSessionId).getStatus());
     }
-    @CacheEvict(value = "auctionSession",allEntries = true)
+
+    @CacheEvict(value = "auctionSession", allEntries = true)
     @Override
     public void terminateAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
@@ -297,8 +299,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 auctionSession.getAuctionItems().stream()
                         .filter(auctionItem -> Objects.equals(auctionItem.getItem().getItemId(), item.getItemId()))
                         .findFirst().ifPresent(auctionItem -> {
-                                item.setStatus(Item.Status.QUEUE);
-                                itemRepos.save(item);
+                            item.setStatus(Item.Status.QUEUE);
+                            itemRepos.save(item);
                         });
             }
             auctionSession.setStartDate(auctionDTO.getStartDate());
@@ -314,7 +316,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession",allEntries = true)
+    @CacheEvict(value = "auctionSession", allEntries = true)
     public void startAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         logger.info("Starting auction session " + auctionSessionId);
@@ -402,6 +404,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new ResourceNotFoundException("Error updating auction session", e);
         }
     }
+
     @Cacheable(key = "#id", value = "auctionSession")
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
@@ -415,8 +418,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
     }
 
+
+    @Cacheable(key = "'past'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
     @Override
-    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
         if (auctionSessions.isEmpty()) {
@@ -425,8 +429,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return auctionSessions.map(AuctionSessionDTO::new);
     }
 
+    @Cacheable(key = "'past'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
     @Override
-    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
         Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
         if (pastAuctionSessions.isEmpty()) {
@@ -439,7 +443,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
+    @Cacheable(key = "#pageable+#title", value = "auctionSession")
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
         Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
@@ -450,7 +454,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return a;
     }
 
-    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
+    @Cacheable(key = "'upcoming'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
         Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
