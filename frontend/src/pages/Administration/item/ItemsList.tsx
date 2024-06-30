@@ -74,6 +74,7 @@ export default function ItemsList() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
   const currency = useCurrency();
@@ -81,6 +82,7 @@ export default function ItemsList() {
   const fetchItems = async (pageNumber: number, status?: ItemStatus) => {
     try {
       let res;
+      setIsLoading(true);
       if (search != null) {
         res = await getItemsByName(pageNumber, 5,search);
       } else if (status){
@@ -97,8 +99,10 @@ export default function ItemsList() {
           totalPages: res.data.totalPages
         }
         dispatch(setCurrentPageNumber(paging));
+        setIsLoading(false);
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -213,108 +217,110 @@ export default function ItemsList() {
           </div>
         </div>
         <TabsContent value={statusFilter}>
-          <Card x-chunk="dashboard-06-chunk-0">
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                Items
-                <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                </div>
-              </CardTitle>
-              <CardDescription>
-                Manage items and view their details.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Id</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="md:table-cell">
-                      Price
-                    </TableHead>
-                    <TableHead className="md:table-cell">
-                      Status
-                    </TableHead>
-                    <TableHead className="md:table-cell">
-                      Description
-                    </TableHead>
-                    {/* <TableHead className="md:table-cell">
+          {isLoading ? <LoadingAnimation />
+            : <Card x-chunk="dashboard-06-chunk-0">
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  Items
+                  <div className="w-full basis-1/2">
+                    <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  </div>
+                </CardTitle>
+                <CardDescription>
+                  Manage items and view their details.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Id</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead className="md:table-cell">
+                        Price
+                      </TableHead>
+                      <TableHead className="md:table-cell">
+                        Status
+                      </TableHead>
+                      <TableHead className="md:table-cell">
+                        Description
+                      </TableHead>
+                      {/* <TableHead className="md:table-cell">
                       Status
                     </TableHead> */}
-                    {/* <TableHead className="md:table-cell">
+                      {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                    <TableHead>
-                      <span className="sr-only">Actions</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {!itemsList
-                    ? <LoadingAnimation />
-                    : itemsList.currentPageList.map((item) => (
-                      <TableRow key={item.itemId}>
-                        <TableCell className="font-medium">
-                          {item.itemId}
-                        </TableCell>
-                        {/* <TableCell>
+                      <TableHead>
+                        <span className="sr-only">Actions</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {!itemsList
+                      ? <LoadingAnimation />
+                      : itemsList.currentPageList.map((item) => (
+                        <TableRow key={item.itemId}>
+                          <TableCell className="font-medium">
+                            {item.itemId}
+                          </TableCell>
+                          {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                        <TableCell className="md:table-cell">
-                          {item.name}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {currency.format({ amount: item.reservePrice })}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {item.status}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          <div dangerouslySetInnerHTML={{ __html: item.description }}></div>
+                          <TableCell className="md:table-cell">
+                            {item.name}
+                          </TableCell>
+                          <TableCell className="md:table-cell">
+                            {currency.format({ amount: item.reservePrice })}
+                          </TableCell>
+                          <TableCell className="md:table-cell">
+                            {item.status}
+                          </TableCell>
+                          <TableCell className="md:table-cell">
+                            <div dangerouslySetInnerHTML={{ __html: item.description }}></div>
 
 
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
+                          </TableCell>
+                          <TableCell className="md:table-cell">
+                            {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
                         <Badge variant="default" className="bg-green-500">{ItemsetCurrentItemStatus[item.status]}</Badge> : 
                         <Badge variant="destructive">{ItemsetCurrentItemStatus[item.status]}</Badge>} */}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  aria-haspopup="true"
+                                  size="icon"
+                                  variant="ghost"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Toggle menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
 
-                              {/* <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem> */}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                                {/* <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem> */}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
 
-                    ))}
-                </TableBody>
-              </Table>
+                      ))}
+                  </TableBody>
+                </Table>
 
-            </CardContent>
-            <CardFooter>
-              {/* <div className="text-xs text-muted-foreground">
+              </CardContent>
+              <CardFooter>
+                {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-            </CardFooter>
-          </Card>
+              </CardFooter>
+            </Card>
+          }
         </TabsContent>
       </Tabs>
       {/* {itemsList.value.map((item) => (
