@@ -3,19 +3,24 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exporter.BidExporter;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import fpt.edu.vn.Backend.service.BidService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -27,9 +32,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,6 +66,35 @@ public class BidController {
     public ResponseEntity<List<BidResponse>> getBidsByAuctionItemId(@PathVariable int auctionSessionId, @PathVariable int itemId) {
         AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
         return ResponseEntity.ok(bidService.toBidResponse(bidService.getBidsByAuctionItemId(auctionItemId)));
+    }
+
+    @GetMapping("/api/bids/export")
+    public ResponseEntity<byte[]> exportToExcel( Authentication authentication) throws IOException {
+        AccountDTO account = accountService.getAccountByEmail(authentication.getName());
+        if (account == null) {
+            throw new InvalidInputException("You are not authorized to perform this action");
+        }
+        List<BidDTO> listBids;
+        {
+            listBids = bidService.getBidsByAccountId(account.getAccountId(), PageRequest.of(0, 1000)).toList();
+        }
+
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerValue = "filename=bids_" + currentDateTime + ".xlsx";
+
+        BidExporter excelExporter = new BidExporter(listBids);
+
+        ByteArrayOutputStream stream = excelExporter.export();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", headerValue);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(stream.toByteArray());
     }
 
     @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
