@@ -46,7 +46,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
 
     @Autowired
-
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, DepositRepos depositRepos, PaymentRepos paymentRepos, BidRepos bidRepos, BidService bidService, PaymentService paymentServiceImpl, AccountServiceImpl accountServiceImpl) {
 
         this.auctionSessionRepos = auctionSessionRepos;
@@ -60,7 +59,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
+    @CacheEvict(value = "auctionSession",allEntries = true)
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
         Account a = accountRepos.findById(accountId).orElseThrow(
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
@@ -115,12 +114,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @CacheEvict(value = "auctionSession",allEntries = true)
     public String placePreBid(int auctionSessionId, int accountId, double amount) {
         return "";
     }
 
     @Override
-    @CacheEvict(key = "#assign.auctionSessionId", value = "auctionSession")
+    @CacheEvict(value = "auctionSession",allEntries = true)
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
@@ -149,7 +149,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return false;
         }
     }
-    @Cacheable(key = "#auctionDTO.title", value = "auctionSession")
+    @CacheEvict(value = "auctionSession",allEntries = true)
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
@@ -176,7 +176,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
+    @CacheEvict(value = "auctionSession",allEntries = true)
     public void finishAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         Map<AccountDTO, List<Integer>> winAccounts = new HashMap<>();
@@ -265,7 +265,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         logger.info("Auction session " + auctionSessionId + " finished :" + getAuctionSessionById(auctionSessionId).getStatus());
     }
-    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
+    @CacheEvict(value = "auctionSession",allEntries = true)
     @Override
     public void terminateAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
@@ -314,7 +314,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
+    @CacheEvict(value = "auctionSession",allEntries = true)
     public void startAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         logger.info("Starting auction session " + auctionSessionId);
