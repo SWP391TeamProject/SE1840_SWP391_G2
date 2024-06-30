@@ -107,7 +107,7 @@ public class SecurityConfig {
                                 "/api/bids/{auctionSessionId}/{itemId}"
                         )
                         .permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
 
                 )
                 .authenticationProvider(daoAuthenticationProvider())
