@@ -6,6 +6,8 @@ import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.ItemCategory;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,13 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class ItemCategoryImpl implements ItemCategoryService {
+public class ItemCategoryServiceImpl implements ItemCategoryService {
     @Autowired
     private ItemCategoryRepos itemCategoryRepos;
 
 
     @Override
+    @CacheEvict(value = "itemCategory",allEntries = true)
     public ItemCategoryDTO createItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
         ItemCategory itemCategory = new ItemCategory();
         itemCategory.setName(itemCategoryRequestDTO.getName());
@@ -34,6 +37,7 @@ public class ItemCategoryImpl implements ItemCategoryService {
     }
 
     @Override
+    @CacheEvict(value = "itemCategory",allEntries = true)
     public ItemCategoryDTO updateItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
         Optional<ItemCategory> optionalItemCategory = itemCategoryRepos.findById(itemCategoryRequestDTO.getItemCategoryId());
         if (optionalItemCategory.isPresent()) {
@@ -50,6 +54,7 @@ public class ItemCategoryImpl implements ItemCategoryService {
     }
 
     @Override
+    @CacheEvict(key = "#id", value = "itemCategory")
     public ResponseEntity<ItemCategoryDTO> deleteItemCategory(int id) {
         if (itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems() != null
                 && !itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems().isEmpty()) {
@@ -64,6 +69,7 @@ public class ItemCategoryImpl implements ItemCategoryService {
     }
 
     @Override
+    @Cacheable(key = "#id", value = "itemCategory")
     public ItemCategoryDTO getItemCategoryById(int id) {
         Optional<ItemCategory> optionalItemCategory = itemCategoryRepos.findById(id);
         if (optionalItemCategory.isPresent()) {
@@ -75,6 +81,7 @@ public class ItemCategoryImpl implements ItemCategoryService {
     }
 
     @Override
+    @Cacheable(key = "#pageable", value = "itemCategory")
     public Page<ItemCategoryDTO> getAllItemCategories(Pageable pageable) {
         Page<ItemCategory> itemCategoryPage = itemCategoryRepos.findAll(pageable);
         return itemCategoryPage.map(ItemCategoryDTO::new);

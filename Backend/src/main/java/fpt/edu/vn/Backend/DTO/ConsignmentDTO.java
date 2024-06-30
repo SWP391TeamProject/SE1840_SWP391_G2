@@ -4,13 +4,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
-public class ConsignmentDTO {
+public class ConsignmentDTO implements Serializable {
     private int consignmentId;
     private String status;
     private String preferContact; // Use String for the enum representation in DTO

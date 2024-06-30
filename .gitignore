@@ -90,3 +90,4 @@ gendb/data/notification.json
 *.json
 Backend/src/main/resources/application-local.properties
 Backend/src/main/resources/application-local.properties
+Backend/src/main/resources/application-local.properties

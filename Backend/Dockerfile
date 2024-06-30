@@ -1,3 +1,5 @@
+FROM mav
+
 FROM eclipse-temurin:17-jdk-jammy as builder
 WORKDIR /opt/app
 COPY .mvn/ .mvn

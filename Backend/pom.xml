@@ -62,9 +62,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-			<version>3.3.0</version>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<!-- Cache -->
 		<dependency>
 			<groupId>net.jodah</groupId>
 			<artifactId>expiringmap</artifactId>
@@ -88,6 +92,9 @@
 			<artifactId>core</artifactId>
 			<version>3.5.3</version>
 		</dependency>
+
+
+
 
 
 

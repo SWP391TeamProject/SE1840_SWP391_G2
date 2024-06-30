@@ -3,12 +3,13 @@ package fpt.edu.vn.Backend.DTO;
 import fpt.edu.vn.Backend.pojo.Order;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Data
-public class OrderDTO {
+public class OrderDTO implements Serializable {
     private int orderId;
     private Set<ItemDTO> item;
     private PaymentDTO payment;

@@ -3,11 +3,12 @@ package fpt.edu.vn.Backend.DTO;
 import fpt.edu.vn.Backend.pojo.CitizenCard;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class CitizenCardDTO {
+public class CitizenCardDTO implements Serializable {
     private int userId;
     private String cardId;
     private String fullName;

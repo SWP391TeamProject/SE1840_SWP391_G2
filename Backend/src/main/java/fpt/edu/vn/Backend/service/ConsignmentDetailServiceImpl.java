@@ -15,6 +15,9 @@ import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = "consignmentDetail")
 public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     private ConsignmentDetailRepos consignmentDetailRepos;
     private AttachmentRepos attachmentRepos;
@@ -41,11 +45,13 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
+    @Cacheable(key = "#pageable.pageNumber",value = "consignmentDetail")
     public Page<ConsignmentDetailDTO> getAllConsignmentsDetail(Pageable pageable) {
         return consignmentDetailRepos.findAll(pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Cacheable(key = "#consignmentId",value = "consignmentDetail")
     public List<ConsignmentDetailDTO> getConsignmentsDetailByConsignmentId(int consignmentId) {
         List<ConsignmentDetail> consignmentDetails = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId);
         return consignmentDetails.stream()
@@ -54,6 +60,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
+    @Cacheable(key = "#consignmentDetailId",value = "consignmentDetail")
     public ConsignmentDetailDTO getConsignmentDetailById(int consignmentDetailId) {
         ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Consignment detail not found with id " + consignmentDetailId));
@@ -61,6 +68,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
+    @CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
         try {
             ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -95,6 +103,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
 
     @Override
+    @CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
             // Find the existing ConsignmentDetail object by ID
             ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)

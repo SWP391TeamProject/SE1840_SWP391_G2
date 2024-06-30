@@ -10,6 +10,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication
 @EnableScheduling
 @Slf4j
-
+@EnableCaching
 public class BackendApplication {
 
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);

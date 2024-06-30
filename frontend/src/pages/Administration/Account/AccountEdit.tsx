@@ -13,27 +13,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { RoleName, Roles } from '@/constants/enums';
+import { useAppSelector } from "@/redux/hooks";
+import { Roles } from '@/constants/enums';
 import { updateAccountService } from "@/services/AccountsServices.ts";
 import { useNavigate } from "react-router-dom";
-import { Role } from '@/models/newModel/account';
-
-const phoneRegex = new RegExp(
-    /^[0-9\-\+]{10}$/
-);
-
-const emailRegex = new RegExp(
-    /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-);
 
 const formSchema = z.object({
     accountId: z.number(),
-    nickname: z.string(),
-    email: z.string().regex(emailRegex, 'Invalid email!'),
-    phone: z.string().regex(phoneRegex, 'Invalid Number!'),
-    role: z.enum([RoleName.MEMBER, RoleName.STAFF, RoleName.MANAGER, RoleName.ADMIN]),
-    balance: z.coerce.number().optional(),
+    nickname: z.string().min(5, "Nickname must be at least 5 characters")
+      .max(20, "Nickname must not be longer than 20 characters"),
+    email: z.string().email({
+      message: "Invalid email address.",
+    }),
+    phone: z.string().max(15, "Phone must not be longer than 15 characters").optional(),
+    role: z.nativeEnum(Roles),
+    balance: z.coerce.number().min(0, "Balance must not be negative"),
 });
 
 
@@ -49,7 +43,7 @@ export default function AccountEdit() {
             email: account?.email,
             phone: account?.phone ?? "",
             balance: account?.balance ?? 0,
-            role: account ? account.role : RoleName.MEMBER,
+            role: account ? account.role : Roles.MEMBER,
         },
     });
 
@@ -59,7 +53,7 @@ export default function AccountEdit() {
         let updatedAccount = {
             accountId: data.accountId,
             email: data.email,
-            nickname: data.nickname ?? "",
+            nickname: data.nickname,
             phone: data.phone,
             avatar: null,
             balance: data.balance,
@@ -91,10 +85,6 @@ export default function AccountEdit() {
                     <p className="mt-2 text-gray-500 dark:text-gray-400">
                         ___________________________________________________________________________________________________________________________________________
                     </p>
-                    {/* <p className="mt-2 text-gray-500 dark:text-gray-400">
-          Fill out the form below to list your item for consignment. We'll
-          review your submission and get back to you within 2 business days.
-        </p> */}
                 </div>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -106,9 +96,6 @@ export default function AccountEdit() {
                                     <FormLabel>accountId</FormLabel>
                                     <FormControl>
                                         <Input disabled
-                                            // defaultValue={JSON.parse(getCookie("user"))?.id}
-                                            // {...field}
-                                            // defaultValue={}
                                             placeholder="account id" {...field}
                                         />
                                     </FormControl>
@@ -121,10 +108,10 @@ export default function AccountEdit() {
                             name="nickname"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>User Name</FormLabel>
+                                    <FormLabel>Nickname</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="enter your prefer user name here"
+                                            placeholder="Nickname"
                                             {...field}
                                         />
                                     </FormControl>
@@ -139,7 +126,7 @@ export default function AccountEdit() {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="adasd" {...field} />
+                                        <Input placeholder="Email" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -152,7 +139,7 @@ export default function AccountEdit() {
                                 <FormItem>
                                     <FormLabel>Phone</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="shadcn" {...field} />
+                                        <Input placeholder="Phone number" type="phone" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -183,7 +170,7 @@ export default function AccountEdit() {
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
                                             className="flex flex-col space-y-1"
-                                            disabled={field.value === RoleName.ADMIN}
+                                            disabled={field.value === Roles.ADMIN}
                                         >
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>

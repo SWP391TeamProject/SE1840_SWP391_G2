@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 
-public class AuctionItemDTO {
+public class AuctionItemDTO implements Serializable {
     private AuctionItemId id;
     private ItemDTO itemDTO;
     private BigDecimal currentPrice;
