@@ -36,19 +36,16 @@ import { ConsignmentContactPreference, ConsignmentStatus } from "@/constants/enu
 import { fetchAllConsignmentsService, fetchConsignmentsByStatusService, takeConsignment } from "@/services/ConsignmentService";
 import { setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 
 export default function ConsignmentList() {
     const consignmentsList = useAppSelector((state) => state.consignments);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("all");
-    const [isLoading, setIsLoading] = useState(true);
 
     const fetchConsignments = async (pageNumber: number, status?: ConsignmentStatus) => {
         try {
             let res;
-            setIsLoading(true);
             if (status) {
                 res = await fetchConsignmentsByStatusService(pageNumber, 10, status);
             } else {
@@ -63,10 +60,8 @@ export default function ConsignmentList() {
                     totalPages: res.data.totalPages
                 }
                 dispatch(setCurrentPageNumber(paging));
-                setIsLoading(false);
             }
         } catch (error) {
-            setIsLoading(false)
             console.log(error);
         }
     };
@@ -183,122 +178,119 @@ export default function ConsignmentList() {
                     </div>
                 </div>
                 <TabsContent value={statusFilter}>
-                    {isLoading ?
-                        <LoadingAnimation />
-                        : <Card x-chunk="dashboard-06-chunk-0">
-                            <CardHeader>
-                                <CardTitle className="flex justify-between items-center">
-                                    Consignments
-                                    <div className="w-full basis-1/2">
-                                        <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                                    </div>
-                                </CardTitle>
-                                <CardDescription>
-                                    Manage consignments and view their details.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Id</TableHead>
-                                            <TableHead>preferContact</TableHead>
-                                            <TableHead className="md:table-cell">
-                                                create Date
-                                            </TableHead>
-                                            <TableHead className="md:table-cell">
-                                                Assigned Staff
-                                            </TableHead>
-                                            <TableHead className="md:table-cell">
-                                                Phone
-                                            </TableHead>
-                                            <TableHead className="md:table-cell">
-                                                Status
-                                            </TableHead>
-                                            {/* <TableHead className="md:table-cell">
+                    <Card x-chunk="dashboard-06-chunk-0">
+                        <CardHeader>
+                            <CardTitle className="flex justify-between items-center">
+                                Consignments
+                                <div className="w-full basis-1/2">
+                                    <PagingIndexes pageNumber={consignmentsList.currentPageNumber ? consignmentsList.currentPageNumber : 0} totalPages={consignmentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                                </div>
+                            </CardTitle>
+                            <CardDescription>
+                                Manage consignments and view their details.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Id</TableHead>
+                                        <TableHead>preferContact</TableHead>
+                                        <TableHead className="md:table-cell">
+                                            create Date
+                                        </TableHead>
+                                        <TableHead className="md:table-cell">
+                                            Assigned Staff
+                                        </TableHead>
+                                        <TableHead className="md:table-cell">
+                                            Phone
+                                        </TableHead>
+                                        <TableHead className="md:table-cell">
+                                            Status
+                                        </TableHead>
+                                        {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                                            <TableHead className="md:table-cell">
-                                                Action
-                                            </TableHead>
-                                            <TableHead>
-                                                <span className="sr-only">More Actions</span>
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {consignmentsList.currentPageList.map((consignment) => (
-                                            <TableRow key={consignment.consignmentId}>
-                                                <TableCell className="font-medium">
-                                                    {consignment.consignmentId}
-                                                </TableCell>
-                                                {/* <TableCell>
+                                        <TableHead className="md:table-cell">
+                                            Action
+                                        </TableHead>
+                                        <TableHead>
+                                            <span className="sr-only">More Actions</span>
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {consignmentsList.currentPageList.map((consignment) => (
+                                        <TableRow key={consignment.consignmentId}>
+                                            <TableCell className="font-medium">
+                                                {consignment.consignmentId}
+                                            </TableCell>
+                                            {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                                                <TableCell className="md:table-cell">
-                                                    {(() => {
-                                                        switch (consignment.preferContact) {
-                                                            case ConsignmentContactPreference.EMAIL:
-                                                                return "Email"
-                                                            case ConsignmentContactPreference.PHONE:
-                                                                return "Phone"
-                                                            case ConsignmentContactPreference.TEXT_MESSAGE:
-                                                                return "Text"
-                                                            default:
-                                                                return "Any of the above"
-                                                        }
-                                                    })()}
-                                                </TableCell>
-                                                <TableCell className="md:table-cell">
-                                                    {new Date(consignment.createDate).toLocaleDateString('en-US')}
-                                                </TableCell>
-                                                <TableCell className="md:table-cell">
-                                                    {consignment.staff ? consignment.staff.nickname : "Not assigned"}
-                                                </TableCell>
-                                                <TableCell className="md:table-cell">
-                                                    {consignment.staffId}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {(() => {
-                                                        switch (consignment.status) {
-                                                            case ConsignmentStatus.WAITING_STAFF:
-                                                                return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
-                                                            case ConsignmentStatus.FINISHED:
-                                                                return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
-                                                            case ConsignmentStatus.IN_INITIAL_EVALUATION:
-                                                                return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
-                                                            case ConsignmentStatus.IN_FINAL_EVALUATION:
-                                                                return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
-                                                            case ConsignmentStatus.SENDING:
-                                                                return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
-                                                            case ConsignmentStatus.TERMINATED:
-                                                                return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
-                                                            default:
-                                                                return <Badge variant="destructive">Unknown Status</Badge>;
-                                                        }
-                                                    })()}
-                                                </TableCell>
+                                            <TableCell className="md:table-cell">
+                                                {(() => {
+                                                    switch (consignment.preferContact) {
+                                                        case ConsignmentContactPreference.EMAIL:
+                                                            return "Email"
+                                                        case ConsignmentContactPreference.PHONE:
+                                                            return "Phone"
+                                                        case ConsignmentContactPreference.TEXT_MESSAGE:
+                                                            return "Text"
+                                                        default:
+                                                            return "Any of the above"
+                                                    }
+                                                })()}
+                                            </TableCell>
+                                            <TableCell className="md:table-cell">
+                                                {new Date(consignment.createDate).toLocaleDateString('en-US')}
+                                            </TableCell>
+                                            <TableCell className="md:table-cell">
+                                                {consignment.staff ? consignment.staff.nickname : "Not assigned"}
+                                            </TableCell>
+                                            <TableCell className="md:table-cell">
+                                                {consignment.staffId}
+                                            </TableCell>
+                                            <TableCell>
+                                                {(() => {
+                                                    switch (consignment.status) {
+                                                        case ConsignmentStatus.WAITING_STAFF:
+                                                            return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
+                                                        case ConsignmentStatus.FINISHED:
+                                                            return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
+                                                        case ConsignmentStatus.IN_INITIAL_EVALUATION:
+                                                            return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
+                                                        case ConsignmentStatus.IN_FINAL_EVALUATION:
+                                                            return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
+                                                        case ConsignmentStatus.SENDING:
+                                                            return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
+                                                        case ConsignmentStatus.TERMINATED:
+                                                            return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
+                                                        default:
+                                                            return <Badge variant="destructive">Unknown Status</Badge>;
+                                                    }
+                                                })()}
+                                            </TableCell>
 
-                                                <TableCell>
-                                                    <Button variant="outline" size="sm" onClick={() => { handleDetailClick(consignment.consignmentId) }}>
-                                                        Detail
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
+                                            <TableCell>
+                                                <Button variant="outline" size="sm" onClick={() => { handleDetailClick(consignment.consignmentId) }}>
+                                                    Detail
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
 
-                                        ))}
-                                    </TableBody>
-                                </Table>
-
-                            </CardContent>
-                            <CardFooter>
-                                {/* <div className="text-xs text-muted-foreground">
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            
+                        </CardContent>
+                        <CardFooter>
+                            {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-                            </CardFooter>
-                        </Card>
-                    }
+                        </CardFooter>
+                    </Card>
                 </TabsContent>
             </Tabs>
             {/* {consignmentsList.value.map((consignment) => (

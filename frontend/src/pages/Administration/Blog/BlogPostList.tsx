@@ -1,4 +1,3 @@
-import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import PagingIndexes from '@/components/pagination/PagingIndexes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,18 +23,9 @@ export const BlogPostList = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [filtered, setFiltered] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchBlogs = async (pageNumber: number, categoryId?: number) => {
+  const fetchBlogs = async (pageNumber: number) => {
     try {
-      setIsLoading(true);
-      let res
-      
-      if(categoryId){
-        res = await BlogService.getBlogByCategory(categoryId, pageNumber, 5);
-      } else {
-        res = await BlogService.getAllBlogs(pageNumber, 5);
-      }
+      const res = await BlogService.getAllBlogs(pageNumber, 5);
       if (res) {
         console.log(res);
 
@@ -45,18 +35,15 @@ export const BlogPostList = () => {
           totalPages: res.data.totalPages
         }
         dispatch(setCurrentPageNumber(paging));
-        setIsLoading(false);
       }
 
     } catch (error) {
-      setIsLoading(false);
       console.log(error);
     }
   };
 
   const handlePageSelect = (pageNumber: number) => {
-    let category = categories.find(category => category.name === filtered);
-    fetchBlogs(pageNumber, category?.blogCategoryId);
+    fetchBlogs(pageNumber);
   }
 
   const handleEditClick = (blogId: number) => {
@@ -85,16 +72,11 @@ export const BlogPostList = () => {
   }
 
   const handleFilterClick = (category: BlogCategory[], filter: string) => {
-    if (filter == "all") {
-      fetchBlogs(0);
-      setStatusFilter(filter);
-      setFiltered(filter);
-    }
-    else {
-      fetchBlogs(0, category[0].blogCategoryId);
-      setStatusFilter(filter);
-      setFiltered(filter);
-    }
+    let filteredList = blogsList.currentPageList.filter(x => category.includes(x.category));
+    console.log(filteredList);
+    dispatch(setCurrentPageList(filteredList));
+    setStatusFilter(filter);
+    setFiltered(filter);
   }
 
 
@@ -221,103 +203,101 @@ export const BlogPostList = () => {
             </Button>
           </div>
         </div>
-        <TabsContent value="all">
-          {isLoading ? <LoadingAnimation />
-            : <Card x-chunk="dashboard-06-chunk-0">
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  Blogs
-                  <div className="w-full basis-1/2">
-                    <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                  </div>
-                </CardTitle>
-                <CardDescription>
-                  Manage blogs and view their details.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Id</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead className="md:table-cell">
-                        create Date
-                      </TableHead>
-                      <TableHead className="md:table-cell">
-                        Author
-                      </TableHead>
-                      <TableHead className="md:table-cell">
-                        Category
-                      </TableHead>
-                      {/* <TableHead className="md:table-cell">
+        <TabsContent value={statusFilter}>
+          <Card x-chunk="dashboard-06-chunk-0">
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                Blogs
+                <div className="w-full basis-1/2">
+                  <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
+              <CardDescription>
+                Manage blogs and view their details.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Id</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead className="md:table-cell">
+                      create Date
+                    </TableHead>
+                    <TableHead className="md:table-cell">
+                      Author
+                    </TableHead>
+                    <TableHead className="md:table-cell">
+                      Category
+                    </TableHead>
+                    {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                      <TableHead className="md:table-cell">
-                        Action
-                      </TableHead>
-                      <TableHead>
-                        <span className="sr-only">More Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {blogsList.currentPageList.map((blog) => (
-                      <TableRow key={blog.postId}>
-                        <TableCell className="font-medium">
-                          {blog.postId}
-                        </TableCell>
-                        {/* <TableCell>
+                    <TableHead className="md:table-cell">
+                      Action
+                    </TableHead>
+                    <TableHead>
+                      <span className="sr-only">More Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {blogsList.currentPageList.map((blog) => (
+                    <TableRow key={blog.postId}>
+                      <TableCell className="font-medium">
+                        {blog.postId}
+                      </TableCell>
+                      {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                        <TableCell className="md:table-cell">
-                          {blog.title}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {new Date(blog.createDate).toLocaleDateString('en-US')}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {blog.author ? blog.author.nickname : "Unknown"}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {blog.category ? blog.category.name : "Unknown"}
-                        </TableCell>
+                      <TableCell className="md:table-cell">
+                        {blog.title}
+                      </TableCell>
+                      <TableCell className="md:table-cell">
+                        {new Date(blog.createDate).toLocaleDateString('en-US')}
+                      </TableCell>
+                      <TableCell className="md:table-cell">
+                        {blog.author ? blog.author.nickname : "Unknown"}
+                      </TableCell>
+                      <TableCell className="md:table-cell">
+                        {blog.category ? blog.category.name : "Unknown"}
+                      </TableCell>
 
 
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => { handleEditClick(blog.postId) }}>Edit</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => { handleDetailClick(blog.postId) }}>Detail</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => { handleEditClick(blog.postId) }}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { handleDetailClick(blog.postId) }}>Detail</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
 
-                    ))}
-                  </TableBody>
-                </Table>
+                  ))}
+                </TableBody>
+              </Table>
 
-              </CardContent>
-              <CardFooter>
-                {/* <div className="text-xs text-muted-foreground">
+            </CardContent>
+            <CardFooter>
+              {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-              </CardFooter>
-            </Card>
-          }
+            </CardFooter>
+          </Card>
         </TabsContent>
       </Tabs>
       {/* {blogsList.value.map((blog) => (

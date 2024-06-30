@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function Consignment() {
   const nav = useNavigate();
   useEffect(() => {
-    // document.title = "Consignment | Biddify";
+    document.title = "Consignment | Biddify";
 
     // fetchConsignmentsService();
   }, [nav]);  

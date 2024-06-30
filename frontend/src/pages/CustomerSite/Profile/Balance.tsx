@@ -38,13 +38,6 @@ const formSchema = z.object({
             code: "custom",
         });
     }
-    if (parseInt(data.amount) > 100000000) {
-        ctx.addIssue({
-            path: ["amount"],
-            message: "Maximum amount is 100,000,000",
-            code: "custom",
-        });
-    }
 });
 
 export default function Balance() {
