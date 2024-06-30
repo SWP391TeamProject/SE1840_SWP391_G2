@@ -54,9 +54,6 @@ export default function AuctionSessionList() {
         res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
       } else {
         switch (filter) {
-          case "all":
-            res = await fetchAllAuctionSessions(pageNumber, 10);
-            break;
           case "upcoming":
             res = await fetchUpcomingAuctionSessions(pageNumber, 10);
             break;

@@ -26,10 +26,16 @@ export const BlogPostList = () => {
   const [filtered, setFiltered] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchBlogs = async (pageNumber: number) => {
+  const fetchBlogs = async (pageNumber: number, categoryId?: number) => {
     try {
       setIsLoading(true);
-      const res = await BlogService.getAllBlogs(pageNumber, 5);
+      let res
+      
+      if(categoryId){
+        res = await BlogService.getBlogByCategory(categoryId, pageNumber, 5);
+      } else {
+        res = await BlogService.getAllBlogs(pageNumber, 5);
+      }
       if (res) {
         console.log(res);
 
@@ -49,7 +55,8 @@ export const BlogPostList = () => {
   };
 
   const handlePageSelect = (pageNumber: number) => {
-    fetchBlogs(pageNumber);
+    let category = categories.find(category => category.name === filtered);
+    fetchBlogs(pageNumber, category?.blogCategoryId);
   }
 
   const handleEditClick = (blogId: number) => {
@@ -78,11 +85,16 @@ export const BlogPostList = () => {
   }
 
   const handleFilterClick = (category: BlogCategory[], filter: string) => {
-    let filteredList = blogsList.currentPageList.filter(x => category.includes(x.category));
-    console.log(filteredList);
-    dispatch(setCurrentPageList(filteredList));
-    setStatusFilter(filter);
-    setFiltered(filter);
+    if (filter == "all") {
+      fetchBlogs(0);
+      setStatusFilter(filter);
+      setFiltered(filter);
+    }
+    else {
+      fetchBlogs(0, category[0].blogCategoryId);
+      setStatusFilter(filter);
+      setFiltered(filter);
+    }
   }
 
 
@@ -209,7 +221,7 @@ export const BlogPostList = () => {
             </Button>
           </div>
         </div>
-        <TabsContent value={statusFilter}>
+        <TabsContent value="all">
           {isLoading ? <LoadingAnimation />
             : <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader>
