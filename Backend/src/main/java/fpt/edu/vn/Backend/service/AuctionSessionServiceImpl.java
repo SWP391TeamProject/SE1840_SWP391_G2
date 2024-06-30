@@ -416,7 +416,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable", value = "auctionSession")
+    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
         if (auctionSessions.isEmpty()) {
@@ -426,7 +426,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable", value = "auctionSession")
+    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
         Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
         if (pastAuctionSessions.isEmpty()) {
@@ -439,7 +439,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable", value = "auctionSession")
+    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
         Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
@@ -450,7 +450,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return a;
     }
 
-    @Cacheable(key = "#pageable", value = "auctionSession")
+    @Cacheable(key = "#pageable != null ? #pageable : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
         Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
