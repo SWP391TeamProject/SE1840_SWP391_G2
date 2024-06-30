@@ -85,6 +85,7 @@ export default function AuctionSessionList() {
 
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   };
 
