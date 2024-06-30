@@ -105,7 +105,7 @@ export default function FeaturedAuctions() {
               {featuredAuctions &&
                 featuredAuctions.map((item) => (
                   <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3 " key={item.auctionSessionId}>
-                    <Card className="w-72 lg:w-64 h-full ">
+                    <Card className="w-80 lg:w-70 h-full ">
                       <CardHeader>
                         <img
 
@@ -124,22 +124,21 @@ export default function FeaturedAuctions() {
                           <h3 className="text-lg font-semibold">
                             {item.title}
                           </h3>
-                          <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium mx-auto absolute -translate-y-14 translate-x-2">
-                            {item.startDate && new Date(item.startDate) > date ?
-                              <>
-                                Starts in <CountDownTime end={new Date(item.startDate)}></CountDownTime>
-                              </> :
-                              item.endDate && new Date(item.endDate) > date
-                                ? <>
-                                  Ends in <CountDownTime end={new Date(item.endDate)}></CountDownTime>
+                          <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium justify-end basis-1/2 text-white">
+                              {item.startDate && new Date(item.startDate) > date ?
+                                <>
+                                  Starts in <CountDownTime className="text-white" end={new Date(item.startDate)}></CountDownTime>
                                 </> :
-                                <div className="text-pink-500 dark:text-pink-400 font-semibold">
-                                  Auction Ended
-                                </div>
-                            }
-                          </div>
+                                item.endDate && new Date(item.endDate) > date
+                                  ? <>
+                                    Ends in <CountDownTime className="text-white" end={new Date(item.endDate)}></CountDownTime>
+                                  </> :
+                                  <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                                    Auction Ended
+                                  </div>
+                              }
+                            </div>
                         </div>
-
                         <div className="flex items-center justify-between">
 
                           <Button variant="default" asChild>

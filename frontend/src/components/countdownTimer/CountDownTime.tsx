@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 interface Props {
     end: Date;
+    className?: string;
 }
 
 const formatTime = (time: number) => {
@@ -20,7 +21,7 @@ const formatTime = (time: number) => {
     return days + " days " + hoursString + ':' + minutesString + ':' + secondsString;
 }
 
-const CountDownTime: React.FC<Props> = ({ end }) => {
+const CountDownTime: React.FC<Props> = ({ end, className }) => {
     const difference = end.getTime() - new Date().getTime();
     const [time, setTime] = useState(difference);
 
@@ -38,7 +39,7 @@ const CountDownTime: React.FC<Props> = ({ end }) => {
 
     return (
         <div >
-            <p className='text-foreground opacity-100 '>
+            <p className={'text-foreground opacity-100 ' + className}>
                 {formatTime(time)}
             </p>
 
