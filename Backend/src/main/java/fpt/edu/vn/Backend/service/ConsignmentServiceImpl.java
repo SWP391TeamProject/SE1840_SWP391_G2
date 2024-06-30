@@ -18,10 +18,14 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +38,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "consignments")
 public class ConsignmentServiceImpl implements ConsignmentService {
 
+    private final RedisCacheManager cacheManager;
     AccountService accountService;
     ConsignmentRepos consignmentRepos;
     AccountRepos accountRepos;
@@ -44,16 +50,56 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     private static final Logger logger = LoggerFactory.getLogger(ConsignmentServiceImpl.class);
 
     @Autowired
-    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos) {
+    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos, RedisCacheManager cacheManager) {
         this.consignmentRepos = consignmentRepos;
         this.accountRepos = accountRepos;
         this.accountService = accountService;
         this.consignmentDetailRepos = consignmentDetailRepos;
         this.notificationRepos = notificationRepos;
+        this.cacheManager = cacheManager;
     }
 
+    @NotNull
+    private Page<ConsignmentDTO> getConsignmentDTOS(Pageable pageable, Page<Consignment> consignmentPage) {
+        List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
+                .map(this::getConsignmentDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
+    }
+
+    @NotNull
+    private ConsignmentDTO getConsignmentDTO(Consignment consignment) {
+        List<ConsignmentDetailDTO> consignmentDetailDTOs = Collections.emptyList();
+        if (consignment.getConsignmentDetails() == null) {
+            consignment.setConsignmentDetails(new ArrayList<>());
+        } else {
+            consignmentDetailDTOs = consignment.getConsignmentDetails().stream()
+                    .map(detail -> new ConsignmentDetailDTO(
+                            detail.getConsignmentDetailId(),
+                            detail.getDescription(),
+                            detail.getStatus().toString(),
+                            detail.getPrice(),
+                            detail.getConsignment().getConsignmentId(),
+                            new AccountDTO(detail.getAccount()),
+                            detail.getAttachments() == null ? null : detail.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toList())
+                    ))
+                    .collect(Collectors.toList());
+        }
+        return new ConsignmentDTO(
+                consignment.getConsignmentId(),
+                String.valueOf(consignment.getStatus()),
+                String.valueOf(consignment.getPreferContact()),
+                consignment.getStaff() != null ? new AccountDTO(consignment.getStaff()) : null,
+                consignment.getCreateDate(),
+                consignment.getUpdateDate(),
+                consignmentDetailDTOs
+        );
+    }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails) {
         try {
             Consignment consignment = new Consignment();
@@ -76,6 +122,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDetailDTO submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -121,6 +169,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDetailDTO submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId) {
 
         try {
@@ -132,14 +182,14 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             int countFin = 0;
             int countRej = 0;
             for (ConsignmentDetail detail : consignment.getConsignmentDetails()) {
-                if (detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION) ) {
+                if (detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION)) {
                     countFin++;
                 }
                 if (detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.MANAGER_REJECTED)) {
                     countRej++;
                 }
             }
-            if(countFin>countRej){
+            if (countFin > countRej) {
                 throw new ConsignmentServiceException("Final Evaluation already submitted");
             }
 
@@ -178,6 +228,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public void confirmJewelryReceived(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId)
@@ -207,6 +259,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public void approveFinalEvaluation(int consignmentId, int accountId, String description) {
         try {
             // Retrieve consignment by ID
@@ -256,6 +310,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public void rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason) {
         try {
             // Retrieve consignment by ID
@@ -304,8 +360,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDTO custAcceptInitialEvaluation(int consignmentId) {
-        try{
+        try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.IN_INITIAL_EVALUATION)) {
                 consignment.setStatus(Consignment.Status.SENDING);
@@ -314,14 +372,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Consignment is not in IN_INITIAL_EVALUATION status");
             }
             return getConsignmentDTO(consignment);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error accepting initial evaluation", e);
             throw new ConsignmentServiceException("Error accepting initial evaluation", e);
         }
     }
+
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDTO custRejectInitialEvaluation(int consignmentId) {
-        try{
+        try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.IN_INITIAL_EVALUATION)) {
                 consignment.setStatus(Consignment.Status.TERMINATED);
@@ -330,14 +391,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Consignment is not in IN_INITIAL_EVALUATION status");
             }
             return getConsignmentDTO(consignment);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error rejecting initial evaluation", e);
             throw new ConsignmentServiceException("Error rejecting initial evaluation", e);
         }
     }
+
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDTO custAcceptFinaltialEvaluation(int consignmentId) {
-        try{
+        try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.WAITING_SELLER)) {
                 consignment.setStatus(Consignment.Status.FINISHED);
@@ -346,14 +410,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Consignment is not in IN_FinalTIAL_EVALUATION status");
             }
             return getConsignmentDTO(consignment);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error accepting Final evaluation", e);
             throw new ConsignmentServiceException("Error accepting final evaluation", e);
         }
     }
+
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public ConsignmentDTO custRejectFinaltialEvaluation(int consignmentId) {
-        try{
+        try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.WAITING_SELLER)) {
                 consignment.setStatus(Consignment.Status.TERMINATED);
@@ -362,7 +429,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Consignment is not in IN_FINAL_EVALUATION status");
             }
             return getConsignmentDTO(consignment);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Error rejecting final evaluation", e);
             throw new ConsignmentServiceException("Error rejecting Final evaluation", e);
         }
@@ -370,6 +437,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
+
     public void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -406,6 +475,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @Cacheable(key = "#pageable.pageNumber", value = "consignments")
     public Page<ConsignmentDTO> getAllConsignments(Pageable pageable) {
         Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
@@ -413,9 +483,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
+    @Cacheable(key = "#status + #page + #size", value = "consignments")
     public Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-
         try {
             Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
             Page<Consignment> consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
@@ -427,6 +497,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @Cacheable(key = "#userId + #page + #size", value = "consignments")
     public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Consignment> consignmentPage = consignmentRepos.findByUserID(userId, pageable);
@@ -441,45 +512,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 //        return PageImpl(consignmentPage.stream().map(this::getConsignmentDTO).collect(Collectors.toList()));
     }
 
-    @NotNull
-    private Page<ConsignmentDTO> getConsignmentDTOS(Pageable pageable, Page<Consignment> consignmentPage) {
-        List<ConsignmentDTO> consignmentDTOs = consignmentPage.getContent().stream()
-                .map(this::getConsignmentDTO)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(consignmentDTOs, pageable, consignmentPage.getTotalElements());
-    }
-
-    @NotNull
-    private ConsignmentDTO getConsignmentDTO(Consignment consignment) {
-        List<ConsignmentDetailDTO> consignmentDetailDTOs = Collections.emptyList();
-        if (consignment.getConsignmentDetails() == null) {
-            consignment.setConsignmentDetails(new ArrayList<>());
-        } else {
-            consignmentDetailDTOs = consignment.getConsignmentDetails().stream()
-                    .map(detail -> new ConsignmentDetailDTO(
-                            detail.getConsignmentDetailId(),
-                            detail.getDescription(),
-                            detail.getStatus().toString(),
-                            detail.getPrice(),
-                            detail.getConsignment().getConsignmentId(),
-                            new AccountDTO(detail.getAccount()),
-                            detail.getAttachments() == null ? null : detail.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toList())
-                    ))
-                    .collect(Collectors.toList());
-        }
-        return new ConsignmentDTO(
-                consignment.getConsignmentId(),
-                String.valueOf(consignment.getStatus()),
-                String.valueOf(consignment.getPreferContact()),
-                consignment.getStaff() != null ? new AccountDTO(consignment.getStaff()) : null,
-                consignment.getCreateDate(),
-                consignment.getUpdateDate(),
-                consignmentDetailDTOs
-        );
-    }
 
     @Override
+    @Cacheable(key = "#consignmentId", value = "consignments")
     public Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId) {
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow();
         List<ConsignmentDetailDTO> consignmentDetailDTOs = new ArrayList<>();
@@ -498,6 +533,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
     public ResponseEntity<ConsignmentDTO> deleteConsignment(int id) {
         if (consignmentRepos.findByConsignmentId(id) == null) {
             throw new ConsignmentServiceException("Consignment not found");
@@ -508,6 +544,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDTO takeConsignment(int consignmentId, int accountId) {
         Account account = accountRepos.findById(accountId).orElseThrow(
                 () -> new ConsignmentServiceException("Account not found : " + accountId));
@@ -524,6 +561,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    @CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDTO receivedConsignment(int consignmentId) {
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
                 () -> new ConsignmentServiceException("Consignment not found : " + consignmentId));

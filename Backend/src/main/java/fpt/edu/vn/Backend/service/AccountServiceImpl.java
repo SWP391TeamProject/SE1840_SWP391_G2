@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Cacheable("accounts")
 public class AccountServiceImpl implements AccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
     @Value("${app.email}")
@@ -93,6 +96,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Cacheable(key = "#pageable.pageNumber",value = "accounts")
     public @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable) {
         return accountRepos.findAll(pageable).map(this::mapEntityToDTO);
     }
@@ -122,6 +126,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @CacheEvict(value = "accounts", allEntries = true)
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
         if(accountRepos.findByEmail(account.getEmail()).isPresent())
             throw new InvalidInputException("Email already exists");
@@ -146,6 +151,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @CacheEvict(value = "accounts", allEntries = true)
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
         Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
         Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
@@ -158,6 +164,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @CacheEvict(value = "accounts", allEntries = true)
     public @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file) {
         try {
             return attachmentServiceImpl.uploadAccountAttachment(file, accountId);
