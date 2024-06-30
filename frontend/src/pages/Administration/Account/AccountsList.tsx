@@ -52,21 +52,18 @@ import { AccountStatus, Roles } from "@/constants/enums";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 import { set } from "date-fns";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [roleFilter, setRoleFilter] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
   const [reload, setReload] = useState(false);
 
   const fetchAccounts = async (pageNumber: number, role?: Roles) => {
     try {
-      setIsLoading(true);
       console.log(role);
       let res;
       if (search && search?.length > 0) {
@@ -86,10 +83,8 @@ export default function AccountsList() {
           totalPages: res.data.totalPages
         }
         dispatch(setCurrentPageNumber(paging));
-        setIsLoading(false);
       }
     } catch (error) {
-      setIsLoading(false);
       console.log(error);
     }
   };
@@ -168,6 +163,7 @@ export default function AccountsList() {
   }, []);
   useEffect(() => {
     fetchAccounts(accountsList.currentPageNumber);
+    fetchAccounts(accountsList.currentPageNumber); 
     setRoleFilter("all");
 
   }, [reload]);
@@ -218,119 +214,116 @@ export default function AccountsList() {
           </div>
         </div>
         <TabsContent value={roleFilter}>
-          {isLoading ?
-            <LoadingAnimation/>
-            : <Card x-chunk="dashboard-06-chunk-0">
-              <CardHeader >
+          <Card x-chunk="dashboard-06-chunk-0">
+            <CardHeader >
 
-                <CardTitle className="flex justify-between items-center">
-                  Accounts
-                  <div className="w-full basis-1/2">
-                    <PagingIndexes className="basis-1/2" pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                  </div>
-                </CardTitle>
-                <CardDescription>
-                  Manage accounts and view their details.
-                </CardDescription>
+              <CardTitle className="flex justify-between items-center">
+                Accounts
+                <div className="w-full basis-1/2">
+                  <PagingIndexes className="basis-1/2" pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                </div>
+              </CardTitle>
+              <CardDescription>
+                Manage accounts and view their details.
+              </CardDescription>
 
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Id</TableHead>
-                      <TableHead>User Name</TableHead>
-                      <TableHead className="md:table-cell">
-                        Email
-                      </TableHead>
-                      <TableHead className="md:table-cell">
-                        Phone
-                      </TableHead>
-                      <TableHead className="md:table-cell">
-                        Role
-                      </TableHead>
-                      <TableHead className="md:table-cell w-28">
-                        Status
-                      </TableHead>
-                      {/* <TableHead className="hidden md:table-cell">
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Id</TableHead>
+                    <TableHead>User Name</TableHead>
+                    <TableHead className="md:table-cell">
+                      Email
+                    </TableHead>
+                    <TableHead className="md:table-cell">
+                      Phone
+                    </TableHead>
+                    <TableHead className="md:table-cell">
+                      Role
+                    </TableHead>
+                    <TableHead className="md:table-cell w-28">
+                      Status
+                    </TableHead>
+                    {/* <TableHead className="hidden md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                      <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {accountsList.currentPageList.map((account) => (
-                      <TableRow key={account.accountId}>
-                        <TableCell className="font-medium">
-                          {account.accountId}
-                        </TableCell>
-                        {/* <TableCell>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {accountsList.currentPageList.map((account) => (
+                    <TableRow key={account.accountId}>
+                      <TableCell className="font-medium">
+                        {account.accountId}
+                      </TableCell>
+                      {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                        <TableCell className=" md:table-cell">
-                          <div className="flex items-center ">
-                            <Avatar className="mr-5">
-                              <AvatarImage src={account.avatar != null ? account.avatar.link : 'https://github.com/shadcn.png'} />
-                              <AvatarFallback>SOS</AvatarFallback>
-                            </Avatar>
-                            {account.nickname}
-                          </div>
+                      <TableCell className=" md:table-cell">
+                        <div className="flex items-center ">
+                          <Avatar className="mr-5">
+                            <AvatarImage src={account.avatar != null ? account.avatar.link : 'https://github.com/shadcn.png'} />
+                            <AvatarFallback>SOS</AvatarFallback>
+                          </Avatar>
+                          {account.nickname}
+                        </div>
 
-                        </TableCell>
-                        <TableCell className=" md:table-cell">
-                          {account.email}
-                        </TableCell>
-                        <TableCell className=" md:table-cell">
-                          {account.phone}
-                        </TableCell>
-                        <TableCell className=" md:table-cell">
-                          {account.role}
-                        </TableCell>
-                        <TableCell className=" md:table-cell">
-                          {account.status == AccountStatus.ACTIVE ?
-                            <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> :
-                            <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => { handleEditClick(account.accountId) }}>Edit</DropdownMenuItem>
-                              {
-                                account.status == AccountStatus.ACTIVE ?
-                                  <DropdownMenuItem onClick={() => { handleSuspendClick(account.accountId) }}>Suspend</DropdownMenuItem> :
-                                  <DropdownMenuItem onClick={() => { handleActiveClick(account.accountId) }}>Activate</DropdownMenuItem>
-                              }
+                      </TableCell>
+                      <TableCell className=" md:table-cell">
+                        {account.email}
+                      </TableCell>
+                      <TableCell className=" md:table-cell">
+                        {account.phone}
+                      </TableCell>
+                      <TableCell className=" md:table-cell">
+                        {account.role}
+                      </TableCell>
+                      <TableCell className=" md:table-cell">
+                        {account.status == AccountStatus.ACTIVE ?
+                          <Badge variant="default" className="bg-green-500">{AccountStatus[account.status]}</Badge> :
+                          <Badge variant="destructive">{AccountStatus[account.status]}</Badge>}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => { handleEditClick(account.accountId) }}>Edit</DropdownMenuItem>
+                            {
+                              account.status == AccountStatus.ACTIVE ?
+                              <DropdownMenuItem onClick={() => { handleSuspendClick(account.accountId) }}>Suspend</DropdownMenuItem>:
+                              <DropdownMenuItem onClick={() => { handleActiveClick(account.accountId) }}>Activate</DropdownMenuItem>
+                            }
+                            
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
 
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-              <CardFooter>
-                {/* <div className="text-xs text-muted-foreground">
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+            <CardFooter>
+              {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-              </CardFooter>
-            </Card>}
-
+            </CardFooter>
+          </Card>
         </TabsContent>
       </Tabs>
       {/* {accountsList.value.map((account) => (
