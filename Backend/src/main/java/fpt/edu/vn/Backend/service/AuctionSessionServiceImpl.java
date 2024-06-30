@@ -81,8 +81,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (depositAmount.compareTo(maxPrice) > 0) {
             depositAmount = maxPrice;
         }
-        items.sort(Comparator.comparing(Item::getReservePrice));
-        if (a.getBalance().compareTo(items.get(0).getReservePrice()) >= 0) {
+        if (a.getBalance().compareTo(depositAmount) >= 0) {
             auctionSession.getDeposits().stream().filter(deposit -> deposit.getPayment().getAccount().getAccountId() == accountId)
                     .findFirst().ifPresent(deposit -> {
                         throw new InvalidInputException("Account already registered for auction session");
