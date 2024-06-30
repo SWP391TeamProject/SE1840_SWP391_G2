@@ -175,7 +175,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    @Cacheable(key = "#pageable.pageNumber + #status", value = "item")
+    @Cacheable(key = "#pageable.pageNumber + #status.toString()", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status) {
         return itemRepos.findItemByStatus(status, pageable).map(this::mapEntityToDTO);
@@ -205,7 +205,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(this::mapEntityToDTO);
     }
 
-    @Cacheable(key="#pageable.pageNumber + #categoryId + #status", value = "item")
+    @Cacheable(key="#pageable.pageNumber + #categoryId + #status.toString()", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId, Item.Status status) {
         return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(this::mapEntityToDTO);
