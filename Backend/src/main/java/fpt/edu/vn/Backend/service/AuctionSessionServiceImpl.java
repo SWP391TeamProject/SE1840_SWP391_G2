@@ -347,7 +347,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "'featured'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
+    @Cacheable(key = "#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 5);
