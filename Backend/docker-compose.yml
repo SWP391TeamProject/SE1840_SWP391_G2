@@ -38,6 +38,8 @@ services:
     depends_on:
        sqlserver.configurator:
           condition: service_completed_successfully
+    restart: unless-stopped
+
     environment:
       - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;database=Biddify;encrypt=true;trustServerCertificate=true;loginTimeout=30;
       - SPRING_DATASOURCE_USERNAME=sa
