@@ -15,8 +15,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAppSelector } from "@/redux/hooks";
 import { Roles } from '@/constants/enums';
-import { updateAccountService } from "@/services/AccountsServices.ts";
-import { useNavigate } from "react-router-dom";
+import { fetchAccountById, updateAccountService } from "@/services/AccountsServices.ts";
+import { useNavigate, useParams } from "react-router-dom";
+import { setCurrentAccount } from '@/redux/reducers/Accounts';
 
 const formSchema = z.object({
     accountId: z.number(),
@@ -34,6 +35,7 @@ const formSchema = z.object({
 export default function AccountEdit() {
     const account = useAppSelector((state) => state.accounts.currentAccount);
     const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -69,6 +71,25 @@ export default function AccountEdit() {
 
         console.log(updatedAccount);
     };
+
+    useEffect(() => {
+        if (!account || account.accountId != parseInt(id)) {
+            fetchAccountById(parseInt(id)).then((res) => {
+                console.log(res);
+                setCurrentAccount(res?.data);
+                form.reset({
+                    accountId: res?.data?.accountId,
+                    nickname: res?.data?.nickname ?? "",
+                    email: res?.data?.email,
+                    phone: res?.data?.phone ?? "",
+                    balance: res?.data?.balance ?? 0,
+                    role: res?.data ? res?.data.role : Roles.MEMBER,
+                });
+            });
+        } else {
+            setCurrentAccount(account);
+        }
+    }, [account]);
 
     useEffect(() => {
         console.log(account);
