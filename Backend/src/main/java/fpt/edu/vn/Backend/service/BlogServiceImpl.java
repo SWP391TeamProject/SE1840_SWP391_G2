@@ -10,6 +10,8 @@ import fpt.edu.vn.Backend.pojo.BlogPost;
 import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@CacheConfig(cacheNames = "blog")
 public class BlogServiceImpl implements BlogService {
     @Autowired
     private BlogPostRepos blogPostRepos;
@@ -40,6 +43,7 @@ public class BlogServiceImpl implements BlogService {
 
 
     @Override
+    @Cacheable(cacheNames = "blog", key = "#pageable.pageNumber")
     public Page<BlogPostDTO> getAllBlogs(Pageable pageable) {
         List<BlogPostDTO> blogPostDTOS = blogPostRepos.findAll().stream().map(BlogPostDTO::new).sorted(
                 (o1, o2) -> o2.getCreateDate().compareTo(o1.getCreateDate())

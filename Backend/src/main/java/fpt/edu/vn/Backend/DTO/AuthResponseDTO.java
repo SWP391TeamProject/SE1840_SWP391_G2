@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
@@ -14,7 +15,7 @@ import java.util.Random;
 @Builder
 @AllArgsConstructor
 @ToString
-public class AuthResponseDTO {
+public class AuthResponseDTO implements Serializable {
     private int id;
     private String accessToken;
     private Account.Role role;

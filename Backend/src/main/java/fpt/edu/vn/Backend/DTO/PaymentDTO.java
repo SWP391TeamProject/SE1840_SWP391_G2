@@ -5,13 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Data
 @ToString
-public class PaymentDTO {
+public class PaymentDTO implements Serializable {
     private int id;
     private BigDecimal amount;
     private LocalDateTime date;

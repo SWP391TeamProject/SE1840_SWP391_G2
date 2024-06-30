@@ -17,6 +17,8 @@ import fpt.edu.vn.Backend.repository.ItemRepos;
 import fpt.edu.vn.Backend.repository.OrderRepos;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig (cacheNames = "item")
 public class ItemServiceImpl implements ItemService {
     private final AccountRepos accountRepos;
     private final ItemRepos itemRepos;
@@ -152,6 +155,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Cacheable(cacheNames = "item", key = "#pageable.pageNumber")
     public @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable) {
         return itemRepos.findAll(pageable).map(this::mapEntityToDTO);
     }

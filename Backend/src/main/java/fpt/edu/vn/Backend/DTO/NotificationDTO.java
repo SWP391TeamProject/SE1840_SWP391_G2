@@ -5,12 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @Builder
-public class NotificationDTO {
+public class NotificationDTO implements Serializable {
     private int notificationId;
     private int userId;
     private String message;
