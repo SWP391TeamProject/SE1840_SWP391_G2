@@ -29,6 +29,14 @@ services:
         /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Y0urStr0ng!Passw0rd -d master -i docker-entrypoint-initdb.d/init.sql;
         echo "All done!";
         '
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    depends_on:
+      sqlserver:
+          condition: service_healthy
+    restart: always
   app:
     build:
       context: .

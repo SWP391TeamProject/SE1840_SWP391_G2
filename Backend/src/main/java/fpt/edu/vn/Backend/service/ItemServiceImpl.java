@@ -18,9 +18,11 @@ import fpt.edu.vn.Backend.repository.OrderRepos;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,17 +42,19 @@ public class ItemServiceImpl implements ItemService {
     private final OrderRepos orderRepos;
 
     private final AttachmentService attachmentService;
+    private final RedisCacheManager cacheManager;
 
     @Autowired
     public ItemServiceImpl(AccountRepos accountRepos,
                            ItemRepos itemRepos,
                            ItemCategoryRepos itemCategoryRepos,
-                           OrderRepos orderRepos, AttachmentService attachmentService) {
+                           OrderRepos orderRepos, AttachmentService attachmentService, RedisCacheManager cacheManager) {
         this.accountRepos = accountRepos;
         this.itemRepos = itemRepos;
         this.itemCategoryRepos = itemCategoryRepos;
         this.orderRepos = orderRepos;
         this.attachmentService = attachmentService;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -106,6 +110,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
     public @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO itemDTO) throws IOException {
 //        Preconditions.checkNotNull(itemDTO.getCategoryId(), "Category is required");
 //        Preconditions.checkNotNull(itemDTO.getName(), "Name is required");
@@ -142,11 +147,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Cacheable(value = "item", key = "#id")
     public ItemDTO getItemById(int id) {
         return itemRepos.findById(id).map(this::mapEntityToDTO).orElse(null);
     }
 
     @Override
+    @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
     public @NotNull ItemDTO updateItem(@NotNull ItemDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
         Item it = itemRepos.findById(item.getItemId())
@@ -155,47 +162,55 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Cacheable(cacheNames = "item", key = "#pageable.pageNumber")
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     public @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable) {
         return itemRepos.findAll(pageable).map(this::mapEntityToDTO);
     }
 
     @Override
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     public @NotNull Page<ItemDTO> getItemsByPrice(@NotNull Pageable pageable, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndStatus(BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice), Item.Status.IN_AUCTION, pageable)
                 .map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status) {
         return itemRepos.findItemByStatus(status, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByOwnerId(@NotNull Pageable pageable, int ownerId) {
         return itemRepos.findItemByOwnerAccountId(ownerId, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name) {
         return itemRepos.findItemByNameContaining(name, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name, Item.Status status) {
         return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {
         return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId, Item.Status status) {
         return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(value = "item", key = "#pageable.pageNumber")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus( BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice),categoryId,Item.Status.IN_AUCTION, pageable)

@@ -8,6 +8,9 @@ import fpt.edu.vn.Backend.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = "auctionSession")
 public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final AuctionSessionRepos auctionSessionRepos;
     private static final Logger logger = LoggerFactory.getLogger(AuctionSessionServiceImpl.class);
@@ -55,8 +59,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         this.accountServiceImpl = accountServiceImpl;
     }
 
-
     @Override
+    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
         Account a = accountRepos.findById(accountId).orElseThrow(
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
@@ -116,6 +120,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @CacheEvict(key = "#assign.auctionSessionId", value = "auctionSession")
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
@@ -144,7 +149,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return false;
         }
     }
-
+    @Cacheable(key = "#auctionDTO.title", value = "auctionSession")
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
@@ -171,6 +176,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
     public void finishAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         Map<AccountDTO, List<Integer>> winAccounts = new HashMap<>();
@@ -259,7 +265,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         logger.info("Auction session " + auctionSessionId + " finished :" + getAuctionSessionById(auctionSessionId).getStatus());
     }
-
+    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
     @Override
     public void terminateAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
@@ -308,6 +314,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @CacheEvict(key = "#auctionSessionId", value = "auctionSession")
     public void startAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         logger.info("Starting auction session " + auctionSessionId);
@@ -338,6 +345,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @Cacheable(key = "#pageable", value = "auctionSession")
     public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
         List<AuctionSession> auctionSessionList = auctionSessionRepos.findAll();
 
@@ -366,6 +374,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @CacheEvict(key = "#auctionDTO.auctionSessionId", value = "auctionSession")
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
             throw new InvalidInputException("Start date must be in the future");
@@ -393,7 +402,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new ResourceNotFoundException("Error updating auction session", e);
         }
     }
-
+    @Cacheable(key = "#id", value = "auctionSession")
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
         try {
@@ -407,6 +416,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @Cacheable(key = "#pageable", value = "auctionSession")
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
         if (auctionSessions.isEmpty()) {
@@ -416,6 +426,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @Cacheable(key = "#pageable", value = "auctionSession")
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
         Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
         if (pastAuctionSessions.isEmpty()) {
@@ -428,6 +439,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    @Cacheable(key = "#pageable", value = "auctionSession")
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
         Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
@@ -438,6 +450,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return a;
     }
 
+    @Cacheable(key = "#pageable", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
         Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
