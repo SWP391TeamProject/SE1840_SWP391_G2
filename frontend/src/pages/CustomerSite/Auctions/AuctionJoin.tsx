@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { useCurrency } from "@/CurrencyProvider.tsx";
+import PlaceBid from './components/PlaceBid';
 
 
 export default function AuctionJoin() {
@@ -25,6 +26,7 @@ export default function AuctionJoin() {
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
+  let endDate = location.state.endDate;
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(true);
@@ -41,7 +43,7 @@ export default function AuctionJoin() {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
-    if (getCookie("user")&&JSON.parse(getCookie("user")) && allow !== false) {
+    if (getCookie("user") && JSON.parse(getCookie("user")) && allow !== false) {
       setAllow(true);
     } else {
       setAllow(false);
@@ -99,7 +101,7 @@ export default function AuctionJoin() {
     console.log(payload);
 
     if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
-      toast.error(payload.body.split(":")[0],{
+      toast.error(payload.body.split(":")[0], {
         position: "bottom-right",
       });
       client?.forceDisconnect();
@@ -110,7 +112,7 @@ export default function AuctionJoin() {
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
       if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
-        toast.error(JSON.parse(payload.body)?.body?.message,{
+        toast.error(JSON.parse(payload.body)?.body?.message, {
           position: "bottom-right",
         });
       }
@@ -120,7 +122,7 @@ export default function AuctionJoin() {
     console.log(message);
     if (message?.status == "JOIN" || message?.status == "BID") {
       if (message?.status == "BID")
-        toast.info(message?.message,{
+        toast.info(message?.message, {
           position: "bottom-right",
         });
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
@@ -135,7 +137,7 @@ export default function AuctionJoin() {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
         toast.error("Please enter a valid number", {
-          position: "bottom-right",
+          position: "bottom-right", 
         });
         return;
       }
@@ -217,7 +219,7 @@ export default function AuctionJoin() {
                     <div>
                       <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
                       <p className="text-2xl font-bold">{currency.format({
-                        amount: price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)
+                        amount: price ?? (bids.length > 0 ? bids[0].price : 0)
                       })}</p>
                     </div>
                     <div>
@@ -269,6 +271,12 @@ export default function AuctionJoin() {
                       </div>
                     </div>
                   }
+                  <PlaceBid
+                  auctionId ={auctionId}
+                  itemId={itemId}
+                  sendMessage={sendMessage} endDate={endDate} name={itemDTO?.name} image={itemDTO?.attachments[0].link} client={client} currentBid={
+                    price ?? (bids.length > 0 ? bids[0].price : 0)
+                  } />
                 </div>
               </div>
             </div>

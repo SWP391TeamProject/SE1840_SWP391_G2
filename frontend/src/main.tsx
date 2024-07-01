@@ -86,16 +86,47 @@ import { ItemList } from "./pages/CustomerSite/Item/ItemList.tsx";
 import { CurrencyProvider } from "@/CurrencyProvider.tsx";
 import CustomerConsignmentDetail from "./pages/CustomerSite/dashboard/CustomerConsignmentDetail.tsx";
 import BlogEdit from "./pages/Administration/Blog/BlogPostEdit/BlogEdit.tsx";
+import StripePayment from "./StripePayment.tsx";
+// import { Elements } from "@stripe/react-stripe-js";
+// import { loadStripe } from "@stripe/stripe-js";
 
 
 const router = createBrowserRouter(routes);
 const queryClient = new QueryClient()
+// const stripePromise = loadStripe('pk_test_51PPLs0KuzKu2wTEitMeve3pW9EFWbNoHqgDUdtgFxjyP4Gue7Ei9W2xMs2J37Lxx4rjZPhEVyF8bjz7FuKPYAg6d00wmqA2mo8');
 
+const appearance = {
+  theme: 'stripe',
+
+  variables: {
+    colorPrimary: '#0570de',
+    colorBackground: '#ffffff',
+    colorText: '#30313d',
+    colorDanger: '#df1b41',
+    fontFamily: 'Ideal Sans, system-ui, sans-serif',
+    spacingUnit: '2px',
+    borderRadius: '4px',
+    // See all possible variables below
+  }
+};
+
+// Pass the appearance object to the Elements instance
+const options = {
+    mode: 'setup',
+    paymentMethodTypes: ['card'],
+    currency: 'usd',
+    paymentMethodCreation: 'manual',  
+
+    // Fully customizable with appearance API.
+    appearance:appearance,
+  };
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 
     <GoogleOAuthProvider
       clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
+            {/* <Elements stripe={stripePromise} options={options}> */}
+
       <QueryClientProvider client={queryClient}>
         <ToastContainer autoClose={3000} pauseOnHover={false} closeOnClick />
         <Provider store={store}>
@@ -247,7 +278,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/unauthorized" element={<ErrorPage />} />
                     {/* <RouterProvider router={router} /> */}
                     <Route path="*" element={<ErrorPage />} />
-                    {/* <Route path="/test" element={<TestPage />} /> */}
+                    {/* <Route path="/test" element={<StripePayment />} /> */}
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}
@@ -257,6 +288,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           </AuthProvider>
         </Provider>
       </QueryClientProvider>
+      {/* </Elements> */}
     </GoogleOAuthProvider>
 
   </ThemeProvider>

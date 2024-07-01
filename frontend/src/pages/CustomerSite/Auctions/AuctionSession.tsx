@@ -299,6 +299,7 @@ export default function AuctionSession() {
                     itemId: item.itemId
                 },
                 itemDTO: item,
+                endDate: auctionSession?.endDate,
                 allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
             }
         });
@@ -385,10 +386,10 @@ export default function AuctionSession() {
                                         <SelectValue placeholder="Select a theme to display" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="All" key={0}>All</SelectItem>
-                                        {categories && categories.map((category) => (
-                                            <SelectItem value={category.name} key={category.itemCategoryId}>{category.name}</SelectItem>
-                                        ))}
+                                        {/* <SelectItem value="All" key={0}>All</SelectItem>
+                                        {categories && categories?.map((category) => (
+                                            <SelectItem value={category?.name} key={category?.itemCategoryId}>{category.name}</SelectItem>
+                                        ))} */}
                                     </SelectContent>
                                 </Select>
                             </div>
