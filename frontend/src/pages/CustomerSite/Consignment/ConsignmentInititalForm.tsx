@@ -31,6 +31,7 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 import thumbnail1 from "@/assets/thumnail1.jpg";
+import { useAuth } from "@/AuthProvider";
 
 
 const formSchema = z.object({
@@ -53,14 +54,15 @@ export default function ConsignmentInititalForm() {
   // 1. Define your form.
   const [user, setUser] = useState();
   const [isLoading, setIsLoading] = useState(false)
+  const auth = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: JSON.parse(getCookie("user"))?.id,
-      email: JSON.parse(getCookie("user"))?.email || "",
-      phone: JSON.parse(getCookie("user"))?.phone || "",
-      contactName: JSON.parse(getCookie("user"))?.nickname || "",
+      accountId: auth.user.accountId,
+      email: auth.user.email,
+      phone:  auth.user.phone,
+      contactName: auth.user.nickname,
       preferContact: "any",
       description: "",
       files: [],
@@ -173,7 +175,6 @@ export default function ConsignmentInititalForm() {
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
                           <Input placeholder="enter your phone number here"
-                            defaultValue={JSON.parse(getCookie("user"))?.phone}
                             readOnly
                             {...field} />
                         </FormControl>
