@@ -244,6 +244,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         element={<TwoFactorAuthForm />}></Route>
                     </Route>
 
+<<<<<<< Updated upstream
                     <Route path="/unauthorized" element={<ErrorPage />} />
                     {/* <RouterProvider router={router} /> */}
                     <Route path="*" element={<ErrorPage />} />
@@ -251,6 +252,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}
+=======
+                  <Route path="/unauthorized" element={<ErrorPage />} />
+                  {/* <RouterProvider router={router} /> */}
+                  <Route path="*" element={<ErrorPage />} />
+                  <Route path="/test" element={<App />} />
+                </Routes>
+              </BrowserRouter>
+              {/* <RouterProvider router={router} /> */}
+>>>>>>> Stashed changes
 
               </TooltipProvider>
             </CurrencyProvider>
