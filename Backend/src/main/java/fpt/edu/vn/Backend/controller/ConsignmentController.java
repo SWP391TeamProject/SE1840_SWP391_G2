@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
@@ -29,7 +30,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/consignments")
@@ -54,17 +54,18 @@ public class ConsignmentController {
             if (consignments == null || consignments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            switch (accountService.getAccountByEmail(authentication.getName()).getRole()){
+            switch (accountService.getAccountByEmail(authentication.getName()).getRole()) {
                 case STAFF: {
-                    Pageable pageable1 = Pageable.unpaged();
+                    Pageable pageable1 = Pageable.ofSize(500).withPage(0);
                     consignments = consignmentService.getAllConsignments(pageable1);
-                    List<ConsignmentDTO> listStaffPage=consignments.stream().filter(consignmentDTO -> consignmentDTO.getStatus().equals(String.valueOf(Consignment.Status.WAITING_STAFF))||consignmentDTO.getStaff()==null||consignmentDTO.getStaff().getEmail().equals(authentication.getName())).toList();
-                    Page<ConsignmentDTO> staffPage= new PageImpl(listStaffPage,pageable,listStaffPage.size());
+                    List<ConsignmentDTO> listStaffPage = consignments.stream().filter(consignmentDTO ->
+                            consignmentDTO.getStatus().equals(String.valueOf(Consignment.Status.WAITING_STAFF))
+                                    || consignmentDTO.getStaff() == null || consignmentDTO.getStaff().getEmail().equals(authentication.getName())).toList();
+                    Page<ConsignmentDTO> staffPage = new PageImpl<>(listStaffPage, pageable, listStaffPage.size());
 
                     return new ResponseEntity<>(staffPage, HttpStatus.OK);
                 }
-                case MANAGER:
-                {
+                case MANAGER: {
                     return new ResponseEntity<>(consignments, HttpStatus.OK);
                 }
 
@@ -81,8 +82,8 @@ public class ConsignmentController {
     @GetMapping("/{id}")
     public ResponseEntity<ConsignmentDTO> getConsignmentByID(@PathVariable int id) {
         try {
-           ConsignmentDTO consignment = consignmentService.getConsignmentById(id);
-            if (consignment == null ) {
+            ConsignmentDTO consignment = consignmentService.getConsignmentById(id);
+            if (consignment == null) {
                 throw new ConsignmentServiceException("No consignments found for acc ID: " + id);
             }
             return new ResponseEntity<>(consignment, HttpStatus.OK);
@@ -96,7 +97,10 @@ public class ConsignmentController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByUserID(@PathVariable int id, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByUserID(
+            @PathVariable int id,
+            @RequestParam(defaultValue = "0") int pageNumb,
+            @RequestParam(defaultValue = "50") int pageSize) {
         try {
             Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
             if (consignments == null || consignments.isEmpty()) {
@@ -113,9 +117,17 @@ public class ConsignmentController {
     }
 
     @GetMapping("/filter-by-status")
-    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByStatus(@RequestParam String status, @RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
+    public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByStatus(
+            @RequestParam String status,
+            @RequestParam(defaultValue = "0") int pageNumb,
+            @RequestParam(defaultValue = "50") int pageSize,
+            Authentication authentication) {
         try {
-            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageNumb, pageSize);
+            AccountDTO acc=accountService.getAccountByEmail(authentication.getName());
+            if(acc==null){
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageNumb, pageSize,acc.getAccountId());
             if (consignments == null || consignments.isEmpty()) {
                 throw new ConsignmentServiceException("No consignments found with status: " + status);
             }
@@ -201,14 +213,17 @@ public class ConsignmentController {
     public ResponseEntity<ConsignmentDTO> acceptInitialEvaluation(@PathVariable int consignmentDetailId) {
         return new ResponseEntity<>(consignmentService.custAcceptInitialEvaluation(consignmentDetailId), HttpStatus.OK);
     }
+
     @GetMapping("/rejectIniEva/{consignmentDetailId}")
     public ResponseEntity<ConsignmentDTO> rejectInitialEvaluation(@PathVariable int consignmentDetailId) {
         return new ResponseEntity<>(consignmentService.custRejectInitialEvaluation(consignmentDetailId), HttpStatus.OK);
     }
+
     @GetMapping("/acceptFinalEva/{consignmentDetailId}")
     public ResponseEntity<ConsignmentDTO> acceptFinaltialEvaluation(@PathVariable int consignmentDetailId) {
         return new ResponseEntity<>(consignmentService.custAcceptFinaltialEvaluation(consignmentDetailId), HttpStatus.OK);
     }
+
     @GetMapping("/rejectFinalEva/{consignmentDetailId}")
     public ResponseEntity<ConsignmentDTO> rejectFinaltialEvaluation(@PathVariable int consignmentDetailId) {
         return new ResponseEntity<>(consignmentService.custRejectFinaltialEvaluation(consignmentDetailId), HttpStatus.OK);

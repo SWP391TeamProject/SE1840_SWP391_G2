@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
@@ -483,13 +484,22 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
-    @Cacheable(key = "#status + #page + #size", value = "consignments")
-    public Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size) {
+    @Cacheable(key = "#status + #page + #size + #accID", value = "consignments")
+    public Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size, int accID) {
         Pageable pageable = PageRequest.of(page, size);
+        Account.Role role = accountRepos.findById(accID).orElseThrow(
+                ()-> new ResourceNotFoundException("Account not found")).getRole();
         try {
             Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
-            Page<Consignment> consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
-
+            Page<Consignment> consignmentPage;
+            if (role.equals(Account.Role.valueOf("MANAGER")) ||
+                    role.equals(Account.Role.valueOf("ADMIN"))) {
+                consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
+            }else if(role.equals(Account.Role.valueOf("STAFF"))){
+                consignmentPage = consignmentRepos.findByStatusAndStaff_AccountId(enumStatus,accID, pageable);
+            }else{
+                return null;
+            }
             return getConsignmentDTOS(pageable, consignmentPage);
         } catch (IllegalArgumentException e) {
             throw new ConsignmentServiceException("Invalid status value: " + status, e);
