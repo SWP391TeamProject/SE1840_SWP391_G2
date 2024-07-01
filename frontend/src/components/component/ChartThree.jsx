@@ -37,7 +37,7 @@ const CharThree = () => {
                     label: 'My First dataset',
                     backgroundColor: 'transparent',
                     borderColor: 'rgba(255,255,255,.55)',
-                    pointBackgroundColor: getStyle('--cui-primary'),
+                    pointBackgroundColor: "#3d99f5",
                     data: [65, 59, 84, 84, 51, 55, 40],
                   },
                 ],

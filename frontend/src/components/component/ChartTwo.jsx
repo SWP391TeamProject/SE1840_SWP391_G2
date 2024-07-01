@@ -37,7 +37,7 @@ const ChartTwo = () => {
                     label: 'My First dataset',
                     backgroundColor: 'transparent',
                     borderColor: 'rgba(255,255,255,.55)',
-                    pointBackgroundColor: getStyle('--cui-info'),
+                    pointBackgroundColor: "#edad21",
                     data: [1, 18, 9, 17, 34, 22, 11],
                   },
                 ],

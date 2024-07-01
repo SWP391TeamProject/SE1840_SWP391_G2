@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../data/theme";
 import { mockLineData as data } from "../data/mockData";
 
+
 const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -78,11 +79,14 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
       }}
       enableGridX={false}
       enableGridY={false}
-      pointSize={8}
-      pointColor={{ theme: "background" }}
-      pointBorderWidth={2}
-      pointBorderColor={{ from: "serieColor" }}
-      pointLabelYOffset={-12}
+      // enablePoints={true}
+      enableArea={true}
+      enableCrosshair={false}
+      // pointSize={8}
+      // pointColor={{ theme: "background" }}
+      // pointBorderWidth={0}
+      // pointBorderColor={{ from: "serieColor" }}
+      // pointLabelYOffset={-12}
       useMesh={true}
       legends={[
         {
@@ -110,6 +114,33 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
           ],
         },
       ]}
+      options={{
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            display: false,
+          },
+          y: {
+            display: false,
+          },
+        },
+        elements: {
+          line: {
+            borderWidth: 2,
+            tension: 0.4,
+          },
+          point: {
+            radius: 0,
+            hitRadius: 10,
+            hoverRadius: 4,
+          },
+        },
+      }}
     />
   );
 };
