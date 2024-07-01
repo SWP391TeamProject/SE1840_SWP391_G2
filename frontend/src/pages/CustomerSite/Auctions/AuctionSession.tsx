@@ -414,13 +414,13 @@ export default function AuctionSession() {
                                     </div>
 
                                     <CardContent className="space-y-2 p-4">
-                                        <h3 className="text-sm font-semibold h-12 mb-10">{item.itemDTO.name}</h3>
-                                        <div className="flex items-center justify-between mt-3">
-                                            <div className="text-primary-500 font-medium mr-8">{currency.format({
+                                        <h3 className="text-sm font-semibold h-12 mb-8">{item.itemDTO.name}</h3>
+                                        {/* <div className="flex items-center justify-between mt-5"> */}
+                                            <div className="text-primary-500 font-medium space-y-3">{currency.format({
                                                 amount: item?.itemDTO.reservePrice
-                                            })}</div>
-
-                                            {
+                                            })}</div>                                            
+                                        {/* </div> */}
+                                        {
                                                 auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
                                                     <div className="rounded-md bg-yellow-300 p-2 text-red-500">
                                                         Won: {currency.format({
@@ -429,7 +429,7 @@ export default function AuctionSession() {
                                                     </div> :
                                                     <>
                                                         {bidders.includes(userId) ? (
-                                                            <Button className='space-y-2 ml-5' onClick={() => {
+                                                            <Button className='space-y-2' onClick={() => {
                                                                 let name = item?.itemDTO.name;
                                                                 navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
                                                             }}>Place Bid</Button>
@@ -439,9 +439,6 @@ export default function AuctionSession() {
                                                     </>
 
                                             }
-
-                                            {/* <div className="text-sm text-gray-500 dark:text-gray-400">1h 23m</div> */}
-                                        </div>
                                     </CardContent>
                                 </Card>
                             )) : "No Item"}
