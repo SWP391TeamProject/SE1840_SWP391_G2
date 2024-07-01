@@ -29,7 +29,7 @@ public interface ConsignmentService {
     // Reads
     ConsignmentDTO getConsignmentById(int id);
     Page<ConsignmentDTO> getAllConsignments(Pageable pageable);
-    Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size);
+    Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size,int accID);
     Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
     Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 
