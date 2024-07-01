@@ -54,23 +54,24 @@ public class ConsignmentController {
             if (consignments == null || consignments.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            switch (accountService.getAccountByEmail(authentication.getName()).getRole()) {
+            Account.Role role = accountService.getAccountByEmail(authentication.getName()).getRole();
+            logger.info(role.toString()+": "+role.equals(Account.Role.STAFF)+": "+role.equals(Account.Role.MANAGER));
+            switch (role) {
                 case STAFF: {
                     Pageable pageable1 = Pageable.ofSize(500).withPage(0);
                     consignments = consignmentService.getAllConsignments(pageable1);
                     List<ConsignmentDTO> listStaffPage = consignments.stream().filter(consignmentDTO ->
-                            consignmentDTO.getStatus().equals(String.valueOf(Consignment.Status.WAITING_STAFF))
+                            consignmentDTO.getStatus().equalsIgnoreCase(String.valueOf(Consignment.Status.WAITING_STAFF))
                                     || consignmentDTO.getStaff() == null || consignmentDTO.getStaff().getEmail().equals(authentication.getName())).toList();
                     Page<ConsignmentDTO> staffPage = new PageImpl<>(listStaffPage, pageable, listStaffPage.size());
 
                     return new ResponseEntity<>(staffPage, HttpStatus.OK);
                 }
-                case MANAGER: {
+                case MANAGER, ADMIN: {
                     return new ResponseEntity<>(consignments, HttpStatus.OK);
                 }
-
             }
-            return new ResponseEntity<>(consignments, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Log the exception
             logger.error("An error occurred while retrieving all consignments: {}", e.getMessage(), e);
