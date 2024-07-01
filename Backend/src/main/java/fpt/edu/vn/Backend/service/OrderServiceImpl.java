@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService{
                     .filter(d -> d.getPayment().getAccount().getAccountId()==(accountId))
                     .findFirst().orElseThrow(() -> new RuntimeException("Deposit not found"))
                     .getPayment().getPaymentAmount();
-            payment.setPaymentAmount(payment.getPaymentAmount().multiply(BigDecimal.valueOf(1.045).subtract(winnerDeposit)));
+            payment.setPaymentAmount((payment.getPaymentAmount().multiply(BigDecimal.valueOf(1.045)).subtract(winnerDeposit)));
             payment = paymentRepository.save(payment);
             order.setPayment(payment);
             order = orderRepository.save(order);

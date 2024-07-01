@@ -166,7 +166,18 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
-        return null;
+        try {
+            Payment payment = paymentRepos.findById(paymentDTO.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentDTO.getId()));
+            payment.setStatus(paymentDTO.getStatus());
+            Payment updatedPayment = paymentRepos.save(payment);
+            return new PaymentDTO(updatedPayment);
+        } catch (Exception e) {
+            // Log the exception
+            System.err.println("An error occurred while updating payment: " + e.getMessage());
+            // Throw a custom exception
+            throw new ResourceNotFoundException("Failed to update payment", e);
+        }
     }
 
     @Override
