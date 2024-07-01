@@ -35,13 +35,18 @@ class BlogService {
     }
 
     public static getBlogByCategory(categoryId: number, page: number, size: number) {
-        return axios.get(`${this.BASE_URL}/category?categoryId=${categoryId}&pageNumb=${page}&pageSize=${size}`,
+        let params = {
+            page: page || 0,
+            size: size || 50,
+        }
+        return axios.get(`${this.BASE_URL}/category?categoryId=${categoryId}`,
             {
                 headers: {
                     "Content-Type": "application/json",
                       
     
                 },
+                params: params
             }
         );
     }

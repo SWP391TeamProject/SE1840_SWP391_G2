@@ -393,10 +393,10 @@ export default function AuctionSession() {
                                 </Select>
                             </div>
                         </div>
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
                             {/* {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => ( */}
                             {items ? items.map((item) => (
-                                <Card key={item.id.itemId}>
+                                <Card key={item.id.itemId} className='min-w-52'>
 
                                     <div className='group relative'>
                                         <img
@@ -414,9 +414,9 @@ export default function AuctionSession() {
                                     </div>
 
                                     <CardContent className="space-y-2 p-4">
-                                        <h3 className="text-sm font-semibold h-12">{item.itemDTO.name}</h3>
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-primary-500 font-medium">{currency.format({
+                                        <h3 className="text-sm font-semibold h-12 mb-10">{item.itemDTO.name}</h3>
+                                        <div className="flex items-center justify-between mt-3">
+                                            <div className="text-primary-500 font-medium mr-8">{currency.format({
                                                 amount: item?.itemDTO.reservePrice
                                             })}</div>
 
@@ -429,7 +429,7 @@ export default function AuctionSession() {
                                                     </div> :
                                                     <>
                                                         {bidders.includes(userId) ? (
-                                                            <Button onClick={() => {
+                                                            <Button className='space-y-2 ml-5' onClick={() => {
                                                                 let name = item?.itemDTO.name;
                                                                 navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
                                                             }}>Place Bid</Button>

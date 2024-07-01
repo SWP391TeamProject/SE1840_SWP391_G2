@@ -35,26 +35,25 @@ import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
 import { fetchActiveAuctionSessions, fetchAllAuctionSessions, fetchAuctionSessionByTitle, fetchPastAuctionSessions, fetchUpcomingAuctionSessions } from "@/services/AuctionSessionService";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 
 export default function AuctionSessionList() {
   const auctionSessionsList = useAppSelector((state) => state.auctionSessions);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
 
   const fetchAuctionSessions = async (pageNumber: number, filter?: string) => {
     try {
       let res;
-      
+      setIsLoading(true);
       if (search && search?.length > 0) {
         res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
       } else {
         switch (filter) {
-          case "all":
-            res = await fetchAllAuctionSessions(pageNumber, 10);
-            break;
           case "upcoming":
             res = await fetchUpcomingAuctionSessions(pageNumber, 10);
             break;
@@ -78,10 +77,12 @@ export default function AuctionSessionList() {
           totalPages: res.data.totalPages
         }
         dispatch(setCurrentPageNumber(paging));
+        setIsLoading(false);
       }
 
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   };
 
@@ -196,113 +197,116 @@ export default function AuctionSessionList() {
           </div>
         </div>
         <TabsContent value={statusFilter}>
-          <Card x-chunk="dashboard-06-chunk-0">
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                AuctionSessions
-                <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                </div>
-              </CardTitle>
-              
-              <CardDescription>
-                Manage Auctions and view auctions details.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Id</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead className="md:table-cell">
-                      Start Date
-                    </TableHead>
-                    <TableHead className="md:table-cell">
-                      End Date
-                    </TableHead>
-                    <TableHead className="md:table-cell text-center">
-                      Participant
-                    </TableHead>
-                    <TableHead className="md:table-cell text-center">
-                      number of lots
-                    </TableHead>
-                    {/* <TableHead className=" md:table-cell">
+          {isLoading
+            ? <LoadingAnimation />
+            : <Card x-chunk="dashboard-06-chunk-0">
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  AuctionSessions
+                  <div className="w-full basis-1/2">
+                    <PagingIndexes pageNumber={auctionSessionsList.currentPageNumber ? auctionSessionsList.currentPageNumber : 0} totalPages={auctionSessionsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                  </div>
+                </CardTitle>
+
+                <CardDescription>
+                  Manage Auctions and view auctions details.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Id</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead className="md:table-cell">
+                        Start Date
+                      </TableHead>
+                      <TableHead className="md:table-cell">
+                        End Date
+                      </TableHead>
+                      <TableHead className="md:table-cell text-center">
+                        Participant
+                      </TableHead>
+                      <TableHead className="md:table-cell text-center">
+                        number of lots
+                      </TableHead>
+                      {/* <TableHead className=" md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                    <TableHead>
-                      <span className="sr-only">Actions</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {auctionSessionsList.currentPageList.map((auctionSession) => (
-                    <TableRow key={auctionSession.auctionSessionId}>
-                      <TableCell className="font-medium">
-                        {auctionSession.auctionSessionId}
-                      </TableCell>
-                      {/* <TableCell>
+                      <TableHead>
+                        <span className="sr-only">Actions</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {auctionSessionsList.currentPageList.map((auctionSession) => (
+                      <TableRow key={auctionSession.auctionSessionId}>
+                        <TableCell className="font-medium">
+                          {auctionSession.auctionSessionId}
+                        </TableCell>
+                        {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="md:table-cell">
-                        {auctionSession.title}
+                        <TableCell className="md:table-cell">
+                          {auctionSession.title}
 
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {/* {auctionSession.startDate} */}
-                        {new Date(auctionSession.startDate).toLocaleDateString("en-US")}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {/* {auctionSession.startDate} */}
+                          {new Date(auctionSession.startDate).toLocaleDateString("en-US")}
 
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {new Date(auctionSession.endDate).toLocaleDateString("en-US")}
-                      </TableCell>
-                      <TableCell className="md:table-cell text-center">
-                        {/* {auctionSession.role[0]?.roleName} */}
-                        {auctionSession.deposits?.length}
-                        
-                      </TableCell>
-                      <TableCell className="md:table-cell text-center">
-                        {auctionSession.auctionItems?.length}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {new Date(auctionSession.endDate).toLocaleDateString("en-US")}
+                        </TableCell>
+                        <TableCell className="md:table-cell text-center">
+                          {/* {auctionSession.role[0]?.roleName} */}
+                          {auctionSession.deposits?.length}
 
-                        {/* {auctionSession.status == AuctionSessionStatus.ACTIVE ? 
+                        </TableCell>
+                        <TableCell className="md:table-cell text-center">
+                          {auctionSession.auctionItems?.length}
+
+                          {/* {auctionSession.status == AuctionSessionStatus.ACTIVE ? 
                         {auctionSession.deposits.length}
 
                         <Badge variant="default" className="bg-green-500">{AuctionSessionStatus[auctionSession.status]}</Badge> : 
                         <Badge variant="destructive">{AuctionSessionStatus[auctionSession.status]}</Badge>} */}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession?.auctionSessionId) }}>Detail</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(auctionSession?.auctionSessionId) }}>Assign Items</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                aria-haspopup="true"
+                                size="icon"
+                                variant="ghost"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => { handleDetailClick(auctionSession?.auctionSessionId) }}>Detail</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(auctionSession?.auctionSessionId) }}>Assign Items</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
 
-                  ))}
-                </TableBody>
-              </Table>
-              
-            </CardContent>
-            <CardFooter>
-              {/* <div className="text-xs text-muted-foreground">
+                    ))}
+                  </TableBody>
+                </Table>
+
+              </CardContent>
+              <CardFooter>
+                {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-            </CardFooter>
-          </Card>
+              </CardFooter>
+            </Card>
+          }
         </TabsContent>
       </Tabs>
       {/* {auctionSessionsList.value.map((auctionSession) => (
