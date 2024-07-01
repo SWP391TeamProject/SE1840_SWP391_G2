@@ -207,7 +207,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.info("Winning account: " + account.getAccountId() + " items: " + items);
         });
         for (DepositDTO deposit : auctionDTO.getDeposits()) {
-            if (deposit.getPayment().getStatus().equals(Payment.Status.SUCCESS)) {
+            if (deposit.getPayment().getStatus().equals(Payment.Status.SUCCESS)
+                    || deposit.getPayment().getStatus().equals(Payment.Status.FAILED)) {
                 continue;
             }
             if (winAccounts.keySet().stream()
@@ -224,7 +225,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 accountRepos.findById(deposit.getPayment().getAccountId()).ifPresent(account -> {
                     account.setBalance(account.getBalance().add(deposit.getPayment().getAmount()));
                     accountRepos.save(account);
-                    logger.info("Refunding deposit for account " + account.getAccountId());
+                    logger.info("Refunding deposit id {} for account " + account.getAccountId(), deposit.getDepositId());
                 });
                 paymentService.updatePayment(deposit.getPayment());
             }
