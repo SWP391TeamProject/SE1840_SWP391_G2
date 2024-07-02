@@ -13,7 +13,7 @@ import {
 } from "./enums";
 
 export interface Account {
-  account_id?: number;
+  accountId?: number;
   balance?: number;
   create_date?: Date;
   email?: string;
@@ -22,7 +22,7 @@ export interface Account {
   phone?: string;
   status?: AccountStatus;
   update_date?: Date;
-  avatar_url_attachment_id?: number;
+  avatar?: Attachment;
 }
 
 export interface Attachment {

@@ -91,6 +91,15 @@ export const createItem = async (itemDTO: any) => {
         }
     });
 };
+export const createItemFromConsignment = async (id:any, itemDTO: any) => {
+    return await axios.post<Item>(`${baseUrl}/create/${id}`, itemDTO, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
+        }
+    });
+};
 
 export const updateItem = async (itemDTO: Item) => {
     if (!itemDTO.itemId) {

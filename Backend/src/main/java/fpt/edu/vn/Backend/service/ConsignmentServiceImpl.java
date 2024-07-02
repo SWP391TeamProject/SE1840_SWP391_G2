@@ -405,10 +405,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.WAITING_SELLER)) {
-                consignment.setStatus(Consignment.Status.FINISHED);
+                consignment.setStatus(Consignment.Status.TO_ITEM);
                 consignmentRepos.save(consignment);
             } else {
-                throw new ConsignmentServiceException("Consignment is not in IN_FinalTIAL_EVALUATION status");
+                throw new ConsignmentServiceException("Consignment is not in IN_FINAL_EVALUATION status");
             }
             return getConsignmentDTO(consignment);
         } catch (Exception e) {
@@ -482,6 +482,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return getConsignmentDTOS(pageable, consignmentPage);
     }
 
+    @Override
+    public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
+        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrStaff_AccountIdOrderByStatus(Consignment.Status.WAITING_STAFF,staffId,pageable);
+        return getConsignmentDTOS(pageable, consignmentPage);
+    }
 
     @Override
     @Cacheable(key = "#status + #page + #size + #accID", value = "consignments")

@@ -1,10 +1,15 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.exporter.ItemExporter;
+import fpt.edu.vn.Backend.pojo.Consignment;
+import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Item;
+import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,16 +37,18 @@ import java.util.List;
 public class ItemController {
     private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
+    private final ConsignmentService consignmentService;
 
     @Autowired
-    public ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService, ConsignmentService consignmentService) {
         this.itemService = itemService;
+        this.consignmentService = consignmentService;
     }
 
     @GetMapping("/")
     public Page<ItemDTO> getItems(@PageableDefault(size = 50, sort = "createDate") Pageable pageable,
                                   @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
-                                  @RequestParam(required = false) String order,@RequestParam(required = false) String status){
+                                  @RequestParam(required = false) String order, @RequestParam(required = false) String status) {
         if (order != null) {
             if (order.equals("desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
@@ -117,13 +125,13 @@ public class ItemController {
 
     @PostMapping("/create")
     public ResponseEntity<ItemDTO> createItem(@ModelAttribute CreateItemRequestDTO itemDTO) throws IOException {
-        if(itemDTO.getName() == null || itemDTO.getName().isEmpty()){
+        if (itemDTO.getName() == null || itemDTO.getName().isEmpty()) {
             throw new InvalidInputException("Item name cannot be null");
         }
-        if(itemDTO.getReservePrice()<0 || itemDTO.getBuyInPrice()<0){
+        if (itemDTO.getReservePrice() < 0 || itemDTO.getBuyInPrice() < 0) {
             throw new InvalidInputException("Item price cannot be negative");
         }
-        if(itemDTO.getReservePrice()>itemDTO.getBuyInPrice()){
+        if (itemDTO.getReservePrice() > itemDTO.getBuyInPrice()) {
             throw new InvalidInputException("Reserve price must be smaller than buy in price");
         }
         if (itemDTO.getFiles() != null) {
@@ -135,6 +143,43 @@ public class ItemController {
         } else {
             throw new InvalidInputException("File cannot be null");
         }
+        return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/create/{id}")
+    public ResponseEntity<ItemDTO> createItemFromConsignment(@ModelAttribute CreateItemRequestDTO itemDTO, @PathVariable int id) throws IOException {
+        ConsignmentDTO consignmentDTO = consignmentService.getConsignmentById(id);
+        BigDecimal reservePrice = consignmentDTO.getConsignmentDetails().stream()
+                .filter(
+                        consignmentDetailDTO -> consignmentDetailDTO.getStatus()
+                                .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentStatus.MANAGER_ACCEPTED))
+                ).toList().get(0).getPrice();
+        if(reservePrice==null){
+            throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");
+        }
+        if (reservePrice.compareTo(BigDecimal.valueOf(itemDTO.getReservePrice())) != 0) {
+            throw new InvalidInputException("You can't change reserve price!");
+        }
+        if (itemDTO.getName() == null || itemDTO.getName().isEmpty()) {
+            throw new InvalidInputException("Item name cannot be null");
+        }
+        if (itemDTO.getReservePrice() < 0 || itemDTO.getBuyInPrice() < 0) {
+            throw new InvalidInputException("Item price cannot be negative");
+        }
+        if (itemDTO.getReservePrice() > itemDTO.getBuyInPrice()) {
+            throw new InvalidInputException("Reserve price must be smaller than buy in price");
+        }
+        if (itemDTO.getFiles() != null) {
+            for (MultipartFile f : itemDTO.getFiles()) {
+                if (f.getSize() > 10000000) {
+                    throw new InvalidInputException("File size must be less than 10MB");
+                }
+            }
+        } else {
+            throw new InvalidInputException("File cannot be null");
+        }
+        consignmentDTO.setStatus(String.valueOf(Consignment.Status.FINISHED));
+        consignmentService.updateConsignment(consignmentDTO.getConsignmentId(),consignmentDTO);
         return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
     }
 
