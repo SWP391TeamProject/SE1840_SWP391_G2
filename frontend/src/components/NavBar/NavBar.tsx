@@ -48,9 +48,7 @@ export default function NavBar() {
               </NavigationMenuItem>
 
 
-              <NavigationMenuItem>
-                <ModeToggle />
-              </NavigationMenuItem>
+     
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent className="md:w-36">

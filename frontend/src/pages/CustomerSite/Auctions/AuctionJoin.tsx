@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,12 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import ImageGallery from './components/ImageGallery';
 import { ArrowBigUp, HashIcon, Timer } from 'lucide-react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import BidsInformation from './components/BidsInformation';
+import { useAuth } from '@/AuthProvider';
+import { AuctionSessionStatus } from '@/constants/enums';
+import { Item } from '@/models/newModel/item';
+import { AuctionItem } from '@/models/newModel/auctionItem';
 
 
 export default function AuctionJoin() {
@@ -34,7 +38,7 @@ export default function AuctionJoin() {
   const [client, setClient] = useState<Client | null>(null);
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
-
+  const auth = useAuth();
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
@@ -44,7 +48,9 @@ export default function AuctionJoin() {
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
+
     if (!getCookie("user")) {
       setAllow(false);
       return;
@@ -61,7 +67,7 @@ export default function AuctionJoin() {
     } else {
       setAllow(false);
     }
-  }, []);
+  }, [itemId]);
 
   useEffect(() => {
     setIsJoin(true);
@@ -105,7 +111,7 @@ export default function AuctionJoin() {
         newClient.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
       }
     };
-  }, [allow]);
+  }, [allow, itemId]);
 
 
 
@@ -188,6 +194,34 @@ export default function AuctionJoin() {
       })
     }
   }, [])
+  const handleViewItemDetailsClick = async (item: AuctionItem, auctionId: number) => {
+    // console.log(item, auctionId, bidders.includes(userId));
+    // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
+    if (itemId !== item.itemDTO.itemId) {
+
+      navigate(`/auctions/${auctionId}/${item.itemDTO.name}`, {
+        state: {
+          id: {
+            auctionSessionId: auctionId,
+            itemId: item.itemDTO.itemId
+          },
+          itemDTO: item.itemDTO,
+          endDate: auctionSession?.endDate,
+          allow: auctionSession.deposits.map((deposit) => {
+            return deposit.payment.accountId;
+          }).includes(auth.user.accountId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
+        }
+      });
+    } else {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }
+
+
+  }
 
   return (
     <>
@@ -197,14 +231,14 @@ export default function AuctionJoin() {
             <h1 className=" text-2lg font-bold   ">
               {itemDTO.name}
             </h1>
-            <div className='flex flex-wrap justify-center items-center'>
-              <div className=' w-full h-full basis-full md:basis-1/2 border rounded-lg  p-2'>
+            <div className='flex flex-wrap justify-between items-center'>
+              <div className=' w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 '>
                 <ImageGallery itemDTO={itemDTO} />
               </div>
-              <div className=' w-full h-full basis-full md:basis-1/2 p-2 flex flex-col items-start justify-start'>
+              <div className=' w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start'>
+                <h2 className='text-lg font-semibold'>Bids</h2>
                 <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
-                  <h2 className='text-lg font-semibold'>bidder list</h2>
-                  {bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
+                  {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
                     <div className="flex items-center justify-between" key={bid?.bidId}>
                       <div className="flex items-center gap-2">
                         <Avatar className="w-8 h-8 border">
@@ -218,16 +252,22 @@ export default function AuctionJoin() {
                   ))}
                 </ScrollArea>
                 {allow ?
-                  <div className=" rounded-xl p-3 w-full flex flex-col gap-3  sticky top-5 md:top-10 lg:top-16  bg-background border border-gray-700
+                  <div className=" rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
                   ">
                     <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
                     <div className='mx-auto'>
-                      <PlaceBid
+                      <PlaceBid 
                         auctionId={auctionId}
                         itemId={itemId}
-                        sendMessage={sendMessage} endDate={auctionId.endDate} name={itemDTO?.name} image={itemDTO?.attachments[0].link} client={client} currentBid={
-                          price ?? (bids.length > 0 ? bids[0].price : 0)
-                        } />
+                        sendMessage={sendMessage}
+                        endDate={auctionId?.endDate} // Added optional chaining for safety
+                        name={itemDTO?.name}
+                        image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                        client={client}
+                        currentBid={
+                          price ?? (bids && bids.length > 0 ? bids[0].price : 0) // Check if bids is defined and not empty
+                        }
+                      />
                     </div>
 
                   </div>
@@ -251,49 +291,49 @@ export default function AuctionJoin() {
               </div>
 
             </div>
-
-            {/* <Carousel className="flex w-5/6" plugins={[
-              Autoplay({
-                delay: 2000,
-              }),
-            ]}>
-              <CarouselContent className=' w-full'>
-                {itemDTO?.attachments.map((image) => (
-                  <CarouselItem key={image.attachmentId} className="basis-1/3 rounded-full border overflow-hidden border-gray-700">
-                    <img src={image.link} alt={itemDTO?.name} className="mx-auto " />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel> */}
           </section>
-          <section className=" justify-center items-center  w-full h-fit mt-11 " >
+          <section className=" justify-center items-center  w-full h-full mt-11 " >
             <div className='flex gap-2 flex-wrap '>
-              <div className='basis-full md:basis-3/5'>
-                <h1 className=" text-2lg font-bold   ">
+              <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
+                <h1 className=" text-2lg font-bold  mb-9  ">
                   Item Description
                 </h1>
-                <div className=" container justify-center items-center  w-full h-[30vh] md:h-[40vh] lg:h-fit "
+                <div className="  "
                   dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
                 />
               </div>
-              <div className='basis-full md:basis-2/5'>
-                <h1 className=" text-2lg font-bold   ">
+              <div className='basis-full md:basis-1/6'>
+                <h1 className=" text-2lg font-bold  mb-9  text-center ">
                   Other Item in this Auction
                 </h1>
-                {
-                  auctionSession.auctionItems.map((item) => (
-                    <Card>
-                      <CardHeader>
-                        <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                      </CardHeader>
-                      <CardContent>
-                        <CountDownTime end={new Date(auctionSession.endDate)} />
-                      </CardContent>
-                    </Card>
-                  ))
-                }
+                <div className='flex gap-2 flex-col items-center'>
+                  {
+                    auctionSession.auctionItems.map((item) => (
+                      <Card className='w-80 h-fit max-w-[360px]'>
+                        <CardHeader>
+                          <img src={item.itemDTO.attachments[0].link} alt="item" className='w-[360px]' />
+                        </CardHeader>
+                        <CardContent>
+                          <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
+                          <BidsInformation
+                            auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
+                            price={item?.highestBid ?? 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
+                            bids={item?.numberOfBids > 0 ? item.numberOfBids : 0} // Use optional chaining for numberOfBids
+                          />
+                          <CardFooter>
+
+                            <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item, auctionId)}>
+                              Join
+                            </Button>
+                          </CardFooter>
+                        </CardContent>
+
+                      </Card>
+                    ))
+                  }
+                </div>
+
+
               </div>
             </div>
 

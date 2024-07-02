@@ -14,7 +14,7 @@ export default function ImageGallery({ ...props }) {
     const updateIndex = ({ index: current }: { index: number }) =>
         setIndex(current);
 
-    return <div>
+    return <div className="hover:cursor-pointer">
 
         {/* <Lightbox
             index={index}
@@ -78,7 +78,7 @@ export default function ImageGallery({ ...props }) {
                     caption: props.itemDTO?.name,
                     download: `${image.link}?download`,
                 }))}
-            plugins={[Inline,Thumbnails]}
+            plugins={[Inline, Thumbnails]}
             on={{
                 view: updateIndex,
                 click: toggleOpen(true),
@@ -93,7 +93,13 @@ export default function ImageGallery({ ...props }) {
                 border: 1,
                 width: 100,
                 height: 100,
-                
+
+            }}
+            render={{
+                buttonPrev: () => null,
+                buttonNext: () => null,
+                iconZoomIn: () => null,
+                iconZoomOut: () => null
             }}
             inline={{
                 style: {
@@ -103,6 +109,8 @@ export default function ImageGallery({ ...props }) {
                     margin: "0 auto",
                 },
             }}
+            styles={{ container: { backgroundColor: "transparent" }, thumbnailsContainer: { backgroundColor: "transparent" },thumbnailsTrack: { backgroundColor: "transparent"  }}}
+
         />
 
         <Lightbox
@@ -110,6 +118,16 @@ export default function ImageGallery({ ...props }) {
             close={toggleOpen(false)}
             index={index}
             plugins={[Zoom, Download, Thumbnails]}
+
+            zoom={{
+                ref: zoomRef,
+                maxZoomPixelRatio: 3,
+                zoomInMultiplier: 1.5,
+                doubleClickDelay: 300,
+                doubleTapDelay: 300,
+                doubleClickMaxStops: 2,
+                keyboardMoveDistance: 120,
+            }}
             slides={
                 props.itemDTO?.attachments.map((image) => ({
                     src: image.link,

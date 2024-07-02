@@ -54,7 +54,6 @@ export function LandingPage() {
         {/* End section Auction Process Section */}
 
         {/* start footer section */}
-        <Footer />
       </main>
     </div>
   );
