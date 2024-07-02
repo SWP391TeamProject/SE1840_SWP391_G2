@@ -1,5 +1,6 @@
 import { ConsignmentStatus } from "@/constants/enums";
-import { Account, ConsignmentDetail } from "@/constants/interfaces";
+import { Account } from "@/constants/interfaces";
+import { ConsignmentDetail } from "./newModel/consignmentDetail";
 
 interface Consignment {
     consignmentId?: number;

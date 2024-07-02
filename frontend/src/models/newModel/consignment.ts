@@ -1,4 +1,6 @@
-import { Account, ConsignmentDetail } from "@/constants/interfaces";
+import { Account } from "@/constants/interfaces";
+import { ConsignmentDetail } from "./consignmentDetail";
+
 
 export interface Consignment{
     consignmentId?:number;

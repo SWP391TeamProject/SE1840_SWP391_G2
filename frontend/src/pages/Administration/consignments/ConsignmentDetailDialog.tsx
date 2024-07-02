@@ -9,7 +9,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ConsignmentDetail } from "@/constants/interfaces";
+import { ConsignmentDetail } from "@/models/newModel/consignmentDetail";
 
 interface consignmentDetaiDialog {
     consignmentDetail: ConsignmentDetail;
@@ -27,11 +27,11 @@ export default function ConsignmentDetailDialog(consignmentDetail: consignmentDe
                 <ScrollArea className="w-full h-96">
                     <div className="flex flex-row justify-start  w-full flex-wrap">
 
-                        {consignmentDetail.consignmentDetail.attachments.map((attachment, index) => {
+                        {consignmentDetail.consignmentDetail.attachments.map((attachment) => {
                             return (
                                 <img
-                                    key={index}
-                                    alt="Product image"
+                                    key={attachment.attachment_id}
+                                    alt="Product"
                                     className="aspect-square rounded-md object-cover basis-1/3"
                                     height="300"
                                     src={attachment.link}

@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ConsignmentContactPreference, ConsignmentStatus } from "@/constants/enums";
+import { ConsignmentContactPreference, ConsignmentDetailType, ConsignmentStatus } from "@/constants/enums";
 import { fetchAllConsignmentsService, fetchConsignmentsByStatusService, takeConsignment } from "@/services/ConsignmentService";
 import { setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
@@ -66,14 +66,23 @@ export default function ConsignmentList() {
                 setIsLoading(false);
             }
         } catch (error) {
-            setIsLoading(false)
             console.log(error);
+            if (error.response.status === 404) {
+                dispatch(setCurrentPageList([]));
+                let paging: any = {
+                    pageNumber: 0,
+                    totalPages: 0
+                }
+                dispatch(setCurrentPageNumber(paging));
+            }
+            setIsLoading(false)
+
         }
     };
 
     const handlePageSelect = (pageNumber: number) => {
-        
-        if(statusFilter === "all"){
+
+        if (statusFilter === "all") {
             console.log(pageNumber);
             fetchConsignments(pageNumber);
         } else {
@@ -91,24 +100,16 @@ export default function ConsignmentList() {
     }
 
     const handleCreateClick = () => {
-        // let consignment = consignmentsList.value.find(consignment => consignment.consignmentId == consignmentId);
-        // console.log(consignment);
-        // // return (<EditAcc consignment={consignment!} key={consignment!.consignmentId} hidden={false} />);
-        // dispatch(setCurrentConsignment(consignment));
         navigate("/admin/consignments/create");
     }
 
     const handleDetailClick = (consignmentId: number) => {
-        // console.log(consignment);
-        // return (<EditAcc consignment={consignment!} key={consignment!.consignmentId} hidden={false} />);
-        // dispatch(setCurrentConsignment(consignment));
-        // navigate("/admin/consignments/edit");
         navigate(`/admin/consignments/${consignmentId}`);
     }
 
     const handleFilterClick = (status: ConsignmentStatus[], filter: string) => {
         if (filter !== statusFilter) {
-            if(filter === "all"){
+            if (filter === "all") {
                 fetchConsignments(0);
             } else {
                 fetchConsignments(0, status[0]);
@@ -118,10 +119,6 @@ export default function ConsignmentList() {
 
     }
 
-    const handleEvaluateClick = (consignmentId: number) => {
-        navigate(`/admin/consignments/${consignmentId}/sendEvaluation`);
-    }
-    useEffect(() => { }, [consignmentsList]);
 
     useEffect(() => {
         fetchConsignments(consignmentsList.currentPageNumber);
@@ -129,12 +126,6 @@ export default function ConsignmentList() {
         setStatusFilter("all");
     }, []);
 
-    const handleTakeClick = (consignmentId: number) => {
-        takeConsignment(consignmentId.toString()).then((res) => {
-            console.log(res);
-            fetchConsignments();
-        });
-    }
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
@@ -142,10 +133,13 @@ export default function ConsignmentList() {
                     <TabsList>
                         {/* {JSON.parse(getCookie('user').role) } */}
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED, ConsignmentStatus.IN_FINAL_EVALUATION, ConsignmentStatus.IN_INITIAL_EVALUATION, ConsignmentStatus.SENDING, ConsignmentStatus.WAITING_STAFF, ConsignmentStatus.TERMINATED], "all")} value="all">All</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_INITIAL_EVALUATION], "IN_INITIAL_EVALUATION")} value="IN_INITIAL_EVALUATION">initial evaluation</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_FINAL_EVALUATION], "IN_FINAL_EVALUATION")} value="IN_FINAL_EVALUATION">final evaluation</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.SENDING], "SENDING")} value="SENDING">sending</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.WAITING_STAFF], "WAITING_STAFF")} value="WAITING_STAFF">waiting staff</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_INITIAL_EVALUATION], "IN_INITIAL_EVALUATION")} value="IN_INITIAL_EVALUATION">initial evaluation</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.SENDING], "SENDING")} value="SENDING">sending</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_FINAL_EVALUATION], "IN_FINAL_EVALUATION")} value="IN_FINAL_EVALUATION">final evaluation</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.WAITING_SELLER], "WAITING_SELLER")} value="WAITING_SELLER">waiting seller</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.TO_ITEM], "TO_ITEM")} value="TO_ITEM">to item</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED], "FINISHED")} value="FINISHED">finished</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.TERMINATED], "TERMINATED")} value="TERMINATED">inactive</TabsTrigger>
                     </TabsList>
                     <div className="ml-auto flex items-center gap-2">
@@ -256,7 +250,8 @@ export default function ConsignmentList() {
                                                     {consignment.staff ? consignment.staff.nickname : "Not assigned"}
                                                 </TableCell>
                                                 <TableCell className="md:table-cell">
-                                                    {consignment.staffId}
+                                                    {consignment.consignmentDetails.filter((detail) => (detail.status === ConsignmentDetailType.REQUEST)
+                                                    )[0].account.phone}
                                                 </TableCell>
                                                 <TableCell>
                                                     {(() => {
@@ -271,6 +266,10 @@ export default function ConsignmentList() {
                                                                 return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
                                                             case ConsignmentStatus.SENDING:
                                                                 return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
+                                                            case ConsignmentStatus.WAITING_SELLER:
+                                                                return <Badge variant="default" className="bg-pink-400 w-[150px] text-center flex justify-center items-center">Waiting Seller Approval</Badge>;
+                                                            case ConsignmentStatus.TO_ITEM:
+                                                                return <Badge variant="default" className="bg-cyan-400 w-[150px] text-center flex justify-center items-center">To Item</Badge>;
                                                             case ConsignmentStatus.TERMINATED:
                                                                 return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
                                                             default:
