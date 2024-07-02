@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,6 +32,14 @@ public class AuctionItem {
 
     @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
+
+    @OneToMany
+    @JoinColumns({
+            @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
+            @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+    })
+    private Set<Bid> bids;
+
 
     @CreationTimestamp
     @Column(name = "create_date")

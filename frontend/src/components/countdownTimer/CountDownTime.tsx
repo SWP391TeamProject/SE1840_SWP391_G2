@@ -18,7 +18,23 @@ const formatTime = (time: number) => {
     if (hours < 10) hoursString = '0' + hours;
     if (minutes < 10) minutesString = '0' + minutes;
     if (seconds < 10) secondsString = '0' + seconds;
-    return days + " days " + hoursString + ':' + minutesString + ':' + secondsString;
+
+    if(days > 7)
+    {
+        return days + " days";
+    }
+    if(days > 0)
+    {
+        return days + " days " + hoursString + ':' + minutesString + ':' + secondsString;
+    }
+    if(hours > 0)
+    {
+        return hoursString + ':' + minutesString + ':' + secondsString;
+    }
+    if(minutes > 0)
+    {
+        return minutesString + ':' + secondsString;
+    }
 }
 
 const CountDownTime: React.FC<Props> = ({ end, className }) => {
@@ -40,6 +56,14 @@ const CountDownTime: React.FC<Props> = ({ end, className }) => {
     return (
         <div >
             <p className={'text-foreground opacity-100 ' + className}>
+                {
+                    (() => {
+                        if (time <= 0) {
+                            return 'Auction Ended';
+                        }
+                    }
+                    )()
+                }
                 {formatTime(time)}
             </p>
 

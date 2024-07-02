@@ -14,6 +14,17 @@ import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { useCurrency } from "@/CurrencyProvider.tsx";
 import PlaceBid from './components/PlaceBid';
+import { fetchAuctionSessionById } from '@/services/AuctionSessionService';
+import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import CountDownTime from '@/components/countdownTimer/CountDownTime';
+import "yet-another-react-lightbox/styles.css";
+
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import ImageGallery from './components/ImageGallery';
+import { ArrowBigUp, HashIcon, Timer } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import BidsInformation from './components/BidsInformation';
 
 
 export default function AuctionJoin() {
@@ -23,6 +34,7 @@ export default function AuctionJoin() {
   const [client, setClient] = useState<Client | null>(null);
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
+
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
@@ -30,7 +42,8 @@ export default function AuctionJoin() {
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(true);
-
+  const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
+  const dispatch = useAppDispatch();
   useEffect(() => {
     if (!getCookie("user")) {
       setAllow(false);
@@ -137,7 +150,7 @@ export default function AuctionJoin() {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
         toast.error("Please enter a valid number", {
-          position: "bottom-right", 
+          position: "bottom-right",
         });
         return;
       }
@@ -166,14 +179,80 @@ export default function AuctionJoin() {
     });
 
   }, [price]);
-
+  useEffect(() => {
+    if (!auctionSession) {
+      fetchAuctionSessionById(auctionId).then((res) => {
+        dispatch(setCurrentAuctionSession(res?.data));
+      }).catch((err) => {
+        console.log(err);
+      })
+    }
+  }, [])
 
   return (
     <>
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
-        <div className="flex flex-col min-h-screen">
-          <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
-            <Carousel className="flex w-5/6" plugins={[
+        <div className="flex flex-col min-h-screen container p-3 gap-10">
+          <section className="justify-center items-center  w-full h-fit ">
+            <h1 className=" text-2lg font-bold   ">
+              {itemDTO.name}
+            </h1>
+            <div className='flex flex-wrap justify-center items-center'>
+              <div className=' w-full h-full basis-full md:basis-1/2 border rounded-lg  p-2'>
+                <ImageGallery itemDTO={itemDTO} />
+              </div>
+              <div className=' w-full h-full basis-full md:basis-1/2 p-2 flex flex-col items-start justify-start'>
+                <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
+                  <h2 className='text-lg font-semibold'>bidder list</h2>
+                  {bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
+                    <div className="flex items-center justify-between" key={bid?.bidId}>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-8 h-8 border">
+                          <img src={bid?.account.avatar?.link} alt="@username" />
+                          <AvatarFallback>N/A</AvatarFallback>
+                        </Avatar>
+                        <p>{bid?.account.nickname}</p>
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
+                    </div>
+                  ))}
+                </ScrollArea>
+                {allow ?
+                  <div className=" rounded-xl p-3 w-full flex flex-col gap-3  sticky top-5 md:top-10 lg:top-16  bg-background border border-gray-700
+                  ">
+                    <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                    <div className='mx-auto'>
+                      <PlaceBid
+                        auctionId={auctionId}
+                        itemId={itemId}
+                        sendMessage={sendMessage} endDate={auctionId.endDate} name={itemDTO?.name} image={itemDTO?.attachments[0].link} client={client} currentBid={
+                          price ?? (bids.length > 0 ? bids[0].price : 0)
+                        } />
+                    </div>
+
+                  </div>
+
+                  :
+                  <div className="mt-12 md:mt-16 lg:mt-20 container">
+                    <div className='flex   rounded-xl flex-row  text-foreground p-5' >
+                      <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                    </div>
+                    <div className="grid gap-4">
+                      <Link to={`/auctions/${auctionId}`} >
+                        <Button type="submit" className="w-full">
+                          Go to Auction
+                        </Button>
+                      </Link>
+
+                    </div>
+                  </div>
+                }
+
+              </div>
+
+            </div>
+
+            {/* <Carousel className="flex w-5/6" plugins={[
               Autoplay({
                 delay: 2000,
               }),
@@ -185,103 +264,42 @@ export default function AuctionJoin() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-">
-                <h1 className=" w-3/5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl   ">
-                  {itemDTO.name}
-                </h1>
-                <p className="mt-4 max-w-3xl text-lg md:text-xl">
-                  Discover the timeless elegance of this beautifully crafted vintage leather armchair, a true statement piece
-                  for your home.
-                </p>
-              </div>
-
               <CarouselPrevious />
               <CarouselNext />
-
-            </Carousel>
-
+            </Carousel> */}
           </section>
-          <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight mb-4">Item Details</h2>
-                <div className="space-y-4">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
-                  />
-
-                </div>
+          <section className=" justify-center items-center  w-full h-fit mt-11 " >
+            <div className='flex gap-2 flex-wrap '>
+              <div className='basis-full md:basis-3/5'>
+                <h1 className=" text-2lg font-bold   ">
+                  Item Description
+                </h1>
+                <div className=" container justify-center items-center  w-full h-[30vh] md:h-[40vh] lg:h-fit "
+                  dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
+                />
               </div>
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight mb-4">Bidding History</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
-                      <p className="text-2xl font-bold">{currency.format({
-                        amount: price ?? (bids.length > 0 ? bids[0].price : 0)
-                      })}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 dark:text-gray-400">Bid Count</p>
-                      <p className="text-2xl font-bold">{bids.length}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <ScrollArea className="h-48 overflow-hidden p-4" style={{ width: 400 }}>
-                      {bids?.map((bid) => (
-                        <div className="flex items-center justify-between" key={bid?.bidId}>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="w-8 h-8 border">
-                              <img src={bid?.account.avatar?.link} alt="@username" />
-                              <AvatarFallback>N/A</AvatarFallback>
-                            </Avatar>
-                            <p>{bid?.account.nickname}</p>
-                          </div>
-                          <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
-                        </div>
-                      ))}
-                    </ScrollArea>
-
-                  </div>
-                  {allow ?
-                    <div className="mt-12 md:mt-16 lg:mt-20">
-                      <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
-                      <form className="max-w-md mx-auto" onSubmit={sendMessage}>
-                        <div className="grid gap-4">
-                          <div>
-                            <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
-                          </div>
-                          <Button type="submit" className="w-full">
-                            Place Bid
-                          </Button>
-                        </div>
-                      </form>
-                    </div>
-                    :
-                    <div className="mt-12 md:mt-16 lg:mt-20">
-                      <div className="grid gap-4">
-
-                        <Link to={`/auctions/${auctionId}`} >
-                          <Button type="submit" className="w-full">
-                            Go to Auction
-                          </Button>
-                        </Link>
-
-                      </div>
-                    </div>
-                  }
-                  <PlaceBid
-                  auctionId ={auctionId}
-                  itemId={itemId}
-                  sendMessage={sendMessage} endDate={endDate} name={itemDTO?.name} image={itemDTO?.attachments[0].link} client={client} currentBid={
-                    price ?? (bids.length > 0 ? bids[0].price : 0)
-                  } />
-                </div>
+              <div className='basis-full md:basis-2/5'>
+                <h1 className=" text-2lg font-bold   ">
+                  Other Item in this Auction
+                </h1>
+                {
+                  auctionSession.auctionItems.map((item) => (
+                    <Card>
+                      <CardHeader>
+                        <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                      </CardHeader>
+                      <CardContent>
+                        <CountDownTime end={new Date(auctionSession.endDate)} />
+                      </CardContent>
+                    </Card>
+                  ))
+                }
               </div>
             </div>
 
-          </div>
+          </section>
+
+
         </div >
       }
     </>

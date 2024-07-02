@@ -5,49 +5,63 @@ import {
     DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import CountDownTime from "@/components/countdownTimer/CountDownTime";
-import { useState } from "react";
-import { useCurrency } from "@/CurrencyProvider";
-import { toast } from "react-toastify";
-import { getCookie } from "@/utils/cookies";
+import { useEffect, useState } from "react";
+import { CurrencyType, useCurrency } from "@/CurrencyProvider";
+
 import { useAuth } from "@/AuthProvider";
 import { useLocation } from "react-router-dom";
 
 
 
+
 export default function PlaceBid({ ...props }) {
     const [showConfirmDialog, setshowConfirmDialog] = useState(false);
+   
     const currency = useCurrency();
     const auth = useAuth();
     const location = useLocation();
+    const [bidIncrement, setBidIncrement] = useState(500);
     const formSchema = z.object({
-        bidAmount: z.coerce.number().min(props.currentBid ? props.currentBid : 0, {
-            message: "Bid must be greater than the current bid amount + increment ",
+        bidAmount: z.coerce.number({
+            message:
+                "Bid amount must be a number"
+        }).min(parseFloat(props.currentBid) ? parseFloat(props.currentBid) + bidIncrement : bidIncrement, {
+            message: `Bid must be greater than the current bid amount + ${bidIncrement} `,
         }).refine((data) => {
-            return data < 2
+            return data < (parseFloat(props.currentBid) < 100 ? 100 : parseFloat(props.currentBid) * 2)
         }, {
             message: "Bid amount must be smaller than twice the current bid amount",
         })
     })
+    useEffect(() => {
+        let currentBid = parseFloat(props.currentBid);
+        if (currentBid < 15000) {
+            setBidIncrement(100);
+        } else if (currentBid >= 15000 && currentBid < 50000) {
+            setBidIncrement(250);
+        } else if (currentBid >= 50000 && currentBid < 200000) {
+            setBidIncrement(500);
+        } else {
+            setBidIncrement(1000);
+        }
+
+    }, [props.currentBid])
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -61,6 +75,8 @@ export default function PlaceBid({ ...props }) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         console.log(values);
+
+
         if (props.client != null) {
             props.client.publish({
                 destination: '/app/chat.sendMessage/' + props.auctionId + '/' + props.itemId,
@@ -73,12 +89,14 @@ export default function PlaceBid({ ...props }) {
                 })
             });
         }
+
+
     }
 
     // Render the success message conditionally
 
 
-
+    
     return (
         <>
             <Dialog defaultOpen={false} onOpenChange={() => {
@@ -101,33 +119,45 @@ export default function PlaceBid({ ...props }) {
                                                 <h1 className=" text-center text-foreground">{props.name}</h1>
                                                 <div className="flex gap-2 items-center justify-center w-full">
                                                     <div>
-                                                        <CountDownTime end={new Date(props.endDate)} />
+                                                        <CountDownTime end={new Date(props?.endDate)} />
                                                     </div>
                                                     <div>
-                                                        <p className="text-foreground">Current Bid: <span>{props.currentBid}</span></p>
+                                                        <p className="text-foreground">Current Bid: <span>{currency.format({
+                                                        amount: props.currentBid,
+                                                        currency: CurrencyType.USD
+                                                    })}</span></p>
                                                     </div>
                                                 </div>
                                                 <Separator />
                                                 <div className="w-full text-foreground">
                                                     <div className=" w-full flex justify-between">
                                                         <p className="font-semibold">Your bid : </p>
-                                                        <span>{form.watch('bidAmount')}</span>
+                                                        <span>{currency.format({
+                                                            amount: form.watch('bidAmount'),
+                                                            currency: CurrencyType.USD
+                                                        })}</span>
                                                     </div>
                                                     <div className=" w-full flex justify-between">
-                                                        <p>Biddify Buyer's Fee</p>
+                                                        <p className="font-semibold">Biddify Buyer's Fee:</p>
                                                         <p>{currency.format(
                                                             {
-                                                                amount: 0.045 * form.watch('bidAmount'),
+                                                                amount: 0.045 * form.watch('bidAmount') > 4500 ? 4500 : 0.045 * form.watch('bidAmount') < 225 ? 225 : 0.045 * form.watch('bidAmount'),
                                                             }
                                                         )}</p>
                                                     </div>
                                                 </div>
                                                 <Separator />
                                                 <div className="text-foreground">
-                                                    <p><strong>Bidding will instantly reach {form.watch('bidAmount')}.</strong> The winning bidder pays Cars &amp; Bids a 4.5% buyer's fee on top of the winning bid (minimum $225, maximum $4,500).</p><p>We will place a hold on your credit card for the buyer's fee. If you win, your card will be charged the non-refundable buyer’s fee at the end of the auction, and you will pay the seller directly for the vehicle. If you don't win, your hold will be released at auction end.</p><p><strong>Bids are binding and cannot be retracted.</strong> You are responsible for completing all due diligence prior to bidding. By placing this bid, you agree to the Cars &amp; Bids <a href="/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</p>
+                                                    <p><strong>Bidding will instantly reach {currency.format({
+                                                        amount: form.watch('bidAmount'),
+                                                        currency: CurrencyType.USD
+                                                    })}.</strong> The winning bidder pays Biddify a 4.5% buyer's fee on top of the winning bid (minimum $225, maximum $4,500).</p><p>We will place a hold on your credit card for the buyer's fee. If you win, your card will be charged the non-refundable buyer’s fee at the end of the auction, and you will pay the seller directly for the vehicle. If you don't win, your hold will be released at auction end.</p><p><strong>Bids are binding and cannot be retracted.</strong> You are responsible for completing all due diligence prior to bidding. By placing this bid, you agree to the Cars &amp; Bids <a href="/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</p>
                                                 </div>
                                                 <div className="flex flex-col justify-center items-center p-4 gap-2">
-                                                    <Button className="min-w-48" type="submit">Bid {form.watch("bidAmount")}</Button>
+                                                    <Button className="min-w-48" type="submit">Bid {currency.format({
+                                                        amount: form.watch('bidAmount'),
+                                                        currency: CurrencyType.USD
+                                                    })}</Button>
                                                     <Button className="" variant="link" onClick={() => {
                                                         setshowConfirmDialog(false);
                                                     }}>Cancel</Button>
@@ -138,37 +168,51 @@ export default function PlaceBid({ ...props }) {
                                     :
                                     <DialogHeader>
                                         <DialogDescription>
-                                            <div className="mt-12 md:mt-16 lg:mt-20 flex flex-col justify-center items-center gap-3">
+                                            <div className="min-h-[60%] w-fit h-full flex flex-col justify-center items-center gap-3">
                                                 <img src={props.image} alt="placeholder" className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full mx-auto" />
                                                 <h1 className=" text-center text-foreground">{props.name}</h1>
                                                 <div className="flex gap-2 items-center">
                                                     <div>
-                                                        <CountDownTime end={new Date(props.endDate)} />
+                                                        <CountDownTime end={new Date(props?.endDate)} />
                                                     </div>
                                                     <div>
-                                                        <p className="text-foreground">Current Bid: <span>{props.currentBid}</span></p>
+                                                        <p className="text-foreground">Current Bid: <span>{currency.format({
+                                                            amount: props.currentBid,
+                                                            currency: CurrencyType.USD
+                                                        })}</span></p>
                                                     </div>
                                                 </div>
                                                 <Separator />
-                                                <div className="flex gap-2">
+                                                <div className="flex gap-2 flex-wrap items-center justify-center">
                                                     <FormField
                                                         control={form.control}
                                                         name="bidAmount"
                                                         render={({ field }) => (
                                                             <FormItem>
                                                                 <FormControl>
-                                                                    <Input className="w-80" placeholder={`please enter amount greater than ${props.currentBid + 500}`} {...field} />
+                                                                    <Input className="w-80 text-foreground"
+                                                                        placeholder={`amount equal or greater than ${currency.format({
+                                                                            amount: parseFloat(props?.currentBid) + bidIncrement,
+                                                                            currency: CurrencyType.USD
+                                                                        })}`} {...field} />
                                                                 </FormControl>
                                                                 <FormMessage />
                                                             </FormItem>
                                                         )}
                                                     />
-                                                    <Button variant="default" type="button" onClick={() => {
-                                                        setshowConfirmDialog(true);
+                                                    <Button variant="default" type="submit" onClick={() => {
+                                                        if (form.formState.isValid) {
+                                                            return setshowConfirmDialog(true);
+                                                        }
                                                     }}>Place Bid</Button>
                                                 </div>
                                                 <DialogFooter>
-                                                    <h6>Bid increment is 500 </h6>
+                                                    <div className="flex justify-center items-center flex-col text-foreground">
+                                                        <h6>Bid increment is <span className="font-semibold">{currency.format({
+                                                            amount: bidIncrement,
+                                                            currency: CurrencyType.USD
+                                                        })} </span></h6>
+                                                        <h5 className="text-red-600 font-semibold">Disclaimer: <span>All bid amounts are in USD. Currency conversions provided are for reference only and the final amount may vary slightly.</span></h5>                                                    </div>
                                                 </DialogFooter>
                                             </div>
                                         </DialogDescription>
@@ -177,9 +221,8 @@ export default function PlaceBid({ ...props }) {
                         </form>
                     </Form>
                 </DialogContent>
-
             </Dialog >
-
         </>
     );
 }
+

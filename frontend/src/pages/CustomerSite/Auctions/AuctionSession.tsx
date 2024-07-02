@@ -386,10 +386,10 @@ export default function AuctionSession() {
                                         <SelectValue placeholder="Select a theme to display" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {/* <SelectItem value="All" key={0}>All</SelectItem>
+                                        <SelectItem value="All" key={0}>All</SelectItem>
                                         {categories && categories?.map((category) => (
                                             <SelectItem value={category?.name} key={category?.itemCategoryId}>{category.name}</SelectItem>
-                                        ))} */}
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -420,7 +420,7 @@ export default function AuctionSession() {
                                     <div className='mt-auto space-y-2 p-4'>
                                         {/* <div className="flex items-center justify-between mt-5"> */}
                                         <div className="text-primary-500 font-medium space-y-3">{currency.format({
-                                            amount: item?.itemDTO.reservePrice
+                                            amount: parseFloat(item?.currentPrice)
                                         })}</div>
                                         {/* </div> */}
                                         {
