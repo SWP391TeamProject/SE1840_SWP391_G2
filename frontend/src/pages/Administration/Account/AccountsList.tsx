@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {  setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
+import { setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
 import { fetchAccountsService, deleteAccountService, fetchAccountsByName, activateAccountService } from "@/services/AccountsServices.ts";
 import {
   PlusCircle,
@@ -103,10 +103,10 @@ export default function AccountsList() {
     // navigate("/admin/accounts/edit");
     deleteAccountService(accountId.toString()).then((res) => {
       console.log(res);
+      setReload(!reload);
     })
-    setReload(!reload);
   }
-  
+
   const handleActiveClick = (accountId: number) => {
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     // dispatch(setCurrentAccount(account));
@@ -206,7 +206,7 @@ export default function AccountsList() {
         </div>
         <TabsContent value={roleFilter}>
           {isLoading ?
-            <LoadingAnimation/>
+            <LoadingAnimation />
             : <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader >
 

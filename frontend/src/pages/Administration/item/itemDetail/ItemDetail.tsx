@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 
 const formSchema = z.object({
   description: z.string(),
-  buyInPrice: z.string(),
+  buyInPrice: z.coerce.number().min(0).max(100000000),
   status: z.string(),
   itemId: z.number(),
   name: z.string(),
@@ -54,7 +54,7 @@ export default function ItemDetail() {
         form.reset({
           itemId: item.itemId,
           description: item.description,
-          buyInPrice: String(item.buyInPrice),
+          buyInPrice: item.buyInPrice,
           category: {
             itemCategoryId: item.category?.itemCategoryId.toString()
           },
@@ -68,7 +68,7 @@ export default function ItemDetail() {
       form.reset({
         itemId: item.itemId,
         description: item.description,
-        buyInPrice: String(item.buyInPrice),
+        buyInPrice: item.buyInPrice,
         category: {
           itemCategoryId: item.category?.itemCategoryId.toString()
         },

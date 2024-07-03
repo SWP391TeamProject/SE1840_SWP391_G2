@@ -110,14 +110,12 @@ export const updateAccountService = async (data: any, id: number) => {
 };
 
 
-
-
 export const deleteAccountService = async (id: string) => {
   return await axios
-    .post(API_SERVER + "/accounts/" + id, {
+    .post(API_SERVER + "/accounts/" + id,{},{
       headers: {
         "Content-Type": "application/json",
-        "Authorization":
+        Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
@@ -129,7 +127,6 @@ export const activateAccountService = async (id: string) => {
     .put(API_SERVER + "/accounts/activate/" + id, null, {
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },

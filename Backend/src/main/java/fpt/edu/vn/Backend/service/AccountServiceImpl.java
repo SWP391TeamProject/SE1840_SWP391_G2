@@ -149,11 +149,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
-        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
-        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
-        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
-        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
-        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
+//        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
+//        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
+//        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
+//        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
+//        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
         Account acc = accountRepos.findById(account.getAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
         return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc, editorRole)));

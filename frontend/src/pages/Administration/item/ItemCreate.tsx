@@ -47,8 +47,16 @@ const FormSchema = z.object({
     }).max(50000, {
         message: "Description must not exceed 50000 characters.",
     }),
-    reservePrice: z.string(),
-    buyInPrice: z.string(),
+    reservePrice: z.coerce.number({
+        message: "Reserve price must be a number.",
+    }).min(0,{
+        message: "Reserve price must be at least 0.",
+    }),
+    buyInPrice: z.coerce.number({
+        message: "Buy in price must be a number.",
+    }).min(0,{
+        message: "Buy in price must be at least 0."
+    }),
     status: z.enum(statusValues),
     ownerId: z.number(),
     files: z.any(),
