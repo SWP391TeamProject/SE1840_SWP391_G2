@@ -26,8 +26,11 @@ public class AuctionItemDTO implements Serializable {
         this.id = auctionItem.getAuctionItemId();
         this.itemDTO = new ItemDTO(auctionItem.getItem());
         this.currentPrice = auctionItem.getCurrentPrice();
-        this.highestBid = auctionItem.getBids().stream().map(bid -> bid.getPayment().getPaymentAmount()).max(BigDecimal::compareTo).orElse(BigDecimal.ZERO);
-        this.numberOfBids = auctionItem.getBids().size();
+        // Safely handle potential null getBids()
+        this.highestBid = auctionItem.getBids() != null ? auctionItem.getBids().stream()
+                .map(bid -> bid.getPayment().getPaymentAmount())
+                .max(BigDecimal::compareTo).orElse(BigDecimal.ZERO) : BigDecimal.ZERO;
+        this.numberOfBids = auctionItem.getBids() != null ? auctionItem.getBids().size() : 0;
     }
 
 }
