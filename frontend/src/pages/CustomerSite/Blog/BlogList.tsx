@@ -216,9 +216,9 @@ export const BlogList = () => {
 
                 </div>
             </section>
-            <div className="sticky z-10 w-full">
+            {/* <div className="sticky z-10 w-full">
                 <Footer />
-            </div>
+            </div> */}
         </>
     )
 }

@@ -32,6 +32,7 @@ const ACCEPTED_IMAGE_TYPES = [
 ];
 import thumbnail1 from "@/assets/thumnail1.jpg";
 import { useAuth } from "@/AuthProvider";
+import { Link } from "react-router-dom";
 
 
 const formSchema = z.object({
@@ -185,7 +186,7 @@ export default function ConsignmentInititalForm() {
                       </FormItem>
                     )}
                   />
-                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your profile.
+                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your <span className="underline"><Link to={"/profile/overview"} >profile </Link> </span> .
                   </h3>
                   <FormField
                     control={form.control}
