@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -24,13 +26,17 @@ public class Order {
     @JoinColumn(name = "order_id")
     private Set<Item> items;
 
-    @Column(name = "total_price")
+    @Column(name = "shipping_address")
     private String shippingAddress;
 
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "payment_id")
     private Payment payment;
+
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
+
 
     @Override
     public int hashCode() {

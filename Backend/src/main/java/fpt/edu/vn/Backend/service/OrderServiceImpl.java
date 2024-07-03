@@ -15,12 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private final OrderRepos orderRepository;
@@ -41,9 +39,10 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public OrderDTO createOrder(int accountId, Set<Integer> itemIds,int auctionId) {
+    public OrderDTO createOrder(int accountId, Set<Integer> itemIds, int auctionId) {
         try {
             Order order = new Order();
+            order.setCreateDate(LocalDateTime.now());
             Set<Item> items = new HashSet<>();
             for (int itemId : itemIds) {
                 items.add(itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found")));
@@ -56,15 +55,15 @@ public class OrderServiceImpl implements OrderService{
             payment.setStatus(Payment.Status.PENDING);
             payment.setAccount(accountRepos.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found")));
             payment.setPaymentAmount(BigDecimal.ZERO);
-            for(AuctionItem item: auctionSession.getAuctionItems()){
-                if(items.stream().anyMatch(i -> i.getItemId().equals(item.getItem().getItemId()))){
+            for (AuctionItem item : auctionSession.getAuctionItems()) {
+                if (items.stream().anyMatch(i -> i.getItemId().equals(item.getItem().getItemId()))) {
                     log.info("Item: {} - {}", item.getItem().getItemId(), item.getCurrentPrice());
                     payment.setPaymentAmount(payment.getPaymentAmount().add(item.getCurrentPrice()));
                 }
             }
             BigDecimal winnerDeposit = auctionSession
                     .getDeposits().stream()
-                    .filter(d -> d.getPayment().getAccount().getAccountId()==(accountId))
+                    .filter(d -> d.getPayment().getAccount().getAccountId() == (accountId))
                     .findFirst().orElseThrow(() -> new RuntimeException("Deposit not found"))
                     .getPayment().getPaymentAmount();
             payment.setPaymentAmount((payment.getPaymentAmount().multiply(BigDecimal.valueOf(1.045)).subtract(winnerDeposit)));
@@ -93,7 +92,40 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
         try {
-            return orderRepository.findAll(pageable).map(OrderDTO::new);
+            return orderRepository.findAll(pageable)
+                    .map(OrderDTO::new);
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching all orders: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch all orders", e);
+        }
+    }
+
+    @Override
+    public Page<OrderDTO> getAllOrdersByUserId(int userId, Pageable pageable) {
+        try {
+            return orderRepository.findAllByPayment_Account_AccountId(userId, pageable)
+                    .map(OrderDTO::new);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch orders by user ID", e);
+        }
+    }
+
+    @Override
+    public Page<OrderDTO> getAllOrdersByStatus(Payment.Status status, Pageable pageable) {
+        try {
+            return orderRepository.findAllByPayment_Status(status, pageable)
+                    .map(OrderDTO::new);
+        } catch (Exception e) {
+            System.err.println("An error occurred while fetching all orders: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch all orders", e);
+        }
+    }
+
+    @Override
+    public Page<OrderDTO> getAllOrdersByUserIdAndStatus(int userId, Payment.Status status, Pageable pageable) {
+        try {
+            return orderRepository.findAllByPayment_Account_AccountIdAndPayment_Status(userId, status, pageable)
+                    .map(OrderDTO::new);
         } catch (Exception e) {
             System.err.println("An error occurred while fetching all orders: " + e.getMessage());
             throw new RuntimeException("Failed to fetch all orders", e);
