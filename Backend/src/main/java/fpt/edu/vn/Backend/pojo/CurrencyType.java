@@ -7,8 +7,5 @@ public enum CurrencyType {
     CNY,
     JPY,
     VND,
-    BTC,
-    DOGE,
-    JACK,
-    FPT;
+    BTC;
 }
