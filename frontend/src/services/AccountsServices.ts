@@ -13,7 +13,7 @@ export const fetchAccountsService = async (pageNumber: number, pageSize: number,
     .get(API_SERVER + "/accounts/", {
       headers: {
         "Content-Type": "application/json",
-         
+
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -33,10 +33,10 @@ export const fetchAccountsByName = async (pageNumber: number, pageSize: number, 
     size: pageSize,
   }
   return await axios
-    .get(API_SERVER + "/accounts/search/"+name, {
+    .get(API_SERVER + "/accounts/search/" + name, {
       headers: {
         "Content-Type": "application/json",
-         
+
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -56,7 +56,7 @@ export const fetchAccountById = async (id: number) => {
     .get(API_SERVER + "/accounts/" + id, {
       headers: {
         "Content-Type": "application/json",
-         
+
         Authorization
           : "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -75,7 +75,7 @@ export const createAccountService = async (data: any) => {
     .post(API_SERVER + "/accounts/", data, {
       headers: {
         "Content-Type": "application/json",
-         
+
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
@@ -94,7 +94,7 @@ export const updateAccountService = async (data: any, id: number) => {
     .put(API_SERVER + "/accounts/" + id, data, {
       headers: {
         "Content-Type": "application/json",
-         
+
 
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
@@ -117,8 +117,7 @@ export const deleteAccountService = async (id: string) => {
     .post(API_SERVER + "/accounts/" + id, {
       headers: {
         "Content-Type": "application/json",
-         
-        Authorization:
+        "Authorization":
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
@@ -127,7 +126,7 @@ export const deleteAccountService = async (id: string) => {
 
 export const activateAccountService = async (id: string) => {
   return await axios
-    .put(API_SERVER + "/accounts/activate/" + id, null ,{
+    .put(API_SERVER + "/accounts/activate/" + id, null, {
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

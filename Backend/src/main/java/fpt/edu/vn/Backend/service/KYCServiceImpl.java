@@ -39,6 +39,9 @@ public class KYCServiceImpl implements KYCService {
     @Value("${FPT_AI_API_KEY}")
     private  String API_KEY_FRONT_FACE ;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
     public KYCServiceImpl(KYCRepos kycRepos, AccountRepos accountRepos) {
         this.kycRepos = kycRepos;
         this.accountRepos = accountRepos;
@@ -186,21 +189,24 @@ public class KYCServiceImpl implements KYCService {
             }
             if(!cardFrontFace.getData().get(0).getId().equalsIgnoreCase(cardBackFace.getData().get(0).getMrzDetails().getId()))
                 throw new InvalidInputException("Citizen card ID does not match, please try again with a different card ID.");
-            String[] parts = decodedText.split("\\|");
-            CitizenCard citizenCard = new CitizenCard();
-            citizenCard.setCardId(cardFrontFace.getData().get(0).getId());
-            citizenCard.setFullName(cardFrontFace.getData().get(0).getName());
-            citizenCard.setBirthday(LocalDate.parse(parseDate(cardFrontFace.getData().get(0).getDob())));
-            citizenCard.setAddress(cardFrontFace.getData().get(0).getAddress());
-            citizenCard.setGender(cardFrontFace.getData().get(0).getSex().equalsIgnoreCase("Nam"));
             Optional<Account> account = accountRepos.findByEmail(authentication.getName());
             if (account.isPresent()) {
+                String[] parts = decodedText.split("\\|");
+                CitizenCard citizenCard = new CitizenCard();
+                citizenCard.setCardId(cardFrontFace.getData().get(0).getId());
+                citizenCard.setFullName(cardFrontFace.getData().get(0).getName());
+                citizenCard.setBirthday(LocalDate.parse(parseDate(cardFrontFace.getData().get(0).getDob())));
+                citizenCard.setAddress(cardFrontFace.getData().get(0).getAddress());
+                citizenCard.setGender(cardFrontFace.getData().get(0).getSex().equalsIgnoreCase("Nam"));
                 citizenCard.setAccount(account.get());
+                log.info("Citizen card: {}", citizenCard);
+                kycRepos.save(citizenCard);
             } else {
                 log.info("Account not found");
             }
-            log.info("Citizen card: {}", citizenCard);
-            kycRepos.save(citizenCard);
+            attachmentService.uploadAccountAttachment(kycRequestDTO.getFrontImage(), account.get().getAccountId());
+
+
         }
         return null;
     }

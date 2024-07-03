@@ -4,6 +4,7 @@ import auctionSessionReducer from './reducers/AuctionSession'
 import consignmentsReducer from './reducers/Consignments'
 import itemsReducer from './reducers/Items'
 import notificationsReducer from './reducers/Notifications'
+import paymentsReducer from './reducers/Payments'
 import blogReducer from './reducers/Blogs' // Import the 'blogReducer' from the appropriate file
 import unreadNotificationCountReducer
   from "@/redux/reducers/UnreadNotificationCountReducer.ts";
@@ -16,7 +17,8 @@ export const store = configureStore({
     items: itemsReducer,
     notifications: notificationsReducer,
     blogs: blogReducer,
-    unreadNotificationCount: unreadNotificationCountReducer
+    unreadNotificationCount: unreadNotificationCountReducer,
+    payments: paymentsReducer,
   },
 })
 
