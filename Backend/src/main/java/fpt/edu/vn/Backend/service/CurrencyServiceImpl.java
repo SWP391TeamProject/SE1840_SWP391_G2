@@ -1,5 +1,8 @@
 package fpt.edu.vn.Backend.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.pojo.CurrencyType;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -26,15 +29,12 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     static {
         COMPUTED_RATES.put(CurrencyType.USD, 1.0);
-        COMPUTED_RATES.put(CurrencyType.JACK, 5_000_000.0 / 25_000);
-        COMPUTED_RATES.put(CurrencyType.FPT, 32_500_000.0 / 25_000);
     }
 
-    private final RestTemplate restTemplate = new RestTemplate();
     private final Map<CurrencyType, Double> exchangeRatesCache = new ConcurrentHashMap<>();
     private long lastFetchTime = 0;
 
-    @Value("${currencyfreaks.apikey}")
+    @Value("${currencyapi.apikey}")
     private String apiKey;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -80,12 +80,20 @@ public class CurrencyServiceImpl implements CurrencyService {
             }
         }
 
-        String url = String.format("https://api.currencyfreaks.com/v2.0/rates/latest?apikey=%s&symbols=%s", apiKey, currenciesToFetch);
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-        Map<String, String> rates = (Map<String, String>) response.get("rates");
+        String url = String.format("https://api.currencyapi.com/v3/latest?apikey=%s&currencies=%s", apiKey, currenciesToFetch);
 
-        for (Map.Entry<String, String> entry : rates.entrySet()) {
-            exchangeRatesCache.put(CurrencyType.valueOf(entry.getKey()), Double.valueOf(entry.getValue()));
+        RestTemplate restTemplate = new RestTemplate();
+        String jsonResponse = restTemplate.getForObject(url, String.class);
+
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
+        JsonObject dataObject = jsonObject.getAsJsonObject("data");
+
+        for (Map.Entry<String, JsonElement> entry : dataObject.entrySet()) {
+            JsonObject currencyObject = entry.getValue().getAsJsonObject();
+            String code = currencyObject.get("code").getAsString();
+            double value = currencyObject.get("value").getAsDouble();
+            exchangeRatesCache.put(CurrencyType.valueOf(code), value);
         }
 
         lastFetchTime = System.currentTimeMillis();
