@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.request.KycRequestDTO;
 import fpt.edu.vn.Backend.service.KYCService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class KycController {
     @Autowired
     KYCService kycService;
-    @PostMapping("/verify")
+    @PostMapping(value = "/verify",produces = "application/json")
     public ResponseEntity verifyKyc(@ModelAttribute KycRequestDTO kycRequestDTO, Authentication authentication) {
         // implementation heretr
         try {

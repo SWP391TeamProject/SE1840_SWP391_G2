@@ -77,10 +77,6 @@ export default function AboutScreen() {
                 </div>
 
             </div>
-            <div className="sticky z-10 w-full">
-                <Footer />
-            </div>
-
         </>
     )
 }

@@ -1,8 +1,9 @@
 
-import CheckoutForm from "./CheckOutForm";
+import Ekyc from "./Ekyc";
   
 export default function StripePayment() {
   return <div>
-      <CheckoutForm />
+      {/* <CheckoutForm /> */}
+      <Ekyc />
   </div>;
 }

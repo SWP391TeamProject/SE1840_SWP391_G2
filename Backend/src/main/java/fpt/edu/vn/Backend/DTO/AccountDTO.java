@@ -25,6 +25,7 @@ public class AccountDTO implements Serializable {
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private boolean isKyc;
 
     public AccountDTO(Account account) {
         this.accountId = account.getAccountId();
@@ -39,5 +40,6 @@ public class AccountDTO implements Serializable {
         this.balance = account.getBalance();
         this.createDate = account.getCreateDate();
         this.updateDate = account.getUpdateDate();
+        this.isKyc = account.getCitizenCard() != null;
     }
 }

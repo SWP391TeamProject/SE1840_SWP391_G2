@@ -26,13 +26,15 @@ import { CurrencyType, useCurrency } from "@/CurrencyProvider";
 
 import { useAuth } from "@/AuthProvider";
 import { useLocation } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 
 
 
 export default function PlaceBid({ ...props }) {
     const [showConfirmDialog, setshowConfirmDialog] = useState(false);
-   
+    const [showBidDialog, setshowBidDialog] = useState(false);
+    const [isSending, setIsSending] = useState(false);
     const currency = useCurrency();
     const auth = useAuth();
     const location = useLocation();
@@ -75,7 +77,7 @@ export default function PlaceBid({ ...props }) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         console.log(values);
-
+        setIsSending(true);
 
         if (props.client != null) {
             props.client.publish({
@@ -87,8 +89,14 @@ export default function PlaceBid({ ...props }) {
                         amount: values.bidAmount
                     }
                 })
-            });
+            }).then(()=>{
+                setIsSending(false);
+                setshowBidDialog(false);
+            
+            })
+            // setIsSending(false);
         }
+
 
 
     }
@@ -96,14 +104,17 @@ export default function PlaceBid({ ...props }) {
     // Render the success message conditionally
 
 
-    
+
     return (
         <>
-            <Dialog defaultOpen={false} onOpenChange={() => {
-                setshowConfirmDialog(false);
-            }}  >
+            <Dialog defaultOpen={false}
+                onOpenChange={() => {
+                    setshowConfirmDialog(false);
+                }}  >
                 <DialogTrigger asChild>
-                    <Button variant="default">Place Bid</Button>
+                    <Button variant="default" onClick={() => {
+                        setshowBidDialog(true);
+                    }}>Place Bid</Button>
                 </DialogTrigger>
                 <DialogContent className="h-fit" onInteractOutside={(e) => {
                     e.preventDefault();
@@ -123,9 +134,9 @@ export default function PlaceBid({ ...props }) {
                                                     </div>
                                                     <div>
                                                         <p className="text-foreground">Current Bid: <span>{currency.format({
-                                                        amount: props.currentBid,
-                                                        currency: CurrencyType.USD
-                                                    })}</span></p>
+                                                            amount: props.currentBid,
+                                                            currency: CurrencyType.USD
+                                                        })}</span></p>
                                                     </div>
                                                 </div>
                                                 <Separator />
@@ -154,10 +165,18 @@ export default function PlaceBid({ ...props }) {
                                                     })}.</strong> The winning bidder pays Biddify a 4.5% buyer's fee on top of the winning bid (minimum $225, maximum $4,500).</p><p>We will place a hold on your credit card for the buyer's fee. If you win, your card will be charged the non-refundable buyer’s fee at the end of the auction, and you will pay the seller directly for the vehicle. If you don't win, your hold will be released at auction end.</p><p><strong>Bids are binding and cannot be retracted.</strong> You are responsible for completing all due diligence prior to bidding. By placing this bid, you agree to the Cars &amp; Bids <a href="/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</p>
                                                 </div>
                                                 <div className="flex flex-col justify-center items-center p-4 gap-2">
-                                                    <Button className="min-w-48" type="submit">Bid {currency.format({
-                                                        amount: form.watch('bidAmount'),
-                                                        currency: CurrencyType.USD
-                                                    })}</Button>
+                                                    {
+                                                        isSending ?
+                                                            <Button className="min-w-48 " disabled><Loader2  className="animate-spin"/></Button>
+                                                            :
+                                                            <Button className="min-w-48" type="submit">Bid {currency.format({
+                                                                amount: form.watch('bidAmount'),
+                                                                currency: CurrencyType.USD
+                                                            })}</Button>}
+
+
+
+
                                                     <Button className="" variant="link" onClick={() => {
                                                         setshowConfirmDialog(false);
                                                     }}>Cancel</Button>

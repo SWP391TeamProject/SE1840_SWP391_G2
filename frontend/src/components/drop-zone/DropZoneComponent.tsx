@@ -7,13 +7,13 @@ interface AcceptedFile extends File {
   preview: string;
 }
 
-export default function DropzoneComponent({ control, name }) {
+export default function DropzoneComponent({ control, name, maxFiles=4, fieldMessage = "Drag 'n' drop some images here, or click to select images" }) {
   return (
 
     <Controller
       control={control}
       name={name}
-      render={({ field: { onChange, resetFields } }) => {
+      render={({ field: { onChange } }) => {
         const [acceptedFiles, setAcceptedFiles] = useState<AcceptedFile[]>([]); // Explicit typing
         const { getRootProps, getInputProps } = useDropzone({
           accept: { "image/*": [] },
@@ -55,14 +55,14 @@ export default function DropzoneComponent({ control, name }) {
 
         return (
           <section className="container min-h-[100px] flex justify-center items-center flex-col w-full ">
-            <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full border rounded-xl  border-dotted h-[100px] hover:cursor-pointer hover:bg-accent" })}>
-              <input {...getInputProps()} />
-              <div className="w-full flex justify-center items-center gap-2">
-                <UploadCloudIcon />
-                <p> Drag 'n' drop some images here, or click to select images</p>
-              </div>
-            </div>
-            
+            {acceptedFileItems.length < maxFiles &&
+              <div  {...getRootProps({ className: "dropzone flex justify-center items-center  w-full border rounded-xl  border-dotted h-[100px] hover:cursor-pointer hover:bg-accent" })}>
+                <input {...getInputProps()} />
+                <div className="w-full flex justify-center items-center gap-2">
+                  <UploadCloudIcon />
+                  <p> {fieldMessage}</p>
+                </div>
+              </div>}
             <ul className="w-full ">{acceptedFileItems}</ul>
           </section>
         );

@@ -27,32 +27,19 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAccounts, setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
+import {  setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
 import { fetchAccountsService, deleteAccountService, fetchAccountsByName, activateAccountService } from "@/services/AccountsServices.ts";
 import {
-  Home,
-  LineChart,
-  ListFilter,
-  Package,
-  Package2,
-  PanelLeft,
-  Search,
-  Settings,
-  ShoppingCart,
-  Users2,
-  File,
   PlusCircle,
   MoreHorizontal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { EditAcc } from "../popup/EditAcc";
-import { useLocation, useNavigate } from "react-router-dom";
+
 import { AccountStatus, Roles } from "@/constants/enums";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
-import { set } from "date-fns";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
+import { useNavigate } from "react-router-dom";
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);

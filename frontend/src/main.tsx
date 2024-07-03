@@ -87,6 +87,8 @@ import { CurrencyProvider } from "@/CurrencyProvider.tsx";
 import CustomerConsignmentDetail from "./pages/CustomerSite/dashboard/CustomerConsignmentDetail.tsx";
 import BlogEdit from "./pages/Administration/Blog/BlogPostEdit/BlogEdit.tsx";
 import StripePayment from "./StripePayment.tsx";
+import PaymentsList from "./pages/Administration/payment/PaymentsList.tsx";
+import KycVerification from "./pages/CustomerSite/Profile/KycVerification.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -182,6 +184,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                             element={<NotificationsList />}></Route>
                           <Route path="balance"
                             element={<Balance />}></Route>
+                            <Route path="kyc" element={<KycVerification />}></Route>
                         </Route>
                       </Route>
                     </Route>
@@ -234,6 +237,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                           {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                           {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                         </Route>
+                        <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
+                          <Route path="payments" element={<PaymentsList />}></Route>
+                          <Route path="payments/:id"
+                            element={<ItemDetail />}></Route>
+                          <Route path="payments/create"
+                            element={<ItemCreate />}></Route>
+                        </Route>
                         <Route element={<PrivateRoute
                           allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
                           <Route path="items" element={<ItemsList />}></Route>
@@ -278,7 +288,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     <Route path="/unauthorized" element={<ErrorPage />} />
                     {/* <RouterProvider router={router} /> */}
                     <Route path="*" element={<ErrorPage />} />
-                    {/* <Route path="/test" element={<StripePayment />} /> */}
+                    <Route path="/test" element={<StripePayment />} />
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}

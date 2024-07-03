@@ -161,17 +161,12 @@ export interface Order {
 }
 
 export interface Payment {
-  payment_id?: number;
-  create_date?: Date;
-  payment_amount?: number;
-  payment_date?: string;
-  payment_status?: PaymentStatus;
-  payment_type?: PaymentType;
-  update_date?: Date;
-  account_id?: number;
-  bid_id?: number;
-  deposit_id?: number;
-  order_id?: number;
+  id: number;
+  amount?: Date;
+  date?: number;
+  type?: string;
+  status?: PaymentStatus;
+  accountId?: PaymentType;
 }
 
 export interface Role {

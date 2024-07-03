@@ -66,6 +66,7 @@ public class AccountServiceImpl implements AccountService {
         accountDTO.setPhone(account.getPhone());
         accountDTO.setStatus(account.getStatus());
         accountDTO.setBalance(account.getBalance());
+        accountDTO.setKyc(account.getCitizenCard() != null);
         // accountDTO.setPassword(account.getPassword()); // DO NOT RETURN PASSWORD
         accountDTO.setCreateDate(account.getCreateDate());
         accountDTO.setUpdateDate(account.getUpdateDate());

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -49,16 +51,15 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
-        if(paymentRequest.getAmount().compareTo(new BigDecimal(5000)) < 0){
+        if (paymentRequest.getAmount().compareTo(new BigDecimal(5000)) < 0) {
             throw new InvalidInputException("Amount must be greater than 5,000 VND");
         }
-        if(paymentRequest.getType() == null){
+        if (paymentRequest.getType() == null) {
             throw new InvalidInputException("Payment type must not be null");
         }
-        if(paymentRequest.getAmount().compareTo(new BigDecimal(500000000)) > 0){
+        if (paymentRequest.getAmount().compareTo(new BigDecimal(500000000)) > 0) {
             throw new InvalidInputException("Amount must be smaller than 500,000,000 VND");
         }
-
 
 
         log.info("createPayment: " + paymentRequest);
@@ -152,10 +153,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<PaymentDTO> getAllPayment(Pageable pageable) {
+    public Page<PaymentDTO> getAllPayment(Pageable pageable, String type, String status) {
         try {
             Page<Payment> payments = paymentRepos.findAll(pageable);
+            List<Payment> paymentList = payments.stream()
+                    .filter(payment ->
+                            (status == null || payment.getStatus().equals(Payment.Status.valueOf(status))) &&
+                                    (type == null || payment.getType().equals(Payment.Type.valueOf(type)))
+                    )
+                    .collect(Collectors.toList());
+
+            payments = new PageImpl<>(paymentList);
             return payments.map(PaymentDTO::new);
+
         } catch (Exception e) {
             // Log the exception
             System.err.println("An error occurred while fetching all payments: " + e.getMessage());

@@ -198,7 +198,7 @@ export default function AuctionJoin() {
     // console.log(item, auctionId, bidders.includes(userId));
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
     if (itemId !== item.itemDTO.itemId) {
-
+      
       navigate(`/auctions/${auctionId}/${item.itemDTO.name}`, {
         state: {
           id: {
@@ -260,7 +260,7 @@ export default function AuctionJoin() {
                         auctionId={auctionId}
                         itemId={itemId}
                         sendMessage={sendMessage}
-                        endDate={auctionId?.endDate} // Added optional chaining for safety
+                        endDate={auctionSession?.endDate} // Added optional chaining for safety
                         name={itemDTO?.name}
                         image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
                         client={client}
@@ -278,7 +278,7 @@ export default function AuctionJoin() {
                       <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
                     </div>
                     <div className="grid gap-4">
-                      <Link to={`/auctions/${auctionId}`} >
+                      <Link to={`/auctions/${auctionId}` } >
                         <Button type="submit" className="w-full">
                           Go to Auction
                         </Button>

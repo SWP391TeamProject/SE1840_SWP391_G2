@@ -409,7 +409,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
     }
 
-    @Cacheable(key = "#id", value = "auctionSession ")
+    @Cacheable(key = "#id", value = "auctionSession")
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
         try {

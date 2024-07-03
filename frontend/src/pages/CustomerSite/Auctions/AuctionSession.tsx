@@ -19,6 +19,8 @@ import { Item } from '@/models/Item'
 import { getAllItemCategories } from '@/services/ItemCategoryService'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { set } from 'date-fns'
+import { useAuth } from '@/AuthProvider'
+import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 
 
 
@@ -29,6 +31,7 @@ export default function AuctionSession() {
     const [items, setItems] = useState([]);
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
+    const [showKycPopup, setShowKycPopup] = useState(false);
     const currencyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -40,6 +43,7 @@ export default function AuctionSession() {
     const userId = user == null ? -1 : user.id;
     const [alertBalance, setAlertBalance] = useState(null);
     const [registerFee, setRegisterFee] = useState(0);
+    const auth = useAuth();
     useEffect(() => {
         if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
@@ -168,7 +172,12 @@ export default function AuctionSession() {
             return (
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant="default" >Register to bid</Button>
+                        <Button variant="default"  onClick={()=>{
+                            if(!auth.user.kyc){
+                                setShowKycPopup(true);
+                                return ;
+                            }
+                        }}>Register to bid</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className='text-foreground'>
                         <AlertDialogHeader >
@@ -204,7 +213,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default" >Register to bid</Button>
+                    <Button variant="default" onClick={()=>{
+                            if(!auth.user.kyc){
+                                setShowKycPopup(true);
+                                return ;
+                            }
+                        }} >Register to bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader >
@@ -303,7 +317,6 @@ export default function AuctionSession() {
                 allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
             }
         });
-
     }
 
     const handleCategoryFilter = (...event: any) => {
@@ -490,6 +503,8 @@ export default function AuctionSession() {
                     </div>
                 </div>
             </main >
+            {showKycPopup && <KycVerificationPopup />}
+
         </div >
     )
 }

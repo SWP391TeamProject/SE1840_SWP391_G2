@@ -4,10 +4,12 @@ import fpt.edu.vn.Backend.DTO.CitizenCardDTO;
 import fpt.edu.vn.Backend.DTO.request.KycRequestDTO;
 import org.springframework.security.core.Authentication;
 
+import java.io.IOException;
+
 public interface KYCService {
 
 
-    CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication);
+    CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException;
 
 
 
