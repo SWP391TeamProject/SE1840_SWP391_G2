@@ -20,9 +20,7 @@ public class KycController {
     @PostMapping(value = "/verify",produces = "application/json")
     public ResponseEntity<CitizenCardDTO> verifyKyc(@ModelAttribute KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException {
         // implementation heretr
-
             return ResponseEntity.ok(kycService.verifyKyc(kycRequestDTO, authentication));
-
     }
 
 

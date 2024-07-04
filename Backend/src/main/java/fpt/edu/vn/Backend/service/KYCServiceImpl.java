@@ -37,7 +37,7 @@ public class KYCServiceImpl implements KYCService {
     private KYCRepos kycRepos;
     private AccountRepos accountRepos;
     @Value("${FPT_AI_API_KEY}")
-    private  String API_KEY_FRONT_FACE ;
+    private  String API_KEY_FPT_AI ;
 
     @Autowired
     private AttachmentService attachmentService;
@@ -97,7 +97,7 @@ public class KYCServiceImpl implements KYCService {
 
             WebClient client = WebClient.builder()
                     .baseUrl("https://api.fpt.ai/vision/idr/vnm")
-                    .defaultHeader("api-key", API_KEY_FRONT_FACE)
+                    .defaultHeader("api-key", API_KEY_FPT_AI)
                     .build();
 
             CitizenCardFrontFace response = client.post()
@@ -123,7 +123,7 @@ public class KYCServiceImpl implements KYCService {
 
             WebClient client = WebClient.builder()
                     .baseUrl("https://api.fpt.ai/vision/idr/vnm")
-                    .defaultHeader("api-key", API_KEY_FRONT_FACE)
+                    .defaultHeader("api-key", API_KEY_FPT_AI)
                     .build();
 
             CitizenCardBackFace response = client.post()
@@ -151,9 +151,6 @@ public class KYCServiceImpl implements KYCService {
     public CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException {
 
         if(!validateImage(kycRequestDTO.getFrontImage())){
-            return null;
-        }
-        if(!validateImage(kycRequestDTO.getBackImage())){
             return null;
         }
         if(!validateImage(kycRequestDTO.getBackImage())){
