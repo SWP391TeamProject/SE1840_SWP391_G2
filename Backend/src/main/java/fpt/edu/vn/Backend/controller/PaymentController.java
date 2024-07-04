@@ -8,12 +8,10 @@ import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.service.PaymentService;
-import fpt.edu.vn.Backend.service.PaymentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -39,8 +37,12 @@ public class PaymentController {
 
     @GetMapping()
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Page<PaymentDTO>> getAllPayments(@PageableDefault(size = 50) Pageable pageable, @RequestParam(required = false) String type, @RequestParam(required = false) String status) {
-        return ResponseEntity.ok(paymentService.getAllPayment(pageable,type,status));
+    public ResponseEntity<Page<PaymentDTO>> getAllPayments(
+            @PageableDefault(size = 50) Pageable pageable,
+            @RequestParam(required = false) Payment.Type type,
+            @RequestParam(required = false) Payment.Status status
+    ) {
+        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status));
     }
 
     @GetMapping("/{id}")
@@ -69,12 +71,8 @@ public class PaymentController {
         for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
             String fieldName = null;
             String fieldValue = null;
-            try {
-                fieldName = URLEncoder.encode(params.nextElement(), StandardCharsets.US_ASCII.toString());
-                fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            fieldName = URLEncoder.encode(params.nextElement(), StandardCharsets.US_ASCII);
+            fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 fields.put(fieldName, fieldValue);
             }
@@ -112,11 +110,5 @@ public class PaymentController {
             return -1;
         }
     }
-    @GetMapping("/filter/date")
-    public ResponseEntity<Page<PaymentDTO>> filterPaymentByDate(@RequestParam String startDate, @RequestParam String endDate, @PageableDefault(size = 50) Pageable pageable) {
-        return ResponseEntity.ok(paymentService.filterPaymentByDate(startDate, endDate, pageable));
-    }
-
-
 
 }

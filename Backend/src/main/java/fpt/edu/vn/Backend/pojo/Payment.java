@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,6 +32,15 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
     private Status status;
+
+    public enum Method {
+        VNPAY, PAYPAL
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    @Nullable
+    private Method method;
 
     public enum Type {
         DEPOSIT,

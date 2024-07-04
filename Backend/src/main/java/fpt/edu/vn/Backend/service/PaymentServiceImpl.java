@@ -2,10 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
-import fpt.edu.vn.Backend.DTO.request.BillingDTO;
-import fpt.edu.vn.Backend.DTO.request.InvoiceDTO;
-import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
-import fpt.edu.vn.Backend.DTO.request.VnPayPaymentRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.*;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -65,27 +62,45 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("createPayment: " + paymentRequest);
         try {
             Payment payment = new Payment();
-            BigDecimal exchangeRate = BigDecimal.valueOf(currencyService.getExchangeRate(CurrencyType.VND));
-            payment.setPaymentAmount(paymentRequest.getAmount().divide(exchangeRate, 10, RoundingMode.HALF_DOWN));
-            log.info("exchange rate: " + exchangeRate);
+            payment.setMethod(paymentRequest.getMethod());
+
+            if (payment.getMethod() == Payment.Method.VNPAY) {
+                BigDecimal exchangeRate = BigDecimal.valueOf(currencyService.getExchangeRate(CurrencyType.VND));
+                log.info("exchange rate to VND: " + exchangeRate);
+                BigDecimal newAmount = paymentRequest.getAmount().divide(exchangeRate, 10, RoundingMode.HALF_DOWN);
+                payment.setPaymentAmount(newAmount);
+            } else {
+                payment.setPaymentAmount(paymentRequest.getAmount());
+            }
             log.info("payment amount: " + payment.getPaymentAmount());
+
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
-            Optional<Account> accountOptional = accountRepos.findByAccountId(paymentRequest.getAccountId());
-            if (accountOptional.isEmpty()) {
-                throw new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId());
-            } else {
-                payment.setAccount(accountOptional.get());
+            payment.setAccount(accountRepos.findByAccountId(paymentRequest.getAccountId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId())));
+            Payment savedPayment = paymentRepos.save(payment);
+
+            if (savedPayment.getMethod() == Payment.Method.VNPAY) {
+                VnPayPaymentRequestDTO vnPayPaymentRequestDTO = VnPayPaymentRequestDTO.builder()
+                        .accountId(savedPayment.getAccount().getAccountId())
+                        .vnp_txnRef(savedPayment.getPaymentId())
+                        .vnp_Amount(paymentRequest.getAmount())
+                        .vnp_OrderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
+                        .build();
+                return createVNPayPayment(vnPayPaymentRequestDTO, paymentRequest.getIpAddr());
             }
 
-            Payment savedPayment = paymentRepos.save(payment);
-            VnPayPaymentRequestDTO vnPayPaymentRequestDTO = VnPayPaymentRequestDTO.builder()
-                    .accountId(savedPayment.getAccount().getAccountId())
-                    .vnp_txnRef(savedPayment.getPaymentId())
-                    .vnp_Amount(paymentRequest.getAmount())
-                    .vnp_OrderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
-                    .build();
-            return createVNPayPayment(vnPayPaymentRequestDTO, paymentRequest.getIpAddr());
+            if (savedPayment.getMethod() == Payment.Method.PAYPAL) {
+                PayPalPaymentRequestDTO paypalPaymentRequestDTO = PayPalPaymentRequestDTO.builder()
+                        .accountId(savedPayment.getAccount().getAccountId())
+                        .amount(paymentRequest.getAmount())
+                        .orderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
+                        .transId(savedPayment.getPaymentId())
+                        .build();
+                return createPayPalPayment(paypalPaymentRequestDTO, paymentRequest.getIpAddr());
+            }
+
+            throw new IllegalStateException("No handler for payment " + savedPayment.getMethod());
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("An error occurred while creating payment: " + e.getMessage());
@@ -96,31 +111,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentDTO updatePayment(PaymentRequest paymentRequest) {
         try {
-            // Find the payment by ID and handle if it's not found
             Payment payment = paymentRepos.findById(paymentRequest.getPaymentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentRequest.getPaymentId()));
-
-            // Update payment field
-            // Find the account by ID and handle if it's not found
-            Account account = accountRepos.findById(payment.getAccount().getAccountId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId()));
-            payment.setAccount(account);
             if (payment.getStatus().equals(Payment.Status.PENDING)) {
                 payment.setStatus(paymentRequest.getStatus());
                 if (paymentRequest.getStatus().equals(Payment.Status.SUCCESS)) {
-                    payment.getAccount().setBalance(account.getBalance().add(payment.getPaymentAmount()));
+                    payment.getAccount().setBalance(payment.getAccount().getBalance().add(payment.getPaymentAmount()));
                 }
             }
-
-            // Save the updated payment
             Payment updatedPayment = paymentRepos.save(payment);
-            // Return the updated payment as a DTO
             return new PaymentDTO(updatedPayment);
         } catch (Exception e) {
-            // Log the exception (using a logging framework is recommended)
-            System.err.println("An error occurred while updating paymentsdsadsadadadad: " + e.getMessage());
-
-            // Throw a custom exception or rethrow the caught exception
+            System.err.println("An error occurred while updating payment: " + e.getMessage());
             throw new ResourceNotFoundException("Failed to update payment", e);
         }
     }
@@ -132,9 +134,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + id));
             return new PaymentDTO(payment);
         } catch (Exception e) {
-            // Log the exception
             System.err.println("An error occurred while fetching payment: " + e.getMessage());
-            // Throw a custom exception
             throw new ResourceNotFoundException("Failed to get payment by id", e);
         }
     }
@@ -147,47 +147,31 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setCreateDate(LocalDateTime.now());
         payment.setType(paymentDTO.getType());
         payment.setStatus(paymentDTO.getStatus());
-        payment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).get());
+        payment.setMethod(paymentDTO.getMethod());
+        payment.setAccount(accountRepos.findById(paymentDTO.getAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentDTO.getAccountId())));
         Payment savedPayment = paymentRepos.save(payment);
         return new PaymentDTO(savedPayment);
     }
 
     @Override
-    public Page<PaymentDTO> getAllPayment(Pageable pageable, String type, String status) {
-        try {
-            Page<Payment> payments = paymentRepos.findAll(pageable);
-            List<Payment> paymentList = payments.stream()
-                    .filter(payment ->
-                            (status == null || payment.getStatus().equals(Payment.Status.valueOf(status))) &&
-                                    (type == null || payment.getType().equals(Payment.Type.valueOf(type)))
-                    )
-                    .collect(Collectors.toList());
-
-            payments = new PageImpl<>(paymentList);
-            return payments.map(PaymentDTO::new);
-
-        } catch (Exception e) {
-            // Log the exception
-            System.err.println("An error occurred while fetching all payments: " + e.getMessage());
-            // Throw a custom exception
-            throw new ResourceNotFoundException("Failed to get all payments", e);
-        }
+    public Page<PaymentDTO> getAllPayment(Pageable pageable, Payment.Type type, Payment.Status status) {
+        Page<Payment> payments = paymentRepos.findAll(pageable);
+        List<PaymentDTO> paymentList = payments.stream()
+                .filter(payment -> status == null || payment.getStatus() == status)
+                .filter(payment -> type == null || payment.getType() == type)
+                .map(PaymentDTO::new)
+                .collect(Collectors.toList());
+        return new PageImpl<>(paymentList);
     }
 
     @Override
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
-        try {
-            Payment payment = paymentRepos.findById(paymentDTO.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentDTO.getId()));
-            payment.setStatus(paymentDTO.getStatus());
-            Payment updatedPayment = paymentRepos.save(payment);
-            return new PaymentDTO(updatedPayment);
-        } catch (Exception e) {
-            // Log the exception
-            System.err.println("An error occurred while updating payment: " + e.getMessage());
-            // Throw a custom exception
-            throw new ResourceNotFoundException("Failed to update payment", e);
-        }
+        Payment payment = paymentRepos.findById(paymentDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentDTO.getId()));
+        payment.setStatus(paymentDTO.getStatus());
+        Payment updatedPayment = paymentRepos.save(payment);
+        return new PaymentDTO(updatedPayment);
     }
 
     @Override
@@ -300,31 +284,9 @@ public class PaymentServiceImpl implements PaymentService {
         return StringUtils.stripAccents(str).replaceAll("[^\\w ]", "");
     }
 
-    @Override
-    public PaymentDTO vnPayPaymentResponse(String token) {
-        return null;
-    }
+    private String createPayPalPayment(PayPalPaymentRequestDTO paypalPaymentRequestDTO, String ipAddr) {
 
-    @Override
-    public Page<PaymentDTO> filterPaymentByDate(String startDate, String endDate, Pageable pageable) {
-        return null;
     }
-
-    @Override
-    public PaymentDTO deleteById(int id) {
-        try {
-            Payment payment = paymentRepos.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + id));
-            paymentRepos.deleteById(id);
-            return new PaymentDTO(payment);
-        } catch (Exception e) {
-            // Log the exception
-            System.err.println("An error occurred while deleting payment: " + e.getMessage());
-            // Throw a custom exception
-            throw new ResourceNotFoundException("Failed to delete payment by id", e);
-        }
-    }
-
 }
 
 
