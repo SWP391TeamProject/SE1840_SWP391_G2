@@ -204,7 +204,7 @@ public class KYCServiceImpl implements KYCService {
             } else {
                 log.info("Account not found");
             }
-            attachmentService.uploadAccountAttachment(kycRequestDTO.getFrontImage(), account.get().getAccountId());
+//            attachmentService.uploadAccountAttachment(kycRequestDTO.getFrontImage(), account.get().getAccountId());
 
 
         }
