@@ -176,7 +176,7 @@ export default function KycVerification() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        {auth.user.kyc === false &&<div className="flex gap-4">
+                        {!kycDetail  && <div className="flex gap-4">
                             {isLoading
                                 ?
                                 <Button disabled>
