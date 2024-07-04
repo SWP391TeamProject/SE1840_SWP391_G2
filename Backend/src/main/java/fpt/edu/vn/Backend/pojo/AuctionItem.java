@@ -33,6 +33,9 @@ public class AuctionItem {
     @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
 
+    @ManyToMany(fetch = FetchType.LAZY,mappedBy = "auctionItems")
+    private Set<Order> orders;
+
     @OneToMany
     @JoinColumns({
             @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),

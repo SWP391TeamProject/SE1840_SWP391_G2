@@ -1,7 +1,5 @@
 package fpt.edu.vn.Backend.dbgen;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -536,7 +534,7 @@ public class DbGenService {
                 case AUCTION_ORDER -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Order order = new Order();
-                    order.setItems(Set.of(itemRepos.getReferenceById(auctionItem.get("itemId").getAsInt())));
+                    order.setAuctionItems(Set.of(auctionItemRepos.getReferenceById(new AuctionItemId(auctionItem.get("auctionSession.auctionSessionId").getAsInt(), auctionItem.get("item.itemId").getAsInt()))));
                     meta = order;
                 }
             }

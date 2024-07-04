@@ -26,7 +26,6 @@ public class ItemDTO implements Serializable {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private AccountDTO owner;
-    private Integer orderId;
     private Set<AttachmentDTO> attachments;
 
     public ItemDTO(Item item) {
@@ -40,7 +39,6 @@ public class ItemDTO implements Serializable {
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
         this.owner = new AccountDTO(item.getOwner());
-        this.orderId = item.getOrder()==null?null:item.getOrder().getOrderId();
         this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
         if(owner!=null){
             owner.setPassword(null);

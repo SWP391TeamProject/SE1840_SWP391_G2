@@ -9,11 +9,9 @@ import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import fpt.edu.vn.Backend.service.BidService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -69,7 +66,7 @@ public class BidController {
     }
 
     @GetMapping("/api/bids/export")
-    public ResponseEntity<byte[]> exportToExcel( Authentication authentication) throws IOException {
+    public ResponseEntity<byte[]> exportToExcel(Authentication authentication) throws IOException {
         AccountDTO account = accountService.getAccountByEmail(authentication.getName());
         if (account == null) {
             throw new InvalidInputException("You are not authorized to perform this action");
@@ -110,21 +107,32 @@ public class BidController {
             BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getAmount();
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
             log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
-
             if (bidDTO.getPayment().getAccountId() == bidService.getHighestBid(auctionItemId).getPayment().getAccountId()) {
                 return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Right now, you are the highest bidder.\n" +
                         "Hold off until someone outbids you.", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
             }
-
-            if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
-                bidDTO = bidService.createBid(bidDTO);
-                AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
-                a.setCurrentPrice(bidDTO.getPayment().getAmount());
-                auctionItemService.updateAuctionItem(a);
-                return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getPayment().getAmount(), bidDTO.getPayment().getAmount(), BidReplyDTO.Status.BID));
+            if (currentBid.compareTo(BigDecimal.valueOf(15000)) < 0) {
+                if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(100))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 100", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
+            } else if (currentBid.compareTo(BigDecimal.valueOf(15000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(50000)) < 0) {
+                if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(250))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 250", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
+            } else if (currentBid.compareTo(BigDecimal.valueOf(50000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(200000)) < 0) {
+                if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(500))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 500", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
             } else {
-                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 5", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(1000))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 1000", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
             }
+            bidDTO = bidService.createBid(bidDTO);
+            AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
+            a.setCurrentPrice(bidDTO.getPayment().getAmount());
+            auctionItemService.updateAuctionItem(a);
+            return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getPayment().getAmount(), bidDTO.getPayment().getAmount(), BidReplyDTO.Status.BID));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

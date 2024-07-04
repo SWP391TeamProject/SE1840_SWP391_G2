@@ -59,7 +59,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(key = "#auctionSessionId",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
         Account a = accountRepos.findById(accountId).orElseThrow(
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
@@ -114,13 +114,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public String placePreBid(int auctionSessionId, int accountId, double amount) {
         return "";
     }
 
     @Override
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
@@ -150,7 +150,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
     }
 
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(key = "#auctionDTO.getAuctionSessionId()",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
@@ -177,10 +177,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void finishAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
-        Map<AccountDTO, List<Integer>> winAccounts = new HashMap<>();
+        Map<AccountDTO, List<AuctionItemId>> winAccounts = new HashMap<>();
         logger.info("Finishing auction session " + auctionSessionId);
         if (auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")) {
             logger.warn("Auction session " + auctionSessionId + " already ended");
@@ -194,12 +194,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (account == null) {
                 continue;
             }
-            List<Integer> winItems = winAccounts.get(account);
+            List<AuctionItemId> winItems = winAccounts.get(account);
             if (winItems == null || winItems.isEmpty()) {
                 winItems = new ArrayList<>();
-                winItems.add(auctionItem.getItemDTO().getItemId());
+                winItems.add(auctionItem.getId());
             } else {
-                winItems.add(auctionItem.getItemDTO().getItemId());
+                winItems.add(auctionItem.getId());
             }
             winAccounts.put(account, winItems);
         }
@@ -256,7 +256,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                         });
             }
             auctionSession.setStartDate(auctionDTO.getStartDate());
-            auctionSession.setEndDate(auctionDTO.getEndDate());
+            auctionSession.setEndDate(LocalDateTime.now());
             auctionSession.setCreateDate(auctionDTO.getCreateDate());
             auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
             auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
@@ -268,7 +268,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         logger.info("Auction session " + auctionSessionId + " finished :" + getAuctionSessionById(auctionSessionId).getStatus());
     }
 
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public void terminateAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
@@ -317,7 +317,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession", allEntries = true)
+    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void startAuction(int auctionSessionId) {
         AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
         logger.info("Starting auction session " + auctionSessionId);
@@ -380,7 +380,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(value = "auctionSession",allEntries = true)
+    @CacheEvict(key = "#auctionDTO.getAuctionSessionId()", cacheNames = "auctionSession",value = "auctionSession",allEntries = true)
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
             throw new InvalidInputException("Start date must be in the future");
@@ -399,8 +399,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             AuctionSession auctionSession = optionalAuctionSession.get();
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
-            auctionSession.setCreateDate(auctionDTO.getCreateDate());
-            auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
+            auctionSession.setUpdateDate(LocalDateTime.now());
             auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
             auctionSessionRepos.save(auctionSession);
             return auctionDTO;

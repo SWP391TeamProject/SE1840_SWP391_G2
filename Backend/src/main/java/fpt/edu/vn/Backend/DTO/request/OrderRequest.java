@@ -14,7 +14,6 @@ import java.util.Set;
 @ToString
 public class OrderRequest implements Serializable {
     private int orderId;
-    private Set<Integer> itemId;
-    private int paymentId;
+    private String ship_address;
 
 }

@@ -63,4 +63,11 @@ public class OrderController {
         Authorizer.expectAdminOrUserId(principal, orderDTO.getPayment().getAccountId());
         return ResponseEntity.ok(orderDTO);
     }
+
+    @GetMapping("update/{id}")
+    public ResponseEntity<OrderDTO> updateShippingAddress(@PathVariable int id,
+                                                          @RequestParam String address) {
+        OrderDTO orderDTO = orderService.updateOrderShippingAddress(address,id);
+        return ResponseEntity.ok(orderDTO);
+    }
 }

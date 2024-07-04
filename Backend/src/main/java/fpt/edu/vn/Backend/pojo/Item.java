@@ -61,9 +61,6 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")

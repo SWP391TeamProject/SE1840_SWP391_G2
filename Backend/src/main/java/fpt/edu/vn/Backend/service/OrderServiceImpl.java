@@ -26,29 +26,33 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentRepos paymentRepository;
     private final AuctionSessionRepos auctionSessionRepos;
     private final AccountRepos accountRepos;
+    private final AuctionItemRepos auctionItemRepos;
 
     @Autowired
-    public OrderServiceImpl(OrderRepos orderRepository, ItemRepos itemRepository, PaymentRepos paymentRepository, AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos) {
+    public OrderServiceImpl(OrderRepos orderRepository, ItemRepos itemRepository, PaymentRepos paymentRepository, AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos, AuctionItemRepos auctionItemRepos) {
         this.orderRepository = orderRepository;
         this.itemRepository = itemRepository;
         this.paymentRepository = paymentRepository;
         this.auctionSessionRepos = auctionSessionRepos;
         this.accountRepos = accountRepos;
+        this.auctionItemRepos = auctionItemRepos;
     }
 
 
     @Override
     @Transactional
-    public OrderDTO createOrder(int accountId, Set<Integer> itemIds, int auctionId) {
+    public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId) {
         try {
             Order order = new Order();
             order.setCreateDate(LocalDateTime.now());
-            Set<Item> items = new HashSet<>();
-            for (int itemId : itemIds) {
-                items.add(itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found")));
+            Set<AuctionItem> auctionItems = new HashSet<>();
+            for (AuctionItemId auctionItemId : itemIds) {
+                log.info("Item: {}", auctionItemId);
+                AuctionItem item = auctionItemRepos.findById(auctionItemId).orElseThrow(() -> new RuntimeException("Item not found"));
+                auctionItems.add(item);
             }
             AuctionSession auctionSession = auctionSessionRepos.findById(auctionId).orElseThrow(() -> new RuntimeException("Auction not found"));
-            order.setItems(items);
+            order.setAuctionItems(auctionItems);
             Payment payment = new Payment();
             payment.setCreateDate(LocalDateTime.now());
             payment.setType(Payment.Type.AUCTION_ORDER);
@@ -56,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
             payment.setAccount(accountRepos.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found")));
             payment.setPaymentAmount(BigDecimal.ZERO);
             for (AuctionItem item : auctionSession.getAuctionItems()) {
-                if (items.stream().anyMatch(i -> i.getItemId().equals(item.getItem().getItemId()))) {
+                if (auctionItems.stream().anyMatch(i -> i.getAuctionItemId().equals(item.getAuctionItemId()))) {
                     log.info("Item: {} - {}", item.getItem().getItemId(), item.getCurrentPrice());
                     payment.setPaymentAmount(payment.getPaymentAmount().add(item.getCurrentPrice()));
                 }
@@ -116,7 +120,6 @@ public class OrderServiceImpl implements OrderService {
             return orderRepository.findAllByPayment_Status(status, pageable)
                     .map(OrderDTO::new);
         } catch (Exception e) {
-            System.err.println("An error occurred while fetching all orders: " + e.getMessage());
             throw new RuntimeException("Failed to fetch all orders", e);
         }
     }
@@ -133,15 +136,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO updateOrder(OrderRequest orderRequest) {
+    public OrderDTO updateOrderShippingAddress(String ship_address, int orderId) {
         try {
-            Order order = orderRepository.findById(orderRequest.getOrderId()).orElseThrow(() -> new RuntimeException("Order not found"));
-            Set<Item> items = new HashSet<>();
-            for (int itemId : orderRequest.getItemId()) {
-                items.add(itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found")));
-            }
-            order.setItems(items);
-            order.setPayment(paymentRepository.findById(orderRequest.getPaymentId()).orElseThrow(() -> new RuntimeException("Payment not found")));
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            order.setShippingAddress(ship_address);
             order = orderRepository.save(order);
             return new OrderDTO(order);
         } catch (Exception e) {
