@@ -1,10 +1,10 @@
+import { Payment } from "../payment";
 import { AuctionItem } from "./auctionItem";
-import { Payment } from "./payment";
 
 export interface Order {
     orderId?: number;
     createDate?: Date;
-    shipAddress?: string;
+    shippingAddress?: string;
     payment?:Payment;
     auctionItemDTOS: AuctionItem[];
   }
