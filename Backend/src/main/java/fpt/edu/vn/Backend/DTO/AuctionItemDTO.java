@@ -20,16 +20,12 @@ public class AuctionItemDTO implements Serializable {
     private AuctionItemId id;
     private ItemDTO itemDTO;
     private BigDecimal currentPrice;
-    private BigDecimal highestBid;
     private int numberOfBids;
     public AuctionItemDTO(AuctionItem auctionItem) {
         this.id = auctionItem.getAuctionItemId();
         this.itemDTO = new ItemDTO(auctionItem.getItem());
         this.currentPrice = auctionItem.getCurrentPrice();
         // Safely handle potential null getBids()
-        this.highestBid = auctionItem.getBids() != null ? auctionItem.getBids().stream()
-                .map(bid -> bid.getPayment().getPaymentAmount())
-                .max(BigDecimal::compareTo).orElse(BigDecimal.ZERO) : BigDecimal.ZERO;
         this.numberOfBids = auctionItem.getBids() != null ? auctionItem.getBids().size() : 0;
     }
 

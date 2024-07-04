@@ -43,7 +43,6 @@ public class ItemExporter {
         createCell(row, columnCount++, "Buy In Price", style);
         createCell(row, columnCount++, "Status", style);
         createCell(row, columnCount++, "Owner", style);
-        createCell(row, columnCount++, "Order ID", style);
         createCell(row, columnCount++, "Create Date", style);
         createCell(row, columnCount++, "Update Date", style);
     }
@@ -79,7 +78,6 @@ public class ItemExporter {
             createCell(row, columnCount++, item.getReservePrice().toString(), style);
             createCell(row, columnCount++, item.getBuyInPrice().toString(), style);
             createCell(row, columnCount++, item.getStatus().toString(), style);
-            createCell(row, columnCount++, item.getOrderId(), style);
             createCell(row, columnCount++, item.getCreateDate().toString(), style);
             createCell(row, columnCount++, item.getUpdateDate().toString(), style);
 

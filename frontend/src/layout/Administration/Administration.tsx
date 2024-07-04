@@ -1,6 +1,6 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag, CircleDollarSign } from 'lucide-react'
+import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag, CircleDollarSign,Package } from 'lucide-react'
 import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
@@ -122,6 +122,13 @@ export default function Administration() {
                                 Manage Blogs
                             </Link>
                             <Link
+                                to="orders"
+                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                            >
+                                <Package />
+                                Manage Orders
+                            </Link>
+                            <Link
                                 to="notifications"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
@@ -206,13 +213,6 @@ export default function Administration() {
                                     >
                                         <Bell />
                                         Manage Notifications
-                                    </Link>
-                                    <Link
-                                        to="payments"
-                                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                                    >
-                                        <CircleDollarSign />
-                                        Manage Payments
                                     </Link>
                                 </nav>
                             </SheetContent>

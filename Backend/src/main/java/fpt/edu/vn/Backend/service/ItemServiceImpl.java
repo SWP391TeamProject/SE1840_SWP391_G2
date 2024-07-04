@@ -78,9 +78,7 @@ public class ItemServiceImpl implements ItemService {
 
         if (item.getOwner() != null)
             itemDTO.setOwner(new AccountDTO(item.getOwner()));
-        Order order = item.getOrder();
-        if (order != null)
-            itemDTO.setOrderId(order.getOrderId());
+
         return itemDTO;
     }
 
@@ -103,9 +101,6 @@ public class ItemServiceImpl implements ItemService {
         if (itemDTO.getOwner() != null)
             item.setOwner(accountRepos.findById(itemDTO.getOwner().getAccountId())
                 .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwner())));
-        if (itemDTO.getOrderId() != null)
-            item.setOrder(orderRepos.findById(itemDTO.getOrderId())
-                    .orElseThrow(() -> new MappingException("Order not found: " + itemDTO.getOrderId())));
         return item;
     }
 

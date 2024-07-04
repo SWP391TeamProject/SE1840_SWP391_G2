@@ -7,7 +7,7 @@ import CountDownTime from '@/components/countdownTimer/CountDownTime'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { getCookie } from '@/utils/cookies'
-import { registerAuctionSession } from '@/services/AuctionSessionService'
+import { fetchAuctionSessionById, registerAuctionSession } from '@/services/AuctionSessionService'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
 import { AuctionSessionStatus } from '@/constants/enums'
@@ -19,6 +19,7 @@ import { Item } from '@/models/Item'
 import { getAllItemCategories } from '@/services/ItemCategoryService'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { set } from 'date-fns'
+import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession'
 import { useAuth } from '@/AuthProvider'
 import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 
@@ -132,6 +133,9 @@ export default function AuctionSession() {
                     setBidders(prevBidders => [...prevBidders, deposit.payment.accountId]);
                 }
             });
+            fetchAuctionSessionById(auctionSession?.auctionSessionId).then(res => {
+                dispatch(setCurrentAuctionSession(res.data));
+            })
             toast.success("Registered Successfully",
                 {
                     position: "bottom-right",
@@ -317,6 +321,7 @@ export default function AuctionSession() {
                 allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
             }
         });
+
     }
 
     const handleCategoryFilter = (...event: any) => {

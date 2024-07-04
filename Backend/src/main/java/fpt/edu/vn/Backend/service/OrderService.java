@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderRequest;
+import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Set;
 
 public interface OrderService {
-    OrderDTO createOrder(int accountId, Set<Integer> itemIds, int auctionId);
+    OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId);
 
     OrderDTO getOrderById(int orderId);
 
@@ -21,7 +22,7 @@ public interface OrderService {
 
     Page<OrderDTO> getAllOrdersByUserIdAndStatus(int userId, Payment.Status status, Pageable pageable);
 
-    OrderDTO updateOrder(OrderRequest orderRequest);
+    OrderDTO updateOrderShippingAddress(String shippingAddress, int orderId);
 
     void deleteOrder(int orderId);
 }

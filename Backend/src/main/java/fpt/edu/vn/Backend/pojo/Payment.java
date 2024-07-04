@@ -30,7 +30,7 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
-    private Status Status;
+    private Status status;
 
     public enum Type {
         DEPOSIT,
@@ -44,7 +44,7 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_type")
-    private Type Type;
+    private Type type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")

@@ -1,4 +1,4 @@
-import { Item } from "@/constants/interfaces";
+import { Item } from "./item";
 
 interface AuctionItemId{
     auctionSessionId?: number;

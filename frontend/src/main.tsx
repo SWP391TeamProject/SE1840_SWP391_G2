@@ -89,6 +89,10 @@ import BlogEdit from "./pages/Administration/Blog/BlogPostEdit/BlogEdit.tsx";
 import StripePayment from "./StripePayment.tsx";
 import PaymentsList from "./pages/Administration/payment/PaymentsList.tsx";
 import KycVerification from "./pages/CustomerSite/Profile/KycVerification.tsx";
+import { Orders } from "./pages/CustomerSite/dashboard/orders/Orders.tsx";
+import { OrderList } from "./pages/Administration/Order/orderList.tsx";
+import { OrderDetail } from "./pages/Administration/Order/orderDetail.tsx";
+import { Order } from "./pages/CustomerSite/dashboard/orders/Order.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -194,6 +198,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         element={<CustomerConsignmentList />}></Route>
                       <Route path="consignments/:id" element={<CustomerConsignmentDetail />}></Route>
                       <Route path="bids" element={<Bids />}></Route>
+                      <Route path="orders" element={<Orders />}></Route>
+                      <Route path="orders/:id"
+                            element={<Order />}></Route>
                     </Route>
                     {/* Administration */}
                     <Route
@@ -263,6 +270,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                             element={<CreateBlog />}></Route>
                           {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                           {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
+                        </Route>
+                        <Route element={<PrivateRoute
+                          allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
+                          <Route path="orders" element={<OrderList />}></Route>
+                          <Route path="orders/:id"
+                            element={<OrderDetail />}></Route>
+
                         </Route>
                         <Route path="notifications"
                           element={<ToBeImplemented />}></Route>
