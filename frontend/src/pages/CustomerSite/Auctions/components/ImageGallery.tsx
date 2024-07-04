@@ -70,7 +70,7 @@ export default function ImageGallery({ ...props }) {
             animation={{ fade: 0 }}
             controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
         /> */}
-        <Lightbox
+        <Lightbox 
             index={index}
             slides={
                 props.itemDTO?.attachments.map((image) => ({
@@ -137,6 +137,7 @@ export default function ImageGallery({ ...props }) {
             on={{ view: updateIndex }}
             animation={{ fade: 0 }}
             controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
+            styles={{ container: {backgroundColor: "rgba(0, 0, 0, 0.9)" }, thumbnailsContainer: {backgroundColor: "rgba(0, 0, 0, 0.9)" ,border: "none" },thumbnailsTrack: {opacity: "100" }}}
         />
     </div>;
 }

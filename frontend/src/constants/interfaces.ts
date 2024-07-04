@@ -154,10 +154,11 @@ export interface Notification {
 }
 
 export interface Order {
-  order_id?: number;
-  order_date?: Date;
-  ship_address?: string;
-  account_id?: number;
+  orderId?: number;
+  createDate?: Date;
+  shipAddress?: string;
+  payment?:Payment;
+  auctionItemDTOS: Item[];
 }
 
 export interface Payment {

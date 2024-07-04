@@ -43,6 +43,11 @@ export default function DashBoardNavBar() {
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
+                <NavigationMenuLink asChild >
+                  <Link to="/dashboard/orders" className={navigationMenuTriggerStyle()}>Orders</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
                 {
                   auth.isAuthenticated() &&
                   <ProfileDropdownMenu>
