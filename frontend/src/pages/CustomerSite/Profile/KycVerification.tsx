@@ -56,7 +56,7 @@ export default function KycVerification() {
         setIsLoading(true)
 
 
-        axios.post("https://localhost:8080/api/kyc/verify", values, {
+        axios.post(`${import.meta.env.VITE_API_SERVER}/kyc/verify`, values, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization' : 'Bearer ' + getCookie('token')

@@ -172,6 +172,8 @@ export default function PaymentsList() {
                         <TabsTrigger onClick={() => handleFilterClick([PaymentType.AUCTION_DEPOSIT], "AUCTION_DEPOSIT")} value="AUCTION_DEPOSIT">AUCTION_DEPOSIT</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([PaymentType.AUCTION_DEPOSIT_REFUND], "AUCTION_DEPOSIT_REFUND")} value="AUCTION_DEPOSIT_REFUND">AUCTION_DEPOSIT_REFUND</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([PaymentType.AUCTION_ORDER], "AUCTION_ORDER")} value="AUCTION_ORDER">AUCTION_ORDER</TabsTrigger>
+                        <TabsTrigger onClick={() => handleFilterClick([PaymentType.DEPOSIT], "DEPOSIT")} value="DEPOSIT">DEPOSIT</TabsTrigger>
+
                     </TabsList>
                     <div className="ml-auto flex items-center gap-2">
                         {/* <DropdownMenu>
