@@ -1,3 +1,4 @@
+import { useAuth } from "@/AuthProvider";
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -8,8 +9,9 @@ import { getCookie } from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import { z } from "zod"
 const MAX_FILE_SIZE = 5000000;
@@ -39,7 +41,9 @@ const formSchema = z.object({
 
 export default function KycVerification() {
     const [isLoading, setIsLoading] = React.useState(false);
-
+    const auth = useAuth();
+    const [kycDetail, setKycDetail] = React.useState<any>(null)
+    
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -48,6 +52,23 @@ export default function KycVerification() {
             backImage: ""
         },
     })
+
+    useEffect(() => {
+        if (auth.user?.kyc === true) {
+            axios.get(`${import.meta.env.VITE_API_SERVER}/kyc/detail`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getCookie('token')
+                }
+            }).then((res) => {
+                console.log(res.data);
+                setKycDetail(res.data)
+            }
+            ).catch((error) => {
+                console.log(error);
+            });
+        }
+    }, [])
 
     // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof formSchema>) {
@@ -59,19 +80,24 @@ export default function KycVerification() {
         axios.post(`${import.meta.env.VITE_API_SERVER}/kyc/verify`, values, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization' : 'Bearer ' + getCookie('token')
+                'Authorization': 'Bearer ' + getCookie('token')
             },
         })
-        .then((res) => {
-            console.log("success");
-            console.log(res.data);
-            setIsLoading(false);
-            // Handle success...
-        })
-        .catch((error) => {
-            setIsLoading(false);
-            // Handle error...
-        });
+            .then((res) => {
+                console.log("success");
+                console.log(res.data);
+                showStatusModal(submissionStatus.SUCCESS);
+                setIsLoading(false);
+                setKycDetail(res.data)
+                toast.success('Your KYC verification has been submitted successfully. You can now participate in the auction on our platform.')
+                // Handle success...
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                showStatusModal(submissionStatus.ERROR);
+                toast.error('There was an error submitting your KYC verification. Please try again.')
+                // Handle error...
+            });
 
         console.log(values)
     }
@@ -87,45 +113,62 @@ export default function KycVerification() {
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}>
                     <CardHeader>
-                        <CardTitle>Profile Details</CardTitle>
+                        <CardTitle>Ekyc Detail</CardTitle>
                         <CardDescription>
-                            View and manage your personal information.
+                            View and manage your verification details
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-4">
                             <div className="grid gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="frontImage"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Front Image</FormLabel>
-                                            <FormControl>
-                                                <DropzoneComponent {...field} maxFiles={1} fieldMessage="
+
+                                {kycDetail === null?
+                                    <div>
+                                        <FormField
+                                            control={form.control}
+                                            name="frontImage"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Front Image</FormLabel>
+                                                    <FormControl>
+                                                        <DropzoneComponent {...field} maxFiles={1} fieldMessage="
                                                 Drag 'n' drop your front identity images here, or click to select images
                                                 " />
 
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="backImage"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Back Image</FormLabel>
-                                            <FormControl>
-                                                <DropzoneComponent {...field} maxFiles={1}
-                                                    fieldMessage="Drag 'n' drop your front identity images here, or click to select images"
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="backImage"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Back Image</FormLabel>
+                                                    <FormControl>
+                                                        <DropzoneComponent {...field} maxFiles={1}
+                                                            fieldMessage="Drag 'n' drop your front identity images here, or click to select images"
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    :
+                                    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+                                    <div className="space-y-4">
+                                        <div className="text-gray-900">
+                                            <p className="font-semibold">CardID: <span className="font-normal">{kycDetail.cardId}</span></p>
+                                            <p className="font-semibold">FullName: <span className="font-normal">{kycDetail.fullName}</span></p>
+                                            <p className="font-semibold">Birthday: <span className="font-normal">{kycDetail.birthday}</span></p>
+                                            <p className="font-semibold">Gender: <span className="font-normal">{kycDetail.gender ? 'Male' : 'Female'}</span></p>
+                                            <p className="font-semibold">Address: <span className="font-normal">{kycDetail.address}</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
                             </div>
                             <div className="grid gap-2">
 
@@ -133,7 +176,7 @@ export default function KycVerification() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <div className="flex gap-4">
+                        {auth.user.kyc === false &&<div className="flex gap-4">
                             {isLoading
                                 ?
                                 <Button disabled>
@@ -143,11 +186,42 @@ export default function KycVerification() {
                                 </Button>
                                 : <Button
                                     type="submit"
-                                >Save details</Button>}
-                        </div>
+                                >Verify</Button>}
+                        </div>}
                     </CardFooter>
                 </form>
             </Form>
         </Card>
     </>;
+}
+
+enum submissionStatus {
+    SUCCESS,
+    ERROR
+}
+
+const showStatusModal = (status: submissionStatus) => {
+    return (
+        <AlertDialog defaultOpen>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{
+                        status === submissionStatus.ERROR ? "Error" : "Success"
+                        }</AlertDialogTitle>
+                </AlertDialogHeader>
+                    {status === submissionStatus.ERROR ?
+                          '  There was an error submitting your KYC verification. Please try again.'
+                        :
+                           ' Your KYC verification has been submitted successfully.You can now participate in the auction on our platform.'
+                    }
+                    Your KYC verification has been submitted successfully.
+                    You can now participate in the auction on our platform.
+                <AlertDialogFooter>
+                    <AlertDialogAction>
+                        <Button>Close</Button>
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    )
 }

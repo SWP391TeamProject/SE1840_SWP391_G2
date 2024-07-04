@@ -141,6 +141,13 @@ public class KYCServiceImpl implements KYCService {
     }
 
     @Override
+    public CitizenCardDTO kycDetail(Authentication authentication)  {
+        Optional<Account> account = accountRepos.findByEmail(authentication.getName());
+        return new CitizenCardDTO(account.get().getCitizenCard());
+
+    }
+
+    @Override
     public CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException {
 
         if(!validateImage(kycRequestDTO.getFrontImage())){
@@ -161,7 +168,6 @@ public class KYCServiceImpl implements KYCService {
             RGBLuminanceSource source = new RGBLuminanceSource(image.getWidth(), image.getHeight(), pixels);
             bitmap = new BinaryBitmap(new HybridBinarizer(source));
         } catch (IOException e) {
-            e.printStackTrace();
             log.info("Error reading image");
         }
         if (bitmap == null)
@@ -171,7 +177,6 @@ public class KYCServiceImpl implements KYCService {
             result = barcodeReader.decode(bitmap);
         } catch (NotFoundException e) {
             log.info("Barcode not found");
-            e.printStackTrace();
         }
         String decodedText = result. getText();
         log.info("Decoded text: {}", decodedText);
@@ -201,6 +206,8 @@ public class KYCServiceImpl implements KYCService {
                 citizenCard.setAccount(account.get());
                 log.info("Citizen card: {}", citizenCard);
                 kycRepos.save(citizenCard);
+
+                return new CitizenCardDTO(citizenCard);
             } else {
                 log.info("Account not found");
             }

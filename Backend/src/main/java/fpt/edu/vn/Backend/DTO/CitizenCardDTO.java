@@ -19,11 +19,14 @@ public class CitizenCardDTO implements Serializable {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
-    CitizenCardDTO(CitizenCard citizenCard) {
+    public CitizenCardDTO(CitizenCard citizenCard) {
         this.userId = citizenCard.getUserId();
-        this.cardId = citizenCard.getCardId();
         this.fullName = citizenCard.getFullName();
         this.birthday = citizenCard.getBirthday();
+        this.cardId = citizenCard.getCardId();
+        this.gender = citizenCard.isGender();
+        this.address = citizenCard.getAddress();
+        this.city = citizenCard.getCity();
     }
 
     // getters and setters
