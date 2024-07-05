@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
+import fpt.edu.vn.Backend.DTO.request.PaymentCaptureRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -59,12 +60,19 @@ public class PaymentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPayment( @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) throws UnsupportedEncodingException {
-//            Authorizer.expectAdminOrUserId(principal, paymentRequest.getAccountId());
-            paymentRequest.setIpAddr(request.getRemoteAddr());
-            String createdPayment = paymentService.createPayment(paymentRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
+    public ResponseEntity<String> createPayment(Principal principal, @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) throws UnsupportedEncodingException {
+        Authorizer.expectAdminOrUserId(principal, paymentRequest.getAccountId());
+        paymentRequest.setIpAddr(request.getRemoteAddr());
+        String createdPayment = paymentService.createPayment(paymentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
     }
+
+    @PostMapping("/capture")
+    public ResponseEntity<String> capturePayment(@RequestBody PaymentCaptureRequestDTO dto) {
+        String res = paymentService.capturePayment(dto);
+        return ResponseEntity.ok(res);
+    }
+
     @GetMapping("/vnpay_ipn")
     public int orderReturn(HttpServletRequest request){
         Map<String, String> fields = new HashMap<>();

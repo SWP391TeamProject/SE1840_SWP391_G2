@@ -58,6 +58,7 @@ interface ICurrencyContext {
   getCurrencyType: () => CurrencyType;
   setCurrencyType: (type: CurrencyType) => void;
   format: (opts: FormatOptions) => string;
+  convert: (amount: number, baseCurrency: CurrencyType, targetCurrency: CurrencyType) => number;
 }
 
 const currencyFormatPreferenceKey = "currencyFormatPreference";
@@ -168,9 +169,13 @@ export const CurrencyProvider: React.FC<{
     return removeTrailingZeros(formatted) + suffix;
   };
 
+  const convert = (amount: number, baseCurrency: CurrencyType, targetCurrency: CurrencyType): number => {
+    return amount * exchangeRates[targetCurrency] / exchangeRates[baseCurrency];
+  };
+
   return (
     <CurrencyContext.Provider
-      value={{getCurrencyType, setCurrencyType: setCurrency, format}}>
+      value={{getCurrencyType, setCurrencyType: setCurrency, format, convert}}>
       {children}
     </CurrencyContext.Provider>
   );

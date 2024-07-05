@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.DTO.request.PayPalPaymentRequestDTO;
+import fpt.edu.vn.Backend.DTO.response.PaypalCaptureResponseDTO;
 import fpt.edu.vn.Backend.exception.PaypalRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,19 +21,24 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PaypalServiceImpl implements PaypalService {
     private static final String PAYPAL_ACCESS_TOKEN_KEY = "PaypalAccessToken";
+    private static final String PAYPAL_PENDING_ORDER_KEY = "PaypalPendingOrders";
     private static final Logger logger = LoggerFactory.getLogger(PaypalServiceImpl.class);
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    @Value("paypal.api-endpoint")
+    @Value("${paypal.api-endpoint}")
     private String apiEndpoint;
 
-    @Value("paypal.client-id")
+    @Value("${paypal.client-id}")
     private String clientId;
 
-    @Value("paypal.client-secret")
+    @Value("${paypal.client-secret}")
     private String clientSecret;
+
+    @Autowired
+    public PaypalServiceImpl(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     public String getAccessToken() {
@@ -96,7 +102,7 @@ public class PaypalServiceImpl implements PaypalService {
         payload.add("purchase_units", purchaseUnits);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic " + getAccessToken());
+        headers.set("Authorization", "Bearer " + getAccessToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String url = apiEndpoint + "/v2/checkout/orders";
@@ -117,11 +123,42 @@ public class PaypalServiceImpl implements PaypalService {
         }
 
         JsonObject json = new Gson().fromJson(res.getBody(), JsonObject.class);
-        return json.getAsJsonPrimitive("id").getAsString();
+        String id = json.getAsJsonPrimitive("id").getAsString();
+
+        redisTemplate.opsForHash().put(PAYPAL_PENDING_ORDER_KEY, id, dto.getTransId());
+
+        return id;
     }
 
     @Override
-    public String captureOrder(String orderId) {
-        return null;
+    public PaypalCaptureResponseDTO captureOrder(String orderId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + getAccessToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String url = apiEndpoint + "/v2/checkout/orders/"+orderId+"/capture";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> res = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                new HttpEntity<>(
+                        headers
+                ),
+                String.class
+        );
+
+        if (!res.getStatusCode().is2xxSuccessful()) {
+            logger.error("Failed to capture PayPal order: {}", res);
+            throw new PaypalRequestException("Failed to capture PayPal order");
+        }
+
+        Integer transId = (Integer) redisTemplate.opsForHash().get(PAYPAL_PENDING_ORDER_KEY, orderId);
+        if (transId == null) {
+            logger.info("Capture success but not found transId in the cache {}", orderId);
+        } else {
+            redisTemplate.opsForHash().delete(PAYPAL_PENDING_ORDER_KEY, orderId);
+        }
+
+        return PaypalCaptureResponseDTO.builder().response(res.getBody()).transId(transId).build();
     }
 }

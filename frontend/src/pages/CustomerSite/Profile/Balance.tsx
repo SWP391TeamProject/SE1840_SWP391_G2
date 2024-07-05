@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {useAuth} from "@/AuthProvider.tsx";
 import {CurrencyType, useCurrency} from "@/CurrencyProvider.tsx";
 import {ExclamationTriangleIcon} from "@radix-ui/react-icons";
@@ -32,38 +32,41 @@ import {
   ReactPayPalScriptOptions
 } from "@paypal/react-paypal-js";
 import {toast} from "react-toastify";
-import {Separator} from "@/components/ui/separator.tsx";
-
-const formSchema = z.object({
-  amount: z.string().min(1, {message: "Please enter amount"}),
-}).superRefine((data, ctx) => {
-  if (parseInt(data.amount) < 5000) {
-    ctx.addIssue({
-      path: ["amount"],
-      message: "Amount must be at least 5000",
-      code: "custom",
-    });
-  }
-  if (parseInt(data.amount) > 100000000) {
-    ctx.addIssue({
-      path: ["amount"],
-      message: "Maximum amount is 100,000,000",
-      code: "custom",
-    });
-  }
-});
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@/components/ui/tabs.tsx";
+import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table";
+import {createSearchParams, useNavigate} from "react-router-dom";
 
 export default function Balance() {
+  const navigate = useNavigate();
   const auth = useAuth();
   const currency = useCurrency();
   const [isOtherAmount, setIsOtherAmount] = useState(true);
+  const [currencyChoice, setCurrencyChoice] = useState(CurrencyType.VND);
+  const currencyChoiceRef = useRef(currencyChoice);
+
+  const formSchema = z.object({
+    amount: z.string().min(1, {message: "Please enter amount"})
+      .refine((val) => {
+        const usd = currency.convert(parseInt(val), currencyChoiceRef.current, CurrencyType.USD);
+        return usd >= 5 && usd <= 500000000;
+      }, {
+        message: "Your deposit must be at least 5 USD and not exceed 500M USD",
+      })
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "all",
     defaultValues: {
-      amount: "",
+      amount: ""
     },
   });
+  const watchAmount = form.watch("amount", "0")
 
   function payWithVNPay(values: z.infer<typeof formSchema>) {
     axios.post(`${API_SERVER}/payments/create`, {
@@ -102,10 +105,10 @@ export default function Balance() {
     "data-sdk-integration-source": "integrationbuilder_sc",
   };
 
-  const [paypalOrderId, setPaypalOrderId] = useState<string>(null);
+  const paypalOrderIdRef = useRef("");
 
   async function payWithPaypal(values: z.infer<typeof formSchema>) {
-    axios.post(`${API_SERVER}/payments/create`, {
+    await axios.post(`${API_SERVER}/payments/create`, {
       ...values,
       paymentId: "",
       type: "DEPOSIT",
@@ -120,11 +123,14 @@ export default function Balance() {
         "Authorization": "Bearer " + auth.user.accessToken,
       },
     }).then(response => {
-      setPaypalOrderId(response.data);
+      paypalOrderIdRef.current = response.data;
     }).catch(error => {
-      console.log(error);
-      toast.error(error, {
-        position: "top-right",
+      navigate({
+        pathname: "/payment-status",
+        search: createSearchParams({
+          status: "error",
+          error: error
+        }).toString()
       });
     });
   }
@@ -170,18 +176,6 @@ export default function Balance() {
           <Form {...form}>
             <form className="space-y-4">
               <div className="grid w-full items-center gap-8">
-                <Alert variant="destructive">
-                  <ExclamationTriangleIcon className="h-4 w-4"/>
-                  <AlertTitle>NOTE</AlertTitle>
-                  <AlertDescription>
-                    If you are going to pay with VNPAY, your fund will be exchanged
-                    to USD automatically at the exchange rate of 1 USD =&nbsp;
-                    {currency.format({
-                      amount: 1,
-                      currency: CurrencyType.VND
-                    })}
-                  </AlertDescription>
-                </Alert>
                 <FormField
                   control={form.control}
                   name="amount"
@@ -204,14 +198,7 @@ export default function Balance() {
                                 </FormControl>
                                 <FormLabel
                                   className="text-base font-normal peer-checked:font-semibold peer-checked:text-primary">
-                                  {currency.format({
-                                    amount: v,
-                                    currency: CurrencyType.VND,
-                                    exchangeMoney: false
-                                  })} {currency.getCurrencyType() === CurrencyType.VND ? "" : `(${currency.format({
-                                  amount: v,
-                                  baseCurrency: CurrencyType.VND
-                                })})`}
+                                  {v}
                                 </FormLabel>
                               </FormItem>)
                             )
@@ -247,61 +234,162 @@ export default function Balance() {
                 />
               </div>
 
-              <Button onClick={form.handleSubmit(payWithVNPay)} className="w-full h-[40px]">Pay with
-                VNPAY</Button>
-
-              <Separator />
-
-              <PayPalScriptProvider options={paypalOptions}>
-                <PayPalButtons
-                  style={{
-                    layout: "vertical",
-                    color:  'blue',
-                    shape:  'pill',
-                    label:  'pay',
-                    height: 40
-                  }}
-                  createOrder={async () => {
-                    await form.handleSubmit(payWithPaypal)();
-                    return paypalOrderId;
-                  }}
-                  onApprove={async (data, actions) => {
-                    try {
-                      const orderData: any  = callbackPaypal(data.orderID);
-                      // Three cases to handle:
-                      //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-                      //   (2) Other non-recoverable errors -> Show a failure message
-                      //   (3) Successful transaction -> Show confirmation or thank you message
-                      const errorDetail = orderData?.details?.[0];
-                      if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
-                        // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-                        // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
-                        return actions.restart();
-                      } else if (errorDetail) {
-                        toast.error(errorDetail.description, {
-                          position: "top-right",
-                        });
-                      } else {
-                        // (3) Successful transaction -> Show confirmation or thank you message
-                        // Or go to another URL:  actions.redirect('thank_you.html');
-                        console.log(
-                          "Capture result",
-                          orderData,
-                          JSON.stringify(orderData, null, 2),
-                        );
-                        toast.success("Payment success", {
-                          position: "top-right",
-                        });
+              <Tabs defaultValue="VND" onValueChange={(v) => {
+                const ct = CurrencyType[v];
+                setCurrencyChoice(ct);
+                currencyChoiceRef.current = ct;
+                form.trigger();
+              }}>
+                <TabsList>
+                  <TabsTrigger value="VND">Pay in VND</TabsTrigger>
+                  <TabsTrigger value="USD">Pay in USD</TabsTrigger>
+                </TabsList>
+                <TabsContent value="VND">
+                  <Table className="pointer-events-none">
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="font-medium">Total</TableCell>
+                        <TableCell className="text-right">
+                          <p>{currency.format({
+                            amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
+                            exchangeMoney: false,
+                            currency: CurrencyType.VND
+                          })}</p>
+                          {
+                            currency.getCurrencyType() !== CurrencyType.VND &&
+                            <p>{currency.format({
+                              amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
+                              baseCurrency: CurrencyType.VND
+                            })}</p>
+                          }
+                        </TableCell>
+                      </TableRow>
+                      {
+                        currency.getCurrencyType() !== CurrencyType.USD &&
+                        <TableRow>
+                          <TableCell
+                            className="font-medium">Exchanged</TableCell>
+                          <TableCell className="text-right">
+                            <p>{currency.format({
+                              amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
+                              baseCurrency: CurrencyType.VND,
+                              currency: CurrencyType.USD
+                            })}</p>
+                          </TableCell>
+                        </TableRow>
                       }
-                    } catch (error) {
-                      console.error(error);
-                      toast.error(error, {
-                        position: "top-right",
-                      });
-                    }
-                  }}
-                />
-              </PayPalScriptProvider>
+                    </TableBody>
+                  </Table>
+
+                  <Alert variant="destructive" className="my-5">
+                    <ExclamationTriangleIcon className="h-4 w-4"/>
+                    <AlertTitle>NOTE</AlertTitle>
+                    <AlertDescription>
+                      If you are going to pay with VNPAY, your fund will be
+                      exchanged
+                      to USD automatically at the exchange rate of 1 USD =&nbsp;
+                      {currency.format({
+                        amount: 1,
+                        currency: CurrencyType.VND
+                      })}
+                    </AlertDescription>
+                  </Alert>
+
+                  <Button onClick={form.handleSubmit(payWithVNPay)}
+                          className="w-full h-[40px]">Pay with
+                    VNPAY</Button>
+                </TabsContent>
+                <TabsContent value="USD">
+                  <Table className="pointer-events-none">
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="font-medium">Total</TableCell>
+                        <TableCell className="text-right">
+                          <p>{currency.format({
+                            amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
+                            exchangeMoney: false,
+                            currency: CurrencyType.USD
+                          })}</p>
+                          {
+                            currency.getCurrencyType() !== CurrencyType.USD &&
+                            <p>{currency.format({
+                              amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
+                              baseCurrency: CurrencyType.USD
+                            })}</p>
+                          }
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+
+                  <PayPalScriptProvider options={paypalOptions}>
+                    <PayPalButtons
+                      style={{
+                        layout: "vertical",
+                        color: 'blue',
+                        shape: 'pill',
+                        label: 'pay',
+                        height: 40
+                      }}
+                      createOrder={async () => {
+                        await form.handleSubmit(payWithPaypal)();
+                        return paypalOrderIdRef.current;
+                      }}
+                      onApprove={async (data, actions) => {
+                        try {
+                          const orderData: any = await callbackPaypal(data.orderID);
+                          // Three cases to handle:
+                          //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                          //   (2) Other non-recoverable errors -> Show a failure message
+                          //   (3) Successful transaction -> Show confirmation or thank you message
+                          const errorDetail = orderData?.details?.[0];
+                          if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+                            // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                            // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
+                            return actions.restart();
+                          } else if (errorDetail) {
+                            navigate({
+                              pathname: "/payment-status",
+                              search: createSearchParams({
+                                status: "error",
+                                error: errorDetail.description
+                              }).toString()
+                            });
+                          } else {
+                            // (3) Successful transaction -> Show confirmation or thank you message
+                            // Or go to another URL:  actions.redirect('thank_you.html');
+                            console.log(
+                              "Capture result",
+                              orderData,
+                              JSON.stringify(orderData, null, 2),
+                            );
+                            toast.success("Payment success", {
+                              position: "top-right",
+                            });
+                            navigate({
+                              pathname: "/payment-status",
+                              search: createSearchParams({
+                                amount: orderData["purchase_units"][0]["payments"]["captures"][0]["amount"]["value"],
+                                status: "success",
+                                currency: "USD"
+                              }).toString()
+                            });
+                          }
+                        } catch (error) {
+                          console.error(error);
+                          navigate({
+                            pathname: "/payment-status",
+                            search: createSearchParams({
+                              status: "error",
+                              error: error
+                            }).toString()
+                          });
+                        }
+                      }}
+                    />
+                  </PayPalScriptProvider>
+                </TabsContent>
+              </Tabs>
             </form>
           </Form>
         </CardContent>

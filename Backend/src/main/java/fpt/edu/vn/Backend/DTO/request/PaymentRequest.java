@@ -21,5 +21,5 @@ public class PaymentRequest implements Serializable {
     private Payment.Method method;
     private int accountId;
     private String ipAddr;
-    private VnPayPaymentRequestDTO.OrderInfoType orderInfoType;
+    private PaymentOrderInfoType orderInfoType;
 }

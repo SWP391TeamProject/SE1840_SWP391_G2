@@ -1,8 +1,11 @@
 package fpt.edu.vn.Backend.service;
 
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.*;
+import fpt.edu.vn.Backend.DTO.response.PaypalCaptureResponseDTO;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -37,28 +40,22 @@ import java.util.stream.Collectors;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
-    @Autowired
-    private PaymentRepos paymentRepos;
+
+    private final PaymentRepos paymentRepos;
+    private final AccountRepos accountRepos;
+    private final CurrencyService currencyService;
+    private final PaypalService paypalService;
 
     @Autowired
-    private AccountRepos accountRepos;
-
-    @Autowired
-    private CurrencyService currencyService;
+    public PaymentServiceImpl(PaymentRepos paymentRepos, AccountRepos accountRepos, CurrencyService currencyService, PaypalService paypalService) {
+        this.paymentRepos = paymentRepos;
+        this.accountRepos = accountRepos;
+        this.currencyService = currencyService;
+        this.paypalService = paypalService;
+    }
 
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
-        if (paymentRequest.getAmount().compareTo(new BigDecimal(5000)) < 0) {
-            throw new InvalidInputException("Amount must be greater than 5,000 VND");
-        }
-        if (paymentRequest.getType() == null) {
-            throw new InvalidInputException("Payment type must not be null");
-        }
-        if (paymentRequest.getAmount().compareTo(new BigDecimal(500000000)) > 0) {
-            throw new InvalidInputException("Amount must be smaller than 500,000,000 VND");
-        }
-
-
         log.info("createPayment: " + paymentRequest);
         try {
             Payment payment = new Payment();
@@ -73,6 +70,13 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.setPaymentAmount(paymentRequest.getAmount());
             }
             log.info("payment amount: " + payment.getPaymentAmount());
+
+            if (payment.getPaymentAmount().compareTo(new BigDecimal(5)) < 0) {
+                throw new InvalidInputException("Amount must be greater than 5 USD");
+            }
+            if (payment.getPaymentAmount().compareTo(new BigDecimal(500000000)) > 0) {
+                throw new InvalidInputException("Amount must be smaller than 500,000,000 USD");
+            }
 
             payment.setType(paymentRequest.getType());
             payment.setStatus(Payment.Status.PENDING);
@@ -97,7 +101,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .orderInfo(paymentRequest.getOrderInfoType() + "-" + savedPayment.getPaymentId())
                         .transId(savedPayment.getPaymentId())
                         .build();
-                return createPayPalPayment(paypalPaymentRequestDTO, paymentRequest.getIpAddr());
+                return paypalService.createOrder(paypalPaymentRequestDTO);
             }
 
             throw new IllegalStateException("No handler for payment " + savedPayment.getMethod());
@@ -212,10 +216,14 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (billing.getVnp_Bill_FullName() != null && !billing.getVnp_Bill_FullName().isEmpty()) {
             int idx = billing.getVnp_Bill_FullName().indexOf(' ');
-            String firstName = billing.getVnp_Bill_FullName().substring(0, idx);
-            String lastName = billing.getVnp_Bill_FullName().substring(billing.getVnp_Bill_FullName().lastIndexOf(' ') + 1);
-            vnp_Params.put("vnp_Bill_FirstName", firstName);
-            vnp_Params.put("vnp_Bill_LastName", lastName);
+            if (idx >= 0) {
+                String firstName = billing.getVnp_Bill_FullName().substring(0, idx);
+                String lastName = billing.getVnp_Bill_FullName().substring(billing.getVnp_Bill_FullName().lastIndexOf(' ') + 1);
+                vnp_Params.put("vnp_Bill_FirstName", firstName);
+                vnp_Params.put("vnp_Bill_LastName", lastName);
+            }
+            vnp_Params.put("vnp_Bill_FirstName", billing.getVnp_Bill_FullName());
+            vnp_Params.put("vnp_Bill_LastName", "");
         }
 
         InvoiceDTO invoice = InvoiceDTO.builder()
@@ -280,12 +288,26 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentUrl;
     }
 
-    private String normalize(String str) {
-        return StringUtils.stripAccents(str).replaceAll("[^\\w ]", "");
+    @Override
+    public String capturePayment(PaymentCaptureRequestDTO dto) {
+        if (dto.getMethod() == Payment.Method.PAYPAL) {
+            PaypalCaptureResponseDTO res = paypalService.captureOrder(dto.getOrderId());
+            if (res.getTransId() != null) {
+                String status = new Gson().fromJson(res.getResponse(), JsonObject.class)
+                        .getAsJsonPrimitive("status").getAsString();
+                log.info("Payment order ID = {}, trans ID = {}, status = {} ", dto.getOrderId(), res.getTransId(), status);
+                updatePayment(PaymentRequest.builder()
+                        .paymentId(res.getTransId())
+                        .status(status.equals("COMPLETED") ? Payment.Status.SUCCESS : Payment.Status.FAILED)
+                        .build());
+            }
+            return res.getResponse();
+        }
+        throw new UnsupportedOperationException("Payment method not supported: " + dto.getMethod());
     }
 
-    private String createPayPalPayment(PayPalPaymentRequestDTO paypalPaymentRequestDTO, String ipAddr) {
-
+    private String normalize(String str) {
+        return StringUtils.stripAccents(str).replaceAll("[^\\w ]", "");
     }
 }
 

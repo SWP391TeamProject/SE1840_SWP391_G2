@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
+import fpt.edu.vn.Backend.DTO.request.PaymentCaptureRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
 import fpt.edu.vn.Backend.DTO.request.VnPayPaymentRequestDTO;
 import fpt.edu.vn.Backend.pojo.Payment;
@@ -19,4 +20,6 @@ public interface PaymentService {
     PaymentDTO updatePayment(PaymentDTO paymentDTO);
 
     String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest,String vnp_IpAddr) throws UnsupportedEncodingException;
+
+    String capturePayment(PaymentCaptureRequestDTO dto);
 }
