@@ -17,4 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("Authorization", "Content-Type", "X-Auth-Token", "Access-Control-Allow-Origin")
         ;
     }
+
+
 }

@@ -37,7 +37,7 @@ public class KYCServiceImpl implements KYCService {
     private KYCRepos kycRepos;
     private AccountRepos accountRepos;
     @Value("${FPT_AI_API_KEY}")
-    private  String API_KEY_FRONT_FACE ;
+    private  String API_KEY_FPT_AI ;
 
     @Autowired
     private AttachmentService attachmentService;
@@ -97,7 +97,7 @@ public class KYCServiceImpl implements KYCService {
 
             WebClient client = WebClient.builder()
                     .baseUrl("https://api.fpt.ai/vision/idr/vnm")
-                    .defaultHeader("api-key", API_KEY_FRONT_FACE)
+                    .defaultHeader("api-key", API_KEY_FPT_AI)
                     .build();
 
             CitizenCardFrontFace response = client.post()
@@ -123,7 +123,7 @@ public class KYCServiceImpl implements KYCService {
 
             WebClient client = WebClient.builder()
                     .baseUrl("https://api.fpt.ai/vision/idr/vnm")
-                    .defaultHeader("api-key", API_KEY_FRONT_FACE)
+                    .defaultHeader("api-key", API_KEY_FPT_AI)
                     .build();
 
             CitizenCardBackFace response = client.post()
@@ -141,12 +141,16 @@ public class KYCServiceImpl implements KYCService {
     }
 
     @Override
+    public CitizenCardDTO kycDetail(Authentication authentication)  {
+        Optional<Account> account = accountRepos.findByEmail(authentication.getName());
+        return new CitizenCardDTO(account.get().getCitizenCard());
+
+    }
+
+    @Override
     public CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException {
 
         if(!validateImage(kycRequestDTO.getFrontImage())){
-            return null;
-        }
-        if(!validateImage(kycRequestDTO.getBackImage())){
             return null;
         }
         if(!validateImage(kycRequestDTO.getBackImage())){
@@ -161,7 +165,6 @@ public class KYCServiceImpl implements KYCService {
             RGBLuminanceSource source = new RGBLuminanceSource(image.getWidth(), image.getHeight(), pixels);
             bitmap = new BinaryBitmap(new HybridBinarizer(source));
         } catch (IOException e) {
-            e.printStackTrace();
             log.info("Error reading image");
         }
         if (bitmap == null)
@@ -171,7 +174,6 @@ public class KYCServiceImpl implements KYCService {
             result = barcodeReader.decode(bitmap);
         } catch (NotFoundException e) {
             log.info("Barcode not found");
-            e.printStackTrace();
         }
         String decodedText = result. getText();
         log.info("Decoded text: {}", decodedText);
@@ -201,10 +203,12 @@ public class KYCServiceImpl implements KYCService {
                 citizenCard.setAccount(account.get());
                 log.info("Citizen card: {}", citizenCard);
                 kycRepos.save(citizenCard);
+
+                return new CitizenCardDTO(citizenCard);
             } else {
                 log.info("Account not found");
             }
-            attachmentService.uploadAccountAttachment(kycRequestDTO.getFrontImage(), account.get().getAccountId());
+//            attachmentService.uploadAccountAttachment(kycRequestDTO.getFrontImage(), account.get().getAccountId());
 
 
         }

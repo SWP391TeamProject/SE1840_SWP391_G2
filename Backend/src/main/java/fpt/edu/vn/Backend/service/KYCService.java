@@ -11,6 +11,7 @@ public interface KYCService {
 
     CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException;
 
+    CitizenCardDTO kycDetail(Authentication authentication) ;
 
 
 }
