@@ -106,7 +106,7 @@ export const OrderDetail = () => {
                             <div className="grid gap-3">
                                 <div className="font-semibold">Shipping Address</div>
                                 <address className="grid gap-0.5 not-italic text-muted-foreground">
-                                    {order?.shipAddress}
+                                    {order?.shippingAddress}
                                 </address>
                             </div>
                         </div>

@@ -145,7 +145,7 @@ export const OrderList = () => {
                                                 <TableRow key={order.orderId}>
                                                     <TableCell className="font-medium">{order.orderId}</TableCell>
                                                     <TableCell>${order.payment.amount}</TableCell>
-                                                    <TableCell>{order.shipAddress}</TableCell>
+                                                    <TableCell>{order.shippingAddress}</TableCell>
                                                     <TableHead>{order.payment.status}</TableHead>
                                                     <TableCell>{new Date(order.createDate).toUTCString()}</TableCell>
                                                     <TableCell>

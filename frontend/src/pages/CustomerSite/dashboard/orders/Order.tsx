@@ -139,7 +139,7 @@ export const Order = () => {
                                     <div>
                                         <div className="font-semibold my-2">Shipping Address</div>
                                         <address className="grid gap-0.5 not-italic text-muted-foreground">
-                                            <Input type="text" value={order?.shipAddress} className='w-full my-2' id='shipAddress' />
+                                            <Input type="text" defaultValue={order?.shippingAddress} className='w-full my-2' id='shipAddress' />
                                             <Button onClick={() => { handleUpdateShipAddress() }}>
                                                 Update
                                             </Button>
@@ -150,7 +150,7 @@ export const Order = () => {
                                     <div>
                                         <div className="font-semibold">Shipping Address</div>
                                         <address className="grid gap-0.5 not-italic text-muted-foreground">
-                                            {order?.shipAddress}
+                                            {order?.shippingAddress}
                                         </address>
                                     </div>
                                 }

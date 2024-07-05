@@ -56,7 +56,7 @@ export const getOrdersById = async (id: number) => {
 };
 
 export const updateShippingAddress = async (id: number, address: string) => {
-    return await axios.get<void>(`${baseUrl}/${id}?address=${address}`, {
+    return await axios.get<void>(`${baseUrl}/update/${id}?address=${address}`, {
         headers: {
             "Content-Type": "application/json",
 
