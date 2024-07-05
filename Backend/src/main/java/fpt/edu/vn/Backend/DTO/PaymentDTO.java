@@ -18,6 +18,7 @@ public class PaymentDTO implements Serializable {
     private LocalDateTime date;
     private Payment.Type type;
     private Payment.Status status;
+    private Payment.Method method;
     private int accountId;
 
 
@@ -28,6 +29,7 @@ public class PaymentDTO implements Serializable {
         this.date = payment.getCreateDate();
         this.type = payment.getType();
         this.status = payment.getStatus();
+        this.method = payment.getMethod();
         this.accountId = payment.getAccount().getAccountId();
     }
 
