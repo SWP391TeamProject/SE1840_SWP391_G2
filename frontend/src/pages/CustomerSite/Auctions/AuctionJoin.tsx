@@ -226,121 +226,122 @@ export default function AuctionJoin() {
   return (
     <>
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
-        <div className="flex flex-col min-h-screen container p-3 gap-10">
-          <section className="justify-center items-center  w-full h-fit ">
-            <h1 className=" text-2lg font-bold   ">
-              {itemDTO.name}
-            </h1>
-            <div className='flex flex-wrap justify-between items-center'>
-              <div className=' w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 '>
-                <ImageGallery itemDTO={itemDTO} />
-              </div>
-              <div className=' w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start'>
-                <h2 className='text-lg font-semibold'>Bids</h2>
-                <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
-                  {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
-                    <div className="flex items-center justify-between" key={bid?.bidId}>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="w-8 h-8 border">
-                          <img src={bid?.account.avatar?.link} alt="@username" />
-                          <AvatarFallback>N/A</AvatarFallback>
-                        </Avatar>
-                        <p>{bid?.account.nickname}</p>
+        auctionSession != undefined ?
+          <div className="flex flex-col min-h-screen container p-3 gap-10">
+            <section className="justify-center items-center  w-full h-fit ">
+              <h1 className=" text-2lg font-bold   ">
+                {itemDTO.name}
+              </h1>
+              <div className='flex flex-wrap justify-between items-center'>
+                <div className=' w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 '>
+                  <ImageGallery itemDTO={itemDTO} />
+                </div>
+                <div className=' w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start'>
+                  <h2 className='text-lg font-semibold'>Bids</h2>
+                  <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
+                    {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
+                      <div className="flex items-center justify-between" key={bid?.bidId}>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-8 h-8 border">
+                            <img src={bid?.account.avatar?.link} alt="@username" />
+                            <AvatarFallback>N/A</AvatarFallback>
+                          </Avatar>
+                          <p>{bid?.account.nickname}</p>
+                        </div>
+                        <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
                       </div>
-                      <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
-                    </div>
-                  ))}
-                </ScrollArea>
-                {allow ?
-                  <div className=" rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
+                    ))}
+                  </ScrollArea>
+                  {allow ?
+                    <div className=" rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
                   ">
-                    <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                    <div className='mx-auto'>
-                      <PlaceBid 
-                        auctionId={auctionId}
-                        itemId={itemId}
-                        sendMessage={sendMessage}
-                        endDate={auctionSession?.endDate} // Added optional chaining for safety
-                        name={itemDTO?.name}
-                        image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
-                        client={client}
-                        currentBid={
-                          price ?? (bids && bids.length > 0 ? bids[0].price : 0) // Check if bids is defined and not empty
-                        }
-                      />
-                    </div>
-
-                  </div>
-
-                  :
-                  <div className="mt-12 md:mt-16 lg:mt-20 container">
-                    <div className='flex   rounded-xl flex-row  text-foreground p-5' >
                       <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                    </div>
-                    <div className="grid gap-4">
-                      <Link to={`/auctions/${auctionId}` } >
-                        <Button type="submit" className="w-full">
-                          Go to Auction
-                        </Button>
-                      </Link>
+                      <div className='mx-auto'>
+                        <PlaceBid
+                          auctionId={auctionId}
+                          itemId={itemId}
+                          sendMessage={sendMessage}
+                          endDate={auctionSession?.endDate} // Added optional chaining for safety
+                          name={itemDTO?.name}
+                          image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                          client={client}
+                          currentBid={
+                            price ?? (bids && bids.length > 0 ? bids[0].price : 0) // Check if bids is defined and not empty
+                          }
+                        />
+                      </div>
 
                     </div>
-                  </div>
-                }
 
-              </div>
+                    :
+                    <div className="mt-12 md:mt-16 lg:mt-20 container">
+                      <div className='flex   rounded-xl flex-row  text-foreground p-5' >
+                        <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                      </div>
+                      <div className="grid gap-4">
+                        <Link to={`/auctions/${auctionId}`} >
+                          <Button type="submit" className="w-full">
+                            Go to Auction
+                          </Button>
+                        </Link>
 
-            </div>
-          </section>
-          <section className=" justify-center items-center  w-full h-full mt-11 " >
-            <div className='flex gap-2 flex-wrap '>
-              <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
-                <h1 className=" text-2lg font-bold  mb-9  ">
-                  Item Description
-                </h1>
-                <div className="  "
-                  dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
-                />
-              </div>
-              <div className='basis-full md:basis-1/6'>
-                <h1 className=" text-2lg font-bold  mb-9  text-center ">
-                  Other Item in this Auction
-                </h1>
-                <div className='flex gap-2 flex-col items-center'>
-                  {
-                    auctionSession.auctionItems.map((item) => (
-                      <Card className='w-80 h-fit max-w-[360px]'>
-                        <CardHeader>
-                          <img src={item.itemDTO.attachments[0].link} alt="item" className='w-[360px]' />
-                        </CardHeader>
-                        <CardContent>
-                          <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
-                          <BidsInformation
-                            auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
-                            price={item?.highestBid ?? 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
-                            bids={item?.numberOfBids > 0 ? item.numberOfBids : 0} // Use optional chaining for numberOfBids
-                          />
-                          <CardFooter>
-
-                            <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item, auctionId)}>
-                              Join
-                            </Button>
-                          </CardFooter>
-                        </CardContent>
-
-                      </Card>
-                    ))
+                      </div>
+                    </div>
                   }
+
                 </div>
 
-
               </div>
-            </div>
+            </section>
+            <section className=" justify-center items-center  w-full h-full mt-11 " >
+              <div className='flex gap-2 flex-wrap '>
+                <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
+                  <h1 className=" text-2lg font-bold  mb-9  ">
+                    Item Description
+                  </h1>
+                  <div className="  "
+                    dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
+                  />
+                </div>
+                <div className='basis-full md:basis-1/6'>
+                  <h1 className=" text-2lg font-bold  mb-9  text-center ">
+                    Other Item in this Auction
+                  </h1>
+                  <div className='flex gap-2 flex-col items-center'>
+                    {
+                      auctionSession.auctionItems.map((item) => (
+                        <Card className='w-80 h-fit max-w-[360px]'>
+                          <CardHeader>
+                            <img src={item.itemDTO.attachments[0].link} alt="item" className='w-[360px]' />
+                          </CardHeader>
+                          <CardContent>
+                            <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
+                            <BidsInformation
+                              auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
+                              price={item?.highestBid ?? 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
+                              bids={item?.numberOfBids > 0 ? item.numberOfBids : 0} // Use optional chaining for numberOfBids
+                            />
+                            <CardFooter>
 
-          </section>
+                              <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item, auctionId)}>
+                                Join
+                              </Button>
+                            </CardFooter>
+                          </CardContent>
+
+                        </Card>
+                      ))
+                    }
+                  </div>
 
 
-        </div >
+                </div>
+              </div>
+
+            </section>
+
+
+          </div > : <LoadingAnimation message='Please wait, Joining auction...' />
       }
     </>
 
