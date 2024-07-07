@@ -11,11 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
 import {Link} from "react-router-dom";
-import React, {ReactNode} from "react";
+import React, {ReactNode, useEffect} from "react";
 import {Roles} from "@/constants/enums.tsx";
-import {WalletIcon} from "lucide-react";
+import {WalletIcon, BadgeCheck } from "lucide-react";
 
 interface ProfileDropdownMenuProps {
   children?: ReactNode;
@@ -47,7 +52,20 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-fit p-4">
-          <DropdownMenuLabel>{auth.user.nickname}</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            <div className="flex">
+              <div className="pr-2 pt-1">{auth.user.nickname}</div>
+              {auth.user.kyc && <Tooltip>
+                <TooltipTrigger asChild>
+                  <BadgeCheck />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>KYC Verified</p>
+                </TooltipContent>
+              </Tooltip>}
+            </div>
+          </DropdownMenuLabel>
+          
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild className="cursor-pointer">
             <Link to={'/profile/overview'}>Profile</Link>
