@@ -72,6 +72,7 @@ export function ItemList() {
         setIsLoadingItems(false);
       }
     } catch (error) {
+      setIsLoadingItems(false);
       console.log(error);
     }
   };
@@ -102,8 +103,6 @@ export function ItemList() {
       setSortBy(null);
       setSortOrder(null);
     }
-
-    // }
   }
 
   const handlePageSelect = (pageNumber: number) => {
@@ -129,7 +128,6 @@ export function ItemList() {
         allow: registered && auction.status === AuctionSessionStatus.PROGRESSING
       }
     });
-
   }
 
   useEffect(() => {
@@ -137,20 +135,22 @@ export function ItemList() {
     fetchActiveAuctionSessions().then((res) => {
       setAuctions(res?.data.content);
       setIsLoading(false);
-
     });
     getAllItemCategories(0, 50).then((res) => {
       setItemCategories(res.data.content);
     });
     if (location.state?.category) {
       console.log(location.state.category);
-      fetchItems(0, location.state.category, minPrice, maxPrice).then(() => {
+      fetchItems(0, location.state.category, minPrice, maxPrice)
+      .then(() => {
         setIsLoading(false);
       });
       setItemCategoryFilter(location.state.category);
     } else {
       if (itemsList.currentPageList.length == 0) {
         fetchItems(itemsList.currentPageNumber);
+      } else {
+        setIsLoadingItems(false);
       }
     }
 
@@ -262,7 +262,7 @@ export function ItemList() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
             {isLoadingItems ?
-              Array.from({ length: 6 }).map((_, index) => (
+              Array.from({ length: 8 }).map((_, index) => (
                 // <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3" key={index}>
                 <Card key={index} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" >
                   <CardHeader>
@@ -327,7 +327,8 @@ export function ItemList() {
           <div className="flex justify-center mt-8">
             <PagingIndexes className="basis-1/2" pageNumber={itemsList.currentPageNumber || 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
           </div>
-        </div>}
+        </div>
+        } 
     </>
 
   )
