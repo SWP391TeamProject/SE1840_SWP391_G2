@@ -1,0 +1,89 @@
+import React from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
+import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
+
+// Define the Transaction type based on the provided data structure
+type Transaction = {
+  id: number;
+  amount: number;
+  date: string;
+  type: 'DEPOSIT' | 'AUCTION_DEPOSIT';
+  status: 'SUCCESS' | 'PENDING' | 'FAILED';
+  method: string | null;
+  accountId: number;
+};
+
+export const getColumns = (): ColumnDef<Transaction>[] => [
+  {
+    accessorKey: 'id',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue('id')}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue('amount'));
+      const formatted = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(amount);
+      return <div className="font-medium">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: 'date',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+    cell: ({ row }) => {
+      const date = new Date(row.getValue('date'));
+      return <div>{date.toLocaleString()}</div>;
+    },
+  },
+  {
+    accessorKey: 'type',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+    cell: ({ row }) => {
+      const type = row.getValue('type') as string;
+      return (
+        <Badge variant="outline" className="capitalize">
+          {type.toLowerCase().replace('_', ' ')}
+        </Badge>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string;
+      return (
+        <Badge 
+          variant={status === 'SUCCESS' ? 'default' : status === 'PENDING' ? 'secondary' : 'destructive'}
+        >
+          {status}
+        </Badge>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: 'method',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Method" />,
+    cell: ({ row }) => row.getValue('method') || 'N/A',
+  },
+  {
+    accessorKey: 'accountId',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Account ID" />,
+    cell: ({ row }) => row.getValue('accountId'),
+  },
+];
+
+export default getColumns;
