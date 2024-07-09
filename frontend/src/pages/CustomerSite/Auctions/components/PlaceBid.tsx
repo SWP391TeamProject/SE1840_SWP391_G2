@@ -32,9 +32,8 @@ import { Loader2 } from "lucide-react";
 
 
 export default function PlaceBid({ ...props }) {
-    const [showConfirmDialog, setshowConfirmDialog] = useState(false);
-    const [showBidDialog, setshowBidDialog] = useState(false);
-    const [isSending, setIsSending] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [showBidDialog, setShowBidDialog] = useState(false);
     const currency = useCurrency();
     const auth = useAuth();
     const location = useLocation();
@@ -76,10 +75,11 @@ export default function PlaceBid({ ...props }) {
     function onSubmit(values: z.infer<typeof formSchema>) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
+        if(!showConfirmDialog) return
         console.log(values);
-        setIsSending(true);
 
         if (props.client != null) {
+            props.setIsSending(true);
             props.client.publish({
                 destination: '/app/chat.sendMessage/' + props.auctionId + '/' + props.itemId,
                 body: JSON.stringify({
@@ -89,10 +89,6 @@ export default function PlaceBid({ ...props }) {
                         amount: values.bidAmount
                     }
                 })
-            }).then(()=>{
-                setIsSending(false);
-                setshowBidDialog(false);
-            
             })
             // setIsSending(false);
         }
@@ -101,19 +97,17 @@ export default function PlaceBid({ ...props }) {
 
     }
 
-    // Render the success message conditionally
-
 
 
     return (
-        <>
             <Dialog defaultOpen={false}
                 onOpenChange={() => {
-                    setshowConfirmDialog(false);
-                }}  >
+                    setShowConfirmDialog(false);
+                }} 
+                >
                 <DialogTrigger asChild>
                     <Button variant="default" onClick={() => {
-                        setshowBidDialog(true);
+                        setShowBidDialog(true);
                     }}>Place Bid</Button>
                 </DialogTrigger>
                 <DialogContent className="h-fit" onInteractOutside={(e) => {
@@ -166,7 +160,7 @@ export default function PlaceBid({ ...props }) {
                                                 </div>
                                                 <div className="flex flex-col justify-center items-center p-4 gap-2">
                                                     {
-                                                        isSending ?
+                                                        props.isSending ?
                                                             <Button className="min-w-48 " disabled><Loader2  className="animate-spin"/></Button>
                                                             :
                                                             <Button className="min-w-48" type="submit">Bid {currency.format({
@@ -178,7 +172,8 @@ export default function PlaceBid({ ...props }) {
 
 
                                                     <Button className="" variant="link" onClick={() => {
-                                                        setshowConfirmDialog(false);
+                                                        setShowConfirmDialog(false);
+                                                        return;
                                                     }}>Cancel</Button>
                                                 </div>
                                             </div>
@@ -220,8 +215,8 @@ export default function PlaceBid({ ...props }) {
                                                         )}
                                                     />
                                                     <Button variant="default" type="submit" onClick={() => {
-                                                        if (form.formState.isValid) {
-                                                            return setshowConfirmDialog(true);
+                                                        if (!form.formState.errors.bidAmount) {
+                                                            setShowConfirmDialog(true)
                                                         }
                                                     }}>Place Bid</Button>
                                                 </div>
@@ -241,7 +236,6 @@ export default function PlaceBid({ ...props }) {
                     </Form>
                 </DialogContent>
             </Dialog >
-        </>
     );
 }
 
