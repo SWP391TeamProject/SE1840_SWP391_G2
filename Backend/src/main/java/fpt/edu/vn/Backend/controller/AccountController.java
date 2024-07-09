@@ -2,9 +2,12 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
+import fpt.edu.vn.Backend.exporter.BidExporter;
 import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.security.OAuth2BiddifyUser;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -18,14 +21,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -157,20 +165,32 @@ public class AccountController {
     }
 
     @GetMapping("/export")
-    public void exportToExcel(HttpServletResponse response){
-        response.setContentType("application/octet-stream");
+    public ResponseEntity<byte[]> exportToExcel(Authentication authentication){
+        AccountDTO account = accountService.getAccountByEmail(authentication.getName());
+        if (account == null || account.getRole() != Account.Role.ADMIN) {
+            throw new InvalidInputException("You are not authorized to perform this action");
+        }
+        List<AccountDTO> listAccounts;
+        {
+            listAccounts = accountService.getAccounts(PageRequest.of(0, 1000)).getContent();
+        }
+
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=accounts_" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-        Pageable pageable = Pageable.unpaged();
-        List<AccountDTO> listUsers = accountService.getAccounts(pageable).getContent();
+        String headerValue = "filename=accounts_" + currentDateTime + ".xlsx";
 
-        AccountExporter excelExporter = new AccountExporter(listUsers);
+        AccountExporter excelExporter = new AccountExporter(listAccounts);
 
-        excelExporter.export(response);
+        ByteArrayOutputStream stream = excelExporter.export();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", headerValue);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(stream.toByteArray());
     }
 
 }

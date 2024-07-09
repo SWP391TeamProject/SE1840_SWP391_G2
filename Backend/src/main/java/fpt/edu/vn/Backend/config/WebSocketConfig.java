@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.config;
 
 
+import fpt.edu.vn.Backend.controller.WebSocketEventListener;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
@@ -15,16 +16,20 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
+import org.springframework.web.socket.handler.WebSocketHandlerDecoratorFactory;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.concurrent.*;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -37,6 +42,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final AuctionSessionRepos auctionSessionRepos;
     @Value("${FRONTEND_CORS_SERVER:}")
     private String allowedOrigins="http://localhost:5173";
+
+    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+
+
     @Autowired
     public WebSocketConfig(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailsService, AuctionSessionService auctionSessionService, AuctionSessionRepos auctionSessionRepos) {
         this.jwtGenerator = jwtGenerator;
@@ -45,13 +54,66 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         this.auctionSessionRepos = auctionSessionRepos;
     }
 
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        WebSocketMessageBrokerConfigurer.super.configureWebSocketTransport(registry);
+
+        registry.addDecoratorFactory(new WebSocketHandlerDecoratorFactory() {
+            @Override
+            public WebSocketHandler decorate(WebSocketHandler webSocketHandler) {
+                return new WebSocketHandlerDecorator(webSocketHandler) {
+                    @Override
+                    public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
+                        try{
+                            sessions.add(session);
+                            super.afterConnectionEstablished(session);
+
+                        } catch (Exception e){
+                            log.error("Error when connection established", e);
+                            session.close(CloseStatus.BAD_DATA);
+                        }
+                    }
+
+                    @Override
+                    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+                        try{
+                            //Remove the WebSocketSession object from the store
+                            sessions.remove(session);
+                            super.afterConnectionClosed(session, closeStatus);
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }finally {
+                            super.afterConnectionClosed(session, closeStatus);
+                        }
+
+
+                    }
+                };
+            }
+        });
+    }
 
     public void finishAuction(int id, int delayInSeconds) {
         final Runnable timeout = new Runnable() {
             public void run() {
                 auctionSessionService.finishAuction(id);
-                log.info("Timeout for auction session: " + id);
-
+                log.info("Timeout for auction session: " + id );
+                for (String topic : WebSocketEventListener.topicSessions.keySet()) {
+                    log.info("Topic: " + topic);
+                    if (topic.contains("/topic/public/"+id+"/")) {
+                        for (String session : WebSocketEventListener.topicSessions.get(topic)) {
+                            try {
+                                for (WebSocketSession s : sessions) {
+                                    if (s.getId().equals(session)) {
+                                        s.close(CloseStatus.NOT_ACCEPTABLE);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.error("Error when closing session", e);
+                            }
+                        }
+                    }
+                }
             }
         };
         final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
@@ -62,6 +124,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public void run() {
                 auctionSessionService.startAuction(id);
                 log.info("Start auction: " + id);
+                AuctionSession session = auctionSessionRepos.findById(id).orElseThrow(
+                        () -> new RuntimeException("Auction session not found")
+                );
+                int delay = (int) (session.getEndDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
+                log.info("Auction session " + session.getAuctionSessionId() + " finish in " + Math.max(delay, 0)+" seconds:"+session.getEndDate());
 
             }
         };

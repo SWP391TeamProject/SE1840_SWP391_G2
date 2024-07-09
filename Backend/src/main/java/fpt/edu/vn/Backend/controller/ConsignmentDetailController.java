@@ -1,23 +1,28 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.EvaluationDTO;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exporter.ConsignmentDetailExporter;
+import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
+import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentDetailService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
-import jakarta.servlet.http.HttpServletResponse;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +35,8 @@ public class ConsignmentDetailController {
     private ConsignmentService consignmentService;
     @Autowired
     private AttachmentServiceImpl attachmentService;
+    @Autowired
+    private AccountService accountService;
 
     @Autowired
     public ConsignmentDetailController(ConsignmentDetailService consignmentDetailService) {
@@ -69,8 +76,8 @@ public class ConsignmentDetailController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ConsignmentDetailDTO> createConsignmentDetail(@RequestBody ConsignmentDetailRequestDTO consignmentRequestDetailDTO){
-        return new ResponseEntity<>(consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO),HttpStatus.CREATED);
+    public ResponseEntity<ConsignmentDetailDTO> createConsignmentDetail(@RequestBody ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
+        return new ResponseEntity<>(consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO), HttpStatus.CREATED);
     }
 
     @PostMapping("/update/{consignmentDetailId}")
@@ -79,19 +86,25 @@ public class ConsignmentDetailController {
     }
 
     @GetMapping("/export")
-    public void exportToExcel(HttpServletResponse response) {
-        response.setContentType("application/octet-stream");
+    public ResponseEntity<byte[]> exportToExcel(Authentication authentication) {
+        AccountDTO account = accountService.getAccountByEmail(authentication.getName());
+        if (account == null || account.getRole() != Account.Role.ADMIN){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        List<ConsignmentDetailDTO> consignmentDetailDTOS;
+        {
+            consignmentDetailDTOS = consignmentDetailService.getAllConsignmentsDetail( Pageable.ofSize(1000)).toList();
+        }
+
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=ConsignmentDetails_" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-        Pageable pageable = Pageable.unpaged();
-        List<ConsignmentDetailDTO> listDetail = consignmentDetailService.getAllConsignmentsDetail(pageable).getContent();
-        listDetail.sort(Comparator.comparingInt(ConsignmentDetailDTO::getConsignmentId));
-        ConsignmentDetailExporter excelExporter = new ConsignmentDetailExporter(listDetail);
+        String headerValue = "filename=consignments_" + currentDateTime + ".xlsx";
 
-        excelExporter.export(response);
+        ConsignmentDetailExporter excelExporter = new ConsignmentDetailExporter(consignmentDetailDTOS);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", headerValue)
+                .body(excelExporter.export().toByteArray());
     }
 }

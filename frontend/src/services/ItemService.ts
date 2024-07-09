@@ -2,7 +2,7 @@ import axios from "axios";
 import { Item, ItemStatus } from "@/models/Item.ts";
 import { Page } from "@/models/Page.ts";
 import { getCookie, removeCookie } from "@/utils/cookies";
-import { API_SERVER } from "@/constants/domain";
+import { API_SERVER, SERVER_DOMAIN_URL } from "@/constants/domain";
 
 // Service methods
 const baseUrl = API_SERVER + "/items";
@@ -112,3 +112,27 @@ export const updateItem = async (itemDTO: Item) => {
         },
     });
 };
+
+export const exportItems = async () => {
+    return await fetch(`${SERVER_DOMAIN_URL}/api/items/export`, {
+      method: 'GET',
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    }).then((response) => response.blob())
+      .then((blob) => {
+        // Create a blob URL and create a link element to trigger the download
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = 'items.xlsx'; // Set the desired file name with .xls extension
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch((error) => {
+        console.error('Error fetching Excel file:', error);
+      });;
+  };

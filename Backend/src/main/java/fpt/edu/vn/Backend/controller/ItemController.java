@@ -1,14 +1,19 @@
 package fpt.edu.vn.Backend.controller;
 
+import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.exporter.ItemExporter;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Item;
+import fpt.edu.vn.Backend.service.AccountService;
+import fpt.edu.vn.Backend.service.AccountServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,11 +24,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -38,11 +47,13 @@ public class ItemController {
     private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
     private final ConsignmentService consignmentService;
+    private final AccountService accountService;
 
     @Autowired
-    public ItemController(ItemService itemService, ConsignmentService consignmentService) {
+    public ItemController(ItemService itemService, ConsignmentService consignmentService, AccountService accountService) {
         this.itemService = itemService;
         this.consignmentService = consignmentService;
+        this.accountService = accountService;
     }
 
 
@@ -195,19 +206,31 @@ public class ItemController {
     }
 
     @GetMapping("/export")
-    public void exportToExcel(HttpServletResponse response) {
-        response.setContentType("application/octet-stream");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
+    public ResponseEntity<byte[]> exportToExcel(Authentication authentication){
+         AccountDTO account = accountService.getAccountByEmail(authentication.getName());
+          if (account == null || account.getRole() != Account.Role.ADMIN) {
+                throw new InvalidInputException("You are not authorized to perform this action");
+          }
+          List<ItemDTO> listItems;
+          {
+                listItems = itemService.getItems(PageRequest.of(0, 1000)).getContent();
+          }
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=accounts_" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-        Pageable pageable = Pageable.unpaged();
-        List<ItemDTO> listItems = itemService.getItems(pageable).getContent();
+          DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+          String currentDateTime = dateFormatter.format(new Date());
 
-        ItemExporter excelExporter = new ItemExporter(listItems);
+          String headerValue = "filename=items_" + currentDateTime + ".xlsx";
 
-        excelExporter.export(response);
-    }
+          ItemExporter excelExporter = new ItemExporter(listItems);
+
+          ByteArrayOutputStream stream = excelExporter.export();
+
+          HttpHeaders headers = new HttpHeaders();
+          headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+          headers.setContentDispositionFormData("attachment", headerValue);
+
+          return ResponseEntity.ok()
+                 .headers(headers)
+                 .body(stream.toByteArray());
+     }
 }
