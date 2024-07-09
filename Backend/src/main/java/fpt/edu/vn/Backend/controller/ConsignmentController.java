@@ -230,19 +230,25 @@ public class ConsignmentController {
     }
 
     @GetMapping("/export")
-    public void exportConsignment(HttpServletResponse response) {
-        response.setContentType("application/octet-stream");
+    public ResponseEntity<byte[]> exportToExcel(Authentication authentication) {
+        AccountDTO account = accountService.getAccountByEmail(authentication.getName());
+        if (account == null || account.getRole() != Account.Role.ADMIN){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        List<ConsignmentDTO> listConsignments;
+        {
+            listConsignments = consignmentService.getAllConsignments( Pageable.ofSize(1000)).toList();
+        }
+
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=Consignments_" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-        Pageable pageable = Pageable.unpaged();
-        List<ConsignmentDTO> listConsignments = consignmentService.getAllConsignments(pageable).getContent();
+        String headerValue = "filename=consignments_" + currentDateTime + ".xlsx";
 
         ConsignmentExporter excelExporter = new ConsignmentExporter(listConsignments);
 
-        excelExporter.export(response);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", headerValue)
+                .body(excelExporter.export().toByteArray());
     }
 }
