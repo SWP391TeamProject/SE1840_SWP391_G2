@@ -11,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public class ItemExporter {
@@ -85,18 +86,23 @@ public class ItemExporter {
         }
     }
 
-    public void export(HttpServletResponse response) {
-        try {
+    public ByteArrayOutputStream export() {
+        try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             writeHeaderLine();
             writeDataLines();
 
-            ServletOutputStream outputStream = response.getOutputStream();
             workbook.write(outputStream);
             workbook.close();
 
-            outputStream.close();
+            return outputStream;
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error exporting data to Excel file: " + e.getMessage());
+        } finally {
+            try {
+                workbook.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

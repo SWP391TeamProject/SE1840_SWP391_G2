@@ -1,4 +1,4 @@
-import { API_SERVER } from "@/constants/domain";
+import { API_SERVER, SERVER_DOMAIN_URL } from "@/constants/domain";
 import { Roles } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
@@ -132,4 +132,28 @@ export const activateAccountService = async (id: string) => {
       },
     })
     .catch((err) => console.log(err));
+};
+
+export const exportAccounts = async () => {
+  return await fetch(`${SERVER_DOMAIN_URL}/api/accounts/export`, {
+    method: 'GET',
+    headers: {
+      Authorization:
+        "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+    },
+  }).then((response) => response.blob())
+    .then((blob) => {
+      // Create a blob URL and create a link element to trigger the download
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = blobUrl;
+      a.download = 'accounts.xlsx'; // Set the desired file name with .xls extension
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(blobUrl);
+    })
+    .catch((error) => {
+      console.error('Error fetching Excel file:', error);
+    });;
 };

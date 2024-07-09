@@ -132,6 +132,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
 
                 AuctionItem auctionItem = new AuctionItem();
+                auctionItem.setAuctionItemId(new AuctionItemId(auctionSession.getAuctionSessionId(), item.getItemId()));
                 auctionItem.setAuctionSession(auctionSession);
                 auctionItem.setItem(item);
                 auctionItem.setCreateDate(LocalDateTime.now());
@@ -142,10 +143,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 auctionItemList.add(auctionItem);
             }
 
-            auctionSession.setAuctionItems(auctionItemList);
             auctionSessionRepos.save(auctionSession);
             return true;
         } catch (Exception e) {
+            logger.error("Error assigning auction session", e);
             return false;
         }
     }
@@ -256,7 +257,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                         });
             }
             auctionSession.setStartDate(auctionDTO.getStartDate());
-            auctionSession.setEndDate(LocalDateTime.now());
+            auctionSession.setEndDate(LocalDateTime.now().minusNanos(LocalDateTime.now().getNano()));
             auctionSession.setCreateDate(auctionDTO.getCreateDate());
             auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
             auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
@@ -388,7 +389,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
             throw new InvalidInputException("End date must be after start date");
         }
-
+        if(auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")){
+            throw new InvalidInputException("Auction session already ended");
+        }
+        if(auctionDTO.getStatus().equals("PROGRESSING")){
+            throw new InvalidInputException("Auction session already started");
+        }
         try {
             Optional<AuctionSession> optionalAuctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId());
             if (!optionalAuctionSession.isPresent()) {

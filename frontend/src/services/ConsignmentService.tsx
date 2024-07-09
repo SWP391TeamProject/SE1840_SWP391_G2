@@ -236,3 +236,27 @@ export const rejectFinalEva = async (id: number) => {
       },
     })
 };
+
+export const exportConsignments = async () => {
+  return await fetch(`${SERVER_DOMAIN_URL}/api/consignments/export`, {
+    method: 'GET',
+    headers: {
+      Authorization:
+        "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+    },
+  }).then((response) => response.blob())
+    .then((blob) => {
+      // Create a blob URL and create a link element to trigger the download
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = blobUrl;
+      a.download = 'consignments.xlsx'; // Set the desired file name with .xls extension
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(blobUrl);
+    })
+    .catch((error) => {
+      console.error('Error fetching Excel file:', error);
+    });;
+};

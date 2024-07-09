@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,10 @@ import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Component
 
 public class WebSocketEventListener {
@@ -24,6 +27,9 @@ public class WebSocketEventListener {
     @Autowired
     private AuctionSessionService auctionSessionService;
 
+    public static Map<String, Set<String>> topicSessions = new ConcurrentHashMap<>();
+
+
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
         logger.info(" a new web socket connection");
@@ -34,11 +40,10 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         String username = (String) headerAccessor.getSessionAttributes().get("username");
-        if(username != null) {
+        if (username != null) {
             logger.info("User Disconnected : " + username);
         }
     }
-
 
 
     @EventListener
@@ -46,21 +51,26 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String topic = headerAccessor.getDestination();
         logger.info("User subscribed to : " + topic);
+        if (!topicSessions.containsKey(topic)) {
+            Set<String> sessions = ConcurrentHashMap.newKeySet();
+            sessions.add(headerAccessor.getSessionId());
+            topicSessions.put(topic, sessions);
+        } else
+            topicSessions.get(topic).add(headerAccessor.getSessionId());
+
         assert topic != null;
-        if(auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])) == null) {
+        if (auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])) == null) {
             logger.info("Auction session not found");
-            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3]+"/"+ topic.split("/")[4], "Auction session not found:0:ERROR");
+            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3] + "/" + topic.split("/")[4], "Auction session not found:0:ERROR");
 //            throw new ResourceNotFoundException("Auction session not found");
-        }
-        else if(auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus().equalsIgnoreCase("FINISHED")) {
+        } else if (auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus().equalsIgnoreCase("FINISHED")) {
             logger.info("Auction session ended");
-            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3]+"/"+ topic.split("/")[4], "Auction session has ended:0:ERROR");
+            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3] + "/" + topic.split("/")[4], "Auction session has ended:0:ERROR");
 //            throw new ResourceNotFoundException("Auction session has ended");
 
-        }
-        else if(auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus().equalsIgnoreCase("SCHEDULED")) {
+        } else if (auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus().equalsIgnoreCase("SCHEDULED")) {
             logger.info("Auction session not started");
-            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3]+"/"+ topic.split("/")[4], "Auction session not started:0:ERROR");
+            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3] + "/" + topic.split("/")[4], "Auction session not started:0:ERROR");
 //            throw new ResourceNotFoundException("Auction session not started");
 
         }

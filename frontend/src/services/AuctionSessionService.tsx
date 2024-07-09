@@ -198,6 +198,22 @@ export const registerAuctionSession = async (id: number) => {
             },
         });
 }
+export const assignItem = async (id: number, assignItem: any) => {
+    console.log(assignItem);
+    console.log(id);
+    return await axios
+        .post(`${SERVER_DOMAIN_URL}/api/auction-sessions/assign-auction-session`, {
+            auctionSessionId: id,
+            item: assignItem
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            }
+        });
+}
 
 export const finishAuctionSession = async (auctionSessionID: number) => {
     return await axios
