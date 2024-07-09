@@ -21,7 +21,6 @@ export const getItems = async (pageNumber: number, pageSize?: number, minPrice?:
     return await axios.get<Page<Item>>(`${baseUrl}/`, {
         headers: {
             "Content-Type": "application/json",
-
         },
         params: params,
     });

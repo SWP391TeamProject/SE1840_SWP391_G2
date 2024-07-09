@@ -3,10 +3,11 @@ import { PaymentType } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 
-export const fetchPaymentssService = async (pageNumber: number, pageSize: number,type:PaymentType) => {
+export const fetchPaymentssService = async (pageNumber: number, pageSize: number,sort?:string,type?:PaymentType) => {
   let params = {
     page: pageNumber,
     size: pageSize,
+    sort:sort,
     type:type
   }
   return await axios

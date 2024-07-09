@@ -31,7 +31,7 @@ import {
     PlusCircle,
     MoreHorizontal,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { AccountStatus, PaymentType } from "@/constants/enums";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -42,6 +42,8 @@ import { fetchPaymentssService } from "@/services/PaymentsService";
 import { setCurrentPageList, setCurrentPageNumber, setCurrentPayment } from "@/redux/reducers/Payments";
 import { Payment } from "@/models/payment";
 import { useCurrency } from "@/CurrencyProvider";
+import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
+import { PaymentsTable } from "./table/payment-tables";
 
 export default function PaymentsList() {
     const paymentsList: any = useAppSelector((state) => state.payments);
@@ -54,19 +56,26 @@ export default function PaymentsList() {
     let search = url.searchParams.get("search");
     const [reload, setReload] = useState(false);
 
+    let pageNumber = url.searchParams.get("page");
+    let sort = url.searchParams.get("sort");
+    let pageSize = url.searchParams.get("per_page");
+
+    // const currency = useCurrency();
+    const paymentPromise = fetchPaymentssService(Number.parseInt(pageNumber),Number.parseInt(pageSize), sort );
+
     const fetchPayments = async (pageNumber: number, type?: PaymentType) => {
         try {
             setIsLoading(true);
             console.log(type);
             let res;
             if (search && search?.length > 0) {
-                res = await fetchPaymentssService(pageNumber, 5,type);
+                res = await fetchPaymentssService(pageNumber, 5, type);
             }
             else if (type != undefined) {
-                res = await fetchPaymentssService(pageNumber, 5,type);
+                res = await fetchPaymentssService(pageNumber, 5, type);
             }
             else {
-                res = await fetchPaymentssService(pageNumber, 5,type);
+                res = await fetchPaymentssService(pageNumber, 5, type);
             }
             if (res) {
                 console.log(res);
@@ -164,6 +173,23 @@ export default function PaymentsList() {
 
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+              <Suspense
+                  fallback={
+                    <DataTableSkeleton
+                      columnCount={5}
+                      searchableColumnCount={1}
+                      filterableColumnCount={2}
+                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                      shrinkZero
+                    />
+                  }
+                >
+                  {/**
+           * Passing promises and consuming them using React.use for triggering the suspense fallback.
+           * @see https://react.dev/reference/react/use
+           */}
+                  <PaymentsTable paymentPromise={paymentPromise} />
+                </Suspense>
             <Tabs defaultValue="all">
                 <div className="flex items-center">
                     <TabsList>
@@ -218,7 +244,7 @@ export default function PaymentsList() {
                                 <CardTitle className="flex justify-between items-center">
                                     Payments
                                     <div className="w-full basis-1/2">
-                                        <PagingIndexes className="basis-1/2" pageNumber={paymentsList.currentPageNumber ? paymentsList.currentPageNumber : 0} size={10} totalPages={paymentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
+                                        {/* <PagingIndexes className="basis-1/2" pageNumber={paymentsList.currentPageNumber ? paymentsList.currentPageNumber : 0} size={10} totalPages={paymentsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes> */}
                                     </div>
                                 </CardTitle>
                                 <CardDescription>
