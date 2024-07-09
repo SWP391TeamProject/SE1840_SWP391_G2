@@ -383,9 +383,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     @CacheEvict(key = "#auctionDTO.getAuctionSessionId()", cacheNames = "auctionSession",value = "auctionSession",allEntries = true)
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
-//        if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
-//            throw new InvalidInputException("Start date must be in the future");
-//        }
+        if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidInputException("Start date must be in the future");
+        }
         if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
             throw new InvalidInputException("End date must be after start date");
         }

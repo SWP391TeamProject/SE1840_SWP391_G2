@@ -83,6 +83,7 @@ public class AuctionSessionServiceImplTest {
         when(auctionSessionRepos.save(any(AuctionSession.class))).thenReturn(auctionSession);
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
         AuctionSessionDTO result = auctionSessionService.updateAuctionSession(auctionSessionDTO);
 
         assertNotNull(result);
@@ -111,7 +112,6 @@ public class AuctionSessionServiceImplTest {
     @Test
     @DisplayName("Should throw exception when auction session not found")
     public void shouldThrowExceptionWhenAuctionSessionNotFound() {
-        when(auctionSessionRepos.findById(1)).thenReturn(Optional.empty());
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         assertThrows(Exception.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
