@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom"
 import { getItemsByStatus } from "@/services/ItemService"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession"
-import { fetchAuctionSessionById } from "@/services/AuctionSessionService"
+import { assignItem, fetchAuctionSessionById } from "@/services/AuctionSessionService"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 
 export default function AssignAuctionItem() {
@@ -59,7 +59,15 @@ export default function AssignAuctionItem() {
   }
 
   const handleSave = () => {
-    console.log(selectedItems)
+    var tempList: any[] = [];
+    selectedItems.forEach(item => {
+        tempList.push(item.itemId);
+    })
+    assignItem(auction?.auctionSessionId, tempList).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.error(err)
+    })
   }
   const handleClear = () => {
     let tempList = selectedItems.concat(availableItems).sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
