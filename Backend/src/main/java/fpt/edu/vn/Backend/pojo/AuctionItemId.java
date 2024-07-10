@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class AuctionItemId implements Serializable {
     @Column(name = "auction_session_id")
     private Integer auctionSessionId;

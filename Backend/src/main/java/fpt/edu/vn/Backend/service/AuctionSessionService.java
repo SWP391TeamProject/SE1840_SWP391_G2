@@ -28,8 +28,6 @@ public interface AuctionSessionService {
 
     AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId);
 
-    String placePreBid(int auctionSessionId, int accountId, double amount);
-
     boolean assignAuctionSession(AssignAuctionItemDTO assignAuctionItemDTO);
 
     void finishAuction(int auctionSessionId);
