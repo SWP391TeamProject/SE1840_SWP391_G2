@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.pojo.AuctionSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -15,4 +16,7 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
     Page<AuctionSession> findByEndDateBefore(LocalDateTime endDate, Pageable pageable);
     Page<AuctionSession> findByStartDateAfter(LocalDateTime startDate, Pageable pageable);
     Page<AuctionSession> findByTitleContaining(String title, Pageable pageable);
+
+    @Query("SELECT a FROM AuctionSession a WHERE a.status = 'FINISHED'")
+    List<AuctionSession> findFinishedAuctionSessionsByYear(int year);
 }
