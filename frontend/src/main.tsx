@@ -93,6 +93,7 @@ import { Orders } from "./pages/CustomerSite/dashboard/orders/Orders.tsx";
 import { OrderList } from "./pages/Administration/Order/orderList.tsx";
 import { OrderDetail } from "./pages/Administration/Order/orderDetail.tsx";
 import { Order } from "./pages/CustomerSite/dashboard/orders/Order.tsx";
+import AdminDashboard from "./pages/Dashboard/AdminDashboard.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -212,7 +213,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     >
                       <Route path="/admin" element={<Administration />}>
                         <Route path="dashboard"
-                          element={<ToBeImplemented />}></Route>
+                          element={<AdminDashboard />}></Route>
                         <Route element={<PrivateRoute
                           allowedRoles={[Roles.ADMIN]} />}>
                           <Route path="accounts"

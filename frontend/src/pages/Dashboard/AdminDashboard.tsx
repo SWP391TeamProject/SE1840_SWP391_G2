@@ -17,7 +17,7 @@ import PaymentsBarChart from "./PaymentsBarChart";
 // import ReportAreaChart from "../../pages/Dashboard/ReportAreaChart";
 import UniqueVisitorCard from "@/pages/Dashboard/UniqueVisitorCard";
 import PastAuctionReportCard from "./PastAuctionReportCard";
-import GeolocationMap from "./GeolocationMap";
+// import GeolocationMap from "./GeolocationMap";
 
 import { useEffect, useState } from "react";
 import {

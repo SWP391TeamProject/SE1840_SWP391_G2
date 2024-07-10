@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Embeddable
@@ -14,6 +15,8 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 public class AuctionItemId implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 4287679686812621166L;
     @Column(name = "auction_session_id")
     private Integer auctionSessionId;
 
