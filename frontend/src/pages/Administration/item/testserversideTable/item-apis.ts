@@ -12,7 +12,7 @@ interface GetItemsSchema {
   order?: 'asc' | 'desc';
   minPrice?: number;
   maxPrice?: number;
-  status?: ItemStatus;
+  status?: string;
 }
 
 const baseUrl = `${API_SERVER}/items`;
@@ -32,7 +32,7 @@ export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
     // Prepare query parameters
     const params: Record<string, any> = {
       page: page - 1, // Spring Boot uses 0-based page index
-      size,
+      size: size ? size : 10,
       sort,
       minPrice,
       maxPrice,
