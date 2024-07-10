@@ -28,4 +28,7 @@ public interface ItemRepos extends JpaRepository<Item, Integer> {
 
 
     Page<Item> findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus(BigDecimal reservePrice, BigDecimal reservePrice2, int itemCategory_itemCategoryId, Item.Status status, Pageable pageable);
+
+    List<Item> findByStatus(Item.Status status);
+
 }
