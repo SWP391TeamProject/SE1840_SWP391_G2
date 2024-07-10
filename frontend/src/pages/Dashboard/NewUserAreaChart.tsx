@@ -42,7 +42,7 @@ interface GetMonthlyUserResponse {
 }
 // ==============================|| INCOME AREA CHART ||============================== //
 
-export default function IncomeAreaChart({ slot }) {
+export default function NewUserAreaChart({ slot }) {
   const theme = useTheme();
 
   const { primary, secondary } = theme.palette.text;
@@ -107,4 +107,4 @@ export default function IncomeAreaChart({ slot }) {
   return <ReactApexChart options={options} series={series} type="area" height={450} />;
 }
 
-IncomeAreaChart.propTypes = { slot: PropTypes.string };
+NewUserAreaChart.propTypes = { slot: PropTypes.string };

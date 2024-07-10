@@ -9,7 +9,8 @@ import Box from '@mui/material/Box';
 
 // project import
 import MainCard from './MainCard';
-import IncomeAreaChart from './IncomeAreaChart';
+import NewUserAreaChart from './NewUserAreaChart';
+
 
 // ==============================|| DEFAULT - UNIQUE VISITOR ||============================== //
 
@@ -24,14 +25,14 @@ export default function UniqueVisitorCard() {
         </Grid>
         <Grid item>
           <Stack direction="row" alignItems="center" spacing={0}>
-            <Button
+            {/* <Button
               size="small"
               onClick={() => setSlot('month')}
               color={slot === 'month' ? 'primary' : 'secondary'}
               variant={slot === 'month' ? 'outlined' : 'text'}
             >
               Month
-            </Button>
+            </Button> */}
             {/* <Button
               size="small"
               onClick={() => setSlot('week')}
@@ -45,7 +46,7 @@ export default function UniqueVisitorCard() {
       </Grid>
       <MainCard content={false} sx={{ mt: 1.5 }}>
         <Box sx={{ pt: 1, pr: 2 }}>
-          <IncomeAreaChart slot={slot} />
+          <NewUserAreaChart slot={slot} />
         </Box>
       </MainCard>
     </>

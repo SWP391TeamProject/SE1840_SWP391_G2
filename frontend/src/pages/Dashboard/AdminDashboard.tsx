@@ -2,12 +2,9 @@ import Grid from "@mui/material/Grid";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import GiftOutlined from '@ant-design/icons/GiftOutlined';
-import MessageOutlined from '@ant-design/icons/MessageOutlined';
-import SettingOutlined from '@ant-design/icons/SettingOutlined';
-import Avatar from '@mui/material/Avatar';
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -16,14 +13,14 @@ import TextField from "@mui/material/TextField";
 //project import
 import MainCard from "./MainCard";
 import AnalyticEcommerce from "../../components/component/AnalyticEcommerce";
-import MonthlyBarChart from "./MonthlyBarChart";
+import PaymentsBarChart from "./PaymentsBarChart";
 // import ReportAreaChart from "../../pages/Dashboard/ReportAreaChart";
 import UniqueVisitorCard from "@/pages/Dashboard/UniqueVisitorCard";
-import SaleReportCard from "./SaleReportCard";
+import PastAuctionReportCard from "./PastAuctionReportCard";
+import GeolocationMap from "./GeolocationMap";
 
 import { useEffect, useState } from "react";
 import {
- 
   getPaymentByStatus,
   getTotalItemSold,
   getTotalOrder,
@@ -34,16 +31,16 @@ import {
 const avatarSX = {
   width: 36,
   height: 36,
-  fontSize: '1rem'
+  fontSize: "1rem",
 };
 
 const actionSX = {
   mt: 0.75,
   ml: 1,
-  top: 'auto',
-  right: 'auto',
-  alignSelf: 'flex-start',
-  transform: 'none'
+  top: "auto",
+  right: "auto",
+  alignSelf: "flex-start",
+  transform: "none",
 };
 
 const status = [
@@ -85,7 +82,7 @@ const AdminDashboard = () => {
   const [totalSale, setTotalSale] = useState<number>(0);
 
   const [selectedLabel, setSelectedLabel] = useState(status[0].value);
-  
+
   const handleChange = (event) => {
     setSelectedLabel(event.target.value);
   };
@@ -110,17 +107,20 @@ const AdminDashboard = () => {
 
         const paymentWithdrawResponse = await getPaymentByStatus(selectedLabel);
         if (Array.isArray(paymentWithdrawResponse)) {
-          const totalPayment = paymentWithdrawResponse.reduce((sum, item) => sum + item.totalAmount, 0);
+          const totalPayment = paymentWithdrawResponse.reduce(
+            (sum, item) => sum + item.totalAmount,
+            0
+          );
           setTotalPayment(totalPayment);
         }
 
         const totalSaleResponse = await getTotalSale();
         if (totalSaleResponse && totalSaleResponse.data) {
-          console.log(totalSaleResponse.data)
+          console.log(totalSaleResponse.data);
           setTotalSale(totalSaleResponse.data);
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -213,13 +213,13 @@ const AdminDashboard = () => {
               </Typography>
             </Stack>
           </Box>
-          <MonthlyBarChart selectedLabel={selectedLabel} />
+          <PaymentsBarChart selectedLabel={selectedLabel} />
         </MainCard>
       </Grid>
 
       {/* row 3 */}
       <Grid item xs={12} md={7} lg={8}>
-        <SaleReportCard />
+        <PastAuctionReportCard />
       </Grid>
       {/* <Grid item xs={12} md={5} lg={4}>
         <Grid container alignItems="center" justifyContent="space-between">
@@ -276,7 +276,7 @@ const AdminDashboard = () => {
                 <Avatar
                   sx={{ color: "success.main", bgcolor: "success.lighter" }}
                 >
-                  <GiftOutlined />
+                  {/* <GiftOutlined /> */}
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
@@ -301,7 +301,7 @@ const AdminDashboard = () => {
                 <Avatar
                   sx={{ color: "primary.main", bgcolor: "primary.lighter" }}
                 >
-                  <MessageOutlined />
+                  {/* <MessageOutlined /> */}
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
@@ -324,7 +324,7 @@ const AdminDashboard = () => {
             <ListItemButton>
               <ListItemAvatar>
                 <Avatar sx={{ color: "error.main", bgcolor: "error.lighter" }}>
-                  <SettingOutlined />
+                  {/* <SettingOutlined /> */}
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
@@ -347,6 +347,9 @@ const AdminDashboard = () => {
           </List>
         </MainCard>
       </Grid>
+      
+      
+      {/* grid bracket */}
     </Grid>
   );
 };

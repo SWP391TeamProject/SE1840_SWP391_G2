@@ -33,7 +33,7 @@ function MainCard(
 ) {
   const theme = useTheme();
   boxShadow = theme.palette.mode === 'dark' ? boxShadow || true : boxShadow;
-
+  
   return (
     <Card
       elevation={elevation || 0}
@@ -42,10 +42,10 @@ function MainCard(
       sx={{
         border: border ? '1px solid' : 'none',
         borderRadius: 2,
-        borderColor: theme.palette.mode === 'dark' ? theme.palette.divider : theme.palette.grey.A800,
-        boxShadow: boxShadow && (!border || theme.palette.mode === 'dark') ? shadow || theme.palette.z1 : 'inherit',
+        borderColor: 'rgba(0, 0, 0, 0.12)',
+        boxShadow: boxShadow ? shadow || theme.shadows[1] : 'inherit',
         ':hover': {
-          boxShadow: boxShadow ? shadow || theme.palette.z1 : 'inherit'
+          boxShadow: boxShadow ? shadow || theme.shadows[1] : 'inherit'
         },
         '& pre': {
           m: 0,

@@ -45,7 +45,7 @@ const barChartOptions = {
 
 // ==============================|| MONTHLY BAR CHART ||============================== //
 
-export default function MonthlyBarChart({ selectedLabel }) {
+export default function PaymentsBarChart({ selectedLabel }) {
   const theme = useTheme();
   
   const { primary, secondary } = theme.palette.text;

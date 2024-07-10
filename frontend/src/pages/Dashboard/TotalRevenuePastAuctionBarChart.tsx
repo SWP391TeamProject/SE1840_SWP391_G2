@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-// material-ui
-import { useTheme } from "@mui/material/styles";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -86,7 +84,7 @@ const columnChartOptions = {
 
 
 
-export default function SalesChart() {
+export default function TotalRevenuePastAuctionBarChart() {
   const [series, setSeries] = useState([]);
 
   const [options, setOptions] = useState(columnChartOptions);

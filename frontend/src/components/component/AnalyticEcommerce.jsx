@@ -11,8 +11,8 @@ import Box from "@mui/material/Box";
 import MainCard from "../../pages/Dashboard/MainCard";
 
 // assets
-import RiseOutlined from "@ant-design/icons/RiseOutlined";
-import FallOutlined from "@ant-design/icons/FallOutlined";
+// import RiseOutlined from "@ant-design/icons/RiseOutlined";
+// import FallOutlined from "@ant-design/icons/FallOutlined";
 
 const iconSX = {
   fontSize: "0.75rem",
@@ -30,7 +30,7 @@ export default function AnalyticEcommerce({
   extra,
 }) {
   return (
-    <div >
+    <div className="bg-backgoundcolor p-5">
       <MainCard contentSX={{ p: 2.25 }}>
         <Stack spacing={0.5}>
           <Typography variant="h6" color="text.secondary">
@@ -44,7 +44,7 @@ export default function AnalyticEcommerce({
             </Grid>
             {percentage && (
               <Grid item>
-                <Chip
+                {/* <Chip
                   variant="combined"
                   color={color}
                   icon={
@@ -57,7 +57,7 @@ export default function AnalyticEcommerce({
                   label={`${percentage}%`}
                   sx={{ ml: 1.25, pl: 1 }}
                   size="small"
-                />
+                /> */}
               </Grid>
             )}
           </Grid>

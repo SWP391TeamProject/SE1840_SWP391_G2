@@ -5,12 +5,12 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 
 // project import
-import SalesChart from './SalesChart';
+import TotalRevenuePastAuctionBarChart from './TotalRevenuePastAuctionBarChart';
 
 
 // ==============================|| DEFAULT - SALES REPORT ||============================== //
 
-export default function SaleReportCard() {
+export default function PastAuctionReportCard() {
 
   return (
     <>
@@ -20,7 +20,7 @@ export default function SaleReportCard() {
         </Grid>
         
       </Grid>
-      <SalesChart />
+      <TotalRevenuePastAuctionBarChart />
     </>
   );
 }
