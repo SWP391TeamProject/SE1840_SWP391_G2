@@ -13,7 +13,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString
 public class AuctionItemId implements Serializable {
     @Serial
     private static final long serialVersionUID = 4287679686812621166L;

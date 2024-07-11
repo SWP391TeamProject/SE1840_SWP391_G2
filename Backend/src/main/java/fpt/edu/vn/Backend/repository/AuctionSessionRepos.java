@@ -8,11 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Repository
 public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integer> {
-    List<AuctionSession> findByStartDateAfter(LocalDateTime startDate);
     Page<AuctionSession> findByEndDateBefore(LocalDateTime endDate, Pageable pageable);
     Page<AuctionSession> findByStartDateAfter(LocalDateTime startDate, Pageable pageable);
     Page<AuctionSession> findByTitleContaining(String title, Pageable pageable);

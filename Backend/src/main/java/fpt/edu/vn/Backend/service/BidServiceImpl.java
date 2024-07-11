@@ -131,16 +131,18 @@ public class BidServiceImpl implements BidService {
     public List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId) {
         List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
         List<BidDTO> result = new ArrayList<>();
-        for (int i = 0; i < bids.size(); i++) {
-            Bid bid = bids.get(i);
-            Payment payment = bid.getPayment();
-            if (i == 0){
+        for (Bid bid : bids) {
+            if (bids.get(0).equals(bid)){
                 log.info("Bid " + bid.getBidId() + " succeeded");
+                Payment payment = bid.getPayment();
                 payment.setStatus(Payment.Status.SUCCESS);
-            } else {
-                log.info("Bid " + bid.getBidId() + " failed");
-                payment.setStatus(Payment.Status.FAILED);
+                paymentRepos.save(payment);
+                result.add(new BidDTO(bid));
+                continue;
             }
+            log.info("Bid " + bid.getBidId() + " failed");
+            Payment payment = bid.getPayment();
+            payment.setStatus(Payment.Status.FAILED);
             paymentRepos.save(payment);
             result.add(new BidDTO(bid));
         }
