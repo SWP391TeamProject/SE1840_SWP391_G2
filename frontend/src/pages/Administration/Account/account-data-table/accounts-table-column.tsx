@@ -1,7 +1,6 @@
 import * as React from "react"
 import { type ColumnDef } from "@tanstack/react-table"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -14,35 +13,31 @@ import {
 import { DataTableColumnHeader } from "@/components/data-tables/data-table-column-header"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
-import { setCurrentItem } from "@/redux/reducers/Items"
+import { AccountStatus } from "@/constants/enums"
 
 // Define the JewelryItem type based on the provided JSON structure
-export type JewelryItem = {
-  itemId: number
-  category: {
-    itemCategoryId: number
-    name: string
-    createDate: string
-  }
-  name: string
-  description: string
-  reservePrice: number
-  buyInPrice: number
-  status: string
-  createDate: string
-  updateDate: string
-  owner: {
-    accountId: number
-    nickname: string
-    email: string
-  }
-  attachments: {
+type Account = {
+  accountId: number
+  avatar: {
     attachmentId: number
+    createDate: Date
     link: string
-  }[]
+    updateDate: Date
+  }
+  balance: number
+  createDate: string
+  email: string
+  kyc: boolean
+  nickname: string
+  password: string
+  phone: string
+  require2fa: boolean
+  role: string
+  status: string
+  updateDate: Date
 }
 
-export const getColumns = (): ColumnDef<JewelryItem>[] => [
+export const getColumns = (): ColumnDef<Account>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -65,47 +60,46 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: "itemId",
+    accessorKey: "accountId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Item ID" />
+      <DataTableColumnHeader column={column} title="Account ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("itemId")}</div>,
+    cell: ({ row }) => <div className="w-20">{row.getValue("accountId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name"  className="w-"/>
+      <DataTableColumnHeader column={column} title="Email"  className="w-"/>
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <Badge variant="outline">{row.original.category.name}</Badge>
         <span className="max-w-[7.25rem] truncate font-medium">
-          {row.getValue("name")}
+          {row.getValue("email")}
         </span>
       </div>
     ),
   },
   {
-    accessorKey: "reservePrice",
+    accessorKey: "phone",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Reserve Price" />
+      <DataTableColumnHeader column={column} title="Phone" />
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        ${row.getValue<number>("reservePrice").toLocaleString()}
+        {row.getValue("phone")}
       </div>
     ),
   },
   {
-    accessorKey: "buyInPrice",
+    accessorKey: "role",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Buy-In Price" />
+      <DataTableColumnHeader column={column} title="Role" />
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        ${row.getValue<number>("buyInPrice").toLocaleString()}
+        {row.getValue("role")}
       </div>
     ),
   },
@@ -115,28 +109,32 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => (
-      <Badge variant={row.getValue("status") === "QUEUE" ? "outline" : "default"}>
+      <Badge variant={row.getValue("status") === AccountStatus.DISABLED ? "destructive" : "default"} className={row.getValue("status") === AccountStatus.ACTIVE ? "bg-green-500" : ""}> 
         {row.getValue("status")}
       </Badge>
+
+    //   {row.getValue("status") == AccountStatus.ACTIVE ?
+    //     <Badge variant="default" className="bg-green-500">{AccountStatus[row.status]}</Badge> :
+    //     <Badge variant="destructive">{AccountStatus[row.status]}</Badge>}
     ),
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
   },
-  {
-    accessorKey: "createDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created At" />
-    ),
-    cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
-  },
-  {
-    accessorKey: "owner.nickname",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Owner" />
-    ),
-    cell: ({ row }) => row.original.owner.nickname,
-  },
+//   {
+//     accessorKey: "createDate",
+//     header: ({ column }) => (
+//       <DataTableColumnHeader column={column} title="Created At" />
+//     ),
+//     cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
+//   },
+//   {
+//     accessorKey: "owner.nickname",
+//     header: ({ column }) => (
+//       <DataTableColumnHeader column={column} title="Owner" />
+//     ),
+//     cell: ({ row }) => row.original.owner.nickname,
+//   },
   {
     id: "actions",
     cell: ({ row }) => {
@@ -145,9 +143,9 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
       const  nav = useNavigate();
       const dispatch = useAppDispatch();
 
-      const handleEditClick = (itemId: number) => {
+      const handleEditClick = (accountId: number) => {
         // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-        nav(`/admin/items/${itemId}`);
+        nav(`/admin/accounts/${accountId}`);
       }
       return (
         <>
@@ -164,7 +162,7 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => handleEditClick(
-                row.original.itemId
+                row.original.accountId
               )}>
                 Edit
               </DropdownMenuItem>

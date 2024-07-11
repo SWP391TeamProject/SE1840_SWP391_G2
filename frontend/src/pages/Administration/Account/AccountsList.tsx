@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/card";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -32,24 +34,42 @@ import { fetchAccountsService, deleteAccountService, fetchAccountsByName, activa
 import {
   PlusCircle,
   MoreHorizontal,
+  ListFilter,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-import { AccountStatus, Roles } from "@/constants/enums";
+import { AccountStatus, RoleName, Roles } from "@/constants/enums";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { useNavigate } from "react-router-dom";
+import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
+import { AccountsTable } from "./account-data-table/account-table";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [roleFilter, setRoleFilter] = useState("");
+  const [seletedRole, setSelectedRole] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
   const [reload, setReload] = useState(false);
+  let pageNumber = url.searchParams.get("page");
+  let sort = url.searchParams.get("sort");
+  let pageSize = url.searchParams.get("per_page");
+
+  const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole});
 
   const fetchAccounts = async (pageNumber: number, role?: Roles) => {
     try {
@@ -117,27 +137,43 @@ export default function AccountsList() {
     setReload(!reload);
   }
 
-  const handleFilterClick = (roles: Roles[], filter: string) => {
-    // let filteredList = accountsList.value.filter(x => status.includes(x.status));
-    // dispatch(setCurrentPageList(filteredList));
-    // if (filter != roleFilter) {
-    url.searchParams.delete("search");
-    window.history.replaceState(null, "", url.toString());
-    search = null;
-    if (filter == "all") {
-      fetchAccounts(0);
-      setRoleFilter(filter);
-      accountsList.filter = undefined;
-    }
-    else {
-      console.log(roles);
-      fetchAccounts(0, roles[0]);
-      setRoleFilter(filter);
-      accountsList.filter = roles[0];
-    }
+  // const handleFilterClick = (roles: Roles[], filter: string) => {
+  //   // let filteredList = accountsList.value.filter(x => status.includes(x.status));
+  //   // dispatch(setCurrentPageList(filteredList));
+  //   // if (filter != roleFilter) {
+  //   url.searchParams.delete("search");
+  //   window.history.replaceState(null, "", url.toString());
+  //   search = null;
+  //   if (filter == "all") {
+  //     fetchAccounts(0);
+  //     setRoleFilter(filter);
+  //     accountsList.filter = undefined;
+  //   }
+  //   else {
+  //     console.log(roles);
+  //     fetchAccounts(0, roles[0]);
+  //     setRoleFilter(filter);
+  //     accountsList.filter = roles[0];
+  //   }
 
-    // }
+  //   // }
+  // }
+
+  const handleFilterClick = (role: string) => {
+    if (role === "All") {
+      setSelectedRole("");
+    } else {
+      setSelectedRole(role);
+    }
   }
+
+  // const handleRoleFilterSelect = (...event: any) => {
+  //   if (event[0] === "All") {
+  //     setSelectedRole("");
+  //   } else {
+  //     setSelectedRole(event[0]);
+  //   }
+  // }
 
   useEffect(() => { }, [accountsList.currentPageList]);
 
@@ -163,13 +199,13 @@ export default function AccountsList() {
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="all">
         <div className="flex items-center">
-          <TabsList>
+          {/* <TabsList>
             <TabsTrigger onClick={() => handleFilterClick([Roles.ADMIN, Roles.MANAGER, Roles.STAFF, Roles.MEMBER], "all")} value="all">All</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([Roles.ADMIN], "admin")} value="admin">Admin</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([Roles.MANAGER], "manager")} value="manager">Manager</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([Roles.STAFF], "staff")} value="staff">Staff</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([Roles.MEMBER], "member")} value="member">Member</TabsTrigger>
-          </TabsList>
+          </TabsList> */}
           <div className="ml-auto flex items-center gap-2">
             {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -212,9 +248,9 @@ export default function AccountsList() {
 
                 <CardTitle className="flex justify-between items-center">
                   Accounts
-                  <div className="w-full basis-1/2">
+                  {/* <div className="w-full basis-1/2">
                     <PagingIndexes className="basis-1/2" pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                  </div>
+                  </div> */}
                 </CardTitle>
                 <CardDescription>
                   Manage accounts and view their details.
@@ -222,7 +258,7 @@ export default function AccountsList() {
 
               </CardHeader>
               <CardContent>
-                <Table>
+                {/* <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Id</TableHead>
@@ -239,9 +275,9 @@ export default function AccountsList() {
                       <TableHead className="md:table-cell w-28">
                         Status
                       </TableHead>
-                      {/* <TableHead className="hidden md:table-cell">
+                      <TableHead className="hidden md:table-cell">
                                                     Created at
-                                                </TableHead> */}
+                                                </TableHead>
                       <TableHead>
                         <span className="sr-only">Actions</span>
                       </TableHead>
@@ -253,9 +289,9 @@ export default function AccountsList() {
                         <TableCell className="font-medium">
                           {account.accountId}
                         </TableCell>
-                        {/* <TableCell>
+                        <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
-                                                </TableCell> */}
+                                                </TableCell>
                         <TableCell className=" md:table-cell">
                           <div className="flex items-center ">
                             <Avatar className="mr-5">
@@ -308,7 +344,58 @@ export default function AccountsList() {
 
                     ))}
                   </TableBody>
-                </Table>
+                </Table> */}
+                <Suspense
+                  fallback={
+                    <DataTableSkeleton
+                      columnCount={5}
+                      searchableColumnCount={1}
+                      filterableColumnCount={2}
+                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                      shrinkZero
+                    />
+                  }
+                >
+                  {/* <Select onValueChange={handleRoleFilterSelect} >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Role</SelectLabel>
+                        <SelectItem value="All" key={0}>All</SelectItem>
+                        {Object.values(RoleName).map((role) => (
+                          <SelectItem value={role}>{role}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select> */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8 gap-1">
+                        <ListFilter className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Role
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuLabel>Role</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == ''} onClick={() => handleFilterClick('All')}>
+                        All
+                      </DropdownMenuCheckboxItem>
+
+
+                      {Object.values(RoleName).map((role) => (
+                        <div className="flex m-1 items-center justify-between" key={role} >
+                          <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == role} onClick={() => handleFilterClick(role)} >{role}</DropdownMenuCheckboxItem>
+                        </div>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <AccountsTable accountPromise={accountPromise} />
+                </Suspense>
               </CardContent>
               <CardFooter>
                 {/* <div className="text-xs text-muted-foreground">

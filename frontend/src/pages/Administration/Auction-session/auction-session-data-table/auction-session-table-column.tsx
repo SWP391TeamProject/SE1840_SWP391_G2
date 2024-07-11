@@ -1,7 +1,6 @@
 import * as React from "react"
 import { type ColumnDef } from "@tanstack/react-table"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -9,40 +8,30 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DataTableColumnHeader } from "@/components/data-tables/data-table-column-header"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
-import { setCurrentItem } from "@/redux/reducers/Items"
+import { AccountStatus } from "@/constants/enums"
+import { formatDate } from "@/lib/utils"
+import { MoreHorizontal } from "lucide-react"
 
 // Define the JewelryItem type based on the provided JSON structure
-export type JewelryItem = {
-  itemId: number
-  category: {
-    itemCategoryId: number
-    name: string
-    createDate: string
-  }
-  name: string
-  description: string
-  reservePrice: number
-  buyInPrice: number
+type AuctionSession = {
+  auctionSessionId: number
+  auctionItems: any[]
+  attachments: any[]
+  deposits: any[]
+  endDate: Date
+  startDate: Date
+  title: string
   status: string
-  createDate: string
-  updateDate: string
-  owner: {
-    accountId: number
-    nickname: string
-    email: string
-  }
-  attachments: {
-    attachmentId: number
-    link: string
-  }[]
+  updateDate: Date
 }
 
-export const getColumns = (): ColumnDef<JewelryItem>[] => [
+export const getColumns = (): ColumnDef<AuctionSession>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -65,77 +54,67 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: "itemId",
+    accessorKey: "auctionSessionId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Item ID" />
+      <DataTableColumnHeader column={column} title="Session ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("itemId")}</div>,
+    cell: ({ row }) => <div className="w-20">{row.getValue("auctionSessionId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "title",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name"  className="w-"/>
+      <DataTableColumnHeader column={column} title="Title"  className="w-"/>
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <Badge variant="outline">{row.original.category.name}</Badge>
         <span className="max-w-[7.25rem] truncate font-medium">
-          {row.getValue("name")}
+          {row.getValue("title")}
         </span>
       </div>
     ),
+    enableSorting: false,
   },
   {
-    accessorKey: "reservePrice",
+    accessorKey: "startDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Reserve Price" />
+      <DataTableColumnHeader column={column} title="Start Date" />
+    ),
+    cell: ({ row }) => formatDate(new Date(row.getValue("startDate"))),
+    enableSorting: false,
+  },
+  {
+    accessorKey: "endDate",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="End Date" />
+    ),
+    cell: ({ row }) => formatDate(new Date(row.getValue("endDate"))),
+    enableSorting: false,
+  },
+  {
+    accessorKey: "deposits",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Participant" />
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        ${row.getValue<number>("reservePrice").toLocaleString()}
+        {row.getValue("deposits").length}
       </div>
     ),
+    enableSorting: false,
   },
   {
-    accessorKey: "buyInPrice",
+    accessorKey: "auctionItems",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Buy-In Price" />
+      <DataTableColumnHeader column={column} title="Number Of Lots" />
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        ${row.getValue<number>("buyInPrice").toLocaleString()}
+        {row.getValue("auctionItems").length}
       </div>
     ),
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => (
-      <Badge variant={row.getValue("status") === "QUEUE" ? "outline" : "default"}>
-        {row.getValue("status")}
-      </Badge>
-    ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    accessorKey: "createDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created At" />
-    ),
-    cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
-  },
-  {
-    accessorKey: "owner.nickname",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Owner" />
-    ),
-    cell: ({ row }) => row.original.owner.nickname,
+    enableSorting: false,
   },
   {
     id: "actions",
@@ -145,14 +124,22 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
       const  nav = useNavigate();
       const dispatch = useAppDispatch();
 
-      const handleEditClick = (itemId: number) => {
+      const handleEditClick = (accountId: number) => {
         // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-        nav(`/admin/items/${itemId}`);
+        nav(`/admin/accounts/${accountId}`);
+      }
+
+      const handleDetailClick = (auctionSessionId: number) => {
+        nav(`/admin/auction-sessions/${auctionSessionId}`);
+      }
+
+      const handleAssignAuctionItemClick = (auctionSessionId: number) => {
+        nav(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
       }
       return (
         <>
           {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 aria-label="Open menu"
@@ -164,13 +151,30 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => handleEditClick(
-                row.original.itemId
+                row.original.auctionSessionId
               )}>
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setShowDeleteItemDialog(true)}>
                 Delete
               </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-haspopup="true"
+                size="icon"
+                variant="ghost"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => { handleDetailClick(row.original.auctionSessionId) }}>Detail</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(row.original.auctionSessionId) }}>Assign Items</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </>

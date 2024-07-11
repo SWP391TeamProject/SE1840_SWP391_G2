@@ -71,12 +71,22 @@ import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { ItemsTable } from "./testserversideTable/item-table";
 import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 import { getItems } from "./testserversideTable/item-apis";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function ItemsList() {
   const itemsList = useAppSelector((state) => state.items);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [seletedStatus, setSelectedStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
@@ -85,7 +95,7 @@ export default function ItemsList() {
   let pageSize = url.searchParams.get("per_page");
 
   const currency = useCurrency();
-  const itemPromise = getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort });
+  const itemPromise = getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: seletedStatus});
 
   const fetchItems = async (pageNumber: number, status?: ItemStatus) => {
     try {
@@ -149,26 +159,44 @@ export default function ItemsList() {
     // })
   }
 
-  const handleFilterClick = (status: ItemStatus[], filter: any) => {
-    console.log(filter);
-    console.log(statusFilter);
+  // const handleFilterClick = (status: ItemStatus[], filter: any) => {
+  //   console.log(filter);
+  //   console.log(statusFilter);
 
-    if (filter.toString() != statusFilter) {
-      url.searchParams.delete("search");
-      window.history.replaceState(null, "", url.toString());
-      search = null;
+  //   if (filter.toString() != statusFilter) {
+  //     url.searchParams.delete("search");
+  //     window.history.replaceState(null, "", url.toString());
+  //     search = null;
 
-      if (filter == "all") {
-        fetchItems(0);
-      } else {
-        fetchItems(0, status[0]);
-      }
+  //     if (filter == "all") {
+  //       fetchItems(0);
+  //     } else {
+  //       fetchItems(0, status[0]);
+  //     }
+  //   }
+
+  //   // let filteredList = itemsList.value.filter(x => status.includes(x.status));
+  //   // console.log(filteredList);
+  //   // dispatch(setCurrentPageList(filteredList));
+  //   setStatusFilter(filter);
+  // }
+
+  // const handleStatusFilterSelect = (...event: any) => {
+  //   console.log(event);
+  //   if (event[0] === "All") {
+  //     setSelectedStatus("");
+  //   } else {
+  //     setSelectedStatus(event[0]);
+  //   }
+  // }
+  
+  const handleFilterClick = (status: string) => {
+    console.log(status);
+    if (status === "All") {
+      setSelectedStatus("");
+    } else {
+      setSelectedStatus(status);
     }
-
-    // let filteredList = itemsList.value.filter(x => status.includes(x.status));
-    // console.log(filteredList);
-    // dispatch(setCurrentPageList(filteredList));
-    setStatusFilter(filter);
   }
 
   useEffect(() => { }, [itemsList]);
@@ -309,6 +337,44 @@ export default function ItemsList() {
            * Passing promises and consuming them using React.use for triggering the suspense fallback.
            * @see https://react.dev/reference/react/use
            */}
+                  {/* <Select onValueChange={handleStatusFilterSelect} >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status</SelectLabel>
+                        <SelectItem value="All" key={0}>All</SelectItem>
+                        {Object.values(ItemStatus).map((status) => (
+                          <SelectItem value={status}>{status}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select> */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8 gap-1">
+                        <ListFilter className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                          Status
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuLabel>Status</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuCheckboxItem className='w-9/12' checked={seletedStatus == ''} onClick={() => handleFilterClick('All')}>
+                        All
+                      </DropdownMenuCheckboxItem>
+
+
+                      {Object.values(ItemStatus).map((state) => (
+                        <div className="flex m-1 items-center justify-between" key={state} >
+                          <DropdownMenuCheckboxItem className='w-9/12' checked={seletedStatus == state} onClick={() => handleFilterClick(state)} >{state}</DropdownMenuCheckboxItem>
+                        </div>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <ItemsTable itemPromise={itemPromise} />
                 </Suspense>
               </CardContent>
@@ -320,9 +386,9 @@ export default function ItemsList() {
               </CardFooter>
             </Card>
           }
-          
+
         </TabsContent>
-        
+
       </Tabs>
       {/* {itemsList.value.map((item) => (
         <EditAcc item={item} key={item.itemId} hidden={true} />

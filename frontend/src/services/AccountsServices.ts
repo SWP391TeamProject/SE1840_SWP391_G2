@@ -1,32 +1,63 @@
 import { API_SERVER, SERVER_DOMAIN_URL } from "@/constants/domain";
 import { Roles } from "@/constants/enums";
+import { Account } from "@/models/AccountModel";
+import { Page } from "@/models/Page";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 
-export const fetchAccountsService = async (pageNumber: number, pageSize: number, role?: Roles) => {
-  let params = {
-    page: pageNumber,
-    size: pageSize,
-    Role: role ? role : "",
-  }
-  return await axios
-    .get(API_SERVER + "/accounts/", {
-      headers: {
-        "Content-Type": "application/json",
+interface GetAccountsSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  status?: string;
+  role?: string;
+}
 
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-      },
-      params: params
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
-      }
-    });
+export const fetchAccountsService = async (input: GetAccountsSchema) => {
+
+  try {
+    const {
+      page,
+      size,
+      sort,
+      order,
+      status,
+      role
+    } = input;
+
+    // Prepare query parameters
+    const params: Record<string, any> = {
+      page: page - 1, // Spring Boot uses 0-based page index
+      size: size ? size : 10,
+      sort,
+      status: status ? status.toUpperCase() : undefined,
+      order,
+      Role: role ? role : undefined
+    };
+
+    const response = await axios
+      .get<Page<Account>>(API_SERVER + "/accounts/", {
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization:
+            "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        },
+        params: params
+      })
+
+    return response.data;
+  } 
+  catch (err) {
+    console.log(err);
+    if (err?.response.status == 401) {
+      removeCookie("user");
+      removeCookie("token");
+    }
+  };
 };
+
 export const fetchAccountsByName = async (pageNumber: number, pageSize: number, name: string) => {
   let params = {
     page: pageNumber,
