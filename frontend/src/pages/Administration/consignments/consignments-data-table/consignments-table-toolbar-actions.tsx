@@ -17,7 +17,7 @@ interface TasksTableToolbarActionsProps {
   table: Table<Task>
 }
 
-export function AccountsTableToolbarActions({
+export function ConsignmentsTableToolbarActions({
   table,
 }: TasksTableToolbarActionsProps) {
     const nav = useNavigate()

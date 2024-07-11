@@ -34,6 +34,74 @@ export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: 
     });
 };
 
+interface GetConsignmentsSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  status?: string;
+  role?: string;
+}
+
+export const getConsignments = async (input: GetConsignmentsSchema) => {
+  try {
+    const {
+      page,
+      size,
+      sort,
+      order,
+      status,
+    } = input;
+
+    // Prepare query parameters
+    if (status === "All") {
+      const params: Record<string, any> = {
+        page: page - 1, // Spring Boot uses 0-based page index
+        size: size ? size : 10,
+        sort,
+        status: status ? status.toUpperCase() : undefined,
+        order,
+      };
+
+      return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization:
+              "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+          },
+          params: params
+        })
+    } else {
+      let params = {
+        status: status,
+        pageNumb: page - 1,
+        pageSize: size ? size : 10,
+      }
+      console.log(params);
+      return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/consignments/filter-by-status`, {
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization:
+              "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+          },
+          params: params
+        })
+    }
+    // return response.data;
+  } 
+  catch (err) {
+    console.log(err);
+    if (err?.response.status == 401) {
+      removeCookie("user");
+      removeCookie("token");
+    }
+  }
+};
+
 export const fetchConsignmentsByStatusService = async (pageNumber: number, pageSize: number, status: ConsignmentStatus) => {
   let params = {
     status: status,

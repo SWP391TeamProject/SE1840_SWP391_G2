@@ -14,30 +14,25 @@ import { DataTableColumnHeader } from "@/components/data-tables/data-table-colum
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { AccountStatus } from "@/constants/enums"
+import { formatDate } from "@/lib/utils"
 
 // Define the JewelryItem type based on the provided JSON structure
-type Account = {
-  accountId: number
-  avatar: {
-    attachmentId: number
-    createDate: Date
-    link: string
-    updateDate: Date
+type Consignment = {
+  consignmentId: number
+  preferContact: string
+  staff: {
+    accountId: number
+    email: string
+    nickname: string
+    phone: string
+    role: string
   }
-  balance: number
   createDate: string
-  email: string
-  kyc: boolean
-  nickname: string
-  password: string
-  phone: string
-  require2fa: boolean
-  role: string
   status: string
   updateDate: Date
 }
 
-export const getColumns = (): ColumnDef<Account>[] => [
+export const getColumns = (): ColumnDef<Consignment>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -60,46 +55,45 @@ export const getColumns = (): ColumnDef<Account>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: "accountId",
+    accessorKey: "consignmentId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Account ID" />
+      <DataTableColumnHeader column={column} title="Consignment ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("accountId")}</div>,
+    cell: ({ row }) => <div className="w-20">{row.getValue("consignmentId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
   {
-    accessorKey: "email",
+    accessorKey: "preferContact",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email"  className="w-"/>
+      <DataTableColumnHeader column={column} title="Prefer Contact" />
     ),
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <span className="max-w-[7.25rem] truncate font-medium">
-          {row.getValue("email")}
-        </span>
-      </div>
-    ),
+    cell: ({ row }) => <div className="w-20">{row.getValue("preferContact")}</div>,
+    enableSorting: true,
+    enableHiding: false,
   },
   {
-    accessorKey: "phone",
+    accessorKey: "createDate",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created At" />
+    ),
+    cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
+  },
+  {
+    accessorKey: "staff.nickname",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Assigned Staff" />
+    ),
+    cell: ({ row }) => row.original.staff?.nickname ? row.original.staff.nickname : "",
+  },
+  {
+    accessorKey: "staff.phone",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phone" />
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        {row.getValue("phone")}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "role",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
-    ),
-    cell: ({ row }) => (
-      <div className="font-medium">
-        {row.getValue("role")}
+        {row.original.staff?.nickname ? row.original.staff.nickname : ""}
       </div>
     ),
   },
@@ -147,30 +141,16 @@ export const getColumns = (): ColumnDef<Account>[] => [
         // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
         nav(`/admin/accounts/${accountId}`);
       }
+
+      const handleDetailClick = (consignmentId: number) => {
+        nav(`/admin/consignments/${consignmentId}`);
+    }
       return (
         <>
           {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="Open menu"
-                variant="ghost"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-              >
-                <DotsHorizontalIcon className="h-4 w-4" aria-hidden="true" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => handleEditClick(
-                row.original.accountId
-              )}>
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setShowDeleteItemDialog(true)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="outline" size="sm" onClick={() => { handleDetailClick(row.original.consignmentId) }}>
+            Detail
+          </Button>
         </>
       )
     },

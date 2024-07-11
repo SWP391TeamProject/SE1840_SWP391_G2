@@ -3,16 +3,17 @@ import * as React from "react";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-tables/data-table";
 import { DataTableToolbar } from "@/components/data-tables/data-table-toolbar";
-import { AccountsTableToolbarActions, ItemsTableToolbarActions } from "./accounts-table-toolbar-actions";
 import { DataTableFilterField } from "@/types";
-import { AccountsTableFloatingBar } from "./accounts-table-floating-bar";
-import getColumns from "./accounts-table-column";
+import getColumns from "./consignments-table-column";
 import { fetchAccountsService } from "@/services/AccountsServices";
-interface AccountTableProps {
-    accountPromise: ReturnType<typeof fetchAccountsService>;
+import { getConsignments } from "@/services/ConsignmentService";
+import { ConsignmentsTableFloatingBar } from "./consignments-table-floating-bar";
+import { ConsignmentsTableToolbarActions } from "./consignments-table-toolbar-actions";
+interface ConsignmentTableProps {
+    consignmentPromise: ReturnType<typeof getConsignments>;
 }
 
-export function AccountsTable({ accountPromise }: AccountTableProps) {
+export function ConsignmentsTable({ consignmentPromise }: ConsignmentTableProps) {
     const [data, setData] = React.useState([]);
     const [pageCount, setPageCount] = React.useState(0);
 
@@ -21,9 +22,9 @@ export function AccountsTable({ accountPromise }: AccountTableProps) {
 
     React.useEffect(() => {
         const fetchData = async () => {
-            if (accountPromise) {
-                const content = (await accountPromise).content;
-                const totalPages = (await accountPromise).totalPages;
+            if (consignmentPromise) {
+                const content = (await consignmentPromise).data.content;
+                const totalPages = (await consignmentPromise).data.totalPages;
                 setData(content);
                 setPageCount(totalPages);
                 console.log(content);
@@ -31,7 +32,7 @@ export function AccountsTable({ accountPromise }: AccountTableProps) {
             }
         };
         fetchData();
-    }, [accountPromise]);
+    }, [consignmentPromise]);
 
     const { table } = useDataTable({
         data,
@@ -44,13 +45,14 @@ export function AccountsTable({ accountPromise }: AccountTableProps) {
         <DataTable
             table={table}
             floatingBar={
-                <AccountsTableFloatingBar table={table} />
+                <ConsignmentsTableFloatingBar table={table} />
             }
-        >
-
-            <DataTableToolbar table={table}>
-                <AccountsTableToolbarActions table={table} />
-            </DataTableToolbar>
+                    >
+        
+    
+        <DataTableToolbar table={table}>
+          <ConsignmentsTableToolbarActions table={table} />
+        </DataTableToolbar>
         </DataTable >
     );
 }
