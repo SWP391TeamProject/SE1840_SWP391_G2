@@ -119,20 +119,20 @@ const appearance = {
 
 // Pass the appearance object to the Elements instance
 const options = {
-    mode: 'setup',
-    paymentMethodTypes: ['card'],
-    currency: 'usd',
-    paymentMethodCreation: 'manual',  
+  mode: 'setup',
+  paymentMethodTypes: ['card'],
+  currency: 'usd',
+  paymentMethodCreation: 'manual',
 
-    // Fully customizable with appearance API.
-    appearance:appearance,
-  };
+  // Fully customizable with appearance API.
+  appearance: appearance,
+};
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 
     <GoogleOAuthProvider
       clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
-            {/* <Elements stripe={stripePromise} options={options}> */}
+      {/* <Elements stripe={stripePromise} options={options}> */}
 
       <QueryClientProvider client={queryClient}>
         <ToastContainer autoClose={3000} pauseOnHover={false} closeOnClick />
@@ -145,8 +145,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     {/* <Route path="/" element={<HomeLayout />}> */}
                     {/* Customer Site */}
                     <Route path="/" element={<CustomerLayout />}>
-
-
                       <Route path="/" element={<LandingPage />}></Route>
                       <Route path="contact" element={<Contact />}></Route>
                       <Route path="about" element={<AboutScreen />}></Route>
@@ -189,7 +187,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                             element={<NotificationsList />}></Route>
                           <Route path="balance"
                             element={<Balance />}></Route>
-                            <Route path="kyc" element={<KycVerification />}></Route>
+                          <Route path="kyc" element={<KycVerification />}></Route>
                         </Route>
                       </Route>
                     </Route>
@@ -201,7 +199,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                       <Route path="bids" element={<Bids />}></Route>
                       <Route path="orders" element={<Orders />}></Route>
                       <Route path="orders/:id"
-                            element={<Order />}></Route>
+                        element={<Order />}></Route>
                     </Route>
                     {/* Administration */}
                     <Route
