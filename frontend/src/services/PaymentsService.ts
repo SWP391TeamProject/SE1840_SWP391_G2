@@ -3,10 +3,63 @@ import { PaymentType } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 
+interface GetPaymentsSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  status?: string;
+  type?: string
+}
+
+export const getPayments = async (input: GetPaymentsSchema) => {
+
+  try {
+    const {
+      page,
+      size,
+      sort,
+      order,
+      status,
+      type
+    } = input;
+
+    // Prepare query parameters
+    const params: Record<string, any> = {
+      page: page - 1, // Spring Boot uses 0-based page index
+      size: size ? size : 10,
+      sort,
+      status: status ? status.toUpperCase() : undefined,
+      order,
+      type
+    };
+
+    const response = await axios
+      .get(API_SERVER + "/payments", {
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization:
+            "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        },
+        params: params
+      })
+
+    return response.data;
+  } 
+  catch (err) {
+    console.log(err);
+    if (err?.response.status == 401) {
+      removeCookie("user");
+      removeCookie("token");
+    }
+  };
+};
+
 export const fetchPaymentssService = async (pageNumber: number, pageSize: number,sort?:string,type?:PaymentType) => {
   let params = {
     page: pageNumber,
-    size: pageSize,
+    size: pageSize | 10,
     sort:sort,
     type:type
   }

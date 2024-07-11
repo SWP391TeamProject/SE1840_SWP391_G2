@@ -6,9 +6,9 @@ import { DataTable } from "@/components/data-tables/data-table";
 import { PaymentsTableFloatingBar } from "./payments-table-floating-bar";
 import { DataTableToolbar } from "@/components/data-tables/data-table-toolbar";
 import { PaymentsTableToolbarActions } from "./payments-table-toolbar-actions";
-import { fetchPaymentssService } from "@/services/PaymentsService";
+import { getPayments } from "@/services/PaymentsService";
 interface PaymentTableProps {
-    paymentPromise: ReturnType<typeof fetchPaymentssService>;
+    paymentPromise: ReturnType<typeof getPayments>;
 }
 
 export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
@@ -21,8 +21,8 @@ export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
     React.useEffect(() => {
         const fetchData = async () => {
             if (paymentPromise) {
-                const content = (await paymentPromise).data.content;
-                const totalPages = (await paymentPromise)?.data.totalPages;
+                const content = (await paymentPromise).content;
+                const totalPages = (await paymentPromise).totalPages;
                 setData(content);
                 setPageCount(totalPages);
                 console.log(content);

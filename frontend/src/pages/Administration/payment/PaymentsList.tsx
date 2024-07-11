@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/card";
 import {
     DropdownMenu,
+    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -30,6 +32,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
     PlusCircle,
     MoreHorizontal,
+    ListFilter,
 } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 
@@ -38,7 +41,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { useNavigate } from "react-router-dom";
-import { fetchPaymentssService } from "@/services/PaymentsService";
+import { fetchPaymentssService, getPayments } from "@/services/PaymentsService";
 import { setCurrentPageList, setCurrentPageNumber, setCurrentPayment } from "@/redux/reducers/Payments";
 import { Payment } from "@/models/payment";
 import { useCurrency } from "@/CurrencyProvider";
@@ -49,7 +52,7 @@ export default function PaymentsList() {
     const paymentsList: any = useAppSelector((state) => state.payments);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const [typeFilter, setRoleFilter] = useState("");
+    const [typeFilter, setTypeFilter] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const url = new URL(window.location.href);
     const currency = useCurrency();
@@ -61,7 +64,7 @@ export default function PaymentsList() {
     let pageSize = url.searchParams.get("per_page");
 
     // const currency = useCurrency();
-    const paymentPromise = fetchPaymentssService(Number.parseInt(pageNumber),Number.parseInt(pageSize), sort );
+    const paymentPromise = getPayments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, type: typeFilter});
 
     const fetchPayments = async (pageNumber: number, type?: PaymentType) => {
         try {
@@ -136,15 +139,15 @@ export default function PaymentsList() {
         url.searchParams.delete("search");
         window.history.replaceState(null, "", url.toString());
         search = null;
-        if (filter == "all") {
-            fetchPayments(0);
-            setRoleFilter(filter);
+        if (filter == "All") {
+            // fetchPayments(0);
+            setTypeFilter('');
             paymentsList.filter = undefined;
         }
         else {
             console.log(types);
-            fetchPayments(0, types[0]);
-            setRoleFilter(filter);
+            // fetchPayments(0, types[0]);
+            setTypeFilter(filter);
             paymentsList.filter = types[0];
         }
 
@@ -162,36 +165,19 @@ export default function PaymentsList() {
         // data.then((data) => {
         //   dispatch(setCurrentPageList(data.content));
         // })
-        setRoleFilter("all");
+        // setTypeFilter("all");
 
     }, []);
     useEffect(() => {
         fetchPayments(paymentsList.currentPageNumber);
-        setRoleFilter("all");
+        // setTypeFilter("all");
 
     }, [reload]);
 
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-              <Suspense
-                  fallback={
-                    <DataTableSkeleton
-                      columnCount={5}
-                      searchableColumnCount={1}
-                      filterableColumnCount={2}
-                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
-                      shrinkZero
-                    />
-                  }
-                >
-                  {/**
-           * Passing promises and consuming them using React.use for triggering the suspense fallback.
-           * @see https://react.dev/reference/react/use
-           */}
-                  <PaymentsTable paymentPromise={paymentPromise} />
-                </Suspense>
             <Tabs defaultValue="all">
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                     <TabsList>
                         <TabsTrigger onClick={() => handleFilterClick([], "all")} value="all">All</TabsTrigger>
                         <TabsTrigger onClick={() => handleFilterClick([PaymentType.AUCTION_BID], "AUCTION_BID")} value="AUCTION_BID">AUCTION_BID</TabsTrigger>
@@ -201,7 +187,7 @@ export default function PaymentsList() {
                         <TabsTrigger onClick={() => handleFilterClick([PaymentType.DEPOSIT], "DEPOSIT")} value="DEPOSIT">DEPOSIT</TabsTrigger>
 
                     </TabsList>
-                    <div className="ml-auto flex items-center gap-2">
+                    <div className="ml-auto flex items-center gap-2"> */}
                         {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
@@ -227,15 +213,15 @@ export default function PaymentsList() {
                                         Export
                                     </span>
                                 </Button> */}
-                        <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
+                        {/* <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
                             <PlusCircle className="h-3.5 w-3.5" />
                             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                                 Add payment
                             </span>
-                        </Button>
-                    </div>
-                </div>
-                <TabsContent value={typeFilter}>
+                        </Button> */}
+                    {/* </div> */}
+                {/* </div> */}
+                <TabsContent value="all">
                     {isLoading ?
                         <LoadingAnimation />
                         : <Card x-chunk="dashboard-06-chunk-0">
@@ -253,7 +239,48 @@ export default function PaymentsList() {
 
                             </CardHeader>
                             <CardContent>
-                                <Table>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm" className="h-8 gap-1">
+                                            <ListFilter className="h-3.5 w-3.5" />
+                                            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                                                Status
+                                            </span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start">
+                                        <DropdownMenuLabel>Status</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuCheckboxItem className='w-9/12' checked={typeFilter == ''} onClick={() => handleFilterClick([], 'All')}>
+                                            All
+                                        </DropdownMenuCheckboxItem>
+
+
+                                        {Object.values(PaymentType).map((type) => (
+                                            <div className="flex m-1 items-center justify-between" key={type} >
+                                                <DropdownMenuCheckboxItem className='w-9/12' checked={typeFilter == type} onClick={() => handleFilterClick([type], type)} >{type}</DropdownMenuCheckboxItem>
+                                            </div>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <Suspense
+                                    fallback={
+                                        <DataTableSkeleton
+                                            columnCount={5}
+                                            searchableColumnCount={1}
+                                            filterableColumnCount={2}
+                                            cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                                            shrinkZero
+                                        />
+                                    }
+                                >
+                                    {/**
+           * Passing promises and consuming them using React.use for triggering the suspense fallback.
+           * @see https://react.dev/reference/react/use
+           */}
+                                    <PaymentsTable paymentPromise={paymentPromise} />
+                                </Suspense>
+                                {/* <Table>
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Id</TableHead>
@@ -278,11 +305,11 @@ export default function PaymentsList() {
                                             <TableRow key={payment.accountId}>
                                                 <TableCell className="font-medium">
                                                     {payment.id}
-                                                </TableCell>
+                                                </TableCell> */}
                                                 {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                                                <TableCell className=" md:table-cell">
+                                                {/* <TableCell className=" md:table-cell">
                                                     <div className="flex items-center ">
                                                         {payment.date}
                                                     </div>
@@ -314,13 +341,13 @@ export default function PaymentsList() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                            <DropdownMenuItem onClick={() => { handleEditClick(payment.accountId) }}>Edit</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => { handleEditClick(payment.accountId) }}>Edit</DropdownMenuItem> */}
                                                             {/* {
                                                                 payment.status == AccountStatus.ACTIVE ?
                                                                     <DropdownMenuItem onClick={() => { handleSuspendClick(payment.accountId) }}>Suspend</DropdownMenuItem> :
                                                                     <DropdownMenuItem onClick={() => { handleActiveClick(payment.accountId) }}>Activate</DropdownMenuItem>
                                                             } */}
-
+{/* 
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </TableCell>
@@ -328,7 +355,7 @@ export default function PaymentsList() {
 
                                         ))}
                                     </TableBody>
-                                </Table>
+                                </Table> */}
                             </CardContent>
                             <CardFooter>
                                 {/* <div className="text-xs text-muted-foreground">
