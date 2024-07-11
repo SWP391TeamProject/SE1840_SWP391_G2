@@ -111,7 +111,7 @@ export default function PlaceBid({ ...props }) {
                     }}>Place Bid</Button>
                 </DialogTrigger>
                 <DialogContent className="h-fit" onInteractOutside={(e) => {
-                    e.preventDefault();
+                    ;
                 }}>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -215,7 +215,8 @@ export default function PlaceBid({ ...props }) {
                                                         )}
                                                     />
                                                     <Button variant="default" type="submit" onClick={() => {
-                                                        if (!form.formState.errors.bidAmount) {
+                                                        console.log(form);
+                                                        if (form?.formState?.isValid) {
                                                             setShowConfirmDialog(true)
                                                         }
                                                     }}>Place Bid</Button>
