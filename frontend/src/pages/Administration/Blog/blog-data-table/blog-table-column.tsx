@@ -14,6 +14,8 @@ import { DataTableColumnHeader } from "@/components/data-tables/data-table-colum
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { formatDate } from "@/lib/utils"
+import { setCurrentBlogPost } from "@/redux/reducers/Blogs"
+import BlogService from "@/services/BlogService"
 
 // Define the JewelryItem type based on the provided JSON structure
 type Blog = {
@@ -153,10 +155,18 @@ export const getColumns = (): ColumnDef<Blog>[] => [
       const  nav = useNavigate();
       const dispatch = useAppDispatch();
 
-      const handleEditClick = (accountId: number) => {
-        // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-        nav(`/admin/accounts/${accountId}`);
+      const handleEditClick = (blogId: number) => {
+        nav("/admin/blogs/"+blogId+"/edit");
       }
+
+      const handleDetailClick = (blogId: number) => {
+        BlogService.getBlogById(blogId).then((res) => {
+          let blog = res.data;
+          dispatch(setCurrentBlogPost(blog));
+          nav(`/admin/blogs/${blogId}`);
+        });
+      }
+
       return (
         <>
           {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
@@ -176,9 +186,7 @@ export const getColumns = (): ColumnDef<Blog>[] => [
               )}>
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setShowDeleteItemDialog(true)}>
-                Delete
-              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => handleDetailClick(row.original.postId)}>Detail</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </>
