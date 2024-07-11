@@ -62,7 +62,6 @@ public class ItemController {
                                   @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
                                   @RequestParam(required = false) String order, @RequestParam(required = false) String status) {
         System.out.println("Pageable: " + pageable.toString());
-//        return itemService.getItems(pageable);
         if (order != null) {
             if (order.equals("desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
