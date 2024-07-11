@@ -181,14 +181,14 @@ export default function ItemsList() {
   //   setStatusFilter(filter);
   // }
 
-  const handleStatusFilterSelect = (...event: any) => {
-    console.log(event);
-    if (event[0] === "All") {
-      setSelectedStatus("");
-    } else {
-      setSelectedStatus(event[0]);
-    }
-  }
+  // const handleStatusFilterSelect = (...event: any) => {
+  //   console.log(event);
+  //   if (event[0] === "All") {
+  //     setSelectedStatus("");
+  //   } else {
+  //     setSelectedStatus(event[0]);
+  //   }
+  // }
   
   const handleFilterClick = (status: string) => {
     console.log(status);

@@ -15,11 +15,7 @@ interface GetAccountsSchema {
 }
 
 export const fetchAccountsService = async (input: GetAccountsSchema) => {
-  // let params = {
-  //   page: pageNumber,
-  //   size: pageSize,
-  //   Role: role ? role : "",
-  // }
+
   try {
     const {
       page,
@@ -61,6 +57,7 @@ export const fetchAccountsService = async (input: GetAccountsSchema) => {
     }
   };
 };
+
 export const fetchAccountsByName = async (pageNumber: number, pageSize: number, name: string) => {
   let params = {
     page: pageNumber,
