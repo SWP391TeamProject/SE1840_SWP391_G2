@@ -476,7 +476,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @Cacheable(key = "#pageable.pageNumber", value = "consignments")
+    @Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "consignments")
     public Page<ConsignmentDTO> getAllConsignments(Pageable pageable) {
         Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
