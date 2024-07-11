@@ -489,12 +489,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @Cacheable(key = "#status + #page + #size + #accID", value = "consignments")
-    public Page<ConsignmentDTO> getConsignmentsByStatus(String status, int page, int size, int accID) {
+    @Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort+ 'status:'+#status", value = "consignments")
+    public Page<ConsignmentDTO> getConsignmentsByStatus(String status, Pageable
+            pageable, int accID) {
         Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
-        Pageable pageable = PageRequest.of(page, size);
         if(Consignment.Status.WAITING_STAFF.equals(enumStatus)){
-            return getConsignmentDTOS(pageable,  consignmentRepos.findByStatus(enumStatus, pageable));
+            return consignmentRepos.findByStatus(enumStatus, pageable).map(this::getConsignmentDTO);
         }
         Account.Role role = accountRepos.findById(accID).orElseThrow(
                 ()-> new ResourceNotFoundException("Account not found")).getRole();
@@ -508,7 +508,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             }else{
                 return null;
             }
-            return getConsignmentDTOS(pageable, consignmentPage);
+            return consignmentPage.map(this::getConsignmentDTO);
         } catch (IllegalArgumentException e) {
             throw new ConsignmentServiceException("Invalid status value: " + status, e);
         }

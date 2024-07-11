@@ -76,8 +76,10 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
     } else {
       let params = {
         status: status,
-        pageNumb: page - 1,
-        pageSize: size ? size : 10,
+        page: page - 1,
+        size: size ? size : 10,
+        sort,
+        order: order,
       }
       console.log(params);
       return await axios
