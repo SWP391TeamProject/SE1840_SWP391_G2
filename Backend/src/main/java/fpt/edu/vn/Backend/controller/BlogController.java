@@ -66,6 +66,7 @@ public class BlogController {
         blogPostDTO.setCreateDate(blogCreateDTO.getCreateDate());
         blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
         blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
+        log.info("Create blog: " + blogPostDTO);
         blogPostDTO = blogService.createBlog(blogPostDTO);
 
         try {
@@ -75,6 +76,7 @@ public class BlogController {
                 }
             }
         } catch (Exception e) {
+            log.info("Error: " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(blogService.getBlogById(blogPostDTO.getPostId()), HttpStatus.OK);
@@ -93,7 +95,6 @@ public class BlogController {
         blogPostDTO.setContent(blogUpdateDTO.getContent());
         blogPostDTO.setUpdateDate(blogUpdateDTO.getUpdateDate());
         blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogUpdateDTO.getCategoryId()));
-        blogPostDTO = blogService.updateBlog(blogPostDTO);
         if (blogUpdateDTO.getDeletedFiles() != null && !blogUpdateDTO.getDeletedFiles().isEmpty()) {
             List<AttachmentDTO> attachments = blogPostDTO.getAttachments().stream().toList();
             for (AttachmentDTO attachmentDTO : attachments) {
@@ -122,6 +123,7 @@ public class BlogController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+        blogPostDTO = blogService.updateBlog(blogPostDTO);
         return new ResponseEntity<>(blogService.getBlogById(blogPostDTO.getPostId()), HttpStatus.OK);
     }
 

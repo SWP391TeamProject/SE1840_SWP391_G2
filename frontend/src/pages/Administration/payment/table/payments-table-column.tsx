@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from '@/components/data-tables/data-table-colum
 // Define the Transaction type based on the provided data structure
 type Transaction = {
   id: number;
-  amount: number;
+  paymentAmount: number;
   date: string;
   type: 'DEPOSIT' | 'AUCTION_DEPOSIT';
   status: 'SUCCESS' | 'PENDING' | 'FAILED';
@@ -23,24 +23,29 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: 'amount',
+    accessorKey: 'paymentAmount',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'));
+      const amount = parseFloat(row.getValue('paymentAmount'));
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
       }).format(amount);
       return <div className="font-medium">{formatted}</div>;
     },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
-    accessorKey: 'date',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+    accessorKey: 'createDate',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Create Date" />,
     cell: ({ row }) => {
-      const date = new Date(row.getValue('date'));
+      console.log(row.getValue('createDate'));
+      const date = new Date(row.getValue('createDate'));
       return <div>{date.toLocaleString()}</div>;
     },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: 'type',
@@ -78,11 +83,15 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     accessorKey: 'method',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Method" />,
     cell: ({ row }) => row.getValue('method') || 'N/A',
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: 'accountId',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Account ID" />,
     cell: ({ row }) => row.getValue('accountId'),
+    enableSorting: false,
+    enableHiding: false,
   },
 ];
 

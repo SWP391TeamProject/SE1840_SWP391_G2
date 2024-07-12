@@ -12,7 +12,7 @@ const baseUrl = API_SERVER + "/orders";
 export const getOrders = async (pageNumber: number, pageSize?: number, sort?: string, order?: string, status?: PaymentStatus) => {
     let params = {
         page: pageNumber,
-        size: pageSize,
+        size: pageSize | 10,
         sort: sort,
         order: order,
         status: status

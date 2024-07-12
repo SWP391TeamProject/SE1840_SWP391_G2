@@ -80,12 +80,12 @@ public class BidServiceImpl implements BidService {
             throw new IllegalArgumentException("Payment cannot be null");
         }
         paymentDTO.setType(Payment.Type.AUCTION_BID);
-        paymentDTO.setAmount(bid.getPayment().getAmount());
+        paymentDTO.setPaymentAmount(bid.getPayment().getPaymentAmount());
         paymentDTO.setAccountId(bid.getPayment().getAccountId());
         paymentDTO.setStatus(Payment.Status.PENDING);
         Payment newPayment = new Payment();
-        newPayment.setPaymentAmount(paymentDTO.getAmount());
-        newPayment.setCreateDate(paymentDTO.getDate());
+        newPayment.setPaymentAmount(paymentDTO.getPaymentAmount());
+        newPayment.setCreateDate(paymentDTO.getCreateDate());
         newPayment.setType(paymentDTO.getType());
         newPayment.setStatus(paymentDTO.getStatus());
         newPayment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).orElseThrow(
@@ -112,7 +112,7 @@ public class BidServiceImpl implements BidService {
         List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
         BidDTO result= new BidDTO();
         result.setPayment(new PaymentDTO());
-        result.getPayment().setAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
+        result.getPayment().setPaymentAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
         ).getItem().getReservePrice());
         if(bids.isEmpty()) return result;
@@ -171,7 +171,7 @@ public class BidServiceImpl implements BidService {
                     () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
             )));
             response.getAccount().setPassword(null);
-            response.setPrice(Double.parseDouble(bid.getPayment().getAmount().toString()));
+            response.setPrice(Double.parseDouble(bid.getPayment().getPaymentAmount().toString()));
             responses.add(response);
         }
         return responses;

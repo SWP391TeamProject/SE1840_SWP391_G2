@@ -6,7 +6,7 @@ import { type Table } from "@tanstack/react-table"
 
 import { exportTableToCSV } from "@/lib/export"
 import { Button } from "@/components/ui/button"
-import { DeleteAccountsDialog } from "./delete-accounts-dialog"
+import { DeleteBlogsDialog } from "./delete-blog-dialog"
 import { PlusIcon } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -17,7 +17,7 @@ interface TasksTableToolbarActionsProps {
   table: Table<Task>
 }
 
-export function ConsignmentsTableToolbarActions({
+export function BlogsTableToolbarActions({
   table,
 }: TasksTableToolbarActionsProps) {
     const nav = useNavigate()
@@ -25,7 +25,7 @@ export function ConsignmentsTableToolbarActions({
     <div className="flex items-center gap-2">
      
       {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteAccountsDialog
+        <DeleteBlogsDialog
           items={table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)}
@@ -45,7 +45,7 @@ export function ConsignmentsTableToolbarActions({
         <DownloadIcon className="mr-2 size-4" aria-hidden="true" />
         Export
       </Button>
-      {/* <Button
+      <Button
         variant="outline"
         size="sm"
         onClick={() =>
@@ -54,7 +54,7 @@ export function ConsignmentsTableToolbarActions({
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Create
-      </Button> */}
+      </Button>
       {/**
        * Other actions can be added here.
        * For example, import, view, etc.

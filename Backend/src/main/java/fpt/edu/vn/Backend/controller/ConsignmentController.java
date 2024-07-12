@@ -121,15 +121,15 @@ public class ConsignmentController {
     @GetMapping("/filter-by-status")
     public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByStatus(
             @RequestParam String status,
-            @RequestParam(defaultValue = "0") int pageNumb,
-            @RequestParam(defaultValue = "50") int pageSize,
+            @PageableDefault(size = 50) Pageable pageable,
             Authentication authentication) {
+        logger.info("Filtering consignments by status: " + pageable.toString());
         try {
             AccountDTO acc = accountService.getAccountByEmail(authentication.getName());
             if (acc == null) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageNumb, pageSize, acc.getAccountId());
+            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageable, acc.getAccountId());
             if (consignments == null || consignments.isEmpty()) {
                 throw new ConsignmentServiceException("No consignments found with status: " + status);
             }

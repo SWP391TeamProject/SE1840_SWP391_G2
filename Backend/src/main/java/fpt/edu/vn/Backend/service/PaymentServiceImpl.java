@@ -20,9 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -149,7 +147,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentDTO createPayment(PaymentDTO paymentDTO) {
         Payment payment = new Payment();
-        payment.setPaymentAmount(paymentDTO.getAmount());
+        payment.setPaymentAmount(paymentDTO.getPaymentAmount());
         payment.setCreateDate(LocalDateTime.now());
         payment.setType(paymentDTO.getType());
         payment.setStatus(paymentDTO.getStatus());
@@ -162,15 +160,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<PaymentDTO> getAllPayment(Pageable pageable, Payment.Type type, Payment.Status status) {
-        Page<Payment> payments = paymentRepos.findAll(pageable);
-        List<PaymentDTO> paymentList = payments.stream()
-                .filter(payment -> status == null || payment.getStatus() == status)
-                .filter(payment -> type == null || payment.getType() == type)
-                .map(PaymentDTO::new)
-                .collect(Collectors.toList());
-        return new PageImpl<>(paymentList);
+        Page<Payment> payments;
+        if (type != null) {
+            payments = paymentRepos.findAllByType(type, pageable);
+        } else if (status != null) {
+            payments = paymentRepos.findAllByStatus(status, pageable);
+        } else {
+            payments = paymentRepos.findAll(pageable);
+        }
+        return new PageImpl<>(payments.getContent().stream().map(PaymentDTO::new).collect(Collectors.toList()), pageable, payments.getTotalElements());
     }
-
 
 
     @Override

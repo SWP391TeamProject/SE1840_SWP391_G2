@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ReloadIcon, TrashIcon } from "@radix-ui/react-icons"
 import { type Row } from "@tanstack/react-table"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { updateItem } from "@/services/ItemService"
 
 
 interface DeleteTasksDialogProps
@@ -26,7 +25,7 @@ interface DeleteTasksDialogProps
   onSuccess?: () => void
 }
 
-export function DeleteItemsDialog({
+export function DeleteBlogsDialog({
     items,
   showTrigger = true,
   onSuccess,
@@ -61,16 +60,20 @@ export function DeleteItemsDialog({
             aria-label="Delete selected rows"
             variant="destructive"
             onClick={() => {
-              startDeleteTransition( () => {
+            //   startDeleteTransition(async () => {
+            //     const { error } = await deleteItem({
+            //       ids: items.map((task) => items.id),
+            //     })
 
+            //     if (error) {
+            //       toast.error(error)
+            //       return
+            //     }
 
-                  toast.error(items.length)
-                  return
-
-                // props.onOpenChange?.(false)
-                // toast.success("Tasks deleted")
-                // onSuccess?.()
-              })
+            //     props.onOpenChange?.(false)
+            //     toast.success("Tasks deleted")
+            //     onSuccess?.()
+            //   })
             }}
             disabled={isDeletePending}
           >

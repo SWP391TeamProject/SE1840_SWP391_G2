@@ -1,10 +1,7 @@
 package fpt.edu.vn.Backend.exporter;
 
 import fpt.edu.vn.Backend.DTO.BidDTO;
-import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -12,7 +9,6 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -76,7 +72,7 @@ public class BidExporter {
 
             createCell(row, columnCount++, bid.getBidId(), style);
             createCell(row, columnCount++, bid.getPayment().getStatus().toString(), style);
-            createCell(row, columnCount++, bid.getPayment().getAmount().toString(), style);
+            createCell(row, columnCount++, bid.getPayment().getPaymentAmount().toString(), style);
             createCell(row, columnCount++, bid.getAuctionItemId().getAuctionSessionId().toString(), style);
             createCell(row, columnCount++, bid.getAuctionItemId().getItemId().toString(), style);
             createCell(row, columnCount++, bid.getPayment().getAccountId(), style);

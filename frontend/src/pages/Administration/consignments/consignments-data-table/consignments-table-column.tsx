@@ -15,22 +15,23 @@ import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { AccountStatus } from "@/constants/enums"
 import { formatDate } from "@/lib/utils"
+import Consignment from "@/models/consignment"
 
 // Define the JewelryItem type based on the provided JSON structure
-type Consignment = {
-  consignmentId: number
-  preferContact: string
-  staff: {
-    accountId: number
-    email: string
-    nickname: string
-    phone: string
-    role: string
-  }
-  createDate: string
-  status: string
-  updateDate: Date
-}
+// type Consignment = {
+//   consignmentId: number
+//   preferContact: string
+//   staff: {
+//     accountId: number
+//     email: string
+//     nickname: string
+//     phone: string
+//     role: string
+//   }
+//   createDate: string
+//   status: string
+//   updateDate: Date
+// }
 
 export const getColumns = (): ColumnDef<Consignment>[] => [
   {
@@ -87,15 +88,18 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
     cell: ({ row }) => row.original.staff?.nickname ? row.original.staff.nickname : "",
   },
   {
-    accessorKey: "staff.phone",
+    accessorKey: "requester",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone" />
+      <DataTableColumnHeader column={column} title="Requester Name" />
+      
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        {row.original.staff?.nickname ? row.original.staff.nickname : ""}
+        {row.original.consignmentDetails[0].account.nickname ? row.original.consignmentDetails[0].account.nickname : ""}
       </div>
-    ),
+    ),    
+    enableSorting: false,
+
   },
   {
     accessorKey: "status",
