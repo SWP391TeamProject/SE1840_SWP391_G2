@@ -1,17 +1,18 @@
 import * as React from "react";
 
 import { useDataTable } from "@/hooks/use-data-table";
-import getColumns from "./payments-table-column";
 import { DataTable } from "@/components/data-tables/data-table";
-import { PaymentsTableFloatingBar } from "./payments-table-floating-bar";
 import { DataTableToolbar } from "@/components/data-tables/data-table-toolbar";
-import { PaymentsTableToolbarActions } from "./payments-table-toolbar-actions";
-import { getPayments } from "@/services/PaymentsService";
-interface PaymentTableProps {
-    paymentPromise: ReturnType<typeof getPayments>;
+import { DataTableFilterField } from "@/types";
+import getColumns from "./order-table-column";
+import { OrdersTableFloatingBar } from "./order-table-floating-bar";
+import { OrdersTableToolbarActions } from "./order-table-toolbar-actions";
+import { getOrders } from "@/services/OrderService";
+interface OrderTableProps {
+    orderPromise: ReturnType<typeof getOrders>;
 }
 
-export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
+export function OrdersTable({ orderPromise }: OrderTableProps) {
     const [data, setData] = React.useState([]);
     const [pageCount, setPageCount] = React.useState(0);
 
@@ -20,9 +21,9 @@ export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
 
     React.useEffect(() => {
         const fetchData = async () => {
-            if (paymentPromise) {
-                const content = (await paymentPromise).content;
-                const totalPages = (await paymentPromise).totalPages;
+            if (orderPromise) {
+                const content = (await orderPromise).data.content;
+                const totalPages = (await orderPromise).data.totalPages;
                 setData(content);
                 setPageCount(totalPages);
                 console.log(content);
@@ -30,7 +31,7 @@ export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
             }
         };
         fetchData();
-    }, [paymentPromise]);
+    }, [orderPromise]);
 
     const { table } = useDataTable({
         data,
@@ -43,12 +44,12 @@ export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
         <DataTable
             table={table}
             floatingBar={
-                <PaymentsTableFloatingBar table={table} />
+                <OrdersTableFloatingBar table={table} />
             }
-                    >
-        <DataTableToolbar table={table} >
-          <PaymentsTableToolbarActions table={table} />
-        </DataTableToolbar>
+        >
+            <DataTableToolbar table={table}>
+                <OrdersTableToolbarActions table={table} />
+            </DataTableToolbar>
         </DataTable >
     );
 }
