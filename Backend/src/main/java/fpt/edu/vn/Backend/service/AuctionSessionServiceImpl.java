@@ -207,7 +207,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             } else {
                 deposit.getPayment().setStatus(Payment.Status.FAILED);
                 accountRepos.findById(deposit.getPayment().getAccountId()).ifPresent(account -> {
-                    account.setBalance(account.getBalance().add(deposit.getPayment().getAmount()));
+                    account.setBalance(account.getBalance().add(deposit.getPayment().getPaymentAmount()));
                     accountRepos.save(account);
                     logger.info("Refunded deposit id {} for account {}", deposit.getDepositId(), account.getAccountId());
                 });
@@ -254,7 +254,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         for (DepositDTO deposit : auctionDTO.getDeposits()) {
             deposit.getPayment().setStatus(Payment.Status.FAILED);
             accountRepos.findById(deposit.getPayment().getAccountId()).ifPresent(account -> {
-                account.setBalance(account.getBalance().add(deposit.getPayment().getAmount()));
+                account.setBalance(account.getBalance().add(deposit.getPayment().getPaymentAmount()));
                 accountRepos.save(account);
                 logger.info("Refunding deposit for account " + account.getAccountId());
             });
@@ -364,7 +364,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
 
-    @Cacheable(key = "'past'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
+    @Cacheable(key = "'past'+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
@@ -374,7 +374,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return auctionSessions.map(AuctionSessionDTO::new);
     }
 
-    @Cacheable(key = "'past'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
+    @Cacheable(key = "'past'+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
         Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
@@ -388,7 +388,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable+#title", value = "auctionSession")
+    @Cacheable(key = "#pageable.toString()+#title", value = "auctionSession")
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
         Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
@@ -399,7 +399,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return a;
     }
 
-    @Cacheable(key = "'upcoming'+#pageable != null ? #pageable : 'default'", value = "auctionSession")
+    @Cacheable(key = "'upcoming'+#pageable.toString() != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
         Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);

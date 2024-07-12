@@ -14,24 +14,20 @@ import java.time.LocalDateTime;
 @ToString
 public class PaymentDTO implements Serializable {
     private int id;
-    private BigDecimal amount;
-    private LocalDateTime date;
+    private BigDecimal paymentAmount;
+    private LocalDateTime createDate;
     private Payment.Type type;
     private Payment.Status status;
     private Payment.Method method;
     private int accountId;
-
-
     public PaymentDTO(Payment payment) {
         if (payment == null) return;
         this.id = payment.getPaymentId();
-        this.amount = payment.getPaymentAmount();
-        this.date = payment.getCreateDate();
+        this.paymentAmount = payment.getPaymentAmount();
+        this.createDate = payment.getCreateDate();
         this.type = payment.getType();
         this.status = payment.getStatus();
         this.method = payment.getMethod();
-        this.accountId = payment.getAccount().getAccountId();
+        this.accountId = payment.getAccount().getAccountId()    ;
     }
-
-
 }
