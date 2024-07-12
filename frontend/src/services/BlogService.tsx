@@ -1,9 +1,74 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import { getCookie } from '@/utils/cookies';
+import { getCookie, removeCookie } from '@/utils/cookies';
 import axios from 'axios';
+
+
+interface GetBlogsSchema {
+    page: number;
+    size: number;
+    sort?: string;
+    order?: 'asc' | 'desc';
+    status?: string;
+    categoryId?: number
+}
 
 class BlogService {
     private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blogs`;
+
+
+    public static getBlogs = async (input: GetBlogsSchema) => {
+
+        try {
+            const {
+                page,
+                size,
+                sort,
+                order,
+                categoryId,
+            } = input;
+            let response;
+
+            if (categoryId > -1) {
+                let params = {
+                    page: page - 1 || 0,
+                    size: size || 10,
+                    sort,
+                    order,
+                }
+                response = await axios.get(`${this.BASE_URL}/category?categoryId=${categoryId}`,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        params: params
+                    }
+                );
+            } else {
+                let params: Record<string, any> = {
+                    page: page - 1, // Spring Boot uses 0-based page index
+                    size: size ? size : 10,
+                    sort,
+                    order,
+                };
+    
+                response = await axios.get(`${this.BASE_URL}/`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    params: params
+                });
+            }
+            // Prepare query parameters
+            return response.data;
+        }
+        catch (err) {
+            console.log(err);
+            if (err?.response.status == 401) {
+                removeCookie("user");
+                removeCookie("token");
+            }
+        };
+    };
 
     public static getAllBlogs(page?: number, size?: number) {
         let params = {
