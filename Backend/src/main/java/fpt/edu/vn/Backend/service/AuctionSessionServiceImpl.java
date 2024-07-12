@@ -1,6 +1,9 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
@@ -361,6 +364,28 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.error("Error processing auction session id: " + id, e);
             throw new ResourceNotFoundException("Error processing auction session", e);
         }
+    }
+
+    @Override
+    public void updateAuctionSessionByStatus(UpdateStatusAuctionSessionRequestDTO request) {
+
+            for (Integer auctionSessionId : request.getAuctionSessionId()) {
+                try {
+                    Optional<AuctionSession> auctionSession = auctionSessionRepos.findById(auctionSessionId);
+                    AuctionSession auction = auctionSession.get();
+                    if (auction != null) {
+                        auction.setStatus(AuctionSession.Status.valueOf(request.getStatus().toUpperCase()));
+                        auctionSessionRepos.save(auction);
+                    } else {
+                        throw new ResourceNotFoundException("Auction not found with ID: " + auctionSessionId);
+                    }
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+                } catch (Exception e) {
+                    throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + auctionSessionId);
+                }
+            }
+
     }
 
 

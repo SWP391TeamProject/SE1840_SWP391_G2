@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
@@ -186,6 +187,10 @@ public class AuctionSessionController {
         auctionSessionService.terminateAuction(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updateAuctionSessionByStatus(@RequestBody(required = false) UpdateStatusAuctionSessionRequestDTO auctionSessionDTOList) {
+        auctionSessionService.updateAuctionSessionByStatus(auctionSessionDTOList);
+        return ResponseEntity.ok().build();
+    }
 
 }

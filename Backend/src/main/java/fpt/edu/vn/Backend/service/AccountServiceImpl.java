@@ -5,9 +5,12 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateAccountStatusRequestDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import jakarta.mail.MessagingException;
@@ -33,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -92,6 +96,26 @@ public class AccountServiceImpl implements AccountService {
                 account.setBalance(accountDTO.getBalance());
         }
         return account;
+    }
+
+    @Override
+    public void updateAccountByStatus(UpdateAccountStatusRequestDTO request) {
+        for (Integer accountId : request.getAccountId()) {
+            try {
+                Optional<Account> account = accountRepos.findById(accountId);
+                Account accounts = account.get();
+                if (accounts != null) {
+                    accounts.setStatus(Account.Status.valueOf(request.getStatus().toUpperCase()));
+                    accountRepos.save(accounts);
+                } else {
+                    throw new ResourceNotFoundException("Auction not found with ID: " + accountId);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + accountId);
+            }
+        }
     }
 
     @Override

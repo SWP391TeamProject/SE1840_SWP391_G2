@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -469,6 +470,25 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
+    public void updateConsignmentByStatus(UpdateConsignmentStatusRequestDTO consignmentDTO) {
+        for (Integer consignmentId : consignmentDTO.getConsignmentId()) {
+            try {
+                Consignment consignments = consignmentRepos.findByConsignmentId(consignmentId);
+                if (consignments != null) {
+                    consignments.setStatus(Consignment.Status.valueOf(consignmentDTO.getStatus().toUpperCase()));
+                    consignmentRepos.save(consignments);
+                } else {
+                    throw new ResourceNotFoundException("Consignment not found with ID: " + consignmentId);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + consignmentDTO.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating consignment with ID: " + consignmentId);
+            }
+        }
+    }
+
+    @Override
     public ConsignmentDTO getConsignmentById(int id) {
 
 
@@ -591,4 +611,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             throw new ConsignmentServiceException("Consignment is not in SENDING status");
         }
     }
+
+
+
 }

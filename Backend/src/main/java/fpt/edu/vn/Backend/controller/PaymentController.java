@@ -4,6 +4,8 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentCaptureRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
+import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdatePaymentStatusRequestDTO;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Payment;
@@ -118,5 +120,9 @@ public class PaymentController {
             return -1;
         }
     }
-
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updatePaymentStatus(@RequestBody(required = false) UpdatePaymentStatusRequestDTO paymentDTOList) {
+        paymentService.updatePaymentByStatus(paymentDTOList);
+        return ResponseEntity.ok().build();
+    }
 }

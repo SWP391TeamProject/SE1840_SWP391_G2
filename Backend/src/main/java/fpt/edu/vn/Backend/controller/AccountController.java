@@ -5,6 +5,8 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateAccountStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.exporter.BidExporter;
@@ -191,6 +193,12 @@ public class AccountController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(stream.toByteArray());
+    }
+
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updateAccountByStatus(@RequestBody(required = false) UpdateAccountStatusRequestDTO accountDTOList) {
+        accountService.updateAccountByStatus(accountDTOList);
+        return ResponseEntity.ok().build();
     }
 
 }
