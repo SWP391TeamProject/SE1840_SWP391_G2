@@ -15,6 +15,7 @@ import { DataTableColumnHeader } from "@/components/data-tables/data-table-colum
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { setCurrentItem } from "@/redux/reducers/Items"
+import { DeleteItemsDialog } from "./delete-items-dialog"
 
 // Define the JewelryItem type based on the provided JSON structure
 export type JewelryItem = {
@@ -152,6 +153,13 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
       return (
         <>
           {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
+          <DeleteItemsDialog
+              open={showDeleteItemDialog}
+              onOpenChange={setShowDeleteItemDialog}
+              items={[row.original]}
+              showTrigger={false}
+              onSuccess={() => row.toggleSelected(false)}
+            />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

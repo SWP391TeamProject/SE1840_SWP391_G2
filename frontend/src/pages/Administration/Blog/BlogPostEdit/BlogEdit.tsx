@@ -1,5 +1,5 @@
-import { useAppSelector } from "@/redux/hooks";
-import { useLayoutEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
@@ -19,6 +19,7 @@ import { getCookie } from "@/utils/cookies";
 import BlogDetail from "./BlogDetail";
 import BlogImageGallery from "./BlogImageGallery";
 import BlogCategory from "./BlogCategory";
+import { setCurrentBlogPost } from "@/redux/reducers/Blogs";
 
 const formSchema = z.object({
   categoryId: z.any({
@@ -47,13 +48,14 @@ export default function BlogEdit() {
   const [currentBlog, setCurrentBlog] = useState<BlogPost | null>(null);
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
     },
   })
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!blog) {
       BlogService.getBlogById(parseInt(id)).then((res) => {
         blog = res.data;
@@ -90,12 +92,25 @@ export default function BlogEdit() {
     // ✅ This will be type-safe and validated.
     console.log(values);
     BlogService.updateBlog(blog?.postId || parseInt(id), values).then((res) => {
-
+      console.log(form);
       console.log(res)
       setCurrentBlog(res.data);
+      dispatch(setCurrentBlogPost(res.data));
       toast.success('Blog updated successfully!', {
         position: "bottom-right",
       });
+      form.reset({
+        categoryId: res.data.category?.blogCategoryId,
+        userId: JSON.parse(getCookie('user'))?.id || 0,
+        title: res.data.title,
+        content: res.data.content,
+        files: [],
+        deletedFiles: [],
+      })
+
+      values = form.getValues();
+      console.log(form);
+      console.log(values);
       setIsLoading(false);
     }).catch((err) => {
       setIsLoading(false);
@@ -110,7 +125,6 @@ export default function BlogEdit() {
         position: "bottom-right",
       });
     })
-
   }
 
   return (
