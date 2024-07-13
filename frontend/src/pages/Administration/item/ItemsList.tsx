@@ -93,9 +93,10 @@ export default function ItemsList() {
   let pageNumber = url.searchParams.get("page");
   let sort = url.searchParams.get("sort");
   let pageSize = url.searchParams.get("per_page");
+  const [itemPromise, setItemPromise] = useState<Promise<any>>();
 
   const currency = useCurrency();
-  const itemPromise = getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: seletedStatus});
+  // const itemPromise = getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: seletedStatus});
 
   const fetchItems = async (pageNumber: number, status?: ItemStatus) => {
     try {
@@ -133,23 +134,23 @@ export default function ItemsList() {
     navigate(`/admin/items/${itemId}`);
   }
 
-  const handlePageSelect = (pageNumber: number) => {
-    if (statusFilter === "all") {
-      fetchItems(pageNumber);
-    } else {
-      fetchItems(pageNumber, statusFilter as ItemStatus);
-    }
-  }
+  // const handlePageSelect = (pageNumber: number) => {
+  //   if (statusFilter === "all") {
+  //     fetchItems(pageNumber);
+  //   } else {
+  //     fetchItems(pageNumber, statusFilter as ItemStatus);
+  //   }
+  // }
 
-  const handleCreateClick = () => {
+  // const handleCreateClick = () => {
     // let item = itemsList.value.find(item => item.itemId == itemId);
     // console.log(item);
     // // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
     // dispatch(setCurrentItem(item));
-    navigate("/admin/items/create");
-  }
+  //   navigate("/admin/items/create");
+  // }
 
-  const handleSuspendClick = (itemId: number) => {
+  // const handleSuspendClick = (itemId: number) => {
     // console.log(item);
     // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
     // dispatch(setCurrentItem(item));
@@ -157,7 +158,7 @@ export default function ItemsList() {
     // deleteItemsetCurrentItemService(itemId.toString()).then((res) => {
     //   console.log(res);
     // })
-  }
+  // }
 
   // const handleFilterClick = (status: ItemStatus[], filter: any) => {
   //   console.log(filter);
@@ -192,9 +193,11 @@ export default function ItemsList() {
   
   const handleFilterClick = (status: string) => {
     console.log(status);
-    if (status === "All") {
+    if (status === "") {
+      setItemPromise(getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: status}));
       setSelectedStatus("");
     } else {
+      setItemPromise(getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: status}));
       setSelectedStatus(status);
     }
   }
@@ -202,7 +205,12 @@ export default function ItemsList() {
   useEffect(() => { }, [itemsList]);
 
   useEffect(() => {
-    fetchItems(itemsList.currentPageNumber);
+    if(Number.parseInt(pageNumber) >= 1)
+    setItemPromise(getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: seletedStatus}));
+  }, [pageSize, pageNumber, sort])
+
+  useEffect(() => {
+    // fetchItems(itemsList.currentPageNumber);
     setStatusFilter("all");
   }, []);
 
@@ -227,9 +235,10 @@ export default function ItemsList() {
             </Button>
           </div> */}
         </div>
-        <TabsContent value={statusFilter} className="max-w-screen">
-          {isLoading ? <LoadingAnimation />
-            : <Card  className="max-w-screen-2xl">
+        <TabsContent value="all" className="max-w-screen">
+          {/* {isLoading ? <LoadingAnimation />
+            :  */}
+            <Card  className="max-w-screen-2xl">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   Items
@@ -363,7 +372,7 @@ export default function ItemsList() {
                     <DropdownMenuContent align="start">
                       <DropdownMenuLabel>Status</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem className='w-9/12' checked={seletedStatus == ''} onClick={() => handleFilterClick('All')}>
+                      <DropdownMenuCheckboxItem className='w-9/12' checked={seletedStatus == ''} onClick={() => handleFilterClick('')}>
                         All
                       </DropdownMenuCheckboxItem>
 
@@ -385,7 +394,7 @@ export default function ItemsList() {
                                     </div> */}
               </CardFooter>
             </Card>
-          }
+          {/* } */}
 
         </TabsContent>
 
