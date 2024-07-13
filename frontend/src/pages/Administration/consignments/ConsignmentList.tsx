@@ -48,14 +48,15 @@ export default function ConsignmentList() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState("all");
-    const [selectedStatus, setSelectedStatus] = useState("All");
+    const [selectedStatus, setSelectedStatus] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const url = new URL(window.location.href);
     let pageNumber = url.searchParams.get("page");
     let sort = url.searchParams.get("sort");
     let pageSize = url.searchParams.get("per_page");
+    const [consignmentPromise, setConsignmentPromise] = useState<Promise<any>>();
 
-    const consignmentPromise = getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: selectedStatus});
+    // const consignmentPromise = getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: selectedStatus});
 
     const fetchConsignments = async (pageNumber: number, status?: ConsignmentStatus) => {
         try {
@@ -133,13 +134,19 @@ export default function ConsignmentList() {
 
     const handleFilterClick = (status: string) => {
         if (status !== selectedStatus) {
+            setConsignmentPromise(getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: status}));
             setSelectedStatus(status);
         }
     }
 
     useEffect(() => {
-        fetchConsignments(consignmentsList.currentPageNumber);
-        dispatch(setCurrentPageList(consignmentsList.value));
+        if(Number.parseInt(pageNumber) >= 1)
+            setConsignmentPromise(getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: selectedStatus}));
+      }, [pageSize, pageNumber, sort])
+
+    useEffect(() => {
+        // fetchConsignments(consignmentsList.currentPageNumber);
+        // dispatch(setCurrentPageList(consignmentsList.value));
         setStatusFilter("all");
     }, []);
 
@@ -189,9 +196,10 @@ export default function ConsignmentList() {
                     </div>
                 </div>
                 <TabsContent value={statusFilter}>
-                    {isLoading ?
+                    {/* {isLoading ?
                         <LoadingAnimation />
-                        : <Card x-chunk="dashboard-06-chunk-0">
+                        :  */}
+                        <Card x-chunk="dashboard-06-chunk-0">
                             <CardHeader>
                                 <CardTitle className="flex justify-between items-center">
                                     Consignments
@@ -338,7 +346,7 @@ export default function ConsignmentList() {
                                         <DropdownMenuContent align="start">
                                             <DropdownMenuLabel>Status</DropdownMenuLabel>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuCheckboxItem className='w-9/12' checked={selectedStatus == ''} onClick={() => handleFilterClick('All')}>
+                                            <DropdownMenuCheckboxItem className='w-9/12' checked={selectedStatus == ''} onClick={() => handleFilterClick('')}>
                                                 All
                                             </DropdownMenuCheckboxItem>
 
@@ -360,7 +368,7 @@ export default function ConsignmentList() {
                                     </div> */}
                             </CardFooter>
                         </Card>
-                    }
+                    {/* } */}
                 </TabsContent>
             </Tabs>
             {/* {consignmentsList.value.map((consignment) => (
