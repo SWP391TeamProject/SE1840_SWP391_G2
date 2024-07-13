@@ -54,74 +54,75 @@ export default function AuctionSessionList() {
   let pageNumber = url.searchParams.get("page");
   let pageSize = url.searchParams.get("per_page");
   const auctionStates = ["Upcoming", "Past", "Active"];
+  const [auctionSessionPromise, setAuctionSessionPromise] = useState<Promise<any>>();
 
-  const auctionSessionPromise = getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter});
+  // const auctionSessionPromise = getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter});
 
-  const fetchAuctionSessions = async (pageNumber: number, filter?: string) => {
-    try {
-      let res;
-      setIsLoading(true);
-      if (search && search?.length > 0) {
-        res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
-      } else {
-        switch (filter) {
-          case "upcoming":
-            res = await fetchUpcomingAuctionSessions(pageNumber, 10);
-            break;
-          case "past":
-            res = await fetchPastAuctionSessions(pageNumber, 10);
-            break;
-          case "live":
-            res = await fetchActiveAuctionSessions(pageNumber, 10);
-            break;
-          default:
-            res = await fetchAllAuctionSessions(pageNumber, 10);
-        }
-      }
+  // const fetchAuctionSessions = async (pageNumber: number, filter?: string) => {
+  //   try {
+  //     let res;
+  //     setIsLoading(true);
+  //     if (search && search?.length > 0) {
+  //       res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
+  //     } else {
+  //       switch (filter) {
+  //         case "upcoming":
+  //           res = await fetchUpcomingAuctionSessions(pageNumber, 10);
+  //           break;
+  //         case "past":
+  //           res = await fetchPastAuctionSessions(pageNumber, 10);
+  //           break;
+  //         case "live":
+  //           res = await fetchActiveAuctionSessions(pageNumber, 10);
+  //           break;
+  //         default:
+  //           res = await fetchAllAuctionSessions(pageNumber, 10);
+  //       }
+  //     }
 
-      if (res) {
-        console.log(res?.data.content);
-        // dispatch(setAuctionSessions(list.data.content));
-        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-        let paging: any = {
-          pageNumber: res.data.number,
-          totalPages: res.data.totalPages
-        }
-        dispatch(setCurrentPageNumber(paging));
-        setIsLoading(false);
-      }
+  //     if (res) {
+  //       console.log(res?.data.content);
+  //       // dispatch(setAuctionSessions(list.data.content));
+  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+  //       let paging: any = {
+  //         pageNumber: res.data.number,
+  //         totalPages: res.data.totalPages
+  //       }
+  //       dispatch(setCurrentPageNumber(paging));
+  //       setIsLoading(false);
+  //     }
 
-    } catch (error) {
-      console.log(error);
-      setIsLoading(false);
-    }
-  };
+  //   } catch (error) {
+  //     console.log(error);
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  const handleAssignAuctionItemClick = (auctionSessionId: number) => {
-    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
-    console.log(auctionSession);
+  // const handleAssignAuctionItemClick = (auctionSessionId: number) => {
+  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+  //   console.log(auctionSession);
     // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
-    dispatch(setCurrentAuctionSession(auctionSession));
-    navigate(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
-  }
+  //   dispatch(setCurrentAuctionSession(auctionSession));
+  //   navigate(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
+  // }
 
-  const handleEditClick = (auctionSessionId: number) => {
-    let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
-    console.log(auctionSession);
+  // const handleEditClick = (auctionSessionId: number) => {
+  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+  //   console.log(auctionSession);
     // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
-    dispatch(setCurrentAuctionSession(auctionSession));
-    navigate("/admin/auctionSessions/edit");
-  }
+  //   dispatch(setCurrentAuctionSession(auctionSession));
+  //   navigate("/admin/auctionSessions/edit");
+  // }
 
-  const handleCreateClick = () => {
+  // const handleCreateClick = () => {
     // let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
     // console.log(auctionSession);
     // // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
     // dispatch(setCurrentAuctionSession(auctionSession));
-    navigate("/admin/auction-sessions/create");
-  }
+  //   navigate("/admin/auction-sessions/create");
+  // }
 
-  const handleSuspendClick = (auctionSessionId: number) => {
+  // const handleSuspendClick = (auctionSessionId: number) => {
     // console.log(auctionSession);
     // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
     // dispatch(setCurrentAuctionSession(auctionSession));
@@ -129,7 +130,7 @@ export default function AuctionSessionList() {
     // deleteAuctionSessionService(auctionSessionId.toString()).then((res) => {
     //   console.log(res);
     // })
-  }
+  // }
   // const handleDetailClick = (auctionSessionId: number) => {
   //   console.log(auctionSessionId);
 
@@ -184,14 +185,25 @@ export default function AuctionSessionList() {
       //     auctionSessionPromise = getAllAuction({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize)});
       //     break;
       // }
-      setStatusFilter(filter);
+      if(filter === "All"){
+        setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: "" }));
+        setStatusFilter("");
+      } else {
+        setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: filter }));
+        setStatusFilter(filter);
+      }
     }    
   }
 
-  useEffect(() => { }, [auctionSessionsList]);
+  // useEffect(() => { }, [auctionSessionsList]);
 
   useEffect(() => {
-    fetchAuctionSessions(0);
+    if (Number.parseInt(pageNumber) >= 1)
+      setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter }));
+  }, [pageSize, pageNumber])
+
+  useEffect(() => {
+    // fetchAuctionSessions(0);
     // setStatusFilter("all");
   }, []);
 
@@ -240,9 +252,10 @@ export default function AuctionSessionList() {
           </div>
         </div> */}
         <TabsContent value="All">
-          {isLoading
+          {/* {isLoading
             ? <LoadingAnimation />
-            : <Card x-chunk="dashboard-06-chunk-0">
+            :  */}
+            <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   AuctionSessions
@@ -367,7 +380,7 @@ export default function AuctionSessionList() {
                     <DropdownMenuContent align="start">
                       <DropdownMenuLabel>Status</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem className='w-9/12' checked={statusFilter == 'All'} onClick={() => handleFilterClick('All')}>
+                      <DropdownMenuCheckboxItem className='w-9/12' checked={statusFilter == ''} onClick={() => handleFilterClick('')}>
                         All
                       </DropdownMenuCheckboxItem>
 
@@ -388,7 +401,7 @@ export default function AuctionSessionList() {
                                     </div> */}
               </CardFooter>
             </Card>
-          }
+          {/* } */}
         </TabsContent>
       </Tabs>
       {/* {auctionSessionsList.value.map((auctionSession) => (

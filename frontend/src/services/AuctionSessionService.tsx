@@ -62,7 +62,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
         switch (status) {
             case "Upcoming": {
                 let params = {
-                    pageNumb: page,
+                    pageNumb: page - 1,
                     pageSize: size ? size : 10,
                 }
 
