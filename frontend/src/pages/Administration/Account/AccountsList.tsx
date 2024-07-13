@@ -54,6 +54,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Account } from "@/models/AccountModel";
+import { Page } from "@/models/Page";
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
@@ -68,38 +70,39 @@ export default function AccountsList() {
   let pageNumber = url.searchParams.get("page");
   let sort = url.searchParams.get("sort");
   let pageSize = url.searchParams.get("per_page");
+  const [accountPromise, setAccountPromise] = useState<Promise<Page<Account>>>();
 
-  const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole});
+  // const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""});
 
-  const fetchAccounts = async (pageNumber: number, role?: Roles) => {
-    try {
-      setIsLoading(true);
-      console.log(role);
-      let res;
-      if (search && search?.length > 0) {
-        res = await fetchAccountsByName(pageNumber, 5, search);
-      }
-      else if (role != undefined) {
-        res = await fetchAccountsService(pageNumber, 5, role);
-      }
-      else {
-        res = await fetchAccountsService(pageNumber, 5);
-      }
-      if (res) {
-        console.log(res);
-        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-        let paging: any = {
-          pageNumber: res.data.number,
-          totalPages: res.data.totalPages
-        }
-        dispatch(setCurrentPageNumber(paging));
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
+  // const fetchAccounts = async (pageNumber: number, role?: Roles) => {
+  //   try {
+  //     setIsLoading(true);
+  //     console.log(role);
+  //     let res;
+  //     if (search && search?.length > 0) {
+  //       res = await fetchAccountsByName(pageNumber, 5, search);
+  //     }
+  //     else if (role != undefined) {
+  //       res = await fetchAccountsService(pageNumber, 5, role);
+  //     }
+  //     else {
+  //       res = await fetchAccountsService(pageNumber, 5);
+  //     }
+  //     if (res) {
+  //       console.log(res);
+  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+  //       let paging: any = {
+  //         pageNumber: res.data.number,
+  //         totalPages: res.data.totalPages
+  //       }
+  //       dispatch(setCurrentPageNumber(paging));
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.log(error);
+  //   }
+  // };
 
 
 
@@ -160,10 +163,14 @@ export default function AccountsList() {
   // }
 
   const handleFilterClick = (role: string) => {
-    if (role === "All") {
-      setSelectedRole("");
-    } else {
-      setSelectedRole(role);
+    if(role !== seletedRole){
+      if (role === "All") {
+        setSelectedRole("");
+        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""}));
+      } else {
+        setSelectedRole(role);
+        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: role}));
+      }
     }
   }
 
@@ -175,24 +182,32 @@ export default function AccountsList() {
   //   }
   // }
 
-  useEffect(() => { }, [accountsList.currentPageList]);
-
-  const handlePageSelect = (pageNumber: number) => {
-    fetchAccounts(pageNumber, accountsList.filter);
-  }
+  // const handlePageSelect = (pageNumber: number) => {
+  //   fetchAccounts(pageNumber, accountsList.filter);
+  // }
 
   useEffect(() => {
-    fetchAccounts(accountsList.currentPageNumber);
+    
+  }, [seletedRole]);
+
+  useEffect(() => {
+    // fetchAccounts(accountsList.currentPageNumber);
     // data.then((data) => {
     //   dispatch(setCurrentPageList(data.content));
     // })
     setRoleFilter("all");
-
+    // setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""}));
   }, []);
-  useEffect(() => {
-    fetchAccounts(accountsList.currentPageNumber);
-    setRoleFilter("all");
 
+  useEffect(() => {
+    if(Number.parseInt(pageNumber) >= 1)
+    setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole}));
+  }, [pageSize, pageNumber, sort])
+  
+  useEffect(() => {
+    // fetchAccounts(accountsList.currentPageNumber);
+    setRoleFilter("all");
+    
   }, [reload]);
 
   return (
@@ -241,9 +256,10 @@ export default function AccountsList() {
           </div>
         </div>
         <TabsContent value={roleFilter}>
-          {isLoading ?
+          {/* {isLoading ?
             <LoadingAnimation />
-            : <Card x-chunk="dashboard-06-chunk-0">
+            :  */}
+            <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader >
 
                 <CardTitle className="flex justify-between items-center">
@@ -403,7 +419,8 @@ export default function AccountsList() {
                                         products
                                     </div> */}
               </CardFooter>
-            </Card>}
+            </Card>
+            {/* } */}
 
         </TabsContent>
       </Tabs>
