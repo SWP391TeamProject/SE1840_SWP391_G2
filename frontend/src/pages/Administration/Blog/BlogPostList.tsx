@@ -32,77 +32,78 @@ export const BlogPostList = () => {
   let pageNumber = url.searchParams.get("page");
   let sort = url.searchParams.get("sort");
   let pageSize = url.searchParams.get("per_page");
+  const [blogPromise, setBlogPromise] = useState<Promise<any>>();
 
-  const accountPromise = BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory});
+  // const blogPromise = BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory});
 
-  const fetchBlogs = async (pageNumber: number, categoryId?: number) => {
-    try {
-      setIsLoading(true);
-      let res
+  // const fetchBlogs = async (pageNumber: number, categoryId?: number) => {
+  //   try {
+  //     setIsLoading(true);
+  //     let res
       
-      if(categoryId){
-        res = await BlogService.getBlogByCategory(categoryId, pageNumber, 5);
-      } else {
-        res = await BlogService.getAllBlogs(pageNumber, 5);
-      }
-      if (res) {
-        console.log(res);
+  //     if(categoryId){
+  //       res = await BlogService.getBlogByCategory(categoryId, pageNumber, 5);
+  //     } else {
+  //       res = await BlogService.getAllBlogs(pageNumber, 5);
+  //     }
+  //     if (res) {
+  //       console.log(res);
 
-        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-        let paging: any = {
-          pageNumber: res.data.number,
-          totalPages: res.data.totalPages
-        }
-        dispatch(setCurrentPageNumber(paging));
-        setIsLoading(false);
-      }
+  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+  //       let paging: any = {
+  //         pageNumber: res.data.number,
+  //         totalPages: res.data.totalPages
+  //       }
+  //       dispatch(setCurrentPageNumber(paging));
+  //       setIsLoading(false);
+  //     }
 
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.log(error);
+  //   }
+  // };
 
-  const handlePageSelect = (pageNumber: number) => {
-    let category = categories.find(category => category.name === filtered);
-    fetchBlogs(pageNumber, category?.blogCategoryId);
-  }
+  // const handlePageSelect = (pageNumber: number) => {
+  //   let category = categories.find(category => category.name === filtered);
+  //   fetchBlogs(pageNumber, category?.blogCategoryId);
+  // }
 
-  const handleEditClick = (blogId: number) => {
-    let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
+  // const handleEditClick = (blogId: number) => {
+  //   let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
     // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
-    dispatch(setCurrentBlogPost(blog));
-    navigate("/admin/blogs/"+blogId+"/edit");
-  }
+  //   dispatch(setCurrentBlogPost(blog));
+  //   navigate("/admin/blogs/"+blogId+"/edit");
+  // }
 
-  const handleCreateClick = () => {
+  // const handleCreateClick = () => {
     // let blog = blogsList.value.find(blog => blog.blogId == blogId);
     // console.log(blog);
     // // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
     // dispatch(setCurrentBlog(blog));
-    navigate("/admin/blogs/create");
-  }
+  //   navigate("/admin/blogs/create");
+  // }
 
-  const handleDetailClick = (blogId: number) => {
+  // const handleDetailClick = (blogId: number) => {
     // console.log(blog);
     // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
     // dispatch(setCurrentBlog(blog));
     // navigate("/admin/blogs/edit");
-    let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
-    dispatch(setCurrentBlogPost(blog));
-    navigate(`/admin/blogs/${blogId}`);
-  }
+  //   let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
+  //   dispatch(setCurrentBlogPost(blog));
+  //   navigate(`/admin/blogs/${blogId}`);
+  // }
 
   const handleFilterClick = (category: BlogCategory[], filter: string) => {
     if (filter == "all") {
-      fetchBlogs(0);
-      setStatusFilter(filter);
+      // fetchBlogs(0);
+      // setStatusFilter(filter);
       setFiltered(filter);
       setSelectedCategory(-1);
     }
     else {
-      fetchBlogs(0, category[0].blogCategoryId);
-      setStatusFilter(filter);
+      // fetchBlogs(0, category[0].blogCategoryId);
+      // setStatusFilter(filter);
       setFiltered(filter);
       setSelectedCategory(category[0].blogCategoryId);
     }
@@ -112,8 +113,8 @@ export const BlogPostList = () => {
   useEffect(() => { }, [blogsList]);
 
   useEffect(() => {
-    fetchBlogs(blogsList.currentPageNumber);
-    dispatch(setCurrentPageList(blogsList.value));
+    // fetchBlogs(blogsList.currentPageNumber);
+    // dispatch(setCurrentPageList(blogsList.value));
     setStatusFilter("all");
     BlogCategoryService.getAllBlogCategories(0, 50).then((res) => {
       setCategories(res.data.content)
@@ -158,6 +159,12 @@ export const BlogPostList = () => {
       });
     });
   }
+
+  useEffect(() => {
+    if(Number.parseInt(pageNumber) >= 1)
+    setBlogPromise(BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory}));
+  }, [pageSize, pageNumber, sort])
+
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 ">
       <Tabs defaultValue="all">
@@ -233,8 +240,9 @@ export const BlogPostList = () => {
           </div> */}
         {/* </div> */}
         <TabsContent value="all">
-          {isLoading ? <LoadingAnimation />
-            : <Card x-chunk="dashboard-06-chunk-0">
+          {/* {isLoading ? <LoadingAnimation />
+            :  */}
+            <Card x-chunk="dashboard-06-chunk-0">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   Blogs
@@ -392,7 +400,7 @@ export const BlogPostList = () => {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu> */}
-                  <BlogsTable blogPromise={accountPromise} />
+                  <BlogsTable blogPromise={blogPromise} />
                 </Suspense>
               </CardContent>
               <CardFooter>
@@ -402,7 +410,7 @@ export const BlogPostList = () => {
                                     </div> */}
               </CardFooter>
             </Card>
-          }
+          {/* } */}
         </TabsContent>
       </Tabs>
       {/* {blogsList.value.map((blog) => (
