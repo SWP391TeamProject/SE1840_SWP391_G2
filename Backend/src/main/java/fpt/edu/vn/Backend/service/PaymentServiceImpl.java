@@ -7,10 +7,12 @@ import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.*;
 import fpt.edu.vn.Backend.DTO.response.PaypalCaptureResponseDTO;
 import fpt.edu.vn.Backend.config.VnPayConfig;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.CurrencyType;
+import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
@@ -177,6 +179,26 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(paymentDTO.getStatus());
         Payment updatedPayment = paymentRepos.save(payment);
         return new PaymentDTO(updatedPayment);
+    }
+
+    @Override
+    public void updatePaymentByStatus(UpdatePaymentStatusRequestDTO request) {
+        for (Integer paymentId : request.getPaymentId()) {
+            try {
+                Optional<Payment> payment = paymentRepos.findById(paymentId);
+                Payment payments = payment.get();
+                if (payments != null) {
+                    payments.setStatus(Payment.Status.valueOf(request.getStatus().toUpperCase()));
+                    paymentRepos.save(payments);
+                } else {
+                    throw new ResourceNotFoundException("Payment not found with ID: " + paymentId);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating Payment with ID: " + paymentId);
+            }
+        }
     }
 
     @Override

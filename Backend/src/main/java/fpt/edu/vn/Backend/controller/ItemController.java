@@ -4,6 +4,8 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
@@ -232,4 +234,11 @@ public class ItemController {
                  .headers(headers)
                  .body(stream.toByteArray());
      }
+
+
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updateItemStatus(@RequestBody(required = false) UpdateItemStatusRequestDTO itemDTOList) {
+        itemService.updateItemByStatus(itemDTOList);
+        return ResponseEntity.ok().build();
+    }
 }

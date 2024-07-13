@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.service.OrderService;
@@ -69,5 +71,11 @@ public class OrderController {
                                                           @RequestParam String address) {
         OrderDTO orderDTO = orderService.updateOrderShippingAddress(address,id);
         return ResponseEntity.ok(orderDTO);
+    }
+
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updateItemStatus(@RequestBody(required = false) UpdateOrderStatusRequestDTO orderDTOList) {
+        orderService.updateOrderByStatus(orderDTOList);
+        return ResponseEntity.ok().build();
     }
 }

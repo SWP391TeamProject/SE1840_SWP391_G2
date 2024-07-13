@@ -2,6 +2,9 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderRequest;
+import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -156,6 +160,26 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             System.err.println("An error occurred while deleting order: " + e.getMessage());
             throw new RuntimeException("Failed to delete order", e);
+        }
+    }
+
+    @Override
+    public void updateOrderByStatus(UpdateOrderStatusRequestDTO request) {
+        for (Integer orderId : request.getOrderId()) {
+            try {
+                Optional<Order> order = orderRepository.findById(orderId);
+                Order orders = order.get();
+                if (orders != null) {
+//                    orders.setStatus(Item.Status.valueOf(request.getStatus().toUpperCase()));
+                    orderRepository.save(orders);
+                } else {
+                    throw new ResourceNotFoundException("Order not found with ID: " + orderId);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating order with ID: " + orderId);
+            }
         }
     }
 }

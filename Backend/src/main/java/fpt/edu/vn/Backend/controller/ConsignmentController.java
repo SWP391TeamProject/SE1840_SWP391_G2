@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -252,4 +253,11 @@ public class ConsignmentController {
                 .header("Content-Disposition", headerValue)
                 .body(excelExporter.export().toByteArray());
     }
+
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updateConsignmentStatus(@RequestBody(required = false) UpdateConsignmentStatusRequestDTO consignmentDTOList) {
+        consignmentService.updateConsignmentByStatus(consignmentDTOList);
+        return ResponseEntity.ok().build();
+    }
+
 }

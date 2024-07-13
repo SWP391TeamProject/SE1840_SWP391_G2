@@ -6,9 +6,12 @@ import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.MappingException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Attachment;
+import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -30,6 +33,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -154,6 +158,26 @@ public class ItemServiceImpl implements ItemService {
         Item it = itemRepos.findById(item.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found", "itemId", item.getItemId().toString()));
         return mapEntityToDTO(itemRepos.save(mapDTOToEntity(item, it)));
+    }
+
+    @Override
+    public void updateItemByStatus(UpdateItemStatusRequestDTO request) {
+        for (Integer itemId : request.getItemId()) {
+            try {
+                Optional<Item> item = itemRepos.findById(itemId);
+                Item items = item.get();
+                if (items != null) {
+                    items.setStatus(Item.Status.valueOf(request.getStatus().toUpperCase()));
+                    itemRepos.save(items);
+                } else {
+                    throw new ResourceNotFoundException("Item not found with ID: " + itemId);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating item with ID: " + itemId);
+            }
+        }
     }
 
     @Override
