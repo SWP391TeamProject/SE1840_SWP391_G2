@@ -62,55 +62,56 @@ export default function PaymentsList() {
     let pageNumber = url.searchParams.get("page");
     let sort = url.searchParams.get("sort");
     let pageSize = url.searchParams.get("per_page");
+    const [paymentPromise, setPaymentPromise] = useState<Promise<any>>();
 
     // const currency = useCurrency();
-    const paymentPromise = getPayments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, type: typeFilter});
+    // const paymentPromise = getPayments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, type: typeFilter});
 
-    const fetchPayments = async (pageNumber: number, type?: PaymentType) => {
-        try {
-            setIsLoading(true);
-            console.log(type);
-            let res;
-            if (search && search?.length > 0) {
-                res = await fetchPaymentssService(pageNumber, 5, type);
-            }
-            else if (type != undefined) {
-                res = await fetchPaymentssService(pageNumber, 5, type);
-            }
-            else {
-                res = await fetchPaymentssService(pageNumber, 5, type);
-            }
-            if (res) {
-                console.log(res);
-                dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-                let paging: any = {
-                    pageNumber: res.data.number,
-                    totalPages: res.data.totalPages
-                }
-                dispatch(setCurrentPageNumber(paging));
-                setIsLoading(false);
-            }
-        } catch (error) {
-            setIsLoading(false);
-            console.log(error);
-        }
-    };
+    // const fetchPayments = async (pageNumber: number, type?: PaymentType) => {
+    //     try {
+    //         setIsLoading(true);
+    //         console.log(type);
+    //         let res;
+    //         if (search && search?.length > 0) {
+    //             res = await fetchPaymentssService(pageNumber, 5, type);
+    //         }
+    //         else if (type != undefined) {
+    //             res = await fetchPaymentssService(pageNumber, 5, type);
+    //         }
+    //         else {
+    //             res = await fetchPaymentssService(pageNumber, 5, type);
+    //         }
+    //         if (res) {
+    //             console.log(res);
+    //             dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+    //             let paging: any = {
+    //                 pageNumber: res.data.number,
+    //                 totalPages: res.data.totalPages
+    //             }
+    //             dispatch(setCurrentPageNumber(paging));
+    //             setIsLoading(false);
+    //         }
+    //     } catch (error) {
+    //         setIsLoading(false);
+    //         console.log(error);
+    //     }
+    // };
 
 
 
-    const handleEditClick = (accountId: number) => {
-        let payment = paymentsList.currentPageList.find(payment => payment.accountId == accountId);
+    // const handleEditClick = (accountId: number) => {
+    //     let payment = paymentsList.currentPageList.find(payment => payment.accountId == accountId);
         // return (<EditAcc payment={payment!} key={payment!.accountId} hidden={false} />);
-        dispatch(setCurrentPayment(payment));
-        navigate(`/admin/payments/${accountId}`);
-    }
+    //     dispatch(setCurrentPayment(payment));
+    //     navigate(`/admin/payments/${accountId}`);
+    // }
 
-    const handleCreateClick = () => {
+    // const handleCreateClick = () => {
         // let payment = paymentsList.value.find(payment => payment.accountId == accountId);
         // // return (<EditAcc payment={payment!} key={payment!.accountId} hidden={false} />);
         // dispatch(setCurrentAccount(payment));
-        navigate("/admin/payments/create");
-    }
+    //     navigate("/admin/payments/create");
+    // }
 
     //   const handleSuspendClick = (accountId: number) => {
     //     // return (<EditAcc payment={payment!} key={payment!.accountId} hidden={false} />);
@@ -140,12 +141,14 @@ export default function PaymentsList() {
         window.history.replaceState(null, "", url.toString());
         search = null;
         if (filter == "All") {
+            setPaymentPromise(getPayments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, type: ''}));
             // fetchPayments(0);
             setTypeFilter('');
             paymentsList.filter = undefined;
         }
         else {
-            console.log(types);
+            setPaymentPromise(getPayments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, type: filter}));
+            // console.log(types);
             // fetchPayments(0, types[0]);
             setTypeFilter(filter);
             paymentsList.filter = types[0];
@@ -154,22 +157,28 @@ export default function PaymentsList() {
         // }
     }
 
-    useEffect(() => { }, [paymentsList.currentPageList]);
+    // useEffect(() => { }, [paymentsList.currentPageList]);
 
-    const handlePageSelect = (pageNumber: number) => {
-        fetchPayments(pageNumber, paymentsList.filter);
-    }
+    // const handlePageSelect = (pageNumber: number) => {
+    //     fetchPayments(pageNumber, paymentsList.filter);
+    // }
 
     useEffect(() => {
-        fetchPayments(paymentsList.currentPageNumber);
+        // fetchPayments(paymentsList.currentPageNumber);
         // data.then((data) => {
         //   dispatch(setCurrentPageList(data.content));
         // })
         // setTypeFilter("all");
 
     }, []);
+
     useEffect(() => {
-        fetchPayments(paymentsList.currentPageNumber);
+        if(Number.parseInt(pageNumber) >= 1)
+            setPaymentPromise(getPayments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, type: typeFilter}));
+      }, [pageSize, pageNumber, sort])
+
+    useEffect(() => {
+        // fetchPayments(paymentsList.currentPageNumber);
         // setTypeFilter("all");
 
     }, [reload]);
@@ -222,9 +231,10 @@ export default function PaymentsList() {
                     {/* </div> */}
                 {/* </div> */}
                 <TabsContent value="all">
-                    {isLoading ?
+                    {/* {isLoading ?
                         <LoadingAnimation />
-                        : <Card x-chunk="dashboard-06-chunk-0">
+                        :  */}
+                        <Card x-chunk="dashboard-06-chunk-0">
                             <CardHeader >
 
                                 <CardTitle className="flex justify-between items-center">
@@ -363,8 +373,8 @@ export default function PaymentsList() {
                                         products
                                     </div> */}
                             </CardFooter>
-                        </Card>}
-
+                        </Card>
+                        {/* } */}
                 </TabsContent>
             </Tabs>
             {/* {paymentsList.value.map((payment) => (
