@@ -31,58 +31,66 @@ export const OrderList = () => {
     let sort = url.searchParams.get("sort")?.split('%2')[0].replace("_", ".").replace("amount", "paymentAmount");
     let sortDir = url.searchParams.get("sort")?.split('%2')[1];
     let pageSize = url.searchParams.get("per_page");
+    const [orderPromise, setOrderPromise] = useState<Promise<any>>();
 
-    const orderPromise = getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filterStatus);
+    // const orderPromise = getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filterStatus);
 
-    const fetchOrders = (pageNumber: number, pageSize: number, sortBy?: string, sortDirection?: string, filterStatus?: PaymentStatus) => {
-        console.log(sortBy, sortDirection, filterStatus);
-        setIsLoading(true);
-        getOrders(pageNumber, pageSize, sortBy, sortDirection, filterStatus).then((res) => {
-            console.log(res);
-            dispatch(setCurrentPageList(res.data.content));
-            if (res.data.content.length == 0) {
-                dispatch(setCurrentPageList([]));
-            }
-            let paging: any = {
-                pageNumber: res.data.number,
-                totalPages: res.data.totalPages
-            }
-            dispatch(setCurrentPageNumber(paging));
-            setIsLoading(false);
-        }).finally(() => {
-            setIsLoading(false);
-        })
-    }
+    // const fetchOrders = (pageNumber: number, pageSize: number, sortBy?: string, sortDirection?: string, filterStatus?: PaymentStatus) => {
+    //     console.log(sortBy, sortDirection, filterStatus);
+    //     setIsLoading(true);
+    //     getOrders(pageNumber, pageSize, sortBy, sortDirection, filterStatus).then((res) => {
+    //         console.log(res);
+    //         dispatch(setCurrentPageList(res.data.content));
+    //         if (res.data.content.length == 0) {
+    //             dispatch(setCurrentPageList([]));
+    //         }
+    //         let paging: any = {
+    //             pageNumber: res.data.number,
+    //             totalPages: res.data.totalPages
+    //         }
+    //         dispatch(setCurrentPageNumber(paging));
+    //         setIsLoading(false);
+    //     }).finally(() => {
+    //         setIsLoading(false);
+    //     })
+    // }
     useEffect(() => {
-        if (orders.currentPageList.length === 0) {
-            fetchOrders(0, 10, sortBy, sortDirection, filterStatus);
-        }
+        // if (orders.currentPageList.length === 0) {
+        //     fetchOrders(0, 10, sortBy, sortDirection, filterStatus);
+        // }
     }, [])
 
     const handleFilterStatus = (status: string) => {
         let filter = PaymentStatus[status as keyof typeof PaymentStatus];
+        setOrderPromise(getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filter));
         setFilterStatus(filter);
         // fetchOrders(0, 10, sortBy, sortDirection, filter);
     }
-    const handleViewDetailsClick = (id: any) => {
-        let order = orders.currentPageList.find(b => b.orderId == id);
-        if (order) {
-            dispatch(setCurrentOrder(order));
-        }
-        nav("/admin/orders/" + id);
-    }
+    // const handleViewDetailsClick = (id: any) => {
+    //     let order = orders.currentPageList.find(b => b.orderId == id);
+    //     if (order) {
+    //         dispatch(setCurrentOrder(order));
+    //     }
+    //     nav("/admin/orders/" + id);
+    // }
 
-    const handleSortBy = (value: string) => {
-        setSortBy(value);
-        fetchOrders(0, 10, value, sortDirection, filterStatus);
-    }
-    const handleSortDirection = (value: string) => {
-        setSortDirection(value);
-        fetchOrders(0, 10, sortBy, value, filterStatus);
-    }
-    const handlePageSelect = (pageNumber: number) => {
-        fetchOrders(pageNumber, 10, sortBy, sortDirection, filterStatus);
-    }
+    // const handleSortBy = (value: string) => {
+    //     setSortBy(value);
+    //     fetchOrders(0, 10, value, sortDirection, filterStatus);
+    // }
+    // const handleSortDirection = (value: string) => {
+    //     setSortDirection(value);
+    //     fetchOrders(0, 10, sortBy, value, filterStatus);
+    // }
+    // const handlePageSelect = (pageNumber: number) => {
+    //     fetchOrders(pageNumber, 10, sortBy, sortDirection, filterStatus);
+    // }
+
+    useEffect(() => {
+        if(Number.parseInt(pageNumber) >= 1)
+        setOrderPromise(getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filterStatus));
+      }, [pageSize, pageNumber, sort])
+
     return (
         <main className="grid flex-1 orders-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
             <Tabs defaultValue="all">
