@@ -230,7 +230,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(this::mapEntityToDTO);
     }
 
-    @Cacheable(key="#pageable + #categoryId + #minPrice + #maxPrice", value = "item")
+    @Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId  + #minPrice + #maxPrice", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus( BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice),categoryId,Item.Status.IN_AUCTION, pageable)
