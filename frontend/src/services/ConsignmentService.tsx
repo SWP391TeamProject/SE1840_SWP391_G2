@@ -54,12 +54,11 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
     } = input;
 
     // Prepare query parameters
-    if (status === "All") {
+    if (status === "") {
       const params: Record<string, any> = {
         page: page - 1, // Spring Boot uses 0-based page index
         size: size ? size : 10,
         sort,
-        status: status ? status.toUpperCase() : undefined,
         order,
       };
 

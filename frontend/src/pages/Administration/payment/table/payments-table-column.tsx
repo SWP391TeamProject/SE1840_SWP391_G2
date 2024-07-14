@@ -23,10 +23,10 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: 'paymentAmount',
+    accessorKey: 'amount',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('paymentAmount'));
+      const amount = parseFloat(row.getValue('amount'));
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',

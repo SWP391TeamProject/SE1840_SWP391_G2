@@ -3,7 +3,7 @@ import * as React from "react";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-tables/data-table";
 import { DataTableToolbar } from "@/components/data-tables/data-table-toolbar";
-import { AccountsTableToolbarActions, ItemsTableToolbarActions } from "./accounts-table-toolbar-actions";
+import { AccountsTableToolbarActions } from "./accounts-table-toolbar-actions";
 import { DataTableFilterField } from "@/types";
 import { AccountsTableFloatingBar } from "./accounts-table-floating-bar";
 import getColumns from "./accounts-table-column";
@@ -26,8 +26,8 @@ export function AccountsTable({ accountPromise }: AccountTableProps) {
                 const totalPages = (await accountPromise).totalPages;
                 setData(content);
                 setPageCount(totalPages);
-                console.log(content);
-                console.log(totalPages);
+                // console.log(content);
+                // console.log(totalPages);
             }
         };
         fetchData();

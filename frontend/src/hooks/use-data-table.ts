@@ -223,12 +223,24 @@ export function useDataTable<TData, TValue>({
   ])
 
   React.useEffect(() => {
+    let sortingString = null;
+    if(sorting[0].id){
+      let tempArr = sorting[0].id.split(",");
+      sortingString = tempArr[0]
+      if (tempArr.length > 1){
+        sortingString = sortingString + "," + tempArr[1];
+      } else {
+        sortingString = sortingString + "," + (sorting[0]?.desc ? "desc" : "asc");
+      }
+    }  
+
     nav(
       `${pathname}?${createQueryString({
         page,
-        sort: sorting[0]?.id
-          ? `${sorting[0]?.id},${sorting[0]?.desc ? "desc" : "asc"}`
-          : null,
+        // sort: sorting[0]?.id
+        //   ? `${sorting[0]?.id.split(",")[0]},${sorting[0]?.desc ? "desc" : "asc"}`
+        //   : null,
+        sort: sortingString
       })}`
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
