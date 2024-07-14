@@ -33,10 +33,6 @@ public class BlogServiceImpl implements BlogService {
     private NotificationServiceImpl notificationService;
 
     @Autowired
-    private NotificationRepos notificationRepos;
-    @Autowired
-    private AttachmentService attachmentService;
-    @Autowired
     private AttachmentRepos attachmentRepos;
 
 

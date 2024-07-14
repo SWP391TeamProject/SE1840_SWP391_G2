@@ -75,13 +75,14 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void sendNotificationToUserGroup(@NotNull NotificationDTO dto, @NotNull Account.Role... roles) {
-        for (Account.Role role : roles) {
-            notificationRepos.saveAll(accountRepos.findByRole(role).stream().map(account -> {
-                Notification notification = mapDTOToEntity(dto);
-                notification.setAccount(account);
-                return notification;
-            }).collect(Collectors.toList()));
-        }
+        notificationRepos.saveAll(Arrays.stream(roles)
+                .map(accountRepos::findByRole)
+                .flatMap(List::stream)
+                .map(account -> {
+            Notification notification = mapDTOToEntity(dto);
+            notification.setAccount(account);
+            return notification;
+        }).collect(Collectors.toList()));
     }
 
     @Override
