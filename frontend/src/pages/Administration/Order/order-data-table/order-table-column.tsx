@@ -23,7 +23,7 @@ type Order = {
   orderId: number
   payment: {
     accountId: number
-    amount: number
+    paymentAmount: number
     date: Date
     id: number
     status: string
@@ -109,14 +109,14 @@ export const getColumns = (): ColumnDef<Order>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: "payment.amount",
+    accessorKey: "payment.paymentAmount",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total"  className="w-"/>
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[7.25rem] truncate font-medium">
-          ${row.original.payment.amount}
+          ${row.original.payment.paymentAmount}
         </span>
       </div>
     ),

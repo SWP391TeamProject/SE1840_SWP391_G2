@@ -86,7 +86,7 @@ export default function PlaceBid({ ...props }) {
                     auctionItemId: location.state.id,
                     payment: {
                         accountId: auth.user.accountId,
-                        amount: values.bidAmount
+                        paymentAmount: values.bidAmount
                     }
                 })
             })

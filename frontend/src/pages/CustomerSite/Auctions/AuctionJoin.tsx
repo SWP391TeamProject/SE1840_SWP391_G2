@@ -170,7 +170,7 @@ export default function AuctionJoin() {
           auctionItemId: location.state.id,
           payment: {
             accountId: JSON.parse(getCookie("user")).id,
-            amount: paymentAmount
+            paymentAmount: paymentAmount
           }
         })
       });
