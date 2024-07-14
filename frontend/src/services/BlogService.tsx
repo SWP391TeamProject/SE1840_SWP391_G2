@@ -39,6 +39,8 @@ class BlogService {
                     {
                         headers: {
                             "Content-Type": "application/json",
+                            Authorization:
+                                "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
                         },
                         params: params
                     }
@@ -50,10 +52,12 @@ class BlogService {
                     sort,
                     order,
                 };
-    
+
                 response = await axios.get(`${this.BASE_URL}/`, {
                     headers: {
                         "Content-Type": "application/json",
+                        Authorization:
+                            "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
                     },
                     params: params
                 });
@@ -78,7 +82,7 @@ class BlogService {
         return axios.get(`${this.BASE_URL}/`, {
             headers: {
                 "Content-Type": "application/json",
-                
+
             },
             params: params
         });
@@ -92,7 +96,7 @@ class BlogService {
         return axios.get(`${this.BASE_URL}/search?keyword=${keyword}`, {
             headers: {
                 "Content-Type": "application/json",
-                  
+
 
             },
             params: params
@@ -108,8 +112,8 @@ class BlogService {
             {
                 headers: {
                     "Content-Type": "application/json",
-                      
-    
+
+
                 },
                 params: params
             }
@@ -121,15 +125,15 @@ class BlogService {
             {
                 headers: {
                     "Content-Type": "application/json",
-                      
-    
+
+
                 },
             }
         );
     }
 
     public static createBlog(blog: any) {
-        return axios.post(this.BASE_URL+"/",blog, {
+        return axios.post(this.BASE_URL + "/", blog, {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
@@ -141,7 +145,7 @@ class BlogService {
         return axios.put(`${this.BASE_URL}/${id}`, blog, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                  
+
                 Authorization: "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         });

@@ -161,9 +161,10 @@ export const BlogPostList = () => {
   }
 
   useEffect(() => {
+    console.log(pageNumber, pageSize, sort, selectedCategory);
     if(Number.parseInt(pageNumber) >= 1)
     setBlogPromise(BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory}));
-  }, [pageSize, pageNumber, sort])
+  }, [pageSize, pageNumber, sort,selectedCategory])
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 ">
