@@ -10,17 +10,21 @@ import {
 } from "@/components/ui/carousel";
 import { fetchFeaturedAuctionSessions } from "@/services/AuctionSessionService";
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { set } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
+import { useAppDispatch } from "@/redux/hooks";
+import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession";
 
 export default function FeaturedAuctions() {
   const date = new Date();
 
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const dispatch = useAppDispatch();
+  const nav = useNavigate();
 
   const getDaysLeft = (endDate: Date) => {
     const difference = endDate.getTime() - new Date().getTime();
@@ -37,6 +41,12 @@ export default function FeaturedAuctions() {
       setIsLoading(false);
     });
   }, []);
+
+  const handleClick = (item : any) => {
+    dispatch(setCurrentAuctionSession(item));
+    nav("/auctions/" + item.auctionSessionId);
+
+  }
 
   return (
     <>
@@ -141,12 +151,12 @@ export default function FeaturedAuctions() {
                         </div>
                         <div className="flex items-center justify-between">
 
-                          <Button variant="default" asChild>
-                            <Link
+                          <Button variant="default" onClick={()=>{handleClick(item)}}>
+                            {/* <Link
                               to={`auctions/${item.auctionSessionId}`}
-                            >
+                            > */}
                               Bid Now
-                            </Link>
+                            {/* </Link> */}
                           </Button>
 
                         </div>
