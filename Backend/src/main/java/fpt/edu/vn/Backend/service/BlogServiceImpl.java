@@ -46,10 +46,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @Cacheable(key = "#pageable", value = "blog")
     public Page<BlogPostDTO> getAllBlogs(Pageable pageable) {
-        List<BlogPostDTO> blogPostDTOS = blogPostRepos.findAll().stream().map(BlogPostDTO::new).sorted(
-                (o1, o2) -> o2.getCreateDate().compareTo(o1.getCreateDate())
-        ).toList();
-        return new PageImpl<>(blogPostDTOS, pageable, blogPostDTOS.size());
+        return blogPostRepos.findAll(pageable).map(BlogPostDTO::new);
     }
 
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {
