@@ -135,17 +135,17 @@ export default function FeaturedAuctions() {
                             {item.title}
                           </h3>
                           <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium justify-end basis-1/2 text-white">
-                              {item.startDate && new Date(item.startDate) > date ?
+                              {item.startDate && new Date(item.startDate).getTime() > date.getTime() ?
                                 <>
                                   Starts in <CountDownTime className="text-white" end={new Date(item.startDate)}></CountDownTime>
                                 </> :
-                                item.endDate && new Date(item.endDate) > date
+                                (item.endDate && new Date(item.endDate).getTime() > date.getTime()
                                   ? <>
                                     Ends in <CountDownTime className="text-white" end={new Date(item.endDate)}></CountDownTime>
                                   </> :
                                   <div className="text-pink-500 dark:text-pink-400 font-semibold">
                                     Auction Ended
-                                  </div>
+                                  </div>)
                               }
                             </div>
                         </div>
