@@ -11,6 +11,7 @@ import MainCard from "./MainCard";
 import ReactApexChart from "react-apexcharts";
 import { getTotalRevenueByPastAuction } from "@/services/StatisticServices";
 import { AxiosResponse } from "axios";
+import { useCurrency } from "@/CurrencyProvider";
 
 // chart options
 const columnChartOptions = {
@@ -86,9 +87,10 @@ const columnChartOptions = {
 
 export default function TotalRevenuePastAuctionBarChart() {
   const [series, setSeries] = useState([]);
-
+  const currency = useCurrency();
   const [options, setOptions] = useState(columnChartOptions);
-  const [totalProfit, setTotalProfit] = useState(0);
+  const [totalProfit, setTotalProfit] = useState("");
+  
 
   useEffect(() => {
       getTotalRevenueByPastAuction(new Date().getFullYear())
@@ -104,9 +106,13 @@ export default function TotalRevenuePastAuctionBarChart() {
               const date = new Date(item.date);
               const monthName = monthNames[date.getMonth()];
               return { ...item, monthName };
+
             });
+
+
             const totalProfit = response.data.reduce((sum, item) => sum + item.totalAmount, 0);
-            setTotalProfit(totalProfit);
+            
+            setTotalProfit(currency.format({amount:totalProfit}));
             setSeries([
               {
                 data: formattedData.map((item) => item.totalAmount),
@@ -186,7 +192,7 @@ export default function TotalRevenuePastAuctionBarChart() {
             <Typography variant="h6" color="secondary">
               Net Profit
             </Typography>
-            <Typography variant="h4">${totalProfit}</Typography>
+            <Typography variant="h4">{totalProfit}</Typography>
           </Stack>
           {/* <FormControl component="fieldset">
             <FormGroup row>
