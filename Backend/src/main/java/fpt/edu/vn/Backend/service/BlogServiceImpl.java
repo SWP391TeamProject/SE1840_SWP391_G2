@@ -2,19 +2,16 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
-import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.BlogPost;
-import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -35,10 +32,6 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private NotificationServiceImpl notificationService;
 
-    @Autowired
-    private NotificationRepos notificationRepos;
-    @Autowired
-    private AttachmentService attachmentService;
     @Autowired
     private AttachmentRepos attachmentRepos;
 
@@ -70,25 +63,12 @@ public class BlogServiceImpl implements BlogService {
     @Override
     @CacheEvict(allEntries = true, value = "blog")
     public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
+        BlogPost blogPost = blogPostRepos.save(toEntity(BlogPostDTO));
 
-        BlogPost blogPost = toEntity(BlogPostDTO);
-        blogPost.setCreateDate(LocalDateTime.now());
-        blogPost.setUpdateDate(LocalDateTime.now());
-        blogPost = blogPostRepos.save(blogPost);
-        Account account = blogPost.getAuthor();
-
-        if (account.getRole() == Account.Role.ADMIN) {
-            Notification notification = new Notification();
-            notification.setAccount(account);
-            notification.setType("Admin");
-            notification.setMessage("New Blog Was Created By " + account.getNickname() + " - " + account.getRole() + ".<br/>" +
-                    "<a href='/blogs/" + blogPost.getPostId() + "'><strong>Click here to view</strong></a>");
-            notification.setRead(false);
-            notification.setCreateDate(LocalDateTime.now());
-            notification.setUpdateDate(LocalDateTime.now());
-            NotificationDTO notificationDTO = new NotificationDTO(notification);
-            notificationService.sendNotificationToAllMembers(notificationDTO);
-        }
+        notificationService.sendNotificationToUserGroup(
+                "New blog post: " + blogPost.getTitle(),
+                Account.Role.MEMBER
+        );
 
         return new BlogPostDTO(blogPost);
     }
