@@ -53,7 +53,7 @@ export default function PaymentStatus() {
                                 fractionDigits: "always",
                                 minFractionDigits: 2,
                                 maxFractionDigits: 2,
-                            }) + " into your account."
+                            }) + " into your account. Please wait up to 5 minutes for the payment to be processed."
                             : "We're sorry, there was a problem processing your payment. Please try again or contact customer support."}
                     </p>
                     {error && error.length > 0 && <p>ERROR: {error}</p>}
