@@ -75,5 +75,8 @@ public class Consignment {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
+    @OneToMany
+    @JoinColumn(name = "consignment_id")
+    private List<Attachment> attachments;
 }
 

@@ -4,7 +4,7 @@ import {genItems, prepareItemAndCategory} from "./gen_item";
 import {Account, Role} from "../model/account";
 import {genConsignment} from "./gen_consignment";
 import {simulateAuction} from "./auction_simulator";
-import {PaymentType} from "../model/transaction";
+import {PaymentStatus, PaymentType} from "../model/transaction";
 import {genNotification} from "./gen_notification";
 import {genPosts} from "./gen_blog";
 
@@ -56,17 +56,17 @@ export async function generate() {
     const transAndAuction = simulateAuction(accountList.filter(a => a.role == Role.MEMBER), items);
 
     for (const transaction of transAndAuction[0]) {
+        if (transaction.status !== PaymentStatus.SUCCESS)
+            continue
         switch (transaction.type) {
             case PaymentType.DEPOSIT:
+                accountList[transaction.accountId-1].balance += transaction.amount;
                 break;
             case PaymentType.WITHDRAW:
                 accountList[transaction.accountId-1].balance -= transaction.amount;
                 break;
             case PaymentType.AUCTION_DEPOSIT:
                 accountList[transaction.accountId-1].balance -= transaction.amount;
-                break;
-            case PaymentType.AUCTION_DEPOSIT_REFUND:
-                accountList[transaction.accountId-1].balance += transaction.amount;
                 break;
             case PaymentType.AUCTION_ORDER:
                 accountList[transaction.accountId-1].balance -= transaction.amount;
@@ -75,7 +75,6 @@ export async function generate() {
                 accountList[transaction.accountId-1].balance += transaction.amount;
                 break;
         }
-        accountList[transaction.accountId-1].balance += transaction.amount;
     }
 
     // tạo noti
@@ -109,10 +108,15 @@ export async function generate() {
     });
     console.log(`Generated ${transAndAuction[0].length} transactions!`);
 
-    fs.writeFile(`./output/auction_session.json`, JSON.stringify(transAndAuction[1]), (err) => {
+    fs.writeFile(`./output/bid.json`, JSON.stringify(transAndAuction[1]), (err) => {
         if (err) throw err;
     });
-    console.log(`Generated ${transAndAuction[1].length} auction sessions!`);
+    console.log(`Generated ${transAndAuction[1].length} bids!`);
+
+    fs.writeFile(`./output/auction_session.json`, JSON.stringify(transAndAuction[2]), (err) => {
+        if (err) throw err;
+    });
+    console.log(`Generated ${transAndAuction[2].length} auction sessions!`);
 
     fs.writeFile(`./output/notification.json`, JSON.stringify(noti), (err) => {
         if (err) throw err;

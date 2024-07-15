@@ -1,15 +1,15 @@
 export interface ConsignmentDetail {
     consignmentId: number,
-    status: ConsignmentDetailStatus,
+    type: ConsignmentDetailType,
     description: string,
     price: number,
     imageURLs: string[],
+    accountId: number,
     createDate: Date,
     updateDate: Date
 }
 
-export enum ConsignmentDetailStatus {
-    REQUEST = "REQUEST",
+export enum ConsignmentDetailType {
     INITIAL_EVALUATION = "INITIAL_EVALUATION",
     FINAL_EVALUATION = "FINAL_EVALUATION",
     MANAGER_ACCEPTED = "MANAGER_ACCEPTED",

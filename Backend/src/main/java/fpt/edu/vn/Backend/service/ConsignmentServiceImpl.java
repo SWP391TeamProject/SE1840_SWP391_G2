@@ -104,17 +104,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails) {
         try {
             Consignment consignment = new Consignment();
-            ConsignmentDetail detail = new ConsignmentDetail();
-            detail.setDescription(consignmentDetails.getDescription());
-            detail.setPrice(consignmentDetails.getPrice());
-            detail.setType(ConsignmentDetail.ConsignmentType.REQUEST);
-            detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
+//            ConsignmentDetail detail = new ConsignmentDetail();
+//            detail.setDescription(consignmentDetails.getDescription());
+//            detail.setPrice(consignmentDetails.getPrice());
+//            detail.setType(ConsignmentDetail.ConsignmentType.REQUEST);
+//            detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
             consignment.setPreferContact(Consignment.preferContact.valueOf(preferContact.toUpperCase()));
             consignment.setStatus(Consignment.Status.WAITING_STAFF);
-            consignment.setConsignmentDetails(List.of(detail));
+//                consignment.setConsignmentDetails(List.of(detail));
             consignment = consignmentRepos.save(consignment);
-            detail.setConsignment(consignment);
-            consignmentDetailRepos.save(detail);
+//            detail.setConsignment(consignment);
+//            consignmentDetailRepos.save(detail);
             return getConsignmentDTO(consignment);
         } catch (Exception e) {
             logger.error("Error creating consignment", e);
