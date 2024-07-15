@@ -49,9 +49,6 @@ public class Consignment {
     @Column(length = 2000, columnDefinition = "NVARCHAR(max)")
     private String description;
 
-    @Column(length = 2000, columnDefinition = "NVARCHAR(max)")
-    private String address;
-
     @Column(length = 30)
     private String color;
 
