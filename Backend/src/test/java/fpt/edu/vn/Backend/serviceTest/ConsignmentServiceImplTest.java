@@ -78,7 +78,7 @@ public class ConsignmentServiceImplTest {
         notification.setAccount(account);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
-        consignment.setStaff(account);
+        consignment.setUser(account);
         consignment.setConsignmentDetails(Collections.emptyList());
 
         ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -86,7 +86,7 @@ public class ConsignmentServiceImplTest {
         consignmentDetail.setPrice(BigDecimal.valueOf(1000));
         consignmentDetail.setAccount(account);
         consignmentDetail.setConsignment(consignment);
-        consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION);
+        consignmentDetail.setType(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION);
 
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail);
         when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
@@ -108,13 +108,13 @@ public class ConsignmentServiceImplTest {
         notification.setAccount(account);
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
-        consignment.setStaff(account);
+        consignment.setUser(account);
         ConsignmentDetail consignmentDetailInitial = new ConsignmentDetail();
         consignmentDetailInitial.setConsignmentDetailId(1);
         consignmentDetailInitial.setPrice(BigDecimal.valueOf(1000));
         consignmentDetailInitial.setAccount(account);
         consignmentDetailInitial.setConsignment(consignment);
-        consignmentDetailInitial.setStatus(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION);
+        consignmentDetailInitial.setType(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION);
         consignment.setConsignmentDetails(new ArrayList<>(Collections.singletonList(consignmentDetailInitial)));
 
         ConsignmentDetail consignmentDetailFinal = new ConsignmentDetail();
@@ -122,7 +122,7 @@ public class ConsignmentServiceImplTest {
         consignmentDetailFinal.setPrice(BigDecimal.valueOf(1000));
         consignmentDetailFinal.setAccount(account);
         consignmentDetailFinal.setConsignment(consignment);
-        consignmentDetailFinal.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+        consignmentDetailFinal.setType(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION);
 
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetailFinal);
         when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
@@ -154,7 +154,7 @@ public class ConsignmentServiceImplTest {
         consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
         consignment.setConsignmentDetails(Collections.emptyList());
         ConsignmentDetail consignmentDetail = new ConsignmentDetail();
-        consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+        consignmentDetail.setType(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION);
         consignment.setConsignmentDetails(new ArrayList<>(Collections.singletonList(consignmentDetail)));
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
         when(accountService.getAccountById(anyInt())).thenReturn(new AccountDTO());
@@ -179,7 +179,7 @@ public class ConsignmentServiceImplTest {
         consignment.setStatus(Consignment.Status.IN_FINAL_EVALUATION);
         consignment.setConsignmentDetails(Collections.emptyList());
         ConsignmentDetail consignmentDetail = new ConsignmentDetail();
-        consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+        consignmentDetail.setType(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION);
         consignment.setConsignmentDetails(new ArrayList<>(Collections.singletonList(consignmentDetail)));
         Account account = new Account();
         account.setAccountId(1);
@@ -237,7 +237,7 @@ public class ConsignmentServiceImplTest {
 
         assertNotNull(result);
         assertEquals(Consignment.Status.IN_INITIAL_EVALUATION.toString(), result.getStatus());
-        assertEquals(account.getAccountId(), result.getStaff().getAccountId());
+        assertEquals(account.getAccountId(), result.getUser().getAccountId());
     }
 
     @Test

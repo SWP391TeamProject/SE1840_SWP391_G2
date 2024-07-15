@@ -38,7 +38,7 @@ public class ConsignmentDetailDTO implements Serializable {
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
         this.consignmentDetailId = consignmentDetail.getConsignmentDetailId();
         this.description = consignmentDetail.getDescription();
-        this.status = String.valueOf(consignmentDetail.getStatus());
+        this.status = String.valueOf(consignmentDetail.getType());
         this.price = consignmentDetail.getPrice();
         this.consignmentId = consignmentDetail.getConsignment().getConsignmentId();
         this.account = new AccountDTO(consignmentDetail.getAccount());

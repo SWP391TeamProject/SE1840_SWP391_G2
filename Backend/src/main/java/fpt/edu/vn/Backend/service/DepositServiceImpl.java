@@ -2,7 +2,6 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.DepositDTO;
 import fpt.edu.vn.Backend.DTO.request.DepositRequest;
-import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 
 import fpt.edu.vn.Backend.pojo.Deposit;

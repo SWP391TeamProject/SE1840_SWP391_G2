@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
-import fpt.edu.vn.Backend.DTO.request.OrderRequest;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -48,26 +47,16 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId) {
         try {
             Order order = new Order();
-            order.setCreateDate(LocalDateTime.now());
-            Set<AuctionItem> auctionItems = new HashSet<>();
-            for (AuctionItemId auctionItemId : itemIds) {
-                log.info("Item: {}", auctionItemId);
-                AuctionItem item = auctionItemRepos.findById(auctionItemId).orElseThrow(() -> new RuntimeException("Item not found"));
-                auctionItems.add(item);
-            }
             AuctionSession auctionSession = auctionSessionRepos.findById(auctionId).orElseThrow(() -> new RuntimeException("Auction not found"));
-            order.setAuctionItems(auctionItems);
             Payment payment = new Payment();
             payment.setCreateDate(LocalDateTime.now());
             payment.setType(Payment.Type.AUCTION_ORDER);
             payment.setStatus(Payment.Status.PENDING);
             payment.setAccount(accountRepos.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found")));
             payment.setPaymentAmount(BigDecimal.ZERO);
-            for (AuctionItem item : auctionSession.getAuctionItems()) {
-                if (auctionItems.stream().anyMatch(i -> i.getAuctionItemId().equals(item.getAuctionItemId()))) {
-                    log.info("Item: {} - {}", item.getItem().getItemId(), item.getCurrentPrice());
-                    payment.setPaymentAmount(payment.getPaymentAmount().add(item.getCurrentPrice()));
-                }
+            for (AuctionItemId auctionItemId : itemIds) {
+                AuctionItem ai = auctionItemRepos.findById(auctionItemId).orElseThrow(() -> new RuntimeException("Item not found"));
+                payment.setPaymentAmount(payment.getPaymentAmount().add(ai.getCurrentPrice()));
             }
             BigDecimal winnerDeposit = auctionSession
                     .getDeposits().stream()
@@ -78,6 +67,12 @@ public class OrderServiceImpl implements OrderService {
             payment = paymentRepository.save(payment);
             order.setPayment(payment);
             order = orderRepository.save(order);
+            for (AuctionItemId auctionItemId : itemIds) {
+                AuctionItem ai = auctionItemRepos.findById(auctionItemId).orElseThrow(() -> new RuntimeException("Item not found"));
+                Item item = ai.getItem();
+                item.setOrder(order);
+                itemRepository.save(item);
+            }
             return new OrderDTO(order);
         } catch (Exception e) {
             // Log the exception (using a logging framework is recommended)
@@ -85,6 +80,7 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Failed to create order", e);
         }
     }
+
 
     @Override
     public OrderDTO getOrderById(int orderId) {

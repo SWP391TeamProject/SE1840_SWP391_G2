@@ -20,6 +20,6 @@ public class AuctionItemId implements Serializable {
     @Column(name = "auction_session_id")
     private Integer auctionSessionId;
 
-    @Column(name = "item_id")
+    @Column(name = "jewelry_id")
     private Integer itemId;
 }

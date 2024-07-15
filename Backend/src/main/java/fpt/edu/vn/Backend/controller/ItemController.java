@@ -4,21 +4,17 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.exporter.ItemExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.service.AccountService;
-import fpt.edu.vn.Backend.service.AccountServiceImpl;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,7 +163,7 @@ public class ItemController {
         BigDecimal reservePrice = consignmentDTO.getConsignmentDetails().stream()
                 .filter(
                         consignmentDetailDTO -> consignmentDetailDTO.getStatus()
-                                .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentStatus.MANAGER_ACCEPTED))
+                                .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED))
                 ).toList().get(0).getPrice();
         if(reservePrice==null){
             throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");

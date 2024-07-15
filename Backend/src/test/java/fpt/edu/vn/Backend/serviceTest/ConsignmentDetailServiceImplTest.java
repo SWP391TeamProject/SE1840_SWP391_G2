@@ -1,7 +1,5 @@
 package fpt.edu.vn.Backend.serviceTest;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -75,7 +73,7 @@ public class ConsignmentDetailServiceImplTest {
         consignmentDetail1.setAccount(account);
         consignmentDetail1.setDescription("Description 1");
         consignmentDetail1.setPrice(BigDecimal.valueOf(100.0));
-        consignmentDetail1.setStatus(ConsignmentDetail.ConsignmentStatus.REQUEST);
+        consignmentDetail1.setType(ConsignmentDetail.ConsignmentType.REQUEST);
         consignmentDetail1.setAttachments(Arrays.asList(attachment));
 
         consignmentDetail2 = new ConsignmentDetail();
@@ -84,7 +82,7 @@ public class ConsignmentDetailServiceImplTest {
         consignmentDetail2.setAccount(account);
         consignmentDetail2.setDescription("Description 2");
         consignmentDetail2.setPrice(BigDecimal.valueOf(200.0));
-        consignmentDetail2.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+        consignmentDetail2.setType(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION);
         consignmentDetail2.setAttachments(Arrays.asList(attachment));
 
         consignmentRequestDetailDTO = new ConsignmentDetailRequestDTO();
@@ -117,12 +115,12 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(consignmentDetail1.getConsignmentDetailId(), dto1.getConsignmentDetailId());
         assertEquals(consignmentDetail1.getDescription(), dto1.getDescription());
         assertEquals(consignmentDetail1.getPrice(), dto1.getPrice());
-        assertEquals(consignmentDetail1.getStatus().name(), dto1.getStatus());
+        assertEquals(consignmentDetail1.getType().name(), dto1.getStatus());
 
         assertEquals(consignmentDetail2.getConsignmentDetailId(), dto2.getConsignmentDetailId());
         assertEquals(consignmentDetail2.getDescription(), dto2.getDescription());
         assertEquals(consignmentDetail2.getPrice(), dto2.getPrice());
-        assertEquals(consignmentDetail2.getStatus().name(), dto2.getStatus());
+        assertEquals(consignmentDetail2.getType().name(), dto2.getStatus());
     }
 
     @Test
@@ -141,12 +139,12 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(consignmentDetail1.getConsignmentDetailId(), dto1.getConsignmentDetailId());
         assertEquals(consignmentDetail1.getDescription(), dto1.getDescription());
         assertEquals(consignmentDetail1.getPrice(), dto1.getPrice());
-        assertEquals(consignmentDetail1.getStatus().name(), dto1.getStatus());
+        assertEquals(consignmentDetail1.getType().name(), dto1.getStatus());
 
         assertEquals(consignmentDetail2.getConsignmentDetailId(), dto2.getConsignmentDetailId());
         assertEquals(consignmentDetail2.getDescription(), dto2.getDescription());
         assertEquals(consignmentDetail2.getPrice(), dto2.getPrice());
-        assertEquals(consignmentDetail2.getStatus().name(), dto2.getStatus());
+        assertEquals(consignmentDetail2.getType().name(), dto2.getStatus());
     }
     @Test
     void testGetConsignmentDetailById() {
@@ -159,7 +157,7 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(consignmentDetail1.getConsignmentDetailId(), result.getConsignmentDetailId());
         assertEquals(consignmentDetail1.getDescription(), result.getDescription());
         assertEquals(consignmentDetail1.getPrice(), result.getPrice());
-        assertEquals(consignmentDetail1.getStatus().name(), result.getStatus());
+        assertEquals(consignmentDetail1.getType().name(), result.getStatus());
     }
 
     @Test

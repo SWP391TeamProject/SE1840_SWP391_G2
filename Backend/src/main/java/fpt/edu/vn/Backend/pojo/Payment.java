@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
@@ -17,12 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "[transaction]")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "transaction_id")
     private int paymentId;
 
-    @Column(name = "payment_amount", precision = 20, scale = 8)
+    @Column(name = "transaction_amount", precision = 20, scale = 8)
     private BigDecimal paymentAmount;
 
     public enum Status {
@@ -30,11 +31,11 @@ public class Payment {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status")
+    @Column(name = "transaction_status")
     private Status status;
 
     public enum Method {
-        VNPAY, PAYPAL
+        VNPAY, PAYPAL,MANUAL
     }
 
     @Enumerated(EnumType.STRING)
@@ -46,14 +47,13 @@ public class Payment {
         DEPOSIT,
         WITHDRAW,
         AUCTION_DEPOSIT,
-        AUCTION_BID,
         AUCTION_ORDER,
         AUCTION_DEPOSIT_REFUND,
         CONSIGNMENT_REWARD
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_type")
+    @Column(name = "transaction_type")
     private Type type;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "auction_item")
+@Table(name = "auction_jewelry")
 public class AuctionItem {
     @EmbeddedId
     private AuctionItemId auctionItemId;
@@ -27,19 +27,16 @@ public class AuctionItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("itemId")
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "jewelry_id")
     private Item item;
 
     @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
 
-    @ManyToMany(fetch = FetchType.LAZY,mappedBy = "auctionItems")
-    private Set<Order> orders;
-
     @OneToMany
     @JoinColumns({
             @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
-            @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+            @JoinColumn(name = "jewelry_id", referencedColumnName = "jewelry_id")
     })
     private Set<Bid> bids;
 

@@ -18,15 +18,15 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item")
+@Table(name = "jewelry")
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
+    @Column(name = "jewelry_id")
     private Integer itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_category_id") // This matches the column in the database
+    @JoinColumn(name = "jewelry_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
 
     @Column(length = 500,columnDefinition = "NVARCHAR(100)")
@@ -61,9 +61,31 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
+    @Column(length = 30)
+    private String color;
+
+    @Column(length = 30)
+    private String size;
+
+    @Column(length = 30)
+    private String weight;
+
+    @Column(length = 30)
+    private String brand;
+
+    @Column(length = 30)
+    private Integer age;
+
+    @Column(length = 30)
+    private String material;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private  Order order;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "jewelry_id")
     private Set<Attachment> attachments;
 
 }
