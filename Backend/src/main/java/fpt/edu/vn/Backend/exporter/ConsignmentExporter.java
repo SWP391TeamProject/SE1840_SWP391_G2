@@ -2,8 +2,6 @@ package fpt.edu.vn.Backend.exporter;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -93,7 +91,7 @@ public class ConsignmentExporter {
                     .findFirst().orElseThrow(()->new ResourceNotFoundException("No Consignment Detail type Request"))
                     .getAccount().getEmail(), style);
             createCell(row, columnCount++, consignment.getPreferContact(), style);
-            createCell(row, columnCount++, consignment.getStaff().getNickname()+"-"+consignment.getStaff().getAccountId(), style);
+            createCell(row, columnCount++, consignment.getUser().getNickname()+"-"+consignment.getUser().getAccountId(), style);
             createCell(row, columnCount++, consignment.getStatus(), style);
         }
     }

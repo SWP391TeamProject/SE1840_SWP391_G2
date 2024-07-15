@@ -80,7 +80,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     .map(detail -> new ConsignmentDetailDTO(
                             detail.getConsignmentDetailId(),
                             detail.getDescription(),
-                            detail.getStatus().toString(),
+                            detail.getType().toString(),
                             detail.getPrice(),
                             detail.getConsignment().getConsignmentId(),
                             new AccountDTO(detail.getAccount()),
@@ -92,30 +92,29 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignment.getConsignmentId(),
                 String.valueOf(consignment.getStatus()),
                 String.valueOf(consignment.getPreferContact()),
-                consignment.getStaff() != null ? new AccountDTO(consignment.getStaff()) : null,
+                consignment.getUser() != null ? new AccountDTO(consignment.getUser()) : null,
                 consignment.getCreateDate(),
                 consignment.getUpdateDate(),
                 consignmentDetailDTOs
         );
     }
-
     @Override
     @CacheEvict(value = "consignments", allEntries = true)
-
+    //todo thís need to be migrated to new schema defintion no more detail
     public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails) {
         try {
             Consignment consignment = new Consignment();
-            ConsignmentDetail detail = new ConsignmentDetail();
-            detail.setDescription(consignmentDetails.getDescription());
-            detail.setPrice(consignmentDetails.getPrice());
-            detail.setStatus(ConsignmentDetail.ConsignmentStatus.REQUEST);
-            detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
+//            ConsignmentDetail detail = new ConsignmentDetail();
+//            detail.setDescription(consignmentDetails.getDescription());
+//            detail.setPrice(consignmentDetails.getPrice());
+//            detail.setType(ConsignmentDetail.ConsignmentType.REQUEST);
+//            detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
             consignment.setPreferContact(Consignment.preferContact.valueOf(preferContact.toUpperCase()));
             consignment.setStatus(Consignment.Status.WAITING_STAFF);
-            consignment.setConsignmentDetails(List.of(detail));
+//                consignment.setConsignmentDetails(List.of(detail));
             consignment = consignmentRepos.save(consignment);
-            detail.setConsignment(consignment);
-            consignmentDetailRepos.save(detail);
+//            detail.setConsignment(consignment);
+//            consignmentDetailRepos.save(detail);
             return getConsignmentDTO(consignment);
         } catch (Exception e) {
             logger.error("Error creating consignment", e);
@@ -123,6 +122,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         }
     }
 
+
+    //todo: this need to be migrated to the new entity definition this one neeed a neww detail
     @Override
     @CacheEvict(value = "consignments", allEntries = true)
 
@@ -130,11 +131,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
-                    detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
+                    detail.getType().equals(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION))) {
                 throw new ConsignmentServiceException("Initial Evaluation already submitted");
             }
             ConsignmentDetail detail = new ConsignmentDetail();
-            detail.setStatus(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION);
+            detail.setType(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION);
             detail.setAccount(accountRepos.findById(accountId).orElseThrow(
                     () -> new ConsignmentServiceException("Account not found")
             ));
@@ -157,24 +158,25 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         }
     }
 
+
+    //todo: this need to be migrated to the new entity definition
     @Override
     @CacheEvict(value = "consignments", allEntries = true)
-
     public ConsignmentDetailDTO submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId) {
 
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getConsignmentDetails().stream().noneMatch(detail ->
-                    detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.INITIAL_EVALUATION))) {
+                    detail.getType().equals(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION))) {
                 throw new ConsignmentServiceException("Initial Evaluation not submitted");
             }
             int countFin = 0;
             int countRej = 0;
             for (ConsignmentDetail detail : consignment.getConsignmentDetails()) {
-                if (detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION)) {
+                if (detail.getType().equals(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION)) {
                     countFin++;
                 }
-                if (detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.MANAGER_REJECTED)) {
+                if (detail.getType().equals(ConsignmentDetail.ConsignmentType.MANAGER_REJECTED)) {
                     countRej++;
                 }
             }
@@ -183,7 +185,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             }
 
             ConsignmentDetail detail = new ConsignmentDetail();
-            detail.setStatus(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION);
+            detail.setType(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION);
             detail.setAccount(accountRepos.findById(accountId).orElseThrow());
             detail.setPrice(price);
             detail.setDescription(evaluation);
@@ -237,14 +239,14 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Account is not manager");
             }
             // Check if the consignment is in final evaluation status
-            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.FINAL_EVALUATION))) {
+            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION))) {
 
                 // Create and set consignment detail
                 ConsignmentDetail consignmentDetail = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId).get(
                         consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId).toArray().length - 1
                 );
                 consignment.setStatus(Consignment.Status.WAITING_SELLER); // Set status consignment when completed
-                consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.MANAGER_ACCEPTED);
+                consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED);
                 consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
                 consignment.getConsignmentDetails().add(consignmentDetail);
 
@@ -282,7 +284,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignmentDetail.setConsignment(consignment);
                 consignmentDetail.setPrice(null);
                 consignmentDetail.setDescription(rejectionReason);
-                consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.MANAGER_REJECTED);
+                consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_REJECTED);
                 consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
                 consignment.getConsignmentDetails().add(consignmentDetail);
 
@@ -385,12 +387,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setUpdateDate(updatedConsignment.getUpdateDate());
             consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
 
-            consignment.setStaff(updatedConsignment.getStaff() == null ? null : accountRepos.findById(updatedConsignment.getStaff().getAccountId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
+            consignment.setUser(updatedConsignment.getUser() == null ? null : accountRepos.findById(updatedConsignment.getUser().getAccountId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
 
             Notification notification = new Notification();
-            notification.setAccount(consignment.getStaff());
-            if (consignment.getStaff() != null) {
-                notification.setMessage("Update Consignment By " + consignment.getStaff().getNickname() + " " + consignment.getStaff().getRole());
+            notification.setAccount(consignment.getUser());
+            if (consignment.getUser() != null) {
+                notification.setMessage("Update Consignment By " + consignment.getUser().getNickname() + " " + consignment.getUser().getRole());
             } else {
                 notification.setMessage("Update Info By unknown staff");
             }
@@ -426,8 +428,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     public ConsignmentDTO getConsignmentById(int id) {
-
-
         return consignmentRepos.findById(id).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
     }
 
@@ -438,10 +438,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return getConsignmentDTOS(pageable, consignmentPage);
     }
 
+    //TODO : redesing the logic for get all staff consignment this need refactor
     @Override
     public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
-        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrStaff_AccountIdOrderByStatus(Consignment.Status.WAITING_STAFF,staffId,pageable);
-        return getConsignmentDTOS(pageable, consignmentPage);
+//        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrUser_AccountIdOrderByStatus(Consignment.Status.WAITING_STAFF,userId,pageable);
+//        return getConsignmentDTOS(pageable, consignmentPage);
+        return null;
     }
 
     @Override
@@ -460,7 +462,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     role.equals(Account.Role.valueOf("ADMIN"))) {
                 consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
             }else if(role.equals(Account.Role.valueOf("STAFF"))){
-                consignmentPage = consignmentRepos.findByStatusAndStaff_AccountId(enumStatus,accID, pageable);
+                //todo: this need to be migrated to the new schema definition
+                consignmentPage = null;
+//                consignmentPage = consignmentRepos.findByStatusAndStaff_AccountId(enumStatus,accID, pageable);
             }else{
                 return null;
             }
@@ -477,7 +481,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         Page<Consignment> consignmentPage = consignmentRepos.findByUserID(userId, pageable);
 
         consignmentPage.stream().filter(consignment -> consignment.getStatus().equals(Consignment.Status.FINISHED)).forEach(consignment -> {
-            consignment.setConsignmentDetails(consignment.getConsignmentDetails().stream().filter(detail -> detail.getStatus().equals(ConsignmentDetail.ConsignmentStatus.MANAGER_ACCEPTED)).toList());
+            consignment.setConsignmentDetails(consignment.getConsignmentDetails().stream().filter(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED)).toList());
         });
 //        logger.info("Retrieved consignments by user ID: " + consignmentPage.size()  );
 
@@ -496,7 +500,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignmentDetailDTOs.add(ConsignmentDetailDTO.builder()
                     .consignmentDetailId(detail.getConsignmentDetailId())
                     .description(detail.getDescription())
-                    .status(detail.getStatus().toString())
+                    .status(detail.getType().toString())
                     .price(detail.getPrice())
                     .consignmentId(detail.getConsignment().getConsignmentId())
                     .account(new AccountDTO(detail.getAccount()))
@@ -517,6 +521,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return null;
     }
 
+
+    //Todo: refactor this to be the first consignment detail of the consignment
     @Override
     @CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDTO takeConsignment(int consignmentId, int accountId) {
@@ -524,9 +530,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 () -> new ConsignmentServiceException("Account not found : " + accountId));
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
                 () -> new ConsignmentServiceException("Consignment not found : " + consignmentId));
-        if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getStaff() == null) {
+        if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getUser() == null) {
             consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
-            consignment.setStaff(account);
+            consignment.setUser(account);
             consignment = consignmentRepos.save(consignment);
             return getConsignmentDTO(consignment);
         } else {

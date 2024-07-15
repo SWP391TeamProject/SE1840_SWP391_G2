@@ -26,12 +26,13 @@ public class ConsignmentDetail {
     @Column(name = "description", length = 10000)
     private String description;
 
-    public enum ConsignmentStatus {
-        REQUEST, INITIAL_EVALUATION, FINAL_EVALUATION, MANAGER_ACCEPTED, MANAGER_REJECTED
+    public enum ConsignmentType {
+        INITIAL_EVALUATION, FINAL_EVALUATION, MANAGER_ACCEPTED, MANAGER_REJECTED
     }
-    @Column(name = "status",nullable = false)
+
+    @Column(name = "type",nullable = false)
     @Enumerated(EnumType.STRING)
-    private ConsignmentStatus status;
+    private ConsignmentType type;
 
     @Column(name = "price", precision = 20, scale = 8)
     private BigDecimal price;

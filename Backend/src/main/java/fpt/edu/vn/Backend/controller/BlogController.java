@@ -58,28 +58,7 @@ public class BlogController {
 
     @PostMapping("/")
     public ResponseEntity<BlogPostDTO> createBlog(@ModelAttribute BlogCreateDTO blogCreateDTO) {
-        log.info("Create blog: " + blogCreateDTO);
-        BlogPostDTO blogPostDTO = new BlogPostDTO();
-        blogPostDTO.setTitle(blogCreateDTO.getTitle());
-        blogPostDTO.setContent(blogCreateDTO.getContent());
-        blogPostDTO.setAuthor(accountService.getAccountById(blogCreateDTO.getUserId()));
-        blogPostDTO.setCreateDate(blogCreateDTO.getCreateDate());
-        blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
-        blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
-        log.info("Create blog: " + blogPostDTO);
-        blogPostDTO = blogService.createBlog(blogPostDTO);
-
-        try {
-            if (blogCreateDTO.getFiles() != null && !blogCreateDTO.getFiles().isEmpty()) {
-                for (MultipartFile image : blogCreateDTO.getFiles()) {
-                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
-                }
-            }
-        } catch (Exception e) {
-            log.info("Error: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(blogService.getBlogById(blogPostDTO.getPostId()), HttpStatus.OK);
+        return new ResponseEntity<>(blogService.createBlog(blogCreateDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -91,40 +70,9 @@ public class BlogController {
         if(blogPostDTO.getAuthor().getAccountId() != blogUpdateDTO.getUserId()) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        blogPostDTO.setTitle(blogUpdateDTO.getTitle());
-        blogPostDTO.setContent(blogUpdateDTO.getContent());
-        blogPostDTO.setUpdateDate(blogUpdateDTO.getUpdateDate());
-        blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogUpdateDTO.getCategoryId()));
-        if (blogUpdateDTO.getDeletedFiles() != null && !blogUpdateDTO.getDeletedFiles().isEmpty()) {
-            List<AttachmentDTO> attachments = blogPostDTO.getAttachments().stream().toList();
-            for (AttachmentDTO attachmentDTO : attachments) {
-                if (blogUpdateDTO.getDeletedFiles().contains(attachmentDTO.getAttachmentId())) {
-                    int attachmentId = attachmentDTO.getAttachmentId();
-                    ArrayList<AttachmentDTO> newAttachments = new ArrayList<>(blogPostDTO.getAttachments().stream().toList());
-                    newAttachments.remove(attachmentDTO);
-                    blogPostDTO.setAttachments(newAttachments);
-                    log.info("1 " );
-                    blogPostDTO = blogService.deleteAttachment(blogPostDTO.getPostId(), attachmentId);
-                    log.info("2" );
-                    attachmentService.deleteAttachment(attachmentId);
-                    log.info("3 " );
-                }
-            }
-        }
-        if (blogUpdateDTO.getFiles() != null && !blogUpdateDTO.getFiles().isEmpty()) {
-            try {
-                log.info("4 " );
-                for (MultipartFile image : blogUpdateDTO.getFiles()) {
-                    log.info("5 " );
-                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
-                    log.info("6 " );
-                }
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        blogPostDTO = blogService.updateBlog(blogPostDTO);
-        return new ResponseEntity<>(blogService.getBlogById(blogPostDTO.getPostId()), HttpStatus.OK);
+        blogUpdateDTO.setPostId(blogPostDTO.getPostId());
+        blogPostDTO = blogService.updateBlog(blogUpdateDTO);
+        return new ResponseEntity<>(blogPostDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

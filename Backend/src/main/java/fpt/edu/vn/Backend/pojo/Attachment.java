@@ -37,11 +37,15 @@ public class Attachment {
     private AuctionSession auctionSession;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consignment_id")
+    private Consignment consignment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "consignment_detail_id")
     private ConsignmentDetail consignmentDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "jewelry_id")
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)

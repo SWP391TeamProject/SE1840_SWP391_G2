@@ -24,9 +24,10 @@ public class Bid {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
-            @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+            @JoinColumn(name = "jewelry_id", referencedColumnName = "jewelry_id")
     })
     private AuctionItem auctionItem;
+
 
     public enum Status {
         PENDING, SUCCESS, FAILED

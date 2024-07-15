@@ -6,8 +6,6 @@ import fpt.edu.vn.Backend.pojo.Payment;
 import lombok.*;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Data

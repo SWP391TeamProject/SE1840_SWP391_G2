@@ -58,6 +58,12 @@ export function genItems(consignments: Consignment[]): Item[] {
             id: i + 1,
             categoryId: cd.__categoryId,
             name: cd.__name,
+            age: cd.age,
+            brand: cd.brand,
+            color: cd.color,
+            material: cd.material,
+            size: cd.size,
+            weight: cd.weight,
             description: detail.description,
             reservePrice: detail.price, // giá sàn
             buyInPrice: detail.price * faker.number.int({ min: 10, max: 100 }), // gia mua đứt

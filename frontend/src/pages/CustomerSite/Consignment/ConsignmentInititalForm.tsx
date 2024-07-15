@@ -41,6 +41,12 @@ const formSchema = z.object({
   phone: z.string().regex(phoneRegex,
     { message: "Invalid phone number.must be 10-digit phone number." }),
   contactName: z.string(),
+    age: z.coerce.number().min(1900, { message: "age" }),
+    material: z.string(),
+    brand:z.string(),
+    color:z.string(),
+    size:z.string(),
+    weight:z.coerce.number().max(100000000).min(0),
   preferContact: z.enum(["email", "phone", "text", "any"]),
   description: z.string().min(10, {
     message: "Description must be between 10 and 500 characters"
