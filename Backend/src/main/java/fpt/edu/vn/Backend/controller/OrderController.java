@@ -1,7 +1,6 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;

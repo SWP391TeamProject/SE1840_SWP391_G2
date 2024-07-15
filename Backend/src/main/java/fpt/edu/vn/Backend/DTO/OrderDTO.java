@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 @Data
 public class OrderDTO implements Serializable {
     private int orderId;
-    private Set<AuctionItemDTO> auctionItemDTOS;
+    private Set<ItemDTO> itemDTOS;
     private String shippingAddress;
     private PaymentDTO payment;
     private LocalDateTime createDate;
 
     public OrderDTO(Order order){
         this.orderId = order.getOrderId();
-        this.auctionItemDTOS = order.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet());
+        this.itemDTOS = order.getItems().stream().map(ItemDTO::new).collect(Collectors.toSet());
         this.payment = new PaymentDTO(order.getPayment());
         this.shippingAddress = order.getShippingAddress();
         this.createDate = order.getCreateDate();
