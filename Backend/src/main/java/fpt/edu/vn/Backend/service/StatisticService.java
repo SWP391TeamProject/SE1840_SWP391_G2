@@ -19,4 +19,8 @@ public interface StatisticService {
 
     List<PaymentsByDateDTO> getPaymentsByDateRange(String startDate, String endDate);
 
+
+
+    List<OrderDTO> getOrderHistory();
+
 }

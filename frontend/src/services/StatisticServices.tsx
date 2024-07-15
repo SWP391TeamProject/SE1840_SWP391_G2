@@ -166,3 +166,23 @@ export const getTotalRevenueByPastAuction = async (year: number) => {
       }
     });
 };
+
+export const getOrderHistory = async () => {
+  return await axios
+    .get(API_SERVER + "/statistics/history/order", {
+      headers: {
+        "Content-Type": "application/json",
+         
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+      
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+    });
+};

@@ -74,6 +74,10 @@ public class StatisticController {
     }
 
 
+    @GetMapping("/history/order")
+    public ResponseEntity<List<OrderDTO>> getOrderHistory() {
+        return new ResponseEntity<>(statisticService.getOrderHistory(), HttpStatus.OK);
+    }
 }
 
 

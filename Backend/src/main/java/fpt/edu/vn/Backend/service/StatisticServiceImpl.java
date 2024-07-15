@@ -1,14 +1,8 @@
 package fpt.edu.vn.Backend.service;
 
-import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
-import fpt.edu.vn.Backend.DTO.MonthlyUserDTO;
-import fpt.edu.vn.Backend.DTO.PaymentsByDateDTO;
-import fpt.edu.vn.Backend.DTO.RevenueDTO;
+import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.pojo.AuctionItem;
-import fpt.edu.vn.Backend.pojo.AuctionSession;
-import fpt.edu.vn.Backend.pojo.Item;
-import fpt.edu.vn.Backend.pojo.Payment;
+import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -165,6 +159,28 @@ public class StatisticServiceImpl implements StatisticService {
                 .collect(Collectors.toList());
     }
     @Override
+    public List<OrderDTO> getOrderHistory() {
+        List<Order> orders = orderRepos.findAll();
+
+        // Convert Order entities to OrderDTO objects
+        List<OrderDTO> orderDTOs = orders.stream()
+                .map(this::convertToOrderDTO)
+                .collect(Collectors.toList());
+
+        return orderDTOs;
+    }
+
+    private OrderDTO convertToOrderDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setCreateDate(order.getCreateDate());
+        orderDTO.setOrderId(order.getOrderId());
+        orderDTO.setPayment(new PaymentDTO(order.getPayment()));
+        orderDTO.setShippingAddress(order.getShippingAddress());
+        orderDTO.setAuctionItemDTOS(order.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet()));
+        return orderDTO;
+    }
+
+    @Override
     public long getTotalOrders(){
         return orderRepos.findAll().size();
     }
@@ -186,6 +202,9 @@ public class StatisticServiceImpl implements StatisticService {
 
         return result;
     }
+
+
+
 
 }
 

@@ -6,16 +6,16 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
-import fpt.edu.vn.Backend.DTO.request.LogOutRequest;
 import fpt.edu.vn.Backend.DTO.request.RefreshRequest;
 import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
 import fpt.edu.vn.Backend.oauth2.exception.ErrorCode;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Token;
+import fpt.edu.vn.Backend.pojo.RefreshToken;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.TokenRepos;
+
+import fpt.edu.vn.Backend.repository.RefreshTokenRepos;
 import fpt.edu.vn.Backend.security.SecurityConstants;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -43,23 +43,19 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 @Service
-public class TokenProvider {
+public class RequestTokenProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestTokenProvider.class);
     @NonFinal
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
-
-    @NonFinal
-    @Value("${jwt.refreshable-duration}")
+    @Value("300000")
     protected long REFRESHABLE_DURATION;
 
     @Autowired
-    private TokenRepos tokenRepos;
+    private RefreshTokenRepos refreshTokenRepos;
 
     @Autowired
     private AccountRepos accountRepos;
@@ -119,7 +115,7 @@ public class TokenProvider {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if (tokenRepos.existsByToken(signedJWT.getJWTClaimsSet().getJWTID()))
+        if (refreshTokenRepos.existsByRefreshToken(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         return signedJWT;
     }
@@ -136,28 +132,45 @@ public class TokenProvider {
         return IntrospectResponse.builder().valid(isValid).build();
     }
 
-    @Scheduled(fixedRate = 8000000) //every 80 minute will auto clean
+    @Scheduled(fixedRate = 600000) //every 10 minute will auto clean
     @Transactional
     public void cleanupExpiredTokens() {
         Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-        tokenRepos.deleteByExpiryTimeBefore(now);
+        refreshTokenRepos.deleteByExpiryTimeBefore(now);
         System.out.println("Expired tokens cleaned up at " + new Date());
     }
     public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         var signedJWT = verifyToken(request.getToken(), true);
-        var email = signedJWT.getJWTClaimsSet().getSubject();
+        var email = getEmailFromToken(request.getToken());
 
         var jit = signedJWT.getJWTClaimsSet().getJWTID();
         var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-        Token tokens =
-                Token.builder()
-                        .token(jit)
-                        .expiryTime(expiryTime)
-                        .tokenType("Bearer")
-                        .build();
+        Optional<Account> account = accountRepos.findByEmail(email);
+        if (!account.isPresent()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        Account accounts = account.get();
 
-        tokenRepos.save(tokens);
+        Optional<RefreshToken> existingToken = refreshTokenRepos.findByAccount(accounts);
+
+        RefreshToken tokens;
+        if (existingToken.isPresent()) {
+            // Update existing token
+            tokens = existingToken.get();
+            tokens.setRefreshToken(jit);
+            tokens.setExpiryTime(expiryTime);
+            tokens.setTokenType("Bearer");
+        } else {
+            // Create new token
+            tokens = RefreshToken.builder()
+                    .refreshToken(jit)
+                    .expiryTime(expiryTime)
+                    .tokenType("Bearer")
+                    .account(accounts)
+                    .build();
+        }
+        refreshTokenRepos.save(tokens);
 
 
 
@@ -177,7 +190,7 @@ public class TokenProvider {
                 .issuer("Biddify.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()
+                        Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()
                 ))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(account))

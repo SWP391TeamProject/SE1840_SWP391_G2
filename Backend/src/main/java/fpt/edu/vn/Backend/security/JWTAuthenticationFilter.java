@@ -1,6 +1,6 @@
 package fpt.edu.vn.Backend.security;
 
-import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
+import fpt.edu.vn.Backend.oauth2.security.RequestTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService customUserDetailService;
     @Autowired
-    private TokenProvider tokenProvider;
+    private RequestTokenProvider tokenProvider;
 
     @Override
     protected void doFilterInternal(

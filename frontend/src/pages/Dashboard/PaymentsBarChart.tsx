@@ -91,7 +91,7 @@ export default function PaymentsBarChart({ selectedLabel }) {
 
           setSeries([
             {
-              data: formattedData.map(item => item.totalAmount)
+              data: formattedData.map((item) => item.totalAmount)
             }
           ]);
   
@@ -99,7 +99,7 @@ export default function PaymentsBarChart({ selectedLabel }) {
             ...prevState,
             xaxis: {
               ...prevState.xaxis,
-              categories: formattedData.map(item => item.monthName)
+              categories: formattedData.map((item) => item.monthName)
             }
           }));
         } else {

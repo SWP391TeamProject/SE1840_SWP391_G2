@@ -27,6 +27,7 @@ import {
   getTotalSale,
   getUserThisMonth,
 } from "@/services/StatisticServices";
+import UserVectorMap from "./UserVectorMap";
 
 const avatarSX = {
   width: 36,
@@ -119,6 +120,8 @@ const AdminDashboard = () => {
           console.log(totalSaleResponse.data);
           setTotalSale(totalSaleResponse.data);
         }
+
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -350,7 +353,18 @@ const AdminDashboard = () => {
             </List>
           </MainCard>
         </Grid>
-
+        <Grid item xs={12} md={5} lg={4}>
+          <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item>
+              <Typography variant="h5">User Geolocation</Typography>
+            </Grid>
+            <Grid item />
+          </Grid>
+          <MainCard sx={{ mt: 2 }} content={false}>
+            <UserVectorMap />
+          </MainCard>
+        </Grid>
+        
 
         {/* grid bracket */}
       </Grid>
