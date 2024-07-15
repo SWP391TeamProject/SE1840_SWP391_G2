@@ -349,21 +349,24 @@ export default function AuctionSession() {
                                 <div className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-sm font-medium dark:bg-gray-700">
                                     <ClockIcon className="h-5 w-5" />
 
-                                    {auctionSession?.status === AuctionSessionStatus.PROGRESSING && new Date(auctionSession?.endDate) > new Date() &&
-                                        <span>Ends in {auctionSession?.endDate ? <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+                                    {(auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
+                                      new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
+                                        <span>Ends in <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime></span> : <></>}
 
-                                    {auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) <= new Date() &&
+                                    {(auctionSession?.status === AuctionSessionStatus.FINISHED ||
+                                      new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
                                         <div className="text-pink-500 dark:text-pink-400 font-semibold">
                                             Auction Ended
-                                        </div>}
+                                        </div> : <></>}
 
                                     {auctionSession?.status === AuctionSessionStatus.TERMINATED &&
                                         <div className="text-red-500 dark:text-red-400 font-semibold">
                                             Auction has been terminated
                                         </div>}
 
-                                    {auctionSession?.status === AuctionSessionStatus.SCHEDULED &&
-                                        <span>Start in {auctionSession?.startDate ? <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime> : <CountDownTime end={new Date()}></CountDownTime>}</span>}
+                                    {(auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
+                                      new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
+                                        <span>Starts in <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime></span> : <></>}
 
                                 </div>
                                 {alertBalance}
