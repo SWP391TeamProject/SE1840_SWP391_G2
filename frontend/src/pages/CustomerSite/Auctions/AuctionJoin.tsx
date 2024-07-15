@@ -241,7 +241,7 @@ export default function AuctionJoin() {
               <h1 className=" text-2lg font-bold   ">
                 {itemDTO.name}
               </h1>
-              <div className='flex flex-wrap justify-between items-center'>
+              <div className='flex flex-wrap justify-between items-center drop-shadow-xl'>
                 <div className=' w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 '>
                   <ImageGallery itemDTO={itemDTO} />
                 </div>
@@ -262,7 +262,7 @@ export default function AuctionJoin() {
                     ))}
                   </ScrollArea>
                   {allow ?
-                    <div className=" rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
+                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
                   ">
                     <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
                     <div className='mx-auto'>
@@ -287,10 +287,10 @@ export default function AuctionJoin() {
 
                   :
                   <div className="mt-12 md:mt-16 lg:mt-20 container">
-                    <div className='flex   rounded-xl flex-row  text-foreground p-5' >
+                    <div className='drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5' >
                       <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
                     </div>
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 ">
                       <Link to={`/auctions/${auctionId}` } >
                         <Button type="submit" className="w-full">
                           Go to Auction
