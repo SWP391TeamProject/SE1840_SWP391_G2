@@ -19,7 +19,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
-import { ConfirmationDialog } from "@/components/confirmation-button/confirmation-button";
+import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog";
 
 const formSchema = z.object({
   description: z.string(),

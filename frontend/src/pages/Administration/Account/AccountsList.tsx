@@ -56,7 +56,7 @@ import {
 } from "@/components/ui/select"
 import { Account } from "@/models/AccountModel";
 import { Page } from "@/models/Page";
-import { ConfirmationButton } from "@/components/confirmation-button/confirmation-button";
+import { ConfirmationButton } from "@/components/confirmation/confirmation-button";
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
