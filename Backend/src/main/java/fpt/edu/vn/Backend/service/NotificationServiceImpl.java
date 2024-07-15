@@ -7,6 +7,8 @@ import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.NotificationRepos;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
+    private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private final NotificationRepos notificationRepos;
     private final AccountRepos accountRepos;
 
@@ -79,10 +82,11 @@ public class NotificationServiceImpl implements NotificationService {
                 .map(accountRepos::findByRole)
                 .flatMap(List::stream)
                 .map(account -> {
-            Notification notification = mapDTOToEntity(dto);
-            notification.setAccount(account);
-            return notification;
-        }).collect(Collectors.toList()));
+                    dto.setUserId(account.getAccountId());
+                    Notification notification = mapDTOToEntity(dto);
+                    notification.setAccount(account);
+                    return notification;
+                }).collect(Collectors.toList()));
     }
 
     @Override
