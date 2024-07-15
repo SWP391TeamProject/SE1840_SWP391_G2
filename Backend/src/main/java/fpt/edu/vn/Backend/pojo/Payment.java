@@ -48,7 +48,6 @@ public class Payment {
         WITHDRAW,
         AUCTION_DEPOSIT,
         AUCTION_ORDER,
-        AUCTION_DEPOSIT_REFUND,
         CONSIGNMENT_REWARD
     }
 

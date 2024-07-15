@@ -7,9 +7,16 @@ export interface Consignment {
     id: number,
     status: ConsignmentStatus,
     preferContact: string,
-    staffId: number,
+    description: string,
+    color: string,
+    size: string,
+    weight: string,
+    brand: string,
+    age: number,
+    material: string;
     createDate: Date,
     updateDate: Date,
+    imageURLs: string[],
     details: ConsignmentDetail[]
 }
 

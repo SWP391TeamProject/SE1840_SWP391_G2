@@ -5,9 +5,10 @@ export interface Transaction {
     status: PaymentStatus,
     accountId: number,
     createDate: Date,
+    orderAddress?: string,
     auctionItem: {
-        itemId: number,
-        auctionId: number,
+        itemId?: number,
+        auctionId?: number,
     } | null
 }
 
@@ -19,8 +20,6 @@ export enum PaymentType {
     DEPOSIT = "DEPOSIT",
     WITHDRAW = "WITHDRAW",
     AUCTION_DEPOSIT = "AUCTION_DEPOSIT",
-    AUCTION_BID = "AUCTION_BID",
     AUCTION_ORDER = "AUCTION_ORDER",
-    AUCTION_DEPOSIT_REFUND = "AUCTION_DEPOSIT_REFUND",
     CONSIGNMENT_REWARD = "CONSIGNMENT_REWARD"
 }

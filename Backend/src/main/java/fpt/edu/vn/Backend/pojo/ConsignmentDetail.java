@@ -27,8 +27,9 @@ public class ConsignmentDetail {
     private String description;
 
     public enum ConsignmentType {
-        REQUEST, INITIAL_EVALUATION, FINAL_EVALUATION, MANAGER_ACCEPTED, MANAGER_REJECTED
+        INITIAL_EVALUATION, FINAL_EVALUATION, MANAGER_ACCEPTED, MANAGER_REJECTED
     }
+
     @Column(name = "type",nullable = false)
     @Enumerated(EnumType.STRING)
     private ConsignmentType type;
