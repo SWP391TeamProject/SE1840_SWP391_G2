@@ -12,6 +12,8 @@ import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
 import fpt.edu.vn.Backend.repository.BlogPostRepos;
 import fpt.edu.vn.Backend.repository.NotificationRepos;
 import fpt.edu.vn.Backend.service.BlogServiceImpl;
+import fpt.edu.vn.Backend.service.NotificationService;
+import fpt.edu.vn.Backend.service.NotificationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,7 @@ public class BlogServiceImplTest {
     private BlogCategoryRepos blogCategoryRepos;
 
     @Mock
-    private NotificationRepos notificationRepos;
+    private NotificationServiceImpl notificationService;
 
 
 
@@ -77,7 +79,7 @@ public class BlogServiceImplTest {
         when(blogCategoryRepos.findById(anyInt())).thenReturn(Optional.of(blogCategory));
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
         when(blogPostRepos.save(any(BlogPost.class))).thenReturn(blogPost);
-        when(notificationRepos.findById(anyInt())).thenReturn(Optional.of(notification));
+        doNothing().when(notificationService).sendNotificationToUserGroup(anyString(), any());
 
         BlogPostDTO blogPostDTO  = BlogPostDTO.builder()
                 .title(blogPost.getTitle())
