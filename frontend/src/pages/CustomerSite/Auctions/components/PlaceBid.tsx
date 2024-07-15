@@ -27,6 +27,7 @@ import { CurrencyType, useCurrency } from "@/CurrencyProvider";
 import { useAuth } from "@/AuthProvider";
 import { useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { set } from "date-fns";
 
 
 
@@ -34,6 +35,7 @@ import { Loader2 } from "lucide-react";
 export default function PlaceBid({ ...props }) {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [showBidDialog, setShowBidDialog] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const currency = useCurrency();
     const auth = useAuth();
@@ -71,11 +73,13 @@ export default function PlaceBid({ ...props }) {
         },
     })
     useEffect(() => {
-        if(!props.isSending){
+        if (!props.isSending) {
+            setOpen(false);
             setShowBidDialog(false);
-            setShowConfirmDialog(false);
+            // setShowBidDialog(false);
+            // setShowConfirmDialog(false);
         }
-    },[props.isSending])
+    }, [props.isSending])
     // 2. Define a submit handler.
 
     function onSubmit(values: z.infer<typeof formSchema>) {
@@ -83,6 +87,10 @@ export default function PlaceBid({ ...props }) {
         // ✅ This will be type-safe and validated.
         // if (!showConfirmDialog) return
         // console.log(values);
+
+
+        if (!showConfirmDialog)
+            return;
 
         if (props.client != null) {
             props.setIsSending(true);
@@ -96,30 +104,21 @@ export default function PlaceBid({ ...props }) {
                     }
                 })
             })
-            
+
         }
-
-
-
     }
 
-
+    const { isDirty, isValid } = form.formState;
 
     return (
-        <Dialog defaultOpen={false}
-            onOpenChange={() => {
-                setShowConfirmDialog(false);
-            }}
-            open={showBidDialog}
+        <Dialog
+            open={open} onOpenChange={setOpen}
+            modal={true}
         >
-            <DialogTrigger asChild>
-                <Button variant="default" onClick={() => {
-                    setShowBidDialog(true);
-                }}>Place Bid</Button>
+            <DialogTrigger >
+                <Button variant="default" >Place Bid</Button>
             </DialogTrigger>
-            <DialogContent className="h-fit" onInteractOutside={(e) => {
-                ;
-            }}>
+            <DialogContent className="h-fit">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         {
@@ -225,9 +224,8 @@ export default function PlaceBid({ ...props }) {
                                                     />
                                                 </div>
                                                 <Button className="mx-auto " variant="default" type="submit" onClick={() => {
-                                                    console.log(form);
-                                                    if (form.watch('bidAmount') >= parseFloat(props?.currentBid) + bidIncrement) {
-                                                        setShowConfirmDialog(true)
+                                                    if (isDirty && isValid) {
+                                                        setShowConfirmDialog(true);
                                                     }
                                                 }}>Place Bid</Button>
                                             </div>

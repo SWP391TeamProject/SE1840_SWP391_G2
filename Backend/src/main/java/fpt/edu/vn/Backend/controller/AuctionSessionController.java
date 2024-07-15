@@ -40,12 +40,10 @@ public class AuctionSessionController {
     @Autowired
     private AccountService accountService;
 
-
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@PageableDefault(size = 50) Pageable pageable) {
         return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<AuctionSessionDTO> getAuctionSessionById(@PathVariable int id) {
