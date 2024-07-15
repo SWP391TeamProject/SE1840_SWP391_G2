@@ -106,6 +106,9 @@ public class Account {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
     private Set<ConsignmentDetail> consignmentDetails;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "account",cascade = CascadeType.ALL)
+    private Set<Bid> bids;
+
     public enum Status {
         ACTIVE,
         DISABLED
