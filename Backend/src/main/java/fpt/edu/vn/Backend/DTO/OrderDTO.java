@@ -22,6 +22,6 @@ public class OrderDTO implements Serializable {
         this.itemDTOS = order.getItems().stream().map(ItemDTO::new).collect(Collectors.toSet());
         this.payment = new PaymentDTO(order.getPayment());
         this.shippingAddress = order.getShippingAddress();
-        this.createDate = order.getCreateDate();
+        this.createDate = order.getPayment().getCreateDate();
     }
 }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -33,9 +35,6 @@ public class Order {
     @MapsId
     @JoinColumn(name = "transaction_id")
     private Payment payment;
-
-    @Column(name = "create_date")
-    private LocalDateTime createDate;
 
 
     @Override
