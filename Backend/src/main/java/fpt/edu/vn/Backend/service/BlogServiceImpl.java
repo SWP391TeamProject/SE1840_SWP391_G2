@@ -1,19 +1,30 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.DTO.BlogCreateDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
+import fpt.edu.vn.Backend.DTO.BlogUpdateDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.BlogPost;
-import fpt.edu.vn.Backend.repository.*;
+import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.AttachmentRepos;
+import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
+import fpt.edu.vn.Backend.repository.BlogPostRepos;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +33,7 @@ import java.util.List;
 @Service
 @CacheConfig(cacheNames = "blog")
 public class BlogServiceImpl implements BlogService {
+    private static final Logger log = LoggerFactory.getLogger(BlogServiceImpl.class);
     @Autowired
     private BlogPostRepos blogPostRepos;
     @Autowired
@@ -34,6 +46,15 @@ public class BlogServiceImpl implements BlogService {
 
     @Autowired
     private AttachmentRepos attachmentRepos;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private BlogCategoryService blogCategoryService;
+
+    @Autowired
+    private AttachmentService attachmentService;
 
 
     @Override
@@ -60,8 +81,6 @@ public class BlogServiceImpl implements BlogService {
         return blogPostRepos.findByPostId(id).map(BlogPostDTO::new).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + id));
     }
 
-    @Override
-    @CacheEvict(allEntries = true, value = "blog")
     public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
         BlogPost blogPost = blogPostRepos.save(toEntity(BlogPostDTO));
 
@@ -73,9 +92,34 @@ public class BlogServiceImpl implements BlogService {
         return new BlogPostDTO(blogPost);
     }
 
-
     @Override
-    @CacheEvict(allEntries = true, value = "blog")
+    @CacheEvict(allEntries = true, value = "blog", beforeInvocation = true)
+    public BlogPostDTO createBlog(BlogCreateDTO blogCreateDTO) {
+        BlogPostDTO blogPostDTO = new BlogPostDTO();
+        blogPostDTO.setTitle(blogCreateDTO.getTitle());
+        blogPostDTO.setContent(blogCreateDTO.getContent());
+        blogPostDTO.setAuthor(accountService.getAccountById(blogCreateDTO.getUserId()));
+        blogPostDTO.setCreateDate(blogCreateDTO.getCreateDate());
+        blogPostDTO.setUpdateDate(blogCreateDTO.getUpdateDate());
+        blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogCreateDTO.getCategoryId()));
+        BlogPost blogPost = blogPostRepos.save(toEntity(blogPostDTO));
+
+        try {
+            if (blogCreateDTO.getFiles() != null && !blogCreateDTO.getFiles().isEmpty()) {
+                for (MultipartFile image : blogCreateDTO.getFiles()) {
+                    log.info("Uploading attachment: " + image.getOriginalFilename());
+                    attachmentService.uploadBlogAttachment(image, blogPost.getPostId());
+                }
+            }
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error uploading attachments");
+        }
+
+        return new BlogPostDTO(blogPost);
+    }
+
+
+
     public BlogPostDTO updateBlog(BlogPostDTO BlogPostDTO) {
         return blogPostRepos.findById(BlogPostDTO.getPostId()).map(blogPost -> {
             blogPost.setTitle(BlogPostDTO.getTitle());
@@ -85,6 +129,44 @@ public class BlogServiceImpl implements BlogService {
                     () -> new ResourceNotFoundException("Invalid category id: " + BlogPostDTO.getCategory())));
             return new BlogPostDTO(blogPostRepos.save(blogPost));
         }).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + BlogPostDTO.getPostId()));
+    }
+
+    @Override
+    @CacheEvict(allEntries = true, value = "blog",cacheNames = "blog")
+    public BlogPostDTO updateBlog(BlogUpdateDTO blogUpdateDTO) {
+        BlogPostDTO blogPostDTO = blogPostRepos.findByPostId(blogUpdateDTO.getPostId()).map(BlogPostDTO::new).orElseThrow(
+                () -> new ResourceNotFoundException("Invalid blog id: " + blogUpdateDTO.getPostId()
+                ));
+        blogPostDTO.setTitle(blogUpdateDTO.getTitle());
+        blogPostDTO.setContent(blogUpdateDTO.getContent());
+        blogPostDTO.setUpdateDate(blogUpdateDTO.getUpdateDate());
+        blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogUpdateDTO.getCategoryId()));
+        if (blogUpdateDTO.getDeletedFiles() != null && !blogUpdateDTO.getDeletedFiles().isEmpty()) {
+            List<AttachmentDTO> attachments = blogPostDTO.getAttachments().stream().toList();
+            for (AttachmentDTO attachmentDTO : attachments) {
+                if (blogUpdateDTO.getDeletedFiles().contains(attachmentDTO.getAttachmentId())) {
+                    int attachmentId = attachmentDTO.getAttachmentId();
+                    ArrayList<AttachmentDTO> newAttachments = new ArrayList<>(blogPostDTO.getAttachments().stream().toList());
+                    newAttachments.remove(attachmentDTO);
+                    blogPostDTO.setAttachments(newAttachments);
+                    blogPostDTO = deleteAttachment(blogPostDTO.getPostId(), attachmentId);
+                    attachmentService.deleteAttachment(attachmentId);
+                }
+            }
+        }
+        blogPostDTO = updateBlog(blogPostDTO);
+
+        if (blogUpdateDTO.getFiles() != null && !blogUpdateDTO.getFiles().isEmpty()) {
+            try {
+                for (MultipartFile image : blogUpdateDTO.getFiles()) {
+                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
+                }
+            } catch (Exception e) {
+                throw new InvalidInputException("Error uploading attachments");
+            }
+        }
+
+        return blogPostDTO;
     }
 
     @Override

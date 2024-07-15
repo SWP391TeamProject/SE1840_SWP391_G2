@@ -23,10 +23,13 @@ export const BlogPostDetail = () => {
     let content = temp?.join('\n');
 
     useEffect(() => {
+        console.log(blog);
+
         if (!blog) {
             BlogService.getBlogById(parseInt(id)).then((res) => {
                 let blog = res.data;
                 dispatch(setCurrentBlogPost(blog));
+                console.log(blog);
             });
         }
     }, [])

@@ -94,8 +94,11 @@ export default function BlogEdit() {
     BlogService.updateBlog(blog?.postId || parseInt(id), values).then((res) => {
       console.log(form);
       console.log(res)
-      setCurrentBlog(res.data);
+      BlogService.getBlogById(parseInt(id)).then((res) => {
+        blog = res.data;
+        setCurrentBlog(res.data);
       dispatch(setCurrentBlogPost(res.data));
+      })
       toast.success('Blog updated successfully!', {
         position: "bottom-right",
       });
