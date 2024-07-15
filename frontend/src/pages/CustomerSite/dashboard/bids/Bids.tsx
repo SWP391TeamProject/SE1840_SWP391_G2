@@ -75,8 +75,8 @@ export const Bids = () => {
                             {bids.map((bid: any) => (
                                 <TableRow key={bid.bidId}>
                                     <TableCell>{bid.bidId}</TableCell>
-                                    <TableCell>{bid.payment.amount}</TableCell>
-                                    <TableCell>{bid.payment.date}</TableCell>
+                                    <TableCell>{bid.payment.paymentAmount}</TableCell>
+                                    <TableCell>{bid.payment.createDate}</TableCell>
                                     {/* <TableCell>{bid.auctionItemId.auctionId}</TableCell>
                             <TableCell>{bid.auctionItemId.itemId}</TableCell> */}
                                     <TableCell className='text-center'>

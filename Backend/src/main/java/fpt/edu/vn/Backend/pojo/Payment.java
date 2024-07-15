@@ -68,10 +68,6 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "bid_id")
-    private Bid bid;
-
     @CreationTimestamp
     private LocalDateTime createDate;
 

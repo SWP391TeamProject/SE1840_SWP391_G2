@@ -95,7 +95,7 @@ export const OrderDetail = () => {
                                             <TableRow>
                                                 <TableCell >Total</TableCell>
                                                 <TableCell></TableCell>
-                                                <TableCell className='font-semibold'>{order?.payment?.amount}</TableCell>
+                                                <TableCell className='font-semibold'>{order?.payment?.paymentAmount}</TableCell>
                                             </TableRow>
                                         </TableBody>
 

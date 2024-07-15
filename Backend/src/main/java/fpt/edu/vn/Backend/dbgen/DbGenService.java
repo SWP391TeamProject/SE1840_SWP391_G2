@@ -515,16 +515,16 @@ public class DbGenService {
             Object meta = null;
 
             switch (payment.getType()) {
-                case AUCTION_BID -> {
-                    JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
-                    Bid bid = new Bid();
-                    bid.setAuctionItem(auctionItemRepos.getReferenceById(new AuctionItemId(
-                                    auctionItem.get("auctionId").getAsInt(),
-                                    auctionItem.get("itemId").getAsInt()
-                            )
-                    ));
-                    meta = bid;
-                }
+//                case AUCTION_BID -> {
+//                    JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
+//                    Bid bid = new Bid();
+//                    bid.setAuctionItem(auctionItemRepos.getReferenceById(new AuctionItemId(
+//                                    auctionItem.get("auctionId").getAsInt(),
+//                                    auctionItem.get("itemId").getAsInt()
+//                            )
+//                    ));
+//                    meta = bid;
+//                }
                 case AUCTION_DEPOSIT -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
                     Deposit deposit = new Deposit();
@@ -565,12 +565,12 @@ public class DbGenService {
 
         for (Pair<Payment, Object> p : preparedPayments.values()) {
             Object o = p.getSecond();
-            if (o instanceof Bid bid) {
-                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
-                bid.setPayment(payment);
-                payment.setBid(bid);
-                paymentToSave.add(payment);
-            }
+//            if (o instanceof Bid bid) {
+//                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+//                bid.setPayment(payment);
+//                payment.setBid(bid);
+//                paymentToSave.add(payment);
+//            }
             if (o instanceof Deposit deposit) {
                 Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
                 deposit.setPayment(payment);

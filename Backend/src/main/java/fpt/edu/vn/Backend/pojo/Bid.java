@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -24,10 +28,20 @@ public class Bid {
     })
     private AuctionItem auctionItem;
 
-    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
+    public enum Status {
+        PENDING, SUCCESS, FAILED
+    }
+    private Status status;
+
+    @Column(name = "amount", precision = 20, scale = 8)
+    private BigDecimal amount;
+
+    @CreationTimestamp
+    private LocalDateTime createdDate;
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
 
     @Override
     public int hashCode() {
