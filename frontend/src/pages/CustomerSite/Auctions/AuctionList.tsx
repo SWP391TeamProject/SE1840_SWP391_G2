@@ -17,7 +17,7 @@ export default function AuctionList() {
 
   const {isLoading, isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
-    queryFn: () => fetchActiveAuctionSessions(auctionSessionList.currentPageNumber, 10),
+    queryFn: () => fetchActiveAuctionSessions(auctionSessionList.currentPageNumber, 100),
   });
 
 

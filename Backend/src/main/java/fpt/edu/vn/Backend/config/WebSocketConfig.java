@@ -136,7 +136,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
     }
 
-    @Scheduled(fixedRate = 86400000 ,initialDelay = 0)
+    @Scheduled(fixedRate = 30000 ,initialDelay = 0)
     @Transactional
     public void scheduleFixedRateTask() {
         for (AuctionSession session : auctionSessionRepos.findAll()) {
