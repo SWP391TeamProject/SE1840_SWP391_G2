@@ -23,14 +23,14 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: 'amount',
+    accessorKey: 'paymentAmount',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'));
+      const paymentAmount = parseFloat(row.getValue('paymentAmount'));
       const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-      }).format(amount);
+      }).format(paymentAmount);
       return <div className="font-medium">{formatted}</div>;
     },
     enableSorting: false,
