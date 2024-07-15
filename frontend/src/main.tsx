@@ -4,7 +4,8 @@ import {
   BrowserRouter,
   createBrowserRouter,
   Route,
-  Routes
+  Routes,
+  Navigate
 } from "react-router-dom";
 import routes from "./constants/routes.tsx";
 import { Provider } from "react-redux";
@@ -210,6 +211,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                       }
                     >
                       <Route path="/admin" element={<Administration />}>
+                        <Route path="" element={<Navigate to="/admin/dashboard" replace />}/>
                         <Route path="dashboard"
                           element={<AdminDashboard />}></Route>
                         <Route element={<PrivateRoute

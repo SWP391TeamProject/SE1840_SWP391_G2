@@ -21,20 +21,22 @@ export default function ProductDetail({ ...props }) {
             </CardHeader>
             <CardContent>
                 <div className="grid gap-6">
-                    <h4 className="scroll-m-5 text-xl font-semibold tracking-tight">
-                       Owner name:
-                    </h4>
-                    <p className="leading-7 [&:not(:first-child)]:mt-6">
-                        {props.item.owner.nickname}
+                  <div className="flex justify-content-center gap-5">
+                    <p className="font-semibold tracking-tight">
+                      Owner name:
                     </p>
+                    <p>
+                      {props.item.owner.nickname}
+                    </p>
+                  </div>
                     <FormField
                         control={props.form.control}
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>name</FormLabel>
+                                <FormLabel>Name</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="enter name here" defaultValue={props?.name} {...field} />
+                                    <Input placeholder="Enter name here" defaultValue={props?.name} {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

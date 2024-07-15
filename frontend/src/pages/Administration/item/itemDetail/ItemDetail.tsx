@@ -122,7 +122,7 @@ export default function ItemDetail() {
                     <Loader2 className="animate-spin" />
                   </Button>
                   : <Button type="submit" >
-                    save
+                    Save
                   </Button>
 
                 }
