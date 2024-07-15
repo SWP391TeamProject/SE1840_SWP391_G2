@@ -7,7 +7,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -32,9 +31,6 @@ public class AuctionItem {
 
     @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
-
-    @ManyToMany(fetch = FetchType.LAZY,mappedBy = "auctionItems")
-    private Set<Order> orders;
 
     @OneToMany
     @JoinColumns({

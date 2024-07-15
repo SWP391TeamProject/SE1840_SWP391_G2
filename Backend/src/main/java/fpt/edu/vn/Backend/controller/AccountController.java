@@ -87,13 +87,6 @@ public class AccountController {
         return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/user/me")
-    @PreAuthorize("hasAuthority('USER')")
-    public Account getCurrentUser(@CurrentUser OAuth2BiddifyUser userPrincipal) {
-        return accountRepos.findByEmail(userPrincipal.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userPrincipal.getUsername()));
-    }
-
     @PostMapping("/")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO accountDTO) {

@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
@@ -34,7 +33,7 @@ public class Payment {
     private Status status;
 
     public enum Method {
-        VNPAY, PAYPAL
+        VNPAY, PAYPAL, MANUAL
     }
 
     @Enumerated(EnumType.STRING)

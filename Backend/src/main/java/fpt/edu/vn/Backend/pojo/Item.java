@@ -10,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -61,9 +60,16 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
-
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_id")
     private Set<Attachment> attachments;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @Override
+    public int hashCode() {
+        return itemId;
+    }
 }

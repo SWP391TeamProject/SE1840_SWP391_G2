@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,4 +32,9 @@ public interface ItemRepos extends JpaRepository<Item, Integer> {
 
     List<Item> findByStatus(Item.Status status);
 
+    @Query("SELECT i FROM Item i " +
+            "JOIN i.order o " +
+            "JOIN o.payment p " +
+            "WHERE p.account.accountId = :accountId")
+    Page<Item> findItemByBuyerAccountId(@Param("accountId") Integer accountId, Pageable pageable);
 }

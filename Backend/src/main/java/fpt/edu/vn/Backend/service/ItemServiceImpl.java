@@ -1,19 +1,13 @@
 package fpt.edu.vn.Backend.service;
 
 import com.google.common.base.Preconditions;
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.AttachmentDTO;
-import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
-import fpt.edu.vn.Backend.DTO.ItemDTO;
+import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.MappingException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.pojo.Attachment;
-import fpt.edu.vn.Backend.pojo.Consignment;
-import fpt.edu.vn.Backend.pojo.Item;
-import fpt.edu.vn.Backend.pojo.Order;
+import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
@@ -204,6 +198,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public @NotNull Page<ItemDTO> getItemsByOwnerId(@NotNull Pageable pageable, int ownerId) {
         return itemRepos.findItemByOwnerAccountId(ownerId, pageable).map(this::mapEntityToDTO);
+    }
+
+    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #buyerId", value = "item")
+    @Override
+    public @NotNull Page<ItemDTO> getItemsByBuyerId(@NotNull Pageable pageable, int buyerId) {
+        return itemRepos.findItemByBuyerAccountId(buyerId, pageable).map(this::mapEntityToDTO);
     }
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name", value = "item")

@@ -9,7 +9,6 @@ import fpt.edu.vn.Backend.repository.*;
 import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.math3.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -490,8 +489,20 @@ public class DbGenService {
         }
         LOGGER.info("Generate transactions...");
 
-        //Multimap<Integer, Integer> depositSet = HashMultimap.create();
-        Map<Integer, Pair<Payment, Object>> preparedPayments = new HashMap<>();
+        @Data
+        class PreparedPayment {
+            public Payment parent;
+            public Object meta;
+            public Integer itemId;
+
+            public PreparedPayment(Payment parent, Object meta, Integer itemId) {
+                this.parent = parent;
+                this.meta = meta;
+                this.itemId = itemId;
+            }
+        }
+
+        Map<Integer, PreparedPayment> preparedPayments = new HashMap<>();
 
         for (JsonElement element : e) {
             JsonObject obj = element.getAsJsonObject();
@@ -502,17 +513,11 @@ public class DbGenService {
             payment.setType(Payment.Type.valueOf(obj.get("type").getAsString()));
             payment.setAccount(accountRepos.getReferenceById(obj.get("accountId").getAsInt()));
             payment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
-
-//            if (payment.getType() == Payment.Type.AUCTION_DEPOSIT) {
-//                JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
-//                int auctionId = auctionItem.get("auctionId").getAsInt();
-//                if (depositSet.get(auctionId).contains(obj.get("accountId").getAsInt())) {
-//                    continue;
-//                }
-//                depositSet.put(auctionId, obj.get("accountId").getAsInt());
-//            }
+            if (payment.getType() == Payment.Type.DEPOSIT)
+                payment.setMethod(Payment.Method.MANUAL);
 
             Object meta = null;
+            Integer itemId = null;
 
             switch (payment.getType()) {
                 case AUCTION_BID -> {
@@ -533,52 +538,53 @@ public class DbGenService {
                 }
                 case AUCTION_ORDER -> {
                     JsonObject auctionItem = obj.getAsJsonObject("auctionItem");
-                    Order order = new Order();
-                    order.setAuctionItems(Set.of(auctionItemRepos.getReferenceById(new AuctionItemId(auctionItem.get("auctionSession.auctionSessionId").getAsInt(), auctionItem.get("item.itemId").getAsInt()))));
-                    meta = order;
+                    itemId = auctionItem.get("itemId").getAsInt();
+                    meta = new Order();
                 }
             }
 
-            preparedPayments.put(payment.getPaymentId(), Pair.create(payment, meta));
+            preparedPayments.put(payment.getPaymentId(), new PreparedPayment(payment, meta, itemId));
         }
 
         /////////////////////////////
 
         Map<String, Object>[] paymentParams = new Map[preparedPayments.size()];
         int i = 0;
-        for (Pair<Payment, Object> csn : preparedPayments.values()) {
+        for (PreparedPayment pp : preparedPayments.values()) {
             paymentParams[i++] = Map.of(
-                    "createDate", csn.getFirst().getCreateDate(),
-                    "id", csn.getFirst().getPaymentId()
+                    "createDate", pp.parent.getCreateDate(),
+                    "id", pp.parent.getPaymentId()
             );
         }
 
         paymentRepos.saveAllAndFlush(preparedPayments.values()
-                .stream().map(Pair::getFirst)
+                .stream().map(PreparedPayment::getParent)
                 .collect(Collectors.toList()));
-
         transactionTemplate.execute(status -> jdbcTemplate.batchUpdate("UPDATE payment SET create_date = :createDate WHERE payment_id = :id", paymentParams));
 
         /////////////////////////////
 
         List<Payment> paymentToSave = new ArrayList<>();
 
-        for (Pair<Payment, Object> p : preparedPayments.values()) {
-            Object o = p.getSecond();
+        for (PreparedPayment p : preparedPayments.values()) {
+            Object o = p.meta;
             if (o instanceof Bid bid) {
-                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+                Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
+                p.parent = payment;
                 bid.setPayment(payment);
                 payment.setBid(bid);
                 paymentToSave.add(payment);
             }
             if (o instanceof Deposit deposit) {
-                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+                Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
+                p.parent = payment;
                 deposit.setPayment(payment);
                 payment.setDeposit(deposit);
                 paymentToSave.add(payment);
             }
             if (o instanceof Order order) {
-                Payment payment = paymentRepos.findById(p.getFirst().getPaymentId()).orElseThrow();
+                Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
+                p.parent = payment;
                 order.setPayment(payment);
                 payment.setOrder(order);
                 paymentToSave.add(payment);
@@ -586,6 +592,16 @@ public class DbGenService {
         }
 
         paymentRepos.saveAllAndFlush(paymentToSave);
+
+        for (PreparedPayment p : preparedPayments.values()) {
+            if (p.meta instanceof Order) {
+                itemRepos.findById(p.itemId).ifPresent((item) -> {
+                    Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
+                    item.setOrder(payment.getOrder());
+                    itemRepos.save(item);
+                });
+            }
+        }
     }
 
     private void generateNotification(JsonObject jsonObject) {

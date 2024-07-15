@@ -1,24 +1,17 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.exporter.AccountExporter;
-import fpt.edu.vn.Backend.exporter.ItemExporter;
-import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Item;
-import fpt.edu.vn.Backend.service.AccountService;
-import fpt.edu.vn.Backend.service.AccountServiceImpl;
+import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +19,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/items")
@@ -49,21 +35,17 @@ public class ItemController {
     private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
     private final ConsignmentService consignmentService;
-    private final AccountService accountService;
 
     @Autowired
-    public ItemController(ItemService itemService, ConsignmentService consignmentService, AccountService accountService) {
+    public ItemController(ItemService itemService, ConsignmentService consignmentService) {
         this.itemService = itemService;
         this.consignmentService = consignmentService;
-        this.accountService = accountService;
     }
 
-
     @GetMapping("/")
-    public Page<ItemDTO> getItems( @PageableDefault Pageable pageable,
+    public Page<ItemDTO> getItems(@PageableDefault Pageable pageable,
                                   @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
                                   @RequestParam(required = false) String order, @RequestParam(required = false) String status) {
-        System.out.println("Pageable: " + pageable.toString());
         if (order != null) {
             if (order.equals("desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
@@ -125,11 +107,10 @@ public class ItemController {
         return itemService.getItemsByStatus(pageable, status);
     }
 
-    @GetMapping("/owner/{ownerId}")
-    public Page<ItemDTO> getItemsByOwnerId(
-            @PathVariable int ownerId,
-            @PageableDefault(size = 30) Pageable pageable) {
-        return itemService.getItemsByOwnerId(pageable, ownerId);
+    @GetMapping("/inventory")
+    public Page<ItemDTO> getInventory(Principal principal, @PageableDefault(size = 30) Pageable pageable) {
+        JwtUser jwtUser = Authorizer.getUser(principal);
+        return itemService.getItemsByBuyerId(pageable, jwtUser.getUserId());
     }
 
     @GetMapping("/detail/{id}")
@@ -204,41 +185,5 @@ public class ItemController {
             throw new InvalidInputException("Item id cannot be null");
         }
         return new ResponseEntity<>(itemService.updateItem(itemDTO), HttpStatus.OK);
-    }
-
-    @GetMapping("/export")
-    public ResponseEntity<byte[]> exportToExcel(Authentication authentication){
-         AccountDTO account = accountService.getAccountByEmail(authentication.getName());
-          if (account == null || account.getRole() != Account.Role.ADMIN) {
-                throw new InvalidInputException("You are not authorized to perform this action");
-          }
-          List<ItemDTO> listItems;
-          {
-                listItems = itemService.getItems(PageRequest.of(0, 1000)).getContent();
-          }
-
-          DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-          String currentDateTime = dateFormatter.format(new Date());
-
-          String headerValue = "filename=items_" + currentDateTime + ".xlsx";
-
-          ItemExporter excelExporter = new ItemExporter(listItems);
-
-          ByteArrayOutputStream stream = excelExporter.export();
-
-          HttpHeaders headers = new HttpHeaders();
-          headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-          headers.setContentDispositionFormData("attachment", headerValue);
-
-          return ResponseEntity.ok()
-                 .headers(headers)
-                 .body(stream.toByteArray());
-     }
-
-
-    @PostMapping("/updateStatus")
-    public ResponseEntity<Void> updateItemStatus(@RequestBody(required = false) UpdateItemStatusRequestDTO itemDTOList) {
-        itemService.updateItemByStatus(itemDTOList);
-        return ResponseEntity.ok().build();
     }
 }
