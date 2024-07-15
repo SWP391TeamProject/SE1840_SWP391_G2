@@ -144,7 +144,7 @@ export default function BlogEdit() {
                   <Loader2 className="animate-spin" />
                 </Button>
                 : <Button type="submit" >
-                  save
+                  Save
                 </Button>
 
               }

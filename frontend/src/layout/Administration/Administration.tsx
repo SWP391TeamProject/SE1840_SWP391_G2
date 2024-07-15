@@ -129,13 +129,6 @@ export default function Administration() {
                                 Manage Orders
                             </Link>
                             <Link
-                                to="notifications"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <Bell />
-                                Manage Notifications
-                            </Link>
-                            <Link
                                 to="payments"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >

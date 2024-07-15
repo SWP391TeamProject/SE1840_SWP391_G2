@@ -14,7 +14,7 @@ export default function Details({ ...props }) {
       <CardHeader>
         <CardTitle>Session Detail</CardTitle>
         <CardDescription>
-          this is the detail of the session
+          This is the detail of the session
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -24,7 +24,7 @@ export default function Details({ ...props }) {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>title</FormLabel>
+                <FormLabel>Title</FormLabel>
                 <FormControl>
                   <Input placeholder="shadcn" {...field} />
                 </FormControl>
@@ -39,7 +39,7 @@ export default function Details({ ...props }) {
               name="startDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>start date</FormLabel>
+                  <FormLabel>Start date</FormLabel>
                   <FormControl>
                     {/* <DateTimePicker {...field} />  */}
                     <Input type="datetime-local"  className="bg-background text-foreground"  {...field} />
