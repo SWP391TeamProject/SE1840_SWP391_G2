@@ -36,6 +36,7 @@ import java.util.concurrent.*;
 
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    ZoneOffset zoneOffset = ZoneOffset.of("+07:00");
     private final JWTGenerator jwtGenerator;
     private final CustomUserDetailsService customUserDetailsService;
     private final AuctionSessionService auctionSessionService;
@@ -127,7 +128,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 AuctionSession session = auctionSessionRepos.findById(id).orElseThrow(
                         () -> new RuntimeException("Auction session not found")
                 );
-                int delay = (int) (session.getEndDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                int delay = (int) (session.getEndDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
                 finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
                 log.info("Auction session " + session.getAuctionSessionId() + " finish in " + Math.max(delay, 0)+" seconds:"+session.getEndDate());
 
@@ -149,12 +150,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 log.info("Auction session " + session.getAuctionSessionId() + " finished:"+session.getEndDate());
             } else
             if(session.getStatus().equals(AuctionSession.Status.SCHEDULED)){
-                int delay = (int) (session.getStartDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                int delay = (int) (session.getStartDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
                 startAuction(session.getAuctionSessionId(), Math.max(delay, 0));
                 log.info("Auction session " + session.getAuctionSessionId() + " start in "+delay+" seconds:"+session.getStartDate());
             } else
             if (session.getStatus().equals(AuctionSession.Status.PROGRESSING)){
-                int delay = (int) (session.getEndDate().toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+                int delay = (int) (session.getEndDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
                 finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
                 log.info("Auction session " + session.getAuctionSessionId() + " will finish in " + Math.max(delay, 0));
             }
