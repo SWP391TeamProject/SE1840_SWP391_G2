@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/redux/hooks";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import ProductDetail from "./ProductDetail";
 import ProductStatus from "./ProductStatus";
 import ProductCategory from "./ProductCategory";
@@ -19,6 +19,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import { ConfirmationDialog } from "@/components/confirmation-button/confirmation-button";
 
 const formSchema = z.object({
   description: z.string(),
@@ -39,6 +40,9 @@ export default function ItemDetail() {
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
   const { id } = useParams<{ id: string }>();
   const [isloading, setIsLoading] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [showTrigger, setShowTrigger] = useState(false);
+  const [formValues, setFormValues] = useState();
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,21 +82,50 @@ export default function ItemDetail() {
     }
   }, []);
 
+  const confirm = () => {
+    setIsConfirmed(true);
+    setShowTrigger(false);
+  }
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
+    // setIsLoading(true);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log("validated")
     console.log(values)
+    setShowTrigger(true);
+    setFormValues(values);
 
+    console.log(showTrigger);
+
+    // if (isConfirmed) {
+    //   updateItem(values).then((res) => {
+
+    //     console.log(res)
+    //     toast.success('Item updated successfully!', {
+    //       position: "bottom-right",
+    //     });
+    //     setIsLoading(false);
+    //   }).catch((err) => {
+    //     setIsLoading(false);
+    //     toast.error(err.response.data.message, {
+    //       position: "bottom-right",
+    //     });
+    //     console.error(err)
+    //   })
+    // } else {
+    //   setIsLoading(false);
+    // }
+  }
+
+  const handleConfirmed = (values: any) => {
+    setIsLoading(true);
     updateItem(values).then((res) => {
-
       console.log(res)
-      toast.success('Item updated successfully!',{
-        position:"bottom-right",
-    });
+      toast.success('Item updated successfully!', {
+        position: "bottom-right",
+      });
       setIsLoading(false);
     }).catch((err) => {
       setIsLoading(false);
@@ -101,8 +134,16 @@ export default function ItemDetail() {
       });
       console.error(err)
     })
-
   }
+
+  useEffect(() => {
+    if(isConfirmed){
+      if(formValues) {
+        handleConfirmed(formValues);
+        setIsConfirmed(false);
+      }
+    } 
+  }, [isConfirmed])
 
   return (
     <>
@@ -133,11 +174,19 @@ export default function ItemDetail() {
 
               </div>
             </div>
-
           }
 
         </form>
       </Form>
+
+        <ConfirmationDialog
+          open={showTrigger}
+          onOpenChange={setShowTrigger}
+          title="Are you sure to update this item?"
+          message={"Item " + currentItem?.name}
+          label="Ok"
+          onSuccess={confirm}
+        />
     </>
   );
 

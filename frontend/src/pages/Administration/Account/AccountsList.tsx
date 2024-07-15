@@ -56,6 +56,7 @@ import {
 } from "@/components/ui/select"
 import { Account } from "@/models/AccountModel";
 import { Page } from "@/models/Page";
+import { ConfirmationButton } from "@/components/confirmation-button/confirmation-button";
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
@@ -221,7 +222,7 @@ export default function AccountsList() {
             <TabsTrigger onClick={() => handleFilterClick([Roles.STAFF], "staff")} value="staff">Staff</TabsTrigger>
             <TabsTrigger onClick={() => handleFilterClick([Roles.MEMBER], "member")} value="member">Member</TabsTrigger>
           </TabsList> */}
-          <div className="ml-auto flex items-center gap-2">
+          {/* <div className="ml-auto flex items-center gap-2"> */}
             {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
@@ -247,13 +248,25 @@ export default function AccountsList() {
                                         Export
                                     </span>
                                 </Button> */}
-            <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
+            {/* <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Add Account
               </span>
             </Button>
-          </div>
+          </div> */}
+          {/* <ConfirmationButton
+            label="Add Account"
+            title="Are you sure to create an Account?"
+            message=""
+            className="h-8 gap-1"
+            onSuccess={() => { handleCreateClick() }}
+          >
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Add Account
+            </span>
+          </ConfirmationButton> */}
         </div>
         <TabsContent value={roleFilter}>
           {/* {isLoading ?
