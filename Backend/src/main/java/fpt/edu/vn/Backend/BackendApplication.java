@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -34,6 +35,7 @@ public class BackendApplication {
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.of("+7")));
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(BackendApplication.class);
 		if (args.length > 0 && args[0].equalsIgnoreCase("gendb")) {
 			builder.listeners((ApplicationListener<ServletWebServerInitializedEvent>) event -> {
