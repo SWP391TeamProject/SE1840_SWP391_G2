@@ -64,6 +64,7 @@ import { Bids } from "./pages/CustomerSite/dashboard/bids/Bids.tsx";
 import NotificationsList from "@/pages/CustomerSite/Profile/Notification.tsx";
 import ItemCreate from "./pages/Administration/item/ItemCreate.tsx";
 import Balance from "./pages/CustomerSite/Profile/Balance.tsx";
+import Inventory from "./pages/CustomerSite/Profile/Inventory.tsx";
 import PaymentStatus from "./pages/CustomerSite/Profile/PaymentStatus.tsx";
 import ThemeProvider from "./components/component/ThemeProvider.tsx";
 import AssignAuctionItem
@@ -185,7 +186,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                           <Route path="preferences"
                             element={<ProfilePreferences />}></Route>
                           <Route path="notification"
-                            element={<NotificationsList />}></Route>
+                                 element={<NotificationsList />}></Route>
+                          <Route path="inventory"
+                                 element={<Inventory />}></Route>
                           <Route path="balance"
                             element={<Balance />}></Route>
                           <Route path="kyc" element={<KycVerification />}></Route>

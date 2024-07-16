@@ -10,6 +10,9 @@ export interface Item {
   updateDate?: Date;
   ownerId?: number;
   orderId?: number;
+  attachments: {
+    link: string
+  }[];
 }
 
 export enum ItemStatus {
