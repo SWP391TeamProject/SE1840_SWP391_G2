@@ -15,7 +15,6 @@ import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { getCookie } from "@/utils/cookies";
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent";
-import Consignment from "@/models/consignment";
 import { toast } from "react-toastify";
 import { createFinalEvaluation, createInitialEvaluation } from "@/services/ConsignmentDetailService";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -23,6 +22,7 @@ import { Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchConsignmentByConsignmentId } from "@/services/ConsignmentService";
 import { ConsignmentStatus } from "@/constants/enums";
+import { Consignment } from "@/models/newModel/consignment";
 const formSchema = z.object({
     accountId: z.number(),
     evaluation: z.string().min(10, {

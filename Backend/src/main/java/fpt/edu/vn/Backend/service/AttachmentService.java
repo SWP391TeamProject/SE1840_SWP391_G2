@@ -28,6 +28,7 @@ public interface AttachmentService {
 
     @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, int accountId) throws IOException;
     @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, int consignmentDetailId);
+    @NotNull AttachmentDTO uploadConsignmentAttachment(@NotNull MultipartFile file, int consignmentId);
     @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException;
     @NotNull AttachmentDTO uploadBlogAttachment(@NotNull MultipartFile file, Integer BlogId) throws IOException;
     @NotNull AttachmentDTO uploadAuctionAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException;

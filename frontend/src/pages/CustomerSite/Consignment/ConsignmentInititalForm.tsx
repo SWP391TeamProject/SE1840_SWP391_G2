@@ -41,7 +41,7 @@ const formSchema = z.object({
   phone: z.string().regex(phoneRegex,
     { message: "Invalid phone number.must be 10-digit phone number." }),
   contactName: z.string(),
-    age: z.coerce.number().min(1900, { message: "age" }),
+    age: z.coerce.number().min(0, { message: "invalid age" }),
     material: z.string(),
     brand:z.string(),
     color:z.string(),
@@ -82,6 +82,7 @@ export default function ConsignmentInititalForm() {
   }, [])
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
+    console.log(data);
     setIsLoading(true);
     // Remove FormData creation and file handling
     createConsignmentService(data).then((res) => {
@@ -240,6 +241,91 @@ export default function ConsignmentInititalForm() {
                       </FormItem>
                     )}
                   />
+                  <div className="flex flex-row justify-between">
+                  <FormField
+                    control={form.control}
+                    name="age"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Age</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="enter item age" {...field}  className="w-36"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="material"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Material</FormLabel>
+                        <FormControl>
+                          <Input placeholder="enter item material" {...field} className="w-36"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="brand"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Brand</FormLabel>
+                        <FormControl>
+                          <Input placeholder="enter item brand" {...field} className="w-36"/>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  </div>
+                  <div className="flex flex-row justify-between">
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <Input placeholder="enter item color" {...field} className="w-36"/>
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="size"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Size</FormLabel>
+                        <FormControl>
+                          <Input placeholder="enter item size" {...field} className="w-36"/>
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="weight"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Weight</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="enter item weight" {...field} className="w-36" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="description"

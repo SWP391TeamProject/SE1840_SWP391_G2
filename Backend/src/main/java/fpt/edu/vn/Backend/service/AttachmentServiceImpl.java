@@ -38,6 +38,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     private AuctionSessionRepos auctionRepos;
     @Autowired
     private BlogPostRepos blogPostRepos;
+
+    @Autowired
+    private ConsignmentRepos consignmentRepos;
+
     @Value("${AZURE_STORAGE_CONNECTION_STRING:}")
     private  String connectStr ;
     @Autowired
@@ -202,6 +206,45 @@ public class AttachmentServiceImpl implements AttachmentService {
         attachment.setBlobId(blobId);
         attachment.setLink(blobClient.getBlobUrl());
         attachment.setConsignmentDetail(consignmentDetail);
+        attachmentRepository.save(attachment);
+        return mapEntityToDTO(attachment);
+    }
+    @Override
+    public @NotNull AttachmentDTO uploadConsignmentAttachment(@NotNull MultipartFile file, int consignmentId) {
+        Optional<Consignment> optionalConsignmentDetail = consignmentRepos.findById(consignmentId);
+        if (optionalConsignmentDetail.isEmpty()) {
+            throw new ResourceNotFoundException("Consignment with id " + consignmentId + " does not exist");
+        }
+        Consignment consignment = optionalConsignmentDetail.get();
+
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
+        MimeType mimeType;
+        try {
+            mimeType = mimeTypes.forName(file.getContentType());
+        } catch (MimeTypeException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        String blobId = consignment.getUser().getAccountId()+"/consignment/"+UUID.randomUUID() + mimeType.getExtension();
+
+        BlockBlobClient blobClient = blobContainerClient.getBlobClient(blobId).getBlockBlobClient();
+
+        // Convert InputStream to ByteArrayInputStream
+        byte[] bytes ;
+        try {
+            bytes = file.getBytes();
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+
+        blobClient.upload(byteArrayInputStream, bytes.length, true);
+
+        Attachment attachment = new Attachment();
+        attachment.setBlobId(blobId);
+        attachment.setLink(blobClient.getBlobUrl());
+        attachment.setConsignment(consignment);
         attachmentRepository.save(attachment);
         return mapEntityToDTO(attachment);
     }

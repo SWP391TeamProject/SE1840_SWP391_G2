@@ -116,13 +116,11 @@ export default function CustomerConsigmentCard({ consignment }) {
                             <h1 className="block text-xl font-medium text-foreground">{custConsignmentDetail == null || custConsignmentDetail.status === ConsignmentDetailType.REQUEST ? "" : "Price"}</h1>
                             {custConsignmentDetail?.price}
                             <div className="flex justify-center flex-wrap">
-                                {custConsignmentDetail?.attachments?.map((attachment: any, index: number) => {
-                                    return (
-                                        <Link key={index} to={attachment.link} target="_blank" className="w-1/4 h-1/4 m-1 rounded-sm">
-                                            <img src={attachment.link} alt="attachment" className="rounded-md" />
+
+                                        <Link to={consignment?.attachment?.link} target="_blank" className="w-1/4 h-1/4 m-1 rounded-sm">
+                                            <img src={consignment?.attachment?.link} alt="attachment" className="rounded-md" />
                                         </Link>
-                                    )
-                                })}
+
                             </div>
                             <div className="text-foreground opacity-50">
                                 *Click on the image to download

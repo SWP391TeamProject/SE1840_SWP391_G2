@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.serviceTest;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
@@ -56,17 +57,34 @@ public class ConsignmentServiceImplTest {
 
     @Test
     public void requestConsignmentCreate_HappyPath() {
-        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(new Account()));
-        when(consignmentRepos.save(any(Consignment.class))).thenReturn(new Consignment());
 
-        ConsignmentDetailDTO consignmentDetails = new ConsignmentDetailDTO();
+
+
+        ConsignmentRequestDTO consignmentDetails = new ConsignmentRequestDTO();
         consignmentDetails.setDescription("description");
+        consignmentDetails.setPreferContact("email");
+        consignmentDetails.setAccountId(1);
+        consignmentDetails.setAge(1);
+        consignmentDetails.setBrand("brand");
+        consignmentDetails.setColor("color");
+        consignmentDetails.setMaterial("material");
+        consignmentDetails.setSize("size");
+        consignmentDetails.setWeight("weight");
 
-        ConsignmentDTO result = consignmentService.requestConsignmentCreate(1, "email", consignmentDetails);
+        Account account = new Account();
+        account.setAccountId(1);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        Consignment consignment = new Consignment();
+        consignment.setConsignmentId(1);
+        consignment.setStatus(Consignment.Status.WAITING_STAFF);
+        consignment.setUser(account);
+
+        when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
+
+        ConsignmentDTO result = consignmentService.requestConsignmentCreate( consignmentDetails);
 
         assertNotNull(result);
         verify(consignmentRepos, times(1)).save(any(Consignment.class));
-        verify(consignmentDetailRepos, times(1)).save(any(ConsignmentDetail.class));
     }
 
     @Test
@@ -228,6 +246,7 @@ public class ConsignmentServiceImplTest {
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
         consignment.setStatus(Consignment.Status.WAITING_STAFF);
+        consignment.setUser(new Account());
 
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
@@ -237,7 +256,7 @@ public class ConsignmentServiceImplTest {
 
         assertNotNull(result);
         assertEquals(Consignment.Status.IN_INITIAL_EVALUATION.toString(), result.getStatus());
-        assertEquals(account.getAccountId(), result.getUser().getAccountId());
+        assertEquals(account.getAccountId(), result.getStaff().getAccountId());
     }
 
     @Test
@@ -257,9 +276,15 @@ public class ConsignmentServiceImplTest {
 
     @Test
     public void receivedConsignment_HappyPath() {
+        Account account = new Account();
+        account.setAccountId(1);
+        when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
+        when(consignmentRepos.save(any(Consignment.class))).thenReturn(new Consignment());
+
         Consignment consignment = new Consignment();
         consignment.setConsignmentId(1);
         consignment.setStatus(Consignment.Status.SENDING);
+        consignment.setUser(account);
 
         when(consignmentRepos.findById(anyInt())).thenReturn(Optional.of(consignment));
 
@@ -284,10 +309,10 @@ public class ConsignmentServiceImplTest {
     public void requestConsignmentCreate_UserNotFound() {
         when(accountRepos.findById(anyInt())).thenReturn(Optional.empty());
 
-        ConsignmentDetailDTO consignmentDetails = new ConsignmentDetailDTO();
+        ConsignmentRequestDTO consignmentDetails = new ConsignmentRequestDTO();
         consignmentDetails.setDescription("description");
 
-        assertThrows(ConsignmentServiceException.class, () -> consignmentService.requestConsignmentCreate(1, "email", consignmentDetails));
+        assertThrows(ConsignmentServiceException.class, () -> consignmentService.requestConsignmentCreate(consignmentDetails));
     }
 
     @Test
