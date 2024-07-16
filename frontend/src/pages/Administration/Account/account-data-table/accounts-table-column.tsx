@@ -62,20 +62,20 @@ export const getColumns = (): ColumnDef<Account>[] => [
   {
     accessorKey: "accountId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Account ID" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("accountId")}</div>,
+    cell: ({ row }) => <div className="w-2">{row.getValue("accountId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
   {
     accessorKey: "email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email"  className="w-"/>
+      <DataTableColumnHeader column={column} title="Email" className="w-20"/>
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[7.25rem] truncate font-medium">
+        <span className="max-w-[20rem] truncate font-medium">
           {row.getValue("email")}
         </span>
       </div>

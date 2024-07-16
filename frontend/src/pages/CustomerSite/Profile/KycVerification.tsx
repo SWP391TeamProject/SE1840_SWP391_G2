@@ -95,7 +95,7 @@ export default function KycVerification() {
             .catch((error) => {
                 setIsLoading(false);
                 showStatusModal(submissionStatus.ERROR);
-                toast.error('There was an error submitting your KYC verification. Please try again.')
+                toast.error('Error submitting KYC verification. Please upload valid images and try again.')
                 // Handle error...
             });
 
@@ -210,7 +210,7 @@ const showStatusModal = (status: submissionStatus) => {
                         }</AlertDialogTitle>
                 </AlertDialogHeader>
                     {status === submissionStatus.ERROR ?
-                          '  There was an error submitting your KYC verification. Please try again.'
+                          '  There was an error submitting your KYC verification. Please upload a better images and try again.'
                         :
                            ' Your KYC verification has been submitted successfully.You can now participate in the auction on our platform.'
                     }
