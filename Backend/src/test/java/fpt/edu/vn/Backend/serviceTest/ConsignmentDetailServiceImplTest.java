@@ -67,6 +67,15 @@ public class ConsignmentDetailServiceImplTest {
         attachment = new Attachment();
         attachment.setAttachmentId(1);
 
+        consignmentDetail1 = new ConsignmentDetail();
+        consignmentDetail1.setConsignmentDetailId(1);
+        consignmentDetail1.setConsignment(consignment);
+        consignmentDetail1.setAccount(account);
+        consignmentDetail1.setDescription("Description 1");
+        consignmentDetail1.setPrice(BigDecimal.valueOf(100.0));
+        consignmentDetail1.setType(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION);
+        consignmentDetail1.setAttachments(Arrays.asList(attachment));
+
         consignmentDetail2 = new ConsignmentDetail();
         consignmentDetail2.setConsignmentDetailId(2);
         consignmentDetail2.setConsignment(consignment);

@@ -7,12 +7,9 @@ import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,14 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,33 +31,30 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private static final Logger logger = LoggerFactory.getLogger(AuctionSessionServiceImpl.class);
     private final AccountRepos accountRepos;
     private final DepositRepos depositRepos;
-    private final BidRepos bidRepos;
     private final PaymentRepos paymentRepos;
+    private final BidService bidService;
+    private final PaymentService paymentService;
+    private final AccountServiceImpl accountServiceImpl;
     private final ItemRepos itemRepos;
     private final AuctionItemRepos auctionItemRepos;
     private final OrderServiceImpl orderServiceImpl;
 
-    private final NotificationService notificationService;
-    private final JavaMailSender mailSender;
-    @Value("${app.email}")
-    private String systemEmail;
-
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos,
-                                     DepositRepos depositRepos, NotificationService notificationService,
-                                     BidRepos bidRepos, PaymentRepos paymentRepos, ItemRepos itemRepos,
-                                     AuctionItemRepos auctionItemRepos, OrderServiceImpl orderServiceImpl,
-                                     JavaMailSender mailSender) {
+                                     DepositRepos depositRepos, PaymentRepos paymentRepos,
+                                     BidService bidService, PaymentService paymentServiceImpl,
+                                     AccountServiceImpl accountServiceImpl, ItemRepos itemRepos,
+                                     AuctionItemRepos auctionItemRepos, OrderServiceImpl orderServiceImpl) {
         this.auctionSessionRepos = auctionSessionRepos;
         this.accountRepos = accountRepos;
         this.depositRepos = depositRepos;
-        this.notificationService = notificationService;
-        this.bidRepos = bidRepos;
         this.paymentRepos = paymentRepos;
+        this.bidService = bidService;
+        this.paymentService = paymentServiceImpl;
+        this.accountServiceImpl = accountServiceImpl;
         this.itemRepos = itemRepos;
         this.auctionItemRepos = auctionItemRepos;
         this.orderServiceImpl = orderServiceImpl;
-        this.mailSender = mailSender;
     }
 
     @Override
@@ -122,10 +113,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Session not found: " + assign.getAuctionSessionId()));
-            if (auctionSession.getStatus() != AuctionSession.Status.SCHEDULED) {
-                throw new IllegalStateException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
-            }
-
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
@@ -179,292 +166,135 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void finishAuction(int auctionSessionId) {
-        AuctionSession auction = auctionSessionRepos.findById(auctionSessionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid auction session id: " + auctionSessionId));
-        if (auction.getStatus() == AuctionSession.Status.FINISHED ||
-                auction.getStatus() == AuctionSession.Status.TERMINATED) {
+        record Winner(AccountDTO dto, List<AuctionItemId> items) {}
+
+        AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
+        if (auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")) {
             logger.warn("Auction session " + auctionSessionId + " already ended");
             return;
         }
-        if (auction.getStatus() == AuctionSession.Status.SCHEDULED) {
-            logger.warn("Auction session " + auctionSessionId + " not started yet");
-            return;
-        }
+
+        Map<Integer, Winner> winAccounts = new HashMap<>();
         logger.info("Finishing auction session " + auctionSessionId);
 
-        //////////////
+        for (AuctionItemDTO auctionItem : auctionDTO.getAuctionItems()) {
+            bidService.finishAuctionItem(auctionItem.getId());
+            AccountDTO account = accountServiceImpl.getAccountById(bidService.getHighestBid(auctionItem.getId())
+                    .getPayment().getAccountId());
+            if (account == null) {
+                continue;
+            }
+            Winner winner = winAccounts.get(account.getAccountId());
+            if (winner == null) {
+                winner = new Winner(account, new ArrayList<>());
+                winAccounts.put(account.getAccountId(), winner);
+            }
+            winner.items().add(auctionItem.getId());
+        }
 
-        record Participant(Account account, List<AuctionItem> wonItems, List<AuctionItem> lostItems) {
-            Participant(Account account) {
-                this(account, Collections.emptyList(), Collections.emptyList());
+        winAccounts.forEach((account, winner) -> {
+            logger.info("Winner: " + account + " won items: " + winner.items().stream()
+                    .map(AuctionItemId::toString)
+                    .collect(Collectors.joining(",")));
+        });
+
+        for (DepositDTO deposit : auctionDTO.getDeposits()) {
+            if (deposit.getPayment().getStatus().equals(Payment.Status.SUCCESS)
+                    || deposit.getPayment().getStatus().equals(Payment.Status.FAILED)) {
+                continue;
+            }
+            if (winAccounts.containsKey(deposit.getPayment().getAccountId())) {
+                deposit.getPayment().setStatus(Payment.Status.SUCCESS);
+                paymentService.updatePayment(deposit.getPayment());
+            } else {
+                deposit.getPayment().setStatus(Payment.Status.FAILED);
+                accountRepos.findById(deposit.getPayment().getAccountId()).ifPresent(account -> {
+                    account.setBalance(account.getBalance().add(deposit.getPayment().getPaymentAmount()));
+                    accountRepos.save(account);
+                    logger.info("Refunded deposit id {} for account {}", deposit.getDepositId(), account.getAccountId());
+                });
+                paymentService.updatePayment(deposit.getPayment());
             }
         }
 
-        Map<Integer, Participant> participants = new HashMap<>();
-        List<NotificationDTO> scheduledNotifications = new ArrayList<>();
-        int bidCount = 0;
+        for (Winner winner : winAccounts.values()) {
+            orderServiceImpl.createOrder(winner.dto.getAccountId(), new HashSet<>(winner.items), auctionSessionId);
+        }
 
-        //////////////
-
-        for (AuctionItem auctionItem : auction.getAuctionItems()) {
-            List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItem.getAuctionItemId());
-            bidCount += bids.size();
-
-            {
+        try {
+            AuctionSession auctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId()).
+                    orElseThrow(() -> new ResourceNotFoundException("Auction session not found", "id", auctionSessionId));
+            for (AuctionItem auctionItem : auctionSession.getAuctionItems()) {
                 Item item = auctionItem.getItem();
-                item.setStatus(bids.isEmpty() ? Item.Status.UNSOLD : Item.Status.SOLD);
+                if (bidService.getBidsByAuctionItemId(auctionItem.getAuctionItemId()).isEmpty()) {
+                    item.setStatus(Item.Status.QUEUE);
+                } else {
+                    item.setStatus(Item.Status.UNSOLD);
+                }
                 itemRepos.save(item);
             }
-
-            for (int i = 0; i < bids.size(); i++) {
-                Bid bid = bids.get(i);
-                bid.setStatus(i == 0 ? Bid.Status.SUCCESS : Bid.Status.FAILED);
-            }
-            bidRepos.saveAll(bids);
-
-            if (!bids.isEmpty()) {
-                Account winner = bids.get(0).getAccount();
-                participants.computeIfAbsent(winner.getAccountId(), (v) -> new Participant(winner))
-                        .wonItems.add(auctionItem);
-
-                Set<Integer> seenAccounts = new HashSet<>();
-                for (Account loser : bids.stream()
-                        .map(Bid::getAccount)
-                        .filter(a -> winner.getAccountId() != a.getAccountId())
-                        .filter(a -> seenAccounts.add(a.getAccountId()))
-                        .toList()) {
-                    participants.computeIfAbsent(loser.getAccountId(), (v) -> new Participant(loser))
-                            .lostItems.add(auctionItem);
-                }
-            }
+            auctionSession.setStatus(AuctionSession.Status.FINISHED);
+            auctionSessionRepos.save(auctionSession);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error updating auction session", e);
         }
-
-        //////////////
-
-        for (Participant participant : participants.values()) {
-            Account account = participant.account;
-            if (!participant.wonItems.isEmpty())
-                logger.info("User {} won items {}", account.getAccountId(), participant.wonItems.stream()
-                        .map(AuctionItem::getAuctionItemId)
-                        .map(AuctionItemId::toString)
-                        .collect(Collectors.joining(", ")));
-            if (!participant.lostItems.isEmpty())
-                logger.info("User {} lost items {}", account.getAccountId(), participant.lostItems.stream()
-                        .map(AuctionItem::getAuctionItemId)
-                        .map(AuctionItemId::toString)
-                        .collect(Collectors.joining(", ")));
-
-            for (AuctionItem wonItem : participant.wonItems) {
-                scheduledNotifications.add(NotificationDTO.builder()
-                        .message(String.format(
-                                "Congratulations! You have won %s from auction %s",
-                                wonItem.getItem().getName(),
-                                auction.getTitle()
-                        ))
-                        .userId(account.getAccountId())
-                        .build());
-            }
-
-            for (AuctionItem lostItem : participant.lostItems) {
-                scheduledNotifications.add(NotificationDTO.builder()
-                        .message(String.format(
-                                "Oops! You have lost %s from auction %s",
-                                lostItem.getItem().getName(),
-                                auction.getTitle()
-                        ))
-                        .userId(account.getAccountId())
-                        .build());
-            }
-
-            CompletableFuture.runAsync(() -> {
-                try {
-                    sendMail(
-                            account.getEmail(),
-                            "[Biddify] Congratulations! You have won an auction",
-                            """
-                                    <p>You have won following items from auction %s:</p>
-                                    <ul>%s</ul>
-                             """.formatted(
-                                    auction.getTitle(),
-                                    participant.wonItems.stream()
-                                            .map((a) -> "<li>" + a.getItem().getName() + "</li>")
-                                            .collect(Collectors.joining("\n"))
-                            )
-                    );
-                } catch (MessagingException e) {
-                    logger.info("Error sending mail to " + account.getEmail(), e);
-                }
-            });
-
-            if (!participant.wonItems.isEmpty())
-                orderServiceImpl.createOrder(
-                        account.getAccountId(),
-                        participant.wonItems.stream()
-                                .map(AuctionItem::getAuctionItemId)
-                                .collect(Collectors.toUnmodifiableSet()),
-                        auctionSessionId
-                );
-
-            scheduledNotifications.add(
-                    NotificationDTO.builder()
-                            .message(String.format(
-                                    "Auction %s has finished with %d participants, %d items and %d bids",
-                                    auction.getTitle(),
-                                    participants.size(),
-                                    auction.getAuctionItems().size(),
-                                    bidCount
-                            ))
-                            .userId(account.getAccountId())
-                            .build()
-            );
-        }
-
-        for (Deposit deposit : auction.getDeposits()) {
-            Payment p = deposit.getPayment();
-            if (p.getStatus() != Payment.Status.PENDING)
-                continue;
-            Account account = p.getAccount();
-            Participant participant = participants.get(account.getAccountId());
-            // If win at least 1 item, then we proceed the deposit
-            if (participant != null && !participant.wonItems.isEmpty()) {
-                p.setStatus(Payment.Status.SUCCESS);
-            } else {
-                p.setStatus(Payment.Status.FAILED);
-                account.setBalance(account.getBalance().add(p.getPaymentAmount()));
-                accountRepos.save(account);
-                scheduledNotifications.add(
-                        NotificationDTO.builder()
-                                .message(String.format(
-                                        "Your deposit has been refunded from auction %s",
-                                        auction.getTitle()
-                                ))
-                                .userId(account.getAccountId())
-                                .build()
-                );
-                logger.info("Refunded deposit id {} for account {}", deposit.getDepositId(), account.getAccountId());
-            }
-            paymentRepos.save(p);
-        }
-
-        auction.setStatus(AuctionSession.Status.FINISHED);
-        auctionSessionRepos.save(auction);
-        notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " finished");
     }
 
     @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public void terminateAuction(int auctionSessionId) {
-        AuctionSession auction = auctionSessionRepos.findById(auctionSessionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid auction session id: " + auctionSessionId));
-        if (auction.getStatus() == AuctionSession.Status.FINISHED ||
-                auction.getStatus() == AuctionSession.Status.TERMINATED) {
+        AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
+        if (auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")) {
             logger.warn("Auction session " + auctionSessionId + " already ended");
             return;
         }
-
         logger.info("Terminating auction session " + auctionSessionId);
-        List<NotificationDTO> scheduledNotifications = new ArrayList<>();
+        for (AuctionItemDTO auctionItem : auctionDTO.getAuctionItems()) {
+            bidService.terminateAuctionItem(auctionItem.getId());
+        }
+        for (DepositDTO deposit : auctionDTO.getDeposits()) {
+            deposit.getPayment().setStatus(Payment.Status.FAILED);
+            accountRepos.findById(deposit.getPayment().getAccountId()).ifPresent(account -> {
+                account.setBalance(account.getBalance().add(deposit.getPayment().getPaymentAmount()));
+                accountRepos.save(account);
+                logger.info("Refunding deposit for account " + account.getAccountId());
+            });
+            paymentService.updatePayment(deposit.getPayment());
 
-        for (AuctionItem auctionItem : auction.getAuctionItems()) {
-            List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItem.getAuctionItemId());
-            {
+        }
+        try {
+            AuctionSession auctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId()).
+                    orElseThrow(() -> new ResourceNotFoundException("Auction session not found", "id", auctionSessionId));
+            for (AuctionItem auctionItem : auctionSession.getAuctionItems()) {
                 Item item = auctionItem.getItem();
-                item.setStatus(Item.Status.UNSOLD);
+                item.setStatus(Item.Status.QUEUE);
                 itemRepos.save(item);
             }
-
-            for (Bid bid : bids) {
-                bid.setStatus(Bid.Status.FAILED);
-            }
-            bidRepos.saveAll(bids);
+            auctionSession.setStatus(AuctionSession.Status.TERMINATED);
+            auctionSessionRepos.save(auctionSession);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error updating auction session", e);
         }
-
-        for (Deposit deposit : auction.getDeposits()) {
-            Payment p = deposit.getPayment();
-            scheduledNotifications.add(
-                    NotificationDTO.builder()
-                            .message(String.format(
-                                    "Auction %s has been terminated",
-                                    auction.getTitle()
-                            ))
-                            .userId(p.getAccount().getAccountId())
-                            .build()
-            );
-            String email = p.getAccount().getEmail();
-            CompletableFuture.runAsync(() -> {
-                try {
-                    sendMail(
-                            email,
-                            "[Biddify] Auction has been terminated",
-                            """
-                                    <p>Due to unexpected circumstances, we have to terminate auction %s</p>
-                                    <p>Your deposit will be refunded to your wallet</p>
-                                    <p>Stay stunned for upcoming updates.</p>
-                             """.formatted(auction.getTitle())
-                    );
-                } catch (MessagingException e) {
-                    logger.info("Error sending mail to " + email, e);
-                }
-            });
-
-            if (p.getStatus() != Payment.Status.PENDING)
-                continue;
-            p.setStatus(Payment.Status.FAILED);
-            p = paymentRepos.save(p);
-
-            Account account = p.getAccount();
-            account.setBalance(account.getBalance().add(p.getPaymentAmount()));
-            accountRepos.save(account);
-
-            scheduledNotifications.add(
-                    NotificationDTO.builder()
-                            .message(String.format(
-                                    "Your deposit has been refunded from auction %s",
-                                    auction.getTitle()
-                            ))
-                            .userId(account.getAccountId())
-                            .build()
-            );
-            logger.info("Refunded deposit for account " + account.getAccountId());
-        }
-
-        auction.setStatus(AuctionSession.Status.TERMINATED);
-        auctionSessionRepos.save(auction);
-        notificationService.sendBulkNotification(scheduledNotifications);
-        logger.info("Auction session " + auctionSessionId + " terminated");
     }
 
     @Override
     @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void startAuction(int auctionSessionId) {
-        AuctionSession auction = auctionSessionRepos.findById(auctionSessionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Invalid auction session id: " + auctionSessionId));
-        if (auction.getStatus() == AuctionSession.Status.FINISHED ||
-                auction.getStatus() == AuctionSession.Status.TERMINATED) {
-            logger.warn("Auction session " + auctionSessionId + " already ended");
-            return;
-        }
-        if (auction.getStatus() == AuctionSession.Status.PROGRESSING) {
+        AuctionSessionDTO auctionDTO = getAuctionSessionById(auctionSessionId);
+        if (auctionDTO.getStatus().equals("PROGRESSING")) {
             logger.warn("Auction session " + auctionSessionId + " already started");
             return;
         }
-
-        List<NotificationDTO> scheduledNotifications = new ArrayList<>();
-        for (Deposit deposit : auction.getDeposits()) {
-            scheduledNotifications.add(
-                    NotificationDTO.builder()
-                            .message(String.format(
-                                    "Auction %s has started. Let's bid!",
-                                    auction.getTitle()
-                            ))
-                            .userId(deposit.getPayment().getAccount().getAccountId())
-                            .build()
-            );
+        logger.info("Starting auction session " + auctionSessionId);
+        try {
+            AuctionSession auctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId()).
+                    orElseThrow(() -> new ResourceNotFoundException("Auction session not found", "id", auctionSessionId));
+            auctionSession.setStatus(AuctionSession.Status.PROGRESSING);
+            auctionSessionRepos.save(auctionSession);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error updating auction session", e);
         }
-        auction.setStatus(AuctionSession.Status.PROGRESSING);
-        auctionSessionRepos.save(auction);
-        notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " started");
     }
 
@@ -501,11 +331,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
             throw new InvalidInputException("End date must be after start date");
         }
-        if(auctionDTO.getStatus() == AuctionSession.Status.FINISHED ||
-                auctionDTO.getStatus() == AuctionSession.Status.TERMINATED){
+        if(auctionDTO.getStatus().equals("FINISHED") || auctionDTO.getStatus().equals("TERMINATED")){
             throw new InvalidInputException("Auction session already ended");
         }
-        if(auctionDTO.getStatus() == AuctionSession.Status.PROGRESSING){
+        if(auctionDTO.getStatus().equals("PROGRESSING")){
             throw new InvalidInputException("Auction session already started");
         }
         try {
@@ -611,13 +440,5 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     }
 
-    private void sendMail(String targetEmail, String title, String content) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, false);
-        helper.setFrom(systemEmail);
-        helper.setTo(targetEmail);
-        helper.setSubject(title);
-        helper.setText(content, true);
-        mailSender.send(message);
-    }
+
 }

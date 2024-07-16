@@ -63,8 +63,7 @@ public class AuctionSessionController {
     public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession( @PageableDefault(size = 10) Pageable pageable) {
         List<AuctionSessionDTO> listA=auctionSessionService.getAllAuctionSessions(pageable).stream().filter(
                 auctionSessionDTO ->
-                        auctionSessionDTO.getStatus() != AuctionSession.Status.FINISHED &&
-                        auctionSessionDTO.getStatus() != AuctionSession.Status.TERMINATED
+                        !auctionSessionDTO.getStatus().equals("FINISHED")&&!auctionSessionDTO.getStatus().equals("TERMINATED")
         ).toList();
 
         return new ResponseEntity<>( new PageImpl<>(listA), HttpStatus.OK);
@@ -110,7 +109,7 @@ public class AuctionSessionController {
         auctionSessionDTO.setTitle(auctionDTO.getTitle());
         auctionSessionDTO.setStartDate(auctionDTO.getStartDate());
         auctionSessionDTO.setEndDate(auctionDTO.getEndDate());
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(String.valueOf(AuctionSession.Status.SCHEDULED));
         auctionSessionDTO=auctionSessionService.createAuctionSession(auctionSessionDTO);
         if(auctionDTO.getFiles()!=null){
             try {
@@ -152,21 +151,20 @@ public class AuctionSessionController {
             log.error("Account not found");
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        AuctionSessionDTO auctionSession = auctionSessionService.getAuctionSessionById(id);
-        if(auctionSession.getEndDate().isBefore(LocalDateTime.now())){
+        if(auctionSessionService.getAuctionSessionById(id).getEndDate().isBefore(LocalDateTime.now())){
             log.error("Auction session has ended");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(auctionSession.getStatus() == AuctionSession.Status.TERMINATED){
+        if(auctionSessionService.getAuctionSessionById(id).getStatus().equals("TERMINATED")){
             log.error("Auction session has been terminated");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(auctionSession.getStatus() == AuctionSession.Status.FINISHED){
+        if(auctionSessionService.getAuctionSessionById(id).getStatus().equals("FINISHED")){
             log.error("Auction session has finished");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if(auctionSession.getDeposits().stream()
+        if(auctionSessionService.getAuctionSessionById(id).getDeposits().stream()
                 .anyMatch(depositDTO -> depositDTO.getPayment().getAccountId()==a.getAccountId())){
             log.error("Account has already registered for this auction session");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -324,7 +324,7 @@ export default function AuctionJoin() {
                     auctionSession.auctionItems.map((item) => (
                       <Card className='w-80 h-fit max-w-[360px]'>
                         <CardHeader>
-                          <img src={item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0 ? item.itemDTO.attachments[0].link : ""} alt="item" className='w-[360px]' />
+                          <img src={item.itemDTO.attachments[0].link} alt="item" className='w-[360px]' />
                         </CardHeader>
                         <CardContent>
                           <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
