@@ -71,11 +71,11 @@ public class BidExporter {
             int columnCount = 0;
 
             createCell(row, columnCount++, bid.getBidId(), style);
-            createCell(row, columnCount++, bid.getPayment().getStatus().toString(), style);
-            createCell(row, columnCount++, bid.getPayment().getPaymentAmount().toString(), style);
+            createCell(row, columnCount++, bid.getStatus().toString(), style);
+            createCell(row, columnCount++, bid.getAmount().toString(), style);
             createCell(row, columnCount++, bid.getAuctionItemId().getAuctionSessionId().toString(), style);
             createCell(row, columnCount++, bid.getAuctionItemId().getItemId().toString(), style);
-            createCell(row, columnCount++, bid.getPayment().getAccountId(), style);
+            createCell(row, columnCount++, bid.getAccountId(), style);
 
         }
     }

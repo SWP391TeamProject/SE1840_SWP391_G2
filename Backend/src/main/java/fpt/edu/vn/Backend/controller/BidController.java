@@ -5,10 +5,12 @@ import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exporter.BidExporter;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
+import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import fpt.edu.vn.Backend.service.BidService;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,35 +106,42 @@ public class BidController {
         try {
             AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
             bidDTO.setAuctionItemId(auctionItemId);
-            BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getPaymentAmount();
+
+            BidDTO highestBid = bidService.getHighestBid(auctionItemId);
+            BigDecimal currentBid = highestBid == null ? auctionItemService.getAuctionItemById(auctionItemId)
+                    .getItemDTO().getReservePrice()
+                    : highestBid.getAmount();
+
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
-            log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getPaymentAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
-            if (bidDTO.getPayment().getAccountId() == bidService.getHighestBid(auctionItemId).getPayment().getAccountId()) {
+            log.info(bidDTO.getAccountId() + " bid " + bidDTO.getAmount() + " on " + auctionItemId.getItemId() + "," + auctionItemId.getAuctionSessionId());
+
+            if (highestBid != null && Objects.equals(bidDTO.getAccountId(), highestBid.getAccountId())) {
                 return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Right now, you are the highest bidder.\n" +
                         "Hold off until someone outbids you.", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
             }
             if (currentBid.compareTo(BigDecimal.valueOf(15000)) < 0) {
-                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(100))) < 0) {
+                if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(100))) < 0) {
                     return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 100", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             } else if (currentBid.compareTo(BigDecimal.valueOf(15000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(50000)) < 0) {
-                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(250))) < 0) {
+                if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(250))) < 0) {
                     return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 250", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             } else if (currentBid.compareTo(BigDecimal.valueOf(50000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(200000)) < 0) {
-                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(500))) < 0) {
+                if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(500))) < 0) {
                     return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 500", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             } else {
-                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(1000))) < 0) {
+                if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(1000))) < 0) {
                     return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 1000", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             }
+            bidDTO.setStatus(Bid.Status.PENDING);
             bidDTO = bidService.createBid(bidDTO);
             AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
-            a.setCurrentPrice(bidDTO.getPayment().getPaymentAmount());
+            a.setCurrentPrice(bidDTO.getAmount());
             auctionItemService.updateAuctionItem(a);
-            return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getPayment().getPaymentAmount(), bidDTO.getPayment().getPaymentAmount(), BidReplyDTO.Status.BID));
+            return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getAmount(), bidDTO.getAmount(), BidReplyDTO.Status.BID));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -147,7 +156,6 @@ public class BidController {
                                                SimpMessageHeaderAccessor headerAccessor) {
         AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
         AuctionSessionDTO auctionSessionDTO = auctionSessionService.getAuctionSessionById(auctionSessionId);
-        // Add username in web socket session
         AccountDTO persistedAccount = accountService.getAccountByEmail(authentication.getName());
         if (persistedAccount == null) {
             return new ResponseEntity<>(new BidReplyDTO("You are not login yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
@@ -155,14 +163,12 @@ public class BidController {
         if (auctionSessionDTO.getDeposits().stream().noneMatch(depositDTO -> depositDTO.getPayment().getAccountId() == persistedAccount.getAccountId())) {
             return new ResponseEntity<>(new BidReplyDTO("You have not registered to this auction yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
         }
-        // Add the updated Account to the session attributes
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
-        // Create a new bid
-//            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", (bidService.getHighestBid(auctionItemId).getPayment().getPaymentAmount()), BidReplyDTO.Status.JOIN));
-
-
+        BidDTO highestBid = bidService.getHighestBid(auctionItemId);
+        BigDecimal currentBid = highestBid == null ? auctionItemService.getAuctionItemById(auctionItemId)
+                .getItemDTO().getReservePrice()
+                : highestBid.getAmount();
+        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", currentBid, BidReplyDTO.Status.JOIN));
     }
-
 }
 
