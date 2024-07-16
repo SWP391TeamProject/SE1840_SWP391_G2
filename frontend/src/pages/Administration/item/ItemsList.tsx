@@ -218,119 +218,19 @@ export default function ItemsList() {
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="all" >
         <div className="flex items-center justify-center">
-          {/* <TabsList>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION, ItemStatus.QUEUE, ItemStatus.UNSOLD, ItemStatus.SOLD, ItemStatus.VALUATING], "all")} value="all">All</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.IN_AUCTION], ItemStatus.IN_AUCTION)} value={ItemStatus.IN_AUCTION}>IN_AUCTION</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.QUEUE], ItemStatus.QUEUE)} value={ItemStatus.QUEUE}>QUEUE</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.UNSOLD], ItemStatus.UNSOLD)} value={ItemStatus.UNSOLD}>UNSOLD</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.SOLD], ItemStatus.SOLD)} value={ItemStatus.SOLD}>SOLD</TabsTrigger>
-            <TabsTrigger onClick={() => handleFilterClick([ItemStatus.VALUATING], ItemStatus.VALUATING)} value={ItemStatus.VALUATING}>VALUATING</TabsTrigger>
-          </TabsList> */}
-          {/* <div className="ml-auto flex items-center gap-2">
-            <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Add Item
-              </span>
-            </Button>
-          </div> */}
         </div>
         <TabsContent value="all" className="max-w-screen">
-          {/* {isLoading ? <LoadingAnimation />
-            :  */}
+        
             <Card  className="max-w-screen-2xl">
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   Items
-                  {/* <div className="w-full basis-1/2">
-                    <PagingIndexes pageNumber={itemsList.currentPageNumber ? itemsList.currentPageNumber : 0} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                  </div> */}
                 </CardTitle>
                 <CardDescription>
                   Manage items and view their details.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* <Table>
-                  <TableHeader>
-                    <TableRow> */}
-                      {/* <TableHead>Id</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="md:table-cell">
-                        Price
-                      </TableHead>
-                      <TableHead className="md:table-cell">
-                        Status
-                      </TableHead>
-                      <TableHead className="md:table-cell">
-                        Description
-                      </TableHead> */}
-                      {/* <TableHead className="md:table-cell">
-                      Status
-                    </TableHead> */}
-                      {/* <TableHead className="md:table-cell">
-                                                    Created at
-                                                </TableHead> */}
-                      {/* <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody> */}
-                    {!itemsList
-                      ? <LoadingAnimation />
-                      : itemsList.currentPageList.map((item) => (
-                        <TableRow key={item.itemId}>
-                          <TableCell className="font-medium">
-                            {item.itemId}
-                          </TableCell>
-                          {/* <TableCell>
-                                                    <Badge variant="outline">Draft</Badge>
-                                                </TableCell> */}
-                          <TableCell className="md:table-cell">
-                            {item.name}
-                          </TableCell>
-                          <TableCell className="md:table-cell">
-                            {currency.format({ amount: item.reservePrice })}
-                          </TableCell>
-                          <TableCell className="md:table-cell">
-                            {item.status}
-                          </TableCell>
-                          <TableCell className="md:table-cell">
-                            <div dangerouslySetInnerHTML={{ __html: item.description }}></div>
-
-
-                          </TableCell>
-                          <TableCell className="md:table-cell">
-                            {/* {item.status == ItemsetCurrentItemStatus.ACTIVE ? 
-                        <Badge variant="default" className="bg-green-500">{ItemsetCurrentItemStatus[item.status]}</Badge> : 
-                        <Badge variant="destructive">{ItemsetCurrentItemStatus[item.status]}</Badge>} */}
-                          </TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  aria-haspopup="true"
-                                  size="icon"
-                                  variant="ghost"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">Toggle menu</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => { handleEditClick(item.itemId) }}>Edit</DropdownMenuItem>
-
-                                {/* <DropdownMenuItem onClick={() => { handleSuspendClick(item.itemId) }}>Suspend</DropdownMenuItem> */}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-
-                      ))}
-                  {/* </TableBody>
-                </Table> */}
                 <Suspense
                   fallback={
                     <DataTableSkeleton

@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { ChevronDownIcon, MenuIcon } from "lucide-react";
@@ -17,7 +17,7 @@ import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
 
 export default function NavBar() {
   const auth = useAuth();
-
+  const nav = useNavigate();
   return (
     <>
       <header className="z-10 px-4 lg:px-6 h-2/5 flex items-center  shadow-md drop-shadow w-full p-1 bg-background text-foreground dark:shadow-gray-600">
@@ -30,7 +30,9 @@ export default function NavBar() {
 
         <nav className="hidden lg:flex items-center gap-6 ml-auto w-fit">
           <Button variant="outline" className="ml-auto" asChild>
-            <Link to="/create-consignment">Put Your Item For Auction</Link>
+            <Link to="/create-consignment" onClick={()=>{
+              !auth.isAuthenticated() && nav("/auth/login")
+            }}>Put Your Item For Auction</Link>
           </Button>
           <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
             <NavigationMenuList>

@@ -178,7 +178,6 @@ export default function ItemDetail() {
 
         </form>
       </Form>
-
         <ConfirmationDialog
           open={showTrigger}
           onOpenChange={setShowTrigger}

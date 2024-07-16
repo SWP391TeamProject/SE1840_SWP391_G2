@@ -106,7 +106,6 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
                     .orElseThrow(() -> new ResourceNotFoundException("ConsignmentDetail not found with id: " + consignmentDetailId));
 
-
             // Update the fields with the provided data from updatedConsignmentDetail
             consignmentDetail.setDescription(consignmentRequestDetailDTO.getDescription());
             consignmentDetail.setPrice(consignmentRequestDetailDTO.getPrice());

@@ -164,13 +164,13 @@ export default function AccountsList() {
   // }
 
   const handleFilterClick = (role: string) => {
-    if(role !== seletedRole){
+    if (role !== seletedRole) {
       if (role === "All") {
         setSelectedRole("");
-        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""}));
+        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: "" }));
       } else {
         setSelectedRole(role);
-        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: role}));
+        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: role }));
       }
     }
   }
@@ -188,7 +188,7 @@ export default function AccountsList() {
   // }
 
   useEffect(() => {
-    
+
   }, [seletedRole]);
 
   useEffect(() => {
@@ -201,14 +201,14 @@ export default function AccountsList() {
   }, []);
 
   useEffect(() => {
-    if(Number.parseInt(pageNumber) >= 1)
-    setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole}));
+    if (Number.parseInt(pageNumber) >= 1)
+      setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole }));
   }, [pageSize, pageNumber, sort])
-  
+
   useEffect(() => {
     // fetchAccounts(accountsList.currentPageNumber);
     setRoleFilter("all");
-    
+
   }, [reload]);
 
   return (
@@ -223,7 +223,7 @@ export default function AccountsList() {
             <TabsTrigger onClick={() => handleFilterClick([Roles.MEMBER], "member")} value="member">Member</TabsTrigger>
           </TabsList> */}
           {/* <div className="ml-auto flex items-center gap-2"> */}
-            {/* <DropdownMenu>
+          {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
                   <ListFilter className="h-3.5 w-3.5" />
@@ -242,52 +242,53 @@ export default function AccountsList() {
                 <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu> */}
-            {/* <Button size="sm" variant="outline" className="h-8 gap-1">
+          {/* <Button size="sm" variant="outline" className="h-8 gap-1">
                                     <File className="h-3.5 w-3.5" />
                                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                                         Export
                                     </span>
                                 </Button> */}
-            {/* <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
+          {/* <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Add Account
               </span>
             </Button>
           </div> */}
-          {/* <ConfirmationButton
-            label="Add Account"
-            title="Are you sure to create an Account?"
-            message=""
-            className="h-8 gap-1"
-            onSuccess={() => { handleCreateClick() }}
-          >
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Account
-            </span>
-          </ConfirmationButton> */}
+
         </div>
         <TabsContent value={roleFilter}>
           {/* {isLoading ?
             <LoadingAnimation />
             :  */}
-            <Card x-chunk="dashboard-06-chunk-0">
-              <CardHeader >
+          <Card x-chunk="dashboard-06-chunk-0">
+            <CardHeader >
 
-                <CardTitle className="flex justify-between items-center">
-                  Accounts
-                  {/* <div className="w-full basis-1/2">
+              <CardTitle className="flex justify-between items-center">
+                Accounts
+                {/* <div className="w-full basis-1/2">
                     <PagingIndexes className="basis-1/2" pageNumber={accountsList.currentPageNumber ? accountsList.currentPageNumber : 0} size={10} totalPages={accountsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
                   </div> */}
-                </CardTitle>
-                <CardDescription>
-                  Manage accounts and view their details.
-                </CardDescription>
+              </CardTitle>
+              <CardDescription>
+                Manage accounts and view their details.
+                {/* <ConfirmationButton
+                  label="Add Account"
+                  title="Are you sure to create an Account?"
+                  message=""
+                  className="h-8 gap-1"
+                  onSuccess={() => { handleCreateClick() }}
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Add Account
+                  </span>
+                </ConfirmationButton> */}
+              </CardDescription>
 
-              </CardHeader>
-              <CardContent>
-                {/* <Table>
+            </CardHeader>
+            <CardContent>
+              {/* <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Id</TableHead>
@@ -374,18 +375,18 @@ export default function AccountsList() {
                     ))}
                   </TableBody>
                 </Table> */}
-                <Suspense
-                  fallback={
-                    <DataTableSkeleton
-                      columnCount={5}
-                      searchableColumnCount={1}
-                      filterableColumnCount={2}
-                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
-                      shrinkZero
-                    />
-                  }
-                >
-                  {/* <Select onValueChange={handleRoleFilterSelect} >
+              <Suspense
+                fallback={
+                  <DataTableSkeleton
+                    columnCount={5}
+                    searchableColumnCount={1}
+                    filterableColumnCount={2}
+                    cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                    shrinkZero
+                  />
+                }
+              >
+                {/* <Select onValueChange={handleRoleFilterSelect} >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Role" />
                     </SelectTrigger>
@@ -399,41 +400,41 @@ export default function AccountsList() {
                       </SelectGroup>
                     </SelectContent>
                   </Select> */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-8 gap-1">
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 gap-1">
+                      <ListFilter className="h-3.5 w-3.5" />
+                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                         Role
-                        </span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuLabel>Role</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == ''} onClick={() => handleFilterClick('All')}>
-                        All
-                      </DropdownMenuCheckboxItem>
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuLabel>Role</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == ''} onClick={() => handleFilterClick('All')}>
+                      All
+                    </DropdownMenuCheckboxItem>
 
 
-                      {Object.values(RoleName).map((role) => (
-                        <div className="flex m-1 items-center justify-between" key={role} >
-                          <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == role} onClick={() => handleFilterClick(role)} >{role}</DropdownMenuCheckboxItem>
-                        </div>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <AccountsTable accountPromise={accountPromise} />
-                </Suspense>
-              </CardContent>
-              <CardFooter>
-                {/* <div className="text-xs text-muted-foreground">
+                    {Object.values(RoleName).map((role) => (
+                      <div className="flex m-1 items-center justify-between" key={role} >
+                        <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == role} onClick={() => handleFilterClick(role)} >{role}</DropdownMenuCheckboxItem>
+                      </div>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <AccountsTable accountPromise={accountPromise} />
+              </Suspense>
+            </CardContent>
+            <CardFooter>
+              {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-              </CardFooter>
-            </Card>
-            {/* } */}
+            </CardFooter>
+          </Card>
+          {/* } */}
 
         </TabsContent>
       </Tabs>

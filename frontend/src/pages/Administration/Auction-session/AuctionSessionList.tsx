@@ -11,41 +11,22 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 // import { fetchAuctionSessionsService, deleteAuctionSessionService } from "@/services/AuctionSessionsServices";
 import {
-  PlusCircle,
-  MoreHorizontal,
-  ListFilter,
+  ListFilter
 } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 // import { AuctionSessionStatus } from "@/constants/enums";
-import { fetchActiveAuctionSessions, fetchAllAuctionSessions, fetchAuctionSessionByTitle, fetchPastAuctionSessions, fetchUpcomingAuctionSessions, getActiveAuction, getAllAuction, getAuctions, getPastAuction, getUpcomingAuction } from "@/services/AuctionSessionService";
-import PagingIndexes from "@/components/pagination/PagingIndexes";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
+import { getAuctions } from "@/services/AuctionSessionService";
 import { AcutionSessionsTable } from "./auction-session-data-table/auction-session-table";
 
 export default function AuctionSessionList() {
-  const auctionSessionsList = useAppSelector((state) => state.auctionSessions);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
