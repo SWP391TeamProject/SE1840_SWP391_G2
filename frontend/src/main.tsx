@@ -96,6 +96,7 @@ import { OrderList } from "./pages/Administration/Order/orderList.tsx";
 import { OrderDetail } from "./pages/Administration/Order/orderDetail.tsx";
 import { Order } from "./pages/CustomerSite/dashboard/orders/Order.tsx";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard.tsx";
+import {PublicItemDetail} from "@/pages/CustomerSite/Item/PublicItemDetail.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -167,6 +168,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id/*" element={<AuctionJoin />} />
                       <Route path="items" element={<ItemList />} />
+                      <Route path="item/:id/*" element={<PublicItemDetail />} />
 
                       <Route element={<PrivateRoute
                         allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER, Roles.MEMBER]} />}>

@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.DTO.request;
 
+import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.pojo.Item;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,13 +15,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateItemRequestDTO implements Serializable {
-    private String name;
-    private String description;
+    private ItemDTO item;
     private List<MultipartFile> files;
-    private int categoryId;
-    private double reservePrice;
-    private double buyInPrice;
-    private int ownerId;
-    private Item.Status status;
-
 }

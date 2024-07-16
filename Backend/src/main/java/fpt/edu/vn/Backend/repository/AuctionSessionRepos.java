@@ -19,4 +19,7 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
 
     @Query("SELECT a FROM AuctionSession a WHERE a.status = 'FINISHED'")
     List<AuctionSession> findFinishedAuctionSessionsByYear(int year);
+
+    @Query("SELECT aj.auctionSession FROM AuctionItem aj WHERE aj.auctionItemId.itemId = :itemId ORDER BY aj.auctionSession.startDate DESC, aj.auctionSession.endDate DESC")
+    Page<AuctionSession> findAuctionSessionsHasItem(int itemId, Pageable pageable);
 }

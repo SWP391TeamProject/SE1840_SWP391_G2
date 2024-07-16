@@ -28,6 +28,16 @@ public class AccountDTO implements Serializable {
     private LocalDateTime updateDate;
     private boolean isKyc;
 
+    public static AccountDTO redacted(Account account) {
+        return AccountDTO.builder()
+                .accountId(account.getAccountId())
+                .nickname(account.getNickname())
+                .status(account.getStatus())
+                .role(account.getRole())
+                .avatar(account.getAvatarUrl() == null ? null : new AttachmentDTO(account.getAvatarUrl()))
+                .build();
+    }
+
     public AccountDTO(Account account) {
         this.accountId = account.getAccountId();
         this.nickname = account.getNickname();

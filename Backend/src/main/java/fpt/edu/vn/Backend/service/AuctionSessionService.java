@@ -42,5 +42,5 @@ public interface AuctionSessionService {
 
     Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable);
 
-
+    Page<AuctionSessionDTO> getPastAuctionOfItem(Pageable pageable, int itemId);
 }
