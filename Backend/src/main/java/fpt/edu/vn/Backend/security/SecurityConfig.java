@@ -92,6 +92,9 @@ public class SecurityConfig {
                         AbstractHttpConfigurer::disable
                 )
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                "/api/items/inventory"
+                        ).authenticated()
                         .requestMatchers("/auth/**",
                                 "api/auction-sessions/**",
                                 "/auction-join/**",

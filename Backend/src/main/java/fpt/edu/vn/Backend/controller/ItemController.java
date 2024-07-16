@@ -13,6 +13,8 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Item;
+import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
@@ -35,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -128,6 +131,12 @@ public class ItemController {
             @PathVariable int ownerId,
             @PageableDefault(size = 30) Pageable pageable) {
         return itemService.getItemsByOwnerId(pageable, ownerId);
+    }
+
+    @GetMapping("/inventory")
+    public Page<ItemDTO> getInventory(Principal principal, @PageableDefault(size = 30) Pageable pageable) {
+        JwtUser jwtUser = Authorizer.getUser(principal);
+        return itemService.getItemsByBuyerId(pageable, jwtUser.getUserId());
     }
 
     @GetMapping("/detail/{id}")
