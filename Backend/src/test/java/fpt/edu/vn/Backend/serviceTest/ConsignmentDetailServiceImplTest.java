@@ -73,7 +73,7 @@ public class ConsignmentDetailServiceImplTest {
         consignmentDetail1.setAccount(account);
         consignmentDetail1.setDescription("Description 1");
         consignmentDetail1.setPrice(BigDecimal.valueOf(100.0));
-        consignmentDetail1.setType(ConsignmentDetail.ConsignmentType.REQUEST);
+        consignmentDetail1.setType(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION);
         consignmentDetail1.setAttachments(Arrays.asList(attachment));
 
         consignmentDetail2 = new ConsignmentDetail();
