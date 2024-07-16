@@ -304,6 +304,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             }
 
             CompletableFuture.runAsync(() -> {
+                if (account.isDummy()) return; // skip email for dummy accounts
                 try {
                     sendMail(
                             account.getEmail(),
@@ -432,11 +433,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                             .userId(p.getAccount().getAccountId())
                             .build()
             );
-            String email = p.getAccount().getEmail();
+            final Account finalAccount = p.getAccount();
             CompletableFuture.runAsync(() -> {
+                if (finalAccount.isDummy()) return; // skip email for dummy accounts
                 try {
                     sendMail(
-                            email,
+                            finalAccount.getEmail(),
                             "[Biddify] Auction has been terminated",
                             """
                                     <p>Due to unexpected circumstances, we have to terminate auction %s</p>
@@ -445,7 +447,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                              """.formatted(auction.getTitle())
                     );
                 } catch (MessagingException e) {
-                    logger.info("Error sending mail to " + email, e);
+                    logger.info("Error sending mail to " + finalAccount.getEmail(), e);
                 }
             });
 
@@ -667,6 +669,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         helper.setTo(targetEmail);
         helper.setSubject(title);
         helper.setText(content, true);
-//        mailSender.send(message);
+        mailSender.send(message);
     }
 }

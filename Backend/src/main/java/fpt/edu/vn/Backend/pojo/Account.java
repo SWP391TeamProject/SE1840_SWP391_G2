@@ -36,6 +36,9 @@ public class Account {
     @Column(columnDefinition="bit default 0", nullable = false)
     private boolean require2fa = false;
 
+    @Column(columnDefinition="bit default 1", nullable = false)
+    private boolean dummy = true;
+
     @Column(name = "nickname", length = 100,columnDefinition = "NVARCHAR(100)")
     private String nickname;
 

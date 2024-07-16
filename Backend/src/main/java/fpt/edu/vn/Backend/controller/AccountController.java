@@ -195,10 +195,4 @@ public class AccountController {
                 .body(stream.toByteArray());
     }
 
-    @PostMapping("/updateStatus")
-    public ResponseEntity<Void> updateAccountByStatus(@RequestBody(required = false) UpdateAccountStatusRequestDTO accountDTOList) {
-        accountService.updateAccountByStatus(accountDTOList);
-        return ResponseEntity.ok().build();
-    }
-
 }
