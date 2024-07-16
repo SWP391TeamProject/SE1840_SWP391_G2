@@ -106,7 +106,7 @@ public class ItemServiceImplTest {
         var item = new Item();
         item.setItemId(1);
         when(itemRepos.findById(1)).thenReturn(Optional.of(item));
-        var itemDTO = itemService.mapEntityToDTO(item);
+        var itemDTO = new ItemDTO(item);
         assertEquals(itemDTO, itemService.getItemById(1));
     }
 
