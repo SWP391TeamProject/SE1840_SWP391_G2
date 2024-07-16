@@ -1,23 +1,15 @@
 package fpt.edu.vn.Backend.service;
 
 import com.google.common.base.Preconditions;
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.AttachmentDTO;
-import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
-import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.MappingException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import fpt.edu.vn.Backend.pojo.Attachment;
-import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.Item;
-import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
-import fpt.edu.vn.Backend.repository.OrderRepos;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -25,17 +17,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @CacheConfig (cacheNames = "item")
@@ -43,47 +30,18 @@ public class ItemServiceImpl implements ItemService {
     private final AccountRepos accountRepos;
     private final ItemRepos itemRepos;
     private final ItemCategoryRepos itemCategoryRepos;
-    private final OrderRepos orderRepos;
 
     private final AttachmentService attachmentService;
-    private final RedisCacheManager cacheManager;
 
     @Autowired
     public ItemServiceImpl(AccountRepos accountRepos,
                            ItemRepos itemRepos,
                            ItemCategoryRepos itemCategoryRepos,
-                           OrderRepos orderRepos, AttachmentService attachmentService, RedisCacheManager cacheManager) {
+                           AttachmentService attachmentService) {
         this.accountRepos = accountRepos;
         this.itemRepos = itemRepos;
         this.itemCategoryRepos = itemCategoryRepos;
-        this.orderRepos = orderRepos;
         this.attachmentService = attachmentService;
-        this.cacheManager = cacheManager;
-    }
-
-    @Override
-    public @NotNull ItemDTO mapEntityToDTO(@NotNull Item item, @NotNull ItemDTO itemDTO) {
-        itemDTO.setItemId(item.getItemId());
-        if (item.getItemCategory() != null)
-            itemDTO.setCategory(new ItemCategoryDTO(item.getItemCategory()));
-        itemDTO.setName(item.getName());
-        itemDTO.setDescription(item.getDescription());
-        itemDTO.setReservePrice(item.getReservePrice());
-        itemDTO.setBuyInPrice(item.getBuyInPrice());
-        itemDTO.setStatus(item.getStatus());
-        itemDTO.setCreateDate(item.getCreateDate());
-        itemDTO.setUpdateDate(item.getUpdateDate());
-        if(item.getAttachments() != null){
-            itemDTO.setAttachments(item.getAttachments().stream().map(
-                    attachment -> new AttachmentDTO(attachment)
-            ).collect(Collectors.toSet()));
-        }
-
-
-        if (item.getOwner() != null)
-            itemDTO.setOwner(new AccountDTO(item.getOwner()));
-
-        return itemDTO;
     }
 
     @Override
@@ -105,50 +63,63 @@ public class ItemServiceImpl implements ItemService {
         if (itemDTO.getOwner() != null)
             item.setOwner(accountRepos.findById(itemDTO.getOwner().getAccountId())
                 .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwner())));
+        if (itemDTO.getColor() != null)
+            item.setColor(itemDTO.getColor());
+        if (itemDTO.getSize() != null)
+            item.setSize(itemDTO.getSize());
+        if (itemDTO.getWeight() != null)
+            item.setWeight(itemDTO.getWeight());
+        if (itemDTO.getBrand() != null)
+            item.setBrand(itemDTO.getBrand());
+        if (itemDTO.getAge() != null)
+            item.setAge(itemDTO.getAge());
+        if (itemDTO.getMaterial() != null)
+            item.setMaterial(itemDTO.getMaterial());
+        // DO NOT CHANGE ORDER
+//        if (itemDTO.getOrderId() != null)
+//            item.setOrder(itemDTO.getOrderId());
         return item;
     }
 
     @Override
     @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
-    public @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO itemDTO) throws IOException {
-//        Preconditions.checkNotNull(itemDTO.getCategoryId(), "Category is required");
-//        Preconditions.checkNotNull(itemDTO.getName(), "Name is required");
-//        Preconditions.checkNotNull(itemDTO.getDescription(), "Description is required");
-//        Preconditions.checkNotNull(itemDTO.getReservePrice(), "Reserve price is required");
-//        Preconditions.checkNotNull(itemDTO.getBuyInPrice(), "Buy-in price is required");
-//        Preconditions.checkNotNull(itemDTO.getOwnerId(), "Owner is required");
-//        for (MultipartFile file : itemDTO.getFiles()) {
-//            Preconditions.checkArgument(file.getContentType().startsWith("image/"), "All attachments must be images");
-//        }
+    public @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO requestDTO) throws IOException {
+        ItemDTO itemDTO = requestDTO.getItem();
+        Preconditions.checkNotNull(itemDTO.getItemId(), "Item ID is required");
+        Preconditions.checkNotNull(itemDTO.getName(), "Name is required");
+        Preconditions.checkState(itemDTO.getName().length() >= 5, "Name must be at least 5 characters");
+        Preconditions.checkNotNull(itemDTO.getDescription(), "Description is required");
+        Preconditions.checkNotNull(itemDTO.getReservePrice(), "Reserve price is required");
+        Preconditions.checkState(itemDTO.getReservePrice().signum() > 0, "Reserve price must not be negative");
+        Preconditions.checkNotNull(itemDTO.getBuyInPrice(), "Buy-in price is required");
+        Preconditions.checkState(itemDTO.getBuyInPrice().signum() > 0, "Buy-in price must not be negative");
+        Preconditions.checkNotNull(itemDTO.getOwner(), "Owner is required");
+        if (requestDTO.getFiles() != null) {
+            for (MultipartFile f : requestDTO.getFiles()) {
+                Preconditions.checkState(f.getSize() <= 10000000, "File size must be less than 10MB");
+            }
+        }
+        
+        if (itemDTO.getStatus() == null)
+            itemDTO.setStatus(Item.Status.QUEUE);
 
-        Item item = new Item();
-        item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found", "categoryId", itemDTO.getCategoryId()))
-        );
-        item.setName(itemDTO.getName());
-        item.setDescription(itemDTO.getDescription());
-        item.setReservePrice(BigDecimal.valueOf(itemDTO.getReservePrice()));
-        item.setBuyInPrice(BigDecimal.valueOf(itemDTO.getBuyInPrice()));
-        item.setStatus(Item.Status.QUEUE);
-        item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found", "ownerId: ", itemDTO.getOwnerId()))
-        );
-        Item savedItem = itemRepos.save(item);
-        Set<Attachment> attachments = new HashSet<>();
-        for(MultipartFile file : itemDTO.getFiles()) {
+        Item savedItem = itemRepos.save(mapDTOToEntity(itemDTO, new Item()));
+        ItemDTO dto = new ItemDTO(savedItem);
+        dto.setAttachments(new HashSet<>());
+        for(MultipartFile file : requestDTO.getFiles()) {
             try {
-                attachmentService.uploadItemAttachment(file, savedItem.getItemId());
+                dto.getAttachments().add(attachmentService.uploadItemAttachment(file, savedItem.getItemId()));
             } catch (IOException e) {
                 throw new IOException("Error uploading attachment: " + e.getMessage());
             }
         }
-        return mapEntityToDTO(item);
+        return dto;
     }
 
     @Override
     @Cacheable(value = "item", key = "#id")
     public ItemDTO getItemById(int id) {
-        return itemRepos.findById(id).map(this::mapEntityToDTO).orElse(null);
+        return itemRepos.findById(id).map(ItemDTO::new).orElse(null);
     }
 
     @Override
@@ -157,89 +128,69 @@ public class ItemServiceImpl implements ItemService {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
         Item it = itemRepos.findById(item.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found", "itemId", item.getItemId().toString()));
-        return mapEntityToDTO(itemRepos.save(mapDTOToEntity(item, it)));
-    }
-
-    @Override
-    public void updateItemByStatus(UpdateItemStatusRequestDTO request) {
-        for (Integer itemId : request.getItemId()) {
-            try {
-                Optional<Item> item = itemRepos.findById(itemId);
-                Item items = item.get();
-                if (items != null) {
-                    items.setStatus(Item.Status.valueOf(request.getStatus().toUpperCase()));
-                    itemRepos.save(items);
-                } else {
-                    throw new ResourceNotFoundException("Item not found with ID: " + itemId);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
-            } catch (Exception e) {
-                throw new ConsignmentServiceException("An error occurred while updating item with ID: " + itemId);
-            }
-        }
+        return new ItemDTO(itemRepos.save(mapDTOToEntity(item, it)));
     }
 
     @Override
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
     public @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable) {
-        return itemRepos.findAll(pageable).map(this::mapEntityToDTO);
+        return itemRepos.findAll(pageable).map(ItemDTO::new);
     }
 
     @Override
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
     public @NotNull Page<ItemDTO> getItemsByPrice(@NotNull Pageable pageable, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndStatus(BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice), Item.Status.IN_AUCTION, pageable)
-                .map(this::mapEntityToDTO);
+                .map(ItemDTO::new);
     }
 
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #status.toString()", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status) {
-        return itemRepos.findItemByStatus(status, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByStatus(status, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #ownerId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByOwnerId(@NotNull Pageable pageable, int ownerId) {
-        return itemRepos.findItemByOwnerAccountId(ownerId, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByOwnerAccountId(ownerId, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #buyerId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByBuyerId(@NotNull Pageable pageable, int buyerId) {
-        return itemRepos.findItemByBuyerAccountId(buyerId, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByBuyerAccountId(buyerId, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name) {
-        return itemRepos.findItemByNameContaining(name, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByNameContaining(name, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name + #status", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name, Item.Status status) {
-        return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {
-        return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId + #status.toString()", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId, Item.Status status) {
-        return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(this::mapEntityToDTO);
+        return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(ItemDTO::new);
     }
 
     @Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId  + #minPrice + #maxPrice", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus( BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice),categoryId,Item.Status.IN_AUCTION, pageable)
-                .map(this::mapEntityToDTO);
+                .map(ItemDTO::new);
     }
 }

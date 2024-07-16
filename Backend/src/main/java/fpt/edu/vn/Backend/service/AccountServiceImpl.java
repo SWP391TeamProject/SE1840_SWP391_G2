@@ -66,6 +66,7 @@ public class AccountServiceImpl implements AccountService {
             accountDTO.setAvatar(attachmentServiceImpl.mapEntityToDTO(avatar));
         if (account.getRole() != null)
             accountDTO.setRole(account.getRole());
+        accountDTO.setDummy(account.isDummy());
         accountDTO.setEmail(account.getEmail());
         accountDTO.setPhone(account.getPhone());
         accountDTO.setStatus(account.getStatus());
@@ -82,13 +83,17 @@ public class AccountServiceImpl implements AccountService {
     public @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole) {
         // avatar dùng method riêng
         account.setAccountId(accountDTO.getAccountId());
+        if (accountDTO.getDummy() != null)
+            account.setDummy(accountDTO.getDummy());
         if (accountDTO.getNickname() != null)
             account.setNickname(accountDTO.getNickname().strip());
         if (accountDTO.getPhone() != null)
             account.setPhone(accountDTO.getPhone().strip());
 
         if (editorRole == Account.Role.ADMIN) { // only admin can update these properties
-            if (accountDTO.getRole() != null && !String.valueOf(accountDTO.getRole()).isEmpty())
+            if (accountDTO.getEmail() != null)
+                account.setEmail(accountDTO.getEmail());
+            if (accountDTO.getRole() != null)
                 account.setRole(accountDTO.getRole());
             if (accountDTO.getStatus() != null)
                 account.setStatus(accountDTO.getStatus());
@@ -96,26 +101,6 @@ public class AccountServiceImpl implements AccountService {
                 account.setBalance(accountDTO.getBalance());
         }
         return account;
-    }
-
-    @Override
-    public void updateAccountByStatus(UpdateAccountStatusRequestDTO request) {
-        for (Integer accountId : request.getAccountId()) {
-            try {
-                Optional<Account> account = accountRepos.findById(accountId);
-                Account accounts = account.get();
-                if (accounts != null) {
-                    accounts.setStatus(Account.Status.valueOf(request.getStatus().toUpperCase()));
-                    accountRepos.save(accounts);
-                } else {
-                    throw new ResourceNotFoundException("Auction not found with ID: " + accountId);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
-            } catch (Exception e) {
-                throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + accountId);
-            }
-        }
     }
 
     @Override
@@ -155,7 +140,7 @@ public class AccountServiceImpl implements AccountService {
         Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
         Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
         Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
-        Preconditions.checkState(account.getBalance().signum() >= 0, "Balance must not be negative");
+        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
         Preconditions.checkState(account.getPassword().strip().equals(account.getPassword()), "Password must not contain spaces");
         Preconditions.checkState(account.getPassword().length() >= 8, "Password must be at least 8 characters long");
         Preconditions.checkState(account.getPassword().length() <= 30, "Password must not be longer than 30 characters");
@@ -168,18 +153,21 @@ public class AccountServiceImpl implements AccountService {
         a.setPhone(account.getPhone().strip());
         a.setStatus(Account.Status.ACTIVE);
         a.setPassword(passwordEncoder.bcryptEncoder().encode(account.getPassword()));
+        a.setDummy(account.getDummy());
         return mapEntityToDTO(accountRepos.save(a));
     }
 
     @Override
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
-//        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
-//        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
-//        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
-//        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
-//        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
+        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
+        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
+        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
+        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
+        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
         Account acc = accountRepos.findById(account.getAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
+        if(!acc.getEmail().equals(account.getEmail()) && accountRepos.findByEmail(account.getEmail()).isPresent())
+            throw new InvalidInputException("New email already exists");
         return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc, editorRole)));
     }
 
@@ -200,6 +188,7 @@ public class AccountServiceImpl implements AccountService {
             throw new IllegalAccessException("Wrong password");
         a.setRequire2fa(dto.isEnable2fa());
         accountRepos.save(a);
+        if (a.isDummy()) return; // skip email for dummy accounts
 
         try {
             MimeMessage message = mailSender.createMimeMessage();

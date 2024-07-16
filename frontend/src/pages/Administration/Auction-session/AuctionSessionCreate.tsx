@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { set, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -13,16 +14,15 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
-import { toast } from "react-toastify"
-import { createAuctionSession } from "@/services/AuctionSessionService"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useState } from "react"
-import { CalendarIcon, Loader2 } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import { format } from "date-fns"
+import { createAuctionSession } from "@/services/AuctionSessionService"
+import { Loader2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "react-toastify"
+import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
+import { set } from "date-fns"
+import { formatDate } from "@/lib/utils"
+import { showErrorToast } from "@/lib/handle-error"
 
 const FormSchema = z.object({
     title: z.string().min(2, {
@@ -35,6 +35,7 @@ const FormSchema = z.object({
 
 export default function AuctionSessionCreate() {
     const [isSubmitting, setIsSubmitting] = useState(false)
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -43,13 +44,13 @@ export default function AuctionSessionCreate() {
 
         },
     })
-
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        setIsSubmitting(true)
-        console.log(data)
-        createAuctionSession(data).then(() => {
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [showTrigger, setShowTrigger] = useState(false);
+    const handleConfirmed = (values: z.infer<typeof FormSchema>) => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        createAuctionSession(values).then(() => {
             setIsSubmitting(false)
-            form.reset()
             toast.success("Auction session created successfully.", {
                 position: "bottom-right",
             })
@@ -57,14 +58,35 @@ export default function AuctionSessionCreate() {
         })
             .catch((err) => {
                 setIsSubmitting(false)
-                toast.error('An error occurred while creating the auction session.', {
-                    position: "bottom-right",
-                })
+                showErrorToast(err)
             })
+    }
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsSubmitting(true);
     }
 
 
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsSubmitting(false)
+            }
+        }
 
+    }, [isConfirmed, form.getValues])
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+        console.log(data)
+        console.log("validated")
+        setShowTrigger(true);
+
+    }
 
     return (
         <Form {...form}>
@@ -111,7 +133,7 @@ export default function AuctionSessionCreate() {
                         name="endDate"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                                <FormLabel>Start Date</FormLabel>
+                                <FormLabel>End Date</FormLabel>
                                 <FormControl>
                                     <input type="datetime-local" className="cursor-pointer bg-background text-foreground" {...field} />
                                 </FormControl>
@@ -142,6 +164,19 @@ export default function AuctionSessionCreate() {
                     : <Button type="submit" variant="default">Submit</Button>
                 }
             </form>
+            <ConfirmationDialog
+                open={showTrigger}
+                onOpenChange={setShowTrigger}
+                title="Are you sure to create this auction session?"
+                message={
+                    form.formState.isDirty
+                        ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'
+                        } End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'
+                        }`
+                        : ''
+                } label="Confirm"
+                onSuccess={confirm}
+            />
         </Form>
     )
 }

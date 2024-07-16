@@ -119,6 +119,7 @@ public class AuthServiceImpl implements AuthService {
             newAccount.setPassword(passwordEncoder.bcryptEncoder().encode(registerDTO.getPassword()));
             newAccount.setRole(Account.Role.MEMBER);
             newAccount.setProvider(Account.AuthProvider.LOCAL);
+            newAccount.setDummy(false);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -159,21 +160,23 @@ public class AuthServiceImpl implements AuthService {
             code = sb.toString();
         } while (verify2faCache.containsKey(code));
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, false);
-        helper.setFrom(systemEmail);
-        helper.setTo(a.getEmail());
-        helper.setSubject("[Biddify] Two-factor Authentication code");
-        String link = String.format(verify2faLink, code);
-        helper.setText("""
-                <p>There was a request to log in into your account</p>
-                <p>Your 2FA code: %s</p>
-                <p>Click here to verify your log-in request: <a href="%s">Verify 2FA</a></p>
-                <p>The code will expire after 10 minutes.</p>
-                <p>If that was not your request, your password might have been leaked. Please ignore this email.</p>
-                <p>- Biddify</p>
-                """.formatted(code, link), true);
-        mailSender.send(message);
+        if (!a.isDummy()) { // skip email for dummy accounts
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+            helper.setFrom(systemEmail);
+            helper.setTo(a.getEmail());
+            helper.setSubject("[Biddify] Two-factor Authentication code");
+            String link = String.format(verify2faLink, code);
+            helper.setText("""
+                    <p>There was a request to log in into your account</p>
+                    <p>Your 2FA code: %s</p>
+                    <p>Click here to verify your log-in request: <a href="%s">Verify 2FA</a></p>
+                    <p>The code will expire after 10 minutes.</p>
+                    <p>If that was not your request, your password might have been leaked. Please ignore this email.</p>
+                    <p>- Biddify</p>
+                    """.formatted(code, link), true);
+            mailSender.send(message);
+        }
 
         verify2faCache.put(code, a.getAccountId(), 10, TimeUnit.MINUTES);
         logger.info("Sending 2FA code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
@@ -306,24 +309,21 @@ public class AuthServiceImpl implements AuthService {
             code = sb.toString();
         } while (resetPasswordCodeCache.containsKey(code));
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, false);
-        helper.setFrom(systemEmail);
-        helper.setTo(a.getEmail());
-        helper.setSubject("[Biddify] Reset Password");
-        // Read the HTML file into a String
-        InputStream inputStream = resourceLoader.getResource("classpath:templates/resetpasswordEmail.html").getInputStream();
-        String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        // Replace placeholders in the HTML content with actual values
-        htmlContent = htmlContent.replace("{code}", code);
-        htmlContent = htmlContent.replace("{link}", String.format(resetEmailLink, code));
-
-
-        // Set the HTML content as the body of the email
-        helper.setText(htmlContent, true);
-        mailSender.send(message);
-
-
+        if (!a.isDummy()) { // skip email for dummy accounts
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+            helper.setFrom(systemEmail);
+            helper.setTo(a.getEmail());
+            helper.setSubject("[Biddify] Reset Password");
+            // Read the HTML file into a String
+            InputStream inputStream = resourceLoader.getResource("classpath:templates/resetpasswordEmail.html").getInputStream();
+            String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            // Replace placeholders in the HTML content with actual values
+            htmlContent = htmlContent.replace("{code}", code);
+            htmlContent = htmlContent.replace("{link}", String.format(resetEmailLink, code));
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+        }
 
         resetPasswordCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
         logger.info("Sending reset password account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
@@ -367,19 +367,21 @@ public class AuthServiceImpl implements AuthService {
             code = sb.toString();
         } while (activationCodeCache.containsKey(code));
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, false);
-        helper.setFrom(systemEmail);
-        helper.setTo(a.getEmail());
-        helper.setSubject("[Biddify] Activate account");
-        String link = String.format(activateAccountLink, code);
-        helper.setText("""
-                <p>Your activation code: %s</p>
-                <p>Click here to activate your account: <a href="%s">Activate account</a></p>
-                <p>The code will expire after 1 hour.</p>
-                <p>- Biddify</p>
-                """.formatted(code, link), true);
-        mailSender.send(message);
+        if (!a.isDummy()) { // skip email for dummy accounts
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+            helper.setFrom(systemEmail);
+            helper.setTo(a.getEmail());
+            helper.setSubject("[Biddify] Activate account");
+            String link = String.format(activateAccountLink, code);
+            helper.setText("""
+                    <p>Your activation code: %s</p>
+                    <p>Click here to activate your account: <a href="%s">Activate account</a></p>
+                    <p>The code will expire after 1 hour.</p>
+                    <p>- Biddify</p>
+                    """.formatted(code, link), true);
+            mailSender.send(message);
+        }
 
         activationCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
         logger.info("Sending activation code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);

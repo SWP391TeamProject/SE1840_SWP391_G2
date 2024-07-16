@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
                             .userId(accountId)
                             .build());
 
-            {
+            if (!account.isDummy()){ // skip email for dummy accounts
                 int orderId = order.getOrderId();
                 CompletableFuture.runAsync(() -> {
                     try {
@@ -214,7 +214,7 @@ public class OrderServiceImpl implements OrderService {
 </div>
 
                                 """, true);
-//                        mailSender.send(message);
+                        mailSender.send(message);
                     } catch (MessagingException e) {
                         log.info("Error sending mail to " + account.getEmail(), e);
                     }

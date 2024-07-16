@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Form,
     FormControl,
@@ -17,6 +17,11 @@ import { AccountStatus, RoleName, Roles } from '@/constants/enums';
 import { createAccountService } from "@/services/AccountsServices.ts";
 import { useNavigate } from "react-router-dom";
 import { Role } from '@/models/newModel/account';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
+import { toast } from 'react-toastify';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const phoneRegex = new RegExp(
     /^[0-9\-\+]{10}$/
@@ -31,9 +36,10 @@ const formSchema = z.object({
     nickname: z.string(),
     email: z.string().regex(emailRegex, 'Invalid email!'),
     phone: z.string().regex(phoneRegex, 'Invalid Number!'),
-    password: z.string().min(6,'Password must be at least 6 characters long'),
+    password: z.string().min(6, 'Password must be at least 6 characters long'),
     role: z.enum([RoleName.MEMBER, RoleName.STAFF, RoleName.MANAGER, RoleName.ADMIN]),
     balance: z.coerce.number().optional(),
+    dummy: z.boolean()
 });
 
 
@@ -41,7 +47,9 @@ const formSchema = z.object({
 export default function AccountCreate() {
     // const account = useAppSelector((state) => state.accounts.currentAccount);
     const navigate = useNavigate();
-
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [showTrigger, setShowTrigger] = useState(false);
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -51,11 +59,12 @@ export default function AccountCreate() {
             phone: "",
             balance: 0,
             role: RoleName.MEMBER,
+            dummy: false
         },
     });
-
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
-        // Remove FormData creation and file handling
+    const handleConfirmed = (data: z.infer<typeof formSchema>) => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
         let createdAccount = {
             // accountId: data.accountId,
             email: data.email,
@@ -66,13 +75,42 @@ export default function AccountCreate() {
             role: data.role,
             password: data.password,
             status: AccountStatus.ACTIVE,
+            dummy: data.dummy
         }
         createAccountService(createdAccount).then((res) => {
             console.log(res);
-            navigate("/admin/accounts/");
+            toast.success("Account created successfully");
+            setIsSubmitting(false);
         })
 
-    };
+    }
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsSubmitting(true);
+    }
+
+
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsSubmitting(false)
+            }
+        }
+
+    }, [isConfirmed, form.getValues])
+
+    function onSubmit(data: z.infer<typeof formSchema>) {
+        console.log(data)
+        console.log("validated")
+        setShowTrigger(true);
+
+    }
+
 
     useEffect(() => {
         // console.log(account);
@@ -80,7 +118,7 @@ export default function AccountCreate() {
     }, [])
 
     return (
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8" style={{float: 'left'}}>
+        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8" style={{ float: 'left' }}>
             <div key="1" className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -143,14 +181,14 @@ export default function AccountCreate() {
                                 </FormItem>
                             )}
                         />
-                         <FormField
+                        <FormField
                             control={form.control}
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                        <Input {...field} type='password'/>
+                                        <Input {...field} type='password' />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -176,13 +214,13 @@ export default function AccountCreate() {
                                 <FormItem>
                                     <FormLabel>Balance</FormLabel>
                                     <FormControl>
-                                        <Input {...field} type='number'/>
+                                        <Input {...field} type='number' />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        
+
                         <FormField
                             control={form.control}
                             name="role"
@@ -194,7 +232,7 @@ export default function AccountCreate() {
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
                                             className="flex flex-col space-y-1"
-                                            // disabled={field.value === RoleName.ADMIN}
+                                        // disabled={field.value === RoleName.ADMIN}
                                         >
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>
@@ -230,10 +268,60 @@ export default function AccountCreate() {
                                 </FormItem>
                             )}
                         />
+                        {isSubmitting
+                            ? <Button variant={"destructive"} disabled>
+                                <Loader2 className='animate-spin' />
+                            </Button>
+                            :
+                            <Button variant={"destructive"} type="submit">
+                                Submit
+                            </Button>
+                        }
+
+                      <FormField
+                        control={form.control}
+                        name="dummy"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dummy?</FormLabel>
+                            <FormControl>
+                              <div>
+                                <Alert variant="destructive">
+                                  <AlertCircle className="h-4 w-4" />
+                                  <AlertTitle>Note</AlertTitle>
+                                  <AlertDescription>
+                                    A dummy account is an account used for testing purposes.<br/>
+                                    <b>NO email will be sent to these accounts.</b>
+                                  </AlertDescription>
+                                </Alert>
+                                <div className="mt-2">
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                  <span className="ml-2">Enable dummy</span>
+                                </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                         <Button variant={"destructive"} type="submit">
                             Submit
                         </Button>
                     </form>
+                    <ConfirmationDialog
+                        description='This action cannot be undone.'
+                        label='Ok'
+                        message='Are you sure to create this account?'
+                        onSuccess={confirm}
+                        open={showTrigger}
+                        onOpenChange={setShowTrigger}
+                        title='Confirmation'
+
+                    />
                 </Form>
             </div>
         </main>

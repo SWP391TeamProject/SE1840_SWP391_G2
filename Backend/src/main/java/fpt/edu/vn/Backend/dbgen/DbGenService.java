@@ -141,6 +141,8 @@ public class DbGenService {
             account.setPassword(passwordEncoderConfig.bcryptEncoder().encode(obj.get("password").getAsString()));
             account.setStatus(Account.Status.valueOf(obj.get("status").getAsString()));
             account.setBalance(obj.get("balance").getAsBigDecimal());
+            account.setDummy(true);
+            account.setProvider(Account.AuthProvider.LOCAL);
             account.setCreateDate(parseDate(obj.get("createDate").getAsString()));
             account.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
             preparedAccounts.put(account.getAccountId(), account);

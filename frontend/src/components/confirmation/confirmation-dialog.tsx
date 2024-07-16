@@ -23,9 +23,11 @@ interface ConfirmationDialogProps
   message: string
   title: string
   label: string
+  description: string
 }
 
 export function ConfirmationDialog({
+  description,
   showTrigger = true,
   message,
   title,
@@ -37,29 +39,32 @@ export function ConfirmationDialog({
 
   return (
     <>
-          <Dialog {...props} >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{title}</DialogTitle>
-                <DialogDescription>
-                  {message}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="gap-2 sm:space-x-0">
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button
-                  // aria-label="Delete selected rows"
-                  // variant="destructive"
-                  onClick={() => onSuccess()}
-                >
-                  {label}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          {/* // : <Button onClick={() => {setOpen(true)}}>
+      <Dialog {...props} >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>
+              {description}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="w grid gap-4 py-4">
+              {message}
+          </div>
+          <DialogFooter className="gap-2 sm:space-x-0">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              // aria-label="Delete selected rows"
+              // variant="destructive"
+              onClick={() => onSuccess()}
+            >
+              {label}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* // : <Button onClick={() => {setOpen(true)}}>
           //   {label}
           // </Button> */}
     </>
