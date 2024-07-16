@@ -49,9 +49,10 @@ export function genAccount(): Account[] {
             id: i + 1,
             nickname: faker.number.float() < 0.2 ? faker.person.fullName() : fullName,
             role: role,
-            email: faker.internet.email(),
+            email: "acc" + (i+1) + "@gmail.com",
             phone: "0" + faker.string.numeric(9),
-            password: faker.internet.password({ length: 20 }),
+            //password: faker.internet.password({ length: 20 }),
+            password: "SE1840_SWP391_G2",
             status: role == Role.MEMBER ? (faker.number.float() < 0.2 ? "DISABLED" : "ACTIVE") : "ACTIVE",
             balance: 0, // generate later
             citizenCard: citizenCard,

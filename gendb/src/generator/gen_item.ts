@@ -68,7 +68,7 @@ export function genItems(consignments: Consignment[]): Item[] {
             reservePrice: detail.price, // giá sàn
             buyInPrice: detail.price * faker.number.int({ min: 10, max: 100 }), // gia mua đứt
             status: ItemStatus.QUEUE, // generate later
-            imageURLs: detail.imageURLs,
+            imageURLs: cd.imageURLs,
             createDate: date,
             updateDate: date,
             ownerId: cd.senderId, // generate later
