@@ -97,23 +97,26 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void finishAuction(int id, int delayInSeconds) {
         final Runnable timeout = new Runnable() {
             public void run() {
-                auctionSessionService.finishAuction(id);
-                log.info("Timeout for auction session: " + id );
-                for (String topic : WebSocketEventListener.topicSessions.keySet()) {
-                    log.info("Topic: " + topic);
-                    if (topic.contains("/topic/public/"+id+"/")) {
-                        for (String session : WebSocketEventListener.topicSessions.get(topic)) {
-                            try {
-                                for (WebSocketSession s : sessions) {
-                                    if (s.getId().equals(session)) {
-                                        s.close(CloseStatus.NOT_ACCEPTABLE);
+                try {
+                    for (String topic : WebSocketEventListener.topicSessions.keySet()) {
+                        log.info("Topic: " + topic);
+                        if (topic.contains("/topic/public/"+id+"/")) {
+                            for (String session : WebSocketEventListener.topicSessions.get(topic)) {
+                                try {
+                                    for (WebSocketSession s : sessions) {
+                                        if (s.getId().equals(session)) {
+                                            s.close(CloseStatus.NOT_ACCEPTABLE);
+                                        }
                                     }
+                                } catch (Exception e) {
+                                    log.error("Error when closing session", e);
                                 }
-                            } catch (Exception e) {
-                                log.error("Error when closing session", e);
                             }
                         }
                     }
+                    auctionSessionService.finishAuction(id);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         };
@@ -123,15 +126,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void startAuction(int id, int delayInSeconds) {
         final Runnable timeout = new Runnable() {
             public void run() {
-                auctionSessionService.startAuction(id);
-                log.info("Start auction: " + id);
-                AuctionSession session = auctionSessionRepos.findById(id).orElseThrow(
-                        () -> new RuntimeException("Auction session not found")
-                );
-                int delay = (int) (session.getEndDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
-                finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
-                log.info("Auction session " + session.getAuctionSessionId() + " finish in " + Math.max(delay, 0)+" seconds:"+session.getEndDate());
-
+                try {
+                    auctionSessionService.startAuction(id);
+                    AuctionSession session = auctionSessionRepos.findById(id).orElseThrow(
+                            () -> new RuntimeException("Auction session not found")
+                    );
+                    int delay = (int) (session.getEndDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
+                    finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
         final ScheduledFuture<?> timeoutHandle = scheduler.schedule(timeout, delayInSeconds, TimeUnit.SECONDS);
@@ -147,19 +151,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
             if(session.getEndDate().isBefore(LocalDateTime.now())){
                 finishAuction(session.getAuctionSessionId(), 1);
-                log.info("Auction session " + session.getAuctionSessionId() + " finished:"+session.getEndDate());
             } else
             if(session.getStatus().equals(AuctionSession.Status.SCHEDULED)){
                 int delay = (int) (session.getStartDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
                 startAuction(session.getAuctionSessionId(), Math.max(delay, 0));
-                log.info("Auction session " + session.getAuctionSessionId() + " start in "+delay+" seconds:"+session.getStartDate());
             } else
             if (session.getStatus().equals(AuctionSession.Status.PROGRESSING)){
                 int delay = (int) (session.getEndDate().toEpochSecond(zoneOffset) - LocalDateTime.now().toEpochSecond(zoneOffset));
                 finishAuction(session.getAuctionSessionId(), Math.max(delay, 0));
-                log.info("Auction session " + session.getAuctionSessionId() + " will finish in " + Math.max(delay, 0));
             }
-
         }
     }
 

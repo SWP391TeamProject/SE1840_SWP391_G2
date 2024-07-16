@@ -33,7 +33,7 @@ public class AuctionItem {
     @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
             @JoinColumn(name = "jewelry_id", referencedColumnName = "jewelry_id")
