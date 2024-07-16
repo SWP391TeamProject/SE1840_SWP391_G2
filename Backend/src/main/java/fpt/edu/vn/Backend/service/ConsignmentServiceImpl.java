@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -25,16 +26,15 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +50,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     ConsignmentDetailRepos consignmentDetailRepos;
     NotificationRepos notificationRepos;
     private static final Logger logger = LoggerFactory.getLogger(ConsignmentServiceImpl.class);
+
+    @Autowired
+    AttachmentService attachmentService;
 
     @Autowired
     public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos, RedisCacheManager cacheManager) {
@@ -72,36 +75,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @NotNull
     private ConsignmentDTO getConsignmentDTO(Consignment consignment) {
-        List<ConsignmentDetailDTO> consignmentDetailDTOs = Collections.emptyList();
         if (consignment.getConsignmentDetails() == null) {
             consignment.setConsignmentDetails(new ArrayList<>());
-        } else {
-            consignmentDetailDTOs = consignment.getConsignmentDetails().stream()
-                    .map(detail -> new ConsignmentDetailDTO(
-                            detail.getConsignmentDetailId(),
-                            detail.getDescription(),
-                            detail.getType().toString(),
-                            detail.getPrice(),
-                            detail.getConsignment().getConsignmentId(),
-                            new AccountDTO(detail.getAccount()),
-                            detail.getAttachments() == null ? null : detail.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toList())
-                    ))
-                    .collect(Collectors.toList());
         }
         return new ConsignmentDTO(
-                consignment.getConsignmentId(),
-                String.valueOf(consignment.getStatus()),
-                String.valueOf(consignment.getPreferContact()),
-                consignment.getUser() != null ? new AccountDTO(consignment.getUser()) : null,
-                consignment.getCreateDate(),
-                consignment.getUpdateDate(),
-                consignmentDetailDTOs
+                consignment
         );
     }
     @Override
     @CacheEvict(value = "consignments", allEntries = true)
     //todo thís need to be migrated to new schema defintion no more detail
-    public ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails) {
+    public ConsignmentDTO requestConsignmentCreate(ConsignmentRequestDTO consignmentRequestDTO) {
         try {
             Consignment consignment = new Consignment();
 //            ConsignmentDetail detail = new ConsignmentDetail();
@@ -109,10 +93,27 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 //            detail.setPrice(consignmentDetails.getPrice());
 //            detail.setType(ConsignmentDetail.ConsignmentType.REQUEST);
 //            detail.setAccount(accountRepos.findById(userId).orElseThrow(() -> new ConsignmentServiceException("User not found")));
-            consignment.setPreferContact(Consignment.preferContact.valueOf(preferContact.toUpperCase()));
+            consignment.setPreferContact(Consignment.preferContact.valueOf(consignmentRequestDTO.getPreferContact().toUpperCase()));
+            consignment.setCreateDate(LocalDateTime.now());
+            consignment.setUpdateDate(LocalDateTime.now());
+            consignment.setConsignmentDetails(new ArrayList<>());
+            consignment.setAge(consignmentRequestDTO.getAge());
+            consignment.setBrand(consignmentRequestDTO.getBrand());
+            consignment.setColor(consignmentRequestDTO.getColor());
+            consignment.setMaterial(consignmentRequestDTO.getMaterial());
+            consignment.setSize(consignmentRequestDTO.getSize());
+            consignment.setWeight(consignmentRequestDTO.getWeight());
             consignment.setStatus(Consignment.Status.WAITING_STAFF);
+            consignment.setDescription(consignmentRequestDTO.getDescription());
+            consignment.setUser(accountRepos.findById(consignmentRequestDTO.getAccountId()).orElseThrow(() -> new ConsignmentServiceException("User not found")));
+
 //                consignment.setConsignmentDetails(List.of(detail));
             consignment = consignmentRepos.save(consignment);
+            if (consignmentRequestDTO.getFiles() != null) {
+                for (MultipartFile f : consignmentRequestDTO.getFiles()) {
+                    attachmentService.uploadConsignmentAttachment(f, consignment.getConsignmentId());
+                }
+            }
 //            detail.setConsignment(consignment);
 //            consignmentDetailRepos.save(detail);
             return getConsignmentDTO(consignment);
@@ -239,7 +240,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 throw new ConsignmentServiceException("Account is not manager");
             }
             // Check if the consignment is in final evaluation status
-            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION))) {
+            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION)
+                    && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION))) {
 
                 // Create and set consignment detail
                 ConsignmentDetail consignmentDetail = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId).get(
@@ -366,7 +368,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignment.setStatus(Consignment.Status.TERMINATED);
                 consignmentRepos.save(consignment);
             } else {
-                throw new ConsignmentServiceException("Consignment is not in IN_FINAL_EVALUATION status");
+                throw new ConsignmentServiceException("Consignment is not in WAITING_SELLER status");
             }
             return getConsignmentDTO(consignment);
         } catch (Exception e) {
@@ -386,6 +388,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setCreateDate(updatedConsignment.getCreateDate());
             consignment.setUpdateDate(updatedConsignment.getUpdateDate());
             consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
+            consignment.setAge(updatedConsignment.getAge());
+            consignment.setBrand(updatedConsignment.getBrand());
+            consignment.setColor(updatedConsignment.getColor());
+            consignment.setMaterial(updatedConsignment.getMaterial());
+            consignment.setSize(updatedConsignment.getSize());
+            consignment.setWeight(updatedConsignment.getWeight());
+            consignment.setDescription(updatedConsignment.getDescription());
 
             consignment.setUser(updatedConsignment.getUser() == null ? null : accountRepos.findById(updatedConsignment.getUser().getAccountId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));
 
@@ -441,9 +450,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     //TODO : redesing the logic for get all staff consignment this need refactor
     @Override
     public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
-//        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrUser_AccountIdOrderByStatus(Consignment.Status.WAITING_STAFF,userId,pageable);
-//        return getConsignmentDTOS(pageable, consignmentPage);
-        return null;
+        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrStaff_AccountIdOrderByStatus(Consignment.Status.WAITING_STAFF,staffId,pageable);
+        return getConsignmentDTOS(pageable, consignmentPage);
     }
 
     @Override
@@ -463,8 +471,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignmentPage = consignmentRepos.findByStatus(enumStatus, pageable);
             }else if(role.equals(Account.Role.valueOf("STAFF"))){
                 //todo: this need to be migrated to the new schema definition
-                consignmentPage = null;
-//                consignmentPage = consignmentRepos.findByStatusAndStaff_AccountId(enumStatus,accID, pageable);
+                consignmentPage = consignmentRepos.findByStatusAndStaff_AccountId(enumStatus,accID, pageable);
             }else{
                 return null;
             }
@@ -475,15 +482,14 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @Cacheable(key = "#userId + #page + #size", value = "consignments")
-    public Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Consignment> consignmentPage = consignmentRepos.findByUserID(userId, pageable);
+    @Cacheable(key = "#userId + #pageable.pageNumber + #pageable.pageSize", value = "consignments")
+    public Page<ConsignmentDTO> getConsignmentsByUserId(int userId,Pageable pageable ){
+        Page<Consignment> consignmentPage = consignmentRepos.findAllByUser_AccountId(userId, pageable);
+//        consignmentPage.stream().filter(consignment -> consignment.getStatus().equals(Consignment.Status.FINISHED)).forEach(consignment -> {
+//            consignment.setConsignmentDetails(consignment.getConsignmentDetails().stream().filter(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED)).toList());
+//        });
 
-        consignmentPage.stream().filter(consignment -> consignment.getStatus().equals(Consignment.Status.FINISHED)).forEach(consignment -> {
-            consignment.setConsignmentDetails(consignment.getConsignmentDetails().stream().filter(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED)).toList());
-        });
-//        logger.info("Retrieved consignments by user ID: " + consignmentPage.size()  );
+        logger.info("Retrieved consignments by user ID: " + consignmentPage.getContent().size());
 
         return getConsignmentDTOS(pageable, consignmentPage);
 
@@ -530,9 +536,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 () -> new ConsignmentServiceException("Account not found : " + accountId));
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
                 () -> new ConsignmentServiceException("Consignment not found : " + consignmentId));
-        if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getUser() == null) {
+        if (account.getRole().equals(Account.Role.STAFF) && consignment.getStatus().equals(Consignment.Status.WAITING_STAFF) && consignment.getStaff() == null) {
             consignment.setStatus(Consignment.Status.IN_INITIAL_EVALUATION);
-            consignment.setUser(account);
+            consignment.setStaff(account);
             consignment = consignmentRepos.save(consignment);
             return getConsignmentDTO(consignment);
         } else {

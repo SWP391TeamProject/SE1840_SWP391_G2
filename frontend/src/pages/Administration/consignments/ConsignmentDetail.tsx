@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Consignment from "@/models/consignment";
 import { useAppDispatch } from "@/redux/hooks";
 import { acceptEvaluation, fetchConsignmentByConsignmentId, receivedConsignment, rejectEvaluation, takeConsignment } from "@/services/ConsignmentService";
 import { useEffect, useState } from "react";
@@ -14,6 +13,8 @@ import { getCookie } from "@/utils/cookies";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Consignment } from "@/models/newModel/consignment";
+import ConsignmentDialog from "./ConsignmentDialog";
 
 export default function ConsignmentDetail() {
     const param = useParams();
@@ -157,9 +158,7 @@ export default function ConsignmentDetail() {
         const price = consignment?.consignmentDetails?.filter(detail => {
             return detail.status === ConsignmentDetailType.MANAGER_ACCEPTED
         })[0].price;
-        const ownerId = consignment?.consignmentDetails?.filter(detail => {
-            return detail.status === ConsignmentDetailType.REQUEST
-        })[0].account?.accountId;
+        const ownerId = consignment?.user?.accountId;
         if (!price || !ownerId || !consignment) {
             return;
         }
@@ -253,41 +252,26 @@ export default function ConsignmentDetail() {
 
                             <h3>Customer information</h3>
                             <Avatar>
-                                <AvatarImage src={consignment?.consignmentDetails?.filter(
-                                    detail => {
-                                        return (detail.status === ConsignmentDetailType.REQUEST);
-                                    })[0].account?.avatar?.link || ""} />
+                                <AvatarImage src={consignment?.user?.avatar?.link || ""} />
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                         </CardTitle>
 
 
-                        <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
-                            detail => {
-                                return (detail.status === ConsignmentDetailType.REQUEST);
-                            })[0].account.email : null}</CardDescription>
+                        <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment?.user?.email : null}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex justify-between items-center">
                             <div className="flex flex-col w-full">
                                 <p>
-                                    Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
-                                        detail => {
-                                            return (detail.status === ConsignmentDetailType.REQUEST);
-                                        })[0].account.nickname : null}
+                                    Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.nickname : null}
 
                                 </p>
                                 <p>
-                                    Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
-                                        detail => {
-                                            return (detail.status === ConsignmentDetailType.REQUEST);
-                                        })[0].account.email : null}
+                                    Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.email : null}
                                 </p>
                                 <p>
-                                    Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
-                                        detail => {
-                                            return (detail.status === ConsignmentDetailType.REQUEST);
-                                        })[0].account.phone : 'not provided'}
+                                    Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.phone : 'not provided'}
 
                                 </p>
                             </div>
@@ -300,7 +284,7 @@ export default function ConsignmentDetail() {
             </div>
             <div className="flex justify-start flex-row w-full mt-1 gap-2">
                 <div className="basis-2/3">
-                    <ScrollArea className="w-full h-96 border rounded-xl ">
+                    <ScrollArea className="w-2/3 h-96 border rounded-xl ">
                         {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
                             return (
                                 <Card key={index} className="w-full">
@@ -336,9 +320,41 @@ export default function ConsignmentDetail() {
 
                         }
                         ) : null}
+
                     </ScrollArea>
 
                 </div>
+                <Card className="w-1/3">
+                    <CardHeader>
+                        <CardTitle>Consignment Information <ConsignmentDialog consignment={consignment} /></CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div>
+                            <p>
+                                Color: {consignment?.color}
+                            </p>
+                            <p>
+                                Size: {consignment?.size}
+                            </p>
+                            <p>
+                                Weight: {consignment?.weight}
+                            </p>
+                            <p>
+                                Brand: {consignment?.brand}
+                            </p>
+                            <p>
+                                Age: {consignment?.age}
+                            </p>
+                            <p>
+                                Material: {consignment?.material}
+                            </p>
+                        </div>
+                        <div contentEditable='true' dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
+                        <div className="w-ful flex justify-between">
+                            <p>Requester: {consignment?.user?.nickname}</p>
+                        </div>
+                    </CardContent>
+                </Card>
 
 
 

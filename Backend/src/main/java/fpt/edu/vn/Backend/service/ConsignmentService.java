@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
+import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ import java.math.BigDecimal;
 
 public interface ConsignmentService {
     // Create
-    ConsignmentDTO requestConsignmentCreate(int userId, String preferContact, ConsignmentDetailDTO consignmentDetails);
+    ConsignmentDTO requestConsignmentCreate(ConsignmentRequestDTO consignmentRequestDTO);
 
     // Evaluations
     ConsignmentDetailDTO submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId);
@@ -38,7 +39,7 @@ public interface ConsignmentService {
 
     Page<ConsignmentDTO> getConsignmentsByStatus(String status, Pageable pageable, int accID);
 
-    Page<ConsignmentDTO> getConsignmentsByUserId(int userId, int page, int size);
+    Page<ConsignmentDTO> getConsignmentsByUserId(int userId, Pageable pageable);
 
     Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
 

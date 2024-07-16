@@ -55,6 +55,16 @@ public class ConsignmentDetailController {
 
     @PostMapping("/createInitialEvaluation")
     public ResponseEntity<ConsignmentDetailDTO> createInitialEvaluation(@ModelAttribute EvaluationDTO evaluationDTO) {
+        AccountDTO account = accountService.getAccountById(evaluationDTO.getAccountId());
+        ConsignmentDTO consignmentDTO = consignmentService.getConsignmentById(evaluationDTO.getConsignmentId());
+        if(consignmentDTO == null || consignmentDTO.getStatus().equalsIgnoreCase("FINISHED")
+                || consignmentDTO.getStatus().equalsIgnoreCase("TERMINATED")){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(account == null || account.getRole() == Account.Role.MEMBER
+        || !(account.getAccountId().equals(consignmentDTO.getStaff().getAccountId()) || account.getRole().equals(Account.Role.MANAGER))){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitInitialEvaluation(evaluationDTO.getConsignmentId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getAccountId());
         if (evaluationDTO.getFiles() != null) {
             for (MultipartFile f : evaluationDTO.getFiles()) {

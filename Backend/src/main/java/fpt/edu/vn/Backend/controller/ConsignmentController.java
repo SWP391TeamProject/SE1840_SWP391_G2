@@ -35,7 +35,7 @@ import java.util.List;
 @CrossOrigin("*")
 public class ConsignmentController {
     private final ConsignmentService consignmentService;
-    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConsignmentController.class);
     @Autowired
     private AttachmentService attachmentService;
     @Autowired
@@ -101,14 +101,16 @@ public class ConsignmentController {
     @GetMapping("/user/{id}")
     public ResponseEntity<Page<ConsignmentDTO>> getConsignmentByUserID(
             @PathVariable int id,
-            @RequestParam(defaultValue = "0") int pageNumb,
-            @RequestParam(defaultValue = "50") int pageSize) {
+            @PageableDefault(size = 50) Pageable pageable,Authentication authentication) {
+        AccountDTO acc = accountService.getAccountByEmail(authentication.getName());
+        if(acc == null || acc.getAccountId() != id){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         try {
-            Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByUserId(id, pageNumb, pageSize);
-            if (consignments == null || consignments.isEmpty()) {
-                throw new ConsignmentServiceException("No consignments found for user ID: " + id);
-            }
-            return new ResponseEntity<>(consignments, HttpStatus.OK);
+//            if (consignments == null || consignments.isEmpty()) {
+//                throw new ConsignmentServiceException("No consignments found for user ID: " + id);
+//            }
+            return new ResponseEntity<>(consignmentService.getConsignmentsByUserId(id, pageable), HttpStatus.OK);
         } catch (ConsignmentServiceException e) {
             logger.error("Error retrieving consignments by ID", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -130,9 +132,6 @@ public class ConsignmentController {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
             Page<ConsignmentDTO> consignments = consignmentService.getConsignmentsByStatus(status, pageable, acc.getAccountId());
-            if (consignments == null || consignments.isEmpty()) {
-                throw new ConsignmentServiceException("No consignments found with status: " + status);
-            }
             return new ResponseEntity<>(consignments, HttpStatus.OK);
         } catch (ConsignmentServiceException e) {
             logger.error("Error retrieving consignments by status", e);
@@ -146,16 +145,8 @@ public class ConsignmentController {
     @PostMapping("/create")
     public ResponseEntity<ConsignmentDTO> createConsignment(@ModelAttribute ConsignmentRequestDTO consignmentRequestDTO) {
         try {
-            ConsignmentDetailDTO consignmentDetailDTO = new ConsignmentDetailDTO();
-            consignmentDetailDTO.setAccount(accountService.getAccountById(consignmentRequestDTO.getAccountId()));
-            consignmentDetailDTO.setDescription(consignmentRequestDTO.getDescription());
-            int userId = consignmentDetailDTO.getAccount().getAccountId(); // Hardcoded user ID for now
-            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(userId, consignmentRequestDTO.getPreferContact(), consignmentDetailDTO);
-            if (consignmentRequestDTO.getFiles() != null) {
-                for (MultipartFile f : consignmentRequestDTO.getFiles()) {
-                    attachmentService.uploadConsignmentDetailAttachment(f, consignment.getConsignmentDetails().stream().filter(x -> x.getStatus().equals("REQUEST")).findFirst().get().getConsignmentDetailId());
-                }
-            }
+            ConsignmentDTO consignment = consignmentService.requestConsignmentCreate(consignmentRequestDTO);
+
             return new ResponseEntity<>(consignment, HttpStatus.CREATED);
         } catch (ConsignmentServiceException e) {
             logger.error("Error creating consignment", e);

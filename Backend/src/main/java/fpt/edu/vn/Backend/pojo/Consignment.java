@@ -43,6 +43,10 @@ public class Consignment {
     @JoinColumn(name = "user_id")
     private Account user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assign_staff_id")
+    private Account staff;
+
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;
 

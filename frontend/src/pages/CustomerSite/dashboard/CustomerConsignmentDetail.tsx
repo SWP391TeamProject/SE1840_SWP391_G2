@@ -117,7 +117,7 @@ export default function CustomerConsignmentDetail() {
                         </div>
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">Owner</p>
-                            <p className="text-base font-medium">{consignment.consignmentDetails[0].account.nickname}</p>
+                            <p className="text-base font-medium">{consignment.user.nickname}</p>
                         </div>
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">Updated Date</p>

@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { AccountStatus } from "@/constants/enums"
 import { formatDate } from "@/lib/utils"
-import Consignment from "@/models/consignment"
+import { Consignment } from "@/models/newModel/consignment"
 
 // Define the JewelryItem type based on the provided JSON structure
 // type Consignment = {
@@ -95,7 +95,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        {row.original.consignmentDetails[0].account.nickname ? row.original.consignmentDetails[0].account.nickname : ""}
+        {row.original.user.nickname ? row.original.user.nickname : ""}
       </div>
     ),    
     enableSorting: false,
