@@ -88,4 +88,8 @@ public class Item {
     @JoinColumn(name = "jewelry_id")
     private Set<Attachment> attachments;
 
+    @Override
+    public int hashCode() {
+        return itemId;
+    }
 }

@@ -23,7 +23,7 @@ public class AuctionSessionDTO implements Serializable {
     private String title;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String status;
+    private AuctionSession.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private Set<AttachmentDTO> attachments;
@@ -34,7 +34,7 @@ public class AuctionSessionDTO implements Serializable {
         this.auctionSessionId = auctionSession.getAuctionSessionId();
         this.startDate = auctionSession.getStartDate();
         this.endDate = auctionSession.getEndDate();
-        this.status = String.valueOf(auctionSession.getStatus());
+        this.status = auctionSession.getStatus();
         this.createDate = auctionSession.getCreateDate();
         this.updateDate = auctionSession.getUpdateDate();
         this.title = auctionSession.getTitle();

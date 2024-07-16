@@ -422,7 +422,7 @@ export default function AuctionSession() {
 
                                     <div className='group relative'>
                                         <img
-                                            src={item.itemDTO.attachments[0].link}
+                                            src={item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0 ? item.itemDTO.attachments[0].link : ""}
                                             width={300}
                                             height={200}
                                             alt="Auction Item"

@@ -11,7 +11,6 @@ import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.BidRepos;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
-import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,24 +26,31 @@ public class BidServiceImpl implements BidService {
 
     private static final Logger log = LoggerFactory.getLogger(BidServiceImpl.class);
 
-    @Autowired
     private BidRepos bidRepos;
+    private AuctionItemRepos auctionItemRepos;
+    private AccountRepos accountRepos;
 
     @Autowired
-    private AuctionItemRepos auctionItemRepos;
-    @Autowired
-    private PaymentRepos paymentRepos;
-    @Autowired
-    private PaymentService paymentService;
-    @Autowired
-    private AccountRepos accountRepos;
+    public BidServiceImpl(BidRepos bidRepos, AuctionItemRepos auctionItemRepos, AccountRepos accountRepos) {
+        this.bidRepos = bidRepos;
+        this.auctionItemRepos = auctionItemRepos;
+        this.accountRepos = accountRepos;
+    }
 
 
     @Override
     public List<BidDTO> getAllBids() {
-        return
-                bidRepos.findAll().stream().map(
-                        BidDTO::new).toList();
+        return bidRepos.findAll().stream().map(BidDTO::new).toList();
+    }
+
+    @Override
+    public List<AccountDTO> getParticipants(AuctionItemId auctionItemId) {
+        return bidRepos.findAllParticipantsByAuctionItemId(auctionItemId).stream().map(AccountDTO::new).toList();
+    }
+
+    @Override
+    public boolean hasBidsByAuctionItemId(AuctionItemId auctionItemId) {
+        return bidRepos.existsByAuctionItem_AuctionItemId(auctionItemId);
     }
 
     @Override
@@ -74,16 +80,12 @@ public class BidServiceImpl implements BidService {
                 () -> new IllegalArgumentException("Invalid auction item id: " + bid.getAuctionItemId())
         );
         newBid.setAuctionItem(auctionItem);
-        PaymentDTO paymentDTO = bid.getPayment();
-        if (paymentDTO == null) {
-            throw new IllegalArgumentException("Payment cannot be null");
-        }
-        newBid.setAmount(paymentDTO.getPaymentAmount());
-        newBid.setStatus(Bid.Status.PENDING);
-        newBid.setAccount(accountRepos.findById(paymentDTO.getAccountId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid account id: " + paymentDTO.getAccountId())
+        newBid.setAmount(bid.getAmount());
+        newBid.setStatus(bid.getStatus());
+        newBid.setAccount(accountRepos.findById(bid.getAccountId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
         ));
-        newBid.setCreatedDate(paymentDTO.getCreateDate());
+        newBid.setCreatedDate(bid.getCreatedDate());
         return new BidDTO(bidRepos.save(newBid));
     }
 
@@ -96,59 +98,8 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public BidDTO getHighestBid(AuctionItemId auctionItemId) {
-        // This method requires a custom query to be implemented in the repository
-        auctionItemRepos.findById(auctionItemId).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
-        );
-        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
-        BidDTO result= new BidDTO();
-        result.setPayment(new PaymentDTO());
-        result.getPayment().setPaymentAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
-                () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
-        ).getItem().getReservePrice());
-        if(bids.isEmpty()) return result;
-        return new BidDTO(bids.get(0));
-    }
-
-    @Override
-    public void deleteBid(int id) {
-        bidRepos.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("Invalid bid id: " + id)
-        );
-        bidRepos.deleteById(id);
-    }
-
-    @Override
-    public List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId) {
-        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
-        List<BidDTO> result = new ArrayList<>();
-        for (int i = 0; i < bids.size(); i++) {
-            Bid bid = bids.get(i);
-            if (i == 0){
-                log.info("Bid " + bid.getBidId() + " succeeded");
-                bid.setStatus(Bid.Status.SUCCESS);
-            } else {
-                log.info("Bid " + bid.getBidId() + " failed");
-                bid.setStatus(Bid.Status.FAILED);
-            }
-            bidRepos.save(bid);
-            result.add(new BidDTO(bid));
-        }
-        return result;
-    }
-
-    @Override
-    public List<BidDTO> terminateAuctionItem(AuctionItemId auctionItemId) {
-        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
-        List<BidDTO> result = new ArrayList<>();
-        for (Bid bid : bids) {
-            log.info("Bid " + bid.getBidId() + " failed");
-
-            bid.setStatus(Bid.Status.FAILED);
-            bidRepos.save(bid);
-            result.add(new BidDTO(bid));
-        }
-        return result;
+        Bid bid = bidRepos.findBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
+        return bid == null ? null : new BidDTO(bid);
     }
 
     @Override
@@ -157,11 +108,11 @@ public class BidServiceImpl implements BidService {
         for (BidDTO bid : bids) {
             BidResponse response = new BidResponse();
             response.setBidId(bid.getBidId());
-            response.setAccount(new AccountDTO(accountRepos.findById(bid.getPayment().getAccountId()).orElseThrow(
-                    () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
+            response.setAccount(new AccountDTO(accountRepos.findById(bid.getAccountId()).orElseThrow(
+                    () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
             )));
             response.getAccount().setPassword(null);
-            response.setPrice(Double.parseDouble(bid.getPayment().getPaymentAmount().toString()));
+            response.setPrice(bid.getAmount());
             responses.add(response);
         }
         return responses;
