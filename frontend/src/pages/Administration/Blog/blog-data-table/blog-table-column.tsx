@@ -67,9 +67,9 @@ export const getColumns = (): ColumnDef<Blog>[] => [
   {
     accessorKey: "postId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Post ID" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("postId")}</div>,
+    cell: ({ row }) => <div className="w-3">{row.getValue("postId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -80,7 +80,7 @@ export const getColumns = (): ColumnDef<Blog>[] => [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[7.25rem] truncate font-medium">
+        <span className="max-w-[20rem] truncate font-medium">
           {row.getValue("title")}
         </span>
       </div>

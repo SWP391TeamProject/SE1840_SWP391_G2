@@ -56,9 +56,9 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
   {
     accessorKey: "auctionSessionId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Session ID" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("auctionSessionId")}</div>,
+    cell: ({ row }) => <div className="w-3">{row.getValue("auctionSessionId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
