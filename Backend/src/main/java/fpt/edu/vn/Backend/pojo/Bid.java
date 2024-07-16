@@ -1,12 +1,14 @@
 package fpt.edu.vn.Backend.pojo;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -22,14 +24,25 @@ public class Bid {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
-            @JoinColumn(name = "item_id", referencedColumnName = "item_id")
+            @JoinColumn(name = "jewelry_id", referencedColumnName = "jewelry_id")
     })
     private AuctionItem auctionItem;
 
-    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
+
+    public enum Status {
+        PENDING, SUCCESS, FAILED
+    }
+    private Status status;
+
+    @Column(name = "amount", precision = 20, scale = 8)
+    private BigDecimal amount;
+
+    @CreationTimestamp
+    private LocalDateTime createdDate;
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
 
     @Override
     public int hashCode() {

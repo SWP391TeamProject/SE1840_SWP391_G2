@@ -8,13 +8,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "auction_item")
+@Table(name = "auction_jewelry")
 public class AuctionItem {
     @EmbeddedId
     private AuctionItemId auctionItemId;
@@ -26,11 +27,19 @@ public class AuctionItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("itemId")
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "jewelry_id")
     private Item item;
 
-    @Column(name = "current_price")
+    @Column(name = "current_price", precision = 20, scale = 8)
     private BigDecimal currentPrice;
+
+    @OneToMany
+    @JoinColumns({
+            @JoinColumn(name = "auction_session_id", referencedColumnName = "auction_session_id"),
+            @JoinColumn(name = "jewelry_id", referencedColumnName = "jewelry_id")
+    })
+    private Set<Bid> bids;
+
 
     @CreationTimestamp
     @Column(name = "create_date")

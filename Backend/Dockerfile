@@ -1,8 +1,10 @@
+FROM mav
+
 FROM eclipse-temurin:17-jdk-jammy as builder
 WORKDIR /opt/app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-RUN ./mvnw dependency:go-offline
+RUN #./mvnw dependency:go-offline
 COPY ./src ./src
 COPY .env.dev.properties /opt/app/.env.dev.properties
 COPY .env.properties /opt/app/.env.properties

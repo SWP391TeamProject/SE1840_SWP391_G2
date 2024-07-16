@@ -28,11 +28,11 @@ public class Consignment {
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
     public enum Status {
-        WAITING_STAFF, IN_INITIAL_EVALUATION,SENDING, IN_FINAL_EVALUATION,WAITING_SELLER, FINISHED, TERMINATED
+        WAITING_STAFF, IN_INITIAL_EVALUATION, SENDING, IN_FINAL_EVALUATION, WAITING_SELLER, TO_ITEM, FINISHED, TERMINATED
     }
 
     public enum preferContact {
-        EMAIL, PHONE , TEXT , ANY
+        EMAIL, PHONE, TEXT, ANY
     }
 
     @Column(name = "prefer_contact")
@@ -40,11 +40,32 @@ public class Consignment {
     private preferContact preferContact;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id")
-    private Account staff;
+    @JoinColumn(name = "user_id")
+    private Account user;
 
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;
+
+    @Column(length = 2000, columnDefinition = "NVARCHAR(max)")
+    private String description;
+
+    @Column(length = 30)
+    private String color;
+
+    @Column(length = 30)
+    private String size;
+
+    @Column(length = 30)
+    private String weight;
+
+    @Column(length = 30)
+    private String brand;
+
+    @Column(length = 30)
+    private Integer age;
+
+    @Column(length = 30)
+    private String material;
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -54,5 +75,8 @@ public class Consignment {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
+    @OneToMany
+    @JoinColumn(name = "consignment_id")
+    private List<Attachment> attachments;
 }
 

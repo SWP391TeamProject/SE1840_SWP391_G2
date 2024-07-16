@@ -4,10 +4,11 @@ import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.Item;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class CreateAuctionSessionRequestDTO {
+public class CreateAuctionSessionRequestDTO implements Serializable {
     private int auctionSessionId;
     private String title;
     private LocalDateTime startDate;

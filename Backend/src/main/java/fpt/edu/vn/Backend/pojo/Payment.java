@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,12 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "[transaction]")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "transaction_id")
     private int paymentId;
 
-    @Column(name = "payment_amount")
+    @Column(name = "transaction_amount", precision = 20, scale = 8)
     private BigDecimal paymentAmount;
 
     public enum Status {
@@ -29,22 +31,29 @@ public class Payment {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status")
-    private Status Status;
+    @Column(name = "transaction_status")
+    private Status status;
+
+    public enum Method {
+        VNPAY, PAYPAL,MANUAL
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    @Nullable
+    private Method method;
 
     public enum Type {
         DEPOSIT,
         WITHDRAW,
         AUCTION_DEPOSIT,
-        AUCTION_BID,
         AUCTION_ORDER,
-        AUCTION_DEPOSIT_REFUND,
         CONSIGNMENT_REWARD
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_type")
-    private Type Type;
+    @Column(name = "transaction_type")
+    private Type type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
@@ -57,10 +66,6 @@ public class Payment {
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
-
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "bid_id")
-    private Bid bid;
 
     @CreationTimestamp
     private LocalDateTime createDate;

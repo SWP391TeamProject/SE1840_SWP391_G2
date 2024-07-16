@@ -5,7 +5,7 @@ import Consignment from "@/models/consignment";
 import { useAppDispatch } from "@/redux/hooks";
 import { acceptEvaluation, fetchConsignmentByConsignmentId, receivedConsignment, rejectEvaluation, takeConsignment } from "@/services/ConsignmentService";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConsignmentDetailDialog from "./ConsignmentDetailDialog";
 import SendEvaluationForm from "./SendEvaluation";
@@ -17,7 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConsignmentDetail() {
     const param = useParams();
-
+    const nav = useNavigate();
 
     const [consignment, setConsignment] = useState<Consignment | undefined>(undefined);
     const [state, setState] = useState(false);
@@ -30,10 +30,11 @@ export default function ConsignmentDetail() {
             setConsignment(res.data);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message,{
-                position:"bottom-right",
+            toast.error(error.response.data.message, {
+                position: "bottom-right",
             });
         })
+
     }, [state]);
 
     const ConfirmReceive = (consignmentId: any) => {
@@ -88,14 +89,14 @@ export default function ConsignmentDetail() {
         receivedConsignment(consignmentId?.consignmentId).then((res) => {
             console.log(res);
             setConsignment(res.data);
-            toast.success("Received consignment successfully",{
-                position:"bottom-right",
+            toast.success("Received consignment successfully", {
+                position: "bottom-right",
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message,{
-                position:"bottom-right",
+            toast.error(error.response.data.message, {
+                position: "bottom-right",
             });
         })
     }
@@ -103,14 +104,14 @@ export default function ConsignmentDetail() {
         takeConsignment(consignmentId?.consignmentId).then((res) => {
             console.log(res);
             setConsignment(res.data);
-            toast.success("Take consignment successfully",{
-                position:"bottom-right",
+            toast.success("Take consignment successfully", {
+                position: "bottom-right",
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message,{
-                position:"bottom-right",
+            toast.error(error.response.data.message, {
+                position: "bottom-right",
             });
         })
     }
@@ -123,14 +124,14 @@ export default function ConsignmentDetail() {
         const reason = reasonInput == null ? "reject by manager" : reasonInput;
         rejectEvaluation(consignmentId.toString(), accountId, reason).then((res) => {
             console.log(res);
-            toast.success("Reject consignment successfully",{
-                position:"bottom-right",
+            toast.success("Reject consignment successfully", {
+                position: "bottom-right",
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message,{
-                position:"bottom-right",
+            toast.error(error.response.data.message, {
+                position: "bottom-right",
             });
         })
     }
@@ -140,16 +141,29 @@ export default function ConsignmentDetail() {
         const accountId = JSON.parse(getCookie('user')).id;
         acceptEvaluation(consignmentId.toString(), accountId).then((res) => {
             console.log(res);
-            toast.success("Accept consignment successfully",{
-                position:"bottom-right",
+            toast.success("Accept consignment successfully", {
+                position: "bottom-right",
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message,{
-                position:"bottom-right",
+            toast.error(error.response.data.message, {
+                position: "bottom-right",
             });
         })
+    }
+
+    const handleCreateItem = () => {
+        const price = consignment?.consignmentDetails?.filter(detail => {
+            return detail.status === ConsignmentDetailType.MANAGER_ACCEPTED
+        })[0].price;
+        const ownerId = consignment?.consignmentDetails?.filter(detail => {
+            return detail.status === ConsignmentDetailType.REQUEST
+        })[0].account?.accountId;
+        if (!price || !ownerId || !consignment) {
+            return;
+        }
+        nav("/admin/items/create", { state: { price: price.toString(), ownerId: ownerId, consignmentId: consignment.consignmentId } });
     }
 
     const Action = () => {
@@ -184,10 +198,11 @@ export default function ConsignmentDetail() {
                         <Button className="bg-green-400  mr-16 w-24" onClick={() => acceptConsignment(consignment.consignmentId)}>Accept</Button></>;
                 }
             }
+            if (consignment?.status === ConsignmentStatus.TO_ITEM) {
+                return <Button onClick={() => handleCreateItem()}>Create Item</Button>;
+            }
         }
     }
-
-
 
     return (
         <div className="flex flex-col justify-start w-full h-full m-0 p-3">
@@ -211,7 +226,9 @@ export default function ConsignmentDetail() {
                                     case ConsignmentStatus.TERMINATED:
                                         return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
                                     case ConsignmentStatus.WAITING_SELLER:
-                                        return <Badge variant="default" className="bg-cyan-500 w-[150px] text-center flex justify-center items-center">Waiting seller</Badge>;
+                                        return <Badge variant="default" className="bg-pink-400 w-[150px] text-center flex justify-center items-center">Waiting seller</Badge>;
+                                    case ConsignmentStatus.TO_ITEM:
+                                        return <Badge variant="default" className="bg-cyan-400 w-[150px] text-center flex justify-center items-center">To Item</Badge>;
                                     default:
                                         return <Badge variant="destructive">Unknown Status</Badge>;
                                 }
@@ -236,26 +253,41 @@ export default function ConsignmentDetail() {
 
                             <h3>Customer information</h3>
                             <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" />
+                                <AvatarImage src={consignment?.consignmentDetails?.filter(
+                                    detail => {
+                                        return (detail.status === ConsignmentDetailType.REQUEST);
+                                    })[0].account?.avatar?.link || ""} />
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                         </CardTitle>
 
 
-                        <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}</CardDescription>
+                        <CardDescription>{Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
+                            detail => {
+                                return (detail.status === ConsignmentDetailType.REQUEST);
+                            })[0].account.email : null}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex justify-between items-center">
                             <div className="flex flex-col w-full">
                                 <p>
-                                    Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.nickname : null}
+                                    Name:  {Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
+                                        detail => {
+                                            return (detail.status === ConsignmentDetailType.REQUEST);
+                                        })[0].account.nickname : null}
 
                                 </p>
                                 <p>
-                                    Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.email : null}
+                                    Email:    {Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
+                                        detail => {
+                                            return (detail.status === ConsignmentDetailType.REQUEST);
+                                        })[0].account.email : null}
                                 </p>
                                 <p>
-                                    Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse()[0].account.phone : 'not provided'}
+                                    Phone:  {Array.isArray(consignment?.consignmentDetails) ? consignment?.consignmentDetails?.filter(
+                                        detail => {
+                                            return (detail.status === ConsignmentDetailType.REQUEST);
+                                        })[0].account.phone : 'not provided'}
 
                                 </p>
                             </div>

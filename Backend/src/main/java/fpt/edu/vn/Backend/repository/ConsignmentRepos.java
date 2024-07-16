@@ -16,7 +16,8 @@ public interface ConsignmentRepos extends JpaRepository<Consignment, Integer> {
     Consignment findByConsignmentId(int id);
 
     Page<Consignment> findByStatus(Consignment.Status status, Pageable pageable);
-
+    Page<Consignment> findByStatusAndUser_AccountId(Consignment.Status status,int accID, Pageable pageable);
+    Page<Consignment> findByStatusOrUser_AccountIdOrderByStatus(Consignment.Status status,int accID, Pageable pageable);
     @Query("SELECT c FROM Consignment c JOIN c.consignmentDetails cd WHERE cd.account.accountId = ?1")
     Page<Consignment> findByUserID(int userId, Pageable pageable);
 }

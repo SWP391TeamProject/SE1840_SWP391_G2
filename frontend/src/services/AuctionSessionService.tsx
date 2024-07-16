@@ -5,10 +5,18 @@ import { SERVER_DOMAIN_URL } from "@/constants/domain";
 
 const controller = "auction-sessions";
 
+interface getAuctionsSchema {
+    page: number;
+    size: number;
+    sort?: string;
+    order?: 'asc' | 'desc';
+    status?: string;
+  }
+
 export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
     let params = {
-        page: page,
-        size: size,
+        page: page ? page - 1 : 0,
+        size: size ? size : 10,
     }
 
     console.log(params);
@@ -32,13 +40,106 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         });
 };
 
+export const getAuctions = async (input: getAuctionsSchema) => {
+    try {
+        const {
+            page,
+            size,
+            sort,
+            order,
+            status,
+        } = input;
+
+        // Prepare query parameters
+        // const params: Record<string, any> = {
+        //     page: page - 1, // Spring Boot uses 0-based page index
+        //     size: size ? size : 10,
+        //     sort,
+        //     status: status ? status.toUpperCase() : undefined,
+        //     order,
+        // };
+
+        switch (status) {
+            case "Upcoming": {
+                let params = {
+                    pageNumb: page - 1,
+                    pageSize: size ? size : 10,
+                }
+
+                return await axios
+                    .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
+                        headers: {
+                            "Content-Type": "application/json",
+
+                        },
+                        params: params
+                    })
+            }
+            case "Past":
+                {
+                    let params = {
+                        pageNumb: page - 1,
+                        pageSize: size ? size : 10,
+                    }
+
+                    return await axios
+                        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
+                            headers: {
+                                "Content-Type": "application/json",
+
+                            },
+                            params: params
+                        })
+                }
+            case "Acive":
+                {
+                    let params = {
+                        page: page ? page - 1 : 0,
+                        size: size ?? 10,
+                    }
+
+                    return await axios
+                        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            params: params
+                        })
+                }
+            default:
+                {
+                    let params: Record<string, any> = {
+                        page: page - 1, // Spring Boot uses 0-based page index
+                        size: size ? size : 10,
+                        sort,
+                        status: status ? status.toUpperCase() : undefined,
+                        order,
+                    };
+
+                    return await axios
+                        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            params: params
+                        })
+                }
+        }
+    }
+    catch (err) {
+        console.log(err);
+        if (err?.response.status == 401) {
+            removeCookie("user");
+            removeCookie("token");
+        }
+    };
+};
+
 export const fetchActiveAuctionSessions = async (page?: number, size?: number) => {
     let params = {
         page: page ?? 0,
         size: size ?? 10,
     }
-
-    console.log(params);
 
     return await axios
         .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
@@ -58,6 +159,46 @@ export const fetchActiveAuctionSessions = async (page?: number, size?: number) =
             }
         });
 };
+
+export const getActiveAuction = async (input: getAuctionsSchema) => {
+    try {
+        const {
+            page,
+            size,
+            sort,
+            order,
+            status,
+        } = input;
+
+        // Prepare query parameters
+        const params: Record<string, any> = {
+            page: page - 1, // Spring Boot uses 0-based page index
+            size: size ? size : 10,
+            sort,
+            status: status ? status.toUpperCase() : undefined,
+            order,
+        };
+
+        const response = await axios
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
+            headers: {
+                "Content-Type": "application/json",
+
+            },
+            params: params
+        })
+
+        return response;
+    }
+    catch (err) {
+        console.log(err);
+        if (err?.response.status == 401) {
+            removeCookie("user");
+            removeCookie("token");
+        }
+    };
+};
+
 export const fetchFeaturedAuctionSessions = async (page?: number, size?: number) => {
     let params = {
         page: page,
@@ -80,7 +221,7 @@ export const fetchFeaturedAuctionSessions = async (page?: number, size?: number)
 export const fetchPastAuctionSessions = async (page?: number, size?: number) => {
     let params = {
         pageNumb: page,
-        pageSize: size,
+        pageSize: size ? size : 10,
     }
 
     return await axios
@@ -96,10 +237,49 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
         });
 }
 
+export const getPastAuction = async (input: getAuctionsSchema) => {
+    try {
+        const {
+            page,
+            size,
+            sort,
+            order,
+            status,
+        } = input;
+
+        // Prepare query parameters
+        const params: Record<string, any> = {
+            page: page - 1, // Spring Boot uses 0-based page index
+            size: size ? size : 10,
+            sort,
+            status: status ? status.toUpperCase() : undefined,
+            order,
+        };
+
+        const response = await axios
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
+            headers: {
+                "Content-Type": "application/json",
+
+            },
+            params: params
+        })
+
+        return response;
+    }
+    catch (err) {
+        console.log(err);
+        if (err?.response.status == 401) {
+            removeCookie("user");
+            removeCookie("token");
+        }
+    };
+};
+
 export const fetchUpcomingAuctionSessions = async (page?: number, size?: number) => {
     let params = {
         pageNumb: page,
-        pageSize: size,
+        pageSize: size ? size : 10,
     }
 
     return await axios
@@ -114,6 +294,45 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
 
         });
 }
+
+export const getUpcomingAuction = async (input: getAuctionsSchema) => {
+    try {
+        const {
+            page,
+            size,
+            sort,
+            order,
+            status,
+        } = input;
+
+        // Prepare query parameters
+        const params: Record<string, any> = {
+            page: page - 1, // Spring Boot uses 0-based page index
+            size: size ? size : 10,
+            sort,
+            status: status ? status.toUpperCase() : undefined,
+            order,
+        };
+
+        const response = await axios
+        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
+            headers: {
+                "Content-Type": "application/json",
+
+            },
+            params: params
+        })
+
+        return response;
+    }
+    catch (err) {
+        console.log(err);
+        if (err?.response.status == 401) {
+            removeCookie("user");
+            removeCookie("token");
+        }
+    };
+};
 
 
 export const fetchAuctionSessionById = async (id: number) => {
@@ -196,12 +415,21 @@ export const registerAuctionSession = async (id: number) => {
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
-        })
-        .catch((err) => {
+        });
+}
+export const assignItem = async (id: number, assignItem: any) => {
+    console.log(assignItem);
+    console.log(id);
+    return await axios
+        .post(`${SERVER_DOMAIN_URL}/api/auction-sessions/assign-auction-session`, {
+            auctionSessionId: id,
+            item: assignItem
+        }, {
+            headers: {
+                "Content-Type": "application/json",
 
-            if (err?.response.status == 401) {
-                removeCookie("user");
-                removeCookie("token");
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             }
         });
 }

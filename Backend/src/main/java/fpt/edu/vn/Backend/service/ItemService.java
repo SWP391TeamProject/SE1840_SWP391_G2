@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,7 @@ public interface ItemService {
     @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO itemDTO) throws IOException;
     @Nullable ItemDTO getItemById(int id);
     ItemDTO updateItem(@NotNull ItemDTO itemDTO);
-
+    void updateItemByStatus(UpdateItemStatusRequestDTO request);
 
     @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable);
 

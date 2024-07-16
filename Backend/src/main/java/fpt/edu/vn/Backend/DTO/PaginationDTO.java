@@ -2,8 +2,10 @@ package fpt.edu.vn.Backend.DTO;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class PaginationDTO {
+public class PaginationDTO implements Serializable {
     private int currentPage;
     private int size;
     private long totalElements;

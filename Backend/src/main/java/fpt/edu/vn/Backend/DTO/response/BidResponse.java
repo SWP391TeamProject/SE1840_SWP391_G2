@@ -4,8 +4,10 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.pojo.Bid;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class BidResponse {
+public class BidResponse implements Serializable {
     private int bidId;
     private AccountDTO account;
     private double price;

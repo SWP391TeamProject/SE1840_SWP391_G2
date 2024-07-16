@@ -56,13 +56,13 @@ class BidServiceImplTest {
 
     @Test
     void getBidsByAuctionItemId_HappyPath() {
-        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(any())).thenReturn(new ArrayList<>());
+        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(any())).thenReturn(new ArrayList<>());
         assertNotNull(bidService.getBidsByAuctionItemId(new AuctionItemId()));
     }
 
     @Test
     void getBidsByAccountId_HappyPath() {
-        when(bidRepos.findByPayment_Account_AccountId(any(Integer.class), any(Pageable.class))).thenReturn(Page.empty());
+        when(bidRepos.findByAccount_AccountId(any(Integer.class), any(Pageable.class))).thenReturn(Page.empty());
         assertNotNull(bidService.getBidsByAccountId(1, PageRequest.of(0, 1)));
     }
 
@@ -74,15 +74,15 @@ class BidServiceImplTest {
         BidDTO bidDTO = new BidDTO();
 
         PaymentDTO paymentDTO = new PaymentDTO();
-        paymentDTO.setAmount(BigDecimal.valueOf(100));
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
         paymentDTO.setAccountId(1);
         bidDTO.setPayment(paymentDTO);
 
         Bid bid = new Bid();
         bid.setBidId(1);
-        bid.setPayment(new Payment());
+        bid.setAmount(paymentDTO.getPaymentAmount());
         bid.setAuctionItem(auctionItem);
-        bid.getPayment().setAccount(new Account());
+        bid.setAccount(new Account());
 
         when(auctionItemRepos.findById(any())).thenReturn(Optional.of(auctionItem));
         when(accountRepos.findById(any())).thenReturn(Optional.of(new Account()));
@@ -97,7 +97,7 @@ class BidServiceImplTest {
 
         BidDTO bidDTO = new BidDTO();
         PaymentDTO paymentDTO = new PaymentDTO();
-        paymentDTO.setAmount(BigDecimal.valueOf(100));
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
         paymentDTO.setAccountId(1);
         bidDTO.setPayment(paymentDTO);
 
@@ -111,7 +111,7 @@ class BidServiceImplTest {
 
         BidDTO bidDTO = new BidDTO();
         PaymentDTO paymentDTO = new PaymentDTO();
-        paymentDTO.setAmount(BigDecimal.valueOf(100));
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
         paymentDTO.setAccountId(1);
         bidDTO.setPayment(paymentDTO);
 
@@ -133,15 +133,15 @@ class BidServiceImplTest {
         BidDTO bidDTO = new BidDTO();
 
         PaymentDTO paymentDTO = new PaymentDTO();
-        paymentDTO.setAmount(BigDecimal.valueOf(100));
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
         paymentDTO.setAccountId(1);
         bidDTO.setPayment(paymentDTO);
 
         Bid bid = new Bid();
         bid.setBidId(1);
-        bid.setPayment(new Payment());
+        bid.setAmount(paymentDTO.getPaymentAmount());
         bid.setAuctionItem(auctionItem);
-        bid.getPayment().setAccount(new Account());
+        bid.setAccount(new Account());
         when(bidRepos.findById(any())).thenReturn(Optional.of(bid));
         assertNotNull(bidService.getBidById(1));
     }
@@ -154,7 +154,7 @@ class BidServiceImplTest {
         AuctionItem auctionItem = new AuctionItem();
         auctionItem.setItem(item);
         when(auctionItemRepos.findById(any())).thenReturn(Optional.of(  auctionItem));
-        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(any())).thenReturn(new ArrayList<>());
+        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(any())).thenReturn(new ArrayList<>());
         assertNotNull(bidService.getHighestBid(auctionItemId));
     }
 
@@ -175,8 +175,8 @@ class BidServiceImplTest {
         auctionItem.setItem(item);
 
         when(auctionItemRepos.findById(any())).thenReturn(Optional.of(auctionItem));
-        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(any())).thenReturn(new ArrayList<>());
-        assertEquals(item.getReservePrice(),bidService.getHighestBid(auctionItemId).getPayment().getAmount());
+        when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(any())).thenReturn(new ArrayList<>());
+        assertEquals(item.getReservePrice(),bidService.getHighestBid(auctionItemId).getPayment().getPaymentAmount());
     }
     @Test
     void deleteBid_HappyPath() {

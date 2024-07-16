@@ -2,6 +2,12 @@ export interface Item {
     id: number,
     categoryId: number,
     name: string,
+    color: string,
+    size: string,
+    weight: string,
+    brand: string,
+    age: number,
+    material: string;
     description: string,
     reservePrice: number,
     buyInPrice: number,

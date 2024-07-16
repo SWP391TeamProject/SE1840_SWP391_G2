@@ -1,9 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
-import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
-import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
@@ -42,12 +40,10 @@ public class AuctionSessionController {
     @Autowired
     private AccountService accountService;
 
-
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@PageableDefault(size = 50) Pageable pageable) {
         return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<AuctionSessionDTO> getAuctionSessionById(@PathVariable int id) {
@@ -189,6 +185,10 @@ public class AuctionSessionController {
         auctionSessionService.terminateAuction(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
+    @PostMapping("/updateStatus")
+    public ResponseEntity<Void> updateAuctionSessionByStatus(@RequestBody(required = false) UpdateStatusAuctionSessionRequestDTO auctionSessionDTOList) {
+        auctionSessionService.updateAuctionSessionByStatus(auctionSessionDTOList);
+        return ResponseEntity.ok().build();
+    }
 
 }

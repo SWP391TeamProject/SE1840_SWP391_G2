@@ -28,11 +28,8 @@ public class Notification {
     @Column(length = 500)
     private String message;
 
-    @Column(length = 20)
-    private String type; // news, system, support, bid,  etc.
-
     @Column(name = "is_read")
-    private boolean isRead; // Use boolean for read/unread status
+    private boolean isRead;
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -41,6 +38,4 @@ public class Notification {
     @UpdateTimestamp
     @Column(name = "update_date")
     private LocalDateTime updateDate;
-
-   
 }

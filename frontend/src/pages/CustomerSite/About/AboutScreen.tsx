@@ -6,7 +6,7 @@ import { About } from "./About";
 import { Buy } from "./Buy";
 import { Sell } from "./Sell";
 import { Sidebar } from "./SideBar";
-// import Faq from "./Faq/Faq";
+import Faq from "./Faq/Faq";
 
 export default function AboutScreen() {
     const about = useRef(null);
@@ -71,16 +71,12 @@ export default function AboutScreen() {
                     <div ref={sell}>
                         <Sell />
                     </div>
-                    {/* <div ref={faq}>
+                    <div ref={faq}>
                         <Faq/>
-                    </div> */}
+                    </div>
                 </div>
 
             </div>
-            <div className="sticky z-10 w-full">
-                <Footer />
-            </div>
-
         </>
     )
 }

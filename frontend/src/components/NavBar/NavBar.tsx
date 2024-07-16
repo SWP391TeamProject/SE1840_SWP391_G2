@@ -48,9 +48,7 @@ export default function NavBar() {
               </NavigationMenuItem>
 
 
-              <NavigationMenuItem>
-                <ModeToggle />
-              </NavigationMenuItem>
+     
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent className="md:w-36">
@@ -93,11 +91,6 @@ export default function NavBar() {
           </NavigationMenu>
         </nav>
 
-
-
-
-
-
         <Sheet>
           <SheetTrigger asChild>
             <Button className="lg:hidden ml-auto" size="icon" variant="outline">
@@ -105,56 +98,75 @@ export default function NavBar() {
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent className="bg-white" side="right">
+          <SheetContent className="bg-background text-foreground" side="right">
             {auth?.isAuthenticated() && <ProfileDropdownMenu></ProfileDropdownMenu>}
             <div className="grid gap-2 py-6">
               {!auth.isAuthenticated() ? (
-                <Button
-                  className="flex items-center gap-2  "
-                  variant="default"
-                  asChild
-                >
-                  <Link to="/auth/login">Login</Link>
-                </Button>
+                <SheetTrigger asChild>
+                  <Button
+                    className="flex items-center gap-2  "
+                    variant="default"
+                    asChild
+                  >
+                    <Link to="/auth/login">Login</Link>
+                  </Button>
+                </SheetTrigger>
               ) : ''}
               <DropdownMenu>
+
                 <DropdownMenuTrigger className="flex w-full items-center py-2 text-lg font-semibold">
                   Auctions
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
                 </DropdownMenuTrigger>
+
                 <DropdownMenuContent align="start">
                   <DropdownMenuItem>
-                    <Link to="/auctions" className={navigationMenuTriggerStyle()}>Auctions</Link>
+                    <SheetTrigger asChild>
+                      <Link to="/auctions" className={navigationMenuTriggerStyle()}>Auctions</Link>
+                    </SheetTrigger>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>Featured</Link>
+                    <SheetTrigger asChild>
+                      <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>Featured</Link>
+                    </SheetTrigger>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>Past Auctions</Link>
+                    <SheetTrigger asChild>
+                      <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>Past Auctions</Link>
+                    </SheetTrigger>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
+                    <SheetTrigger asChild>
+                      <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
+                    </SheetTrigger>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="/about"
-              >
-                About
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="/blogs"
-              >
-                Blog
-              </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="/contact"
-              >
-                Contact
-              </Link>
+
+              <SheetTrigger asChild>
+                <Link
+                  className="flex w-full items-center py-2 text-lg font-semibold"
+                  to="/about"
+                >
+                  About
+                </Link>
+              </SheetTrigger>
+              <SheetTrigger asChild>
+                <Link
+                  className="flex w-full items-center py-2 text-lg font-semibold"
+                  to="/blogs"
+                >
+                  Blog
+                </Link>
+              </SheetTrigger>
+              <SheetTrigger asChild>
+                <Link
+                  className="flex w-full items-center py-2 text-lg font-semibold"
+                  to="/contact"
+                >
+                  Contact
+                </Link>
+              </SheetTrigger>
             </div>
           </SheetContent>
         </Sheet>

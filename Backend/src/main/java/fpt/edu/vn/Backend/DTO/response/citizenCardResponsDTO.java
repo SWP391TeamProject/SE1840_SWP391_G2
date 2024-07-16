@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.DTO.response;
 
-public class citizenCardResponsDTO {
+import java.io.Serializable;
+
+public class citizenCardResponsDTO implements Serializable {
 
 
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,22 @@ import { toast } from 'react-toastify';
 import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { useCurrency } from "@/CurrencyProvider.tsx";
+import PlaceBid from './components/PlaceBid';
+import { fetchAuctionSessionById } from '@/services/AuctionSessionService';
+import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import CountDownTime from '@/components/countdownTimer/CountDownTime';
+import "yet-another-react-lightbox/styles.css";
+
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import ImageGallery from './components/ImageGallery';
+import { ArrowBigUp, HashIcon, Timer } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import BidsInformation from './components/BidsInformation';
+import { useAuth } from '@/AuthProvider';
+import { AuctionSessionStatus } from '@/constants/enums';
+import { Item } from '@/models/newModel/item';
+import { AuctionItem } from '@/models/newModel/auctionItem';
 
 
 export default function AuctionJoin() {
@@ -22,14 +38,21 @@ export default function AuctionJoin() {
   const [client, setClient] = useState<Client | null>(null);
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
+  const auth = useAuth();
   let auctionId = location.state.id.auctionSessionId;
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
+  let endDate = location.state.endDate;
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(true);
+  const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
+
     if (!getCookie("user")) {
       setAllow(false);
       return;
@@ -41,12 +64,12 @@ export default function AuctionJoin() {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
-    if (getCookie("user")&&JSON.parse(getCookie("user")) && allow !== false) {
+    if (getCookie("user") && JSON.parse(getCookie("user")) && allow !== false) {
       setAllow(true);
     } else {
       setAllow(false);
     }
-  }, []);
+  }, [itemId]);
 
   useEffect(() => {
     setIsJoin(true);
@@ -57,6 +80,7 @@ export default function AuctionJoin() {
       return;
     }
     const newClient = new Client({
+      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
       // onDisconnect: () => {
       //   toast.error('You have been disconnected from the auction');
       // },
@@ -89,7 +113,7 @@ export default function AuctionJoin() {
         newClient.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
       }
     };
-  }, [allow]);
+  }, [allow, itemId]);
 
 
 
@@ -98,7 +122,7 @@ export default function AuctionJoin() {
     console.log(payload);
 
     if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
-      toast.error(payload.body.split(":")[0],{
+      toast.error(payload.body.split(":")[0], {
         position: "bottom-right",
       });
       client?.forceDisconnect();
@@ -109,9 +133,10 @@ export default function AuctionJoin() {
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
       if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
-        toast.error(JSON.parse(payload.body)?.body?.message,{
+        toast.error(JSON.parse(payload.body)?.body?.message, {
           position: "bottom-right",
         });
+        setIsSending(false);
       }
       return;
     }
@@ -119,9 +144,10 @@ export default function AuctionJoin() {
     console.log(message);
     if (message?.status == "JOIN" || message?.status == "BID") {
       if (message?.status == "BID")
-        toast.info(message?.message,{
+        toast.info(message?.message, {
           position: "bottom-right",
         });
+        setIsSending(false);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
     setIsReceived(!isReceived);
@@ -144,7 +170,7 @@ export default function AuctionJoin() {
           auctionItemId: location.state.id,
           payment: {
             accountId: JSON.parse(getCookie("user")).id,
-            amount: paymentAmount
+            paymentAmount: paymentAmount
           }
         })
       });
@@ -163,117 +189,171 @@ export default function AuctionJoin() {
     });
 
   }, [price]);
+  useEffect(() => {
+    if (!auctionSession) {
+      fetchAuctionSessionById(auctionId).then((res) => {
+        dispatch(setCurrentAuctionSession(res?.data));
+      }).catch((err) => {
+        console.log(err);
+      })
+    }
+  }, [])
+  const handleViewItemDetailsClick = async (item: AuctionItem, auctionId: number) => {
+    // console.log(item, auctionId, bidders.includes(userId));
+    // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
+    if (itemId !== item.itemDTO.itemId) {
+      
+      navigate(`/auctions/${auctionId}/${item.itemDTO.name}`, {
+        state: {
+          id: {
+            auctionSessionId: auctionId,
+            itemId: item.itemDTO.itemId
+          },
+          itemDTO: item.itemDTO,
+          endDate: auctionSession?.endDate,
+          allow: auctionSession.deposits.map((deposit) => {
+            return deposit.payment.accountId;
+          }).includes(auth.user.accountId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
+        }
+      });
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }
 
+
+  }
 
   return (
     <>
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
-        <div className="flex flex-col min-h-screen">
-          <section className=" flex justify-center items-center  w-full h-[60vh] md:h-[70vh] lg:h-[80vh] bg-black">
-            <Carousel className="flex w-5/6" plugins={[
-              Autoplay({
-                delay: 2000,
-              }),
-            ]}>
-              <CarouselContent className=' w-full'>
-                {itemDTO?.attachments.map((image) => (
-                  <CarouselItem key={image.attachmentId} className="basis-1/3 rounded-full border overflow-hidden border-gray-700">
-                    <img src={image.link} alt={itemDTO?.name} className="mx-auto " />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white z-">
-                <h1 className=" w-3/5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl   ">
-                  {itemDTO.name}
-                </h1>
-                <p className="mt-4 max-w-3xl text-lg md:text-xl">
-                  Discover the timeless elegance of this beautifully crafted vintage leather armchair, a true statement piece
-                  for your home.
-                </p>
-              </div>
-
-              <CarouselPrevious />
-              <CarouselNext />
-
-            </Carousel>
-
-          </section>
-          <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight mb-4">Item Details</h2>
-                <div className="space-y-4">
-                  <div
-                    dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
-                  />
-
+        auctionSession != undefined ?
+          <div className="flex flex-col min-h-screen container p-3 gap-10">
+            <section className="justify-center items-center  w-full h-fit ">
+              <h1 className=" text-2lg font-bold   ">
+                {itemDTO.name}
+              </h1>
+              <div className='flex flex-wrap justify-between items-center drop-shadow-xl'>
+                <div className=' w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 '>
+                  <ImageGallery itemDTO={itemDTO} />
                 </div>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight mb-4">Bidding History</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gray-500 dark:text-gray-400">Current Bid</p>
-                      <p className="text-2xl font-bold">{currency.format({
-                        amount: price ?? (bids.length > 0 ? bids[0].price : itemDTO.reservePrice)
-                      })}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 dark:text-gray-400">Bid Count</p>
-                      <p className="text-2xl font-bold">{bids.length}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <ScrollArea className="h-48 overflow-hidden p-4" style={{ width: 400 }}>
-                      {bids?.map((bid) => (
-                        <div className="flex items-center justify-between" key={bid?.bidId}>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="w-8 h-8 border">
-                              <img src={bid?.account.avatar?.link} alt="@username" />
-                              <AvatarFallback>N/A</AvatarFallback>
-                            </Avatar>
-                            <p>{bid?.account.nickname}</p>
-                          </div>
-                          <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
+                <div className=' w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start'>
+                  <h2 className='text-lg font-semibold'>Bids</h2>
+                  <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
+                    {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
+                      <div className="flex items-center justify-between" key={bid?.bidId}>
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-8 h-8 border">
+                            <img src={bid?.account.avatar?.link} alt="@username" />
+                            <AvatarFallback>N/A</AvatarFallback>
+                          </Avatar>
+                          <p>{bid?.account.nickname}</p>
                         </div>
-                      ))}
-                    </ScrollArea>
-
-                  </div>
-                  {allow ?
-                    <div className="mt-12 md:mt-16 lg:mt-20">
-                      <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Place a Bid</h2>
-                      <form className="max-w-md mx-auto" onSubmit={sendMessage}>
-                        <div className="grid gap-4">
-                          <div>
-                            <Input type="text" id="price" placeholder="Enter your bid amount" className="w-full" />
-                          </div>
-                          <Button type="submit" className="w-full">
-                            Place Bid
-                          </Button>
-                        </div>
-                      </form>
-                    </div>
-                    :
-                    <div className="mt-12 md:mt-16 lg:mt-20">
-                      <div className="grid gap-4">
-
-                        <Link to={`/auctions/${auctionId}`} >
-                          <Button type="submit" className="w-full">
-                            Go to Auction
-                          </Button>
-                        </Link>
-
+                        <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
                       </div>
+                    ))}
+                  </ScrollArea>
+                  {allow ?
+                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
+                  ">
+                    <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                    <div className='mx-auto'>
+                      <PlaceBid 
+                        auctionId={auctionId}
+                        itemId={itemId}
+                        setIsSending={setIsSending}
+                        isSending={isSending}
+                        sendMessage={sendMessage}
+                        onMessageReceived={onMessageReceived}
+                        endDate={auctionSession?.endDate} // Added optional chaining for safety
+                        name={itemDTO?.name}
+                        image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                        client={client}
+                        currentBid={
+                          price ?? (bids && bids.length > 0 ? bids[0].price : 0) // Check if bids is defined and not empty
+                        }
+                      />
                     </div>
+
+                  </div>
+
+                  :
+                  <div className="mt-12 md:mt-16 lg:mt-20 container">
+                    <div className='drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5' >
+                      <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                    </div>
+                    <div className="grid gap-4 ">
+                      <Link to={`/auctions/${auctionId}` } >
+                        <Button type="submit" className="w-full">
+                          Go to Auction
+                        </Button>
+                      </Link>
+
+                    </div>
+                  </div>
+                }
+
+              </div>
+
+            </div>
+          </section>
+          <section className=" justify-center items-center  w-full h-full mt-11 " >
+            <div className='flex gap-2 flex-wrap '>
+              <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
+                <h1 className=" text-2lg font-bold  mb-9  ">
+                  Item Description
+                </h1>
+                <div className="  "
+                  dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
+                />
+              </div>
+              <div className='basis-full md:basis-1/6'>
+                <h1 className=" text-2lg font-bold  mb-9  text-center ">
+                  Other Item in this Auction
+                </h1>
+                <div className='flex gap-2 flex-col items-center'>
+                  {
+                    auctionSession.auctionItems.map((item) => (
+                      <Card className='w-80 h-fit max-w-[360px]'>
+                        <CardHeader>
+                          <img src={item.itemDTO.attachments[0].link} alt="item" className='w-[360px]' />
+                        </CardHeader>
+                        <CardContent>
+                          <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
+                          <BidsInformation
+                            auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
+                            price={item?.highestBid ?? 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
+                            bids={item?.numberOfBids > 0 ? item.numberOfBids : 0} // Use optional chaining for numberOfBids
+                          />
+                          <CardFooter>
+
+                            <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item, auctionId)}>
+                              Join
+                            </Button>
+                          </CardFooter>
+                        </CardContent>
+
+                      </Card>
+                    ))
                   }
                 </div>
+
+
               </div>
             </div>
 
-          </div>
-        </div >
+          </section>
+
+
+          </div > : <LoadingAnimation message='Please wait, Joining auction...' />
       }
     </>
 

@@ -31,6 +31,8 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 import thumbnail1 from "@/assets/thumnail1.jpg";
+import { useAuth } from "@/AuthProvider";
+import { Link } from "react-router-dom";
 
 
 const formSchema = z.object({
@@ -39,6 +41,12 @@ const formSchema = z.object({
   phone: z.string().regex(phoneRegex,
     { message: "Invalid phone number.must be 10-digit phone number." }),
   contactName: z.string(),
+    age: z.coerce.number().min(1900, { message: "age" }),
+    material: z.string(),
+    brand:z.string(),
+    color:z.string(),
+    size:z.string(),
+    weight:z.coerce.number().max(100000000).min(0),
   preferContact: z.enum(["email", "phone", "text", "any"]),
   description: z.string().min(10, {
     message: "Description must be between 10 and 500 characters"
@@ -53,14 +61,15 @@ export default function ConsignmentInititalForm() {
   // 1. Define your form.
   const [user, setUser] = useState();
   const [isLoading, setIsLoading] = useState(false)
+  const auth = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: JSON.parse(getCookie("user"))?.id,
-      email: JSON.parse(getCookie("user"))?.email || "",
-      phone: JSON.parse(getCookie("user"))?.phone || "",
-      contactName: JSON.parse(getCookie("user"))?.nickname || "",
+      accountId: auth.user.accountId,
+      email: auth.user.email,
+      phone:  auth.user.phone,
+      contactName: auth.user.nickname,
       preferContact: "any",
       description: "",
       files: [],
@@ -173,7 +182,6 @@ export default function ConsignmentInititalForm() {
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
                           <Input placeholder="enter your phone number here"
-                            defaultValue={JSON.parse(getCookie("user"))?.phone}
                             readOnly
                             {...field} />
                         </FormControl>
@@ -184,7 +192,7 @@ export default function ConsignmentInititalForm() {
                       </FormItem>
                     )}
                   />
-                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your profile.
+                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your <span className="underline"><Link to={"/profile/overview"} >profile </Link> </span> .
                   </h3>
                   <FormField
                     control={form.control}

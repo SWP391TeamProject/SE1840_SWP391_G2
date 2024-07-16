@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @Slf4j
-public class ConsignmentDetailDTO {
+public class ConsignmentDetailDTO implements Serializable {
     private int consignmentDetailId;
     private String description;
     private String status; // Use String for the enum representation in DTO
@@ -37,7 +38,7 @@ public class ConsignmentDetailDTO {
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
         this.consignmentDetailId = consignmentDetail.getConsignmentDetailId();
         this.description = consignmentDetail.getDescription();
-        this.status = String.valueOf(consignmentDetail.getStatus());
+        this.status = String.valueOf(consignmentDetail.getType());
         this.price = consignmentDetail.getPrice();
         this.consignmentId = consignmentDetail.getConsignment().getConsignmentId();
         this.account = new AccountDTO(consignmentDetail.getAccount());

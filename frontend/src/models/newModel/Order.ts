@@ -1,7 +1,10 @@
-import { Payment } from "@/constants/interfaces";
+import { Payment } from "../payment";
+import { AuctionItem } from "./auctionItem";
 
-export interface Order{
-    orderId?:number;
-    itemId?:number;
+export interface Order {
+    orderId?: number;
+    createDate?: Date;
+    shippingAddress?: string;
     payment?:Payment;
-}
+    auctionItemDTOS: AuctionItem[];
+  }

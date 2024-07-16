@@ -5,9 +5,12 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateAccountStatusRequestDTO;
+import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
 import jakarta.mail.MessagingException;
@@ -18,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -31,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -64,6 +70,7 @@ public class AccountServiceImpl implements AccountService {
         accountDTO.setPhone(account.getPhone());
         accountDTO.setStatus(account.getStatus());
         accountDTO.setBalance(account.getBalance());
+        accountDTO.setKyc(account.getCitizenCard() != null);
         // accountDTO.setPassword(account.getPassword()); // DO NOT RETURN PASSWORD
         accountDTO.setCreateDate(account.getCreateDate());
         accountDTO.setUpdateDate(account.getUpdateDate());
@@ -88,8 +95,27 @@ public class AccountServiceImpl implements AccountService {
             if (accountDTO.getBalance() != null)
                 account.setBalance(accountDTO.getBalance());
         }
-
         return account;
+    }
+
+    @Override
+    public void updateAccountByStatus(UpdateAccountStatusRequestDTO request) {
+        for (Integer accountId : request.getAccountId()) {
+            try {
+                Optional<Account> account = accountRepos.findById(accountId);
+                Account accounts = account.get();
+                if (accounts != null) {
+                    accounts.setStatus(Account.Status.valueOf(request.getStatus().toUpperCase()));
+                    accountRepos.save(accounts);
+                } else {
+                    throw new ResourceNotFoundException("Auction not found with ID: " + accountId);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + accountId);
+            }
+        }
     }
 
     @Override
@@ -147,11 +173,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
-        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
-        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
-        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
-        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
-        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
+//        Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
+//        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
+//        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
+//        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
+//        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
         Account acc = accountRepos.findById(account.getAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
         return mapEntityToDTO(accountRepos.save(mapDTOToEntity(account, acc, editorRole)));

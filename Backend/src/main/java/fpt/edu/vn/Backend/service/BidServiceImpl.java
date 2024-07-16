@@ -8,7 +8,6 @@ import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
-import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.BidRepos;
 import fpt.edu.vn.Backend.repository.AuctionItemRepos;
@@ -51,7 +50,7 @@ public class BidServiceImpl implements BidService {
     @Override
     public List<BidDTO> getBidsByAuctionItemId(AuctionItemId auctionItemId) {
         try {
-            return bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId).stream().map(BidDTO::new).toList();
+            return bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId).stream().map(BidDTO::new).toList();
         }catch (Exception e){
             throw new ResourceNotFoundException("Invalid auction item id: " + auctionItemId);
         }
@@ -60,7 +59,7 @@ public class BidServiceImpl implements BidService {
     @Override
     public Page<BidDTO> getBidsByAccountId(int id, Pageable pageable) {
         try {
-            return bidRepos.findByPayment_Account_AccountId(id, pageable).map(BidDTO::new);
+            return bidRepos.findByAccount_AccountId(id, pageable).map(BidDTO::new);
         }catch (Exception e){
             throw new ResourceNotFoundException("Invalid account id: " + id);
         }
@@ -79,20 +78,12 @@ public class BidServiceImpl implements BidService {
         if (paymentDTO == null) {
             throw new IllegalArgumentException("Payment cannot be null");
         }
-        paymentDTO.setType(Payment.Type.AUCTION_BID);
-        paymentDTO.setAmount(bid.getPayment().getAmount());
-        paymentDTO.setAccountId(bid.getPayment().getAccountId());
-        paymentDTO.setStatus(Payment.Status.PENDING);
-        Payment newPayment = new Payment();
-        newPayment.setPaymentAmount(paymentDTO.getAmount());
-        newPayment.setCreateDate(paymentDTO.getDate());
-        newPayment.setType(paymentDTO.getType());
-        newPayment.setStatus(paymentDTO.getStatus());
-        newPayment.setAccount(accountRepos.findById(paymentDTO.getAccountId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
+        newBid.setAmount(paymentDTO.getPaymentAmount());
+        newBid.setStatus(Bid.Status.PENDING);
+        newBid.setAccount(accountRepos.findById(paymentDTO.getAccountId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid account id: " + paymentDTO.getAccountId())
         ));
-        newBid.setPayment(newPayment);
-        newPayment.setBid(newBid);
+        newBid.setCreatedDate(paymentDTO.getCreateDate());
         return new BidDTO(bidRepos.save(newBid));
     }
 
@@ -109,10 +100,10 @@ public class BidServiceImpl implements BidService {
         auctionItemRepos.findById(auctionItemId).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
         );
-        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
         BidDTO result= new BidDTO();
         result.setPayment(new PaymentDTO());
-        result.getPayment().setAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
+        result.getPayment().setPaymentAmount(auctionItemRepos.findById(auctionItemId).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + auctionItemId)
         ).getItem().getReservePrice());
         if(bids.isEmpty()) return result;
@@ -129,21 +120,18 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public List<BidDTO> finishAuctionItem(AuctionItemId auctionItemId) {
-        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
         List<BidDTO> result = new ArrayList<>();
-        for (Bid bid : bids) {
-            if (bids.get(0).equals(bid)){
+        for (int i = 0; i < bids.size(); i++) {
+            Bid bid = bids.get(i);
+            if (i == 0){
                 log.info("Bid " + bid.getBidId() + " succeeded");
-                Payment payment = bid.getPayment();
-                payment.setStatus(Payment.Status.SUCCESS);
-                paymentRepos.save(payment);
-                result.add(new BidDTO(bid));
-                continue;
+                bid.setStatus(Bid.Status.SUCCESS);
+            } else {
+                log.info("Bid " + bid.getBidId() + " failed");
+                bid.setStatus(Bid.Status.FAILED);
             }
-            log.info("Bid " + bid.getBidId() + " failed");
-            Payment payment = bid.getPayment();
-            payment.setStatus(Payment.Status.FAILED);
-            paymentRepos.save(payment);
+            bidRepos.save(bid);
             result.add(new BidDTO(bid));
         }
         return result;
@@ -151,13 +139,13 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public List<BidDTO> terminateAuctionItem(AuctionItemId auctionItemId) {
-        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByPayment_PaymentAmountDesc(auctionItemId);
+        List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
         List<BidDTO> result = new ArrayList<>();
         for (Bid bid : bids) {
             log.info("Bid " + bid.getBidId() + " failed");
-            Payment payment = bid.getPayment();
-            payment.setStatus(Payment.Status.FAILED);
-            paymentRepos.save(payment);
+
+            bid.setStatus(Bid.Status.FAILED);
+            bidRepos.save(bid);
             result.add(new BidDTO(bid));
         }
         return result;
@@ -173,7 +161,7 @@ public class BidServiceImpl implements BidService {
                     () -> new IllegalArgumentException("Invalid account id: " + bid.getPayment().getAccountId())
             )));
             response.getAccount().setPassword(null);
-            response.setPrice(Double.parseDouble(bid.getPayment().getAmount().toString()));
+            response.setPrice(Double.parseDouble(bid.getPayment().getPaymentAmount().toString()));
             responses.add(response);
         }
         return responses;

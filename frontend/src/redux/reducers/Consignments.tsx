@@ -1,4 +1,4 @@
-import Consignment from "@/models/consignment";
+import { Consignment } from "@/models/newModel/consignment";
 import { createSlice } from "@reduxjs/toolkit"
 
 interface ConsignmentsState {

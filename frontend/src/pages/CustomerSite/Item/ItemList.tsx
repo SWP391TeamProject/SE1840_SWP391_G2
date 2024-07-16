@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { getItems, getItemsByCategoryId, getItemsByName } from "@/services/ItemService"
 import PagingIndexes from "@/components/pagination/PagingIndexes"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { ItemCategory } from "@/models/newModel/itemCategory"
 import { setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Items"
 import { getAllItemCategories } from "@/services/ItemCategoryService"
@@ -23,6 +23,9 @@ import { getCookie } from "@/utils/cookies"
 
 import { useCurrency } from "@/CurrencyProvider"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { AuctionSessionStatus } from "@/constants/enums"
+import { CarouselItem } from "@/components/ui/carousel"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function ItemList() {
   const itemsList: any = useAppSelector((state) => state.items);
@@ -38,12 +41,14 @@ export function ItemList() {
   const [maxPrice, setMaxPrice] = useState(1000000000);
   const [auctions, setAuctions] = useState<AuctionSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingItems, setIsLoadingItems] = useState(true);
   const location = useLocation();
   const currency = useCurrency();
 
 
   const fetchItems = async (pageNumber: number, itemCategory?: ItemCategory, minPrice?: number, maxPrice?: number, sortBy?: string, sortOrder?: string) => {
     try {
+      setIsLoadingItems(true);
       console.log(itemCategory);
       let res;
       if (search && search?.length > 0) {
@@ -64,8 +69,10 @@ export function ItemList() {
           totalPages: res.data.totalPages
         }
         dispatch(setCurrentPageNumber(paging));
+        setIsLoadingItems(false);
       }
     } catch (error) {
+      setIsLoadingItems(false);
       console.log(error);
     }
   };
@@ -96,8 +103,6 @@ export function ItemList() {
       setSortBy(null);
       setSortOrder(null);
     }
-
-    // }
   }
 
   const handlePageSelect = (pageNumber: number) => {
@@ -106,7 +111,7 @@ export function ItemList() {
 
   const handleViewItemDetailsClick = async (item: Item, auction: AuctionSession) => {
     let registered = false;
-    if (getCookie("user").length > 0){
+    if (getCookie("user").length > 0) {
       auction?.deposits.forEach((deposit: any) => {
         if (deposit.payment.accountId == JSON.parse(getCookie("user"))?.id) {
           registered = true;
@@ -120,10 +125,9 @@ export function ItemList() {
           itemId: item.itemId
         },
         itemDTO: item,
-        allow: registered
+        allow: registered && auction.status === AuctionSessionStatus.PROGRESSING
       }
     });
-
   }
 
   useEffect(() => {
@@ -131,21 +135,22 @@ export function ItemList() {
     fetchActiveAuctionSessions().then((res) => {
       setAuctions(res?.data.content);
       setIsLoading(false);
-
-
     });
     getAllItemCategories(0, 50).then((res) => {
       setItemCategories(res.data.content);
     });
     if (location.state?.category) {
       console.log(location.state.category);
-      fetchItems(0, location.state.category, minPrice, maxPrice).then(() => {
+      fetchItems(0, location.state.category, minPrice, maxPrice)
+      .then(() => {
         setIsLoading(false);
       });
       setItemCategoryFilter(location.state.category);
     } else {
       if (itemsList.currentPageList.length == 0) {
         fetchItems(itemsList.currentPageNumber);
+      } else {
+        setIsLoadingItems(false);
       }
     }
 
@@ -255,55 +260,75 @@ export function ItemList() {
             </div>
           </div>
 
-
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
-            {itemsList.currentPageList.map((item) => (
-              auctions.map((auction) => {
-                if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
-                  return (
-                    <Card key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" >
-                      <div className='group relative'>
-                        <CardHeader>
+            {isLoadingItems ?
+              Array.from({ length: 8 }).map((_, index) => (
+                // <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3" key={index}>
+                <Card key={index} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" >
+                  <CardHeader>
+                    <Skeleton
+                      className="rounded-t-lg object-cover w-full h-56"
+                    />
+                  </CardHeader>
+                  <CardContent className="p-4 flex flex-col gap-2">
+                    <h3 className="text-sm font-bold h-6 mb-6">Loading...</h3>
+                    {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
+                    <div className="flex justify-between items-center h-6">
+                      <div className="text-primary font-bold text-lg">Loading...</div>
+                      <div className="text-muted-foreground text-sm">Loading...</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                // </CarouselItem>
+              ))
+              :
+              itemsList.currentPageList.map((item) => (
+                auctions.map((auction) => {
+                  if (auction.auctionItems.filter((auctionItem) => auctionItem.id.itemId == item.itemId).length > 0) {
+                    return (
+                      <Card key={item.itemId} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer" >
+                        <div className='group relative'>
+                          <CardHeader>
 
-                          <img
-                            src={item.attachments[0].link}
-                            width={300}
-                            height={200}
-                            alt="Auction Item"
-                            className="rounded-t-lg object-cover w-full "
-                          />
-                        </CardHeader>
-                        <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                          onClick={() => handleViewItemDetailsClick(item, auction)}
-                        >
-                          <Button >Detail</Button>
+                            <img
+                              src={item.attachments[0].link}
+                              width={300}
+                              height={200}
+                              alt="Auction Item"
+                              className="rounded-t-lg object-cover w-full "
+                            />
+                          </CardHeader>
+                          <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                            onClick={() => handleViewItemDetailsClick(item, auction)}
+                          >
+                            <Button >Detail</Button>
+                          </div>
                         </div>
-                      </div>
-                      <CardContent className="p-4 flex flex-col gap-2 ">
-                        <h3 className="text-sm font-bold h-6 mb-6">{item.name}</h3>
-                        {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
-                        <div className="flex justify-between items-center h-6">
-                          <div className="text-primary font-bold text-lg">{currency.format({
-                            amount: item.reservePrice,
-                            currency: item.currency,
-                          })}</div>
-                          <div className="text-muted-foreground text-sm">{item.category.name}</div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                  )
+                        <CardContent className="p-4 flex flex-col gap-2 ">
+                          <h3 className="text-sm font-bold h-6 mb-6">{item.name}</h3>
+                          {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
+                          <div className="flex justify-between items-center h-6">
+                            <div className="text-primary font-bold text-lg">{currency.format({
+                              amount: item.reservePrice,
+                              currency: item.currency,
+                            })}</div>
+                            <div className="text-muted-foreground text-sm">{item.category.name}</div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  }
                 }
-              }
-
-              )
-            ))}
+                )
+              ))
+            }
           </div>
 
           <div className="flex justify-center mt-8">
             <PagingIndexes className="basis-1/2" pageNumber={itemsList.currentPageNumber || 0} size={10} totalPages={itemsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
           </div>
-        </div>}
+        </div>
+        } 
     </>
 
   )

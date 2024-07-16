@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -20,17 +23,19 @@ public class Order {
     @Column(name = "order_id")
     private int orderId;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id")
-    private Set<Item> items;
+    private Set<Item> Items;
 
-    @Column(name = "total_price")
+
+    @Column(name = "shipping_address")
     private String shippingAddress;
 
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "payment_id")
+    @JoinColumn(name = "transaction_id")
     private Payment payment;
+
 
     @Override
     public int hashCode() {

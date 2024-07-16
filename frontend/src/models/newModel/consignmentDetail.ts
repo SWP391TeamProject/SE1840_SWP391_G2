@@ -4,7 +4,7 @@ import { Account, Attachment } from "@/constants/interfaces";
 
 export interface ConsignmentDetail{
     consignmentDetailId?:number;
-    desciprtion?:string;
+    description?:string;
     status?: ConsignmentDetailType;
     price?:number;
     conisgnmentId?:number;

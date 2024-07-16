@@ -5,7 +5,7 @@ import fpt.edu.vn.Backend.DTO.ItemCategoryDTO;
 import fpt.edu.vn.Backend.DTO.request.ItemCategoryRequestDTO;
 import fpt.edu.vn.Backend.pojo.ItemCategory;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
-import fpt.edu.vn.Backend.service.ItemCategoryImpl;
+import fpt.edu.vn.Backend.service.ItemCategoryServiceImpl;
 import fpt.edu.vn.Backend.service.ItemCategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 public class ItemCategoryImplTest {
 
     @InjectMocks
-    private ItemCategoryImpl itemCategoryService;
+    private ItemCategoryServiceImpl itemCategoryService;
 
     @Mock
     private ItemCategoryRepos itemCategoryRepos;

@@ -15,7 +15,7 @@ public class Deposit {
 
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "payment_id")
+    @JoinColumn(name = "transaction_id")
     private Payment payment;
 
     @Override

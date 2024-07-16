@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AttachmentDTO {
+public class AttachmentDTO implements Serializable {
     private int attachmentId;
     private String link;
     private LocalDateTime createDate;

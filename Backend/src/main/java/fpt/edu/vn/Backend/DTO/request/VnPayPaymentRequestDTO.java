@@ -18,9 +18,6 @@ public class VnPayPaymentRequestDTO implements Serializable {
     private String vnp_OrderInfo;
     private int vnp_txnRef;
 
-    public  enum OrderInfoType {
-         DEPOSIT, ORDER
-    }
     // Getters and setters for all fields
     // ...
 }

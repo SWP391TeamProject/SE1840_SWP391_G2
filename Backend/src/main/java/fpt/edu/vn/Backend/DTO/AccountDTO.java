@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.DTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @ToString
 @Builder
 @AllArgsConstructor
-public class AccountDTO {
+public class AccountDTO implements Serializable {
     private Integer accountId;
     private String nickname;
     private boolean require2fa;
@@ -24,6 +25,7 @@ public class AccountDTO {
     private BigDecimal balance;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private boolean isKyc;
 
     public AccountDTO(Account account) {
         this.accountId = account.getAccountId();
@@ -38,5 +40,6 @@ public class AccountDTO {
         this.balance = account.getBalance();
         this.createDate = account.getCreateDate();
         this.updateDate = account.getUpdateDate();
+        this.isKyc = account.getCitizenCard() != null;
     }
 }

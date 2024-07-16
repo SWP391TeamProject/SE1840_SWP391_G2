@@ -129,7 +129,7 @@ export default function AuctionSessionDetail() {
                                 <CardContent className="flex">
                                     {
                                         isloading ? <Button><Loader2 className="animate-spin" /></Button>
-                                            : <Button type="submit" className="m-2">Save</Button>
+                                            : <Button type="submit" className="m-2">Update Session</Button>
                                     }
 
                                     {
@@ -138,9 +138,9 @@ export default function AuctionSessionDetail() {
                                     }
 
                                     {
-                                        isloading ? <Button><Loader2 className="animate-spin" /></Button>
-                                            : <Button type="button" onClick={handleTerminateSession} className="m-2">Terminate Session</Button>
-
+                                      currentAuctionSession?.status !== AuctionSessionStatus.FINISHED &&
+                                      currentAuctionSession?.status !== AuctionSessionStatus.TERMINATED
+                                            && <Button type="button" onClick={handleTerminateSession} className="m-2">Terminate Session</Button>
                                     }
                                 </CardContent>
                             </Card>

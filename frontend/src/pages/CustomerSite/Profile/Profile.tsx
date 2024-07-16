@@ -15,6 +15,7 @@ const profileNavItems = [
   { title: "Notification", href: "/profile/notification" },
   { title: "Preferences", href: "/profile/preferences" },
   { title: "Balance", href: "/profile/balance" },
+  { title: "KYC", href: "/profile/kyc"},
 ];
 
 export default function Profile() {
@@ -47,7 +48,6 @@ export default function Profile() {
         </div>
       </div>
 
-      <Footer />
     </>
   );
 }

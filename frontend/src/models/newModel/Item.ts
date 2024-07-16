@@ -1,5 +1,6 @@
 import { ItemStatus } from "@/constants/enums";
-import { Account, Attachment, ItemCategory } from "@/constants/interfaces";
+import { Account, Attachment } from "@/constants/interfaces";
+import { ItemCategory } from "./itemCategory";
 
 export interface Item{
     itemId?:number;

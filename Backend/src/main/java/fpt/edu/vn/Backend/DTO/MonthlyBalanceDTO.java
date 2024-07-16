@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 
@@ -11,7 +12,7 @@ import java.time.YearMonth;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyBalanceDTO {
+public class MonthlyBalanceDTO implements Serializable {
     private YearMonth month;
     private BigDecimal balance;
 

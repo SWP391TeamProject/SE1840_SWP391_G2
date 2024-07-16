@@ -26,11 +26,11 @@ import { toast } from "react-toastify"
 import { ItemCategory } from "@/models/newModel/itemCategory"
 import { SelectGroup } from "@radix-ui/react-select"
 import axios from "axios"
-import { createItem } from "@/services/ItemService"
+import { createItem, createItemFromConsignment } from "@/services/ItemService"
 import { getCookie } from "@/utils/cookies"
 import TextEditor from "@/components/component/TextEditor"
 import { MinusCircle, PlusCircle } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 const statusValues = Object.values(ItemStatus);
 
 const FormSchema = z.object({
@@ -47,8 +47,16 @@ const FormSchema = z.object({
     }).max(50000, {
         message: "Description must not exceed 50000 characters.",
     }),
-    reservePrice: z.string(),
-    buyInPrice: z.string(),
+    reservePrice: z.coerce.number({
+        message: "Reserve price must be a number.",
+    }).min(0,{
+        message: "Reserve price must be at least 0.",
+    }),
+    buyInPrice: z.coerce.number({
+        message: "Buy in price must be a number.",
+    }).min(0,{
+        message: "Buy in price must be at least 0."
+    }),
     status: z.enum(statusValues),
     ownerId: z.number(),
     files: z.any(),
@@ -56,6 +64,13 @@ const FormSchema = z.object({
 export default function ItemCreate() {
     const nav = useNavigate();
     const [categories, setCategories] = useState<ItemCategory[]>([]);
+
+    const location = useLocation();
+    const reservePrice = location?.state?.price;
+    const ownerId = location?.state?.ownerId;
+    const consignmentId = location?.state?.consignmentId;
+
+    console.log(reservePrice + "=" + ownerId + "=" + consignmentId);
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -63,10 +78,9 @@ export default function ItemCreate() {
             description: "",
             status: ItemStatus.QUEUE,
             categoryId: "",
-            reservePrice: "0",
+            reservePrice: reservePrice || "0",
             buyInPrice: "0",
-            ownerId: JSON.parse(getCookie("user"))?.id || -1,
-
+            ownerId: ownerId || JSON.parse(getCookie("user"))?.id || -1,
             files: [],
         },
     })
@@ -88,19 +102,35 @@ export default function ItemCreate() {
     function onSubmit(data: z.infer<typeof FormSchema>) {
         data.categoryId = categories.find((item) => item.name === data.categoryId)?.itemCategoryId;
         console.log(data);
-        createItem(data).then((res) => {
-            console.log(res);
-            toast.success('Item created successfully!', {
-                position: "bottom-right",
+        if (consignmentId == null) {
+            createItem(data).then((res) => {
+                console.log(res);
+                toast.success('Item created successfully!', {
+                    position: "bottom-right",
+                });
+                nav("/admin/items");
+            }
+            ).catch(error => {
+                console.log(error);
+                toast.error(error.response.data.message, {
+                    position: "bottom-right",
+                });
             });
-            nav("/admin/items");
+        } else {
+            createItemFromConsignment(consignmentId, data).then((res) => {
+                console.log(res);
+                toast.success('Item created successfully!', {
+                    position: "bottom-right",
+                });
+                nav("/admin/items");
+            }
+            ).catch(error => {
+                console.log(error);
+                toast.error(error.response.data.message, {
+                    position: "bottom-right",
+                });
+            });
         }
-        ).catch(error => {
-            console.log(error);
-            toast.error(error.response.data.message, {
-                position: "bottom-right",
-            });
-        });
 
 
 
@@ -108,7 +138,7 @@ export default function ItemCreate() {
     const createCategory = () => {
         let newCategoy = (document.getElementById("newCategory") as HTMLInputElement).value;
         console.log(newCategoy);
-        let category:ItemCategoryRequestDTO = {itemCategoryId:-1,name:newCategoy};
+        let category: ItemCategoryRequestDTO = { itemCategoryId: -1, name: newCategoy };
         createItemCategory(category).then((res) => {
             setCategories([...categories, res.data]);
             toast.success("Create success", {
@@ -207,7 +237,7 @@ export default function ItemCreate() {
                                                 <SelectItem className="w-9/12" value={item.name} >
                                                     {item.name}
                                                 </SelectItem>
-                                                <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={()=>deleteCategory(item.itemCategoryId)}>
+                                                <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={() => deleteCategory(item.itemCategoryId)}>
                                                     <MinusCircle className="h-full w-6" />
                                                 </Button>
                                             </div>
@@ -254,7 +284,7 @@ export default function ItemCreate() {
                             <FormItem>
                                 <FormLabel>Reserve Price</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="enter reserve price" {...field} />
+                                    <Input placeholder="enter reserve price" {...field} defaultValue={reservePrice || "0"} readOnly={reservePrice != null} />
                                 </FormControl>
                                 <FormDescription>
 

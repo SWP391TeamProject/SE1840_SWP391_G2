@@ -5,16 +5,23 @@ import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class ConsignmentRequestDTO {
+public class ConsignmentRequestDTO implements Serializable {
     private int accountId;
     private String contactName;
     private String description;
     private String phone;
     private String email;
     private String preferContact;
+    private String color;
+    private String size;
+    private String weight;
+    private String brand;
+    private Integer age;
+    private String material;
     private List<MultipartFile> files;
 }

@@ -117,7 +117,7 @@ export default function NotificationsList() {
                                     {notificationsList.currentPageList.map((notification) => (
                                         <TableRow
                                             key={notification.notificationId}>
-                                            <TableCell>{notification.message}</TableCell>
+                                            <TableCell><div dangerouslySetInnerHTML={{__html:`${notification.message}`}}/></TableCell>
                                             <TableCell>
                                                 {notification.read ?
                                                     <Badge variant="default"

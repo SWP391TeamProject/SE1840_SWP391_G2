@@ -26,8 +26,8 @@ const initialState: ItemsState = {
     error: ''
 }
 
-export const accountsSlice = createSlice({
-    name: 'accounts',
+export const itemsSlice = createSlice({
+    name: 'items',
     initialState,
     reducers: {
         setItems: (state, action) => {
@@ -51,5 +51,5 @@ export const accountsSlice = createSlice({
 });
 
 
-export const { setItems, setCurrentItem, setCurrentPageList, setCurrentPageNumber, error } = accountsSlice.actions;
-export default accountsSlice.reducer
+export const { setItems, setCurrentItem, setCurrentPageList, setCurrentPageNumber, error } = itemsSlice.actions;
+export default itemsSlice.reducer

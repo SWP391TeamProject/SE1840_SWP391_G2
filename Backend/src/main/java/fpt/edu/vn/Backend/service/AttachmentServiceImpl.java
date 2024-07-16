@@ -3,8 +3,6 @@ package fpt.edu.vn.Backend.service;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.azure.storage.blob.sas.BlobContainerSasPermission;
-import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -18,12 +16,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -122,13 +120,15 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public boolean deleteAttachment(int attachmentId) {
-        Attachment a = attachmentRepository.deleteByAttachmentId(attachmentId);
+    public void deleteAttachment(int attachmentId) {
+        Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
+        );
         if (a != null) {
+            attachmentRepository.delete(a);
             BlockBlobClient blobClient = blobContainerClient.getBlobClient(a.getBlobId()).getBlockBlobClient();
-            return blobClient.deleteIfExists();
+            blobClient.deleteIfExists();
         }
-        return false;
     }
 
     @Override

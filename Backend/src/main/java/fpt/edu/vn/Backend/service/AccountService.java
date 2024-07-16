@@ -4,6 +4,8 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
 import fpt.edu.vn.Backend.DTO.request.TwoFactorAuthChangeDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateAccountStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +22,8 @@ public interface AccountService {
         return mapEntityToDTO(account, new AccountDTO());
     }
     @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole);
+
+    void updateAccountByStatus(UpdateAccountStatusRequestDTO request);
 
     @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable);
     @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles);

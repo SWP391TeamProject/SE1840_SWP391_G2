@@ -15,9 +15,6 @@ export enum CurrencyType {
   JPY = 'JPY',
   VND = 'VND',
   BTC = 'BTC',
-  DOGE = 'DOGE',
-  JACK = 'JACK',
-  FPT = 'FPT',
 }
 
 export const currencyNames: { [key in CurrencyType]: string } = {
@@ -28,16 +25,10 @@ export const currencyNames: { [key in CurrencyType]: string } = {
   [CurrencyType.CNY]: 'Chinese Yuan',
   [CurrencyType.JPY]: 'Japanese Yen',
   [CurrencyType.BTC]: 'Bitcoin',
-  [CurrencyType.DOGE]: 'Dogecoin',
-  [CurrencyType.JACK]: 'Jack',
-  [CurrencyType.FPT]: 'FPT',
 };
 
 export const currencySymbol: Partial<{ [key in CurrencyType]: string }> = {
   [CurrencyType.BTC]: '₿',
-  [CurrencyType.DOGE]: 'Ɖ',
-  [CurrencyType.JACK]: '𝓙𝓪𝓬𝓴',
-  [CurrencyType.FPT]: '𝓕𝓟𝓣'
 }
 
 const defaultExchangeRates: { [key in CurrencyType]: number } = {
@@ -48,9 +39,6 @@ const defaultExchangeRates: { [key in CurrencyType]: number } = {
   [CurrencyType.CNY]: 7.26,
   [CurrencyType.JPY]: 159.48,
   [CurrencyType.BTC]: 0.000016,
-  [CurrencyType.DOGE]: 8.55,
-  [CurrencyType.JACK]: 5_000_000 / 25_000,
-  [CurrencyType.FPT]: 32_500_000 / 25_000,
 };
 
 export const StandardCurrency = CurrencyType.USD;
@@ -70,6 +58,7 @@ interface ICurrencyContext {
   getCurrencyType: () => CurrencyType;
   setCurrencyType: (type: CurrencyType) => void;
   format: (opts: FormatOptions) => string;
+  convert: (amount: number, baseCurrency: CurrencyType, targetCurrency: CurrencyType) => number;
 }
 
 const currencyFormatPreferenceKey = "currencyFormatPreference";
@@ -180,9 +169,13 @@ export const CurrencyProvider: React.FC<{
     return removeTrailingZeros(formatted) + suffix;
   };
 
+  const convert = (amount: number, baseCurrency: CurrencyType, targetCurrency: CurrencyType): number => {
+    return amount * exchangeRates[targetCurrency] / exchangeRates[baseCurrency];
+  };
+
   return (
     <CurrencyContext.Provider
-      value={{getCurrencyType, setCurrencyType: setCurrency, format}}>
+      value={{getCurrencyType, setCurrencyType: setCurrency, format, convert}}>
       {children}
     </CurrencyContext.Provider>
   );

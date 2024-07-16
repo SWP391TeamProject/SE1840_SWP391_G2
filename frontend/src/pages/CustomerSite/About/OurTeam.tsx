@@ -8,7 +8,7 @@ export const OurTeam = () => {
                     <div className="grid grid-cols-2 gap-6">
                         <div className="flex flex-col items-center space-y-2">
                             <img
-                                src="https://scontent.fsgn2-5.fna.fbcdn.net/v/t1.15752-9/446057549_1183542262782588_739918089689676065_n.png?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeG-ijE1yBAFmYPUH1n5Nfl3I9psmOUbTBQj2myY5RtMFPKfCiLQpVXguvzlOBBjCSFtd3EtfOUDcPz2CK9SJpLD&_nc_ohc=jZoUZjZHDNgQ7kNvgEtkFqB&_nc_ht=scontent.fsgn2-5.fna&oh=03_Q7cD1QFEAammJwzzD0Qvqp2_Lfb_xIxpIhA041ucAC67KXeMkg&oe=6686C08A"
+                                src="https://scontent.fhan14-5.fna.fbcdn.net/v/t1.15752-9/446057549_1183542262782588_739918089689676065_n.png?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_ohc=K6_a9YBBP6sQ7kNvgEMYIna&_nc_ht=scontent.fhan14-5.fna&oh=03_Q7cD1QExhenAys4VoN6sMuv4b2o05vbcMjZ0Sg3vBefxrAiHfA&oe=66BC254A"
                                 width="200"
                                 height="200"
                                 alt="Team Member"
@@ -19,7 +19,7 @@ export const OurTeam = () => {
                         </div>
                         <div className="flex flex-col items-center space-y-2">
                             <img
-                                src="https://scontent.fsgn2-9.fna.fbcdn.net/v/t1.15752-9/446018397_491818609851834_7024958988380731178_n.png?_nc_cat=103&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeEJZR12Jil5qTBruLLsWu-lj9JHyXulYu2P0kfJe6Vi7TE-W7XqFDZoOueFsbcNjRqRCjfVbGCNuNmBGtPIcRys&_nc_ohc=Pl3kMvfMrG8Q7kNvgEPunIW&_nc_ht=scontent.fsgn2-9.fna&oh=03_Q7cD1QEsxlcWSlD0lRdlb5dyggyHetY8T2pHvfPMhQ31UP1Tsg&oe=6686B928"
+                                src="https://scontent.fhan14-3.fna.fbcdn.net/v/t1.15752-9/446018397_491818609851834_7024958988380731178_n.png?_nc_cat=103&ccb=1-7&_nc_sid=9f807c&_nc_ohc=AgusKa5S9ycQ7kNvgHK_L6e&_nc_ht=scontent.fhan14-3.fna&oh=03_Q7cD1QGH0-SCyD7rkle5gyk8dIB9k6w4KUdPMaY5W6sBAINWuQ&oe=66BC5628"
                                 width="200"
                                 height="200"
                                 alt="Team Member"
@@ -30,7 +30,7 @@ export const OurTeam = () => {
                         </div>
                         <div className="flex flex-col items-center space-y-2">
                             <img
-                                src="https://scontent.fsgn2-7.fna.fbcdn.net/v/t1.15752-9/440957517_997484047997405_1419956590655065098_n.png?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeF-Fvcoa7bsadOrvvwn-bXhGaQ4zvjBpUYZpDjO-MGlRoBHQc3kQ8sw5Fb98zQM4RbBj_cE2sZq6pOsuivbbhLZ&_nc_ohc=9TS_qdhNYlUQ7kNvgEUwMKy&_nc_ht=scontent.fsgn2-7.fna&oh=03_Q7cD1QFercgegQt8HtnY5L047kHBO7nNLWWnsafau11MrJJrnw&oe=6686A9EE"
+                                src="https://scontent.fhan14-2.fna.fbcdn.net/v/t1.15752-9/440957517_997484047997405_1419956590655065098_n.png?_nc_cat=108&ccb=1-7&_nc_sid=9f807c&_nc_ohc=Xl06Xk900DkQ7kNvgHyvku-&_nc_ht=scontent.fhan14-2.fna&oh=03_Q7cD1QHdiqDtYobNNW3NcL9vGdMhPj7Zr9a8YZewtOa-GR_7_g&oe=66BC46EE"
                                 width="200"
                                 height="200"
                                 alt="Team Member"
@@ -41,7 +41,7 @@ export const OurTeam = () => {
                         </div>
                         <div className="flex flex-col items-center space-y-2">
                             <img
-                                src="https://scontent.fsgn2-11.fna.fbcdn.net/v/t1.15752-9/445381942_1424069858313105_1596971466450631268_n.png?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHinmPeWua7Bkf9Zj80srKoBw9nOuidpasHD2c66J2lq-ObqoJ_8uKQ3NHWwbikSE6wfynxO5tkdJpC00WB6VNf&_nc_ohc=N_0q74jhomsQ7kNvgHCNVIe&_nc_ht=scontent.fsgn2-11.fna&oh=03_Q7cD1QHHoUHUMB0S7KuQgmPfbbrQbrm-AAO0rJOzjnsQ8r5sqA&oe=6686A18F"
+                                src="https://scontent.fhan14-1.fna.fbcdn.net/v/t1.15752-9/445381942_1424069858313105_1596971466450631268_n.png?_nc_cat=105&ccb=1-7&_nc_sid=9f807c&_nc_ohc=GjA1g7IC0b8Q7kNvgEKU5_g&_nc_ht=scontent.fhan14-1.fna&oh=03_Q7cD1QH-ubtgciTV2hVFcMIeb1vSWjfoQpmv0nK9LIVmkpuqrw&oe=66BC3E8F"
                                 width="200"
                                 height="200"
                                 alt="Team Member"

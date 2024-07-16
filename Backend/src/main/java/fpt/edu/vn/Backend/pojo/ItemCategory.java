@@ -13,11 +13,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item_category")
+@Table(name = "jewelry_category")
 public class ItemCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_category_id")
+    @Column(name = "jewelry_category_id")
     private int itemCategoryId;
 
     @Column(length = 100)

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDTO {
+public class ItemDTO implements Serializable {
     private Integer itemId;
     private ItemCategoryDTO category;
     private String name;
@@ -25,7 +26,6 @@ public class ItemDTO {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private AccountDTO owner;
-    private Integer orderId;
     private Set<AttachmentDTO> attachments;
 
     public ItemDTO(Item item) {
@@ -39,7 +39,6 @@ public class ItemDTO {
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
         this.owner = new AccountDTO(item.getOwner());
-        this.orderId = item.getOrder()==null?null:item.getOrder().getOrderId();
         this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
         if(owner!=null){
             owner.setPassword(null);

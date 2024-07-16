@@ -1,16 +1,117 @@
 import { SERVER_DOMAIN_URL } from "@/constants/domain";
+import { ConsignmentStatus } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {
   let params = {
+    page: pageNumber || 0,
+    size: pageSize || 50,
+  }
+  console.log(params);
+  return await axios
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization:
+          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+      params: params
+    })
+    .then((res) => {
+      console.log(res.data.content);
+      return res
+    }) // return the data here
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie("user");
+        removeCookie("token");
+      }
+      throw err; // make sure to throw the error so it can be caught by the query
+    });
+};
+
+interface GetConsignmentsSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  status?: string;
+  role?: string;
+}
+
+export const getConsignments = async (input: GetConsignmentsSchema) => {
+  try {
+    const {
+      page,
+      size,
+      sort,
+      order,
+      status,
+    } = input;
+
+    // Prepare query parameters
+    if (status === "") {
+      const params: Record<string, any> = {
+        page: page - 1, // Spring Boot uses 0-based page index
+        size: size ? size : 10,
+        sort,
+        order,
+      };
+
+      return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization:
+              "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+          },
+          params: params
+        })
+    } else {
+      let params = {
+        status: status,
+        page: page - 1,
+        size: size ? size : 10,
+        sort,
+        order: order,
+      }
+      console.log(params);
+      return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/consignments/filter-by-status`, {
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization:
+              "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+          },
+          params: params
+        })
+    }
+    // return response.data;
+  } 
+  catch (err) {
+    console.log(err);
+    if (err?.response.status == 401) {
+      removeCookie("user");
+      removeCookie("token");
+    }
+  }
+};
+
+export const fetchConsignmentsByStatusService = async (pageNumber: number, pageSize: number, status: ConsignmentStatus) => {
+  let params = {
+    status: status,
     pageNumb: pageNumber,
     pageSize: pageSize,
   }
   console.log(params);
   return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+    .get(`${SERVER_DOMAIN_URL}/api/consignments/filter-by-status`, {
       headers: {
         "Content-Type": "application/json",
 
@@ -203,4 +304,28 @@ export const rejectFinalEva = async (id: number) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
+};
+
+export const exportConsignments = async () => {
+  return await fetch(`${SERVER_DOMAIN_URL}/api/consignments/export`, {
+    method: 'GET',
+    headers: {
+      Authorization:
+        "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+    },
+  }).then((response) => response.blob())
+    .then((blob) => {
+      // Create a blob URL and create a link element to trigger the download
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = blobUrl;
+      a.download = 'consignments.xlsx'; // Set the desired file name with .xls extension
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(blobUrl);
+    })
+    .catch((error) => {
+      console.error('Error fetching Excel file:', error);
+    });;
 };

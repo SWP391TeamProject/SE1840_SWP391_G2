@@ -10,17 +10,21 @@ import {
 } from "@/components/ui/carousel";
 import { fetchFeaturedAuctionSessions } from "@/services/AuctionSessionService";
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Autoplay from "embla-carousel-autoplay";
 import { set } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
+import { useAppDispatch } from "@/redux/hooks";
+import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession";
 
 export default function FeaturedAuctions() {
   const date = new Date();
 
   const [featuredAuctions, setFeaturedAuctions] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const dispatch = useAppDispatch();
+  const nav = useNavigate();
 
   const getDaysLeft = (endDate: Date) => {
     const difference = endDate.getTime() - new Date().getTime();
@@ -37,6 +41,12 @@ export default function FeaturedAuctions() {
       setIsLoading(false);
     });
   }, []);
+
+  const handleClick = (item : any) => {
+    dispatch(setCurrentAuctionSession(item));
+    nav("/auctions/" + item.auctionSessionId);
+
+  }
 
   return (
     <>
@@ -105,7 +115,7 @@ export default function FeaturedAuctions() {
               {featuredAuctions &&
                 featuredAuctions.map((item) => (
                   <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3 " key={item.auctionSessionId}>
-                    <Card className="w-72 lg:w-64 h-full ">
+                    <Card className="w-80 lg:w-70 h-full ">
                       <CardHeader>
                         <img
 
@@ -124,30 +134,29 @@ export default function FeaturedAuctions() {
                           <h3 className="text-lg font-semibold">
                             {item.title}
                           </h3>
-                          <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium mx-auto absolute -translate-y-14 translate-x-2">
-                            {item.startDate && new Date(item.startDate) > date ?
-                              <>
-                                Starts in <CountDownTime end={new Date(item.startDate)}></CountDownTime>
-                              </> :
-                              item.endDate && new Date(item.endDate) > date
-                                ? <>
-                                  Ends in <CountDownTime end={new Date(item.endDate)}></CountDownTime>
+                          <div className="inline-block rounded-lg bg-opacity-60 bg-black  px-3 py-1 text-sm font-medium justify-end basis-1/2 text-white">
+                              {item.startDate && new Date(item.startDate).getTime() > date.getTime() ?
+                                <>
+                                  Starts in <CountDownTime className="text-white" end={new Date(item.startDate)}></CountDownTime>
                                 </> :
-                                <div className="text-pink-500 dark:text-pink-400 font-semibold">
-                                  Auction Ended
-                                </div>
-                            }
-                          </div>
+                                (item.endDate && new Date(item.endDate).getTime() > date.getTime()
+                                  ? <>
+                                    Ends in <CountDownTime className="text-white" end={new Date(item.endDate)}></CountDownTime>
+                                  </> :
+                                  <div className="text-pink-500 dark:text-pink-400 font-semibold">
+                                    Auction Ended
+                                  </div>)
+                              }
+                            </div>
                         </div>
-
                         <div className="flex items-center justify-between">
 
-                          <Button variant="default" asChild>
-                            <Link
+                          <Button variant="default" onClick={()=>{handleClick(item)}}>
+                            {/* <Link
                               to={`auctions/${item.auctionSessionId}`}
-                            >
+                            > */}
                               Bid Now
-                            </Link>
+                            {/* </Link> */}
                           </Button>
 
                         </div>

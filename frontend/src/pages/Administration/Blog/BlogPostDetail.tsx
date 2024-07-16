@@ -1,7 +1,13 @@
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setCurrentBlogPost } from '@/redux/reducers/Blogs';
+import BlogService from '@/services/BlogService';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 export const BlogPostDetail = () => {
     const blog = useAppSelector((state) => state.blogs.currentBlogPost);
+    const { id } = useParams<{ id: string }>();
+    const dispatch = useAppDispatch();
 
     let temp = blog?.content?.split('&lt;img/&gt;');
     for (let i = 0; i < temp?.length - 1; i++) {
@@ -15,6 +21,18 @@ export const BlogPostDetail = () => {
     const blogDate=(`${utc_date.getDate()}/${utc_date.getMonth()<9?'0':''}${utc_date.getMonth() + 1}/${utc_date.getFullYear()}`);  
 
     let content = temp?.join('\n');
+
+    useEffect(() => {
+        console.log(blog);
+
+        if (!blog) {
+            BlogService.getBlogById(parseInt(id)).then((res) => {
+                let blog = res.data;
+                dispatch(setCurrentBlogPost(blog));
+                console.log(blog);
+            });
+        }
+    }, [])
     return (
         <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
             <div className="container mx-auto px-4 py-8 md:py-12 lg:py-16">

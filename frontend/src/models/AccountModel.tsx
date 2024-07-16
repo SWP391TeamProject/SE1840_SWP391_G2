@@ -10,6 +10,7 @@ export interface Account {
   avatar?: {
     link?: string
   };
+  kyc:boolean;
   accessToken?: string;
   balance?: number;
   role: Roles;

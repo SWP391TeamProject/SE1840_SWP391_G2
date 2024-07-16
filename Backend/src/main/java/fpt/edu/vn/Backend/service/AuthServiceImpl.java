@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -41,7 +42,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Date;
@@ -51,7 +55,7 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
 
     private final AccountRepos accountRepos;
@@ -77,8 +81,11 @@ public class AuthServiceImpl implements AuthService{
     private CustomUserDetailsService customUserDetailService;
     private PasswordEncoderConfig passwordEncoder;
 
+    private ResourceLoader resourceLoader;
+
     @Autowired
     public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, RefreshTokenProvider refreshTokenProvider, RefreshTokenRepos refreshTokenRepos, CustomUserDetailsService customUserDetailService, PasswordEncoderConfig passwordEncoder) {
+   
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
@@ -87,11 +94,12 @@ public class AuthServiceImpl implements AuthService{
         this.refreshTokenRepos = refreshTokenRepos;
         this.customUserDetailService = customUserDetailService;
         this.passwordEncoder = passwordEncoder;
+        this.resourceLoader = resourceLoader;
     }
 
     @Override
     public AuthResponseDTO register(RegisterDTO registerDTO) {
-        Account newAccount ;
+        Account newAccount;
         try {
             Preconditions.checkState(EMAIL_PATTERN.matcher(registerDTO.getEmail()).matches(), "Email must be valid");
             Preconditions.checkState(registerDTO.getName().length() >= 5, "Nickname must be at least 5 characters");
@@ -185,7 +193,7 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
-        if(loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()){
+        if (loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()) {
             throw new InvalidInputException("Email or password is empty!");
         }
 
@@ -234,7 +242,7 @@ public class AuthServiceImpl implements AuthService{
             refreshTokenRepos.save(invalidatedToken);
             refreshTokenProvider.cleanupExpiredTokens();
 
-        } catch (AppException exception){
+        } catch (AppException exception) {
             logger.info("Token already expired");
         }
     }
@@ -272,7 +280,7 @@ public class AuthServiceImpl implements AuthService{
         Preconditions.checkState(dto.getNewPassword().length() <= 30, "Password must not be longer than 30 characters");
         Preconditions.checkState(dto.getNewPassword().equals(dto.getConfirmPassword()), "New password and confirm password must match");
 
-        if (!passwordEncoder.bcryptEncoder().matches(dto.getOldPassword(),a.getPassword()))
+        if (!passwordEncoder.bcryptEncoder().matches(dto.getOldPassword(), a.getPassword()))
             throw new InvalidInputException("Old password is incorrect!");
 
         a.setPassword(passwordEncoder.bcryptEncoder().encode(dto.getNewPassword()));
@@ -304,15 +312,18 @@ public class AuthServiceImpl implements AuthService{
         helper.setTo(a.getEmail());
         helper.setSubject("[Biddify] Reset Password");
         // Read the HTML file into a String
-        String htmlContent = new String(Files.readAllBytes(Paths.get("/src/main/resources/templates/resetpasswordEmail.html")));
-
+        InputStream inputStream = resourceLoader.getResource("classpath:templates/resetpasswordEmail.html").getInputStream();
+        String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         // Replace placeholders in the HTML content with actual values
         htmlContent = htmlContent.replace("{code}", code);
         htmlContent = htmlContent.replace("{link}", String.format(resetEmailLink, code));
 
+
         // Set the HTML content as the body of the email
         helper.setText(htmlContent, true);
         mailSender.send(message);
+
+
 
         resetPasswordCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
         logger.info("Sending reset password account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);

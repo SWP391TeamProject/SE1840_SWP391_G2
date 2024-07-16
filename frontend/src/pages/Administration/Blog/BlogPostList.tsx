@@ -1,3 +1,4 @@
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import PagingIndexes from '@/components/pagination/PagingIndexes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,80 +13,108 @@ import { setCurrentBlogPost, setCurrentPageList, setCurrentPageNumber } from '@/
 import BlogCategoryService from '@/services/BlogCategoryService';
 import BlogService from '@/services/BlogService';
 import { ListFilter, MinusCircle, MoreHorizontal, PlusCircle } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { BlogsTable } from './blog-data-table/blog-table';
+import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
 
 export const BlogPostList = () => {
   const blogsList = useAppSelector((state) => state.blogs);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(-1);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [filtered, setFiltered] = useState("all");
-  const fetchBlogs = async (pageNumber: number) => {
-    try {
-      const res = await BlogService.getAllBlogs(pageNumber, 5);
-      if (res) {
-        console.log(res);
+  const [isLoading, setIsLoading] = useState(true);
+  const url = new URL(window.location.href);
+  let pageNumber = url.searchParams.get("page");
+  let sort = url.searchParams.get("sort");
+  let pageSize = url.searchParams.get("per_page");
+  const [blogPromise, setBlogPromise] = useState<Promise<any>>();
 
-        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-        let paging: any = {
-          pageNumber: res.data.number,
-          totalPages: res.data.totalPages
-        }
-        dispatch(setCurrentPageNumber(paging));
-      }
+  // const blogPromise = BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory});
 
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchBlogs = async (pageNumber: number, categoryId?: number) => {
+  //   try {
+  //     setIsLoading(true);
+  //     let res
+      
+  //     if(categoryId){
+  //       res = await BlogService.getBlogByCategory(categoryId, pageNumber, 5);
+  //     } else {
+  //       res = await BlogService.getAllBlogs(pageNumber, 5);
+  //     }
+  //     if (res) {
+  //       console.log(res);
 
-  const handlePageSelect = (pageNumber: number) => {
-    fetchBlogs(pageNumber);
-  }
+  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+  //       let paging: any = {
+  //         pageNumber: res.data.number,
+  //         totalPages: res.data.totalPages
+  //       }
+  //       dispatch(setCurrentPageNumber(paging));
+  //       setIsLoading(false);
+  //     }
 
-  const handleEditClick = (blogId: number) => {
-    let blog = blogsList.value.find(blog => blog.postId == blogId);
-    console.log(blog);
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     console.log(error);
+  //   }
+  // };
+
+  // const handlePageSelect = (pageNumber: number) => {
+  //   let category = categories.find(category => category.name === filtered);
+  //   fetchBlogs(pageNumber, category?.blogCategoryId);
+  // }
+
+  // const handleEditClick = (blogId: number) => {
+  //   let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
     // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
-    dispatch(setCurrentBlogPost(blog));
-    navigate("/admin/blogs/edit");
-  }
+  //   dispatch(setCurrentBlogPost(blog));
+  //   navigate("/admin/blogs/"+blogId+"/edit");
+  // }
 
-  const handleCreateClick = () => {
+  // const handleCreateClick = () => {
     // let blog = blogsList.value.find(blog => blog.blogId == blogId);
     // console.log(blog);
     // // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
     // dispatch(setCurrentBlog(blog));
-    navigate("/admin/blogs/create");
-  }
+  //   navigate("/admin/blogs/create");
+  // }
 
-  const handleDetailClick = (blogId: number) => {
+  // const handleDetailClick = (blogId: number) => {
     // console.log(blog);
     // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
     // dispatch(setCurrentBlog(blog));
     // navigate("/admin/blogs/edit");
-    let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
-    dispatch(setCurrentBlogPost(blog));
-    navigate(`/admin/blogs/${blogId}`);
-  }
+  //   let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
+  //   dispatch(setCurrentBlogPost(blog));
+  //   navigate(`/admin/blogs/${blogId}`);
+  // }
 
   const handleFilterClick = (category: BlogCategory[], filter: string) => {
-    let filteredList = blogsList.currentPageList.filter(x => category.includes(x.category));
-    console.log(filteredList);
-    dispatch(setCurrentPageList(filteredList));
-    setStatusFilter(filter);
-    setFiltered(filter);
+    if (filter == "all") {
+      // fetchBlogs(0);
+      // setStatusFilter(filter);
+      setFiltered(filter);
+      setSelectedCategory(-1);
+    }
+    else {
+      // fetchBlogs(0, category[0].blogCategoryId);
+      // setStatusFilter(filter);
+      setFiltered(filter);
+      setSelectedCategory(category[0].blogCategoryId);
+    }
   }
 
 
   useEffect(() => { }, [blogsList]);
 
   useEffect(() => {
-    fetchBlogs(blogsList.currentPageNumber);
-    dispatch(setCurrentPageList(blogsList.value));
+    // fetchBlogs(blogsList.currentPageNumber);
+    // dispatch(setCurrentPageList(blogsList.value));
     setStatusFilter("all");
     BlogCategoryService.getAllBlogCategories(0, 50).then((res) => {
       setCategories(res.data.content)
@@ -130,12 +159,19 @@ export const BlogPostList = () => {
       });
     });
   }
+
+  useEffect(() => {
+    console.log(pageNumber, pageSize, sort, selectedCategory);
+    if(Number.parseInt(pageNumber) >= 1)
+    setBlogPromise(BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory}));
+  }, [pageSize, pageNumber, sort,selectedCategory])
+
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 ">
       <Tabs defaultValue="all">
-        <div className="flex items-center ">
+        {/* <div className="flex items-center "> */}
 
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-8 gap-1">
                 <ListFilter className="h-3.5 w-3.5" />
@@ -170,7 +206,7 @@ export const BlogPostList = () => {
               </Button>
             </div>
           </DropdownMenu>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2"> */}
             {/* <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 gap-1">
@@ -196,109 +232,186 @@ export const BlogPostList = () => {
                                         Export
                                     </span>
                                 </Button> */}
-            <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
+            {/* <Button size="sm" className="h-8 gap-1" onClick={() => { handleCreateClick() }}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Add Blog
               </span>
             </Button>
-          </div>
-        </div>
-        <TabsContent value={statusFilter}>
-          <Card x-chunk="dashboard-06-chunk-0">
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                Blogs
-                <div className="w-full basis-1/2">
-                  <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                </div>
-              </CardTitle>
-              <CardDescription>
-                Manage blogs and view their details.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Id</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead className="md:table-cell">
-                      create Date
-                    </TableHead>
-                    <TableHead className="md:table-cell">
-                      Author
-                    </TableHead>
-                    <TableHead className="md:table-cell">
-                      Category
-                    </TableHead>
-                    {/* <TableHead className="md:table-cell">
+          </div> */}
+        {/* </div> */}
+        <TabsContent value="all">
+          {/* {isLoading ? <LoadingAnimation />
+            :  */}
+            <Card x-chunk="dashboard-06-chunk-0">
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  Blogs
+                  <div className="w-full basis-1/2">
+                    {/* <PagingIndexes pageNumber={blogsList.currentPageNumber ? blogsList.currentPageNumber : 0} totalPages={blogsList.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes> */}
+                  </div>
+                </CardTitle>
+                <CardDescription>
+                  Manage blogs and view their details.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Id</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead className="md:table-cell">
+                        create Date
+                      </TableHead>
+                      <TableHead className="md:table-cell">
+                        Author
+                      </TableHead>
+                      <TableHead className="md:table-cell">
+                        Category
+                      </TableHead> */}
+                      {/* <TableHead className="md:table-cell">
                                                     Created at
                                                 </TableHead> */}
-                    <TableHead className="md:table-cell">
-                      Action
-                    </TableHead>
-                    <TableHead>
-                      <span className="sr-only">More Actions</span>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {blogsList.currentPageList.map((blog) => (
-                    <TableRow key={blog.postId}>
-                      <TableCell className="font-medium">
-                        {blog.postId}
-                      </TableCell>
-                      {/* <TableCell>
+                      {/* <TableHead className="md:table-cell">
+                        Action
+                      </TableHead>
+                      <TableHead>
+                        <span className="sr-only">More Actions</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {blogsList.currentPageList.map((blog) => (
+                      <TableRow key={blog.postId}>
+                        <TableCell className="font-medium">
+                          {blog.postId}
+                        </TableCell> */}
+                        {/* <TableCell>
                                                     <Badge variant="outline">Draft</Badge>
                                                 </TableCell> */}
-                      <TableCell className="md:table-cell">
-                        {blog.title}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {new Date(blog.createDate).toLocaleDateString('en-US')}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {blog.author ? blog.author.nickname : "Unknown"}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {blog.category ? blog.category.name : "Unknown"}
-                      </TableCell>
+                        {/* <TableCell className="md:table-cell">
+                          {blog.title}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {new Date(blog.createDate).toLocaleDateString('en-US')}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {blog.author ? blog.author.nickname : "Unknown"}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {blog.category ? blog.category.name : "Unknown"}
+                        </TableCell>
 
 
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                aria-haspopup="true"
+                                size="icon"
+                                variant="ghost"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => { handleEditClick(blog.postId) }}>Edit</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => { handleDetailClick(blog.postId) }}>Detail</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+
+                    ))}
+                  </TableBody>
+                </Table> */}
+                <Suspense
+                  fallback={
+                    <DataTableSkeleton
+                      columnCount={5}
+                      searchableColumnCount={1}
+                      filterableColumnCount={2}
+                      cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                      shrinkZero
+                    />
+                  }
+                >
+                  <div className='flex items-center'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-8 gap-1">
+                          <ListFilter className="h-3.5 w-3.5" />
+                          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                            Filter
+                          </span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuLabel>Category</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuCheckboxItem className='w-9/12' checked={filtered == 'all'} onClick={() => handleFilterClick(categories, 'all')}>
+                          All
+                        </DropdownMenuCheckboxItem>
+
+
+                        {categories.map((category) => (
+                          <div className="flex m-1 items-center justify-between" key={category.blogCategoryId} >
+                            <DropdownMenuCheckboxItem className='w-9/12' checked={filtered == category.name} onClick={() => handleFilterClick([category], category.name)} >{category.name}</DropdownMenuCheckboxItem>
+                            <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={() => deleteCategory(category.blogCategoryId)}>
+                              <MinusCircle className="h-full w-full" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => { handleEditClick(blog.postId) }}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => { handleDetailClick(blog.postId) }}>Detail</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                          </div>
+                        ))}
 
-                  ))}
-                </TableBody>
-              </Table>
 
-            </CardContent>
-            <CardFooter>
-              {/* <div className="text-xs text-muted-foreground">
+                      </DropdownMenuContent>
+                      <div className="flex m-1 items-center justify-start ">
+                        <Input placeholder="new category" className='w-9/12 h-8 mx-2' id='newCategory' />
+                        <Button size="sm" variant="ghost" className="gap-1 w-2/12 h-8" onClick={createCategory}>
+                          <PlusCircle className="h-full w-full" />
+                        </Button>
+                      </div>
+                    </DropdownMenu>
+                  </div>
+                  
+                  {/* <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8 gap-1">
+                        <ListFilter className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Role
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuLabel>Role</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == ''} onClick={() => handleFilterClick('All')}>
+                        All
+                      </DropdownMenuCheckboxItem>
+
+
+                      {Object.values(RoleName).map((role) => (
+                        <div className="flex m-1 items-center justify-between" key={role} >
+                          <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == role} onClick={() => handleFilterClick(role)} >{role}</DropdownMenuCheckboxItem>
+                        </div>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu> */}
+                  <BlogsTable blogPromise={blogPromise} />
+                </Suspense>
+              </CardContent>
+              <CardFooter>
+                {/* <div className="text-xs text-muted-foreground">
                                         Showing <strong>1-10</strong> of <strong>32</strong>{" "}
                                         products
                                     </div> */}
-            </CardFooter>
-          </Card>
+              </CardFooter>
+            </Card>
+          {/* } */}
         </TabsContent>
       </Tabs>
       {/* {blogsList.value.map((blog) => (

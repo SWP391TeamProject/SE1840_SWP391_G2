@@ -17,7 +17,7 @@ export default function AuctionList() {
 
   const {isLoading, isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
-    queryFn: () => fetchActiveAuctionSessions(auctionSessionList.currentPageNumber, 10),
+    queryFn: () => fetchActiveAuctionSessions(auctionSessionList.currentPageNumber, 100),
   });
 
 
@@ -93,17 +93,17 @@ export default function AuctionList() {
                           Auction has been terminated
                         </div> :
                         <div className="text-sm font-medium">
-                          {session.startDate && new Date(session.startDate) > date ?
+                          {session.startDate && new Date(session.startDate).getTime() > date.getTime() ?
                             <>
                               Starts in <CountDownTime end={new Date(session.startDate)}></CountDownTime>
                             </> :
-                            session.endDate && new Date(session.endDate) > date
+                            (session.endDate && new Date(session.endDate).getTime() > date.getTime()
                               ? <>
                                 Ends in <CountDownTime end={new Date(session.endDate)}></CountDownTime>
                               </> :
                               <div className="text-pink-500 dark:text-pink-400 font-semibold">
                                 Auction Ended
-                              </div>
+                              </div>)
                           }
                         </div>
                       }

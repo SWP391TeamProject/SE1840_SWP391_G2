@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.controller;
 import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.exporter.BidExporter;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -27,9 +30,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,6 +65,35 @@ public class BidController {
         return ResponseEntity.ok(bidService.toBidResponse(bidService.getBidsByAuctionItemId(auctionItemId)));
     }
 
+    @GetMapping("/api/bids/export")
+    public ResponseEntity<byte[]> exportToExcel(Authentication authentication) throws IOException {
+        AccountDTO account = accountService.getAccountByEmail(authentication.getName());
+        if (account == null) {
+            throw new InvalidInputException("You are not authorized to perform this action");
+        }
+        List<BidDTO> listBids;
+        {
+            listBids = bidService.getBidsByAccountId(account.getAccountId(), PageRequest.of(0, 1000)).toList();
+        }
+
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerValue = "filename=bids_" + currentDateTime + ".xlsx";
+
+        BidExporter excelExporter = new BidExporter(listBids);
+
+        ByteArrayOutputStream stream = excelExporter.export();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", headerValue);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(stream.toByteArray());
+    }
+
     @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
     @SendTo("/topic/public/{auctionSessionId}/{itemId}")
     @Transactional
@@ -68,24 +104,35 @@ public class BidController {
         try {
             AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
             bidDTO.setAuctionItemId(auctionItemId);
-            BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getAmount();
+            BigDecimal currentBid = bidService.getHighestBid(auctionItemId).getPayment().getPaymentAmount();
             AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
-            log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
-
+            log.info(bidDTO.getPayment().getAccountId() + " bid " + bidDTO.getPayment().getPaymentAmount() + " on " + bidDTO.getAuctionItemId().getItemId() + "," + bidDTO.getAuctionItemId().getAuctionSessionId());
             if (bidDTO.getPayment().getAccountId() == bidService.getHighestBid(auctionItemId).getPayment().getAccountId()) {
                 return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Right now, you are the highest bidder.\n" +
                         "Hold off until someone outbids you.", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
             }
-
-            if (bidDTO.getPayment().getAmount().compareTo(currentBid.add(new BigDecimal(5))) >= 0) {
-                bidDTO = bidService.createBid(bidDTO);
-                AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
-                a.setCurrentPrice(bidDTO.getPayment().getAmount());
-                auctionItemService.updateAuctionItem(a);
-                return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getPayment().getAmount(), bidDTO.getPayment().getAmount(), BidReplyDTO.Status.BID));
+            if (currentBid.compareTo(BigDecimal.valueOf(15000)) < 0) {
+                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(100))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 100", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
+            } else if (currentBid.compareTo(BigDecimal.valueOf(15000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(50000)) < 0) {
+                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(250))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 250", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
+            } else if (currentBid.compareTo(BigDecimal.valueOf(50000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(200000)) < 0) {
+                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(500))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 500", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
             } else {
-                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 5", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                if (bidDTO.getPayment().getPaymentAmount().compareTo(currentBid.add(new BigDecimal(1000))) < 0) {
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 1000", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                }
             }
+            bidDTO = bidService.createBid(bidDTO);
+            AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
+            a.setCurrentPrice(bidDTO.getPayment().getPaymentAmount());
+            auctionItemService.updateAuctionItem(a);
+            return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getPayment().getPaymentAmount(), bidDTO.getPayment().getPaymentAmount(), BidReplyDTO.Status.BID));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -112,7 +159,7 @@ public class BidController {
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
         // Create a new bid
 //            bidService.createbid(new bid(persistedAccount, new BigDecimal(0), auctionItemService.getAuctionItemById(bidDTO.getAuctionItemId() )));
-        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", (bidService.getHighestBid(auctionItemId).getPayment().getAmount()), BidReplyDTO.Status.JOIN));
+        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", (bidService.getHighestBid(auctionItemId).getPayment().getPaymentAmount()), BidReplyDTO.Status.JOIN));
 
 
     }

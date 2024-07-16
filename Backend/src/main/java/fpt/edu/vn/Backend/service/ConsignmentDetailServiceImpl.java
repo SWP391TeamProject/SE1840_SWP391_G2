@@ -7,7 +7,6 @@ import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -15,17 +14,19 @@ import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
 import fpt.edu.vn.Backend.repository.ConsignmentRepos;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = "consignmentDetail")
 public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     private ConsignmentDetailRepos consignmentDetailRepos;
     private AttachmentRepos attachmentRepos;
@@ -41,11 +42,13 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
+    @Cacheable(key = "#pageable.pageNumber",value = "consignmentDetail")
     public Page<ConsignmentDetailDTO> getAllConsignmentsDetail(Pageable pageable) {
         return consignmentDetailRepos.findAll(pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Cacheable(key = "#consignmentId",value = "consignmentDetail")
     public List<ConsignmentDetailDTO> getConsignmentsDetailByConsignmentId(int consignmentId) {
         List<ConsignmentDetail> consignmentDetails = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId);
         return consignmentDetails.stream()
@@ -54,6 +57,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
+    @Cacheable(key = "#consignmentDetailId",value = "consignmentDetail")
     public ConsignmentDetailDTO getConsignmentDetailById(int consignmentDetailId) {
         ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Consignment detail not found with id " + consignmentDetailId));
@@ -61,6 +65,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
+    @CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
         try {
             ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -82,7 +87,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             consignmentDetail.setAccount(account);
 
             // Set ConsignmentStatus enum
-            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentRequestDetailDTO.getStatus()));
+            consignmentDetail.setType(ConsignmentDetail.ConsignmentType.valueOf(consignmentRequestDetailDTO.getStatus()));
 
             // Fetch Attachments by IDs
 
@@ -95,6 +100,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
 
     @Override
+    @CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
             // Find the existing ConsignmentDetail object by ID
             ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
@@ -104,7 +110,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             // Update the fields with the provided data from updatedConsignmentDetail
             consignmentDetail.setDescription(consignmentRequestDetailDTO.getDescription());
             consignmentDetail.setPrice(consignmentRequestDetailDTO.getPrice());
-            consignmentDetail.setStatus(ConsignmentDetail.ConsignmentStatus.valueOf(consignmentRequestDetailDTO.getStatus()));
+            consignmentDetail.setType(ConsignmentDetail.ConsignmentType.valueOf(consignmentRequestDetailDTO.getStatus()));
             consignmentDetail.setUpdateDate(LocalDateTime.now());
             // Fetch Consignment by ID from DTO and set it in the ConsignmentDetail
             Consignment consignment = consignmentRepos.findByConsignmentId(consignmentRequestDetailDTO.getConsignmentId());
@@ -134,7 +140,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
         return new ConsignmentDetailDTO(
                 consignmentDetail.getConsignmentDetailId(),
                 consignmentDetail.getDescription(),
-                consignmentDetail.getStatus().toString(), // Convert enum to string
+                consignmentDetail.getType().toString(), // Convert enum to string
                 consignmentDetail.getPrice(),
                 consignmentDetail.getConsignment().getConsignmentId(),
                 new AccountDTO(consignmentDetail.getAccount()),
