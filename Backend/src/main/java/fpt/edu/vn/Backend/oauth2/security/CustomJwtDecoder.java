@@ -21,7 +21,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     private String signerKey;
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private RefreshTokenProvider refreshTokenProvider;
 
     private NimbusJwtDecoder nimbusJwtDecoder = null;
 
@@ -34,7 +34,7 @@ public class CustomJwtDecoder implements JwtDecoder {
         }
 
         try {
-            var response = tokenProvider.introspect(
+            var response = refreshTokenProvider.introspect(
                     IntrospectRequest.builder().token(token).build());
 
             if (!response.isValid()) throw new JwtException("Token invalid");

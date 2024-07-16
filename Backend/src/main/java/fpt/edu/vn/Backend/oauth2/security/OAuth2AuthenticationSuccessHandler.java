@@ -1,6 +1,5 @@
 package fpt.edu.vn.Backend.oauth2.security;
 import fpt.edu.vn.Backend.oauth2.AppProperties;
-import fpt.edu.vn.Backend.oauth2.exception.BadRequestException;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.JWTGenerator;
@@ -24,7 +23,7 @@ import static fpt.edu.vn.Backend.oauth2.security.HttpCookieOAuth2AuthorizationRe
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private TokenProvider tokenProvider;
+    private RefreshTokenProvider refreshTokenProvider;
 
     private AppProperties appProperties;
 
@@ -38,9 +37,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 
     @Autowired
-    OAuth2AuthenticationSuccessHandler(TokenProvider tokenProvider, AppProperties appProperties,
+    OAuth2AuthenticationSuccessHandler(RefreshTokenProvider refreshTokenProvider, AppProperties appProperties,
                                        HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
-        this.tokenProvider = tokenProvider;
+        this.refreshTokenProvider = refreshTokenProvider;
         this.appProperties = appProperties;
         this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
     }
