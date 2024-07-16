@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public interface AuctionSessionService {
 
-    AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO);
+    AuctionSessionDTO createAuctionSession(AuctionCreateDTO auctionDTO);
 
     AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO);
     

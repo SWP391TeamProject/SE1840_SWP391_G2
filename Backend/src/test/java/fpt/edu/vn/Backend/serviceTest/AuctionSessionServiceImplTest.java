@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.serviceTest;
 
+import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -64,11 +65,10 @@ public class AuctionSessionServiceImplTest {
 
 
         when(auctionSessionRepos.save(any(AuctionSession.class))).thenReturn(auctionSession);
-        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
+        AuctionCreateDTO auctionSessionDTO = new AuctionCreateDTO();
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
         AuctionSessionDTO result = auctionSessionService.createAuctionSession(auctionSessionDTO);
 
         assertNotNull(result);
@@ -198,33 +198,30 @@ public class AuctionSessionServiceImplTest {
     void createAuctionSession_HappyPath() {
         when(auctionSessionRepos.save(any())).thenReturn(new AuctionSession());
 
-        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
+        AuctionCreateDTO auctionSessionDTO = new AuctionCreateDTO();
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
 
         assertNotNull(auctionSessionService.createAuctionSession(auctionSessionDTO));
     }
 
     @Test
     void createAuctionSession_StartDateInThePast() {
-        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
+        AuctionCreateDTO auctionSessionDTO = new AuctionCreateDTO();
         auctionSessionDTO.setStartDate(LocalDateTime.now().minusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
 
         assertThrows(InvalidInputException.class, () -> auctionSessionService.createAuctionSession(auctionSessionDTO));
     }
 
     @Test
     void createAuctionSession_EndDateBeforeStartDate() {
-        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
+        AuctionCreateDTO auctionSessionDTO = new AuctionCreateDTO();
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
 
         assertThrows(InvalidInputException.class, () -> auctionSessionService.createAuctionSession(auctionSessionDTO));
     }

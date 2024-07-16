@@ -20,9 +20,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,6 +45,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final ItemRepos itemRepos;
     private final AuctionItemRepos auctionItemRepos;
     private final OrderServiceImpl orderServiceImpl;
+
+    @Autowired
+    private AttachmentService attachmentService;
 
     private final NotificationService notificationService;
     private final JavaMailSender mailSender;
@@ -152,7 +158,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @CacheEvict(key = "#auctionDTO.getAuctionSessionId()",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
-    public AuctionSessionDTO createAuctionSession(AuctionSessionDTO auctionDTO) {
+    public AuctionSessionDTO createAuctionSession(AuctionCreateDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
             throw new InvalidInputException("Start date must be in the future");
         }
@@ -164,13 +170,19 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             auctionSession.setTitle(auctionDTO.getTitle());
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
-            auctionSession.setCreateDate(auctionDTO.getCreateDate());
-            auctionSession.setUpdateDate(auctionDTO.getUpdateDate());
+            auctionSession.setCreateDate(LocalDateTime.now());
+            auctionSession.setUpdateDate(LocalDateTime.now());
             auctionSession.setStatus(AuctionSession.Status.SCHEDULED);
             AuctionSession savedAuctionSession = auctionSessionRepos.save(auctionSession);
-
-            auctionDTO.setAuctionSessionId(savedAuctionSession.getAuctionSessionId());
-            return auctionDTO;
+            try {
+                if(auctionDTO.getFiles()!=null && !auctionDTO.getFiles().isEmpty()){
+                    for (MultipartFile file : auctionDTO.getFiles()) {
+                        attachmentService.uploadAuctionAttachment(file,savedAuctionSession.getAuctionSessionId());
+                    }}
+            } catch (Exception e) {
+                throw new RuntimeException("Error uploading attachments", e);
+            }
+            return new AuctionSessionDTO(savedAuctionSession);
         } catch (Exception e) {
             throw new RuntimeException("Error creating auction session", e);
         }

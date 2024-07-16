@@ -379,7 +379,7 @@ export const createAuctionSession = async (data: any) => {
     return await axios
         .post(`${SERVER_DOMAIN_URL}/api/${controller}/`, data, {
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
 
                 Authorization:
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",

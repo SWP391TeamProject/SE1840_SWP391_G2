@@ -104,24 +104,11 @@ public class AuctionSessionController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<AuctionSessionDTO> createAuctionSession(@RequestBody AuctionCreateDTO auctionDTO) {
+    public ResponseEntity<AuctionSessionDTO> createAuctionSession(@ModelAttribute AuctionCreateDTO auctionDTO) {
 
-        AuctionSessionDTO auctionSessionDTO = new AuctionSessionDTO();
-        auctionSessionDTO.setTitle(auctionDTO.getTitle());
-        auctionSessionDTO.setStartDate(auctionDTO.getStartDate());
-        auctionSessionDTO.setEndDate(auctionDTO.getEndDate());
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
-        auctionSessionDTO=auctionSessionService.createAuctionSession(auctionSessionDTO);
-        if(auctionDTO.getFiles()!=null){
-            try {
-                for (MultipartFile file : auctionDTO.getFiles()) {
-                    attachmentService.uploadAuctionAttachment(file,auctionSessionDTO.getAuctionSessionId());
-                }
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-        return new ResponseEntity<>(auctionSessionService.getAuctionSessionById(auctionSessionDTO.getAuctionSessionId()), HttpStatus.OK);
+        AuctionSessionDTO auctionSessionDTO=auctionSessionService.createAuctionSession(auctionDTO);
+
+        return new ResponseEntity<>(auctionSessionDTO, HttpStatus.OK);
     }
 
     @PostMapping("/assign-auction-session")
