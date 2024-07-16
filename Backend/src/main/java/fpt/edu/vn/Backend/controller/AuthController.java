@@ -7,7 +7,7 @@ import fpt.edu.vn.Backend.DTO.RegisterDTO;
 import fpt.edu.vn.Backend.DTO.request.*;
 import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.DTO.response.IntrospectResponse;
-import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
+import fpt.edu.vn.Backend.oauth2.security.RefreshTokenProvider;
 import fpt.edu.vn.Backend.service.AuthService;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class AuthController {
 
     private final AuthService authService;
     @Autowired
-    private TokenProvider tokenProvider;
+    private RefreshTokenProvider refreshTokenProvider;
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -49,14 +49,14 @@ public class AuthController {
     @PostMapping("/introspect")
     public ResponseEntity<IntrospectResponse> isAuthenticate(@RequestBody IntrospectRequest request)
             throws ParseException, JOSEException {
-        boolean result = tokenProvider.introspect(request).isValid();
+        boolean result = refreshTokenProvider.introspect(request).isValid();
         IntrospectResponse introspectResponse = IntrospectResponse.builder().valid(result).build();
         return ResponseEntity.ok(introspectResponse);
     }
     @PostMapping("/refresh")
     ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest request)
             throws ParseException, JOSEException {
-        AuthenticationResponse result = tokenProvider.refreshToken(request);
+        AuthenticationResponse result = refreshTokenProvider.refreshToken(request);
         return ResponseEntity.ok(result);
     }
 

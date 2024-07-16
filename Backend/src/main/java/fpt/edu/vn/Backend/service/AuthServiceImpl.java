@@ -13,11 +13,11 @@ import fpt.edu.vn.Backend.exception.CooldownException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
-import fpt.edu.vn.Backend.oauth2.security.TokenProvider;
+import fpt.edu.vn.Backend.oauth2.security.RefreshTokenProvider;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Token;
+import fpt.edu.vn.Backend.pojo.RefreshToken;
 import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.TokenRepos;
+import fpt.edu.vn.Backend.repository.RefreshTokenRepos;
 import fpt.edu.vn.Backend.security.CustomUserDetailsService;
 import fpt.edu.vn.Backend.security.JWTGenerator;
 import fpt.edu.vn.Backend.security.PasswordEncoderConfig;
@@ -25,7 +25,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpiringMap;
-import org.apache.commons.lang3.RegExUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,21 +76,22 @@ public class AuthServiceImpl implements AuthService {
     private final ExpiringMap<Integer, Object> activationCooldownCache = ExpiringMap.builder().variableExpiration().build();
     private final ExpiringMap<String, Integer> verify2faCache = ExpiringMap.builder().variableExpiration().build();
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
-    private TokenProvider tokenProvider;
-    private TokenRepos tokenRepos;
+    private RefreshTokenProvider refreshTokenProvider;
+    private RefreshTokenRepos refreshTokenRepos;
     private CustomUserDetailsService customUserDetailService;
     private PasswordEncoderConfig passwordEncoder;
 
     private ResourceLoader resourceLoader;
 
     @Autowired
-    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, TokenProvider tokenProvider, TokenRepos tokenRepos, CustomUserDetailsService customUserDetailService, PasswordEncoderConfig passwordEncoder, ResourceLoader resourceLoader) {
+    public AuthServiceImpl(AccountRepos accountRepos, JWTGenerator jwtGenerator, AuthenticationManager authenticationManager, JavaMailSender mailSender, RefreshTokenProvider refreshTokenProvider, RefreshTokenRepos refreshTokenRepos, CustomUserDetailsService customUserDetailService, PasswordEncoderConfig passwordEncoder) {
+   
         this.accountRepos = accountRepos;
         this.jwtGenerator = jwtGenerator;
         this.authenticationManager = authenticationManager;
         this.mailSender = mailSender;
-        this.tokenProvider = tokenProvider;
-        this.tokenRepos = tokenRepos;
+        this.refreshTokenProvider = refreshTokenProvider;
+        this.refreshTokenRepos = refreshTokenRepos;
         this.customUserDetailService = customUserDetailService;
         this.passwordEncoder = passwordEncoder;
         this.resourceLoader = resourceLoader;
@@ -229,18 +229,18 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(LogOutRequest request) throws ParseException, JOSEException {
         try {
-            var signToken = tokenProvider.verifyToken(request.getToken(), true);
+            var signToken = refreshTokenProvider.verifyToken(request.getToken(), true);
             String jit = signToken.getJWTClaimsSet().getJWTID();
             Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
 
-            Token invalidatedToken =
-                    Token.builder()
-                            .token(jit)
+            RefreshToken invalidatedToken =
+                    RefreshToken.builder()
+                            .refreshToken(jit)
                             .expiryTime(expiryTime)
                             .tokenType("Bearer")
                             .build();
-            tokenRepos.save(invalidatedToken);
-            tokenProvider.cleanupExpiredTokens();
+            refreshTokenRepos.save(invalidatedToken);
+            refreshTokenProvider.cleanupExpiredTokens();
 
         } catch (AppException exception) {
             logger.info("Token already expired");
