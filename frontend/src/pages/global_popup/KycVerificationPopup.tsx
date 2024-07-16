@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom";
-export default function KycVerificationPopup() {
+export default function KycVerificationPopup({open, setOpen}) {
 
 
     const nav = useNavigate();
@@ -21,12 +21,13 @@ export default function KycVerificationPopup() {
     }
 
     return <>
-        <AlertDialog defaultOpen >
+        <AlertDialog open={open}  onOpenChange={setOpen}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>KYC Verification Required</AlertDialogTitle>
                     <AlertDialogDescription>
-                        To continue using all features, please complete your KYC verification. This process is quick and ensures your account security.
+                        To participate in bidding, ease complete your KYC verification. This process is quick and ensures your account security.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
