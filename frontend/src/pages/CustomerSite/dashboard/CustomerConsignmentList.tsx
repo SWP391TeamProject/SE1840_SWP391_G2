@@ -135,7 +135,7 @@ export default function CustomerConsignmentList() {
                             <TableRow key={consignment.consignmentId}>
                                 <TableCell >{consignment.consignmentId}</TableCell >
                                 <TableCell >{consignment.createDate}</TableCell >
-                                <TableCell >{consignment.status == ConsignmentStatus.WAITING_STAFF ? 'Evaluating' : 'Terminated'}</TableCell >
+                                <TableCell >{consignment.status == ConsignmentStatus.WAITING_STAFF ? 'Evaluating' : consignment.status}</TableCell >
                             </TableRow>
                         ))}
                     </TableBody>

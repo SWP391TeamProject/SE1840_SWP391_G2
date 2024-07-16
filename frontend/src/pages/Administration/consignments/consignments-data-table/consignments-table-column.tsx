@@ -13,7 +13,7 @@ import {
 import { DataTableColumnHeader } from "@/components/data-tables/data-table-column-header"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
-import { AccountStatus } from "@/constants/enums"
+import { ConsignmentStatus } from "@/constants/enums"
 import { formatDate } from "@/lib/utils"
 import { Consignment } from "@/models/newModel/consignment"
 
@@ -91,13 +91,13 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
     accessorKey: "requester",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Requester Name" />
-      
+
     ),
     cell: ({ row }) => (
       <div className="font-medium">
         {row.original.user.nickname ? row.original.user.nickname : ""}
       </div>
-    ),    
+    ),
     enableSorting: false,
 
   },
@@ -106,39 +106,57 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => (
-      <Badge variant={row.getValue("status") === AccountStatus.DISABLED ? "destructive" : "default"} className={row.getValue("status") === AccountStatus.ACTIVE ? "bg-green-500" : ""}> 
-        {row.getValue("status")}
-      </Badge>
-
-    //   {row.getValue("status") == AccountStatus.ACTIVE ?
-    //     <Badge variant="default" className="bg-green-500">{AccountStatus[row.status]}</Badge> :
-    //     <Badge variant="destructive">{AccountStatus[row.status]}</Badge>}
-    ),
+    cell: ({ row }) => {
+          switch (row.original.status) {
+            case ConsignmentStatus.WAITING_STAFF:
+              return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Waiting for Staff</Badge>;
+            case ConsignmentStatus.FINISHED:
+              return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
+            case ConsignmentStatus.IN_INITIAL_EVALUATION:
+              return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">In Initial Evaluation</Badge>;
+            case ConsignmentStatus.IN_FINAL_EVALUATION:
+              return <Badge variant="default" className="bg-indigo-500 w-[150px] text-center flex justify-center items-center">In Final Evaluation</Badge>;
+            case ConsignmentStatus.SENDING:
+              return <Badge variant="default" className="bg-purple-500 w-[150px] text-center flex justify-center items-center">Sending</Badge>;
+            case ConsignmentStatus.TERMINATED:
+              return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
+            case ConsignmentStatus.WAITING_SELLER:
+              return <Badge variant="default" className="bg-pink-400 w-[150px] text-center flex justify-center items-center">Waiting seller</Badge>;
+            case ConsignmentStatus.TO_ITEM:
+              return <Badge variant="default" className="bg-cyan-400 w-[150px] text-center flex justify-center items-center">To Item</Badge>;
+            default:
+              return <Badge variant="destructive">Unknown Status</Badge>;
+          }
+        }
+        
+      //   {row.getValue("status") == ConsignmentStatus.ACTIVE ?
+      //     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[row.status]}</Badge> :
+      //     <Badge variant="destructive">{ConsignmentStatus[row.status]}</Badge>}
+    ,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
     },
   },
-//   {
-//     accessorKey: "createDate",
-//     header: ({ column }) => (
-//       <DataTableColumnHeader column={column} title="Created At" />
-//     ),
-//     cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
-//   },
-//   {
-//     accessorKey: "owner.nickname",
-//     header: ({ column }) => (
-//       <DataTableColumnHeader column={column} title="Owner" />
-//     ),
-//     cell: ({ row }) => row.original.owner.nickname,
-//   },
+  //   {
+  //     accessorKey: "createDate",
+  //     header: ({ column }) => (
+  //       <DataTableColumnHeader column={column} title="Created At" />
+  //     ),
+  //     cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
+  //   },
+  //   {
+  //     accessorKey: "owner.nickname",
+  //     header: ({ column }) => (
+  //       <DataTableColumnHeader column={column} title="Owner" />
+  //     ),
+  //     cell: ({ row }) => row.original.owner.nickname,
+  //   },
   {
     id: "actions",
     cell: ({ row }) => {
       const [showUpdateItemSheet, setShowUpdateItemSheet] = React.useState(false)
       const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false)
-      const  nav = useNavigate();
+      const nav = useNavigate();
       const dispatch = useAppDispatch();
 
       const handleEditClick = (accountId: number) => {
@@ -148,7 +166,8 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
 
       const handleDetailClick = (consignmentId: number) => {
         nav(`/admin/consignments/${consignmentId}`);
-    }
+      }
+
       return (
         <>
           {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}

@@ -282,8 +282,8 @@ export default function ConsignmentDetail() {
                     </CardContent>
                 </Card>
             </div>
-            <div className="flex justify-start flex-row w-full mt-1 gap-2">
-                <div className="basis-2/3">
+            <div className="flex justify-start flex-row w-full mt-1 gap-2 ">
+                <div className="basis-2/3 flex w-full">
                     <ScrollArea className="w-2/3 h-96 border rounded-xl ">
                         {Array.isArray(consignment?.consignmentDetails) ? consignment.consignmentDetails.reverse().map((item, index) => {
                             return (
@@ -322,39 +322,39 @@ export default function ConsignmentDetail() {
                         ) : null}
 
                     </ScrollArea>
-
+                    <Card className="w-1/3">
+                        <CardHeader>
+                            <CardTitle>Consignment Detail <ConsignmentDialog consignment={consignment} /></CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div>
+                                <p>
+                                    Color: {consignment?.color}
+                                </p>
+                                <p>
+                                    Size: {consignment?.size}
+                                </p>
+                                <p>
+                                    Weight: {consignment?.weight}
+                                </p>
+                                <p>
+                                    Brand: {consignment?.brand}
+                                </p>
+                                <p>
+                                    Age: {consignment?.age}
+                                </p>
+                                <p>
+                                    Material: {consignment?.material}
+                                </p>
+                            </div>
+                            <div contentEditable='true' dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
+                            <div className="w-ful flex justify-between">
+                                <p>Requester: {consignment?.user?.nickname}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
-                <Card className="w-1/3">
-                    <CardHeader>
-                        <CardTitle>Consignment Information <ConsignmentDialog consignment={consignment} /></CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div>
-                            <p>
-                                Color: {consignment?.color}
-                            </p>
-                            <p>
-                                Size: {consignment?.size}
-                            </p>
-                            <p>
-                                Weight: {consignment?.weight}
-                            </p>
-                            <p>
-                                Brand: {consignment?.brand}
-                            </p>
-                            <p>
-                                Age: {consignment?.age}
-                            </p>
-                            <p>
-                                Material: {consignment?.material}
-                            </p>
-                        </div>
-                        <div contentEditable='true' dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
-                        <div className="w-ful flex justify-between">
-                            <p>Requester: {consignment?.user?.nickname}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+
 
 
 
