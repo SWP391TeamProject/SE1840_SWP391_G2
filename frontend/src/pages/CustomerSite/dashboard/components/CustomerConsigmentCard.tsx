@@ -150,8 +150,8 @@ export default function CustomerConsigmentCard({ consignment }) {
             <Card className="w-[350px]  ">
                 <CardHeader className="w-full">
                     {
-                        custConsignment?.consignmentDetails[0]?.attachments[0]
-                            ? <img src={custConsignment?.consignmentDetails[0]?.attachments[0]?.link} alt="Auction Item" className="rounded-t-lg object-cover" height="225" style={{ aspectRatio: "400/225", objectFit: "cover" }} />
+                        custConsignment
+                            ? <img src={custConsignment?.attachments[0]?.link} alt="Auction Item" className="rounded-t-lg object-cover" height="225" style={{ aspectRatio: "400/225", objectFit: "cover" }} />
 
                             : <img src="https://via.placeholder.com/400x225" alt="Auction Item" className="rounded-t-lg object-cover" height="225" style={{ aspectRatio: "400/225", objectFit: "cover" }} />
                     }

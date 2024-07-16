@@ -249,7 +249,7 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Age</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="enter item age" {...field}  className="w-36"/>
+                          <Input type="text" placeholder="enter item age" {...field}  className="w-36"/>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -318,7 +318,7 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Weight</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="enter item weight" {...field} className="w-36" />
+                          <Input type="text" placeholder="enter item weight" {...field} className="w-36" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
