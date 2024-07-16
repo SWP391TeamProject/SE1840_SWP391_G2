@@ -5,14 +5,15 @@ import fpt.edu.vn.Backend.pojo.Bid;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 public class BidResponse implements Serializable {
     private int bidId;
     private AccountDTO account;
-    private double price;
+    private BigDecimal price;
 
-    public BidResponse(int bidId, AccountDTO account, double price) {
+    public BidResponse(int bidId, AccountDTO account, BigDecimal price) {
         this.bidId = bidId;
         this.account = account;
         this.price = price;
