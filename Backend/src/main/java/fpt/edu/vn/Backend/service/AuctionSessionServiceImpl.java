@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
+import com.google.common.collect.Sets;
 import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
@@ -47,6 +48,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final JavaMailSender mailSender;
     @Value("${app.email}")
     private String systemEmail;
+
+    private final Map<Integer, AuctionSession.Status> auctionHandlingLock = Collections.synchronizedMap(new HashMap<>());
 
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos,
@@ -190,13 +193,18 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.warn("Auction session " + auctionSessionId + " not started yet");
             return;
         }
+        if (auctionHandlingLock.putIfAbsent(auctionSessionId, AuctionSession.Status.FINISHED) != null) {
+            logger.info("Auction session {} is already in progress of {}",
+                    auctionSessionId, auctionHandlingLock.get(auctionSessionId));
+            return;
+        }
         logger.info("Finishing auction session " + auctionSessionId);
 
         //////////////
 
         record Participant(Account account, List<AuctionItem> wonItems, List<AuctionItem> lostItems) {
             Participant(Account account) {
-                this(account, Collections.emptyList(), Collections.emptyList());
+                this(account, new ArrayList<>(), new ArrayList<>());
             }
         }
 
@@ -205,13 +213,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         int bidCount = 0;
 
         //////////////
+        logger.info("Handle bids and items for auction {} ", auctionSessionId);
 
         for (AuctionItem auctionItem : auction.getAuctionItems()) {
             List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItem.getAuctionItemId());
             bidCount += bids.size();
 
+            Item item = auctionItem.getItem();
             {
-                Item item = auctionItem.getItem();
                 item.setStatus(bids.isEmpty() ? Item.Status.UNSOLD : Item.Status.SOLD);
                 itemRepos.save(item);
             }
@@ -222,7 +231,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             }
             bidRepos.saveAll(bids);
 
-            if (!bids.isEmpty()) {
+            if (!bids.isEmpty() && bids.get(0).getAmount().compareTo(item.getReservePrice()) >= 0) {
                 Account winner = bids.get(0).getAccount();
                 participants.computeIfAbsent(winner.getAccountId(), (v) -> new Participant(winner))
                         .wonItems.add(auctionItem);
@@ -236,10 +245,16 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                     participants.computeIfAbsent(loser.getAccountId(), (v) -> new Participant(loser))
                             .lostItems.add(auctionItem);
                 }
+                logger.info("Item {} has {} bids, winner is {} and {} losers",
+                        auctionItem.getAuctionItemId(), bids.size(),
+                        winner.getAccountId(), seenAccounts.size());
+            } else {
+                logger.info("Item {} has {} bids without winner", auctionItem.getAuctionItemId(), bids.size());
             }
         }
 
         //////////////
+        logger.info("Handle notification and order for auction {} ", auctionSessionId);
 
         for (Participant participant : participants.values()) {
             Account account = participant.account;
@@ -296,7 +311,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 }
             });
 
-            if (!participant.wonItems.isEmpty())
+            if (!participant.wonItems.isEmpty()) {
+                logger.info("Creating order for winner {} ", participant.account.getAccountId());
                 orderServiceImpl.createOrder(
                         account.getAccountId(),
                         participant.wonItems.stream()
@@ -304,6 +320,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                                 .collect(Collectors.toUnmodifiableSet()),
                         auctionSessionId
                 );
+            }
 
             scheduledNotifications.add(
                     NotificationDTO.builder()
@@ -318,6 +335,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                             .build()
             );
         }
+
+        logger.info("Handle deposits for auction {} ", auctionSessionId);
 
         for (Deposit deposit : auction.getDeposits()) {
             Payment p = deposit.getPayment();
@@ -350,6 +369,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         auctionSessionRepos.save(auction);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " finished");
+        auctionHandlingLock.remove(auctionSessionId);
     }
 
     @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
@@ -362,23 +382,32 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.warn("Auction session " + auctionSessionId + " already ended");
             return;
         }
+        if (auctionHandlingLock.putIfAbsent(auctionSessionId, AuctionSession.Status.TERMINATED) != null) {
+            logger.info("Auction session {} is already in progress of {}",
+                    auctionSessionId, auctionHandlingLock.get(auctionSessionId));
+            return;
+        }
 
         logger.info("Terminating auction session " + auctionSessionId);
         List<NotificationDTO> scheduledNotifications = new ArrayList<>();
 
-        for (AuctionItem auctionItem : auction.getAuctionItems()) {
-            List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItem.getAuctionItemId());
-            {
-                Item item = auctionItem.getItem();
-                item.setStatus(Item.Status.UNSOLD);
-                itemRepos.save(item);
-            }
+        logger.info("Handle bids and items for auction {} ", auctionSessionId);
 
+        for (AuctionItem auctionItem : auction.getAuctionItems()) {
+            Set<Bid> bids = auctionItem.getBids();
             for (Bid bid : bids) {
                 bid.setStatus(Bid.Status.FAILED);
             }
             bidRepos.saveAll(bids);
+
+            Item item = auctionItem.getItem();
+            item.setStatus(Item.Status.UNSOLD);
+            itemRepos.save(item);
+
+            logger.info("Item {} has {} bids without winner", auctionItem.getAuctionItemId(), bids.size());
         }
+
+        logger.info("Handle deposits for auction {} ", auctionSessionId);
 
         for (Deposit deposit : auction.getDeposits()) {
             Payment p = deposit.getPayment();
@@ -426,13 +455,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                             .userId(account.getAccountId())
                             .build()
             );
-            logger.info("Refunded deposit for account " + account.getAccountId());
+            logger.info("Refunded deposit id {} for account {} ", p.getPaymentId(), account.getAccountId());
         }
 
         auction.setStatus(AuctionSession.Status.TERMINATED);
         auctionSessionRepos.save(auction);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " terminated");
+        auctionHandlingLock.remove(auctionSessionId);
     }
 
     @Override
@@ -449,6 +479,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             logger.warn("Auction session " + auctionSessionId + " already started");
             return;
         }
+        if (auctionHandlingLock.putIfAbsent(auctionSessionId, AuctionSession.Status.PROGRESSING) != null) {
+            logger.info("Auction session {} is already in progress of {}",
+                    auctionSessionId, auctionHandlingLock.get(auctionSessionId));
+            return;
+        }
+        logger.info("Starting auction session " + auctionSessionId);
 
         List<NotificationDTO> scheduledNotifications = new ArrayList<>();
         for (Deposit deposit : auction.getDeposits()) {
@@ -466,6 +502,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         auctionSessionRepos.save(auction);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " started");
+        auctionHandlingLock.remove(auctionSessionId);
     }
 
     @Override
@@ -618,6 +655,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         helper.setTo(targetEmail);
         helper.setSubject(title);
         helper.setText(content, true);
-        mailSender.send(message);
+//        mailSender.send(message);
     }
 }

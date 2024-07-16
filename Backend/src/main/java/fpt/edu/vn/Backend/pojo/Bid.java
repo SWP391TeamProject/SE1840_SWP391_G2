@@ -39,10 +39,10 @@ public class Bid {
 
     @CreationTimestamp
     private LocalDateTime createdDate;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
-
 
     @Override
     public int hashCode() {

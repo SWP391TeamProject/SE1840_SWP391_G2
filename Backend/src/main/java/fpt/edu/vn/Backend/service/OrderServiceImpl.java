@@ -214,7 +214,7 @@ public class OrderServiceImpl implements OrderService {
 </div>
 
                                 """, true);
-                        mailSender.send(message);
+//                        mailSender.send(message);
                     } catch (MessagingException e) {
                         log.info("Error sending mail to " + account.getEmail(), e);
                     }
