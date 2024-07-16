@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Form,
     FormControl,
@@ -36,6 +36,14 @@ export default function AccountEdit() {
     const account = useAppSelector((state) => state.accounts.currentAccount);
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const [editedAccount, setEditedAccount] = useState({
+        accountId: 0,
+        nickname: "",
+        email: "",
+        phone: "",
+        balance: 0,
+        role: Roles.MEMBER,
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,7 +53,7 @@ export default function AccountEdit() {
             email: account?.email,
             phone: account?.phone ?? "",
             balance: account?.balance ?? 0,
-            role: account ? account.role : Roles.MEMBER,
+            role: account ? account.role : Roles.ADMIN,
         },
     });
 
@@ -72,10 +80,29 @@ export default function AccountEdit() {
         console.log(updatedAccount);
     };
 
+    // useEffect(() => {
+    //     if (!account || account.accountId != parseInt(id)) {
+    //         fetchAccountById(parseInt(id)).then((res) => {
+    //             console.log(res);
+    //             setCurrentAccount(res?.data);
+    //             form.reset({
+    //                 accountId: res?.data?.accountId,
+    //                 nickname: res?.data?.nickname ?? "",
+    //                 email: res?.data?.email,
+    //                 phone: res?.data?.phone ?? "",
+    //                 balance: res?.data?.balance ?? 0,
+    //                 role: res.data ? res?.data.role : Roles.MEMBER,
+    //             });
+    //             console.log(form.formState);
+    //             console.log(form.control._formValues);
+    //         });
+    //     }
+    // }, [account]);
+
     useEffect(() => {
+        console.log(form.formState.defaultValues);
         if (!account || account.accountId != parseInt(id)) {
             fetchAccountById(parseInt(id)).then((res) => {
-                console.log(res);
                 setCurrentAccount(res?.data);
                 form.reset({
                     accountId: res?.data?.accountId,
@@ -83,17 +110,11 @@ export default function AccountEdit() {
                     email: res?.data?.email,
                     phone: res?.data?.phone ?? "",
                     balance: res?.data?.balance ?? 0,
-                    role: res?.data ? res?.data.role : Roles.MEMBER,
+                    role: res.data ? res?.data.role : Roles.MEMBER,
                 });
+                setEditedAccount(res.data);
             });
-        } else {
-            setCurrentAccount(account);
         }
-    }, [account]);
-
-    useEffect(() => {
-        console.log(account);
-        console.log(form.formState.defaultValues);
     }, [])
 
     return (
@@ -189,9 +210,10 @@ export default function AccountEdit() {
                                     <FormControl>
                                         <RadioGroup
                                             onValueChange={field.onChange}
-                                            defaultValue={field.value}
+                                            // defaultValue={field.value}
+                                            value={field.value}
                                             className="flex flex-col space-y-1"
-                                            disabled={field.value === Roles.ADMIN}
+                                            disabled={editedAccount?.role === Roles.ADMIN}
                                         >
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>
