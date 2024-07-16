@@ -18,6 +18,9 @@ import { Roles } from '@/constants/enums';
 import { fetchAccountById, updateAccountService } from "@/services/AccountsServices.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { setCurrentAccount } from '@/redux/reducers/Accounts';
+import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
     accountId: z.number(),
@@ -29,6 +32,7 @@ const formSchema = z.object({
     phone: z.string().max(15, "Phone must not be longer than 15 characters").optional(),
     role: z.nativeEnum(Roles),
     balance: z.coerce.number().min(0, "Balance must not be negative"),
+    dummy: z.boolean()
 });
 
 
@@ -46,6 +50,7 @@ export default function AccountEdit() {
             phone: account?.phone ?? "",
             balance: account?.balance ?? 0,
             role: account ? account.role : Roles.MEMBER,
+            dummy: false
         },
     });
 
@@ -60,7 +65,7 @@ export default function AccountEdit() {
             avatar: null,
             balance: data.balance,
             role: data.role,
-       
+            dummy: data.dummy,
             status: account?.status
         }
         updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
@@ -82,6 +87,7 @@ export default function AccountEdit() {
                     nickname: res?.data?.nickname ?? "",
                     email: res?.data?.email,
                     phone: res?.data?.phone ?? "",
+                    dummy: res?.data?.dummy ?? false,
                     balance: res?.data?.balance ?? 0,
                     role: res?.data ? res?.data.role : Roles.MEMBER,
                 });
@@ -226,6 +232,36 @@ export default function AccountEdit() {
                                     <FormMessage />
                                 </FormItem>
                             )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="dummy"
+                          render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Dummy?</FormLabel>
+                                <FormControl>
+                                  <div>
+                                    <Alert variant="destructive">
+                                      <AlertCircle className="h-4 w-4" />
+                                      <AlertTitle>Note</AlertTitle>
+                                      <AlertDescription>
+                                        A dummy account is an account used for testing purposes.<br/>
+                                        <b>NO email will be sent to these accounts.</b>
+                                      </AlertDescription>
+                                    </Alert>
+                                    <div className="mt-2">
+                                      <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                      />
+                                      <span className="ml-2">Enable dummy</span>
+                                    </div>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                          )}
                         />
                         <Button variant={"destructive"} type="submit">
                             Submit

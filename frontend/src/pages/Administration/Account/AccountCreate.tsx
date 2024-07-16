@@ -17,9 +17,11 @@ import { AccountStatus, RoleName, Roles } from '@/constants/enums';
 import { createAccountService } from "@/services/AccountsServices.ts";
 import { useNavigate } from "react-router-dom";
 import { Role } from '@/models/newModel/account';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { toast } from 'react-toastify';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const phoneRegex = new RegExp(
     /^[0-9\-\+]{10}$/
@@ -37,6 +39,7 @@ const formSchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters long'),
     role: z.enum([RoleName.MEMBER, RoleName.STAFF, RoleName.MANAGER, RoleName.ADMIN]),
     balance: z.coerce.number().optional(),
+    dummy: z.boolean()
 });
 
 
@@ -56,6 +59,7 @@ export default function AccountCreate() {
             phone: "",
             balance: 0,
             role: RoleName.MEMBER,
+            dummy: false
         },
     });
     const handleConfirmed = (data: z.infer<typeof formSchema>) => {
@@ -71,6 +75,7 @@ export default function AccountCreate() {
             role: data.role,
             password: data.password,
             status: AccountStatus.ACTIVE,
+            dummy: data.dummy
         }
         createAccountService(createdAccount).then((res) => {
             console.log(res);
@@ -272,8 +277,43 @@ export default function AccountCreate() {
                                 Submit
                             </Button>
                         }
+
+                      <FormField
+                        control={form.control}
+                        name="dummy"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dummy?</FormLabel>
+                            <FormControl>
+                              <div>
+                                <Alert variant="destructive">
+                                  <AlertCircle className="h-4 w-4" />
+                                  <AlertTitle>Note</AlertTitle>
+                                  <AlertDescription>
+                                    A dummy account is an account used for testing purposes.<br/>
+                                    <b>NO email will be sent to these accounts.</b>
+                                  </AlertDescription>
+                                </Alert>
+                                <div className="mt-2">
+                                  <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                  <span className="ml-2">Enable dummy</span>
+                                </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                        <Button variant={"destructive"} type="submit">
+                            Submit
+                        </Button>
                     </form>
                     <ConfirmationDialog
+                        description='This action cannot be undone.'
                         label='Ok'
                         message='Are you sure to create this account?'
                         onSuccess={confirm}

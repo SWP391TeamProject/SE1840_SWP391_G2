@@ -42,7 +42,7 @@ public class Item {
     private BigDecimal buyInPrice;
 
     public enum Status {
-        VALUATING, QUEUE, IN_AUCTION, SOLD, UNSOLD, REMOVED
+        QUEUE, IN_AUCTION, SOLD, UNSOLD, REMOVED
     }
 
     @Column(length = 30)
@@ -61,22 +61,22 @@ public class Item {
     @JoinColumn(name = "owner_id")
     private Account owner;
 
-    @Column(length = 30)
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String color;
 
-    @Column(length = 30)
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String size;
 
-    @Column(length = 30)
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String weight;
 
-    @Column(length = 30)
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String brand;
 
     @Column(length = 30)
     private Integer age;
 
-    @Column(length = 30)
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String material;
 
 

@@ -96,6 +96,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         account.setRole(Role.MEMBER);
         account.setPassword(RandomStringUtils.randomAlphanumeric(12));
         account.setStatus(Account.Status.ACTIVE);
+        account.setDummy(false);
 
         Attachment attachment = new Attachment();
         attachment.setLink(info.getImageUrl());

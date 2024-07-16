@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class AccountDTO implements Serializable {
     private Integer accountId;
     private String nickname;
+    private Boolean dummy;
     private boolean require2fa;
     private Account.Role role;
     private AttachmentDTO avatar;
@@ -27,10 +28,21 @@ public class AccountDTO implements Serializable {
     private LocalDateTime updateDate;
     private boolean isKyc;
 
+    public static AccountDTO redacted(Account account) {
+        return AccountDTO.builder()
+                .accountId(account.getAccountId())
+                .nickname(account.getNickname())
+                .status(account.getStatus())
+                .role(account.getRole())
+                .avatar(account.getAvatarUrl() == null ? null : new AttachmentDTO(account.getAvatarUrl()))
+                .build();
+    }
+
     public AccountDTO(Account account) {
         this.accountId = account.getAccountId();
         this.nickname = account.getNickname();
         this.require2fa = account.isRequire2fa();
+        this.dummy = account.isDummy();
         this.role = account.getRole();
         this.avatar = account.getAvatarUrl()==null? null : new AttachmentDTO(account.getAvatarUrl());
         this.email = account.getEmail();

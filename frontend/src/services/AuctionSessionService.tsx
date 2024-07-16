@@ -3,6 +3,8 @@ import axios from '@/config/axiosConfig.ts';
 import { toast } from "react-toastify";
 import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { showErrorToast } from "@/lib/handle-error";
+import {AuctionSession} from "@/models/AuctionSessionModel.tsx";
+import {Page} from "@/models/Page.ts";
 
 const controller = "auction-sessions";
 
@@ -450,4 +452,11 @@ export const terminateAuctionSession = async (auctionSessionId: number) => {
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             },
         })
+}
+
+export const fetchAuctionSessionHistoryOfItem = async (itemId?: number, page: number = 0, size: number = 10) => {
+    return await axios.get<Page<AuctionSession>>(`${SERVER_DOMAIN_URL}/api/${controller}/history-item/${itemId}`, {
+          headers: {"Content-Type": "application/json"},
+          params: {page, size}
+      });
 }

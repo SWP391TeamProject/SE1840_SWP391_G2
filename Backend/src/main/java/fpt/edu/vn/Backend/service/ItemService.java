@@ -12,16 +12,11 @@ import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 
 public interface ItemService {
-    @NotNull ItemDTO mapEntityToDTO(@NotNull Item item, @NotNull ItemDTO itemDTO);
-    @NotNull default ItemDTO mapEntityToDTO(@NotNull Item item) {
-        return mapEntityToDTO(item, new ItemDTO());
-    }
     @NotNull Item mapDTOToEntity(@NotNull ItemDTO itemDTO, @NotNull Item item);
 
     @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO itemDTO) throws IOException;
     @Nullable ItemDTO getItemById(int id);
     ItemDTO updateItem(@NotNull ItemDTO itemDTO);
-    void updateItemByStatus(UpdateItemStatusRequestDTO request);
 
     @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable);
 
