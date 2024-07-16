@@ -51,12 +51,18 @@ public class AuctionSessionController {
     }
     @GetMapping("/search/{title}")
     public ResponseEntity<Page<AuctionSessionDTO>> getAuctionsByNameAndEmail(@PageableDefault(size = 200) Pageable pageable,
-                                                                      @PathVariable String title) {
+                                                                             @PathVariable String title) {
         log.info("Get accounts with name: {}", title);
         if (title == null) {
             return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(auctionSessionService.getAuctionSessionsByTitle(pageable, title), HttpStatus.OK);
+    }
+
+    @GetMapping("/history-item/{itemId}")
+    public ResponseEntity<Page<AuctionSessionDTO>> getPastAuctionOfItem(@PageableDefault(size = 200) Pageable pageable,
+                                                                      @PathVariable int itemId) {
+        return new ResponseEntity<>(auctionSessionService.getPastAuctionOfItem(pageable, itemId), HttpStatus.OK);
     }
 
     @GetMapping("/active")

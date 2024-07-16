@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,6 +25,13 @@ public class ItemDTO implements Serializable {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private AccountDTO owner;
+    private String color;
+    private String size;
+    private String weight;
+    private String brand;
+    private Integer age;
+    private String material;
+    private Integer orderId;
     private Set<AttachmentDTO> attachments;
 
     public ItemDTO(Item item) {
@@ -38,10 +44,15 @@ public class ItemDTO implements Serializable {
         this.status = item.getStatus();
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
-        this.owner = new AccountDTO(item.getOwner());
+        this.owner = AccountDTO.redacted(item.getOwner());
+        this.color = item.getColor();
+        this.size = item.getSize();
+        this.weight = item.getWeight();
+        this.brand = item.getBrand();
+        this.age = item.getAge();
+        this.material = item.getMaterial();
+        if (item.getOrder() != null)
+            this.orderId = item.getOrder().getOrderId();
         this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
-        if(owner!=null){
-            owner.setPassword(null);
-        }
     }
 }

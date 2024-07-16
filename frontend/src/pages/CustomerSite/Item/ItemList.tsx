@@ -291,7 +291,7 @@ export function ItemList() {
                           <CardHeader>
 
                             <img
-                              src={item.attachments[0].link}
+                              src={item.attachments && item.attachments.length > 0 ? item.attachments[0].link : ""}
                               width={300}
                               height={200}
                               alt="Auction Item"

@@ -1,21 +1,32 @@
+import {ItemCategory} from "@/models/ItemCategory.ts";
+import {Account} from "@/models/AccountModel.tsx";
+import {Attachment} from "@/models/Attachment.ts";
+
 export interface Item {
   itemId?: number;
-  categoryId?: number;
-  name: string;
-  description: string;
-  reservePrice: number;
-  buyInPrice: number;
-  status: ItemStatus;
+  category?: ItemCategory;
+  name?: string;
+  description?: string;
+  reservePrice?: number;
+  buyInPrice?: number;
+  status?: ItemStatus;
   createDate?: Date;
   updateDate?: Date;
-  ownerId?: number;
+  owner?: Account;
+  color?: string;
+  size?: string;
+  weight?: string;
+  brand?: string;
+  age?: number;
+  material?: string;
   orderId?: number;
+  attachments?: Attachment[];
 }
 
 export enum ItemStatus {
-  VALUATING = "VALUATING",
   QUEUE = "QUEUE",
   IN_AUCTION = "IN_AUCTION",
   SOLD = "SOLD",
-  UNSOLD = "UNSOLD"
+  UNSOLD = "UNSOLD",
+  REMOVED = "REMOVED"
 }

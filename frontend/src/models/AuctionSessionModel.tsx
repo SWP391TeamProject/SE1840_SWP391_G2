@@ -1,12 +1,12 @@
 export interface AuctionSession {
     auctionSessionId?: number;
     title?: string;
-    startDate?: Date;
-    endDate?: Date;
+    startDate?: string;
+    endDate?: string;
     status?: string;
     auctionItems?: [];
     deposits?:[];
-    createDate?: Date;
-    updateDate?: Date;
+    createDate?: string;
+    updateDate?: string;
     attachments?: [];
 }

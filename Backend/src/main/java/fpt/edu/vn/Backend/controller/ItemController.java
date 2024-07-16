@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
+import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
@@ -15,6 +16,7 @@ import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,24 +138,6 @@ public class ItemController {
 
     @PostMapping("/create")
     public ResponseEntity<ItemDTO> createItem(@ModelAttribute CreateItemRequestDTO itemDTO) throws IOException {
-        if (itemDTO.getName() == null || itemDTO.getName().isEmpty()) {
-            throw new InvalidInputException("Item name cannot be null");
-        }
-        if (itemDTO.getReservePrice() < 0 || itemDTO.getBuyInPrice() < 0) {
-            throw new InvalidInputException("Item price cannot be negative");
-        }
-        if (itemDTO.getReservePrice() > itemDTO.getBuyInPrice()) {
-            throw new InvalidInputException("Reserve price must be smaller than buy in price");
-        }
-        if (itemDTO.getFiles() != null) {
-            for (MultipartFile f : itemDTO.getFiles()) {
-                if (f.getSize() > 10000000) {
-                    throw new InvalidInputException("File size must be less than 10MB");
-                }
-            }
-        } else {
-            throw new InvalidInputException("File cannot be null");
-        }
         return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
     }
 
@@ -164,34 +148,14 @@ public class ItemController {
                 .filter(
                         consignmentDetailDTO -> consignmentDetailDTO.getStatus()
                                 .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED))
-                ).toList().get(0).getPrice();
+                ).findFirst().map(ConsignmentDetailDTO::getPrice).orElse(null);
         if(reservePrice==null){
             throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");
         }
-        if (reservePrice.compareTo(BigDecimal.valueOf(itemDTO.getReservePrice())) != 0) {
-            throw new InvalidInputException("You can't change reserve price!");
-        }
-        if (itemDTO.getName() == null || itemDTO.getName().isEmpty()) {
-            throw new InvalidInputException("Item name cannot be null");
-        }
-        if (itemDTO.getReservePrice() < 0 || itemDTO.getBuyInPrice() < 0) {
-            throw new InvalidInputException("Item price cannot be negative");
-        }
-        if (itemDTO.getReservePrice() > itemDTO.getBuyInPrice()) {
-            throw new InvalidInputException("Reserve price must be smaller than buy in price");
-        }
-        if (itemDTO.getFiles() != null) {
-            for (MultipartFile f : itemDTO.getFiles()) {
-                if (f.getSize() > 10000000) {
-                    throw new InvalidInputException("File size must be less than 10MB");
-                }
-            }
-        } else {
-            throw new InvalidInputException("File cannot be null");
-        }
+        ItemDTO item = itemService.createItem(itemDTO);
         consignmentDTO.setStatus(String.valueOf(Consignment.Status.FINISHED));
         consignmentService.updateConsignment(consignmentDTO.getConsignmentId(),consignmentDTO);
-        return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(item, HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
@@ -230,11 +194,4 @@ public class ItemController {
                  .headers(headers)
                  .body(stream.toByteArray());
      }
-
-
-    @PostMapping("/updateStatus")
-    public ResponseEntity<Void> updateItemStatus(@RequestBody(required = false) UpdateItemStatusRequestDTO itemDTOList) {
-        itemService.updateItemByStatus(itemDTOList);
-        return ResponseEntity.ok().build();
-    }
 }

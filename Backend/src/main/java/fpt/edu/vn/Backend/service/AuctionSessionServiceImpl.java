@@ -542,6 +542,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
+    public Page<AuctionSessionDTO> getPastAuctionOfItem(Pageable pageable, int itemId) {
+        return auctionSessionRepos.findAuctionSessionsHasItem(itemId, pageable).map(AuctionSessionDTO::minimal);
+    }
+
+    @Override
     @CacheEvict(key = "#auctionDTO.getAuctionSessionId()", cacheNames = "auctionSession",value = "auctionSession",allEntries = true)
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
