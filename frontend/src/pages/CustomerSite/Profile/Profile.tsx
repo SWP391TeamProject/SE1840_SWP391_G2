@@ -1,19 +1,11 @@
-import { Separator } from "@radix-ui/react-separator";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
-import Footer from "@/components/footer/Footer";
 import { cn } from "@/lib/utils";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-
-// Define a Link interface to match the Breadcrumb component's expectation
-interface LinkProps {
-  href: string;
-  label: string;
-}
+import { NavLink, Outlet } from "react-router-dom";
 
 const profileNavItems = [
   { title: "Overview", href: "/profile/overview" },
   { title: "Notification", href: "/profile/notification" },
   { title: "Preferences", href: "/profile/preferences" },
+  { title: "Inventory", href: "/profile/inventory" },
   { title: "Balance", href: "/profile/balance" },
   { title: "KYC", href: "/profile/kyc"},
 ];

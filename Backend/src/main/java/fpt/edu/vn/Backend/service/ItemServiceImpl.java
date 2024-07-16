@@ -206,6 +206,12 @@ public class ItemServiceImpl implements ItemService {
         return itemRepos.findItemByOwnerAccountId(ownerId, pageable).map(this::mapEntityToDTO);
     }
 
+    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #buyerId", value = "item")
+    @Override
+    public @NotNull Page<ItemDTO> getItemsByBuyerId(@NotNull Pageable pageable, int buyerId) {
+        return itemRepos.findItemByBuyerAccountId(buyerId, pageable).map(this::mapEntityToDTO);
+    }
+
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name) {
