@@ -72,12 +72,15 @@ class BidServiceImplTest {
         auctionItem.setAuctionItemId(new AuctionItemId(1,1));
 
         BidDTO bidDTO = new BidDTO();
-        bidDTO.setAmount(BigDecimal.valueOf(100));
-        bidDTO.setAccountId(1);
+
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
+        paymentDTO.setAccountId(1);
+        bidDTO.setPayment(paymentDTO);
 
         Bid bid = new Bid();
         bid.setBidId(1);
-        bid.setAmount(bidDTO.getAmount());
+        bid.setAmount(paymentDTO.getPaymentAmount());
         bid.setAuctionItem(auctionItem);
         bid.setAccount(new Account());
 
@@ -93,8 +96,10 @@ class BidServiceImplTest {
         when(auctionItemRepos.findById(any())).thenReturn(Optional.empty());
 
         BidDTO bidDTO = new BidDTO();
-        bidDTO.setAmount(BigDecimal.valueOf(100));
-        bidDTO.setAccountId(1);
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
+        paymentDTO.setAccountId(1);
+        bidDTO.setPayment(paymentDTO);
 
         assertThrows(IllegalArgumentException.class, () -> bidService.createBid(bidDTO));
     }
@@ -105,8 +110,10 @@ class BidServiceImplTest {
         when(accountRepos.findById(any())).thenReturn(Optional.empty());
 
         BidDTO bidDTO = new BidDTO();
-        bidDTO.setAmount(BigDecimal.valueOf(100));
-        bidDTO.setAccountId(1);
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
+        paymentDTO.setAccountId(1);
+        bidDTO.setPayment(paymentDTO);
 
         assertThrows(IllegalArgumentException.class, () -> bidService.createBid(bidDTO));
     }
@@ -124,12 +131,15 @@ class BidServiceImplTest {
         auctionItem.setAuctionItemId(new AuctionItemId(1,1));
 
         BidDTO bidDTO = new BidDTO();
-        bidDTO.setAmount(BigDecimal.valueOf(100));
-        bidDTO.setAccountId(1);
+
+        PaymentDTO paymentDTO = new PaymentDTO();
+        paymentDTO.setPaymentAmount(BigDecimal.valueOf(100));
+        paymentDTO.setAccountId(1);
+        bidDTO.setPayment(paymentDTO);
 
         Bid bid = new Bid();
         bid.setBidId(1);
-        bid.setAmount(bidDTO.getAmount());
+        bid.setAmount(paymentDTO.getPaymentAmount());
         bid.setAuctionItem(auctionItem);
         bid.setAccount(new Account());
         when(bidRepos.findById(any())).thenReturn(Optional.of(bid));
@@ -145,14 +155,14 @@ class BidServiceImplTest {
         auctionItem.setItem(item);
         when(auctionItemRepos.findById(any())).thenReturn(Optional.of(  auctionItem));
         when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(any())).thenReturn(new ArrayList<>());
-        assertNull(bidService.getHighestBid(auctionItemId));
+        assertNotNull(bidService.getHighestBid(auctionItemId));
     }
 
     @Test
     void getHighestBid_AuctionItemNotFound() {
         AuctionItemId auctionItemId = new AuctionItemId(1,1);
         when(auctionItemRepos.findById(any())).thenReturn(Optional.empty());
-        assertNull(bidService.getHighestBid(auctionItemId));
+        assertThrows(IllegalArgumentException.class, () -> bidService.getHighestBid(auctionItemId));
     }
 
     @Test
@@ -166,7 +176,12 @@ class BidServiceImplTest {
 
         when(auctionItemRepos.findById(any())).thenReturn(Optional.of(auctionItem));
         when(bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(any())).thenReturn(new ArrayList<>());
-        assertNull(bidService.getHighestBid(auctionItemId));
+        assertEquals(item.getReservePrice(),bidService.getHighestBid(auctionItemId).getPayment().getPaymentAmount());
+    }
+    @Test
+    void deleteBid_HappyPath() {
+        when(bidRepos.findById(any())).thenReturn(Optional.of(new Bid()));
+        assertDoesNotThrow(() -> bidService.deleteBid(1));
     }
 
     @Test

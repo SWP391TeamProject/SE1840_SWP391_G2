@@ -56,7 +56,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setEndDate(auctionSession.getEndDate());
         auctionSessionDTO.setCreateDate(auctionSession.getCreateDate());
         auctionSessionDTO.setUpdateDate(auctionSession.getUpdateDate());
-        auctionSessionDTO.setStatus(auctionSession.getStatus());
+        auctionSessionDTO.setStatus(auctionSession.getStatus().toString());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
         AuctionSessionDTO result = auctionSessionService.createAuctionSession(auctionSessionDTO);
 
         assertNotNull(result);
@@ -83,7 +83,7 @@ public class AuctionSessionServiceImplTest {
         when(auctionSessionRepos.save(any(AuctionSession.class))).thenReturn(auctionSession);
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
         AuctionSessionDTO result = auctionSessionService.updateAuctionSession(auctionSessionDTO);
 
         assertNotNull(result);
@@ -202,7 +202,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertNotNull(auctionSessionService.createAuctionSession(auctionSessionDTO));
     }
@@ -213,7 +213,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().minusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertThrows(InvalidInputException.class, () -> auctionSessionService.createAuctionSession(auctionSessionDTO));
     }
@@ -224,7 +224,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertThrows(InvalidInputException.class, () -> auctionSessionService.createAuctionSession(auctionSessionDTO));
     }
@@ -239,7 +239,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertNotNull(auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
@@ -253,7 +253,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
@@ -266,7 +266,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().minusDays(1));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertThrows(InvalidInputException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
@@ -278,7 +278,7 @@ public class AuctionSessionServiceImplTest {
         auctionSessionDTO.setStartDate(LocalDateTime.now().plusDays(2));
         auctionSessionDTO.setEndDate(LocalDateTime.now().plusDays(1));
         auctionSessionDTO.setTitle("Test");
-        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED);
+        auctionSessionDTO.setStatus(AuctionSession.Status.SCHEDULED.toString());
 
         assertThrows(InvalidInputException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
