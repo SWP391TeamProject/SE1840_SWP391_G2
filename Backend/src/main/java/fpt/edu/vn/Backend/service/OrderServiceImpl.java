@@ -242,35 +242,73 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderDTO payOrder(int accountId, int orderId, OrderPayRequestDTO dto) {
         Account account = accountRepos.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "accountId", accountId));
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found", "orderId", orderId));
-        Payment payment = order.getPayment();
-        Preconditions.checkState(accountId == payment.getAccount().getAccountId(),
-                "You are not authorized to pay this order");
-        Preconditions.checkState(payment.getStatus() == Payment.Status.PENDING,
-                "Order is not in PENDING status");
-        Preconditions.checkState(account.getBalance().compareTo(payment.getPaymentAmount()) >= 0,
-                "Insufficient balance");
-        payment.setStatus(Payment.Status.SUCCESS);
-        paymentRepository.save(payment);
-        account.setBalance(account.getBalance().subtract(payment.getPaymentAmount()));
-        accountRepos.save(account);
-        order.setShippingStatus(Order.ShippingStatus.PACKAGING);
-        order.setShippingAddress(dto.getShippingAddress());
-        order.setShippingNote(dto.getShippingNote());
-        orderRepository.save(order);
-        notificationService.sendNotification(
-                NotificationDTO.builder()
-                        .message(String.format(
-                                "You have paid order #%d successfully. It will be packaged for delivery soon!",
-                                order.getOrderId()
-                        ))
-                        .userId(payment.getAccount().getAccountId())
-                        .build());
-        log.info("Account {} paid {} for order {}", accountId, payment.getPaymentAmount(), orderId);
+        Payment orderPayment = order.getPayment();
+
+        // handle order for buyer
+        {
+            Preconditions.checkState(accountId == orderPayment.getAccount().getAccountId(),
+                    "You are not authorized to pay this order");
+            Preconditions.checkState(orderPayment.getStatus() == Payment.Status.PENDING,
+                    "Order is not in PENDING status");
+            Preconditions.checkState(account.getBalance().compareTo(orderPayment.getPaymentAmount()) >= 0,
+                    "Insufficient balance");
+            orderPayment.setStatus(Payment.Status.SUCCESS);
+            paymentRepository.save(orderPayment);
+            account.setBalance(account.getBalance().subtract(orderPayment.getPaymentAmount()));
+            accountRepos.save(account);
+            order.setShippingStatus(Order.ShippingStatus.PACKAGING);
+            order.setShippingAddress(dto.getShippingAddress());
+            order.setShippingNote(dto.getShippingNote());
+            orderRepository.save(order);
+            notificationService.sendNotification(
+                    NotificationDTO.builder()
+                            .message(String.format(
+                                    "You have paid order #%d successfully. It will be packaged for delivery soon!",
+                                    order.getOrderId()
+                            ))
+                            .userId(orderPayment.getAccount().getAccountId())
+                            .build());
+            log.info("Account {} paid {} for order {}", accountId, orderPayment.getPaymentAmount(), orderId);
+        }
+
+        // handle order for seller
+        BigDecimal sumSoldPrice = new BigDecimal(0);
+        {
+            for (Item item : order.getItems()) {
+                BigDecimal price = item.getSoldPrice();
+                sumSoldPrice = sumSoldPrice.add(price);
+                Account seller = item.getOwner();
+                seller.setBalance(seller.getBalance().add(price));
+                accountRepos.save(seller);
+                Payment rewardPayment = Payment.builder()
+                        .paymentAmount(price)
+                        .account(seller)
+                        .type(Payment.Type.CONSIGNMENT_REWARD)
+                        .status(Payment.Status.SUCCESS)
+                        .method(Payment.Method.MANUAL)
+                        .build();
+                paymentRepository.save(rewardPayment);
+                notificationService.sendNotification(
+                        NotificationDTO.builder()
+                                .message(String.format(
+                                        "You have received the revenue from selling item %s!",
+                                        item.getName()
+                                ))
+                                .userId(seller.getAccountId())
+                                .build());
+                log.info("Account {} gained {} from selling item {} in order {}",
+                        seller.getAccountId(), price, item.getItemId(), orderId);
+            }
+        }
+
+        log.info("System fee = {}", orderPayment.getPaymentAmount().subtract(sumSoldPrice));
+
         return new OrderDTO(order);
     }
 
