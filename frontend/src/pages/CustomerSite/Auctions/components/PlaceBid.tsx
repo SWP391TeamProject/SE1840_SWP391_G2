@@ -98,10 +98,8 @@ export default function PlaceBid({ ...props }) {
                 destination: '/app/chat.sendMessage/' + props.auctionId + '/' + props.itemId,
                 body: JSON.stringify({
                     auctionItemId: location.state.id,
-                    payment: {
                         accountId: auth.user.accountId,
-                        paymentAmount: values.bidAmount
-                    }
+                        amount: values.bidAmount
                 })
             })
 
