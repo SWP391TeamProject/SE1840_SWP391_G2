@@ -50,7 +50,7 @@ const FormSchema = z.object({
   }).min(0, {
     message: "Buy in price must be at least 0."
   }),
-  ownerId: z.number({
+  ownerId: z.coerce.number({
     message: "Owner must be specified.",
   }),
   color: z.string().optional(),
