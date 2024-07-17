@@ -23,12 +23,13 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import ImageGallery from './components/ImageGallery';
 import { ArrowBigUp, HashIcon, Timer } from 'lucide-react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import BidsInformation from './components/BidsInformation';
 import { useAuth } from '@/AuthProvider';
 import { AuctionSessionStatus } from '@/constants/enums';
 import { Item } from '@/models/newModel/item';
 import { AuctionItem } from '@/models/newModel/auctionItem';
+import Confetti from 'react-confetti-boom';
 
 
 export default function AuctionJoin() {
@@ -43,6 +44,7 @@ export default function AuctionJoin() {
   let itemId = location.state.id.itemId;
   let itemDTO = location.state.itemDTO;
   let endDate = location.state.endDate;
+  console.log(location.state);
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(true);
@@ -50,6 +52,7 @@ export default function AuctionJoin() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSending, setIsSending] = useState(false);
+  const [showCofetti, setShowCofetti] = useState(false);
 
   useEffect(() => {
 
@@ -72,6 +75,7 @@ export default function AuctionJoin() {
   }, [itemId]);
 
   useEffect(() => {
+    let timer;
     setIsJoin(true);
     if (allow === false || !getCookie("user")) {
       setIsJoin(false);
@@ -98,6 +102,17 @@ export default function AuctionJoin() {
           });
           setIsJoin(false);
         }, 1000);
+        console.log("reload in ", new Date(endDate).getTime() - new Date().getTime());
+        if(new Date(endDate) > new Date()) {
+          console.log("reload in ", new Date(endDate).getTime() - new Date().getTime());
+          timer = setTimeout(() => {
+            console.log('Reloading...');
+            window.location.reload();
+          }, (new Date(endDate).getTime() - new Date().getTime() -500));
+        }
+      },onDisconnect: () => {
+        console.log('Disconnected');
+        clearTimeout(timer);
       },
       onStompError: (error) => {
         console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
@@ -129,6 +144,7 @@ export default function AuctionJoin() {
       client?.deactivate({ force: true });
       setClient(null);
       setAllow(false);
+      setIsJoin(false);
       return;
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
@@ -184,6 +200,14 @@ export default function AuctionJoin() {
       console.log(res);
       setBids(res.data);
       bids.sort((a, b) => { return a.price - b.price });
+      console.log(res.data.length > 0 , new Date(endDate) < new Date());
+      if (res.data.length > 0 && new Date(endDate) < new Date()) {
+        console.log("here");
+        setShowCofetti(true);
+        setTimeout(() => {
+          setShowCofetti(false);
+        },5000)
+      }
     }).catch((err) => {
       console.log(err);
     });
@@ -234,6 +258,20 @@ export default function AuctionJoin() {
 
   return (
     <>
+    {
+      showCofetti && <div className='fixed z-10 bg-red-200/15 w-full h-full'>
+        <Confetti mode='fall'  colors={['#ff577f', '#ff884b']} />
+        <Card className='w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+          <CardHeader>
+            <CardTitle>Congratulations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {bids[0].account.nickname} won the auction
+            <p className='text-foreground font-semibold'>{currency.format({ amount: bids[0].price })}</p>
+          </CardContent>
+        </Card>
+        </div>
+    }
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
         auctionSession != undefined ?
           <div className="flex flex-col min-h-screen container p-3 gap-10">
