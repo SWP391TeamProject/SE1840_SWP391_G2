@@ -18,6 +18,7 @@ import { Form } from "@/components/ui/form";
 import { AuctionSessionStatus } from "@/models/newModel/auctionSession";
 import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
+import { inviteAll } from "@/services/NotificationService";
 
 const formSchema = z.object({
     auctionSessionId: z.number(),
@@ -62,7 +63,7 @@ export default function AuctionSessionDetail() {
     }
 
     useEffect(() => {
-        if (!auctionSession) {
+        if (!auctionSession || auctionSession.auctionSessionId != Number.parseInt(id)) {
             console.log(auctionSession);
             fetchAuctionSessionById(parseInt(id)).then((res) => {
                 console.log(res);
@@ -109,6 +110,19 @@ export default function AuctionSessionDetail() {
         });
     }
 
+    const handleInviteAll = () => {
+        inviteAll(currentAuctionSession?.auctionSessionId).then((res) => {
+            console.log(res);
+            toast.success(`Invite All to Auction ${currentAuctionSession?.auctionSessionId} Successfully`,{
+                position:"bottom-right",
+            });
+        }).catch((err) => {
+            toast.error(err.response.data.message,{
+                position:"bottom-right",
+            })
+        });
+    }
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -140,7 +154,11 @@ export default function AuctionSessionDetail() {
                                     {
                                       currentAuctionSession?.status !== AuctionSessionStatus.FINISHED &&
                                       currentAuctionSession?.status !== AuctionSessionStatus.TERMINATED
-                                            && <Button type="button" onClick={handleTerminateSession} className="m-2">Terminate Session</Button>
+                                            && 
+                                            <>
+                                                <Button type="button" onClick={handleTerminateSession} className="m-2">Terminate Session</Button>
+                                                <Button type="button" onClick={handleInviteAll} className="m-2">Invite All User</Button>
+                                            </>
                                     }
                                 </CardContent>
                             </Card>

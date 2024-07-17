@@ -142,6 +142,7 @@ export const updateAccountService = async (data: any, id: number) => {
 
 
 export const deleteAccountService = async (id: string) => {
+  console.log(id);
   return await axios
     .post(API_SERVER + "/accounts/" + id,{},{
       headers: {
