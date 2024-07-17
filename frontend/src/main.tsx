@@ -100,6 +100,7 @@ import {PublicItemDetail} from "@/pages/CustomerSite/Item/PublicItemDetail.tsx";
 import {
   OrderCheckout
 } from "@/pages/CustomerSite/dashboard/orders/OrderCheckout.tsx";
+import { Toaster } from "@/components/ui/sonner"
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -315,6 +316,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}
+                <Toaster position="bottom-center" richColors />
 
               </TooltipProvider>
             </CurrencyProvider>

@@ -17,7 +17,8 @@ import { AccountStatus } from "@/constants/enums"
 import { DeleteAccountsDialog } from "./delete-accounts-dialog"
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
 import { activateAccountService, deleteAccountService } from "@/services/AccountsServices"
-import { toast } from "react-toastify"
+import { showErrorToast } from "@/lib/handle-error"
+import { toast } from "sonner"
 
 // Define the JewelryItem type based on the provided JSON structure
 type Account = {
@@ -153,19 +154,14 @@ export const getColumns = (): ColumnDef<Account>[] => [
       }
       
       const suspendAccount = (id: string) => {
-        // try {
           deleteAccountService(id).then((res) => {
             if(res) {
               toast.success("Account suspended")
             }
             setShowDeleteItemDialog(false)
           }).catch((err) => {
-            toast.error(err.response.data.message)
+            showErrorToast(err)
           })
-        // } catch (error){
-        //   console.log(error);
-        //   toast.error(error)
-        // }
       }
 
       const activateAccount = (id: string) => {
@@ -175,7 +171,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
             }
             setShowDeleteItemDialog(false)
           }).catch((err) => {
-            toast.error(err.response.data.message)
+            showErrorToast(err)
           })
       }
 

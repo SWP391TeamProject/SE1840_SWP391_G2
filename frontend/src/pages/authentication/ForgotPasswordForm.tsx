@@ -5,8 +5,9 @@ import {Loader2} from "lucide-react";
 import {useState} from "react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {requestResetPassword} from "@/services/AuthService.ts";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {Card} from "@/components/ui/card.tsx";
+import { showErrorToast } from "@/lib/handle-error";
 
 type FormValues = {
     email: string;
@@ -32,9 +33,7 @@ function ForgotPasswordForm() {
                 });
             })
             .catch(err => {
-                toast.error(err.response.data.message,{
-                    position:"bottom-right",
-                });
+                showErrorToast(err);
                 setLocked(false);
             });
     };

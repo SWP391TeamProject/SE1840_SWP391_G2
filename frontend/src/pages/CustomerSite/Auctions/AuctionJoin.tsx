@@ -85,9 +85,7 @@ export default function AuctionJoin() {
     }
     const newClient = new Client({
       brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
-      // onDisconnect: () => {
-      //   toast.error('You have been disconnected from the auction');
-      // },
+  
       onConnect: () => {
         newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
         setTimeout(() => {
@@ -138,7 +136,7 @@ export default function AuctionJoin() {
 
     if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
       toast.error(payload.body.split(":")[0], {
-        position: "bottom-right",
+        
       });
       client?.forceDisconnect();
       client?.deactivate({ force: true });
@@ -150,7 +148,7 @@ export default function AuctionJoin() {
     if (JSON.parse(payload.body).statusCodeValue == 400) {
       if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
         toast.error(JSON.parse(payload.body)?.body?.message, {
-          position: "bottom-right",
+          
         });
         setIsSending(false);
       }
@@ -161,7 +159,7 @@ export default function AuctionJoin() {
     if (message?.status == "JOIN" || message?.status == "BID") {
       if (message?.status == "BID")
         toast.info(message?.message, {
-          position: "bottom-right",
+          
         });
         setIsSending(false);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
@@ -176,7 +174,7 @@ export default function AuctionJoin() {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
         toast.error("Please enter a valid number", {
-          position: "bottom-right",
+          
         });
         return;
       }

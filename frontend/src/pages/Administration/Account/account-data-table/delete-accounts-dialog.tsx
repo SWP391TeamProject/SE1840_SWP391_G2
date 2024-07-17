@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/dialog"
 import { AccountStatus } from "@/constants/enums"
 import { activateAccountService, deleteAccountService } from "@/services/AccountsServices"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
+import { showErrorToast } from "@/lib/handle-error"
 
 interface DeleteTasksDialogProps
   extends React.ComponentPropsWithoutRef<typeof Dialog> {
@@ -64,32 +65,21 @@ export function DeleteAccountsDialog({
               startDeleteTransition(() => {
                 if(items.length == 1){
                   if(items[0].status == AccountStatus.ACTIVE){
-                    try {
                         deleteAccountService(items[0].accountId).then((res) => {
                           if(res)
                             toast.success("Account suspended")
-                          else if(res.error)
-                            toast.error(res.error)
-                          return
+                        }).catch((err) => {
+                          showErrorToast(err)
                         })
-                    } catch (error) {
-                      toast.error(error)
-                      return
-                    }                  
+                            
                   } 
                   else if(items[0].status == AccountStatus.DISABLED){
-                    try {
                        activateAccountService(items[0].accountId).then((res) => {
                           if(res)
                             toast.success("Account activated")
-                          else if(res.error)
-                            toast.error(res.error)
-                          return
-                        })
-                    } catch (error) {
-                      toast.error(error)
-                      return
-                    }                  
+                        }).catch((err) => {
+                          showErrorToast(err)
+                        })      
                   } else if (items[0].status == AccountStatus.DISABLED){
   
                   }

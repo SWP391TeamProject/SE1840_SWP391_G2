@@ -1,4 +1,4 @@
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 import { z } from "zod"
 
 export function getErrorMessage(err: unknown) {
@@ -16,7 +16,12 @@ export function getErrorMessage(err: unknown) {
   }
 }
 
-export function showErrorToast(err: unknown) {
+export function showErrorToast(err: any ) {
   const errorMessage = getErrorMessage(err)
-  return toast.error(errorMessage)
+  return toast.error(err.response.data.message ?? errorMessage, {
+        
+    richColors: true,
+    cancel: true,
+    important: true,
+  })
 }

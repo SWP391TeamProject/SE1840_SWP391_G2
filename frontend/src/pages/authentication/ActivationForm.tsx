@@ -3,7 +3,6 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {toast} from "react-toastify";
 import {Loader2} from "lucide-react";
 import {activateAccount} from "@/services/AuthService.ts";
 import {
@@ -22,6 +21,8 @@ import {
 import {zodResolver} from "@hookform/resolvers/zod"
 import {z} from "zod"
 import {REGEXP_ONLY_DIGITS} from "input-otp";
+import { showErrorToast } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     code: z.string().length(6, {
@@ -58,9 +59,7 @@ function ActivationForm() {
                     position:"bottom-right",
                 });
             } else {
-                toast.error(err.message,{
-                    position:"bottom-right",
-                });
+                showErrorToast(err);
             }
             setLocked(false);
         });

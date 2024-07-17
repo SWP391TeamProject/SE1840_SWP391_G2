@@ -15,7 +15,7 @@ import {Form,} from "@/components/ui/form"
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {
   ConfirmationDialog
 } from "@/components/confirmation/confirmation-dialog";
@@ -23,6 +23,7 @@ import {setCurrentItem} from "@/redux/reducers/Items.tsx";
 import {ItemStatus} from "@/models/Item.ts";
 import ProductProperties
   from "@/pages/Administration/item/itemDetail/ProductProperties.tsx";
+import { showErrorToast } from "@/lib/handle-error";
 
 const formSchema = z.object({
   itemId: z.number(), categoryId: z.string().regex(/\d+/, {
@@ -107,9 +108,8 @@ export default function ItemDetail() {
       setIsLoading(false);
     }).catch((e) => {
       console.error(e);
-      toast.error('Error when loading item detail!', {
-        position: "bottom-right",
-      });
+      showErrorToast(e);
+
     });
   }, []);
 
@@ -135,14 +135,13 @@ export default function ItemDetail() {
     updateItem(dto).then((res) => {
       console.log(res)
       toast.success("Item updated successfully!", {
-        position: "bottom-right",
+        
       });
       dispatch(setCurrentItem(res.data));
     }).catch((err) => {
       console.error(err)
-      toast.error("Failed to update item", {
-        position: "bottom-right",
-      });
+      showErrorToast(err);
+
     }).finally(() => {
       setIsLoading(false);
     });

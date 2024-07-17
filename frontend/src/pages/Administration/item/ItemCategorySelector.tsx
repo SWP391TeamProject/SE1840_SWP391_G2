@@ -16,9 +16,10 @@ import {
   getAllItemCategories,
   ItemCategoryRequestDTO
 } from "@/services/ItemCategoryService.ts";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {useEffect, useState} from "react";
 import {ItemCategory} from "@/models/newModel/itemCategory.ts";
+import { showErrorToast } from "@/lib/handle-error";
 
 export default function ItemCategorySelector(props: SelectProps) {
   const [categories, setCategories] = useState<ItemCategory[]>([]);
@@ -29,9 +30,8 @@ export default function ItemCategorySelector(props: SelectProps) {
       setCategories(res.data.content);
     }).catch((e) => {
       console.error(e);
-      toast.error('Failed to fetch item categories!', {
-        position: "bottom-right",
-      });
+      showErrorToast(e);
+
     });
   }, []);
 
@@ -48,29 +48,20 @@ export default function ItemCategorySelector(props: SelectProps) {
       });
     }).catch(e => {
       console.error(e);
-      toast.error("Failed to create item category", {
-        position: "bottom-right"
-      });
+      showErrorToast(e);
+
     });
   }
 
   const deleteCategory = (id: number) => {
     deleteItemCategory(id).then((res) => {
-      if (res.status == 200) {
         setCategories(categories.filter(x => x.itemCategoryId != id));
         toast.success("Item category deleted", {
           position: "bottom-right"
         });
-      } else {
-        toast.error("Failed to delete item category", {
-          position: "bottom-right"
-        });
-      }
     }).catch(e => {
       console.error(e);
-      toast.error("Delete failed", {
-        position: "bottom-right"
-      });
+      showErrorToast(e);
     });
   }
 
