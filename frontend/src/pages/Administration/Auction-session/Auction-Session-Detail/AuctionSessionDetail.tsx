@@ -62,7 +62,7 @@ export default function AuctionSessionDetail() {
     }
 
     useEffect(() => {
-        if (!auctionSession) {
+        if (!auctionSession || auctionSession.auctionSessionId != Number.parseInt(id)) {
             console.log(auctionSession);
             fetchAuctionSessionById(parseInt(id)).then((res) => {
                 console.log(res);

@@ -14,6 +14,10 @@ import { DataTableColumnHeader } from "@/components/data-tables/data-table-colum
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { AccountStatus } from "@/constants/enums"
+import { DeleteAccountsDialog } from "./delete-accounts-dialog"
+import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
+import { activateAccountService, deleteAccountService } from "@/services/AccountsServices"
+import { toast } from "react-toastify"
 
 // Define the JewelryItem type based on the provided JSON structure
 type Account = {
@@ -147,9 +151,63 @@ export const getColumns = (): ColumnDef<Account>[] => [
         // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
         nav(`/admin/accounts/${accountId}`);
       }
+      
+      const suspendAccount = (id: string) => {
+        try {
+          deleteAccountService(id).then((res) => {
+            if(res) {
+              toast.success("Account suspended")
+            }
+            setShowDeleteItemDialog(false)
+          })
+        } catch (error){
+          console.log(error);
+          toast.error(error)
+        }
+      }
+
+      const activateAccount = (id: string) => {
+        try {
+          activateAccountService(id).then((res) => {
+            if(res) {
+              toast.success("Account activated")
+            }
+            setShowDeleteItemDialog(false)
+          })
+        } catch (error){
+          toast.error(error)
+        }
+      }
+
       return (
         <>
           {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
+          {/* <DeleteAccountsDialog
+              open={showDeleteItemDialog}
+              onOpenChange={setShowDeleteItemDialog}
+              items={[row.original]}
+              showTrigger={false}
+              onSuccess={() => row.toggleSelected(false)}
+            /> */}
+          {
+            row.original.status == AccountStatus.ACTIVE ?
+              <ConfirmationDialog
+                open={showDeleteItemDialog}
+                onOpenChange={setShowDeleteItemDialog}
+                message={"Are you sure to suspend account " + row.original.accountId + "?"}
+                title={"Suspend Account"}
+                label={"Suspend"}
+                description={""}
+                onSuccess={() => suspendAccount(row.original.accountId.toString())} /> :
+              <ConfirmationDialog
+                open={showDeleteItemDialog}
+                onOpenChange={setShowDeleteItemDialog}
+                message={"Are you sure to activate account " + row.original.accountId + "?"}
+                title={"Activate Account"}
+                label={"Activate"}
+                description={""}
+                onSuccess={() => activateAccount(row.original.accountId.toString())} />
+          }
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -167,7 +225,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setShowDeleteItemDialog(true)}>
-                Delete
+                {row.original.status == AccountStatus.ACTIVE ? "Suspend" : "Activate"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
