@@ -1,191 +1,199 @@
-import { useAppSelector } from "@/redux/hooks";
-import { useEffect, useLayoutEffect, useState } from "react";
+import {useAppDispatch, useAppSelector} from "@/redux/hooks";
+import {useEffect, useState} from "react";
 import ProductDetail from "./ProductDetail";
 import ProductStatus from "./ProductStatus";
 import ProductCategory from "./ProductCategory";
 import ProductImageGallery from "./ProductImageGallery";
-import { useParams } from "react-router-dom";
-import { getItemById, updateItem } from "@/services/ItemService";
-import { Item } from "@/models/Item";
-import { Loader2 } from "lucide-react";
+import {Link, useParams} from "react-router-dom";
+import {getItemById, updateItem} from "@/services/ItemService";
+import {Loader2} from "lucide-react";
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
 import ProductPrice from "./ProductPrice";
 
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
+import {Form,} from "@/components/ui/form"
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {toast} from "react-toastify";
 import {
-  Form,
-} from "@/components/ui/form"
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
-import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog";
+  ConfirmationDialog
+} from "@/components/confirmation/confirmation-dialog";
+import {setCurrentItem} from "@/redux/reducers/Items.tsx";
+import {ItemStatus} from "@/models/Item.ts";
+import ProductProperties
+  from "@/pages/Administration/item/itemDetail/ProductProperties.tsx";
 
 const formSchema = z.object({
-  description: z.string(),
-  buyInPrice: z.coerce.number().min(0).max(100000000),
-  status: z.string(),
-  itemId: z.number(),
-  name: z.string(),
-  category: z.object({
-    itemCategoryId: z.string(),
-  })
-})
-
-
-
+  itemId: z.number(), categoryId: z.string().regex(/\d+/, {
+    message: "Please select a category.",
+  }),
+  name: z.string().min(5, {
+    message: "Name must be at least 5 characters long.",
+  }).max(300, {
+    message: "Name must not exceed 50 characters.",
+  }),
+  description: z.string().min(5, {
+    message: "Description must be at least 5 characters long.",
+  }).max(50000, {
+    message: "Description must not exceed 50000 characters.",
+  }),
+  reservePrice: z.coerce.number({
+    message: "Reserve price must be a number.",
+  }).min(0, {
+    message: "Reserve price must be at least 0.",
+  }),
+  buyInPrice: z.coerce.number({
+    message: "Buy in price must be a number.",
+  }).min(0, {
+    message: "Buy in price must be at least 0."
+  }),
+  color: z.string().optional(),
+  size: z.string().optional(),
+  weight: z.string().optional(),
+  brand: z.string().optional(),
+  age: z.string().regex(/^\d*$/, {
+    message: "Age must be a number.",
+  }),
+  material: z.string().optional(),
+  status: z.nativeEnum(ItemStatus)
+});
 
 export default function ItemDetail() {
-  let item = useAppSelector((state) => state.items.currentItem);
-  const [currentItem, setCurrentItem] = useState<Item | null>(null);
-  const { id } = useParams<{ id: string }>();
-  const [isloading, setIsLoading] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const itemId = parseInt(useParams().id);
+  const item = useAppSelector((state) => state.items.currentItem);
+  const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(true);
   const [showTrigger, setShowTrigger] = useState(false);
-  const [formValues, setFormValues] = useState();
-  // 1. Define your form.
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      itemId: -1,
+      categoryId: "1",
+      name: "",
+      description: "",
+      reservePrice: 0,
+      buyInPrice: 0,
+      color: "",
+      size: "",
+      weight: "",
+      brand: "",
+      age: "",
+      material: "",
+      status: ItemStatus.QUEUE,
     },
-  })
-  useLayoutEffect(() => {
-    if (!item) {
-      console.log(item);
-      getItemById(parseInt(id)).then((res) => {
-        item = res.data;
-        setCurrentItem(item);
-        form.reset({
-          itemId: item.itemId,
-          description: item.description,
-          buyInPrice: item.buyInPrice,
-          category: {
-            itemCategoryId: item.category?.itemCategoryId.toString()
-          },
-          name: item.name,
-          status: item?.status,
-        });
-      });
-
-    } else {
-      setCurrentItem(item);
-      form.reset({
-        itemId: item.itemId,
-        description: item.description,
-        buyInPrice: item.buyInPrice,
-        category: {
-          itemCategoryId: item.category?.itemCategoryId.toString()
-        },
-        name: item.name,
-        status: item?.status,
-      });
-    }
-  }, []);
-
-  const confirm = () => {
-    setIsConfirmed(true);
-    setShowTrigger(false);
-  }
-
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // setIsLoading(true);
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log("validated")
-    console.log(values)
-    setShowTrigger(true);
-    setFormValues(values);
-
-    console.log(showTrigger);
-
-    // if (isConfirmed) {
-    //   updateItem(values).then((res) => {
-
-    //     console.log(res)
-    //     toast.success('Item updated successfully!', {
-    //       position: "bottom-right",
-    //     });
-    //     setIsLoading(false);
-    //   }).catch((err) => {
-    //     setIsLoading(false);
-    //     toast.error(err.response.data.message, {
-    //       position: "bottom-right",
-    //     });
-    //     console.error(err)
-    //   })
-    // } else {
-    //   setIsLoading(false);
-    // }
-  }
-
-  const handleConfirmed = (values: any) => {
-    setIsLoading(true);
-    updateItem(values).then((res) => {
-      console.log(res)
-      toast.success('Item updated successfully!', {
-        position: "bottom-right",
-      });
-      setIsLoading(false);
-    }).catch((err) => {
-      setIsLoading(false);
-      toast.error(err.response.data.message, {
-        position: "bottom-right",
-      });
-      console.error(err)
-    })
-  }
+  });
 
   useEffect(() => {
-    if(isConfirmed){
-      if(formValues) {
-        handleConfirmed(formValues);
-        setIsConfirmed(false);
-      }
-    } 
-  }, [isConfirmed])
+    getItemById(itemId).then((res) => {
+      const i = res.data;
+      dispatch(setCurrentItem(i));
+      form.reset({
+        itemId: i.itemId,
+        categoryId: i.category.itemCategoryId.toString(),
+        name: i.name,
+        description: i.description,
+        reservePrice: i.reservePrice,
+        buyInPrice: i.buyInPrice,
+        color: i.color,
+        size: i.size,
+        weight: i.weight,
+        brand: i.brand,
+        age: (i.age || 0).toString(),
+        material: i.material,
+        status: i.status
+      });
+      setIsLoading(false);
+    }).catch((e) => {
+      console.error(e);
+      toast.error('Error when loading item detail!', {
+        position: "bottom-right",
+      });
+    });
+  }, []);
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+
+    interface DTO extends Omit<z.infer<typeof formSchema>, 'categoryId' | 'age'> {
+      categoryId?: number;
+      age?: number;
+    }
+
+    const dto: DTO = {
+      ...values,
+      categoryId: parseInt(values.categoryId),
+      age: values.age.length == 0 ? undefined : parseInt(values.age),
+    };
+
+    if (item.status != ItemStatus.QUEUE) {
+      dto.reservePrice = undefined;
+      dto.buyInPrice = undefined;
+    }
+
+    updateItem(dto).then((res) => {
+      console.log(res)
+      toast.success("Item updated successfully!", {
+        position: "bottom-right",
+      });
+      dispatch(setCurrentItem(res.data));
+    }).catch((err) => {
+      console.error(err)
+      toast.error("Failed to update item", {
+        position: "bottom-right",
+      });
+    }).finally(() => {
+      setIsLoading(false);
+    });
+  }
 
   return (
     <>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {currentItem?.name === undefined
-            ? <LoadingAnimation message="loading item detail..." />
-            : <div className="container flex flex-row flex-nowrap">
-
-              <div className="basis-8/12 p-3 flex flex-col gap-3">
-                <ProductDetail item={currentItem} name={currentItem?.name} description={currentItem?.description} form={form} />
-                <ProductImageGallery images={currentItem?.attachments} />
+      {isLoading || item == undefined ?
+        <LoadingAnimation message="loading item detail..."/> :
+        <>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="container flex flex-row flex-nowrap">
+                <div className="basis-8/12 p-3 flex flex-col gap-3">
+                  <ProductDetail item={item} form={form}/>
+                  <ProductImageGallery item={item}/>
+                </div>
+                <div className="basis-4/12 p-3 flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-5">
+                    {isLoading ?
+                      <Button type="button" disabled><Loader2
+                        className="animate-spin"/></Button> :
+                      <Button type="button" onClick={() => {
+                        setShowTrigger(true);
+                      }}>Save</Button>
+                    }
+                    <Button type="submit" variant="outline" asChild>
+                      <Link to={`/item/${item.itemId}`}>Public view</Link>
+                    </Button>
+                  </div>
+                  <ProductStatus item={item} form={form}/>
+                  <ProductCategory item={item} form={form}/>
+                  <ProductPrice item={item} form={form}/>
+                  <ProductProperties item={item} form={form}/>
+                </div>
               </div>
-              <div className="basis-4/12 p-3 flex flex-col gap-3">
-                {isloading
-                  ? <Button type="submit" disabled>
-                    <Loader2 className="animate-spin" />
-                  </Button>
-                  : <Button type="submit" >
-                    Save
-                  </Button>
-
-                }
-
-                <ProductStatus form={form} />
-                <ProductCategory form={form} />
-                <ProductPrice item={currentItem} form={form} />
-
-              </div>
-            </div>
-          }
-
-        </form>
-      </Form>
-        <ConfirmationDialog
-          open={showTrigger}
-          onOpenChange={setShowTrigger}
-          title="Are you sure to update this item?"
-          message={"Item " + currentItem?.name}
-          label="Ok"
-          onSuccess={confirm}
-        />
+            </form>
+          </Form>
+          <ConfirmationDialog
+            open={showTrigger}
+            onOpenChange={setShowTrigger}
+            title="Are you sure to update this item?"
+            message={"Item " + item?.name}
+            label="Ok"
+            onSuccess={() => {
+              setShowTrigger(false);
+              form.handleSubmit(onSubmit)();
+            }}
+            description=""
+          />
+        </>}
     </>
   );
 

@@ -47,6 +47,10 @@ public class NotificationController {
         return new ResponseEntity<>(notificationService.countUnreadNotifications(principal.getName()), HttpStatus.OK);
     }
 
-
+    @PostMapping("/invite-alll/{auctionSessionId}")
+    public ResponseEntity<String> inviteAll(@PathVariable int auctionSessionId) {
+        notificationService.sendInvitationToAllMembers(auctionSessionId);
+        return ResponseEntity.ok("Invitations sent successfully.");
+    }
 
 }

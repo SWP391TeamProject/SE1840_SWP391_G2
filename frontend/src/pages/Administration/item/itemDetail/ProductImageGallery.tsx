@@ -1,4 +1,3 @@
-
 import {
     Card,
     CardContent,
@@ -7,10 +6,11 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import {Item} from "@/models/Item.ts";
 
-
-
-export default function ProductImageGallery({...props}) {
+export default function ProductImageGallery(props: {
+    item: Item
+}) {
     return (
         <Card className="overflow-hidden  w-full h-[400px]">
             <CardHeader>
@@ -22,7 +22,7 @@ export default function ProductImageGallery({...props}) {
             <CardContent className="flex justify-center items-center">
                 <Carousel className="w-full max-w-xs">
                     <CarouselContent className="w-full">
-                        {props.images && props.images?.map((image) => (
+                        {props.item.attachments && props.item.attachments.map((image) => (
                             <CarouselItem key={image.attachmentId} className="basis-1/2 ">
 
                                 <img

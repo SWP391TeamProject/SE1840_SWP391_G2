@@ -3,7 +3,6 @@
 import * as React from "react"
 import { ReloadIcon, TrashIcon } from "@radix-ui/react-icons"
 import { type Row } from "@tanstack/react-table"
-import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-
+import { AccountStatus } from "@/constants/enums"
+import { activateAccountService, deleteAccountService } from "@/services/AccountsServices"
+import { toast } from "react-toastify"
 
 interface DeleteTasksDialogProps
   extends React.ComponentPropsWithoutRef<typeof Dialog> {
@@ -39,7 +40,7 @@ export function DeleteAccountsDialog({
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-            Delete ({items.length})
+            Suspend ({items.length})
           </Button>
         </DialogTrigger>
       ) : null}
@@ -47,9 +48,9 @@ export function DeleteAccountsDialog({
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your{" "}
+            This will suspend your{" "}
             <span className="font-medium">{items.length}</span>
-            {items.length === 1 ? " task" : " tasks"} from our servers.
+            {items.length === 1 ? " account" : " accounts"} on our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:space-x-0">
@@ -58,22 +59,43 @@ export function DeleteAccountsDialog({
           </DialogClose>
           <Button
             aria-label="Delete selected rows"
-            variant="destructive"
+            variant={items[0].status == AccountStatus.ACTIVE ? "destructive" : "default"}
             onClick={() => {
-            //   startDeleteTransition(async () => {
-            //     const { error } = await deleteItem({
-            //       ids: items.map((task) => items.id),
-            //     })
-
-            //     if (error) {
-            //       toast.error(error)
-            //       return
-            //     }
-
-            //     props.onOpenChange?.(false)
-            //     toast.success("Tasks deleted")
-            //     onSuccess?.()
-            //   })
+              startDeleteTransition(() => {
+                if(items.length == 1){
+                  if(items[0].status == AccountStatus.ACTIVE){
+                    try {
+                        deleteAccountService(items[0].accountId).then((res) => {
+                          if(res)
+                            toast.success("Account suspended")
+                          else if(res.error)
+                            toast.error(res.error)
+                          return
+                        })
+                    } catch (error) {
+                      toast.error(error)
+                      return
+                    }                  
+                  } 
+                  else if(items[0].status == AccountStatus.DISABLED){
+                    try {
+                       activateAccountService(items[0].accountId).then((res) => {
+                          if(res)
+                            toast.success("Account activated")
+                          else if(res.error)
+                            toast.error(res.error)
+                          return
+                        })
+                    } catch (error) {
+                      toast.error(error)
+                      return
+                    }                  
+                  } else if (items[0].status == AccountStatus.DISABLED){
+  
+                  }
+              }
+              props.onOpenChange?.(false)
+              onSuccess?.()})
             }}
             disabled={isDeletePending}
           >
@@ -83,7 +105,7 @@ export function DeleteAccountsDialog({
                 aria-hidden="true"
               />
             )}
-            Delete
+            {items[0].status == AccountStatus.ACTIVE ? "Suspend" : "Activate"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -102,9 +102,9 @@ export const getColumns = (): ColumnDef<Order>[] => [
   {
     accessorKey: "orderId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Order ID" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("orderId")}</div>,
+    cell: ({ row }) => <div className="w-5">{row.getValue("orderId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -115,7 +115,7 @@ export const getColumns = (): ColumnDef<Order>[] => [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[7.25rem] truncate font-medium">
+        <span className="max-w-[10rem] truncate font-medium">
           ${row.original.payment.paymentAmount}
         </span>
       </div>
@@ -127,7 +127,7 @@ export const getColumns = (): ColumnDef<Order>[] => [
       <DataTableColumnHeader column={column} title="Shipping Address" />
     ),
     cell: ({ row }) => (
-      <div className="font-medium">
+      <div className="font-medium max-w-[20rem]">
         {row.original.shippingAddress}
       </div>
     ),

@@ -1,337 +1,340 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
 
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { create } from "domain"
-import { ItemStatus } from "@/models/Item"
-import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import {Input} from "@/components/ui/input"
+import {ScrollArea} from "@/components/ui/scroll-area"
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
-import { useEffect, useState } from "react"
-import { ItemCategoryRequestDTO, createItemCategory, deleteItemCategory, getAllItemCategories } from "@/services/ItemCategoryService"
-import { toast } from "react-toastify"
-import { ItemCategory } from "@/models/newModel/itemCategory"
-import { SelectGroup } from "@radix-ui/react-select"
-import axios from "axios"
-import { createItem, createItemFromConsignment } from "@/services/ItemService"
-import { getCookie } from "@/utils/cookies"
+import {useState} from "react"
+import {toast} from "react-toastify"
+import {createItem, uploadItemAttachment} from "@/services/ItemService"
 import TextEditor from "@/components/component/TextEditor"
-import { MinusCircle, PlusCircle } from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
-const statusValues = Object.values(ItemStatus);
+import {useLocation, useNavigate} from "react-router-dom"
+import {useAuth} from "@/AuthProvider.tsx";
+import LoadingAnimation
+  from "@/components/loadingAnimation/LoadingAnimation.tsx";
+import ItemCategorySelector
+  from "@/pages/Administration/item/ItemCategorySelector.tsx";
 
 const FormSchema = z.object({
-    categoryId: z.string({
-        required_error: "Please select category to display.",
-    }),
-    name: z.string().min(3, {
-        message: "Name must be at least 3 characters long.",
-    }).max(50, {
-        message: "Name must not exceed 50 characters.",
-    }),
-    description: z.string().min(3, {
-        message: "Description must be at least 3 characters long.",
-    }).max(50000, {
-        message: "Description must not exceed 50000 characters.",
-    }),
-    reservePrice: z.coerce.number({
-        message: "Reserve price must be a number.",
-    }).min(0,{
-        message: "Reserve price must be at least 0.",
-    }),
-    buyInPrice: z.coerce.number({
-        message: "Buy in price must be a number.",
-    }).min(0,{
-        message: "Buy in price must be at least 0."
-    }),
-    status: z.enum(statusValues),
-    ownerId: z.number(),
-    files: z.any(),
+  categoryId: z.string().regex(/\d+/, {
+    message: "Please select a category.",
+  }),
+  name: z.string().min(5, {
+    message: "Name must be at least 5 characters long.",
+  }).max(50, {
+    message: "Name must not exceed 50 characters.",
+  }),
+  description: z.string().min(5, {
+    message: "Description must be at least 5 characters long.",
+  }).max(50000, {
+    message: "Description must not exceed 50000 characters.",
+  }),
+  reservePrice: z.coerce.number({
+    message: "Reserve price must be a number.",
+  }).min(0, {
+    message: "Reserve price must be at least 0.",
+  }),
+  buyInPrice: z.coerce.number({
+    message: "Buy in price must be a number.",
+  }).min(0, {
+    message: "Buy in price must be at least 0."
+  }),
+  ownerId: z.number({
+    message: "Owner must be specified.",
+  }),
+  color: z.string().optional(),
+  size: z.string().optional(),
+  weight: z.string().optional(),
+  brand: z.string().optional(),
+  age: z.string().regex(/^\d*$/, {
+    message: "Age must be a number.",
+  }),
+  material: z.string().optional(),
+  files: z.any(),
 });
+
 export default function ItemCreate() {
-    const nav = useNavigate();
-    const [categories, setCategories] = useState<ItemCategory[]>([]);
+  const auth = useAuth();
+  const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const consignmentId = location?.state?.consignmentId;
 
-    const location = useLocation();
-    const reservePrice = location?.state?.price;
-    const ownerId = location?.state?.ownerId;
-    const consignmentId = location?.state?.consignmentId;
-
-    console.log(reservePrice + "=" + ownerId + "=" + consignmentId);
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            name: "",
-            description: "",
-            status: ItemStatus.QUEUE,
-            categoryId: "",
-            reservePrice: reservePrice || "0",
-            buyInPrice: "0",
-            ownerId: ownerId || JSON.parse(getCookie("user"))?.id || -1,
-            files: [],
-        },
-    })
-
-    useEffect(() => {
-        getAllItemCategories(0, 50).then((res) => {
-            setCategories(res.data.content)
-            console.log(res.data.content);
-            // toast.success('Category fetched successfully!');
-        }
-        ).catch(error => {
-            toast.error(error, {
-                position: "bottom-right",
-            });
-        });
-    }, [])
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      categoryId: "1",
+      name: "",
+      description: "",
+      reservePrice: location?.state?.price || 0,
+      buyInPrice: 0,
+      ownerId: location?.state?.ownerId || auth.user.accountId,
+      color: "",
+      size: "",
+      weight: "",
+      brand: "",
+      age: "",
+      material: "",
+      files: [],
+    },
+  })
 
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        data.categoryId = categories.find((item) => item.name === data.categoryId)?.itemCategoryId;
-        console.log(data);
-        if (consignmentId == null) {
-            createItem(data).then((res) => {
-                console.log(res);
-                toast.success('Item created successfully!', {
-                    position: "bottom-right",
-                });
-                nav("/admin/items");
-            }
-            ).catch(error => {
-                console.log(error);
-                toast.error(error.response.data.message, {
-                    position: "bottom-right",
-                });
-            });
-        } else {
-            createItemFromConsignment(consignmentId, data).then((res) => {
-                console.log(res);
-                toast.success('Item created successfully!', {
-                    position: "bottom-right",
-                });
-                nav("/admin/items");
-            }
-            ).catch(error => {
-                console.log(error);
-                toast.error(error.response.data.message, {
-                    position: "bottom-right",
-                });
-            });
-        }
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    setLoading(true);
 
-
-
+    interface DTO extends Omit<z.infer<typeof FormSchema>, 'categoryId' | 'age' | 'files'> {
+      categoryId?: number;
+      age?: number;
+      consignmentId?: number;
     }
-    const createCategory = () => {
-        let newCategoy = (document.getElementById("newCategory") as HTMLInputElement).value;
-        console.log(newCategoy);
-        let category: ItemCategoryRequestDTO = { itemCategoryId: -1, name: newCategoy };
-        createItemCategory(category).then((res) => {
-            setCategories([...categories, res.data]);
-            toast.success("Create success", {
-                position: "bottom-right"
-            });
-            (document.getElementById("newCategory") as HTMLInputElement).value = "";
+
+    const dto: DTO = {
+      ...data,
+      categoryId: parseInt(data.categoryId),
+      age: data.age.length == 0 ? undefined : parseInt(data.age),
+      consignmentId
+    };
+
+    createItem(dto).then(async (res) => {
+      console.log(res);
+      if (data.files.length > 0) {
+        await uploadItemAttachment(res.data.itemId, {files: data.files}).then(() => {
+          toast.success('Attachment uploaded successfully!', {
+            position: "bottom-right",
+          });
         }).catch(error => {
-            toast.error("Create failed", {
-                position: "bottom-right"
-            });
+          console.error(error);
+          toast.error("Failed to upload attachments", {
+            position: "bottom-right",
+          });
         });
-    }
-    const deleteCategory = (id: number) => {
-        deleteItemCategory(id).then((res) => {
-            console.log(res);
-            if (res.status == 200) {
-                let newCategories = categories.filter(x => x.itemCategoryId != id);
-                setCategories(newCategories);
-                toast.success("Delete success", {
-                    position: "bottom-right"
-                });
-            } else {
-                toast.error("Delete failed", {
-                    position: "bottom-right"
-                });
-            }
-        }).catch(error => {
-            toast.error("Delete failed", {
-                position: "bottom-right"
-            });
-        });
-    }
-    return (
+      }
+      toast.success('Item created successfully!', {
+        position: "bottom-right",
+      });
+      nav("/admin/items");
+    }).catch(error => {
+      console.error(error);
+      toast.error("Failed to create item!", {
+        position: "bottom-right",
+      });
+      setLoading(false);
+    });
+  }
+
+  return (
+    <>
+      {loading ?
+        <LoadingAnimation/>
+        :
         <div className="p-10">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}
+                  className="w-2/3 space-y-6">
+              <FormField
+                control={form.control}
+                name="ownerId"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Owner ID</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Item name</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <ItemCategorySelector defaultValue={field.value}
+                                          onValueChange={field.onChange}/>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <TextEditor {...field} placeholder="description..."/>
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Item name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="shadcn" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    This is your public display name.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="status"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={ItemStatus.QUEUE}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a a category to display" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {Object.keys(ItemStatus).map((item: any) => {
-                                            return <SelectItem value={item}>{item}</SelectItem>
-                                        })}
-                                    </SelectContent>
-                                </Select>
-                                <FormDescription>
+              <FormField
+                control={form.control}
+                name="reservePrice"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Reserve Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Reserve Price is the initial price of the item.
+                    </FormDescription>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+              <FormField
+                control={form.control}
+                name="buyInPrice"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Buy In Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Buy in price is the price to purchase item straight away.
+                    </FormDescription>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                    <FormField
-                        control={form.control}
-                        name="categoryId"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Category</FormLabel>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {categories?.map((item) => (
-                                            <div className="flex  items-center justify-evenly " key={item.itemCategoryId}>
-                                                <SelectItem className="w-9/12" value={item.name} >
-                                                    {item.name}
-                                                </SelectItem>
-                                                <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={() => deleteCategory(item.itemCategoryId)}>
-                                                    <MinusCircle className="h-full w-6" />
-                                                </Button>
-                                            </div>
+              <FormField
+                control={form.control}
+                name="color"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Color</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                                        ))}
-                                        <div className="flex items-center justify-evenly ">
-                                            <Input placeholder="create new category" className='w-9/12' id='newCategory' />
-                                            <Button size="sm" variant="ghost" className="gap-1 w-2/12" onClick={createCategory}>
-                                                <PlusCircle className="h-full w-6" />
-                                            </Button>
-                                        </div>
-                                    </SelectContent>
-                                </Select>
-                                <FormDescription>Select the category.</FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+              <FormField
+                control={form.control}
+                name="size"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Size</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
+              <FormField
+                control={form.control}
+                name="weight"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Weight</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
+              <FormField
+                control={form.control}
+                name="brand"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Brand</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
+              <FormField
+                control={form.control}
+                name="age"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Age</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
-                                <FormControl>
-                                    <TextEditor {...field} placeholder="description..." />
-                                    {/* // <Textarea placeholder="shadcn" {...field} /> */}
-                                </FormControl>
-                                <FormDescription>
-                                    This is your public display name.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="reservePrice"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Reserve Price</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="enter reserve price" {...field} defaultValue={reservePrice || "0"} readOnly={reservePrice != null} />
-                                </FormControl>
-                                <FormDescription>
+              <FormField
+                control={form.control}
+                name="material"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Material</FormLabel>
+                    <FormControl>
+                      <Input type="text" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
 
-                                    this is the reserve price of the item.
+              <ScrollArea className="h-[200px]">
+                <FormField
+                  control={form.control}
+                  name="files"
+                  render={({field}) => (
+                    <FormItem>
+                      <FormLabel>Attachments</FormLabel>
+                      <FormControl>
+                        <DropzoneComponent {...field} control={form.control}/>
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              </ScrollArea>
 
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="buyInPrice"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Buy In Price</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="enter buy in price" {...field} />
-                                </FormControl>
-                                <FormDescription>
-
-                                    this is the buy in price of the item.
-
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <ScrollArea className="h-[200px]">
-                        <FormField
-                            control={form.control}
-                            name="files"
-                            render={({ field }) => (
-                                <DropzoneComponent {...field} />
-                            )}
-                        />
-
-                    </ScrollArea>
-                    <Separator />
-                    <input type="hidden" {...form.register(`ownerId`)} />
-
-                    <Button className="sticky bottom-1" type="submit">Submit</Button>
-
-                </form>
-
-            </Form>
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
         </div>
-
-    )
+      }
+    </>
+  )
 }

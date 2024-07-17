@@ -8,9 +8,9 @@ import getColumns from "./auction-session-table-column";
 import { fetchAccountsService } from "@/services/AccountsServices";
 import { AcutionSessionsTableFloatingBar } from "./auction-session-table-floating-bar";
 import { AcutionSessionsTableToolbarActions } from "./auction-session-table-toolbar-actions";
-import { fetchAllAuctionSessions, getAllAuction } from "@/services/AuctionSessionService";
+import { getAuctions } from "@/services/AuctionSessionService";
 interface AcutionSessionTableProps {
-    acutionSessionPromise: ReturnType<typeof getAllAuction>;
+    acutionSessionPromise: ReturnType<typeof getAuctions>;
 }
 
 export function AcutionSessionsTable({ acutionSessionPromise }: AcutionSessionTableProps) {

@@ -37,4 +37,5 @@ public interface NotificationService {
     @NotNull Page<NotificationDTO> getNotifications(@NotNull Pageable pageable, String userEmail);
 
     int countUnreadNotifications(String userEmail);
+    void sendInvitationToAllMembers(int auctionSessionId);
 }

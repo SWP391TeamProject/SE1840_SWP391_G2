@@ -282,6 +282,18 @@ public class AttachmentServiceImpl implements AttachmentService {
         // Map the Attachment entity to an AttachmentDTO and return it
         return mapEntityToDTO(attachment);
     }
+
+    @Override
+    public  void deleteItemAttachment(int attachmentId, int itemId) {
+        Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
+        );
+        if (a.getItem() == null || a.getItem().getItemId() != itemId) {
+            throw new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist for item with id " + itemId);
+        }
+        attachmentRepository.delete(a);
+    }
+
     @Override
     public @NotNull AttachmentDTO uploadBlogAttachment(@NotNull MultipartFile file, Integer blogId) throws IOException {
         // Get the Item object from the itemId

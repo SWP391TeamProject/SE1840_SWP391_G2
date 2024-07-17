@@ -58,9 +58,9 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
   {
     accessorKey: "consignmentId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Consignment ID" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("consignmentId")}</div>,
+    cell: ({ row }) => <div className="w-3">{row.getValue("consignmentId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -94,7 +94,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
 
     ),
     cell: ({ row }) => (
-      <div className="font-medium">
+      <div className="font-medium max-w-[20rem]">
         {row.original.user.nickname ? row.original.user.nickname : ""}
       </div>
     ),

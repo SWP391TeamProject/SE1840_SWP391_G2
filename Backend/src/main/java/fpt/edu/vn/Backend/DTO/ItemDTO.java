@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,7 @@ public class ItemDTO implements Serializable {
     private String description;
     private BigDecimal reservePrice;
     private BigDecimal buyInPrice;
+    private BigDecimal soldPrice;
     private Item.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
@@ -41,6 +43,7 @@ public class ItemDTO implements Serializable {
         this.description = item.getDescription();
         this.reservePrice = item.getReservePrice();
         this.buyInPrice = item.getBuyInPrice();
+        this.soldPrice = item.getSoldPrice();
         this.status = item.getStatus();
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
@@ -53,6 +56,9 @@ public class ItemDTO implements Serializable {
         this.material = item.getMaterial();
         if (item.getOrder() != null)
             this.orderId = item.getOrder().getOrderId();
-        this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
+        if (item.getAttachments() != null)
+            this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
+        else
+            this.attachments = new HashSet<>();
     }
 }

@@ -2,7 +2,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, Pagi
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 
-export default function PagingIndexes(props: {pageNumber: number, totalPages: number, pageSelectCallback: any}) {
+export default function PagingIndexes(props: {pageNumber: number, totalPages: number, pageSelectCallback: any, className?: string}) {
   const indexButtons = [];
 
   const loadIndexButtons = () => {
@@ -80,7 +80,7 @@ export default function PagingIndexes(props: {pageNumber: number, totalPages: nu
 
   return (
 
-    <div className="flex justify-center mt-8">
+    <div className={`flex justify-center mt-8 ${props.className}`}>
 
       <Pagination>
         <PaginationContent>

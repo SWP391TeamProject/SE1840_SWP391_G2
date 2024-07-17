@@ -68,9 +68,9 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
   {
     accessorKey: "itemId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Item ID" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
-    cell: ({ row }) => <div className="w-20">{row.getValue("itemId")}</div>,
+    cell: ({ row }) => <div className="w-5">{row.getValue("itemId")}</div>,
     enableSorting: true,
     enableHiding: false,
   },
@@ -82,7 +82,7 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <Badge variant="outline">{row.original.category.name}</Badge>
-        <span className="max-w-[7.25rem] truncate font-medium">
+        <span className="max-w-[20rem] truncate font-medium">
           {row.getValue("name")}
         </span>
       </div>

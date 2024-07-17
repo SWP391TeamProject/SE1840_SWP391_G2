@@ -32,7 +32,7 @@ export default function AuctionSessionList() {
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let search = url.searchParams.get("search");
-  let pageNumber = url.searchParams.get("page");
+  let pageNumber = url.searchParams.get("page") || "1";
   let pageSize = url.searchParams.get("per_page");
   const auctionStates = ["Upcoming", "Past", "Active"];
   const [auctionSessionPromise, setAuctionSessionPromise] = useState<Promise<any>>();
@@ -179,13 +179,19 @@ export default function AuctionSessionList() {
   // useEffect(() => { }, [auctionSessionsList]);
 
   useEffect(() => {
+    console.log(pageNumber);
+    console.log(Number.parseInt(pageSize));
     if (Number.parseInt(pageNumber) >= 1)
       setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter }));
+    // else if (Number.parseInt(pageNumber) == 1 || pageNumber == null)
+    //   setAuctionSessionPromise(getAuctions({ page: 1, size: Number.parseInt(pageSize), status: statusFilter }));
   }, [pageSize, pageNumber])
 
   useEffect(() => {
     // fetchAuctionSessions(0);
     // setStatusFilter("all");
+    // if (Number.parseInt(pageNumber) != undefined)
+    //   setAuctionSessionPromise(getAuctions({ page: 1, size: Number.parseInt(pageSize), status: statusFilter }));
   }, []);
 
   return (

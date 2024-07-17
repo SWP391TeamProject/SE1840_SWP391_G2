@@ -19,7 +19,7 @@ import {
 interface ConfirmationDialogProps
   extends React.ComponentPropsWithoutRef<typeof Dialog> {
   showTrigger?: boolean
-  onSuccess?: () => void
+  onSuccess: () => void
   message: string
   title: string
   label: string

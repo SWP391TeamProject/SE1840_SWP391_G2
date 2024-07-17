@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import com.google.common.collect.Sets;
 import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.ItemUpdateDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
@@ -158,8 +159,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 auctionItem.setCurrentPrice(item.getReservePrice()); // Buy in price
                 auctionItemRepos.save(auctionItem);
 
-                item.setStatus(Item.Status.IN_AUCTION);
-                itemServiceImpl.updateItem(new ItemDTO(item));
+                itemServiceImpl.updateItem(ItemUpdateDTO.builder()
+                        .itemId(itemIds).status(Item.Status.IN_AUCTION).build());
             }
             for (Account a: accountRepos.findByRole(Account.Role.MEMBER)) {
                 if (!a.isDummy()) { // skip email for dummy accounts
@@ -263,6 +264,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             Item item = auctionItem.getItem();
             {
                 item.setStatus(bids.isEmpty() ? Item.Status.UNSOLD : Item.Status.SOLD);
+                if (!bids.isEmpty())
+                    item.setSoldPrice(bids.get(0).getAmount());
                 itemRepos.save(item);
             }
 

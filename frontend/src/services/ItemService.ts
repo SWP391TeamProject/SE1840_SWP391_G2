@@ -3,6 +3,8 @@ import { Item, ItemStatus } from "@/models/Item.ts";
 import { Page } from "@/models/Page.ts";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import { API_SERVER } from "@/constants/domain";
+import {Attachment} from "@/models/Attachment.ts";
+import {ItemUpdateDTO} from "@/models/ItemUpdateDTO.ts";
 
 // Service methods
 const baseUrl = API_SERVER + "/items";
@@ -95,33 +97,40 @@ export const getItemById = async (id: number) => {
     });
 };
 
-export const createItem = async (itemDTO: any) => {
+export const createItem = async (itemDTO: ItemUpdateDTO) => {
     return await axios.post<Item>(`${baseUrl}/create`, itemDTO, {
         headers: {
-            "Content-Type": "multipart/form-data",
-
-            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
-        }
-    });
-};
-export const createItemFromConsignment = async (id:any, itemDTO: any) => {
-    return await axios.post<Item>(`${baseUrl}/create/${id}`, itemDTO, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
         }
     });
 };
 
-export const updateItem = async (itemDTO: Item) => {
+export const updateItem = async (itemDTO: ItemUpdateDTO) => {
     if (!itemDTO.itemId) {
         throw new Error("Item id cannot be null");
     }
-    return await axios.put<Item>(`${baseUrl}/update`, itemDTO, {
+    return await axios.post<Item>(`${baseUrl}/update`, itemDTO, {
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
+        },
+    });
+};
 
+export const uploadItemAttachment = async (itemId: number, data: { files: File[] }) => {
+    return await axios.put<Attachment[]>(`${baseUrl}/attachment/${itemId}`, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
+        },
+    });
+};
+
+export const deleteItemAttachment = async (itemId: number, attachmentId: number) => {
+    return await axios.delete<Attachment[]>(`${baseUrl}/attachment/${itemId}/${attachmentId}`, {
+        headers: {
+            "Content-Type": "application/json",
             "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
         },
     });
