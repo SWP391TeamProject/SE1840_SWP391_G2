@@ -102,29 +102,29 @@ export function OrderDetail() {
                           </Button>}
                     </div>
                     {order.payment.status !== PaymentStatus.FAILED &&
-                    <>
-                        <h2 className="text-2xl font-bold my-4">Items</h2>
-                        <div className="space-y-4">
-                            {order?.itemDTOS?.map((item) => (
-                              <div key={item.itemId}
-                                   className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
-                                  <img
-                                    src={item.attachments && item.attachments.length > 0 ? item.attachments[0].link : "/placeholder.svg"}
-                                    alt="Product Image" width={80} height={80}
-                                    className="rounded-md"/>
-                                  <div>
-                                      <h3 className="font-medium">
-                                          <a href={`/item/${item.itemId}`}>{item.name}</a>
-                                      </h3>
-                                  </div>
-                                  <div className="text-right">
-                                      <div
-                                        className="font-medium">{currency.format({amount: item.soldPrice})}</div>
-                                  </div>
-                              </div>
-                            ))}
-                        </div>
-                    </>}
+                      <>
+                          <h2 className="text-2xl font-bold my-4">Items</h2>
+                          <div className="space-y-4">
+                              {order?.itemDTOS?.map((item) => (
+                                <div key={item.itemId}
+                                     className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
+                                    <img
+                                      src={item.attachments && item.attachments.length > 0 ? item.attachments[0].link : "/placeholder.svg"}
+                                      alt="Product Image" width={80} height={80}
+                                      className="rounded-md"/>
+                                    <div>
+                                        <h3 className="font-medium">
+                                            <a href={`/item/${item.itemId}`}>{item.name}</a>
+                                        </h3>
+                                    </div>
+                                    <div className="text-right">
+                                        <div
+                                          className="font-medium">{currency.format({amount: item.soldPrice})}</div>
+                                    </div>
+                                </div>
+                              ))}
+                          </div>
+                      </>}
                 </div>
                 <div className="basis-5/12 xl:basis-4/12 flex flex-col gap-5">
                     <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
@@ -215,26 +215,26 @@ export function OrderDetail() {
                     </div>
                     { order.payment.status === PaymentStatus.SUCCESS &&
                       <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
-                        <h2 className="text-2xl font-bold mb-4">Delivery Tracking</h2>
-                        <div className="flex flex-col gap-5">
-                            <div className="flex justify-between gap-3">
-                                <span className="basis-1/3">Delivery Partner</span>
-                                <span>Biddify</span>
-                            </div>
-                            <div className="flex justify-between gap-3">
-                                <span className="basis-1/3">Status</span>
-                                <span className="capitalize">{order.shippingStatus.toLowerCase()}</span>
-                            </div>
-                            <div className="flex justify-between gap-3">
-                                <span className="basis-1/3">Address</span>
-                                <span>{order.shippingAddress}</span>
-                            </div>
-                            <div className="flex justify-between gap-3">
-                                <span className="basis-1/3">Note</span>
-                                <span className="break-all">{order.shippingNote}</span>
-                            </div>
-                        </div>
-                    </div>}
+                          <h2 className="text-2xl font-bold mb-4">Delivery Tracking</h2>
+                          <div className="flex flex-col gap-5">
+                              <div className="flex justify-between gap-3">
+                                  <span className="basis-1/3">Delivery Partner</span>
+                                  <span>Biddify</span>
+                              </div>
+                              <div className="flex justify-between gap-3">
+                                  <span className="basis-1/3">Status</span>
+                                  <span className="capitalize">{order.shippingStatus.toLowerCase()}</span>
+                              </div>
+                              <div className="flex justify-between gap-3">
+                                  <span className="basis-1/3">Address</span>
+                                  <span>{order.shippingAddress}</span>
+                              </div>
+                              <div className="flex justify-between gap-3">
+                                  <span className="basis-1/3">Note</span>
+                                  <span className="break-all">{order.shippingNote}</span>
+                              </div>
+                          </div>
+                      </div>}
                 </div>
             </div>
           }
