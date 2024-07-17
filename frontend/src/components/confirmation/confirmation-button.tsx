@@ -23,6 +23,7 @@ interface ConfirmationButtonProps
   message: string
   title: string
   label: string
+  description: string
   className?: string
 }
 
@@ -32,21 +33,28 @@ export function ConfirmationButton({
   label,
   onSuccess,
   className,
+  description,
   ...props
 }: ConfirmationButtonProps) {
   const [open, setOpen] = React.useState(false);
+  const onConfirm = () => {
+    console.log(onSuccess)
+    onSuccess();
+    setOpen(false)
+  }
 
   return (
     <>
-          <ConfirmationDialog
-              open={open}
-              onOpenChange={setOpen}
-              title={title}
-              message={message}
-              label={label}
-              onSuccess={onSuccess}
-          />
-          {/* <Dialog {...props} >
+      <ConfirmationDialog
+        open={open}
+        onOpenChange={setOpen}
+        title={title}
+        message={message}
+        label={label}
+        onSuccess={onConfirm}
+        description={description}
+      />
+      {/* <Dialog {...props} >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{title}</DialogTitle>
@@ -68,9 +76,9 @@ export function ConfirmationButton({
               </DialogFooter>
             </DialogContent>
           </Dialog> */}
-          <Button className={className} onClick={() => {setOpen(true)}}>
-              {props.children}
-          </Button>
+      <Button type="button" className={className} onClick={() => { setOpen(true) }}>
+        {props.children}
+      </Button>
     </>
 
   )
