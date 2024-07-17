@@ -1,117 +1,243 @@
-import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import {Button} from "@/components/ui/button.tsx"
+import {Separator} from "@/components/ui/separator.tsx"
+import {useCurrency} from "@/CurrencyProvider.tsx";
+import {useAppDispatch, useAppSelector} from "@/redux/hooks";
+import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {getOrderById, updateOrder} from "@/services/OrderService";
+import {setCurrentOrder} from "@/redux/reducers/Orders";
+import {toast} from "react-toastify";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
-} from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { PaymentStatus } from '@/constants/enums'
-import { useAppDispatch, useAppSelector } from '@/redux/hooks'
-import { setCurrentOrder } from '@/redux/reducers/Orders'
-import { getOrderById } from '@/services/OrderService'
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+    AlertCircle,
+    CircleAlert,
+    CircleCheck,
+    CircleCheckBig
+} from "lucide-react";
+import {PaymentStatus} from "@/constants/enums.tsx";
+import {ShippingStatus} from "@/models/newModel/order";
+import {fetchAccountById} from "@/services/AccountsServices.ts";
+import {Account} from "@/models/AccountModel.tsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import dayjs from "dayjs";
+import CountDownTime from "@/components/countdownTimer/CountDownTime.tsx";
 
-export const OrderDetail = () => {
-    const order = useAppSelector(state => state.orders.currentOrder)
-    const param = useParams();
+export function OrderDetail() {
+    const orderId = parseInt(useParams().id);
     const dispatch = useAppDispatch();
-    const [isLoading, setIsLoading] = useState(true);
+    const order = useAppSelector(state => state.orders.currentOrder);
+    const currency = useCurrency();
+    const [loading, setLoading] = useState(true);
+    const [customer, setCustomer] = useState({} as Account);
+
     useEffect(() => {
-        if (!order) {
-            setIsLoading(true);
-            getOrderById(parseInt(param.id) || 0).then((res) => {
-                console.log(res.data);
-                dispatch(setCurrentOrder(res.data));
-                setIsLoading(false);
+        getOrderById(orderId).then((res) => {
+            dispatch(setCurrentOrder(res.data));
+            fetchAccountById(res.data.payment.accountId).then((res) => {
+                setCustomer(res.data as Account);
+            }).catch((e) => {
+                console.error(e);
+                toast.error('Error when loading customer detail!', {
+                    position: "bottom-right",
+                });
             }).finally(() => {
-                setIsLoading(false);
-            })
-        } else {
-            setIsLoading(false);
-        }
-    })
+                setLoading(false);
+            });
+        }).catch((e) => {
+            console.error(e);
+            toast.error('Error when loading order detail!', {
+                position: "bottom-right",
+            });
+        });
+    }, []);
+
+    const updateShippingStatus = async (shippingStatus: ShippingStatus) => {
+        setLoading(true);
+        updateOrder(orderId, {shippingStatus}).then((res) => {
+            dispatch(setCurrentOrder(res.data));
+            setLoading(false);
+            toast.success('Delivery status updated!', {
+                position: "bottom-right",
+            });
+        }).catch((e) => {
+            setLoading(false);
+            console.error(e);
+            toast.error('Error when updating order!', {
+                position: "bottom-right",
+            });
+        });
+    };
+
+
+    const guides = {
+        FAILED: "The customer has failed to pay this order on time. It has been cancelled.",
+        PENDING: "Please wait for the customer to pay this order.",
+        PACKAGING: "Please package the order and send to the delivery team as soon as possible.",
+        DELIVERING: "The delivery is in progress. Please stay in touch with the customer about the delivery status.",
+        DELIVERED: "The customer has received the order. There is no action to do with this order.",
+    };
+
     return (
-        <div>
-            {isLoading ? <LoadingAnimation /> :
-                <Card className="overflow-hidden max-w-fit m-auto">
-                    <CardHeader className="flex flex-row items-start bg-gray-100">
-                        <div className="grid gap-0.5">
-                            <CardTitle className="group flex items-center gap-2 text-lg">
-                                Order #{order?.orderId}
-                                <Button
-                                    className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                                >
-                                    <div className="h-3 w-3" />
-                                    <span className="sr-only">Copy Order ID</span>
-                                </Button>
-                            </CardTitle>
-                            <CardDescription>
-                                Placed on {new Date(order?.createDate).toLocaleDateString()}
-                                <br />
-                                Owner ID: #{order?.payment?.accountId}
-                            </CardDescription>
+      <>
+          {loading ?
+            <LoadingAnimation/>
+            :
+            <div
+              className="lg:flex flex-row justify-between gap-10 items-start p-10 lg:p-20 lg:pt-10">
+                <div className="basis-7/12">
+                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mb-10">
+                        <h2 className="text-2xl font-bold mb-4">Your action</h2>
+                        <p>{guides[order.payment.status == "SUCCESS" ? order.shippingStatus : order.payment.status]}</p>
+                        {order.shippingStatus === ShippingStatus.PACKAGING &&
+                          <Button className="mt-5 bg-green-400 justify-center gap-2" variant="outline" size="sm"
+                                  onClick={() => updateShippingStatus(ShippingStatus.DELIVERING)}>
+                              <CircleCheckBig className="w-5 h-5"/>
+                              I have packaged and sent for delivery
+                          </Button>}
+                        {order.shippingStatus === ShippingStatus.DELIVERING &&
+                          <Button className="mt-5 bg-green-400 justify-center gap-2" variant="outline" size="sm"
+                                  onClick={() => updateShippingStatus(ShippingStatus.DELIVERED)}>
+                              <CircleCheckBig className="w-5 h-5"/>
+                              The customer reported the order as delivered
+                          </Button>}
+                    </div>
+                    {order.payment.status !== PaymentStatus.FAILED &&
+                    <>
+                        <h2 className="text-2xl font-bold my-4">Items</h2>
+                        <div className="space-y-4">
+                            {order?.itemDTOS?.map((item) => (
+                              <div key={item.itemId}
+                                   className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
+                                  <img
+                                    src={item.attachments && item.attachments.length > 0 ? item.attachments[0].link : "/placeholder.svg"}
+                                    alt="Product Image" width={80} height={80}
+                                    className="rounded-md"/>
+                                  <div>
+                                      <h3 className="font-medium">
+                                          <a href={`/item/${item.itemId}`}>{item.name}</a>
+                                      </h3>
+                                  </div>
+                                  <div className="text-right">
+                                      <div
+                                        className="font-medium">{currency.format({amount: item.soldPrice})}</div>
+                                  </div>
+                              </div>
+                            ))}
                         </div>
-                        <div className="ml-auto flex items-center gap-1">
-                            {(() => {
-                                switch (order?.payment?.status) {
-                                    case PaymentStatus.FAILED:
-                                        return <Badge variant="default" className="bg-orange-500 w-[150px] text-center flex justify-center items-center">Failed</Badge>;
-                                    case PaymentStatus.SUCCESS:
-                                        return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Success</Badge>;
-                                    case PaymentStatus.PENDING:
-                                        return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">Pending</Badge>;
-                                    default:
-                                        return <Badge variant="destructive">Unknown Status</Badge>;
+                    </>}
+                </div>
+                <div className="basis-5/12 xl:basis-4/12 flex flex-col gap-5">
+                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
+                        <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
+                        <div className="flex flex-col gap-5">
+                            <div className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span>Subtotal</span>
+                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Fee</span>
+                                    <span>{currency.format({amount: 0})}</span>
+                                </div>
+                                <Separator/>
+                                <div className="flex justify-between font-bold">
+                                    <span>Total</span>
+                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                </div>
+                                { order.payment.status === PaymentStatus.PENDING &&
+                                  <div className="flex justify-between font-bold">
+                                      <span>Deadline</span>
+                                      <CountDownTime end={dayjs(order.createDate).add(7, 'days').toDate()}
+                                                     messageOnEnd="0"/>
+                                  </div>
                                 }
-                            })()}
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-6 text-sm">
-                        <div className="grid gap-6">
-                            <div className="grid gap-3">
-                                <div className="font-semibold">Order Summary</div>
-                                <ul className="grid gap-3">
-
-                                    <Table>
-                                        <TableHeader>
-                                            <TableHead>ID</TableHead>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Price</TableHead>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {order?.auctionItemDTOS?.map((item) => (
-                                                <TableRow key={item.id.itemId}>
-                                                    <TableCell>{item.id.itemId}</TableCell>
-                                                    <TableCell>{item.itemDTO?.name}</TableCell>
-                                                    <TableCell>{item.currentPrice}</TableCell>
-                                                </TableRow>
-                                            ))}
-                                            <TableRow>
-                                                <TableCell >Total</TableCell>
-                                                <TableCell></TableCell>
-                                                <TableCell className='font-semibold'>{order?.payment?.paymentAmount}</TableCell>
-                                            </TableRow>
-                                        </TableBody>
-
-                                    </Table>
-                                </ul>
+                                { order.payment.status === PaymentStatus.FAILED &&
+                                  <div className="flex justify-between font-bold">
+                                      <span>Deadline</span>
+                                      <span>Overdue</span>
+                                  </div>
+                                }
                             </div>
-                            <Separator className="my-4" />
-                            <div className="grid gap-3">
-                                <div className="font-semibold">Shipping Address</div>
-                                <address className="grid gap-0.5 not-italic text-muted-foreground">
-                                    {order?.shippingAddress}
-                                </address>
+                            { order.payment.status === PaymentStatus.SUCCESS &&
+                              <Button className="bg-green-600 flex justify-center items-center gap-2" disabled>
+                                  <CircleCheck className="w-5 h-5"/>
+                                  Order Paid
+                              </Button>
+                            }
+                            { order.payment.status !== PaymentStatus.SUCCESS &&
+                              <Button className="bg-red-600 flex justify-center items-center gap-2" disabled>
+                                  <CircleAlert className="w-5 h-5"/>
+                                  Order Not Paid
+                              </Button>
+                            }
+                        </div>
+                    </div>
+                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
+                        <h2 className="text-2xl font-bold mb-4">Customer</h2>
+                        <div className="flex flex-col gap-5">
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Account ID</span>
+                                <span>{customer.accountId}</span>
+                            </div>
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Name</span>
+                                <span>{customer.nickname}</span>
+                            </div>
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Email</span>
+                                <span>{customer.email}</span>
+                            </div>
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Phone</span>
+                                <span>{customer.phone}</span>
+                            </div>
+                            {customer.dummy &&
+                              <Alert variant="destructive">
+                                  <AlertCircle className="h-5 w-5"/>
+                                  <AlertTitle>
+                                      <h3 className="text-lg">Dummy account</h3>
+                                  </AlertTitle>
+                                  <AlertDescription>
+                                      This is a dummy account for testing purposes. It is not a real person!
+                                  </AlertDescription>
+                              </Alert>}
+                            {!customer.kyc &&
+                              <Alert variant="destructive">
+                                  <AlertCircle className="h-5 w-5"/>
+                                  <AlertTitle>
+                                      <h3 className="text-lg">KYC Unverified</h3>
+                                  </AlertTitle>
+                                  <AlertDescription>
+                                      This account has not been KYC-verified.
+                                  </AlertDescription>
+                              </Alert>}
+                        </div>
+                    </div>
+                    { order.payment.status === PaymentStatus.SUCCESS &&
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
+                        <h2 className="text-2xl font-bold mb-4">Delivery Tracking</h2>
+                        <div className="flex flex-col gap-5">
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Delivery Partner</span>
+                                <span>Biddify</span>
+                            </div>
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Status</span>
+                                <span className="capitalize">{order.shippingStatus.toLowerCase()}</span>
+                            </div>
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Address</span>
+                                <span>{order.shippingAddress}</span>
+                            </div>
+                            <div className="flex justify-between gap-3">
+                                <span className="basis-1/3">Note</span>
+                                <span className="break-all">{order.shippingNote}</span>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>}
-        </div>
+                    </div>}
+                </div>
+            </div>
+          }
+      </>
     )
 }

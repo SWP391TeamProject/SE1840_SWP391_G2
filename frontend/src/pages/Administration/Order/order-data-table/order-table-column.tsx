@@ -1,22 +1,14 @@
 import * as React from "react"
 import { type ColumnDef } from "@tanstack/react-table"
-import { DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { DataTableColumnHeader } from "@/components/data-tables/data-table-column-header"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
 import { formatDate } from "@/lib/utils"
-import { setCurrentBlogPost } from "@/redux/reducers/Blogs"
-import BlogService from "@/services/BlogService"
 import { setCurrentOrder } from "@/redux/reducers/Orders"
+import {ShippingStatus} from "@/models/newModel/order.ts";
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 // Define the JewelryItem type based on the provided JSON structure
 type Order = {
@@ -74,6 +66,7 @@ type Order = {
     numberOfBids: number
   }[]
   shippingAddress: string
+  shippingStatus: ShippingStatus
   createDate: Date
 }
 
@@ -113,11 +106,27 @@ export const getColumns = (): ColumnDef<Order>[] => [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total"  className="w-"/>
     ),
+    cell: ({ row }) => {
+      const currency = useCurrency();
+
+      return (
+        <>
+          <div className="flex space-x-2">
+          <span className="max-w-[10rem] truncate font-medium">
+            {currency.format({amount: row.original.payment.paymentAmount})}
+          </span>
+          </div>
+        </>)
+    },
+  },
+  {
+    accessorKey: "payment.accountId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Account" className="w-[50px]" />
+    ),
     cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <span className="max-w-[10rem] truncate font-medium">
-          ${row.original.payment.paymentAmount}
-        </span>
+      <div className="font-medium max-w-[20rem]">
+        {row.original.payment.accountId}
       </div>
     ),
   },
@@ -137,11 +146,27 @@ export const getColumns = (): ColumnDef<Order>[] => [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => (
-      <div className="font-medium">
-        {row.original.payment.status}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const currency = useCurrency();
+
+      const statusColor = {
+        FAILED: "text-red-500",
+        PENDING: "text-yellow-500",
+        PACKAGING: "text-purple-500",
+        DELIVERING: "text-black-500",
+        DELIVERED: "text-green-600",
+      };
+
+      const status = row.original.payment.status == "SUCCESS" ?
+        row.original.shippingStatus : row.original.payment.status;
+
+      return (
+        <>
+          <div className={`font-medium capitalize ${statusColor[status]}`}>
+            { status }
+          </div>
+        </>)
+    },
   },
   {
     accessorKey: "createDate",
@@ -149,16 +174,14 @@ export const getColumns = (): ColumnDef<Order>[] => [
       <DataTableColumnHeader column={column} title="Date" />
     ),
     cell: ({ row }) => (
-    <div>
-      {row.original.createDate ? formatDate(new Date(row.original.createDate)) : ""}
+      <div>
+        {row.original.createDate ? formatDate(new Date(row.original.createDate)) : ""}
       </div>
     ),
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const [showUpdateItemSheet, setShowUpdateItemSheet] = React.useState(false)
-      const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false)
       const  nav = useNavigate();
       const dispatch = useAppDispatch();
 
