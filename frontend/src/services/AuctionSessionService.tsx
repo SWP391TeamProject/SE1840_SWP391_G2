@@ -68,7 +68,6 @@ export const getAuctions = async (input: getAuctionsSchema) => {
                     pageNumb: page - 1,
                     pageSize: size ? size : 10,
                 }
-
                 return await axios
                     .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
                         headers: {

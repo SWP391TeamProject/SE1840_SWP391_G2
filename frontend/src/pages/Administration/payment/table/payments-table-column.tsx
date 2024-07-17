@@ -16,10 +16,10 @@ type Transaction = {
 
 export const getColumns = (): ColumnDef<Transaction>[] => [
   {
-    accessorKey: 'id',
+    accessorKey: 'paymentId',
     header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
-    cell: ({ row }) => <div className="w-5">{row.getValue('id')}</div>,
-    enableSorting: false,
+    cell: ({ row }) => <div className="w-5">{row.original.id}</div>,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -33,7 +33,7 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
       }).format(paymentAmount);
       return <div className="font-medium">{formatted}</div>;
     },
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -44,7 +44,7 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
       const date = new Date(row.getValue('createDate'));
       return <div>{date.toLocaleString()}</div>;
     },
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -83,7 +83,7 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     accessorKey: 'method',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Method" />,
     cell: ({ row }) => row.getValue('method') || 'N/A',
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -91,7 +91,7 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Account ID" />,
     cell: ({ row }) => row.getValue('accountId'),
     enableSorting: false,
-    enableHiding: false,
+    enableHiding: true,
   },
 ];
 

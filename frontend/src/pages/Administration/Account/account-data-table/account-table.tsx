@@ -8,6 +8,8 @@ import { DataTableFilterField } from "@/types";
 import { AccountsTableFloatingBar } from "./accounts-table-floating-bar";
 import getColumns from "./accounts-table-column";
 import { fetchAccountsService } from "@/services/AccountsServices";
+import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
+import { set } from "date-fns";
 interface AccountTableProps {
     accountPromise: ReturnType<typeof fetchAccountsService>;
 }
@@ -15,6 +17,7 @@ interface AccountTableProps {
 export function AccountsTable({ accountPromise }: AccountTableProps) {
     const [data, setData] = React.useState([]);
     const [pageCount, setPageCount] = React.useState(0);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     // Memoize the columns so they don't re-render on every render
     const columns = React.useMemo(() => getColumns(), []);
@@ -22,12 +25,14 @@ export function AccountsTable({ accountPromise }: AccountTableProps) {
     React.useEffect(() => {
         const fetchData = async () => {
             if (accountPromise) {
+                setIsLoading(true)
                 const content = (await accountPromise).content;
                 const totalPages = (await accountPromise).totalPages;
                 setData(content);
                 setPageCount(totalPages);
                 // console.log(content);
                 // console.log(totalPages);
+                setIsLoading(false);
             }
         };
         fetchData();
@@ -41,16 +46,27 @@ export function AccountsTable({ accountPromise }: AccountTableProps) {
     });
 
     return (
-        <DataTable
-            table={table}
-            floatingBar={
-                <AccountsTableFloatingBar table={table} />
-            }
-        >
+        <>{
+            isLoading ?
+                <DataTableSkeleton
+                    columnCount={6}
+                    cellWidths={["10rem", "10rem", "10rem", "10rem", "10rem", "8rem"]}
+                    shrinkZero
+                />
 
-            <DataTableToolbar table={table}>
-                <AccountsTableToolbarActions table={table} />
-            </DataTableToolbar>
-        </DataTable >
+                :
+                <DataTable
+                    table={table}
+                    floatingBar={
+                        <AccountsTableFloatingBar table={table} />
+                    }
+                >
+
+                    <DataTableToolbar table={table}>
+                        <AccountsTableToolbarActions table={table} />
+                    </DataTableToolbar>
+                </DataTable >}
+
+        </>
     );
 }

@@ -268,49 +268,48 @@ export default function AccountCreate() {
                                 </FormItem>
                             )}
                         />
+
+
+                        <FormField
+                            control={form.control}
+                            name="dummy"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Dummy?</FormLabel>
+                                    <FormControl>
+                                        <div>
+                                            <Alert variant="destructive">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <AlertTitle>Note</AlertTitle>
+                                                <AlertDescription>
+                                                    A dummy account is an account used for testing purposes.<br />
+                                                    <b>NO email will be sent to these accounts.</b>
+                                                </AlertDescription>
+                                            </Alert>
+                                            <div className="mt-2">
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                                <span className="ml-2">Enable dummy</span>
+                                            </div>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+
                         {isSubmitting
-                            ? <Button variant={"destructive"} disabled>
+                            ? <Button variant={"default"} className='w-20' disabled>
                                 <Loader2 className='animate-spin' />
                             </Button>
                             :
-                            <Button variant={"destructive"} type="submit">
+                            <Button variant={"default"} type="submit" className='w-20'>
                                 Submit
                             </Button>
                         }
-
-                      <FormField
-                        control={form.control}
-                        name="dummy"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Dummy?</FormLabel>
-                            <FormControl>
-                              <div>
-                                <Alert variant="destructive">
-                                  <AlertCircle className="h-4 w-4" />
-                                  <AlertTitle>Note</AlertTitle>
-                                  <AlertDescription>
-                                    A dummy account is an account used for testing purposes.<br/>
-                                    <b>NO email will be sent to these accounts.</b>
-                                  </AlertDescription>
-                                </Alert>
-                                <div className="mt-2">
-                                  <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                  <span className="ml-2">Enable dummy</span>
-                                </div>
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                        <Button variant={"destructive"} type="submit">
-                            Submit
-                        </Button>
                     </form>
                     <ConfirmationDialog
                         description='This action cannot be undone.'
@@ -320,7 +319,6 @@ export default function AccountCreate() {
                         open={showTrigger}
                         onOpenChange={setShowTrigger}
                         title='Confirmation'
-
                     />
                 </Form>
             </div>

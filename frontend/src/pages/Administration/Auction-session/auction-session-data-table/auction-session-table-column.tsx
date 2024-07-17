@@ -60,7 +60,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
     ),
     cell: ({ row }) => <div className="w-3">{row.getValue("auctionSessionId")}</div>,
     enableSorting: true,
-    enableHiding: false,
+    enableHiding: true,
   },
   {
     accessorKey: "title",
@@ -74,7 +74,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
         </span>
       </div>
     ),
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "startDate",
@@ -82,7 +82,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       <DataTableColumnHeader column={column} title="Start Date" />
     ),
     cell: ({ row }) => formatDate(new Date(row.getValue("startDate"))),
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "endDate",
@@ -90,7 +90,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       <DataTableColumnHeader column={column} title="End Date" />
     ),
     cell: ({ row }) => formatDate(new Date(row.getValue("endDate"))),
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "deposits",
@@ -99,10 +99,10 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        {row.getValue("deposits").length}
+        {row.getValue("deposits")?.length}
       </div>
     ),
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "auctionItems",
@@ -111,7 +111,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
     ),
     cell: ({ row }) => (
       <div className="font-medium">
-        {row.getValue("auctionItems").length}
+        {row.getValue("auctionItems")?.length}
       </div>
     ),
     enableSorting: false,
