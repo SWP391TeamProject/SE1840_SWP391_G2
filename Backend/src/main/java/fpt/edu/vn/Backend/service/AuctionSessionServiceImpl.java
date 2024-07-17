@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -137,6 +138,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "auctionSession", allEntries = true),
+            @CacheEvict(cacheNames = "item", allEntries = true),
+            // Add more @CacheEvict annotations as needed
+    })
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
