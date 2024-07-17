@@ -320,7 +320,6 @@ export default function AccountCreate() {
                         open={showTrigger}
                         onOpenChange={setShowTrigger}
                         title='Confirmation'
-
                     />
                 </Form>
             </div>

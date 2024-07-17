@@ -20,7 +20,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { setCurrentAccount } from '@/redux/reducers/Accounts';
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { toast } from 'react-toastify';
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 
 const formSchema = z.object({
     accountId: z.number(),
@@ -40,6 +42,9 @@ export default function AccountEdit() {
     const account = useAppSelector((state) => state.accounts.currentAccount);
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [showTrigger, setShowTrigger] = useState(false);
     const [editedAccount, setEditedAccount] = useState({
         accountId: 0,
         nickname: "",
@@ -62,9 +67,9 @@ export default function AccountEdit() {
         },
     });
 
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
-        // Remove FormData creation and file handling
-
+    const handleConfirmed = (data: z.infer<typeof formSchema>) => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
         let updatedAccount = {
             accountId: data.accountId,
             email: data.email,
@@ -79,11 +84,58 @@ export default function AccountEdit() {
         updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
             console.log(res);
             // dispatch(setCurrentAccount(res))
-            navigate("/admin/accounts/");
+            if(res){
+                toast.success("Account Updated Successfully")
+                navigate("/admin/accounts/");
+            }
         })
 
-        console.log(updatedAccount);
+    }
+    const onSubmit = (data: z.infer<typeof formSchema>) => {
+        // Remove FormData creation and file handling
+        setShowTrigger(true);
+
+        // let updatedAccount = {
+        //     accountId: data.accountId,
+        //     email: data.email,
+        //     nickname: data.nickname,
+        //     phone: data.phone,
+        //     avatar: null,
+        //     balance: data.balance,
+        //     role: data.role,
+        //     dummy: data.dummy,
+        //     status: account?.status
+        // }
+        // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
+        //     console.log(res);
+        //     // dispatch(setCurrentAccount(res))
+        //     if(res){
+        //         toast.success("Account Updated Successfully")
+        //         navigate("/admin/accounts/");
+        //     }
+        // })
+
+        // console.log(updatedAccount);
     };
+
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsSubmitting(true);
+    }
+
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsSubmitting(false)
+            }
+        }
+
+    }, [isConfirmed, form.getValues])
 
     // useEffect(() => {
     //     if (!account || account.accountId != parseInt(id)) {
@@ -285,11 +337,26 @@ export default function AccountEdit() {
                             </FormItem>
                           )}
                         />
-                        <Button variant={"destructive"} type="submit">
-                            Submit
-                        </Button>
+                        {isSubmitting
+                            ? <Button variant={"destructive"} disabled>
+                                <Loader2 className='animate-spin' />
+                            </Button>
+                            :
+                            <Button variant={"destructive"} type="submit">
+                                Submit
+                            </Button>
+                        }
                     </form>
                 </Form>
+                <ConfirmationDialog
+                    description='This action cannot be undone.'
+                    label='Ok'
+                    message='Are you sure to update this account?'
+                    onSuccess={confirm}
+                    open={showTrigger}
+                    onOpenChange={setShowTrigger}
+                    title='Confirmation'
+                />
             </div>
         </main>
     )
