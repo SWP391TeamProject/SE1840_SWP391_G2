@@ -15,7 +15,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {useAuth} from "@/AuthProvider.tsx";
 import {Controller, SubmitHandler, useForm} from "react-hook-form";
 import {API_SERVER} from "@/constants/domain.ts";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import axios from "axios";
 import ChangePassword from "./profile-detail/ChangePassword";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
@@ -29,6 +29,7 @@ import {
   FormLabel,
   FormMessage
 } from "@/components/ui/form.tsx";
+import { showErrorToast } from "@/lib/handle-error";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -109,15 +110,13 @@ const ProfileDetail = () => {
         avatar: res.data
       });
       toast.success('Update avatar successfully!', {
-        position: "bottom-right",
+        
       });
       setIsLoading(false);
     })
       .catch((err) => {
         console.log(err);
-        toast.error('Update avatar failed!', {
-          position: "bottom-right",
-        });
+        showErrorToast(err);
         setIsLoading(false);
       })
   };
@@ -135,14 +134,13 @@ const ProfileDetail = () => {
         ...data
       });
       toast.success('Update details successfully!', {
-        position: "bottom-right",
+        
       });
       setIsLoading(false);
     }).catch((err) => {
       console.log(err);
-      toast.error('Update details failed!', {
-        position: "bottom-right",
-      });
+      showErrorToast(err);
+
       setIsLoading(false);
     })
   };
@@ -150,7 +148,7 @@ const ProfileDetail = () => {
   const onSubmitTwoFactorAuth: SubmitHandler<z.infer<typeof twoFactorAuthSchema>> = (data) => {
     if (data.enable2fa === auth.user.require2fa) {
       toast.warning("Settings stay unchanged!", {
-        position: "bottom-right",
+        
       });
       return;
     }
@@ -162,7 +160,7 @@ const ProfileDetail = () => {
       },
     }).then(() => {
       toast.success('Changed 2FA settings successfully!', {
-        position: "bottom-right",
+        
       });
       setIsLoading(false);
       twoFactorAuthForm.reset({
@@ -171,9 +169,8 @@ const ProfileDetail = () => {
       });
     }).catch((err) => {
       console.log(err);
-      toast.error('Changed 2FA settings failed!', {
-        position: "bottom-right",
-      });
+      showErrorToast(err);
+
       setIsLoading(false);
       twoFactorAuthForm.reset({
         enable2fa: auth.user.require2fa,

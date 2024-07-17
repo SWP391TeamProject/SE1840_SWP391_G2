@@ -1,4 +1,5 @@
 import Footer from '@/components/footer/Footer';
+import { showErrorToast } from '@/lib/handle-error';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCurrentBlogPost, setCurrentPageList } from '@/redux/reducers/Blogs';
 import BlogService from '@/services/BlogService';
@@ -34,9 +35,8 @@ export const BlogDetail = () => {
             BlogService.getBlogById(parseInt(param.id)).then((res) => {
                 dispatch(setCurrentBlogPost(res.data));
             }).catch(error => {
-                toast.error('There was an error!', {
-                    position: "bottom-right",
-                });
+                showErrorToast(error);
+
             });
         };
         if (!blogList || blogList.length == 0) {
@@ -47,9 +47,8 @@ export const BlogDetail = () => {
                     blog.category.blogCategoryId == currentBlog?.category.blogCategoryId
                     && blog.postId != currentBlog?.postId));
             }).catch(error => {
-                toast.error('There was an error!', {
-                    position: "bottom-right",
-                });
+                showErrorToast(error);
+
             });
         };
         window.scrollTo(0, 0);

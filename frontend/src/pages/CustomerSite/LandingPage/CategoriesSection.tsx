@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export default function CategoriesSection() {
   const [categories, setCategories] = React.useState<ItemCategory[]>([]);
@@ -16,7 +16,7 @@ export default function CategoriesSection() {
       console.log(res.data.content);
     }).catch((err) => {
       toast.error(err.response.data.message, {
-        position: "bottom-right",
+        
       });
     });
   }, []);

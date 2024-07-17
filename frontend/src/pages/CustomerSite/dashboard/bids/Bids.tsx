@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { showErrorToast } from '@/lib/handle-error';
 import { Item } from '@/models/newModel/item';
 import { exportBids, fetchBidsByAccount } from '@/services/BidsService';
 import { getItemById } from '@/services/ItemService';
@@ -20,9 +21,8 @@ export const Bids = () => {
             console.log(res.data);
             setBids(res.data.content);
         }).catch((err) => {
-            toast.error(err, {
-                position: "bottom-right",
-            });
+            showErrorToast(err);
+
         });
 
         window.scrollTo(0, 0);
@@ -37,9 +37,8 @@ export const Bids = () => {
                 nav(`/auctions/${bid.auctionItemId.auctionSessionId}/${itemDTO.name}`, { state: { id: bid.auctionItemId, itemDTO: itemDTO } });
 
             }).catch((err) => {
-                toast.error(err, {
-                    position: "bottom-right",
-                });
+                showErrorToast(err);
+
             });
 
         }

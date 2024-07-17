@@ -16,11 +16,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import ItemsList from "./ItemsList";
 import { Form } from "@/components/ui/form";
 import { AuctionSessionStatus } from "@/models/newModel/auctionSession";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { inviteAll } from "@/services/NotificationService";
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog";
 import { ConfirmationButton } from "@/components/confirmation/confirmation-button";
+import { showErrorToast } from "@/lib/handle-error";
 
 const formSchema = z.object({
     auctionSessionId: z.number(),
@@ -85,7 +86,6 @@ export default function AuctionSessionDetail() {
             setCurrentAuctionSession(auctionSession);
             // form.reset({...auctionSession});
             console.log(auctionSession);
-
         }
     }, [auctionSession]);
 
@@ -96,9 +96,8 @@ export default function AuctionSessionDetail() {
                 position:"bottom-right",
             });
         }).catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            })
+            showErrorToast(err)
+
         });
     }
 
@@ -110,9 +109,7 @@ export default function AuctionSessionDetail() {
                 position:"bottom-right",
             });
         }).catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            })
+            showErrorToast(err)
         });
     }
 
@@ -124,9 +121,8 @@ export default function AuctionSessionDetail() {
                 position:"bottom-right",
             });
         }).catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            })
+            showErrorToast(err)
+
         });
     }
 
@@ -142,9 +138,7 @@ export default function AuctionSessionDetail() {
             });
             setIsLoading(false);
         }).catch((err) => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            })
+            showErrorToast(err)
             setIsLoading(false)
         });
     }

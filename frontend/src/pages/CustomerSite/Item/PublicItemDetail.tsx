@@ -3,7 +3,7 @@ import {getItemById} from "@/services/ItemService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import {useCurrency} from "@/CurrencyProvider"
 import {Link, useParams} from "react-router-dom";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {AxiosResponse} from "axios";
 import {Item, ItemStatus} from "@/models/Item.ts";
 import {AlertCircle, BoxIcon, GavelIcon, GemIcon} from "lucide-react";
@@ -65,14 +65,14 @@ export function PublicItemDetail() {
         }).catch((e) => {
           console.error(e);
           toast.error('Failed to get auction history!', {
-            position: "bottom-right",
+            
           });
         })
       }
     }).catch((e) => {
       console.error(e);
       toast.error('Error when loading item detail!', {
-        position: "bottom-right",
+        
       });
     })
   }, []);

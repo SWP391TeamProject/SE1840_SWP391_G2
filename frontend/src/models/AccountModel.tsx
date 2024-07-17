@@ -6,6 +6,7 @@ export interface Account {
   email: string;
   nickname: string;
   require2fa: boolean;
+  dummy: boolean;
   phone: string;
   avatar?: {
     link?: string

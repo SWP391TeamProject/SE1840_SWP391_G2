@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ReloadIcon, TrashIcon } from "@radix-ui/react-icons"
 import { type Row } from "@tanstack/react-table"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -62,11 +62,8 @@ export function DeleteItemsDialog({
             variant="destructive"
             onClick={() => {
               startDeleteTransition( () => {
-
-
-                  toast.error(items.length)
+                  // toast.error(items.length)
                   return
-
                 // props.onOpenChange?.(false)
                 // toast.success("Tasks deleted")
                 // onSuccess?.()

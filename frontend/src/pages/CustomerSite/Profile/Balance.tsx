@@ -31,7 +31,7 @@ import {
   PayPalScriptProvider,
   ReactPayPalScriptOptions
 } from "@paypal/react-paypal-js";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {
   Tabs,
   TabsContent,

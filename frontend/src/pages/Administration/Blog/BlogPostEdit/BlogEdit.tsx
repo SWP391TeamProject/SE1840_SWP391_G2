@@ -12,7 +12,7 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { BlogPost } from "@/models/newModel/blogPost";
 import BlogService from "@/services/BlogService";
 import { getCookie } from "@/utils/cookies";
@@ -21,6 +21,7 @@ import BlogImageGallery from "./BlogImageGallery";
 import BlogCategory from "./BlogCategory";
 import { setCurrentBlogPost } from "@/redux/reducers/Blogs";
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog";
+import { showErrorToast } from "@/lib/handle-error";
 
 const formSchema = z.object({
   categoryId: z.any({
@@ -145,7 +146,7 @@ export default function BlogEdit() {
         dispatch(setCurrentBlogPost(res.data));
       })
       toast.success('Blog updated successfully!', {
-        position: "bottom-right",
+        
       });
       form.reset({
         categoryId: res.data.category?.blogCategoryId,
@@ -162,16 +163,8 @@ export default function BlogEdit() {
       setIsLoading(false);
     }).catch((err) => {
       setIsLoading(false);
-      if (err.response.status === 403) {
-        toast.error("You are not this blog author", {
-          position: "bottom-right",
-        });
-        return;
-      }
-
-      toast.error(err.response.data.message, {
-        position: "bottom-right",
-      });
+      showErrorToast(err);
+      return;
     })
   }
 

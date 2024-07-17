@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from '@/services/ConsignmentService';
-import { toast } from "react-toastify";
+import { toast } from "sonner";
+import { showErrorToast } from '@/lib/handle-error';
 
 export default function CustomerConsignmentDetail() {
     const location = useLocation();
@@ -18,24 +19,22 @@ export default function CustomerConsignmentDetail() {
             ).then((res) => {
                 setCusConsignment(res.data);
                 toast.success("Initial Evaluation Accepted", {
-                    position: "bottom-right",
+                    
                 });
             }).catch((err) => {
-                toast.error("Error in accepting Initial Evaluation", {
-                    position: "bottom-right",
-                });
+                showErrorToast(err);
+
             });
         } else if (custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
             acceptFinalEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
                 toast.success("Final Evaluation Accepted", {
-                    position: "bottom-right",
+                    
                 });
             }).catch((err) => {
-                toast.error("Error in accepting Final Evaluation", {
-                    position: "bottom-right",
-                });
+                showErrorToast(err);
+
             });
         }
     }
@@ -45,24 +44,22 @@ export default function CustomerConsignmentDetail() {
             ).then((res) => {
                 setCusConsignment(res.data);
                 toast.success("Initial Evaluation Rejected", {
-                    position: "bottom-right",
+                    
                 });
             }).catch((err) => {
-                toast.error("Error in Rejecting Initial Evaluation", {
-                    position: "bottom-right",
-                });
+                showErrorToast(err);
+
             });
         } else if (custConsignment.status === ConsignmentStatus.IN_FINAL_EVALUATION) {
             rejectFinalEva(custConsignment.consignmentId
             ).then((res) => {
                 setCusConsignment(res.data);
                 toast.success("Final Evaluation Rejected", {
-                    position: "bottom-right",
+                    
                 });
             }).catch((err) => {
-                toast.error("Error in Rejecting Final Evaluation", {
-                    position: "bottom-right",
-                });
+                showErrorToast(err);
+
             });
         }
     }

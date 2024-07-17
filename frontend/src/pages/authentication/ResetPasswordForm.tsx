@@ -3,7 +3,6 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {toast} from "react-toastify";
 import {Loader2} from "lucide-react";
 import {resetPassword} from "@/services/AuthService.ts";
 import {InputOTP, InputOTPGroup, InputOTPSlot,} from "@/components/ui/input-otp"
@@ -21,6 +20,8 @@ import {z} from "zod"
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {Input} from "@/components/ui/input.tsx";
 import {containsWhitespace} from "@/lib/validator.ts";
+import { showErrorToast } from "@/lib/handle-error";
+import { toast } from "sonner";
 
 const formSchema = z.object({
     code: z.string().length(6, {
@@ -74,9 +75,7 @@ function ResetPasswordForm() {
                     position:"bottom-right",
                 });
             } else {
-                toast.error(err.message,{
-                    position:"bottom-right",
-                });
+                showErrorToast(err);
             }
             setLocked(false);
         });

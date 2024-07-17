@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
+import { showErrorToast } from '@/lib/handle-error'
 import { BlogCategory } from '@/models/newModel/blogCategory'
 import BlogCategoryService from '@/services/BlogCategoryService'
 import BlogService from '@/services/BlogService'
@@ -66,14 +67,11 @@ export const CreateBlog = () => {
 
     useEffect(() => {
         BlogCategoryService.getAllBlogCategories(0, 50).then((res) => {
-            setCategory(res.data.content)
-            console.log(res.data.content);
+            setCategory(res?.data.content)
             // toast.success('Category fetched successfully!');
         }
         ).catch(error => {
-            toast.error('There was an error!', {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
         });
     }, [])
 
@@ -105,18 +103,15 @@ export const CreateBlog = () => {
         BlogService.createBlog(data).then((res) => {
             console.log(res);
             toast.success('Blog created successfully!', {
-                position: "bottom-right",
+                
             });
             form.reset();
             setIsLoading(false);
             nav('/admin/blogs');
         }
         ).catch(error => {
-            console.log(error);
-            toast.error('There was an error!', {
-                position: "bottom-right",
-            });
             setIsLoading(false)
+            showErrorToast(error);
         });
     }
 

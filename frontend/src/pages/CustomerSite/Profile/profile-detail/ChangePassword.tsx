@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {changePassword} from "@/services/AuthService";
 import { useAuth } from "@/AuthProvider";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import {containsWhitespace} from "@/lib/validator.ts";
+import { showErrorToast } from "@/lib/handle-error";
 
 const formSchema = z.object({
     oldPassword: z.string({
@@ -66,9 +67,8 @@ export default function ChangePassword({ setIsLoading, isLoading }) {
                 confirmPassword: "",
             });
         }).catch(err => {
-            toast.error(err.response.data.message,{
-                position:"bottom-right",
-            })
+            showErrorToast(err);
+
             console.log(err)
             setIsLoading(false)
         })

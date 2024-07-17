@@ -3,7 +3,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {Loader2} from "lucide-react";
 import {verify2fa} from "@/services/AuthService.ts";
 import {
@@ -25,6 +25,7 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {useAuth} from "@/AuthProvider.tsx";
 import {AccountStatus, Roles} from "@/constants/enums.tsx";
 import {setCookie} from "@/utils/cookies.ts";
+import { showErrorToast } from "@/lib/handle-error";
 
 const formSchema = z.object({
     code: z.string().length(6, {
@@ -76,9 +77,8 @@ function TwoFactorAuthForm() {
                     position:"bottom-right",
                 });
             } else {
-                toast.error(err.message,{
-                    position:"bottom-right",
-                });
+                showErrorToast(err);
+
             }
             setLocked(false);
         });

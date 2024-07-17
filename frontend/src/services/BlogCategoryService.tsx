@@ -1,4 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
+import { showErrorToast } from '@/lib/handle-error';
 import { getCookie } from '@/utils/cookies';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -17,9 +18,8 @@ class BlogCategoryService {
             },
             params: params
         }).catch((error) => {
-            toast.error(error, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
+
         });
     }
 
@@ -37,9 +37,7 @@ class BlogCategoryService {
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             }
         }).catch((error) => {
-            toast.error(error, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
         });
     }
 
@@ -55,9 +53,8 @@ class BlogCategoryService {
                     "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
             }
         }).catch((error) => {
-            toast.error(error, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
+
         });
     }
 }

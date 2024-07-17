@@ -1,8 +1,9 @@
 import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { ConsignmentStatus } from "@/constants/enums";
+import { showErrorToast } from "@/lib/handle-error";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {
   let params = {
@@ -93,7 +94,7 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
         })
     }
     // return response.data;
-  } 
+  }
   catch (err) {
     console.log(err);
     if (err?.response.status == 401) {
@@ -190,9 +191,8 @@ export const deleteConsignmentService = async (id: string) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => toast.error(err.response.data.message + ": you are not allow to delete this consignment", {
-      position: "bottom-right",
-    }));
+    .catch((err) => showErrorToast(err)
+    );
 };
 
 //staff
@@ -209,7 +209,7 @@ export const takeConsignment = async (id: string) => {
       }
     })
     .catch((err) => toast.error(err.response.data.message + ": you are not allow to take this consignment", {
-      position: "bottom-right",
+      
     }));
 };
 export const receivedConsignment = async (id: string) => {
@@ -222,9 +222,9 @@ export const receivedConsignment = async (id: string) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
     })
-    .catch((err) => toast.error(err.response.data.message + ": you are not allow to take this consignment",{
-      position:"bottom-right",
-  }));
+    .catch((err) => toast.error(err.response.data.message + ": you are not allow to take this consignment", {
+      
+    }));
 };
 
 //manager
@@ -239,9 +239,9 @@ export const rejectEvaluation = async (id: string, accountId: number, reason: an
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
     })
-    .catch((err) => toast.error(err.response.data.message,{
-      position:"bottom-right",
-  }));
+    .catch((err) => toast.error(err.response.data.message, {
+      
+    }));
 };
 export const acceptEvaluation = async (id: string, accountId: number) => {
   console.log({ accountId: accountId })
@@ -254,9 +254,9 @@ export const acceptEvaluation = async (id: string, accountId: number) => {
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       }
     })
-    .catch((err) => toast.error(err.response.data.message,{
-      position:"bottom-right",
-  }));
+    .catch((err) => toast.error(err.response.data.message, {
+      
+    }));
 };
 
 //customer
