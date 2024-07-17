@@ -407,7 +407,7 @@ public class OrderServiceImpl implements OrderService {
         return new OrderDTO(orderRepository.save(order));
     }
 
-    @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 1)
+    @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)
     @Transactional
     public void scheduleFixedRateTask() {
         LocalDateTime deadline = LocalDateTime.now().minusDays(7);
