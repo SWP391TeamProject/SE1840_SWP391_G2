@@ -28,7 +28,6 @@ public interface OrderService {
 
     Page<OrderDTO> getAllOrdersByUserIdAndStatus(int userId, Payment.Status status, Pageable pageable);
 
-    OrderDTO updateOrderShippingStatus(Order.ShippingStatus shippingStatus, int orderId);
 
     OrderDTO updateOrder(int id, OrderUpdateDTO dto);
 }
