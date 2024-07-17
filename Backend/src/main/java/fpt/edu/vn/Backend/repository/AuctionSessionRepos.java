@@ -17,6 +17,8 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
     Page<AuctionSession> findByStartDateAfter(LocalDateTime startDate, Pageable pageable);
     Page<AuctionSession> findByTitleContaining(String title, Pageable pageable);
 
+    Page<AuctionSession> findAllByStatus(AuctionSession.Status status, Pageable pageable);
+
     @Query("SELECT a FROM AuctionSession a WHERE a.status = 'FINISHED'")
     List<AuctionSession> findFinishedAuctionSessionsByYear(int year);
 

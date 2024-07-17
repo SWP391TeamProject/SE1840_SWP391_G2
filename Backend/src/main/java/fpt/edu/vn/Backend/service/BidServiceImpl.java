@@ -98,7 +98,7 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public BidDTO getHighestBid(AuctionItemId auctionItemId) {
-        Bid bid = bidRepos.findBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId);
+        Bid bid = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItemId).get(0);
         return bid == null ? null : new BidDTO(bid);
     }
 
