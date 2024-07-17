@@ -18,7 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { createAuctionSession } from "@/services/AuctionSessionService"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
 import { set } from "date-fns"
 import { formatDate } from "@/lib/utils"
@@ -52,7 +52,7 @@ export default function AuctionSessionCreate() {
         createAuctionSession(values).then(() => {
             setIsSubmitting(false)
             toast.success("Auction session created successfully.", {
-                position: "bottom-right",
+                
             })
 
         })

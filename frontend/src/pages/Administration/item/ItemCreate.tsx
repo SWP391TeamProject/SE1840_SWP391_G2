@@ -16,7 +16,7 @@ import {Input} from "@/components/ui/input"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
 import {useState} from "react"
-import {toast} from "react-toastify"
+import {toast} from "sonner"
 import {createItem, uploadItemAttachment} from "@/services/ItemService"
 import TextEditor from "@/components/component/TextEditor"
 import {useLocation, useNavigate} from "react-router-dom"
@@ -25,6 +25,7 @@ import LoadingAnimation
   from "@/components/loadingAnimation/LoadingAnimation.tsx";
 import ItemCategorySelector
   from "@/pages/Administration/item/ItemCategorySelector.tsx";
+import { showErrorToast } from "@/lib/handle-error"
 
 const FormSchema = z.object({
   categoryId: z.string().regex(/\d+/, {
@@ -112,24 +113,21 @@ export default function ItemCreate() {
       if (data.files.length > 0) {
         await uploadItemAttachment(res.data.itemId, {files: data.files}).then(() => {
           toast.success('Attachment uploaded successfully!', {
-            position: "bottom-right",
+            
           });
         }).catch(error => {
           console.error(error);
-          toast.error("Failed to upload attachments", {
-            position: "bottom-right",
-          });
+          showErrorToast(error);
         });
       }
       toast.success('Item created successfully!', {
-        position: "bottom-right",
+        
       });
       nav("/admin/items");
     }).catch(error => {
       console.error(error);
-      toast.error("Failed to create item!", {
-        position: "bottom-right",
-      });
+      showErrorToast(error);
+
       setLoading(false);
     });
   }
