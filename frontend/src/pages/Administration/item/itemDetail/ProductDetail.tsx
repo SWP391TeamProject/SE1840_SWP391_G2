@@ -8,9 +8,13 @@ import {
 } from "@/components/ui/card"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input"
+import {Item} from "@/models/Item.ts";
+import {UseFormReturn} from "react-hook-form";
 
-
-export default function ProductDetail({ ...props }) {
+export default function ProductDetail(props: {
+  item: Item,
+  form: UseFormReturn
+}) {
     return (
         <Card>
             <CardHeader>
@@ -23,10 +27,10 @@ export default function ProductDetail({ ...props }) {
                 <div className="grid gap-6">
                   <div className="flex justify-content-center gap-5">
                     <p className="font-semibold tracking-tight">
-                      Owner name:
+                      Owner:
                     </p>
                     <p>
-                      {props.item.owner.nickname}
+                      {props.item.owner.nickname} (#{props.item.owner.accountId})
                     </p>
                   </div>
                     <FormField
@@ -36,7 +40,7 @@ export default function ProductDetail({ ...props }) {
                             <FormItem>
                                 <FormLabel>Name</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Enter name here" defaultValue={props?.name} {...field} />
+                                    <Input type="text" placeholder="Enter name here" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
