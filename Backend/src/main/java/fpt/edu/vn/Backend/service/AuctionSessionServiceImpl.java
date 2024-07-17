@@ -551,7 +551,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 5);
@@ -646,7 +645,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
 
-    @Cacheable(key = "'past'+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
+    @Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
@@ -656,10 +655,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return auctionSessions.map(AuctionSessionDTO::new);
     }
 
-    @Cacheable(key = "'past'+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
+        Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.FINISHED, pageable);
         if (pastAuctionSessions.isEmpty()) {
             logger.warn("No past auction sessions found");
             throw new ResourceNotFoundException("No past auction sessions found");
@@ -670,7 +668,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable.toString()+#title", value = "auctionSession")
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
         Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
@@ -681,20 +678,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return a;
     }
 
-    @Cacheable(key = "'upcoming'+#pageable.toString() != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
-        List<AuctionSession> listA = upcomingAuctionSessions.stream().filter(
-                auctionSession -> auctionSession.getStatus().equals(AuctionSession.Status.SCHEDULED)
-        ).toList();
-
+        Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.SCHEDULED, pageable);
         if (upcomingAuctionSessions.isEmpty()) {
             logger.warn("No upcoming auction sessions found");
             throw new ResourceNotFoundException("No upcoming auction sessions found");
         }
-        return new PageImpl<>(listA.stream()
-                .map(AuctionSessionDTO::new).toList());
+        return upcomingAuctionSessions.map(AuctionSessionDTO::new);
 
     }
 
