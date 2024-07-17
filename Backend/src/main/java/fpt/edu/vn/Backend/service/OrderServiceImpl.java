@@ -7,6 +7,7 @@ import fpt.edu.vn.Backend.DTO.request.OrderPayRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderUpdateDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
@@ -237,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO getOrderById(int orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidInputException("Order not found"));
         return new OrderDTO(order);
     }
 
@@ -359,12 +360,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(OrderDTO::new);
     }
 
-    @Override
-    public OrderDTO updateOrderShippingStatus(Order.ShippingStatus shippingStatus, int orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        order = orderRepository.save(order);
-        return new OrderDTO(order);
-    }
+
 
     @Override
     public OrderDTO updateOrder(int id, OrderUpdateDTO dto) {
@@ -379,7 +375,7 @@ public class OrderServiceImpl implements OrderService {
                 ),
                 Order.ShippingStatus.DELIVERED, Set.of(Order.ShippingStatus.DELIVERED)
         );
-        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        Order order = orderRepository.findById(id).orElseThrow(() -> new InvalidInputException("Order not found"));
         Preconditions.checkState(order.getPayment().getStatus() == Payment.Status.SUCCESS,
                 "Order has not paid yet");
 

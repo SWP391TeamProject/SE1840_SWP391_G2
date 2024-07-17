@@ -182,7 +182,7 @@ export function PublicItemDetail() {
 
           <div
             className="flex flex-row flex-wrap lg:flex-nowrap gap-10 mt-10 lg:mt-20">
-            <div className="grow">
+            <div className="w-full lg:basis-8/12 xl:basis-9/12">
               <h1 className="text-3xl font-bold">Description</h1>
               <div className="w-full pb-10"
                    dangerouslySetInnerHTML={{__html: item.description}}></div>
@@ -191,30 +191,33 @@ export function PublicItemDetail() {
               {
                 pastAuction.length == 0 ?
                   <p>This item has not appeared in any auction before.</p> :
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Start Date</TableHead>
-                        <TableHead>End Date</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {
-                        pastAuction.map(a => {
-                          return <TableRow>
-                            <TableCell className="font-medium">
-                              <a href={`/auctions/${a.auctionSessionId}`}>{a.title}</a>
-                            </TableCell>
-                            <TableCell>{dateFormatter.format(new Date(a.startDate))}</TableCell>
-                            <TableCell>{dateFormatter.format(new Date(a.endDate))}</TableCell>
-                            <TableCell>{a.status}</TableCell>
-                          </TableRow>
-                        })
-                      }
-                    </TableBody>
-                  </Table>
+                  <>
+                    <p className="py-2">This item has appeared in {pastAuction.length} auctions</p>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Start Date</TableHead>
+                          <TableHead>End Date</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {
+                          pastAuction.map(a => {
+                            return <TableRow>
+                              <TableCell className="font-medium">
+                                <a href={`/auctions/${a.auctionSessionId}`}>{a.title}</a>
+                              </TableCell>
+                              <TableCell>{dateFormatter.format(new Date(a.startDate))}</TableCell>
+                              <TableCell>{dateFormatter.format(new Date(a.endDate))}</TableCell>
+                              <TableCell>{a.status}</TableCell>
+                            </TableRow>
+                          })
+                        }
+                      </TableBody>
+                    </Table>
+                  </>
               }
             </div>
             <div className="w-full lg:basis-4/12 xl:basis-3/12">

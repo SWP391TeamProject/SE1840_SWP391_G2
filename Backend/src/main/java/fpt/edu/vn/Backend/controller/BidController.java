@@ -143,7 +143,7 @@ public class BidController {
             auctionItemService.updateAuctionItem(a);
             return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getAmount(), bidDTO.getAmount(), BidReplyDTO.Status.BID));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
     }
 

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -137,19 +138,24 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Override
     @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "auctionSession", allEntries = true),
+            @CacheEvict(cacheNames = "item", allEntries = true),
+            // Add more @CacheEvict annotations as needed
+    })
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Session not found: " + assign.getAuctionSessionId()));
             if (auctionSession.getStatus() != AuctionSession.Status.SCHEDULED) {
-                throw new RuntimeException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
+                throw new InvalidInputException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
             }
 
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
                 if (item.getStatus() != Item.Status.QUEUE && item.getStatus() != Item.Status.UNSOLD) {
-                    throw new RuntimeException("Item is not in queue or unsold: " + item.getItemId());
+                    throw new InvalidInputException("Item is not in queue or unsold: " + item.getItemId());
                 }
 
                 AuctionItem auctionItem = new AuctionItem();
@@ -159,16 +165,17 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 auctionItem.setCurrentPrice(item.getReservePrice()); // Buy in price
                 auctionItemRepos.save(auctionItem);
 
-                itemServiceImpl.updateItem(ItemUpdateDTO.builder()
-                        .itemId(itemIds).status(Item.Status.IN_AUCTION).build());
+                item.setStatus(Item.Status.IN_AUCTION);
+                itemRepos.save(item);
             }
+
             for (Account a: accountRepos.findByRole(Account.Role.MEMBER)) {
                 if (!a.isDummy()) { // skip email for dummy accounts
                     MimeMessage message = mailSender.createMimeMessage();
                     MimeMessageHelper helper = new MimeMessageHelper(message, false);
                     helper.setFrom(systemEmail);
                     helper.setTo(a.getEmail());
-                    helper.setSubject("[Biddify] Reset Password");
+                    helper.setSubject("[Biddify] New Jewelry auction");
                     // Read the HTML file into a String
                     InputStream inputStream = resourceLoader.getResource("classpath:templates/auctionNotiMail.html").getInputStream();
                     String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -213,11 +220,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                         attachmentService.uploadAuctionAttachment(file,savedAuctionSession.getAuctionSessionId());
                     }}
             } catch (Exception e) {
-                throw new RuntimeException("Error uploading attachments", e);
+                throw new InvalidInputException("Error uploading attachments", e);
             }
             return new AuctionSessionDTO(savedAuctionSession);
         } catch (Exception e) {
-            throw new RuntimeException("Error creating auction session", e);
+            throw new InvalidInputException("Error creating auction session", e);
         }
     }
 
@@ -552,7 +559,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 5);
@@ -647,7 +653,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
 
-    @Cacheable(key = "'past'+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
+    @Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
@@ -657,10 +663,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return auctionSessions.map(AuctionSessionDTO::new);
     }
 
-    @Cacheable(key = "'past'+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findByEndDateBefore(LocalDateTime.now(), pageable);
+        Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.FINISHED, pageable);
         if (pastAuctionSessions.isEmpty()) {
             logger.warn("No past auction sessions found");
             throw new ResourceNotFoundException("No past auction sessions found");
@@ -671,7 +676,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @Cacheable(key = "#pageable.toString()+#title", value = "auctionSession")
     public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
         Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
                 .map(AuctionSessionDTO::new);
@@ -682,20 +686,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         return a;
     }
 
-    @Cacheable(key = "'upcoming'+#pageable.toString() != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now(), pageable);
-        List<AuctionSession> listA = upcomingAuctionSessions.stream().filter(
-                auctionSession -> auctionSession.getStatus().equals(AuctionSession.Status.SCHEDULED)
-        ).toList();
-
+        Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.SCHEDULED, pageable);
         if (upcomingAuctionSessions.isEmpty()) {
             logger.warn("No upcoming auction sessions found");
             throw new ResourceNotFoundException("No upcoming auction sessions found");
         }
-        return new PageImpl<>(listA.stream()
-                .map(AuctionSessionDTO::new).toList());
+        return upcomingAuctionSessions.map(AuctionSessionDTO::new);
 
     }
 
