@@ -141,14 +141,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Session not found: " + assign.getAuctionSessionId()));
             if (auctionSession.getStatus() != AuctionSession.Status.SCHEDULED) {
-                throw new RuntimeException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
+                throw new InvalidInputException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
             }
 
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
                 if (item.getStatus() != Item.Status.QUEUE && item.getStatus() != Item.Status.UNSOLD) {
-                    throw new RuntimeException("Item is not in queue or unsold: " + item.getItemId());
+                    throw new InvalidInputException("Item is not in queue or unsold: " + item.getItemId());
                 }
 
                 AuctionItem auctionItem = new AuctionItem();
@@ -212,11 +212,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                         attachmentService.uploadAuctionAttachment(file,savedAuctionSession.getAuctionSessionId());
                     }}
             } catch (Exception e) {
-                throw new RuntimeException("Error uploading attachments", e);
+                throw new InvalidInputException("Error uploading attachments", e);
             }
             return new AuctionSessionDTO(savedAuctionSession);
         } catch (Exception e) {
-            throw new RuntimeException("Error creating auction session", e);
+            throw new InvalidInputException("Error creating auction session", e);
         }
     }
 

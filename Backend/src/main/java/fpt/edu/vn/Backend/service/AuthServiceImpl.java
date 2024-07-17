@@ -122,13 +122,13 @@ public class AuthServiceImpl implements AuthService {
             newAccount.setDummy(false);
             newAccount = accountRepos.save(newAccount);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
 
         try {
             requestActivateAccount(newAccount.getEmail()); // send activation email
         } catch (MessagingException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
 
         // After successful registration, log the user in and generate a token
@@ -221,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
             try {
                 request2fa(user);
             } catch (MessagingException e) {
-                throw new RuntimeException(e);
+                throw new InvalidInputException(e);
             }
             return AuthResponseDTO.builder().redirect2fa(true).build();
         }

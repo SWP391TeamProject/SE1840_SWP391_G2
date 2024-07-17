@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.DTO.request.PayPalPaymentRequestDTO;
 import fpt.edu.vn.Backend.DTO.response.PaypalCaptureResponseDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.PaypalRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class PaypalServiceImpl implements PaypalService {
 
         if (!res.getStatusCode().is2xxSuccessful()) {
             logger.error("Failed to get PayPal access token: {}", res);
-            throw new RuntimeException("Failed to get PayPal access token");
+            throw new InvalidInputException("Failed to get PayPal access token");
         }
 
         JsonObject json = new Gson().fromJson(res.getBody(), JsonObject.class);

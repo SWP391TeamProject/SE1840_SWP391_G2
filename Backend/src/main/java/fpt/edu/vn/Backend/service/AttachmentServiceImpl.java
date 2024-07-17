@@ -5,6 +5,7 @@ import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
@@ -183,7 +184,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             mimeType = mimeTypes.forName(file.getContentType());
         } catch (MimeTypeException e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
 
 
@@ -196,7 +197,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             bytes = file.getBytes();
         }catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 
@@ -222,7 +223,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             mimeType = mimeTypes.forName(file.getContentType());
         } catch (MimeTypeException e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
 
 
@@ -235,7 +236,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             bytes = file.getBytes();
         }catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new InvalidInputException(e);
         }
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 

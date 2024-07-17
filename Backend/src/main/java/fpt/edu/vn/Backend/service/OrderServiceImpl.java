@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.DTO.OrderDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
@@ -224,7 +225,7 @@ public class OrderServiceImpl implements OrderService {
             return new OrderDTO(order);
         } catch (Exception e) {
             System.err.println("An error occurred while creating order: " + e.getMessage());
-            throw new RuntimeException("Failed to create order", e);
+            throw new InvalidInputException("Failed to create order", e);
         }
     }
 
@@ -232,11 +233,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO getOrderById(int orderId) {
         try {
-            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidInputException("Order not found"));
             return new OrderDTO(order);
         } catch (Exception e) {
             System.err.println("An error occurred while fetching order by ID: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch order by ID", e);
+            throw new InvalidInputException("Failed to fetch order by ID", e);
         }
     }
 
@@ -247,7 +248,7 @@ public class OrderServiceImpl implements OrderService {
                     .map(OrderDTO::new);
         } catch (Exception e) {
             System.err.println("An error occurred while fetching all orders: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch all orders", e);
+            throw new InvalidInputException("Failed to fetch all orders", e);
         }
     }
 
@@ -257,7 +258,7 @@ public class OrderServiceImpl implements OrderService {
             return orderRepository.findAllByPayment_Account_AccountId(userId, pageable)
                     .map(OrderDTO::new);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch orders by user ID", e);
+            throw new InvalidInputException("Failed to fetch orders by user ID", e);
         }
     }
 
@@ -267,7 +268,7 @@ public class OrderServiceImpl implements OrderService {
             return orderRepository.findAllByPayment_Status(status, pageable)
                     .map(OrderDTO::new);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch all orders", e);
+            throw new InvalidInputException("Failed to fetch all orders", e);
         }
     }
 
@@ -278,31 +279,31 @@ public class OrderServiceImpl implements OrderService {
                     .map(OrderDTO::new);
         } catch (Exception e) {
             System.err.println("An error occurred while fetching all orders: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch all orders", e);
+            throw new InvalidInputException("Failed to fetch all orders", e);
         }
     }
 
     @Override
     public OrderDTO updateOrderShippingAddress(String ship_address, int orderId) {
         try {
-            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidInputException("Order not found"));
             order.setShippingAddress(ship_address);
             order = orderRepository.save(order);
             return new OrderDTO(order);
         } catch (Exception e) {
             System.err.println("An error occurred while updating order: " + e.getMessage());
-            throw new RuntimeException("Failed to update order", e);
+            throw new InvalidInputException("Failed to update order", e);
         }
     }
 
     @Override
     public void deleteOrder(int orderId) {
         try {
-            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+            Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidInputException("Order not found"));
             orderRepository.delete(order);
         } catch (Exception e) {
             System.err.println("An error occurred while deleting order: " + e.getMessage());
-            throw new RuntimeException("Failed to delete order", e);
+            throw new InvalidInputException("Failed to delete order", e);
         }
     }
 

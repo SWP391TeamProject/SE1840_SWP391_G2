@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.DepositDTO;
 import fpt.edu.vn.Backend.DTO.request.DepositRequest;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 
 import fpt.edu.vn.Backend.pojo.Deposit;
@@ -34,20 +35,20 @@ public class DepositServiceImpl implements DepositService{
             if (auctionSessionOptional.isPresent()) {
                 deposit.setAuctionSession(auctionSessionOptional.get());
             } else {
-                throw new RuntimeException("Auction Item not found");
+                throw new InvalidInputException("Auction Item not found");
             }
             int paymentId = depositRequest.getPaymentId();
             Optional<Payment> paymentOptional = paymentRepos.findById(paymentId);
             if (paymentOptional.isPresent()) {
                 deposit.setPayment(paymentOptional.get());
             } else {
-                throw new RuntimeException("Payment not found");
+                throw new InvalidInputException("Payment not found");
             }
 
             deposit = depositRepos.save(deposit);
             return new DepositDTO(deposit);
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to create deposit: " + ex.getMessage());
+            throw new InvalidInputException("Failed to create deposit: " + ex.getMessage());
         }
     }
 
@@ -55,10 +56,10 @@ public class DepositServiceImpl implements DepositService{
     public DepositDTO getDepositById(int depositId) {
         try {
             Deposit deposit = depositRepos.findById(depositId)
-                    .orElseThrow(() -> new RuntimeException("Deposit not found"));
+                    .orElseThrow(() -> new InvalidInputException("Deposit not found"));
             return new DepositDTO(deposit);
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to retrieve deposit: " + ex.getMessage());
+            throw new InvalidInputException("Failed to retrieve deposit: " + ex.getMessage());
         }
     }
 
@@ -68,7 +69,7 @@ public class DepositServiceImpl implements DepositService{
             Page<Deposit> deposits = depositRepos.findAll(pageable);
             return deposits.map(DepositDTO::new);
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to retrieve deposits: " + ex.getMessage());
+            throw new InvalidInputException("Failed to retrieve deposits: " + ex.getMessage());
         }
     }
 
@@ -76,26 +77,26 @@ public class DepositServiceImpl implements DepositService{
     public DepositDTO updateDeposit(DepositRequest depositRequest) {
        try {
             Deposit deposit = depositRepos.findById(depositRequest.getDepositId())
-                    .orElseThrow(() -> new RuntimeException("Deposit not found"));
+                    .orElseThrow(() -> new InvalidInputException("Deposit not found"));
 
            Optional<AuctionSession> auctionSessionOptional = auctionSessionRepos.findById(depositRequest.getAuctionSessionId());
             if (auctionSessionOptional.isPresent()) {
                 deposit.setAuctionSession(auctionSessionOptional.get());
             } else {
-                throw new RuntimeException("Auction Item not found");
+                throw new InvalidInputException("Auction Item not found");
             }
             int paymentId = depositRequest.getPaymentId();
             Optional<Payment> paymentOptional = paymentRepos.findById(paymentId);
             if (paymentOptional.isPresent()) {
                 deposit.setPayment(paymentOptional.get());
             } else {
-                throw new RuntimeException("Payment not found");
+                throw new InvalidInputException("Payment not found");
             }
 
             deposit = depositRepos.save(deposit);
             return new DepositDTO(deposit);
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to update deposit: " + ex.getMessage());
+            throw new InvalidInputException("Failed to update deposit: " + ex.getMessage());
         }
     }
 
@@ -103,10 +104,10 @@ public class DepositServiceImpl implements DepositService{
     public void deleteDeposit(int depositId) {
         try {
             Deposit deposit = depositRepos.findById(depositId)
-                    .orElseThrow(() -> new RuntimeException("Deposit not found"));
+                    .orElseThrow(() -> new InvalidInputException("Deposit not found"));
             depositRepos.delete(deposit);
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to delete deposit: " + ex.getMessage());
+            throw new InvalidInputException("Failed to delete deposit: " + ex.getMessage());
         }
     }
 }
