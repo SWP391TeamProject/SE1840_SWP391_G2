@@ -185,6 +185,7 @@ export default function ItemDetail() {
           message={"Item " + currentItem?.name}
           label="Ok"
           onSuccess={confirm}
+          description=""
         />
     </>
   );
