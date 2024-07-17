@@ -3,8 +3,10 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.pojo.Notification;
 import fpt.edu.vn.Backend.repository.AccountRepos;
+import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.repository.NotificationRepos;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -15,9 +17,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,11 +29,13 @@ public class NotificationServiceImpl implements NotificationService {
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private final NotificationRepos notificationRepos;
     private final AccountRepos accountRepos;
+    private final AuctionSessionRepos auctionSessionRepos;
 
     @Autowired
-    public NotificationServiceImpl(NotificationRepos notificationRepos, AccountRepos accountRepos) {
+    public NotificationServiceImpl(NotificationRepos notificationRepos, AccountRepos accountRepos, AuctionSessionRepos auctionSessionRepos) {
         this.notificationRepos = notificationRepos;
         this.accountRepos = accountRepos;
+        this.auctionSessionRepos = auctionSessionRepos;
     }
 
     @Override
@@ -99,4 +105,25 @@ public class NotificationServiceImpl implements NotificationService {
     public int countUnreadNotifications(String userEmail) {
         return notificationRepos.countAllByAccount_EmailAndReadIsFalse(userEmail);
     }
+
+    @Override
+    public void sendInvitationToAllMembers(int auctionSessionId) {
+        List<Account> members = accountRepos.findAll();
+        Optional<AuctionSession> auction = auctionSessionRepos.findById(auctionSessionId);
+        AuctionSession auctionSession = auction.get();
+
+        String auctionLink = "https://biddify/api/auction-sessions/" + auctionSessionId;
+        String message = "You are invited to join the auction for " + auctionSession.getTitle() + "! Click the link to participate: " + auctionLink;
+
+        for (Account account : members) {
+            Notification notification = new Notification();
+            notification.setAccount(account);
+            notification.setMessage(message);
+            notification.setRead(false);
+            notification.setCreateDate(LocalDateTime.now());
+            notification.setUpdateDate(LocalDateTime.now());
+            notificationRepos.save(notification);
+        }
+    }
+
 }
