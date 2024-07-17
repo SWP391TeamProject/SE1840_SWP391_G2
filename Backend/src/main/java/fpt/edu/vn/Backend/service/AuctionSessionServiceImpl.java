@@ -169,7 +169,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                     MimeMessageHelper helper = new MimeMessageHelper(message, false);
                     helper.setFrom(systemEmail);
                     helper.setTo(a.getEmail());
-                    helper.setSubject("[Biddify] New auction");
+                    helper.setSubject("[Biddify] New Jewelry auction");
                     // Read the HTML file into a String
                     InputStream inputStream = resourceLoader.getResource("classpath:templates/auctionNotiMail.html").getInputStream();
                     String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
