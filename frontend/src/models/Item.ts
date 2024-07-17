@@ -9,6 +9,7 @@ export interface Item {
   description?: string;
   reservePrice?: number;
   buyInPrice?: number;
+  soldPrice?: number;
   status?: ItemStatus;
   createDate?: Date;
   updateDate?: Date;

@@ -41,6 +41,9 @@ public class Item {
     @Column(name = "buy_in_price", precision = 20, scale = 8)
     private BigDecimal buyInPrice;
 
+    @Column(name = "sold_price", precision = 20, scale = 8)
+    private BigDecimal soldPrice;
+
     public enum Status {
         QUEUE, IN_AUCTION, SOLD, UNSOLD, REMOVED
     }

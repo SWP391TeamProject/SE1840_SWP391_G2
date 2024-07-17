@@ -1,7 +1,7 @@
 import { API_SERVER } from "@/constants/domain";
 import { PaymentStatus } from "@/constants/enums";
 import { Page } from "@/models/Page";
-import { Order } from "@/models/newModel/order";
+import {Order, ShippingStatus} from "@/models/newModel/order";
 import { getCookie } from "@/utils/cookies";
 import axios from "axios";
 
@@ -45,8 +45,8 @@ export const getOrdersByUserId = async (pageNumber: number, pageSize?: number, s
     });
 };
 
-export const getOrdersById = async (id: number) => {
-    return await axios.get<Page<Order>>(`${baseUrl}/${id}`, {
+export const getOrderById = async (id: number) => {
+    return await axios.get<Order>(`${baseUrl}/${id}`, {
         headers: {
             "Content-Type": "application/json",
 
@@ -55,12 +55,28 @@ export const getOrdersById = async (id: number) => {
     });
 };
 
-export const updateShippingAddress = async (id: number, address: string) => {
-    return await axios.get<void>(`${baseUrl}/update/${id}?address=${address}`, {
+
+export const payOrder = async (id: number, dto : {
+    shippingAddress?: string,
+    shippingNote?: string
+}) => {
+    console.log(JSON.parse(getCookie("user") || "{}").accessToken || "")
+    return await axios.post<Order>(`${baseUrl}/pay/${id}`, dto, {
         headers: {
             "Content-Type": "application/json",
-
-            Authorization: "Bearer " + JSON.parse(getCookie("user"))?.accessToken,
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
+        },
+    });
+}
+export const updateOrder = async (id: number, dto : {
+    shippingAddress?: string,
+    shippingNote?: string,
+    shippingStatus?: ShippingStatus
+}) => {
+    return await axios.post<Order>(`${baseUrl}/${id}`, dto, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + JSON.parse(getCookie("user") || "{}").accessToken || "",
         },
     });
 }

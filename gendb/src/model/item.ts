@@ -11,6 +11,7 @@ export interface Item {
     description: string,
     reservePrice: number,
     buyInPrice: number,
+    soldPrice?: number,
     status: ItemStatus,
     imageURLs: string[],
     createDate: Date,

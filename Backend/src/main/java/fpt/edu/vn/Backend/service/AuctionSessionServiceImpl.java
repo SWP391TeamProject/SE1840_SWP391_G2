@@ -263,6 +263,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             Item item = auctionItem.getItem();
             {
                 item.setStatus(bids.isEmpty() ? Item.Status.UNSOLD : Item.Status.SOLD);
+                if (!bids.isEmpty())
+                    item.setSoldPrice(bids.get(0).getAmount());
                 itemRepos.save(item);
             }
 

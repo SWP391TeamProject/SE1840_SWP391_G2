@@ -91,12 +91,15 @@ import BlogEdit from "./pages/Administration/Blog/BlogPostEdit/BlogEdit.tsx";
 import StripePayment from "./StripePayment.tsx";
 import PaymentsList from "./pages/Administration/payment/PaymentsList.tsx";
 import KycVerification from "./pages/CustomerSite/Profile/KycVerification.tsx";
-import { Orders } from "./pages/CustomerSite/dashboard/orders/Orders.tsx";
+import { UserOrders } from "./pages/CustomerSite/dashboard/orders/UserOrders.tsx";
 import { OrderList } from "./pages/Administration/Order/orderList.tsx";
 import { OrderDetail } from "./pages/Administration/Order/orderDetail.tsx";
-import { Order } from "./pages/CustomerSite/dashboard/orders/Order.tsx";
+import { UserOrderDetail } from "./pages/CustomerSite/dashboard/orders/UserOrderDetail.tsx";
 import AdminDashboard from "./pages/Dashboard/AdminDashboard.tsx";
 import {PublicItemDetail} from "@/pages/CustomerSite/Item/PublicItemDetail.tsx";
+import {
+  OrderCheckout
+} from "@/pages/CustomerSite/dashboard/orders/OrderCheckout.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -203,9 +206,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         element={<CustomerConsignmentList />}></Route>
                       <Route path="consignments/:id" element={<CustomerConsignmentDetail />}></Route>
                       <Route path="bids" element={<Bids />}></Route>
-                      <Route path="orders" element={<Orders />}></Route>
-                      <Route path="orders/:id"
-                        element={<Order />}></Route>
+                      <Route path="order/:id" element={<UserOrderDetail />}></Route>
+                      <Route path="orders" element={<UserOrders />}></Route>
+                      <Route path="orders/checkout/:id" element={<OrderCheckout />}></Route>
                     </Route>
                     {/* Administration */}
                     <Route
