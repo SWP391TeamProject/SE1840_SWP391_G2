@@ -25,9 +25,10 @@ import { Suspense, useEffect, useState } from "react";
 import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 import { getAuctions } from "@/services/AuctionSessionService";
 import { AcutionSessionsTable } from "./auction-session-data-table/auction-session-table";
+import { useLocation } from "react-router-dom";
 
 export default function AuctionSessionList() {
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
@@ -36,6 +37,7 @@ export default function AuctionSessionList() {
   let pageSize = url.searchParams.get("per_page");
   const auctionStates = ["Upcoming", "Past", "Active"];
   const [auctionSessionPromise, setAuctionSessionPromise] = useState<Promise<any>>();
+  const location = useLocation();
 
   // const auctionSessionPromise = getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter});
 
@@ -183,16 +185,23 @@ export default function AuctionSessionList() {
     console.log(Number.parseInt(pageSize));
     if (Number.parseInt(pageNumber) >= 1)
       setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter }));
-    // else if (Number.parseInt(pageNumber) == 1 || pageNumber == null)
-    //   setAuctionSessionPromise(getAuctions({ page: 1, size: Number.parseInt(pageSize), status: statusFilter }));
   }, [pageSize, pageNumber])
+
+  useEffect(() => {
+    console.log(pageNumber);
+  }, [pageNumber])
 
   useEffect(() => {
     // fetchAuctionSessions(0);
     // setStatusFilter("all");
     // if (Number.parseInt(pageNumber) != undefined)
     //   setAuctionSessionPromise(getAuctions({ page: 1, size: Number.parseInt(pageSize), status: statusFilter }));
+    console.log(url);
   }, []);
+
+  useEffect(() => {
+  }, [location])
+
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">

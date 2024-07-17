@@ -15,7 +15,7 @@ import {
 import {Input} from "@/components/ui/input"
 import {ScrollArea} from "@/components/ui/scroll-area"
 import DropzoneComponent from "@/components/drop-zone/DropZoneComponent"
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {toast} from "react-toastify"
 import {createItem, uploadItemAttachment} from "@/services/ItemService"
 import TextEditor from "@/components/component/TextEditor"
@@ -25,6 +25,7 @@ import LoadingAnimation
   from "@/components/loadingAnimation/LoadingAnimation.tsx";
 import ItemCategorySelector
   from "@/pages/Administration/item/ItemCategorySelector.tsx";
+import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
 
 const FormSchema = z.object({
   categoryId: z.string().regex(/\d+/, {
@@ -68,6 +69,8 @@ export default function ItemCreate() {
   const auth = useAuth();
   const nav = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showTrigger, setShowTrigger] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const location = useLocation();
   const consignmentId = location?.state?.consignmentId;
 
@@ -92,8 +95,50 @@ export default function ItemCreate() {
 
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    setLoading(true);
+    // setLoading(true);
 
+    // interface DTO extends Omit<z.infer<typeof FormSchema>, 'categoryId' | 'age' | 'files'> {
+    //   categoryId?: number;
+    //   age?: number;
+    //   consignmentId?: number;
+    // }
+
+    // const dto: DTO = {
+    //   ...data,
+    //   categoryId: parseInt(data.categoryId),
+    //   age: data.age.length == 0 ? undefined : parseInt(data.age),
+    //   consignmentId
+    // };
+
+    // createItem(dto).then(async (res) => {
+    //   console.log(res);
+    //   if (data.files.length > 0) {
+    //     await uploadItemAttachment(res.data.itemId, {files: data.files}).then(() => {
+    //       toast.success('Attachment uploaded successfully!', {
+    //         position: "bottom-right",
+    //       });
+    //     }).catch(error => {
+    //       console.error(error);
+    //       toast.error("Failed to upload attachments", {
+    //         position: "bottom-right",
+    //       });
+    //     });
+    //   }
+    //   toast.success('Item created successfully!', {
+    //     position: "bottom-right",
+    //   });
+    //   nav("/admin/items");
+    // }).catch(error => {
+    //   console.error(error);
+    //   toast.error("Failed to create item!", {
+    //     position: "bottom-right",
+    //   });
+    //   setLoading(false);
+    // });
+    setShowTrigger(true);
+  }
+
+  const handleConfirmed = (data: z.infer<typeof formSchema>) => {
     interface DTO extends Omit<z.infer<typeof FormSchema>, 'categoryId' | 'age' | 'files'> {
       categoryId?: number;
       age?: number;
@@ -110,7 +155,7 @@ export default function ItemCreate() {
     createItem(dto).then(async (res) => {
       console.log(res);
       if (data.files.length > 0) {
-        await uploadItemAttachment(res.data.itemId, {files: data.files}).then(() => {
+        await uploadItemAttachment(res.data.itemId, { files: data.files }).then(() => {
           toast.success('Attachment uploaded successfully!', {
             position: "bottom-right",
           });
@@ -133,6 +178,24 @@ export default function ItemCreate() {
       setLoading(false);
     });
   }
+
+  const confirm = () => {
+    setIsConfirmed(true);
+    setShowTrigger(false);
+    setLoading(true);
+  }
+
+  useEffect(() => {
+    if (isConfirmed) {
+      if (form.getValues) {
+        const values = form.getValues();
+        handleConfirmed(values);
+        setIsConfirmed(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  }, [isConfirmed, form.getValues])
 
   return (
     <>
@@ -333,6 +396,15 @@ export default function ItemCreate() {
               <Button type="submit">Submit</Button>
             </form>
           </Form>
+          <ConfirmationDialog
+            description='This action cannot be undone.'
+            label='Ok'
+            message='Are you sure to Create this Item?'
+            onSuccess={confirm}
+            open={showTrigger}
+            onOpenChange={setShowTrigger}
+            title='Confirmation'
+          />
         </div>
       }
     </>

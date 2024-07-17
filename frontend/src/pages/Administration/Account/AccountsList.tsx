@@ -198,9 +198,11 @@ export default function AccountsList() {
     // })
     setRoleFilter("all");
     // setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""}));
+    console.log(url)
   }, []);
 
   useEffect(() => {
+    console.log(pageNumber)
     if (Number.parseInt(pageNumber) >= 1)
       setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole }));
   }, [pageSize, pageNumber, sort])
@@ -210,6 +212,10 @@ export default function AccountsList() {
     setRoleFilter("all");
 
   }, [reload]);
+
+  useEffect(() => {
+    console.log(url)
+  }, [url])
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
