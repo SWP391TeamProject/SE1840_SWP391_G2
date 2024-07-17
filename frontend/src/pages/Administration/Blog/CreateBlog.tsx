@@ -1,4 +1,5 @@
 import TextEditor from '@/components/component/TextEditor'
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog'
 import DropzoneComponent from '@/components/drop-zone/DropZoneComponent'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -14,6 +15,7 @@ import BlogCategoryService from '@/services/BlogCategoryService'
 import BlogService from '@/services/BlogService'
 import { getCookie } from '@/utils/cookies'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -48,6 +50,10 @@ const formSchema = z.object({
 export const CreateBlog = () => {
     const [category, setCategory] = useState<BlogCategory[]>([]);
     const nav = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [showTrigger, setShowTrigger] = useState(false);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -68,7 +74,29 @@ export const CreateBlog = () => {
             showErrorToast(error);
         });
     }, [])
+
     function onSubmit(data: z.infer<typeof formSchema>) {
+        // data.categoryId = category.find((blog) => blog.name === data.categoryId)?.blogCategoryId;
+        // data.userId = JSON.parse(getCookie('user') || '{}').id;
+        // console.log(data);
+        // BlogService.createBlog(data).then((res) => {
+        //     console.log(res);
+        //     toast.success('Blog created successfully!', {
+        //         position: "bottom-right",
+        //     });
+        //     form.reset();
+        //     nav('/admin/blogs');
+        // }
+        // ).catch(error => {
+        //     console.log(error);
+        //     toast.error('There was an error!', {
+        //         position: "bottom-right",
+        //     });
+        // });
+        setShowTrigger(true);
+    }
+
+    const handleConfirmed = (data: z.infer<typeof formSchema>) => {
         data.categoryId = category.find((blog) => blog.name === data.categoryId)?.blogCategoryId;
         data.userId = JSON.parse(getCookie('user') || '{}').id;
         console.log(data);
@@ -78,14 +106,33 @@ export const CreateBlog = () => {
                 
             });
             form.reset();
+            setIsLoading(false);
             nav('/admin/blogs');
         }
         ).catch(error => {
-            console.log(error);
+            setIsLoading(false)
             showErrorToast(error);
         });
-
     }
+
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsLoading(true);
+    }
+
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsLoading(false)
+            }
+        }
+    }, [isConfirmed, form.getValues])
+
     return (
         <main className="flex-1 py-8 px-6">
             <div className="container mx-auto max-w-6xl">
@@ -163,11 +210,27 @@ export const CreateBlog = () => {
                         <input type="hidden" {...form.register(`userId`)} />
                         <div className="sticky bottom-1">
                             <Separator />
-                            <Button className='mt-2' type="submit">Submit</Button>
+                            {isLoading
+                                ? <Button type="submit" disabled>
+                                    <Loader2 className="animate-spin" />
+                                </Button>
+                                : <Button className='mt-2' type="submit" >
+                                    Submit
+                                </Button>
+                            }
                         </div>
 
                     </form>
                 </Form>
+                <ConfirmationDialog
+                    description='This action cannot be undone.'
+                    label='Ok'
+                    message='Are you sure to Create this Blog?'
+                    onSuccess={confirm}
+                    open={showTrigger}
+                    onOpenChange={setShowTrigger}
+                    title='Confirmation'
+                />
             </div>
         </main>
     )

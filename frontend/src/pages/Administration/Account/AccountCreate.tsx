@@ -82,8 +82,8 @@ export default function AccountCreate() {
             toast.success("Account created successfully");
             setIsSubmitting(false);
         })
-
     }
+    
     const confirm = () => {
         setIsConfirmed(true);
         setShowTrigger(false);
@@ -320,7 +320,6 @@ export default function AccountCreate() {
                         open={showTrigger}
                         onOpenChange={setShowTrigger}
                         title='Confirmation'
-
                     />
                 </Form>
             </div>
