@@ -153,30 +153,30 @@ export const getColumns = (): ColumnDef<Account>[] => [
       }
       
       const suspendAccount = (id: string) => {
-        try {
+        // try {
           deleteAccountService(id).then((res) => {
             if(res) {
               toast.success("Account suspended")
             }
             setShowDeleteItemDialog(false)
+          }).catch((err) => {
+            toast.error(err.response.data.message)
           })
-        } catch (error){
-          console.log(error);
-          toast.error(error)
-        }
+        // } catch (error){
+        //   console.log(error);
+        //   toast.error(error)
+        // }
       }
 
       const activateAccount = (id: string) => {
-        try {
           activateAccountService(id).then((res) => {
             if(res) {
               toast.success("Account activated")
             }
             setShowDeleteItemDialog(false)
+          }).catch((err) => {
+            toast.error(err.response.data.message)
           })
-        } catch (error){
-          toast.error(error)
-        }
       }
 
       return (

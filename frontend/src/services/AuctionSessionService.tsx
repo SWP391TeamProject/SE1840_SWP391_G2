@@ -94,7 +94,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
                             params: params
                         })
                 }
-            case "Acive":
+            case "Active":
                 {
                     let params = {
                         page: page ? page - 1 : 0,

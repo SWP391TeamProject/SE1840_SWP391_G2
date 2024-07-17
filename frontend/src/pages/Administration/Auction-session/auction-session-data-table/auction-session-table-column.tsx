@@ -14,7 +14,7 @@ import {
 import { DataTableColumnHeader } from "@/components/data-tables/data-table-column-header"
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch } from "@/redux/hooks"
-import { AccountStatus } from "@/constants/enums"
+import { AccountStatus, AuctionSessionStatus } from "@/constants/enums"
 import { formatDate } from "@/lib/utils"
 import { MoreHorizontal } from "lucide-react"
 
@@ -115,6 +115,34 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       </div>
     ),
     enableSorting: false,
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+          switch (row.original.status) {
+            case AuctionSessionStatus.PROGRESSING:
+              return <Badge variant="default" className="bg-yellow-500 w-[150px] text-center flex justify-center items-center">Progressing</Badge>;
+            case AuctionSessionStatus.FINISHED:
+              return <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">Finished</Badge>;
+            case AuctionSessionStatus.SCHEDULED:
+              return <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">Scheduled</Badge>;
+            case AuctionSessionStatus.TERMINATED:
+              return <Badge variant="default" className="bg-red-500 w-[150px] text-center flex justify-center items-center">Terminated</Badge>;
+            default:
+              return <Badge variant="destructive">Unknown Status</Badge>;
+          }
+        }
+        
+      //   {row.getValue("status") == ConsignmentStatus.ACTIVE ?
+      //     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[row.status]}</Badge> :
+      //     <Badge variant="destructive">{ConsignmentStatus[row.status]}</Badge>}
+    ,
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
   },
   {
     id: "actions",

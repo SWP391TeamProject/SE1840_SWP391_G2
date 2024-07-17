@@ -32,3 +32,9 @@ export const countUnreadNotifications = async () => {
         ...authHeader()
     });
 };
+
+export const inviteAll = async (id: number) => {
+    return await axios.get<number>(`${baseUrl}/invite-alll/${id}`,{
+        ...authHeader()
+    });
+};
