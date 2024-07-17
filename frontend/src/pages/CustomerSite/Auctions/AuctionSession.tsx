@@ -249,7 +249,12 @@ export default function AuctionSession() {
             return (
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant="default" >Place bid</Button>
+                        <Button variant="default" onClick={()=>{
+                             if(!auth.user.kyc){
+                                setShowKycPopup(true);
+                                return ;
+                            }
+                        }} >Place bid</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className='text-foreground'>
                         <AlertDialogHeader >
@@ -260,7 +265,9 @@ export default function AuctionSession() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel >Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => navigate('/auth/login')}>Login</AlertDialogAction>
+                            <AlertDialogAction onClick={() => {
+                               
+                                navigate('/auth/login')}}>Login</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -285,7 +292,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default">Place Bid</Button>
+                    <Button variant="default" onClick={()=>{
+                          if(!auth?.user.kyc){
+                            setShowKycPopup(true);
+                            return ;
+                        }
+                    }}>Place Bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
@@ -301,7 +313,9 @@ export default function AuctionSession() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleRegister()}>Register</AlertDialogAction>
+                        <AlertDialogAction onClick={()  =>{
+                          
+                            handleRegister()}}>Register</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -454,6 +468,7 @@ export default function AuctionSession() {
                                                 <>
                                                     {bidders.includes(userId) ? (
                                                         <Button className='space-y-2' onClick={() => {
+                                                            
                                                             let name = item?.itemDTO.name;
                                                             navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
                                                         }}>Place Bid</Button>
@@ -511,7 +526,7 @@ export default function AuctionSession() {
                     </div>
                 </div>
             </main >
-            {showKycPopup && <KycVerificationPopup />}
+            <KycVerificationPopup open={showKycPopup} setOpen={setShowKycPopup}/>
 
         </div >
     )

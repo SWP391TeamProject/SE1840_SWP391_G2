@@ -1,9 +1,13 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.DTO.OrderDTO;
+import fpt.edu.vn.Backend.DTO.request.OrderPayRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.OrderUpdateDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +29,7 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Page<OrderDTO>> getAllOrders(@PageableDefault(size = 50, sort = "payment.paymentAmount") Pageable pageable,
                                                        @RequestParam(required = false) String order,
                                                        @RequestParam(required = false) String status) {
@@ -42,10 +46,12 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<OrderDTO>> getAllOrdersByUserId(@PageableDefault(size = 50, sort = "createDate") Pageable pageable,
+    public ResponseEntity<Page<OrderDTO>> getAllOrdersByUserId(Principal principal,
+                                                               @PageableDefault(size = 50, sort = "createDate") Pageable pageable,
                                                                @RequestParam(required = false) String order,
                                                                @RequestParam(required = false) String status,
                                                                @PathVariable("userId") int userId) {
+        Authorizer.expectManagerOrUserId(principal, userId);
         if (order != null) {
             if (order.equals("desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
@@ -61,20 +67,24 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> getOrderById(Principal principal, @PathVariable int id) {
         OrderDTO orderDTO = orderService.getOrderById(id);
-        Authorizer.expectAdminOrUserId(principal, orderDTO.getPayment().getAccountId());
+        Authorizer.expectManagerOrUserId(principal, orderDTO.getPayment().getAccountId());
         return ResponseEntity.ok(orderDTO);
     }
 
-    @GetMapping("update/{id}")
-    public ResponseEntity<OrderDTO> updateShippingAddress(@PathVariable int id,
-                                                          @RequestParam String address) {
-        OrderDTO orderDTO = orderService.updateOrderShippingAddress(address,id);
-        return ResponseEntity.ok(orderDTO);
+    @PostMapping("/{id}")
+    public ResponseEntity<OrderDTO> updateOrder(Principal principal, @PathVariable int id, @RequestBody OrderUpdateDTO dto) {
+        OrderDTO orderDTO = orderService.getOrderById(id);
+        JwtUser user = Authorizer.expectManagerOrUserId(principal, orderDTO.getPayment().getAccountId());
+        if (!Authorizer.MANAGER.contains(user.getRole())) {
+            dto.setShippingStatus(null); // user cannot change shipping status
+        }
+        return ResponseEntity.ok(orderService.updateOrder(id, dto));
     }
 
-    @PostMapping("/updateStatus")
-    public ResponseEntity<Void> updateItemStatus(@RequestBody(required = false) UpdateOrderStatusRequestDTO orderDTOList) {
-        orderService.updateOrderByStatus(orderDTOList);
-        return ResponseEntity.ok().build();
+    @PostMapping("/pay/{id}")
+    public ResponseEntity<OrderDTO> payOrder(Principal principal, @PathVariable int id,
+                                             @RequestBody OrderPayRequestDTO dto) {
+        JwtUser user = Authorizer.getUser(principal);
+        return ResponseEntity.ok(orderService.payOrder(user.getUserId(), id, dto));
     }
 }

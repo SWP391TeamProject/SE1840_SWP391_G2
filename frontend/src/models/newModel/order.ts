@@ -1,10 +1,18 @@
 import { Payment } from "../payment";
-import { AuctionItem } from "./auctionItem";
+import {Item} from "@/models/Item.ts";
 
 export interface Order {
     orderId?: number;
     createDate?: Date;
     shippingAddress?: string;
+    shippingNote?: string;
+    shippingStatus?: ShippingStatus;
     payment?:Payment;
-    auctionItemDTOS: AuctionItem[];
+    itemDTOS: Item[];
   }
+
+export enum ShippingStatus {
+    PACKAGING = "PACKAGING",
+    DELIVERING = "DELIVERING",
+    DELIVERED = "DELIVERED"
+}

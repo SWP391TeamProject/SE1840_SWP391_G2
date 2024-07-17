@@ -27,3 +27,5 @@ export const MAX_BID_TIME_INCREMENT = 60;
 export const AUCTION_WIN_CHANCE = 0.7;
 export const NOTIFICATION_PER_ACCOUNT_MIN = 10;
 export const NOTIFICATION_PER_ACCOUNT_MAX = 20;
+export const ITEM_MIN_PRICE = 1000;
+export const ITEM_MAX_PRICE = 10000;

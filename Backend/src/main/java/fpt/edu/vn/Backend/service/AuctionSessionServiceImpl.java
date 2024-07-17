@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +29,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -48,10 +51,15 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final OrderServiceImpl orderServiceImpl;
 
     @Autowired
+    private ResourceLoader resourceLoader;
+
+
+    @Autowired
     private AttachmentService attachmentService;
 
     private final NotificationService notificationService;
     private final JavaMailSender mailSender;
+    private final ItemServiceImpl itemServiceImpl;
     @Value("${app.email}")
     private String systemEmail;
 
@@ -62,7 +70,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                                      DepositRepos depositRepos, NotificationService notificationService,
                                      BidRepos bidRepos, PaymentRepos paymentRepos, ItemRepos itemRepos,
                                      AuctionItemRepos auctionItemRepos, OrderServiceImpl orderServiceImpl,
-                                     JavaMailSender mailSender) {
+                                     JavaMailSender mailSender, ItemServiceImpl itemServiceImpl) {
         this.auctionSessionRepos = auctionSessionRepos;
         this.accountRepos = accountRepos;
         this.depositRepos = depositRepos;
@@ -73,6 +81,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         this.auctionItemRepos = auctionItemRepos;
         this.orderServiceImpl = orderServiceImpl;
         this.mailSender = mailSender;
+        this.itemServiceImpl = itemServiceImpl;
     }
 
     @Override
@@ -132,14 +141,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Session not found: " + assign.getAuctionSessionId()));
             if (auctionSession.getStatus() != AuctionSession.Status.SCHEDULED) {
-                throw new IllegalStateException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
+                throw new RuntimeException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
             }
 
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
                 if (item.getStatus() != Item.Status.QUEUE && item.getStatus() != Item.Status.UNSOLD) {
-                    throw new IllegalStateException("Item is not in queue or unsold: " + item.getItemId());
+                    throw new RuntimeException("Item is not in queue or unsold: " + item.getItemId());
                 }
 
                 AuctionItem auctionItem = new AuctionItem();
@@ -150,8 +159,28 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 auctionItemRepos.save(auctionItem);
 
                 item.setStatus(Item.Status.IN_AUCTION);
-                itemRepos.save(item);
+                itemServiceImpl.updateItem(new ItemDTO(item));
             }
+            for (Account a: accountRepos.findByRole(Account.Role.MEMBER)) {
+                if (!a.isDummy()) { // skip email for dummy accounts
+                    MimeMessage message = mailSender.createMimeMessage();
+                    MimeMessageHelper helper = new MimeMessageHelper(message, false);
+                    helper.setFrom(systemEmail);
+                    helper.setTo(a.getEmail());
+                    helper.setSubject("[Biddify] Reset Password");
+                    // Read the HTML file into a String
+                    InputStream inputStream = resourceLoader.getResource("classpath:templates/auctionNotiMail.html").getInputStream();
+                    String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                    // Replace placeholders in the HTML content with actual values
+                    htmlContent = htmlContent.replace("{auctionName}", auctionSession.getTitle());
+                    htmlContent = htmlContent.replace("{auctionId}", String.valueOf(auctionSession.getAuctionSessionId()));
+                    htmlContent = htmlContent.replace("{createDate}", String.valueOf(auctionSession.getCreateDate()));
+                    htmlContent = htmlContent.replace("{auctionImage}", String.valueOf(auctionSession.getAttachments().size()==0?"":auctionSession.getAttachments().get(0).getLink()));
+                    helper.setText(htmlContent, true);
+                    mailSender.send(message);
+                }
+            }
+
             return true;
         } catch (Exception e) {
             logger.error("Error assigning auction session", e);
@@ -234,6 +263,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             Item item = auctionItem.getItem();
             {
                 item.setStatus(bids.isEmpty() ? Item.Status.UNSOLD : Item.Status.SOLD);
+                if (!bids.isEmpty())
+                    item.setSoldPrice(bids.get(0).getAmount());
                 itemRepos.save(item);
             }
 

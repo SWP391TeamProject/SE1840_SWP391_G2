@@ -27,7 +27,6 @@ public class Order {
     @JoinColumn(name = "order_id")
     private Set<Item> Items;
 
-
     @Column(name = "shipping_address")
     private String shippingAddress;
 
@@ -36,6 +35,18 @@ public class Order {
     @JoinColumn(name = "transaction_id")
     private Payment payment;
 
+    @Column(name = "shipping_note", length = 1000, columnDefinition = "NVARCHAR(1000)")
+    private String shippingNote;
+
+    @Column(name = "shipping_status")
+    @Enumerated(EnumType.STRING)
+    private ShippingStatus shippingStatus;
+
+    public enum ShippingStatus {
+        PACKAGING,
+        DELIVERING,
+        DELIVERED
+    }
 
     @Override
     public int hashCode() {
