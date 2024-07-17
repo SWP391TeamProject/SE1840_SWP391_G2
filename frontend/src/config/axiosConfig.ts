@@ -2,7 +2,6 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import axios from 'axios';
 import { redirect, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 const instance = axios.create({
   // You can put your base URL here

@@ -15,9 +15,10 @@ import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Loader2} from "lucide-react";
 import {SubmitHandler, useForm} from "react-hook-form";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {useNavigate} from "react-router-dom";
 import {requestActivateAccount} from "@/services/AuthService.ts";
+import { showErrorToast } from "@/lib/handle-error";
 
 type FormValues = {
     email: string;
@@ -45,9 +46,8 @@ function UnactivatedWarning() {
                 })
             })
             .catch(err => {
-                toast.error(err.response.data.message,{
-                    position:"bottom-right",
-                });
+                showErrorToast(err);
+
                 setLocked(false);
             });
     };

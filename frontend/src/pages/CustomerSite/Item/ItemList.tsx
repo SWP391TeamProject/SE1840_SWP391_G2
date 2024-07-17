@@ -17,7 +17,7 @@ import { fetchActiveAuctionSessions } from "@/services/AuctionSessionService"
 import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import { Search } from "lucide-react"
 import { Item, ItemStatus } from "@/models/Item"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 import { boolean } from "zod"
 import { getCookie } from "@/utils/cookies"
 

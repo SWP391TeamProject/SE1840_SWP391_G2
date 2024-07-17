@@ -17,9 +17,10 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {register} from "@/services/AuthService";
 import {useNavigate} from "react-router-dom";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {setCookie} from "@/utils/cookies.ts";
 import {Loader2} from "lucide-react";
+import { showErrorToast } from "@/lib/handle-error";
 
 gsap.registerPlugin(useGSAP);
 
@@ -71,7 +72,7 @@ function RegisterForm() {
     register(values).then((res) => {
       console.log(res);
       toast.success("Account created successfully. Please login.", {
-        position: "bottom-right",
+        
         autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -86,16 +87,7 @@ function RegisterForm() {
     }).catch((err) => {
       setIsLoading(false)
       console.log(err)
-      toast.error(err.response.data.message, {
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      showErrorToast(err);
     });
 
     console.log(values);

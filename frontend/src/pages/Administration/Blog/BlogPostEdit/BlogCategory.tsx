@@ -16,10 +16,11 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { SERVER_DOMAIN_URL } from "@/constants/domain"
+import { showErrorToast } from "@/lib/handle-error"
 import BlogCategoryService from "@/services/BlogCategoryService"
 import { getCookie } from "@/utils/cookies"
 import { useEffect, useState } from "react"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 
 type BlogCategory = {
     categoryP: any;
@@ -33,9 +34,7 @@ export default function BlogCategory({ ...props }) {
         BlogCategoryService.getAllBlogCategories().then((res) => {
             setCategories(res.data.content);
         }).catch((error) => {
-            toast.error(error, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
         });
         console.log(categories)
     }, [])

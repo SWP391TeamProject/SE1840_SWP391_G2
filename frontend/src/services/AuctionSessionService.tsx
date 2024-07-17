@@ -1,6 +1,6 @@
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from '@/config/axiosConfig.ts';
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { showErrorToast } from "@/lib/handle-error";
 import {AuctionSession} from "@/models/AuctionSessionModel.tsx";
@@ -34,7 +34,7 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         })
         .catch((err) => {
             toast.error(err.response.data.message, {
-                position: "bottom-right",
+                
             });
             if (err?.response.status == 401) {
                 removeCookie("user");
@@ -153,9 +153,8 @@ export const fetchActiveAuctionSessions = async (page?: number, size?: number) =
             params: params
         })
         .catch((err) => {
-            toast.error(err.response.data.message, {
-                position: "bottom-right",
-            });
+            showErrorToast(err);
+
             if (err?.response.status == 401) {
                 removeCookie("user");
                 removeCookie("token");

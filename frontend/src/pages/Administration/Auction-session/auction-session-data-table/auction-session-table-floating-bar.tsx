@@ -100,7 +100,6 @@ export function AcutionSessionsTableFloatingBar({ table }: acutionSessionsTableF
             //       })
 
             //       if (error) {
-            //         toast.error(error)
             //         return
             //       }
 
@@ -196,7 +195,6 @@ export function AcutionSessionsTableFloatingBar({ table }: acutionSessionsTableF
                 //       })
 
                 //       if (error) {
-                //         toast.error(error)
                 //         return
                 //       }
 

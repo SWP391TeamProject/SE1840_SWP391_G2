@@ -7,7 +7,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getOrderById, payOrder} from "@/services/OrderService";
 import {setCurrentOrder} from "@/redux/reducers/Orders";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {Alert, AlertDescription, AlertTitle,} from "@/components/ui/alert"
 import {
   Card,
@@ -32,6 +32,7 @@ import {
 import {Input} from "@/components/ui/input.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {PaymentStatus} from "@/constants/enums.tsx";
+import { showErrorToast } from "@/lib/handle-error";
 
 const orderCheckoutSchema = z.object({
   shippingAddress: z.string({
@@ -65,7 +66,7 @@ export function OrderCheckout() {
       }
       if (res.data.payment.status !== PaymentStatus.PENDING) {
         toast.error('Invalid order!', {
-          position: "bottom-right",
+          
         });
         return
       }
@@ -73,9 +74,8 @@ export function OrderCheckout() {
       setLoading(false);
     }).catch((e) => {
       console.error(e);
-      toast.error('Error when loading item detail!', {
-        position: "bottom-right",
-      });
+      showErrorToast(e);
+
     });
   }, []);
 
@@ -89,9 +89,8 @@ export function OrderCheckout() {
     }).catch((e) => {
       setLoading(false);
       console.error(e);
-      toast.error('Error when checking out!', {
-        position: "bottom-right",
-      });
+      showErrorToast(e);
+
     });
   };
 

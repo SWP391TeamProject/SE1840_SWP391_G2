@@ -66,7 +66,6 @@ export function DeleteAccountsDialog({
             //     })
 
             //     if (error) {
-            //       toast.error(error)
             //       return
             //     }
 

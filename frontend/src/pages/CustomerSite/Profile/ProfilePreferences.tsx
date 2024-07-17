@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {currencyNames, CurrencyType, useCurrency} from "@/CurrencyProvider.tsx";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 
 const formSchema = z.object({
   themeMode: z.enum(["light", "dark", "system"]),

@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BlogsTable } from './blog-data-table/blog-table';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
+import { showErrorToast } from '@/lib/handle-error';
 
 export const BlogPostList = () => {
   const blogsList = useAppSelector((state) => state.blogs);
@@ -133,30 +134,22 @@ export const BlogPostList = () => {
         position: "bottom-right"
       });
       (document.getElementById("newCategory") as HTMLInputElement).value = "";
-    }).catch(error => {
-      toast.error("Create failed", {
-        position: "bottom-right"
-      });
+    }).catch(err => {
+      showErrorToast(err)
+
     });
   }
   const deleteCategory = (id: number) => {
     BlogCategoryService.deleteBlogCategory(id).then((res) => {
       console.log(res);
-      if (res.status == 204) {
         let newCategories = categories.filter(x => x.blogCategoryId != id);
         setCategories(newCategories);
         toast.success("Delete success", {
           position: "bottom-right"
         });
-      } else {
-        toast.error("Delete failed", {
-          position: "bottom-right"
-        });
-      }
     }).catch(error => {
-      toast.error("Delete failed", {
-        position: "bottom-right"
-      });
+      showErrorToast(error)
+
     });
   }
 

@@ -7,7 +7,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getOrderById, updateOrder} from "@/services/OrderService";
 import {setCurrentOrder} from "@/redux/reducers/Orders";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {CircleCheck} from "lucide-react";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
@@ -24,6 +24,7 @@ import {Input} from "@/components/ui/input.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {PaymentStatus} from "@/constants/enums.tsx";
 import {ShippingStatus} from "@/models/newModel/order";
+import { showErrorToast } from "@/lib/handle-error";
 
 const orderUpdateSchema = z.object({
     shippingAddress: z.string({
@@ -56,7 +57,7 @@ export function UserOrderDetail() {
             }
             if (res.data.payment.status !== PaymentStatus.SUCCESS) {
                 toast.error('Invalid order!', {
-                    position: "bottom-right",
+                    
                 });
                 return
             }
@@ -66,9 +67,8 @@ export function UserOrderDetail() {
             setLoading(false);
         }).catch((e) => {
             console.error(e);
-            toast.error('Error when loading order detail!', {
-                position: "bottom-right",
-            });
+            showErrorToast(e);
+
         });
     }, []);
 
@@ -80,13 +80,13 @@ export function UserOrderDetail() {
             dispatch(setCurrentOrder(res.data));
             setLoading(false);
             toast.success('Delivery information updated!', {
-                position: "bottom-right",
+                
             });
         }).catch((e) => {
             setLoading(false);
             console.error(e);
             toast.error('Error when updating order!', {
-                position: "bottom-right",
+                
             });
         });
     };

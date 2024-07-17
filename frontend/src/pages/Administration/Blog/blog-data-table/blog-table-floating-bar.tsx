@@ -100,7 +100,6 @@ export function BlogsTableFloatingBar({ table }: blogsTableFloatingBarProps) {
             //       })
 
             //       if (error) {
-            //         toast.error(error)
             //         return
             //       }
 
@@ -196,7 +195,6 @@ export function BlogsTableFloatingBar({ table }: blogsTableFloatingBarProps) {
                 //       })
 
                 //       if (error) {
-                //         toast.error(error)
                 //         return
                 //       }
 

@@ -5,7 +5,7 @@ import { useAppDispatch } from "@/redux/hooks";
 import { acceptEvaluation, fetchConsignmentByConsignmentId, receivedConsignment, rejectEvaluation, takeConsignment } from "@/services/ConsignmentService";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import ConsignmentDetailDialog from "./ConsignmentDetailDialog";
 import SendEvaluationForm from "./SendEvaluation";
 import { ConsignmentDetailType, ConsignmentStatus, Roles } from "@/constants/enums";
@@ -15,6 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Consignment } from "@/models/newModel/consignment";
 import ConsignmentDialog from "./ConsignmentDialog";
+import { showErrorToast } from "@/lib/handle-error";
 
 export default function ConsignmentDetail() {
     const param = useParams();
@@ -30,10 +31,7 @@ export default function ConsignmentDetail() {
             console.log(res.data);
             setConsignment(res.data);
         }).catch((error) => {
-            console.log(error);
-            toast.error(error.response.data.message, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
         })
 
     }, [state]);
@@ -91,14 +89,12 @@ export default function ConsignmentDetail() {
             console.log(res);
             setConsignment(res.data);
             toast.success("Received consignment successfully", {
-                position: "bottom-right",
+                
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
         })
     }
     const handleTake = (consignmentId: any) => {
@@ -106,14 +102,12 @@ export default function ConsignmentDetail() {
             console.log(res);
             setConsignment(res.data);
             toast.success("Take consignment successfully", {
-                position: "bottom-right",
+                
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
         })
     }
 
@@ -126,14 +120,13 @@ export default function ConsignmentDetail() {
         rejectEvaluation(consignmentId.toString(), accountId, reason).then((res) => {
             console.log(res);
             toast.success("Reject consignment successfully", {
-                position: "bottom-right",
+                
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
+
         })
     }
     const acceptConsignment = (consignmentId: number) => {
@@ -143,14 +136,13 @@ export default function ConsignmentDetail() {
         acceptEvaluation(consignmentId.toString(), accountId).then((res) => {
             console.log(res);
             toast.success("Accept consignment successfully", {
-                position: "bottom-right",
+                
             });
             setState(!state);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.response.data.message, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
+
         })
     }
 

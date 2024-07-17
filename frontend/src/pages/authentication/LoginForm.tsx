@@ -10,11 +10,12 @@ import { useAuth } from "@/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { AccountStatus, Roles } from "@/constants/enums";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import googleIcon from "../../assets/icons8-google.svg";
 import { AUTH_SERVER, SERVER_DOMAIN_URL } from "@/constants/domain";
+import { showErrorToast } from "@/lib/handle-error";
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -59,13 +60,11 @@ function LoginForm() {
           navigate(from, { replace: true });
         }
         toast.success("Logged in successfully!", {
-          position: "bottom-right",
+          
         });
       })
       .catch(err => {
-        toast.error(err.response.data.message, {
-          position: "bottom-right",
-        });
+        showErrorToast(err);
         setIsLogin(false);
       });
   };
@@ -97,13 +96,11 @@ function LoginForm() {
             navigate(from, { replace: true, });
           }
           toast.success("Logged in successfully!", {
-            position: "bottom-right",
+            
           });
         })
         .catch(err => {
-          toast.error(err.response.data.message, {
-            position: "bottom-right",
-          });
+          showErrorToast(err);
           setIsLogin(false);
         })
     }

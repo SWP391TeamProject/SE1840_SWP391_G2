@@ -22,6 +22,7 @@ import { set } from 'date-fns'
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession'
 import { useAuth } from '@/AuthProvider'
 import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
+import { showErrorToast } from '@/lib/handle-error'
 
 
 
@@ -57,11 +58,7 @@ export default function AuctionSession() {
                     setSessionAttachments(res.data.attachments);
                 })
                 .catch(err => {
-                    toast.error("Failed to load Auction Session",
-                        {
-                            position: "bottom-right",
-                        }
-                    );
+                    showErrorToast(err);
                     console.log(err);
                 })
         }
@@ -73,11 +70,8 @@ export default function AuctionSession() {
                     setAuction(res.data);
                 })
                 .catch(err => {
-                    toast.error("Failed to load Auction Session",
-                        {
-                            position: "bottom-right",
-                        }
-                    );
+                    showErrorToast(err);
+
                     console.log(err);
                 })
         }
@@ -87,9 +81,8 @@ export default function AuctionSession() {
             setCategories(res.data.content)
         }
         ).catch(error => {
-            toast.error(error, {
-                position: "bottom-right",
-            });
+            showErrorToast(error);
+
         });
 
         window.scrollTo(0, 0);
@@ -142,7 +135,7 @@ export default function AuctionSession() {
             })
             toast.success("Registered Successfully",
                 {
-                    position: "bottom-right",
+                    
                 }
             );
         }).catch(err => {
@@ -167,11 +160,8 @@ export default function AuctionSession() {
                 );
                 // Usage:
             };
-            toast.error(err.response.data.message,
-                {
-                    position: "bottom-right",
-                }
-            );
+            showErrorToast(err);
+
 
         });
     }
