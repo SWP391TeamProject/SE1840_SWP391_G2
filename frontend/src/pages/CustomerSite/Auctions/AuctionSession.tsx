@@ -45,12 +45,15 @@ export default function AuctionSession() {
     const [alertBalance, setAlertBalance] = useState(null);
     const [registerFee, setRegisterFee] = useState(0);
     const auth = useAuth();
+    const [auciton, setAuction] = useState(auctionSession);
+
     useEffect(() => {
         if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
                     console.log(res.data);
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setAuction(res.data);
                     setSessionAttachments(res.data.attachments);
                 })
                 .catch(err => {
@@ -67,6 +70,7 @@ export default function AuctionSession() {
                 .then(res => {
                     dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
                     setSessionAttachments(res.data.attachments);
+                    setAuction(res.data);
                 })
                 .catch(err => {
                     toast.error("Failed to load Auction Session",
@@ -249,12 +253,7 @@ export default function AuctionSession() {
             return (
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant="default" onClick={()=>{
-                             if(!auth.user.kyc){
-                                setShowKycPopup(true);
-                                return ;
-                            }
-                        }} >Place bid</Button>
+                        <Button variant="default" >Place bid</Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className='text-foreground'>
                         <AlertDialogHeader >
@@ -265,9 +264,7 @@ export default function AuctionSession() {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel >Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => {
-                               
-                                navigate('/auth/login')}}>Login</AlertDialogAction>
+                            <AlertDialogAction onClick={() => navigate('/auth/login')}>Login</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -292,12 +289,7 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default" onClick={()=>{
-                          if(!auth?.user.kyc){
-                            setShowKycPopup(true);
-                            return ;
-                        }
-                    }}>Place Bid</Button>
+                    <Button variant="default">Place Bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
@@ -313,9 +305,7 @@ export default function AuctionSession() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={()  =>{
-                          
-                            handleRegister()}}>Register</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleRegister()}>Register</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -331,7 +321,7 @@ export default function AuctionSession() {
                     itemId: item.itemId
                 },
                 itemDTO: item,
-                endDate: auctionSession?.endDate,
+                endDate: auciton?.endDate,
                 allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
             }
         });
@@ -468,7 +458,6 @@ export default function AuctionSession() {
                                                 <>
                                                     {bidders.includes(userId) ? (
                                                         <Button className='space-y-2' onClick={() => {
-                                                            
                                                             let name = item?.itemDTO.name;
                                                             navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
                                                         }}>Place Bid</Button>
@@ -526,7 +515,7 @@ export default function AuctionSession() {
                     </div>
                 </div>
             </main >
-            <KycVerificationPopup open={showKycPopup} setOpen={setShowKycPopup}/>
+            {showKycPopup && <KycVerificationPopup />}
 
         </div >
     )
