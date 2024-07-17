@@ -159,16 +159,17 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 auctionItem.setCurrentPrice(item.getReservePrice()); // Buy in price
                 auctionItemRepos.save(auctionItem);
 
-                itemServiceImpl.updateItem(ItemUpdateDTO.builder()
-                        .itemId(itemIds).status(Item.Status.IN_AUCTION).build());
+                item.setStatus(Item.Status.IN_AUCTION);
+                itemRepos.save(item);
             }
+
             for (Account a: accountRepos.findByRole(Account.Role.MEMBER)) {
                 if (!a.isDummy()) { // skip email for dummy accounts
                     MimeMessage message = mailSender.createMimeMessage();
                     MimeMessageHelper helper = new MimeMessageHelper(message, false);
                     helper.setFrom(systemEmail);
                     helper.setTo(a.getEmail());
-                    helper.setSubject("[Biddify] Reset Password");
+                    helper.setSubject("[Biddify] New auction");
                     // Read the HTML file into a String
                     InputStream inputStream = resourceLoader.getResource("classpath:templates/auctionNotiMail.html").getInputStream();
                     String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
