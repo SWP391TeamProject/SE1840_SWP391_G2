@@ -1,9 +1,10 @@
 package fpt.edu.vn.Backend.service;
 
 import com.google.common.base.Preconditions;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
-import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
-import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
+import fpt.edu.vn.Backend.DTO.request.ItemUpdateDTO;
 import fpt.edu.vn.Backend.exception.MappingException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Item;
@@ -22,11 +23,31 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.*;
 
 @Service
 @CacheConfig (cacheNames = "item")
 public class ItemServiceImpl implements ItemService {
+    private static final Map<Item.Status, Set<Item.Status>> VALID_TRANSITIONS = Map.of(
+            Item.Status.QUEUE, Set.of(
+                    Item.Status.QUEUE,
+                    Item.Status.REMOVED
+            ),
+            Item.Status.IN_AUCTION, Set.of(
+                    Item.Status.IN_AUCTION
+            ),
+            Item.Status.SOLD, Set.of(
+                    Item.Status.SOLD
+            ),
+            Item.Status.UNSOLD, Set.of(
+                    Item.Status.UNSOLD,
+                    Item.Status.QUEUE,
+                    Item.Status.REMOVED
+            ),
+            Item.Status.REMOVED, Set.of(
+                    Item.Status.REMOVED
+            )
+    );
     private final AccountRepos accountRepos;
     private final ItemRepos itemRepos;
     private final ItemCategoryRepos itemCategoryRepos;
@@ -45,24 +66,30 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public @NotNull Item mapDTOToEntity(@NotNull ItemDTO itemDTO, @NotNull Item item) {
+    public @NotNull Item mapDTOToEntity(@NotNull ItemUpdateDTO itemDTO, @NotNull Item item) {
         item.setItemId(itemDTO.getItemId());
-        if (itemDTO.getCategory() != null)
-            item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategory().getItemCategoryId())
-                .orElseThrow(() -> new MappingException("Category not found: " + itemDTO.getCategory())));
+        if (itemDTO.getCategoryId() != null)
+            item.setItemCategory(itemCategoryRepos.findById(itemDTO.getCategoryId())
+                .orElseThrow(() -> new MappingException("Category not found: " + itemDTO.getCategoryId())));
         if (itemDTO.getName() != null)
             item.setName(itemDTO.getName());
         if (itemDTO.getDescription() != null)
             item.setDescription(itemDTO.getDescription());
-        if (itemDTO.getReservePrice() != null)
+        if (itemDTO.getReservePrice() != null) {
+            Preconditions.checkState(itemDTO.getReservePrice().signum() >= 0,
+                    "Reserve price must not be negative");
             item.setReservePrice(itemDTO.getReservePrice());
-        if (itemDTO.getBuyInPrice() != null)
+        }
+        if (itemDTO.getBuyInPrice() != null) {
+            Preconditions.checkState(itemDTO.getBuyInPrice().signum() >= 0,
+                    "Buy-in price must not be negative");
             item.setBuyInPrice(itemDTO.getBuyInPrice());
+        }
         if (itemDTO.getStatus() != null)
             item.setStatus(itemDTO.getStatus());
-        if (itemDTO.getOwner() != null)
-            item.setOwner(accountRepos.findById(itemDTO.getOwner().getAccountId())
-                .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwner())));
+        if (itemDTO.getOwnerId() != null)
+            item.setOwner(accountRepos.findById(itemDTO.getOwnerId())
+                .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwnerId())));
         if (itemDTO.getColor() != null)
             item.setColor(itemDTO.getColor());
         if (itemDTO.getSize() != null)
@@ -83,37 +110,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
-    public @NotNull ItemDTO createItem(@NotNull CreateItemRequestDTO requestDTO) throws IOException {
-        ItemDTO itemDTO = requestDTO.getItem();
-        Preconditions.checkNotNull(itemDTO.getItemId(), "Item ID is required");
-        Preconditions.checkNotNull(itemDTO.getName(), "Name is required");
-        Preconditions.checkState(itemDTO.getName().length() >= 5, "Name must be at least 5 characters");
-        Preconditions.checkNotNull(itemDTO.getDescription(), "Description is required");
-        Preconditions.checkNotNull(itemDTO.getReservePrice(), "Reserve price is required");
-        Preconditions.checkState(itemDTO.getReservePrice().signum() > 0, "Reserve price must not be negative");
-        Preconditions.checkNotNull(itemDTO.getBuyInPrice(), "Buy-in price is required");
-        Preconditions.checkState(itemDTO.getBuyInPrice().signum() > 0, "Buy-in price must not be negative");
-        Preconditions.checkNotNull(itemDTO.getOwner(), "Owner is required");
-        if (requestDTO.getFiles() != null) {
-            for (MultipartFile f : requestDTO.getFiles()) {
-                Preconditions.checkState(f.getSize() <= 10000000, "File size must be less than 10MB");
-            }
-        }
-        
-        if (itemDTO.getStatus() == null)
-            itemDTO.setStatus(Item.Status.QUEUE);
-
-        Item savedItem = itemRepos.save(mapDTOToEntity(itemDTO, new Item()));
-        ItemDTO dto = new ItemDTO(savedItem);
-        dto.setAttachments(new HashSet<>());
-        for(MultipartFile file : requestDTO.getFiles()) {
-            try {
-                dto.getAttachments().add(attachmentService.uploadItemAttachment(file, savedItem.getItemId()));
-            } catch (IOException e) {
-                throw new IOException("Error uploading attachment: " + e.getMessage());
-            }
-        }
-        return dto;
+    public @NotNull ItemDTO createItem(@NotNull ItemUpdateDTO requestDTO) throws IOException {
+        requestDTO.setStatus(Item.Status.QUEUE); // always QUEUE
+        requestDTO.setItemId(null); // always create new item
+        Preconditions.checkNotNull(requestDTO.getReservePrice(), "Reserve price must not be null");
+        Preconditions.checkNotNull(requestDTO.getBuyInPrice(), "Buy-in price must not be null");
+        Preconditions.checkNotNull(requestDTO.getName(), "Name must not be null");
+        Preconditions.checkNotNull(requestDTO.getDescription(), "Description must not be null");
+        Preconditions.checkNotNull(requestDTO.getCategoryId(), "CategoryId must not be null");
+        Preconditions.checkNotNull(requestDTO.getOwnerId(), "OwnerId must not be null");
+        Item savedItem = itemRepos.save(mapDTOToEntity(requestDTO, new Item()));
+        return new ItemDTO(savedItem);
     }
 
     @Override
@@ -124,11 +131,38 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
-    public @NotNull ItemDTO updateItem(@NotNull ItemDTO item) {
+    public @NotNull ItemDTO updateItem(@NotNull ItemUpdateDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
         Item it = itemRepos.findById(item.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found", "itemId", item.getItemId().toString()));
+        // check VAR
+        Preconditions.checkState(item.getStatus() == null ||
+                VALID_TRANSITIONS.get(it.getStatus()).contains(item.getStatus()),
+                "Invalid status transition");
+        Preconditions.checkState(item.getStatus() == Item.Status.QUEUE || item.getReservePrice() == null,
+                "Cannot change reserve price at this time");
+        Preconditions.checkState(item.getStatus() == Item.Status.QUEUE || item.getBuyInPrice() == null,
+                "Cannot change buy in price at this time");
+        Preconditions.checkState(item.getOwnerId() == null, "Cannot change owner");
         return new ItemDTO(itemRepos.save(mapDTOToEntity(item, it)));
+    }
+
+    @Override
+    public List<AttachmentDTO> uploadAttachment(int id, AttachmentUploadDTO dto) throws IOException {
+        if (dto.getFiles() == null || dto.getFiles().isEmpty()) return Collections.emptyList();
+        for (MultipartFile f : dto.getFiles()) {
+            Preconditions.checkState(f.getSize() <= 10000000, "File size must be less than 10MB");
+        }
+        List<AttachmentDTO> attachments = new ArrayList<>();
+        for(MultipartFile file : dto.getFiles()) {
+            attachments.add(attachmentService.uploadItemAttachment(file, id));
+        }
+        return attachments;
+    }
+
+    @Override
+    public void deleteAttachment(int attachmentId, int itemId) {
+        attachmentService.deleteItemAttachment(attachmentId, itemId);
     }
 
     @Override

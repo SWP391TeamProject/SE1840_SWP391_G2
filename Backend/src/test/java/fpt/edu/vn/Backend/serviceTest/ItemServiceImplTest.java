@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.serviceTest;
 
 import fpt.edu.vn.Backend.DTO.ItemDTO;
+import fpt.edu.vn.Backend.DTO.request.ItemUpdateDTO;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.pojo.ItemCategory;
@@ -121,7 +122,7 @@ public class ItemServiceImplTest {
         when(itemRepos.findById(1)).thenReturn(Optional.of(item));
         when(itemRepos.save(item)).thenReturn(item);
 
-        var itemDTO = new ItemDTO();
+        var itemDTO = new ItemUpdateDTO();
         itemDTO.setItemId(1);
         itemDTO.setName("FPT Chicken");
 

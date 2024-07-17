@@ -1,16 +1,12 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
-import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-import fpt.edu.vn.Backend.DTO.ItemDTO;
-import fpt.edu.vn.Backend.DTO.request.CreateItemRequestDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateItemStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
+import fpt.edu.vn.Backend.DTO.request.ItemUpdateDTO;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.exporter.ItemExporter;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.security.Authorizer;
@@ -18,7 +14,6 @@ import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
 import fpt.edu.vn.Backend.service.ItemService;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -144,35 +138,43 @@ public class ItemController {
         return new ResponseEntity<>(itemService.getItemById(id), HttpStatus.OK);
     }
 
-
     @PostMapping("/create")
-    public ResponseEntity<ItemDTO> createItem(@ModelAttribute CreateItemRequestDTO itemDTO) throws IOException {
+    public ResponseEntity<ItemDTO> createItem(@RequestBody ItemUpdateDTO itemDTO) throws IOException {
+        if (itemDTO.getConsignmentId() != null) {
+            ConsignmentDTO consignmentDTO = consignmentService.getConsignmentById(itemDTO.getConsignmentId());
+            BigDecimal reservePrice = consignmentDTO.getConsignmentDetails().stream()
+                    .filter(
+                            consignmentDetailDTO -> consignmentDetailDTO.getStatus()
+                                    .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED))
+                    ).findFirst().map(ConsignmentDetailDTO::getPrice).orElse(null);
+            if (reservePrice == null) {
+                throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");
+            }
+            consignmentService.updateConsignment(consignmentDTO.getConsignmentId(), consignmentDTO);
+        }
         return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
     }
 
-    @PostMapping("/create/{id}")
-    public ResponseEntity<ItemDTO> createItemFromConsignment(@ModelAttribute CreateItemRequestDTO itemDTO, @PathVariable int id) throws IOException {
-        ConsignmentDTO consignmentDTO = consignmentService.getConsignmentById(id);
-        BigDecimal reservePrice = consignmentDTO.getConsignmentDetails().stream()
-                .filter(
-                        consignmentDetailDTO -> consignmentDetailDTO.getStatus()
-                                .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED))
-                ).findFirst().map(ConsignmentDetailDTO::getPrice).orElse(null);
-        if(reservePrice==null){
-            throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");
-        }
-        ItemDTO item = itemService.createItem(itemDTO);
-        consignmentDTO.setStatus(String.valueOf(Consignment.Status.FINISHED));
-        consignmentService.updateConsignment(consignmentDTO.getConsignmentId(),consignmentDTO);
-        return new ResponseEntity<>(item, HttpStatus.CREATED);
+    @PostMapping("/update")
+    public ResponseEntity<ItemDTO> updateItem(@RequestBody ItemUpdateDTO itemDTO) {
+        return new ResponseEntity<>(itemService.updateItem(itemDTO), HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ItemDTO> updateItem(@RequestBody ItemDTO itemDTO) {
-        if (itemDTO.getItemId() == null) {
-            throw new InvalidInputException("Item id cannot be null");
+    @PutMapping("/attachment/{id}")
+    public ResponseEntity<List<AttachmentDTO>> uploadItemAttachment(@PathVariable int id,
+                                                                    @ModelAttribute AttachmentUploadDTO dto) {
+        try {
+            return new ResponseEntity<>(itemService.uploadAttachment(id, dto), HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload item attachment", e);
         }
-        return new ResponseEntity<>(itemService.updateItem(itemDTO), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/attachment/{item}/{attachment}")
+    public ResponseEntity<ItemDTO> deleteItemAttachment(@PathVariable int item,
+                                                        @PathVariable int attachment) {
+        itemService.deleteAttachment(attachment, item);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/export")

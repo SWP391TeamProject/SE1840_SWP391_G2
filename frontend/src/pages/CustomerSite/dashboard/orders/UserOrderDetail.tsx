@@ -66,7 +66,7 @@ export function UserOrderDetail() {
             setLoading(false);
         }).catch((e) => {
             console.error(e);
-            toast.error('Error when loading item detail!', {
+            toast.error('Error when loading order detail!', {
                 position: "bottom-right",
             });
         });

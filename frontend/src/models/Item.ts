@@ -31,3 +31,29 @@ export enum ItemStatus {
   UNSOLD = "UNSOLD",
   REMOVED = "REMOVED"
 }
+
+type StatusMap = {
+  [key in ItemStatus]: Set<ItemStatus>;
+};
+
+const VALID_TRANSITIONS: StatusMap = {
+  [ItemStatus.QUEUE]: new Set([
+    ItemStatus.QUEUE,
+    ItemStatus.REMOVED,
+  ]),
+  [ItemStatus.IN_AUCTION]: new Set([
+    ItemStatus.IN_AUCTION,
+  ]),
+  [ItemStatus.SOLD]: new Set([ItemStatus.SOLD]),
+  [ItemStatus.UNSOLD]: new Set([
+    ItemStatus.UNSOLD,
+    ItemStatus.QUEUE,
+    ItemStatus.REMOVED,
+  ]),
+  [ItemStatus.REMOVED]: new Set([ItemStatus.REMOVED]),
+};
+
+export function isValidTransition(oldStatus: ItemStatus, newStatus: ItemStatus): boolean {
+  const validTransitions = VALID_TRANSITIONS[oldStatus];
+  return validTransitions.has(newStatus);
+}
