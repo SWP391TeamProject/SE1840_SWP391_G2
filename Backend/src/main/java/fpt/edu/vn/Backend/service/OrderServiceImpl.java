@@ -1,7 +1,10 @@
 package fpt.edu.vn.Backend.service;
 
+import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.DTO.OrderDTO;
+import fpt.edu.vn.Backend.DTO.request.OrderPayRequestDTO;
+import fpt.edu.vn.Backend.DTO.request.OrderUpdateDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
@@ -17,14 +20,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -34,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentRepos paymentRepository;
     private final AccountRepos accountRepos;
     private final AuctionItemRepos auctionItemRepos;
+    private final ItemRepos itemRepos;
     private final NotificationService notificationService;
     private final JavaMailSender mailSender;
     @Value("${app.email}")
@@ -42,11 +51,13 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     public OrderServiceImpl(OrderRepos orderRepository, PaymentRepos paymentRepository,
                             AccountRepos accountRepos, AuctionItemRepos auctionItemRepos,
+                            ItemRepos itemRepos,
                             NotificationService notificationService, JavaMailSender mailSender) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.accountRepos = accountRepos;
         this.auctionItemRepos = auctionItemRepos;
+        this.itemRepos = itemRepos;
         this.notificationService = notificationService;
         this.mailSender = mailSender;
     }
@@ -54,61 +65,60 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId) {
-        try {
-            Account account = accountRepos.findById(accountId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
-            BigDecimal totalPay = BigDecimal.ZERO;
+        Account account = accountRepos.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
+        BigDecimal totalPay = BigDecimal.ZERO;
 
-            Order order = new Order();
-            order.setItems(new HashSet<>());
-            for (AuctionItemId itemId : itemIds) {
-                AuctionItem item = auctionItemRepos.findById(itemId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Auction Item not found", "id", itemId));
-                order.getItems().add(item.getItem());
-                totalPay = totalPay.add(item.getCurrentPrice());
-            }
+        Order order = new Order();
+        order.setItems(new HashSet<>());
+        for (AuctionItemId itemId : itemIds) {
+            AuctionItem item = auctionItemRepos.findById(itemId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Auction Item not found", "id", itemId));
+            order.getItems().add(item.getItem());
+            totalPay = totalPay.add(item.getCurrentPrice());
+        }
 
-            Payment payment = new Payment();
-            payment.setType(Payment.Type.AUCTION_ORDER);
-            payment.setStatus(Payment.Status.PENDING);
-            payment.setAccount(account);
-            payment.setPaymentAmount(totalPay.multiply(BigDecimal.valueOf(1.045)));
-            payment = paymentRepository.save(payment);
+        Payment payment = new Payment();
+        payment.setType(Payment.Type.AUCTION_ORDER);
+        payment.setStatus(Payment.Status.PENDING);
+        payment.setAccount(account);
+        payment.setPaymentAmount(totalPay.multiply(BigDecimal.valueOf(1.045)));
+        payment = paymentRepository.save(payment);
 
-            order.setPayment(payment);
-            order = orderRepository.save(order);
+        order.setPayment(payment);
+        order = orderRepository.save(order);
 
-            log.info("Order {} account {} must pay {}", order.getOrderId(), accountId, payment.getPaymentAmount());
+        log.info("Order {} account {} must pay {}", order.getOrderId(), accountId, payment.getPaymentAmount());
 
-            notificationService.sendNotificationToUserGroup(
-                    NotificationDTO.builder()
-                            .message(String.format(
-                                    "A new order worth $%s was created",
-                                    payment.getPaymentAmount()
-                            ))
-                            .build(),
-                    Account.Role.MANAGER, Account.Role.ADMIN
-            );
+        notificationService.sendNotificationToUserGroup(
+                NotificationDTO.builder()
+                        .message(String.format(
+                                "A new order worth $%s was created",
+                                payment.getPaymentAmount()
+                        ))
+                        .build(),
+                Account.Role.MANAGER, Account.Role.ADMIN
+        );
 
-            notificationService.sendNotification(
-                    NotificationDTO.builder()
-                            .message(String.format(
-                                    "An order worth $%s was issued. Please pay for it in 7 days.",
-                                    payment.getPaymentAmount()
-                            ))
-                            .userId(accountId)
-                            .build());
+        notificationService.sendNotification(
+                NotificationDTO.builder()
+                        .message(String.format(
+                                "An order worth $%s was issued. Please pay for it in 7 days.",
+                                payment.getPaymentAmount()
+                        ))
+                        .userId(accountId)
+                        .build());
 
-            if (!account.isDummy()){ // skip email for dummy accounts
-                int orderId = order.getOrderId();
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        MimeMessage message = mailSender.createMimeMessage();
-                        MimeMessageHelper helper = new MimeMessageHelper(message, false);
-                        helper.setFrom(systemEmail);
-                        helper.setTo(account.getEmail());
-                        helper.setSubject("[Biddify] Invoice for order #%d".formatted(orderId));
-                        helper.setText("""
+        if (!account.isDummy()){ // skip email for dummy accounts
+            int orderId = order.getOrderId();
+            CompletableFuture.runAsync(() -> {
+                try {
+                    MimeMessage message = mailSender.createMimeMessage();
+                    MimeMessageHelper helper = new MimeMessageHelper(message, false);
+                    helper.setFrom(systemEmail);
+                    helper.setTo(account.getEmail());
+                    helper.setSubject("[Biddify] Invoice for order #%d".formatted(orderId));
+                    helper.setText("""
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -214,115 +224,158 @@ public class OrderServiceImpl implements OrderService {
 </div>
 
                                 """, true);
-                        mailSender.send(message);
-                    } catch (MessagingException e) {
-                        log.info("Error sending mail to " + account.getEmail(), e);
-                    }
-                });
-            }
-
-            return new OrderDTO(order);
-        } catch (Exception e) {
-            System.err.println("An error occurred while creating order: " + e.getMessage());
-            throw new RuntimeException("Failed to create order", e);
+                    mailSender.send(message);
+                } catch (MessagingException e) {
+                    log.info("Error sending mail to " + account.getEmail(), e);
+                }
+            });
         }
+
+        return new OrderDTO(order);
     }
 
 
     @Override
     public OrderDTO getOrderById(int orderId) {
-        try {
-            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-            return new OrderDTO(order);
-        } catch (Exception e) {
-            System.err.println("An error occurred while fetching order by ID: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch order by ID", e);
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        return new OrderDTO(order);
+    }
+
+    @Override
+    public OrderDTO payOrder(int accountId, int orderId, OrderPayRequestDTO dto) {
+        Account account = accountRepos.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found", "accountId", accountId));
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found", "orderId", orderId));
+        Payment payment = order.getPayment();
+        Preconditions.checkState(accountId == payment.getAccount().getAccountId(),
+                "You are not authorized to pay this order");
+        Preconditions.checkState(payment.getStatus() == Payment.Status.PENDING,
+                "Order is not in PENDING status");
+        Preconditions.checkState(account.getBalance().compareTo(payment.getPaymentAmount()) >= 0,
+                "Insufficient balance");
+        payment.setStatus(Payment.Status.SUCCESS);
+        paymentRepository.save(payment);
+        account.setBalance(account.getBalance().subtract(payment.getPaymentAmount()));
+        accountRepos.save(account);
+        order.setShippingStatus(Order.ShippingStatus.PACKAGING);
+        order.setShippingAddress(dto.getShippingAddress());
+        order.setShippingNote(dto.getShippingNote());
+        orderRepository.save(order);
+        notificationService.sendNotification(
+                NotificationDTO.builder()
+                        .message(String.format(
+                                "You have paid order #%d successfully. It will be packaged for delivery soon!",
+                                order.getOrderId()
+                        ))
+                        .userId(payment.getAccount().getAccountId())
+                        .build());
+        log.info("Account {} paid {} for order {}", accountId, payment.getPaymentAmount(), orderId);
+        return new OrderDTO(order);
+    }
+
+    @Override
+    public void cancelOrder(Order order) {
+        Payment payment = order.getPayment();
+        Preconditions.checkState(payment.getStatus() == Payment.Status.PENDING,
+                "Order is not in PENDING status");
+        payment.setStatus(Payment.Status.FAILED);
+        paymentRepository.save(payment);
+        for (Item item : order.getItems()) {
+            item.setOrder(null);
+            item.setStatus(Item.Status.UNSOLD);
         }
+        itemRepos.saveAll(order.getItems());
+        log.info("Released items {} due to order cancellation", order.getItems().stream()
+                .map(Item::getItemId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(",")));
+        notificationService.sendNotification(
+                NotificationDTO.builder()
+                        .message(String.format(
+                                "Your order #%d was cancelled due to not paying within the deadline.",
+                                order.getOrderId()
+                        ))
+                        .userId(payment.getAccount().getAccountId())
+                        .build());
     }
 
     @Override
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
-        try {
-            return orderRepository.findAll(pageable)
-                    .map(OrderDTO::new);
-        } catch (Exception e) {
-            System.err.println("An error occurred while fetching all orders: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch all orders", e);
-        }
+        return orderRepository.findAll(pageable).map(OrderDTO::new);
     }
 
     @Override
     public Page<OrderDTO> getAllOrdersByUserId(int userId, Pageable pageable) {
-        try {
-            return orderRepository.findAllByPayment_Account_AccountId(userId, pageable)
-                    .map(OrderDTO::new);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch orders by user ID", e);
-        }
+        return orderRepository.findAllByPayment_Account_AccountId(userId, pageable).map(OrderDTO::new);
     }
 
     @Override
     public Page<OrderDTO> getAllOrdersByStatus(Payment.Status status, Pageable pageable) {
-        try {
-            return orderRepository.findAllByPayment_Status(status, pageable)
-                    .map(OrderDTO::new);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch all orders", e);
-        }
+        return orderRepository.findAllByPayment_Status(status, pageable).map(OrderDTO::new);
     }
 
     @Override
     public Page<OrderDTO> getAllOrdersByUserIdAndStatus(int userId, Payment.Status status, Pageable pageable) {
-        try {
-            return orderRepository.findAllByPayment_Account_AccountIdAndPayment_Status(userId, status, pageable)
-                    .map(OrderDTO::new);
-        } catch (Exception e) {
-            System.err.println("An error occurred while fetching all orders: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch all orders", e);
-        }
+        return orderRepository.findAllByPayment_Account_AccountIdAndPayment_Status(userId, status, pageable)
+                .map(OrderDTO::new);
     }
 
     @Override
-    public OrderDTO updateOrderShippingAddress(String ship_address, int orderId) {
-        try {
-            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-            order.setShippingAddress(ship_address);
-            order = orderRepository.save(order);
-            return new OrderDTO(order);
-        } catch (Exception e) {
-            System.err.println("An error occurred while updating order: " + e.getMessage());
-            throw new RuntimeException("Failed to update order", e);
-        }
+    public OrderDTO updateOrderShippingStatus(Order.ShippingStatus shippingStatus, int orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        order = orderRepository.save(order);
+        return new OrderDTO(order);
     }
 
     @Override
-    public void deleteOrder(int orderId) {
-        try {
-            Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-            orderRepository.delete(order);
-        } catch (Exception e) {
-            System.err.println("An error occurred while deleting order: " + e.getMessage());
-            throw new RuntimeException("Failed to delete order", e);
+    public OrderDTO updateOrder(int id, OrderUpdateDTO dto) {
+        final Map<Order.ShippingStatus, Set<Order.ShippingStatus>> statusMatrix = Map.of(
+                Order.ShippingStatus.PACKAGING, Set.of(
+                        Order.ShippingStatus.PACKAGING,
+                        Order.ShippingStatus.DELIVERING
+                ),
+                Order.ShippingStatus.DELIVERING, Set.of(
+                        Order.ShippingStatus.DELIVERING,
+                        Order.ShippingStatus.DELIVERED
+                ),
+                Order.ShippingStatus.DELIVERED, Set.of(Order.ShippingStatus.DELIVERED)
+        );
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        Preconditions.checkState(order.getPayment().getStatus() == Payment.Status.SUCCESS,
+                "Order has not paid yet");
+
+        if (dto.getShippingStatus() != null) {
+            Order.ShippingStatus currStatus = order.getShippingStatus();
+            Preconditions.checkState(statusMatrix.get(currStatus).contains(dto.getShippingStatus()),
+                    "Invalid new shipping status");
+            order.setShippingStatus(dto.getShippingStatus());
         }
+
+        if (dto.getShippingAddress() != null) {
+            Preconditions.checkState(
+                    order.getShippingStatus() == Order.ShippingStatus.PACKAGING,
+                    "Cannot change shipping address now");
+            order.setShippingAddress(dto.getShippingAddress());
+        }
+
+        if (dto.getShippingNote() != null) {
+            Preconditions.checkState(
+                    order.getShippingStatus() == Order.ShippingStatus.PACKAGING,
+                    "Cannot change shipping note now");
+            order.setShippingNote(dto.getShippingNote());
+        }
+
+        return new OrderDTO(orderRepository.save(order));
     }
 
-    @Override
-    public void updateOrderByStatus(UpdateOrderStatusRequestDTO request) {
-        for (Integer orderId : request.getOrderId()) {
-            try {
-                Optional<Order> order = orderRepository.findById(orderId);
-                Order orders = order.get();
-                if (orders != null) {
-//                    orders.setStatus(Item.Status.valueOf(request.getStatus().toUpperCase()));
-                    orderRepository.save(orders);
-                } else {
-                    throw new ResourceNotFoundException("Order not found with ID: " + orderId);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
-            } catch (Exception e) {
-                throw new ConsignmentServiceException("An error occurred while updating order with ID: " + orderId);
-            }
+    @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 1)
+    @Transactional
+    public void scheduleFixedRateTask() {
+        LocalDateTime deadline = LocalDateTime.now().minusDays(7);
+        for (Order order : orderRepository.findAllPendingOrdersWithPaymentCreatedBefore(deadline)) {
+            log.info("Cancelling order {}", order.getOrderId());
+            cancelOrder(order);
         }
     }
 }

@@ -11,7 +11,7 @@ import {
     ConsignmentDetailType
 } from "../model/consignment_detail";
 import dayjs from "dayjs";
-import {NUMBER_OF_CONSIGNMENT} from "../config";
+import {ITEM_MAX_PRICE, ITEM_MIN_PRICE, NUMBER_OF_CONSIGNMENT} from "../config";
 
 const materialNames: string[] = [
     'Gold', 'Silver', 'Platinum', 'Diamond', 'Pearl', 'Ruby', 'Emerald',
@@ -155,7 +155,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                 consignmentId: i + 1,
                 type: ConsignmentDetailType.INITIAL_EVALUATION,
                 description: faker.helpers.arrayElement(requestReceivedMessages),
-                price: faker.number.int({ min: 100, max: 10000 }),
+                price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
                 imageURLs: [],
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
@@ -175,7 +175,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                 consignmentId: i + 1,
                 type: ConsignmentDetailType.FINAL_EVALUATION,
                 description: faker.helpers.arrayElement(itemReceivedMessages),
-                price: faker.number.int({ min: 100, max: 10000 }),
+                price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
                 imageURLs: [],
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
@@ -183,15 +183,19 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
         }
 
         if (status == ConsignmentStatus.IN_FINAL_EVALUATION && faker.number.float() < 0.95) {
-            const type = faker.number.float() < 0.95 ? ConsignmentDetailType.MANAGER_ACCEPTED : ConsignmentDetailType.MANAGER_REJECTED;
-            status = type == ConsignmentDetailType.MANAGER_ACCEPTED ? ConsignmentStatus.FINISHED : ConsignmentStatus.TERMINATED;
+            const type = faker.number.float() < 0.95 ?
+              ConsignmentDetailType.MANAGER_ACCEPTED : ConsignmentDetailType.MANAGER_REJECTED;
+            status = type == ConsignmentDetailType.MANAGER_ACCEPTED ?
+              ConsignmentStatus.FINISHED : ConsignmentStatus.TERMINATED;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
             details.push({
                 accountId: managerId,
                 consignmentId: i + 1,
                 type: type,
-                description: faker.helpers.arrayElement(type == ConsignmentDetailType.MANAGER_ACCEPTED ? requestAcceptMessages : requestDeclineMessages),
-                price: faker.number.int({ min: 10000, max: 1000000 }),
+                description: faker.helpers.arrayElement(
+                  type == ConsignmentDetailType.MANAGER_ACCEPTED ?
+                    requestAcceptMessages : requestDeclineMessages),
+                price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
                 imageURLs: [],
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()

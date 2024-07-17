@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 interface Props {
     end: Date;
     className?: string;
+    messageOnEnd?: string;
 }
 
 const formatTime = (time: number) => {
@@ -37,12 +38,11 @@ const formatTime = (time: number) => {
     }
 }
 
-const CountDownTime: React.FC<Props> = ({ end, className }) => {
+const CountDownTime: React.FC<Props> = ({ end, className, messageOnEnd }) => {
     const difference = end.getTime() - new Date().getTime();
     const [time, setTime] = useState(difference);
 
     useEffect(() => {
-        console.log(time);
         if (time > 0) {
             const interval = setInterval(() => {
                 setTime(time => time - 1000);
@@ -54,20 +54,11 @@ const CountDownTime: React.FC<Props> = ({ end, className }) => {
     }, []);
 
     return (
-        <div >
-            <p className={'text-foreground opacity-100 ' + className}>
-                {
-                    (() => {
-                        if (time <= 0) {
-                            return 'Auction Ended';
-                        }
-                    }
-                    )()
-                }
-                {formatTime(time)}
-            </p>
-
-        </div>
+      <span className={className}>
+          {
+              time <= 0 ? (messageOnEnd || 'Auction Ended') : formatTime(time)
+          }
+      </span>
     );
 };
 

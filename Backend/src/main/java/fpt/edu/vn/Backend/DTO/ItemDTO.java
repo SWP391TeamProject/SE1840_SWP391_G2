@@ -21,6 +21,7 @@ public class ItemDTO implements Serializable {
     private String description;
     private BigDecimal reservePrice;
     private BigDecimal buyInPrice;
+    private BigDecimal soldPrice;
     private Item.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
@@ -41,6 +42,7 @@ public class ItemDTO implements Serializable {
         this.description = item.getDescription();
         this.reservePrice = item.getReservePrice();
         this.buyInPrice = item.getBuyInPrice();
+        this.soldPrice = item.getSoldPrice();
         this.status = item.getStatus();
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();

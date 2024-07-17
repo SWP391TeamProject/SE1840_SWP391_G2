@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { PaymentStatus } from '@/constants/enums'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import { setCurrentOrder } from '@/redux/reducers/Orders'
-import { getOrdersById } from '@/services/OrderService'
+import { getOrderById } from '@/services/OrderService'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -25,7 +25,7 @@ export const OrderDetail = () => {
     useEffect(() => {
         if (!order) {
             setIsLoading(true);
-            getOrdersById(parseInt(param.id) || 0).then((res) => {
+            getOrderById(parseInt(param.id) || 0).then((res) => {
                 console.log(res.data);
                 dispatch(setCurrentOrder(res.data));
                 setIsLoading(false);
