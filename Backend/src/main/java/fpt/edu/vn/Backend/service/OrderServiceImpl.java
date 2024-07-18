@@ -87,6 +87,14 @@ public class OrderServiceImpl implements OrderService {
         payment = paymentRepository.save(payment);
 
         order.setPayment(payment);
+
+        BigDecimal fee = totalPay.multiply(BigDecimal.valueOf(0.045));
+        if (fee.compareTo(BigDecimal.valueOf(225)) < 0) {
+            fee = BigDecimal.valueOf(225);
+        } else if (fee.compareTo(BigDecimal.valueOf(4500)) > 0) {
+            fee = BigDecimal.valueOf(4500);
+        }
+        order.setFee(fee);
         order = orderRepository.save(order);
 
         log.info("Order {} account {} must pay {}", order.getOrderId(), accountId, payment.getPaymentAmount());
