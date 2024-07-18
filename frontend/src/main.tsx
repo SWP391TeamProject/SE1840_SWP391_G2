@@ -19,7 +19,6 @@ import { AuthProvider } from "./AuthProvider.tsx";
 import { Roles } from "./constants/enums.tsx";
 import AuctionList from "./pages/CustomerSite/Auctions/AuctionList.tsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import 'react-toastify/dist/ReactToastify.css';
 import AccountEdit from "./pages/Administration/Account/AccountEdit.tsx";
 import AccountCreate from "./pages/Administration/Account/AccountCreate.tsx";
 import AuctionSessionList

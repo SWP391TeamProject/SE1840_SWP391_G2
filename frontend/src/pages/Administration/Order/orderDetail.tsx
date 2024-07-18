@@ -7,7 +7,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getOrderById, updateOrder} from "@/services/OrderService";
 import {setCurrentOrder} from "@/redux/reducers/Orders";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {
     AlertCircle,
     CircleAlert,
@@ -37,17 +37,13 @@ export function OrderDetail() {
                 setCustomer(res.data as Account);
             }).catch((e) => {
                 console.error(e);
-                toast.error('Error when loading customer detail!', {
-                    position: "bottom-right",
-                });
+                toast.error('Error when loading customer detail!');
             }).finally(() => {
                 setLoading(false);
             });
         }).catch((e) => {
             console.error(e);
-            toast.error('Error when loading order detail!', {
-                position: "bottom-right",
-            });
+            toast.error('Error when loading order detail!');
         });
     }, []);
 
@@ -56,15 +52,11 @@ export function OrderDetail() {
         updateOrder(orderId, {shippingStatus}).then((res) => {
             dispatch(setCurrentOrder(res.data));
             setLoading(false);
-            toast.success('Delivery status updated!', {
-                position: "bottom-right",
-            });
+            toast.success('Delivery status updated!');
         }).catch((e) => {
             setLoading(false);
             console.error(e);
-            toast.error('Error when updating order!', {
-                position: "bottom-right",
-            });
+            toast.error('Error when updating order!');
         });
     };
 

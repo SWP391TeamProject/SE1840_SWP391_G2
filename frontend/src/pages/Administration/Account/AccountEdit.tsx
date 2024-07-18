@@ -89,6 +89,7 @@ export default function AccountEdit() {
         toast.promise(updateAccountServicePromise, {
             loading: 'Updating account...',
             success: (res) => {
+                setIsSubmitting(false);
                 dispatch(setCurrentAccount(res?.data));
                 return "Account updated successfully.";
             },
@@ -96,8 +97,6 @@ export default function AccountEdit() {
                return  getErrorMessage(err);
             }
         });
-
-
         // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
         //     console.log(res);
         //     toast.success("Account updated successfully.");
