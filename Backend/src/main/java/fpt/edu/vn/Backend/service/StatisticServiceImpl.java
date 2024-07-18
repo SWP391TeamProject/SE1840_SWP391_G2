@@ -3,7 +3,7 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.MonthlyUserDTO;
 import fpt.edu.vn.Backend.DTO.PaymentsByDateDTO;
 import fpt.edu.vn.Backend.DTO.RevenueDTO;
-import fpt.edu.vn.Backend.oauth2.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.pojo.Item;

@@ -2,6 +2,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import axios from 'axios';
 import { redirect, useNavigate } from 'react-router-dom';
+import {removeCookie} from "@/utils/cookies.ts";
 
 const instance = axios.create({
   // You can put your base URL here
@@ -17,7 +18,7 @@ instance.interceptors.response.use(
   function (error) {
     // If the response had a status of 401, redirect to /auth/login and remove the cookie
     if (error.response && error.response.status === 401) {
-      // removeCookie('user');
+      removeCookie('user');
       console.log('Redirect to login');
       window.location.href = '/auth/login';
       // redirect('/auth/login');
