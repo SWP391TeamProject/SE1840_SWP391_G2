@@ -75,18 +75,19 @@ export default function AssignAuctionItem() {
       let auctionItem = auction.auctionItems.find(i => i.itemDTO.itemId == existingItem.itemId)
       console.log(auctionItem);
       removeAuctionItem(auctionItem?.id).then((res) => {
-        toast.success('Item Unassigned', {
-          position: "bottom-right",
-        });
-        let tempList = [...availableItems, item];
-        tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
-        setAvailableItems(tempList);
-        setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
-        setExistingItems(selectedItems.filter(i => i.itemId !== item.itemId))
+        // toast.success('Item Unassigned', {
+        //   position: "bottom-right",
+        // });
+        // let tempList = [...availableItems, item];
+        // tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
+        // setAvailableItems(tempList);
+        // setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
+        setExistingItems(existingItems.filter(i => i.itemId !== item.itemId))
       }).catch((err) => {
         showErrorToast(err)
-      });;
-    } else {
+      });
+    } 
+    // else {
       setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
       let tempList = [...availableItems, item];
       tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
@@ -94,7 +95,7 @@ export default function AssignAuctionItem() {
       toast.success('Item Unassigned', {
         position: "bottom-right",
       });
-    }
+    // }
   }
 
   const handleSave = () => {
