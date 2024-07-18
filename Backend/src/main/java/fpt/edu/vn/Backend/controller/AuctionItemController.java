@@ -45,8 +45,8 @@ public class AuctionItemController {
         return new ResponseEntity<>(updatedAuctionItem, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteAuctionItem(@PathVariable("id") AuctionItemId id) {
+    @PostMapping("/delete")
+    public ResponseEntity<Void> deleteAuctionItem(@RequestBody AuctionItemId id) {
         auctionItemService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

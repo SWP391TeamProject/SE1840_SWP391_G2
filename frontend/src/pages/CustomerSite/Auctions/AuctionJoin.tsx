@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { fetchBidsByAuctionItemId } from '@/services/BidsService';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay"
-import { toast } from 'react-toastify';
+import { toast } from "sonner";
 import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { useCurrency } from "@/CurrencyProvider.tsx";

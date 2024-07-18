@@ -1,6 +1,6 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag, CircleDollarSign,Package } from 'lucide-react'
+import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag, CircleDollarSign, Package } from 'lucide-react'
 import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
@@ -15,12 +15,13 @@ import { Input } from "@/components/ui/input";
 import { useLocation } from "react-router-dom";
 import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
 import logo from "@/assets/icon.png";
+import { useAuth } from '@/AuthProvider'
 
 export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
     const location = useLocation();
-
+    const auth = useAuth();
     const [consignments] = useState([]);
     const [arrayPath, setArrayPath] = useState([""]);
     const breadcrumbs = [
@@ -78,28 +79,28 @@ export default function Administration() {
                     </div>
                     <div className="flex-1">
                         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                            <Link
+                            {auth.user.role == "ADMIN" && <Link
                                 to="dashboard"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <Menu />
                                 Dashboard
-                            </Link>
+                            </Link>}
 
-                            <Link
+                            {auth.user.role == "ADMIN" && <Link
                                 to="accounts"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <User2 />
                                 Manage Accounts
-                            </Link>
-                            <Link
+                            </Link>}
+                            { <Link
                                 to="consignments"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <FolderClosed />
                                 Manage Consignments
-                            </Link>
+                            </Link>}
                             <Link
                                 to="auction-sessions"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"

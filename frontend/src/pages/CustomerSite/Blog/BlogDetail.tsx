@@ -6,7 +6,7 @@ import BlogService from '@/services/BlogService';
 import { set } from 'date-fns';
 import React, { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from "sonner";
 
 export const BlogDetail = () => {
     const blogList = useAppSelector((state) => state.blogs.currentPageList);
@@ -32,6 +32,10 @@ export const BlogDetail = () => {
 
     useEffect(() => {
         if (!currentBlog) {
+         
+
+
+            
             BlogService.getBlogById(parseInt(param.id)).then((res) => {
                 dispatch(setCurrentBlogPost(res.data));
             }).catch(error => {

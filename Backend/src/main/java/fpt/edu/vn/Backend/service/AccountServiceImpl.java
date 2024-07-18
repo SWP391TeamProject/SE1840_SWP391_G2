@@ -153,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
         a.setPhone(account.getPhone().strip());
         a.setStatus(Account.Status.ACTIVE);
         a.setPassword(passwordEncoder.bcryptEncoder().encode(account.getPassword()));
-        a.setDummy(account.getDummy());
+        a.setDummy(account.getDummy() == null || account.getDummy());
         return mapEntityToDTO(accountRepos.save(a));
     }
 

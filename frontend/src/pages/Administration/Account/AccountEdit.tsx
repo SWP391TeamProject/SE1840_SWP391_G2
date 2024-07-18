@@ -21,7 +21,7 @@ import { setCurrentAccount } from '@/redux/reducers/Accounts';
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
@@ -84,15 +84,28 @@ export default function AccountEdit() {
             dummy: data.dummy,
             status: account?.status
         }
-        updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
-            console.log(res);
-            toast.success("Account updated successfully.");
-            setIsSubmitting(false);
-            dispatch(setCurrentAccount(res?.data))
-        }).catch((err) => {
-            console.log(err);
-            showErrorToast(err);
-        })
+        const updateAccountServicePromise = updateAccountService(updatedAccount, updatedAccount.accountId);
+
+        toast.promise(updateAccountServicePromise, {
+            loading: 'Updating account...',
+            success: (res) => {
+                setIsSubmitting(false);
+                dispatch(setCurrentAccount(res?.data));
+                return "Account updated successfully.";
+            },
+            error: (err) => {
+               return  getErrorMessage(err);
+            }
+        });
+        // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
+        //     console.log(res);
+        //     toast.success("Account updated successfully.");
+        //     setIsSubmitting(false);
+        //     dispatch(setCurrentAccount(res?.data))
+        // }).catch((err) => {
+        //     console.log(err);
+        //     showErrorToast(err);
+        // })
     }
 
     useEffect(() => {

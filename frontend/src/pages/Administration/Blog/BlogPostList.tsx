@@ -15,7 +15,7 @@ import BlogService from '@/services/BlogService';
 import { ListFilter, MinusCircle, MoreHorizontal, PlusCircle } from 'lucide-react';
 import React, { Suspense, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from "sonner";
 import { BlogsTable } from './blog-data-table/blog-table';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
 import { showErrorToast } from '@/lib/handle-error';
