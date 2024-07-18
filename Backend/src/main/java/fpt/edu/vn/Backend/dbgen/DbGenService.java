@@ -18,6 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +65,10 @@ public class DbGenService {
     private AuctionItemRepos auctionItemRepos;
     @Autowired
     private PaymentRepos paymentRepos;
+    @Autowired
+    private OrderRepos orderRepos;
+    @Autowired
+    private OrderDetailRepos orderDetailRepos;
     @Autowired
     private BidRepos bidRepos;
     @Autowired
@@ -235,19 +240,21 @@ public class DbGenService {
             JsonObject obj = element.getAsJsonObject();
             Consignment consignment = new Consignment();
             consignment.setConsignmentId(obj.get("id").getAsInt());
-            consignment.setUser(accountRepos.getReferenceById(obj.get("senderId").getAsInt()));
+            consignment.setUser(accountRepos.getReferenceById(obj.get("userId").getAsInt()));
+            consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
             consignment.setStatus(Consignment.Status.valueOf(obj.get("status").getAsString()));
             consignment.setPreferContact(Consignment.preferContact.valueOf(obj.get("preferContact").getAsString()));
             consignment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
             consignment.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
             consignment.setDescription(obj.get("description").getAsString());
             consignment.setColor(obj.get("color").getAsString());
-            consignment.setWeight(Double.parseDouble(obj.get("weight").getAsString()));
+            consignment.setWeight(obj.get("weight").getAsDouble());
             consignment.setMeasurement(obj.get("measurement").getAsString());
             consignment.setCondition(obj.get("condition").getAsString());
             consignment.setMetal(obj.get("metal").getAsString());
             consignment.setGemstone(obj.get("gemstone").getAsString());
             consignment.setStamped(obj.get("stamped").getAsString());
+            consignment.setSecretCode(obj.has("secretCode") ? obj.get("secretCode").getAsString() : null);
 
             {
                 List<Attachment> attachments = new ArrayList<>();
@@ -558,11 +565,13 @@ public class DbGenService {
             public Payment parent;
             public Object meta;
             public Integer itemId;
+            public BigDecimal soldPrice;
 
-            public PreparedPayment(Payment parent, Object meta, Integer itemId) {
+            public PreparedPayment(Payment parent, Object meta, Integer itemId, BigDecimal soldPrice) {
                 this.parent = parent;
                 this.meta = meta;
                 this.itemId = itemId;
+                this.soldPrice = soldPrice;
             }
         }
 
@@ -582,6 +591,7 @@ public class DbGenService {
 
             Object meta = null;
             Integer itemId = null;
+            BigDecimal soldPrice = null;
 
             switch (payment.getType()) {
                 case AUCTION_DEPOSIT -> {
@@ -596,10 +606,12 @@ public class DbGenService {
                     meta = new Order();
                     if (obj.has("orderAddress"))
                         ((Order) meta).setShippingAddress(obj.get("orderAddress").getAsString());
+                    if (obj.has("soldPrice"))
+                        soldPrice = obj.get("soldPrice").getAsBigDecimal();
                 }
             }
 
-            preparedPayments.put(payment.getPaymentId(), new PreparedPayment(payment, meta, itemId));
+            preparedPayments.put(payment.getPaymentId(), new PreparedPayment(payment, meta, itemId, soldPrice));
         }
 
         /////////////////////////////
@@ -645,9 +657,14 @@ public class DbGenService {
         for (PreparedPayment p : preparedPayments.values()) {
             if (p.meta instanceof Order) {
                 itemRepos.findById(p.itemId).ifPresent((item) -> {
-                    Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
-//                    item.getOrderDetails();
-                    itemRepos.save(item);
+                    Order order = orderRepos.findById(p.parent.getPaymentId()).orElseThrow();
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.setId(new OrderDetailKey(order.getOrderId(), item.getItemId()));
+                    orderDetail.setOrder(order);
+                    orderDetail.setItem(item);
+                    orderDetail.setSoldPrice(p.soldPrice);
+                    orderDetail.setOrder(order);
+                    orderDetailRepos.save(orderDetail);
                 });
             }
         }

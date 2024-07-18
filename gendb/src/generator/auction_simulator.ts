@@ -67,13 +67,13 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
               for (let j = 0; j < numOfItems; j++) {
                   const item = items.find(i => i.status == ItemStatus.QUEUE &&
-                    i.createDate < startDate
-                    && !excludeItems.has(i.id));
+                    i.createDate < startDate && !excludeItems.has(i.id));
                   if (item == undefined) {
                       console.log(`> No item available to assign to auction`);
                       continue outer;
                   }
                   item.status = ItemStatus.IN_AUCTION;
+                  // do not handle multiple auctions for the same item, im too lazy
                   excludeItems.add(item.id);
 
                   let currentPrice = 0;
@@ -168,7 +168,6 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
                           if (currentPrice >= item.reservePrice && lastBidder !== undefined) {
                               item.status = ItemStatus.SOLD;
-                              item.soldPrice = currentPrice;
 
                               // order
                               const orderDate = virtualDate.add(faker.number.int({
@@ -184,7 +183,8 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                                   accountId: lastBidder.id,
                                   createDate: orderDate,
                                   auctionItem: {
-                                      itemId: item.id
+                                      itemId: item.id,
+                                      soldPrice: currentPrice
                                   },
                                   orderAddress: faker.location.streetAddress({useFullAddress: true})
                               });
@@ -194,13 +194,11 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                               localBids.filter(b => b.accountId == lastBidder.id)
                                 .forEach(b => b.status = BidStatus.SUCCESS);
 
-                              // set auction deposit of winner to success
-                              // set auction deposit of losers to failed
-                              deposits.filter(d => d.accountId == lastBidder.id)
-                                .forEach(d => d.status = PaymentStatus.SUCCESS);
+                              // set auction deposit of all to success
+                              deposits.forEach(d => d.status = PaymentStatus.SUCCESS);
                               console.log(`> Winner: ${lastBidder.id}`);
                           } else {
-                              item.status = ItemStatus.UNSOLD;
+                              item.status = ItemStatus.QUEUE;
                               console.log(`> No winner`);
                           }
                       }
