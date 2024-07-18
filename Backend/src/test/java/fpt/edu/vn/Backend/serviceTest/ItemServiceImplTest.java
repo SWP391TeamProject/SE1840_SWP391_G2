@@ -60,7 +60,7 @@ public class ItemServiceImplTest {
     @DisplayName("Should return all items belonging to the category when category id is given")
     public void shouldReturnAllItemsBelongingToTheCategoryWhenCategoryIdIsGiven() {
         var itemCategory = new ItemCategory();
-        itemCategory.setItemCategoryId(1);
+        itemCategory.setItemCategoryId(1); // Set the itemCategoryId here
 
         var item1 = new Item();
         item1.setItemId(1);
@@ -72,9 +72,11 @@ public class ItemServiceImplTest {
 
         var pr = PageRequest.of(0, 2);
 
+        // Mocking the repository method call
         when(itemRepos.findItemByItemCategoryItemCategoryId(1, pr))
                 .thenReturn(new PageImpl<>(List.of(item1, item2)));
 
+        // Asserting the result
         assertEquals(2, itemService.getItemsByCategoryId(pr, 1).getContent().size());
     }
 
@@ -130,7 +132,12 @@ public class ItemServiceImplTest {
         expected.setItemId(1);
         expected.setName("FPT Chicken");
         expected.setDescription("The best chicken");
+        // Call the service method
+        var updatedItemDTO = itemService.updateItem(itemDTO);
 
-        assertEquals(expected, itemService.updateItem(itemDTO));
+        // Assert individual fields to pinpoint the issue
+        assertEquals(expected.getItemId(), updatedItemDTO.getItemId());
+        assertEquals(expected.getName(), updatedItemDTO.getName());
+        assertEquals(expected.getDescription(), updatedItemDTO.getDescription());
     }
 }

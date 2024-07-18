@@ -87,16 +87,18 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new MappingException("Account not found: " + itemDTO.getOwnerId())));
         if (itemDTO.getColor() != null)
             item.setColor(itemDTO.getColor());
-        if (itemDTO.getSize() != null)
-            item.setSize(itemDTO.getSize());
         if (itemDTO.getWeight() != null)
-            item.setWeight(itemDTO.getWeight());
-        if (itemDTO.getBrand() != null)
-            item.setBrand(itemDTO.getBrand());
-        if (itemDTO.getAge() != null)
-            item.setAge(itemDTO.getAge());
-        if (itemDTO.getMaterial() != null)
-            item.setMaterial(itemDTO.getMaterial());
+            item.setWeight(Double.parseDouble(itemDTO.getWeight()));
+        if (itemDTO.getMeasurement() != null)
+            item.setMeasurement(itemDTO.getMeasurement());
+        if(itemDTO.getMetal() != null)
+            item.setMetal(itemDTO.getMetal());
+        if(itemDTO.getCondition() != null)
+            item.setCondition(itemDTO.getCondition());
+        if(itemDTO.getStamped() != null)
+            item.setStamped(itemDTO.getStamped());
+        if(itemDTO.getGemstone() != null)
+            item.setGemstone(itemDTO.getGemstone());
         // DO NOT CHANGE ORDER
 //        if (itemDTO.getOrderId() != null)
 //            item.setOrder(itemDTO.getOrderId());
@@ -114,6 +116,12 @@ public class ItemServiceImpl implements ItemService {
         Preconditions.checkNotNull(requestDTO.getDescription(), "Description must not be null");
         Preconditions.checkNotNull(requestDTO.getCategoryId(), "CategoryId must not be null");
         Preconditions.checkNotNull(requestDTO.getOwnerId(), "OwnerId must not be null");
+        Preconditions.checkNotNull(requestDTO.getGemstone(), "Gemstone must not be null");
+        Preconditions.checkNotNull(requestDTO.getCondition(), "Condition must not be null");
+        Preconditions.checkNotNull(requestDTO.getMeasurement(), "Measurement must not be null");
+        Preconditions.checkNotNull(requestDTO.getStamped(), "Stamped must not be null");
+        Preconditions.checkNotNull(requestDTO.getMetal(), "Metal must not be null");
+        Preconditions.checkNotNull(requestDTO.getWeight(), "Weight must not be null");
         Item savedItem = itemRepos.save(mapDTOToEntity(requestDTO, new Item()));
         return new ItemDTO(savedItem);
     }

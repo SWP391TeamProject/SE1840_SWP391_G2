@@ -68,20 +68,23 @@ public class Item {
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String color;
 
-    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
-    private String size;
+    @Column(length = 30,columnDefinition = "FLOAT")
+    private double weight;
 
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
-    private String weight;
+    private String metal;
 
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
-    private String brand;
-
-    @Column(length = 30)
-    private Integer age;
+    private String gemstone;
 
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
-    private String material;
+    private String measurement;
+
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String condition;
+
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String stamped;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

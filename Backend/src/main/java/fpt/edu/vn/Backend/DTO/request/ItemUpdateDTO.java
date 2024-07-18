@@ -25,11 +25,12 @@ public class ItemUpdateDTO implements Serializable {
     private Item.Status status;
     private Integer ownerId;
     private String color;
-    private String size;
     private String weight;
-    private String brand;
-    private Integer age;
-    private String material;
+    private String metal;
+    private String gemstone;
+    private String measurement;
+    private String condition;
+    private String stamped;
     //
     private Integer consignmentId;
 }
