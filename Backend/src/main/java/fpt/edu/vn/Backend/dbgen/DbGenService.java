@@ -254,6 +254,9 @@ public class DbGenService {
             consignment.setMetal(obj.get("metal").getAsString());
             consignment.setGemstone(obj.get("gemstone").getAsString());
             consignment.setStamped(obj.get("stamped").getAsString());
+            consignment.setContactEmail(obj.get("contactEmail").getAsString());
+            consignment.setContactName(obj.get("contactName").getAsString());
+            consignment.setContactPhone(obj.get("contactPhone").getAsString());
             consignment.setSecretCode(obj.has("secretCode") ? obj.get("secretCode").getAsString() : null);
 
             {
@@ -607,7 +610,7 @@ public class DbGenService {
                     if (obj.has("orderAddress"))
                         ((Order) meta).setShippingAddress(obj.get("orderAddress").getAsString());
                     if (obj.has("soldPrice"))
-                        soldPrice = obj.get("soldPrice").getAsBigDecimal();
+                        soldPrice = auctionItem.get("soldPrice").getAsBigDecimal();
                 }
             }
 
