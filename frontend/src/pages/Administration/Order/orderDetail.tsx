@@ -119,7 +119,7 @@ export function OrderDetail() {
                                     </div>
                                     <div className="text-right">
                                         <div
-                                          className="font-medium">{currency.format({amount: item.soldPrice})}</div>
+                                          className="font-medium">{currency.format(item.soldPrice)}</div>
                                     </div>
                                 </div>
                               ))}
@@ -133,16 +133,16 @@ export function OrderDetail() {
                             <div className="space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                    <span>{currency.format(order.payment.paymentAmount)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Fee</span>
-                                    <span>{currency.format({amount: 0})}</span>
+                                    <span>{currency.format(0)}</span>
                                 </div>
                                 <Separator/>
                                 <div className="flex justify-between font-bold">
                                     <span>Total</span>
-                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                    <span>{currency.format(order.payment.paymentAmount)}</span>
                                 </div>
                                 { order.payment.status === PaymentStatus.PENDING &&
                                   <div className="flex justify-between font-bold">

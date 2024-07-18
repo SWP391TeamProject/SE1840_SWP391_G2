@@ -22,7 +22,7 @@ export default function ProductPrice(props: {
           name="reservePrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Reserve Price: {currency.format({amount: props.form.getValues("reservePrice")})}</FormLabel>
+              <FormLabel>Reserve Price: {currency.format(props.form.getValues("reservePrice"))}</FormLabel>
               <FormControl>
                 <Input type="number" disabled={props.item.status != ItemStatus.QUEUE} {...field} />
               </FormControl>
@@ -35,7 +35,7 @@ export default function ProductPrice(props: {
           name="buyInPrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Buy In Price: {currency.format({amount: props.form.getValues("buyInPrice")})}</FormLabel>
+              <FormLabel>Buy In Price: {currency.format(props.form.getValues("buyInPrice"))}</FormLabel>
               <FormControl>
                 <Input type="number" disabled={props.item.status != ItemStatus.QUEUE} {...field} />
               </FormControl>

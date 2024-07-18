@@ -308,10 +308,7 @@ export function ItemList() {
                           <h3 className="text-sm font-bold h-6 mb-6">{item.name}</h3>
                           {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
                           <div className="flex justify-between items-center h-6">
-                            <div className="text-primary font-bold text-lg">{currency.format({
-                              amount: item.reservePrice,
-                              currency: item.currency,
-                            })}</div>
+                            <div className="text-primary font-bold text-lg">{currency.format(item.reservePrice)}</div>
                             <div className="text-muted-foreground text-sm">{item.category.name}</div>
                           </div>
                         </CardContent>

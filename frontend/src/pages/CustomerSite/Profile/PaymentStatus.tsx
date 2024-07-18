@@ -47,8 +47,7 @@ export default function PaymentStatus() {
                 <CardContent>
                     <p>
                         {isSuccess
-                            ? "Thank you for your purchase. We have deposited " + currencyUtils.format({
-                                amount: parseInt(amount),
+                            ? "Thank you for your purchase. We have deposited " + currencyUtils.format(amount, {
                                 baseCurrency: CurrencyType[currency],
                                 fractionDigits: "always",
                                 minFractionDigits: 2,

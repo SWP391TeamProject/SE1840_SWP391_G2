@@ -27,30 +27,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {currencyNames, CurrencyType, useCurrency} from "@/CurrencyProvider.tsx";
 import {toast} from "sonner";
 
 const formSchema = z.object({
-  themeMode: z.enum(["light", "dark", "system"]),
-  currencyType: z.nativeEnum(CurrencyType)
+  themeMode: z.enum(["light", "dark", "system"])
 });
 
 export default function ProfilePreferences() {
   const { setTheme } = useTheme();
-  const currency = useCurrency();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      themeMode: getCookie("themeMode") ? JSON.parse(getCookie("themeMode")) : "light",
-      currencyType: currency.getCurrencyType()
+      themeMode: getCookie("themeMode") ? JSON.parse(getCookie("themeMode")) : "light"
     },
   });
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     setCookie("themeMode", JSON.stringify(data.themeMode), 2147483647);
     setTheme(data.themeMode);
-    currency.setCurrencyType(data.currencyType);
     toast.success('Update preferences successfully!',{
       position:"bottom-right",
   });
@@ -86,49 +81,6 @@ export default function ProfilePreferences() {
                       </SelectContent>
                     </Select>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="currencyType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency Format</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a currency to display" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.values(CurrencyType).map((type) => (
-                            <SelectItem key={type} value={type}>{currencyNames[type]}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    <div className="text-sm">
-                      <p>Preview</p>
-                      <ul className="list-disc list-inside">
-                        <li>Exchange rate: 1 USD = {currency.format({
-                          amount: 1,
-                          currency: field.value
-                        })}</li>
-                        <li>Full format: {currency.format({
-                          amount: 123456.789,
-                          currency: field.value,
-                          format: 'full',
-                          exchangeMoney: false
-                        })}</li>
-                        <li>Compact format: {currency.format({
-                          amount: 123456.789,
-                          currency: field.value,
-                          format: 'compact',
-                          exchangeMoney: false
-                        })}</li>
-                      </ul>
-                    </div>
                   </FormItem>
                 )}
               />

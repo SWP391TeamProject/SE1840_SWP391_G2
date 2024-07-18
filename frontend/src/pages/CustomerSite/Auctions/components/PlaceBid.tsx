@@ -131,46 +131,32 @@ export default function PlaceBid({ ...props }) {
                                                     <CountDownTime end={new Date(props?.endDate)} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-foreground">Current Bid: <span>{currency.format({
-                                                        amount: props.currentBid,
-                                                        currency: CurrencyType.USD
-                                                    })}</span></p>
+                                                    <p className="text-foreground">Current Bid: <span>{currency.format(props.currentBid)}</span></p>
                                                 </div>
                                             </div>
                                             <Separator />
                                             <div className="w-full text-foreground">
                                                 <div className=" w-full flex justify-between">
                                                     <p className="font-semibold">Your bid : </p>
-                                                    <span>{currency.format({
-                                                        amount: form.watch('bidAmount'),
-                                                        currency: CurrencyType.USD
-                                                    })}</span>
+                                                    <span>{currency.format(form.watch('bidAmount'))}</span>
                                                 </div>
                                                 <div className=" w-full flex justify-between">
                                                     <p className="font-semibold">Biddify Buyer's Fee:</p>
                                                     <p>{currency.format(
-                                                        {
-                                                            amount: 0.045 * form.watch('bidAmount') > 4500 ? 4500 : 0.045 * form.watch('bidAmount') < 225 ? 225 : 0.045 * form.watch('bidAmount'),
-                                                        }
+                                                      0.045 * form.watch('bidAmount') > 4500 ? 4500 : 0.045 * form.watch('bidAmount') < 225 ? 225 : 0.045 * form.watch('bidAmount')
                                                     )}</p>
                                                 </div>
                                             </div>
                                             <Separator />
                                             <div className="text-foreground">
-                                                <p><strong>Bidding will instantly reach {currency.format({
-                                                    amount: form.watch('bidAmount'),
-                                                    currency: CurrencyType.USD
-                                                })}.</strong> The winning bidder pays Biddify a 4.5% buyer's fee on top of the winning bid (minimum $225, maximum $4,500).</p><p>We will place a hold on your credit card for the buyer's fee. If you win, your card will be charged the non-refundable buyer’s fee at the end of the auction, and you will pay the seller directly for the vehicle. If you don't win, your hold will be released at auction end.</p><p><strong>Bids are binding and cannot be retracted.</strong> You are responsible for completing all due diligence prior to bidding. By placing this bid, you agree to the Cars &amp; Bids <a href="/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</p>
+                                                <p><strong>Bidding will instantly reach {currency.format(form.watch('bidAmount'))}.</strong> The winning bidder pays Biddify a 4.5% buyer's fee on top of the winning bid (minimum $225, maximum $4,500).</p><p>We will place a hold on your credit card for the buyer's fee. If you win, your card will be charged the non-refundable buyer’s fee at the end of the auction, and you will pay the seller directly for the vehicle. If you don't win, your hold will be released at auction end.</p><p><strong>Bids are binding and cannot be retracted.</strong> You are responsible for completing all due diligence prior to bidding. By placing this bid, you agree to the Cars &amp; Bids <a href="/terms-of-use" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</p>
                                             </div>
                                             <div className="flex flex-col justify-center items-center p-4 gap-2">
                                                 {
                                                     props.isSending ?
                                                         <Button className="min-w-48 " disabled><Loader2 className="animate-spin" /></Button>
                                                         :
-                                                        <Button className="min-w-48" type="submit">Bid {currency.format({
-                                                            amount: form.watch('bidAmount'),
-                                                            currency: CurrencyType.USD
-                                                        })}</Button>}
+                                                        <Button className="min-w-48" type="submit">Bid {currency.format(form.watch('bidAmount'))}</Button>}
 
 
 
@@ -193,10 +179,7 @@ export default function PlaceBid({ ...props }) {
                                                     <CountDownTime end={new Date(props?.endDate)} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-foreground">Current Bid: <span>{currency.format({
-                                                        amount: props.currentBid,
-                                                        currency: CurrencyType.USD
-                                                    })}</span></p>
+                                                    <p className="text-foreground">Current Bid: <span>{currency.format(props.currentBid)}</span></p>
                                                 </div>
                                             </div>
                                             <Separator />
@@ -211,10 +194,7 @@ export default function PlaceBid({ ...props }) {
                                                             <FormItem>
                                                                 <FormControl>
                                                                     <Input className="w-full text-foreground"
-                                                                        placeholder={`amount equal or greater than ${currency.format({
-                                                                            amount: parseFloat(props?.currentBid) + bidIncrement,
-                                                                            currency: CurrencyType.USD
-                                                                        })}`} {...field} />
+                                                                        placeholder={`amount equal or greater than ${currency.format(parseFloat(props?.currentBid) + bidIncrement)}`} {...field} />
                                                                 </FormControl>
                                                                 <FormMessage />
                                                             </FormItem>
@@ -229,10 +209,7 @@ export default function PlaceBid({ ...props }) {
                                             </div>
                                             <DialogFooter>
                                                 <div className="flex justify-center items-center flex-col text-foreground">
-                                                    <h6>Bid increment is <span className="font-semibold">{currency.format({
-                                                        amount: bidIncrement,
-                                                        currency: CurrencyType.USD
-                                                    })} </span></h6>
+                                                    <h6>Bid increment is <span className="font-semibold">{currency.format(bidIncrement)} </span></h6>
                                                     <h5 className="text-red-600 font-semibold">Disclaimer: <span>All bid amounts are in USD. Currency conversions provided are for reference only and the final amount may vary slightly.</span></h5>                                                    </div>
                                             </DialogFooter>
                                         </div>
