@@ -94,12 +94,12 @@ export default function AccountEdit() {
             showErrorToast(err);
         })
     }
+    
     const confirm = () => {
         setIsConfirmed(true);
         setShowTrigger(false);
         setIsSubmitting(true);
     }
-
 
     useEffect(() => {
         if (isConfirmed) {
@@ -118,39 +118,6 @@ export default function AccountEdit() {
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         // Remove FormData creation and file handling
         setShowTrigger(true);
-
-    }
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
-        // Remove FormData creation and file handling
-        setShowTrigger(true);
-
-        // let updatedAccount = {
-        //     accountId: data.accountId,
-        //     email: data.email,
-        //     nickname: data.nickname,
-        //     phone: data.phone,
-        //     avatar: null,
-        //     balance: data.balance,
-        //     role: data.role,
-        //     dummy: data.dummy,
-        //     status: account?.status
-        // }
-        // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
-        //     console.log(res);
-        //     // dispatch(setCurrentAccount(res))
-        //     if(res){
-        //         toast.success("Account Updated Successfully")
-        //         navigate("/admin/accounts/");
-        //     }
-        // })
-
-        // console.log(updatedAccount);
-    };
-
-    const confirm = () => {
-        setIsConfirmed(true);
-        setShowTrigger(false);
-        setIsSubmitting(true);
     }
 
     useEffect(() => {
