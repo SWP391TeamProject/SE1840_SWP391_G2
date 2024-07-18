@@ -94,12 +94,6 @@ export default function AccountEdit() {
             showErrorToast(err);
         })
     }
-    const confirm = () => {
-        setIsConfirmed(true);
-        setShowTrigger(false);
-        setIsSubmitting(true);
-    }
-
 
     useEffect(() => {
         if (isConfirmed) {
@@ -114,12 +108,6 @@ export default function AccountEdit() {
 
     }, [isConfirmed, form.getValues])
 
-
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
-        // Remove FormData creation and file handling
-        setShowTrigger(true);
-
-    }
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         // Remove FormData creation and file handling
         setShowTrigger(true);
