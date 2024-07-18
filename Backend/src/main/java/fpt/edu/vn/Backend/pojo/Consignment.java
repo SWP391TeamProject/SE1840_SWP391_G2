@@ -56,20 +56,22 @@ public class Consignment {
     @Column(length = 30)
     private String color;
 
-    @Column(length = 30)
-    private String size;
+    private double weight;
 
     @Column(length = 30)
-    private String weight;
+    private String metal;
 
-    @Column(length = 30)
-    private String brand;
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String gemstone;
 
-    @Column(length = 30)
-    private Integer age;
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String measurement;
 
-    @Column(length = 30)
-    private String material;
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String condition;
+
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String stamped;
 
     @CreationTimestamp
     @Column(name = "create_date")

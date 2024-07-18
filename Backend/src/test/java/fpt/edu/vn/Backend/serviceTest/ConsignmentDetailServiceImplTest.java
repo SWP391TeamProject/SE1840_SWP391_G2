@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -77,11 +78,28 @@ public class ConsignmentDetailServiceImplTest {
         consignmentDetail2.setAttachments(Arrays.asList(attachment));
 
         consignmentRequestDetailDTO = new ConsignmentDetailRequestDTO();
-        consignmentRequestDetailDTO.setConsignmentId(consignment.getConsignmentId());
+        consignmentRequestDetailDTO.setConsignmentId(1);
         consignmentRequestDetailDTO.setAccountId(1);
         consignmentRequestDetailDTO.setDescription("Description 1");
         consignmentRequestDetailDTO.setPrice(BigDecimal.valueOf(100.0));
-        consignmentRequestDetailDTO.setStatus("REQUEST");
+        consignmentRequestDetailDTO.setStatus("INITIAL_EVALUATION");
+
+        consignmentDetail1 = new ConsignmentDetail();
+        consignmentDetail1.setConsignmentDetailId(1);
+        consignmentDetail1.setDescription("Test Description");
+        consignmentDetail1.setPrice(BigDecimal.valueOf(100));
+        consignmentDetail1.setType(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION);
+        consignmentDetail1.setCreateDate(LocalDateTime.now());
+        consignmentDetail1.setUpdateDate(LocalDateTime.now());
+        consignmentDetail1.setConsignment(consignment);
+        consignmentDetail1.setAccount(account);
+
+        consignmentRequestDetailDTO = new ConsignmentDetailRequestDTO();
+        consignmentRequestDetailDTO.setDescription("Test Description");
+        consignmentRequestDetailDTO.setPrice(BigDecimal.valueOf(100));
+        consignmentRequestDetailDTO.setStatus("FINAL_EVALUATION");
+        consignmentRequestDetailDTO.setAccountId(1);
+        consignmentRequestDetailDTO.setConsignmentId(1);
 
     }
 
@@ -140,7 +158,6 @@ public class ConsignmentDetailServiceImplTest {
     @Test
     void testGetConsignmentDetailById() {
         when(consignmentDetailRepos.findById(1)).thenReturn(Optional.of(consignmentDetail1));
-
         ConsignmentDetailDTO result = consignmentDetailService.getConsignmentDetailById(1);
 
         verify(consignmentDetailRepos, times(1)).findById(1);
@@ -155,16 +172,17 @@ public class ConsignmentDetailServiceImplTest {
     void testCreateConsignmentDetail() {
         when(consignmentRepos.findByConsignmentId(1)).thenReturn(consignment);
         when(accountRepos.findById(1)).thenReturn(Optional.of(account));
-
         when(consignmentDetailRepos.save(any(ConsignmentDetail.class))).thenReturn(consignmentDetail1);
 
+        // Call the service method
         ConsignmentDetailDTO result = consignmentDetailService.createConsignmentDetail(consignmentRequestDetailDTO);
 
+        // Verify repository method invocations
         verify(consignmentRepos, times(1)).findByConsignmentId(1);
         verify(accountRepos, times(1)).findById(1);
-
         verify(consignmentDetailRepos, times(1)).save(any(ConsignmentDetail.class));
 
+        // Assertions
         assertNotNull(result);
         assertEquals(consignmentRequestDetailDTO.getDescription(), result.getDescription());
         assertEquals(consignmentRequestDetailDTO.getPrice(), result.getPrice());
@@ -184,7 +202,7 @@ public class ConsignmentDetailServiceImplTest {
         updatedConsignmentDetailDTO.setAccountId(1);
         updatedConsignmentDetailDTO.setDescription("Updated Description");
         updatedConsignmentDetailDTO.setPrice(BigDecimal.valueOf(150.0));
-        updatedConsignmentDetailDTO.setStatus("REQUEST");
+        updatedConsignmentDetailDTO.setStatus("FINAL_EVALUATION");
 
         ConsignmentDetailDTO result = consignmentDetailService.updateConsignmentDetail(1, updatedConsignmentDetailDTO);
 
@@ -232,7 +250,7 @@ public class ConsignmentDetailServiceImplTest {
         updatedConsignmentDetailDTO.setAccountId(1);
         updatedConsignmentDetailDTO.setDescription("Updated Description");
         updatedConsignmentDetailDTO.setPrice(BigDecimal.valueOf(150.0));
-        updatedConsignmentDetailDTO.setStatus("REQUEST");
+        updatedConsignmentDetailDTO.setStatus("FINAL_EVALUATION");
 
         ConsignmentDetailDTO result = consignmentDetailService.updateConsignmentDetail(1, updatedConsignmentDetailDTO);
 

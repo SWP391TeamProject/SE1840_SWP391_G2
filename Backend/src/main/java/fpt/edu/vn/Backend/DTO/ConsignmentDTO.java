@@ -18,11 +18,12 @@ public class ConsignmentDTO implements Serializable {
     private AccountDTO staff;
     private String description;
     private String color;
-    private String size;
-    private String weight;
-    private String brand;
-    private Integer age;
-    private String material;
+    private double weight;
+    private String metal;
+    private String gemstone;
+    private String measurement;
+    private String condition;
+    private String stamped;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     List<ConsignmentDetailDTO> consignmentDetails;
@@ -41,11 +42,12 @@ public class ConsignmentDTO implements Serializable {
         }
         this.description = consignment.getDescription();
         this.color = consignment.getColor();
-        this.size = consignment.getSize();
         this.weight = consignment.getWeight();
-        this.brand = consignment.getBrand();
-        this.age = consignment.getAge();
-        this.material = consignment.getMaterial();
+        this.metal = consignment.getMetal();
+        this.gemstone = consignment.getGemstone();
+        this.measurement = consignment.getMeasurement();
+        this.condition = consignment.getCondition();
+        this.stamped = consignment.getStamped();
         this.createDate = consignment.getCreateDate();
         this.updateDate = consignment.getUpdateDate();
         this.consignmentDetails = consignment.getConsignmentDetails() == null ? null : consignment.getConsignmentDetails().stream()
