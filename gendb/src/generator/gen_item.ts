@@ -46,32 +46,32 @@ export async function prepareItemAndCategory(baseDate: Date): Promise<[ItemCateg
 
 export function genItems(consignments: Consignment[]): Item[] {
     const availableConsignments = consignments
-        .filter(d => d.status == ConsignmentStatus.FINISHED);
+        .filter(d => d.status == ConsignmentStatus.TO_ITEM);
     const items: Item[] = [];
 
     for (let i = 0; i < availableConsignments.length; i++){
         const cd = availableConsignments[i];
-        const date = addRandomDays(3, 60, cd.createDate);
         const detail = cd.details[cd.details.length - 1];
 
         items.push({
             id: i + 1,
             categoryId: cd.__categoryId,
             name: cd.__name,
-            age: cd.age,
-            brand: cd.brand,
-            color: cd.color,
-            material: cd.material,
-            size: cd.size,
             weight: cd.weight,
+            color: cd.color,
+            condition: cd.condition,
+            gemstone: cd.gemstone,
+            measurement: cd.measurement,
+            metal: cd.metal,
+            stamped: cd.stamped,
             description: cd.description,
             reservePrice: detail.price, // giá sàn
             buyInPrice: detail.price * faker.number.int({ min: 10, max: 100 }), // gia mua đứt
             status: ItemStatus.QUEUE, // generate later
             imageURLs: cd.imageURLs,
-            createDate: date,
-            updateDate: date,
-            ownerId: cd.senderId, // generate later
+            createDate: cd.createDate,
+            updateDate: cd.createDate,
+            ownerId: cd.userId, // generate later
             orderId: undefined // generate later
         })
     }

@@ -9,6 +9,7 @@ export interface Transaction {
     auctionItem: {
         itemId?: number,
         auctionId?: number,
+        soldPrice?: number
     } | null
 }
 
