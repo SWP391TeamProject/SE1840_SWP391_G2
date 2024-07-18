@@ -64,13 +64,13 @@ public class ConsignmentServiceImplTest {
         consignmentDetails.setDescription("description");
         consignmentDetails.setPreferContact("email");
         consignmentDetails.setAccountId(1);
-        consignmentDetails.setAge(1);
-        consignmentDetails.setBrand("brand");
+        consignmentDetails.setGemstone("ruby");
+        consignmentDetails.setCondition("good");
         consignmentDetails.setColor("color");
-        consignmentDetails.setMaterial("material");
-        consignmentDetails.setSize("size");
-        consignmentDetails.setWeight("weight");
-
+        consignmentDetails.setMetal("red");
+        consignmentDetails.setStamped("14k");
+        consignmentDetails.setWeight(100.00);
+        consignmentDetails.setMeasurement("2xl");
         Account account = new Account();
         account.setAccountId(1);
         when(accountRepos.findById(anyInt())).thenReturn(Optional.of(account));
@@ -78,6 +78,7 @@ public class ConsignmentServiceImplTest {
         consignment.setConsignmentId(1);
         consignment.setStatus(Consignment.Status.WAITING_STAFF);
         consignment.setUser(account);
+
 
         when(consignmentRepos.save(any(Consignment.class))).thenReturn(consignment);
 

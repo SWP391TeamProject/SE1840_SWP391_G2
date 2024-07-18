@@ -18,10 +18,11 @@ public class ConsignmentRequestDTO implements Serializable {
     private String email;
     private String preferContact;
     private String color;
-    private String size;
-    private String weight;
-    private String brand;
-    private Integer age;
-    private String material;
+    private double weight;
+    private String metal;
+    private String gemstone;
+    private String measurement;
+    private String condition;
+    private String stamped;
     private List<MultipartFile> files;
 }

@@ -28,17 +28,21 @@ public class ItemDTO implements Serializable {
     private LocalDateTime updateDate;
     private AccountDTO owner;
     private String color;
-    private String size;
-    private String weight;
-    private String brand;
-    private Integer age;
-    private String material;
+    private double weight;
+    private String metal;
+    private String gemstone;
+    private String measurement;
+    private String condition;
+    private String stamped;
     private Integer orderId;
     private Set<AttachmentDTO> attachments;
 
     public ItemDTO(Item item) {
         this.itemId = item.getItemId();
-        this.category = new ItemCategoryDTO(item.getItemCategory());
+        if(item.getItemCategory() != null){
+            this.category = new ItemCategoryDTO(item.getItemCategory());
+        }
+
         this.name = item.getName();
         this.description = item.getDescription();
         this.reservePrice = item.getReservePrice();
@@ -47,13 +51,16 @@ public class ItemDTO implements Serializable {
         this.status = item.getStatus();
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
-        this.owner = AccountDTO.redacted(item.getOwner());
+        if (item.getOwner() != null) {
+            this.owner = AccountDTO.redacted(item.getOwner());
+        }
         this.color = item.getColor();
-        this.size = item.getSize();
         this.weight = item.getWeight();
-        this.brand = item.getBrand();
-        this.age = item.getAge();
-        this.material = item.getMaterial();
+        this.metal = item.getMetal();
+        this.gemstone = item.getGemstone();
+        this.measurement = item.getMeasurement();
+        this.condition = item.getCondition();
+        this.stamped = item.getStamped();
         if (item.getOrder() != null)
             this.orderId = item.getOrder().getOrderId();
         if (item.getAttachments() != null)

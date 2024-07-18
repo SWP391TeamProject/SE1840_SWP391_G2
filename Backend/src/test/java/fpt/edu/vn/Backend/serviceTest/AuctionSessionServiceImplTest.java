@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -148,37 +149,65 @@ public class AuctionSessionServiceImplTest {
     @Test
     @DisplayName("Test get past auction sessions")
     void testGetPastAuctionSessions() {
+        LocalDateTime now = LocalDateTime.now();
         Pageable pageable = PageRequest.of(0, 50);
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
-        when(auctionSessionRepos.findByEndDateBefore(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
 
+        // Mocking the repository method call
+        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Collections.singletonList(auctionSession));
+        when(auctionSessionRepos.findAllByStatus(AuctionSession.Status.FINISHED, pageable)).thenReturn(auctionSessionPage);
+
+        // Calling the service method
         Page<AuctionSessionDTO> result = auctionSessionService.getPastAuctionSessions(pageable);
 
+        // Assertions
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        verify(auctionSessionRepos, times(1)).findByEndDateBefore(any(LocalDateTime.class), eq(pageable));
+
+        // Verification
+        verify(auctionSessionRepos, times(1)).findAllByStatus(AuctionSession.Status.FINISHED, pageable);
     }
 
     @Test
     @DisplayName("Test get upcoming auction sessions")
     void testGetUpcomingAuctionSessions() {
         Pageable pageable = PageRequest.of(0, 10);
-        auctionSession= new AuctionSession();
+        AuctionSession auctionSession = new AuctionSession();
         auctionSession.setAuctionSessionId(1);
         auctionSession.setStartDate(LocalDateTime.now().plusDays(1));
         auctionSession.setEndDate(LocalDateTime.now().plusDays(2));
         auctionSession.setCreateDate(LocalDateTime.now().minusDays(2));
         auctionSession.setUpdateDate(LocalDateTime.now());
         auctionSession.setStatus(AuctionSession.Status.SCHEDULED);
-        
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
-        when(auctionSessionRepos.findByStartDateAfter(any(LocalDateTime.class), eq(pageable))).thenReturn(auctionSessionPage);
+
+        // Case 1: Mocking a non-empty Page<AuctionSession>
+        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Collections.singletonList(auctionSession));
+        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
+                .thenReturn(auctionSessionPage);
 
         Page<AuctionSessionDTO> result = auctionSessionService.getUpcomingAuctionSessions(pageable);
 
         assertNotNull(result);
+        assertFalse(result.isEmpty());
         assertEquals(1, result.getTotalElements());
-        verify(auctionSessionRepos, times(1)).findByStartDateAfter(any(LocalDateTime.class), eq(pageable));
+
+        verify(auctionSessionRepos, times(1)).findAllByStatus(auctionSession.getStatus(), pageable);
+
+        // Case 2: Mocking an empty Page<AuctionSession>
+        Page<AuctionSession> emptyAuctionSessionPage = new PageImpl<>(Collections.emptyList());
+        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
+                .thenReturn(emptyAuctionSessionPage);
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> auctionSessionService.getUpcomingAuctionSessions(pageable),
+                "No upcoming auction sessions found");
+
+        // Case 3: Mocking a null return from repository
+        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
+                .thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> auctionSessionService.getUpcomingAuctionSessions(pageable),
+                "No upcoming auction sessions found");
     }
 
     @Test
@@ -296,7 +325,7 @@ public class AuctionSessionServiceImplTest {
 
     @Test
     void getPastAuctionSessions_NoPastAuctionSessionsFound() {
-        when(auctionSessionRepos.findByEndDateBefore(any(), any())).thenReturn(Page.empty());
+        when(auctionSessionRepos.findAllByStatus(eq(AuctionSession.Status.FINISHED), any(Pageable.class))).thenReturn(Page.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getPastAuctionSessions(PageRequest.of(0, 10)));
     }
@@ -308,10 +337,4 @@ public class AuctionSessionServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAuctionSessionsByTitle(PageRequest.of(0, 10), "Test"));
     }
 
-    @Test
-    void getUpcomingAuctionSessions_NoUpcomingAuctionSessionsFound() {
-        when(auctionSessionRepos.findByStartDateAfter(any(), any())).thenReturn(Page.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getUpcomingAuctionSessions(PageRequest.of(0, 10)));
-    }
 }

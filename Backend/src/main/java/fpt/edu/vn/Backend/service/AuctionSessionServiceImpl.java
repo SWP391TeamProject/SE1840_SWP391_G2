@@ -689,10 +689,17 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
         Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.SCHEDULED, pageable);
+
+        if (upcomingAuctionSessions == null) {
+            logger.warn("Auction session repository returned null");
+            throw new ResourceNotFoundException("No upcoming auction sessions found");
+        }
+
         if (upcomingAuctionSessions.isEmpty()) {
             logger.warn("No upcoming auction sessions found");
             throw new ResourceNotFoundException("No upcoming auction sessions found");
         }
+
         return upcomingAuctionSessions.map(AuctionSessionDTO::new);
 
     }

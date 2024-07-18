@@ -97,11 +97,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setCreateDate(LocalDateTime.now());
             consignment.setUpdateDate(LocalDateTime.now());
             consignment.setConsignmentDetails(new ArrayList<>());
-            consignment.setAge(consignmentRequestDTO.getAge());
-            consignment.setBrand(consignmentRequestDTO.getBrand());
             consignment.setColor(consignmentRequestDTO.getColor());
-            consignment.setMaterial(consignmentRequestDTO.getMaterial());
-            consignment.setSize(consignmentRequestDTO.getSize());
+            consignment.setMetal(consignmentRequestDTO.getMetal());
+            consignment.setGemstone(consignmentRequestDTO.getGemstone());
+            consignment.setStamped(consignmentRequestDTO.getStamped());
+            consignment.setMeasurement(consignmentRequestDTO.getMeasurement());
+            consignment.setCondition(consignmentRequestDTO.getCondition());
             consignment.setWeight(consignmentRequestDTO.getWeight());
             consignment.setStatus(Consignment.Status.WAITING_STAFF);
             consignment.setDescription(consignmentRequestDTO.getDescription());
@@ -388,12 +389,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setCreateDate(updatedConsignment.getCreateDate());
             consignment.setUpdateDate(updatedConsignment.getUpdateDate());
             consignment.setStatus(Consignment.Status.valueOf(updatedConsignment.getStatus().toUpperCase()));
-            consignment.setAge(updatedConsignment.getAge());
-            consignment.setBrand(updatedConsignment.getBrand());
             consignment.setColor(updatedConsignment.getColor());
-            consignment.setMaterial(updatedConsignment.getMaterial());
-            consignment.setSize(updatedConsignment.getSize());
             consignment.setWeight(updatedConsignment.getWeight());
+            consignment.setMetal(updatedConsignment.getMetal());
+            consignment.setGemstone(updatedConsignment.getGemstone());
+            consignment.setCondition(updatedConsignment.getCondition());
+            consignment.setStamped(updatedConsignment.getStamped());
+            consignment.setMeasurement(updatedConsignment.getMeasurement());
             consignment.setDescription(updatedConsignment.getDescription());
 
             consignment.setUser(updatedConsignment.getUser() == null ? null : accountRepos.findById(updatedConsignment.getUser().getAccountId()).orElseThrow(() -> new ConsignmentServiceException("Account not found")));

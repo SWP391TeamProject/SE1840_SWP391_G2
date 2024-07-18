@@ -242,11 +242,13 @@ public class DbGenService {
             consignment.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
             consignment.setDescription(obj.get("description").getAsString());
             consignment.setColor(obj.get("color").getAsString());
-            consignment.setSize(obj.get("size").getAsString());
-            consignment.setWeight(obj.get("weight").getAsString());
-            consignment.setBrand(obj.get("brand").getAsString());
-            consignment.setAge(obj.has("age") ? obj.get("age").getAsInt() : null);
-            consignment.setMaterial(obj.get("material").getAsString());
+            consignment.setWeight(Double.parseDouble(obj.get("weight").getAsString()));
+            consignment.setMeasurement(obj.get("measurement").getAsString());
+            consignment.setCondition(obj.get("condition").getAsString());
+            consignment.setMetal(obj.get("metal").getAsString());
+            consignment.setGemstone(obj.get("gemstone").getAsString());
+            consignment.setStamped(obj.get("stamped").getAsString());
+
             {
                 List<Attachment> attachments = new ArrayList<>();
 
@@ -415,11 +417,12 @@ public class DbGenService {
             item.setItemCategory(itemCategoryRepos.getReferenceById(obj.get("categoryId").getAsInt()));
             item.setName(obj.get("name").getAsString());
             item.setColor(obj.get("color").getAsString());
-            item.setSize(obj.get("size").getAsString());
-            item.setWeight(obj.get("weight").getAsString());
-            item.setBrand(obj.get("brand").getAsString());
-            item.setAge(obj.has("age") ? obj.get("age").getAsInt() : null);
-            item.setMaterial(obj.get("material").getAsString());
+            item.setWeight(Double.parseDouble(obj.get("weight").getAsString()));
+            item.setGemstone(obj.get("gemstone").getAsString());
+            item.setCondition(obj.get("condition").getAsString());
+            item.setMetal(obj.get("metal").getAsString());
+            item.setMeasurement(obj.get("color").getAsString());
+            item.setStamped(obj.get("stamped").getAsString());
             item.setDescription(obj.get("description").getAsString());
             item.setReservePrice(obj.get("reservePrice").getAsBigDecimal());
             item.setBuyInPrice(obj.get("buyInPrice").getAsBigDecimal());

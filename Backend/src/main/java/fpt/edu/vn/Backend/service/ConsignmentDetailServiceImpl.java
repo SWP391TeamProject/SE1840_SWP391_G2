@@ -132,9 +132,12 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     private ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
-        List<AttachmentDTO> attachmentIds = consignmentDetail.getAttachments().stream()
-                .map(AttachmentDTO::new)
-                .collect(Collectors.toList());
+        List<AttachmentDTO> attachmentIds = null;
+        if (consignmentDetail.getAttachments() != null) {
+            attachmentIds = consignmentDetail.getAttachments().stream()
+                    .map(AttachmentDTO::new)
+                    .collect(Collectors.toList());
+        }
 
         return new ConsignmentDetailDTO(
                 consignmentDetail.getConsignmentDetailId(),
