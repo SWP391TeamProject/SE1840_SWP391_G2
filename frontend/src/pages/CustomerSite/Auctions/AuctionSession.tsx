@@ -21,8 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { set } from 'date-fns'
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession'
 import { useAuth } from '@/AuthProvider'
-import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 import { showErrorToast } from '@/lib/handle-error'
+import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 
 
 
@@ -135,7 +135,7 @@ export default function AuctionSession() {
             })
             toast.success("Registered Successfully",
                 {
-                    
+
                 }
             );
         }).catch(err => {
@@ -170,10 +170,10 @@ export default function AuctionSession() {
             return (
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant="default"  onClick={()=>{
-                            if(!auth.user.kyc){
+                        <Button variant="default" onClick={() => {
+                            if (!auth.user.kyc) {
                                 setShowKycPopup(true);
-                                return ;
+                                return;
                             }
                         }}>Register to bid</Button>
                     </AlertDialogTrigger>
@@ -211,12 +211,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default" onClick={()=>{
-                            if(!auth.user.kyc){
-                                setShowKycPopup(true);
-                                return ;
-                            }
-                        }} >Register to bid</Button>
+                    <Button variant="default" onClick={() => {
+                        if (!auth.user.kyc) {
+                            setShowKycPopup(true);
+                            return;
+                        }
+                    }} >Register to bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader >
@@ -279,7 +279,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default">Place Bid</Button>
+                    <Button variant="default" onClick={() => {
+                        if (!auth.user.kyc) {
+                            setShowKycPopup(true);
+                            return;
+                        }
+                    }}>Place Bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
@@ -344,11 +349,11 @@ export default function AuctionSession() {
                                     <ClockIcon className="h-5 w-5" />
 
                                     {(auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
-                                      new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
+                                        new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
                                         <span>Ends in <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime></span> : <></>}
 
                                     {(auctionSession?.status === AuctionSessionStatus.FINISHED ||
-                                      new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
+                                        new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
                                         <div className="text-pink-500 dark:text-pink-400 font-semibold">
                                             Auction Ended
                                         </div> : <></>}
@@ -359,7 +364,7 @@ export default function AuctionSession() {
                                         </div>}
 
                                     {(auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
-                                      new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
+                                        new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
                                         <span>Starts in <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime></span> : <></>}
 
                                 </div>
@@ -501,7 +506,7 @@ export default function AuctionSession() {
                     </div>
                 </div>
             </main >
-            {showKycPopup && <KycVerificationPopup />}
+            <KycVerificationPopup open={showKycPopup} setOpen={setShowKycPopup} />
 
         </div >
     )
