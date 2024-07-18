@@ -154,7 +154,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
-                if (item.getStatus() != Item.Status.QUEUE && item.getStatus() != Item.Status.UNSOLD) {
+                if (item.getStatus() != Item.Status.QUEUE ) {
                     throw new InvalidInputException("Item is not in queue or unsold: " + item.getItemId());
                 }
 
@@ -270,7 +270,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
             Item item = auctionItem.getItem();
             {
-                item.setStatus(bids.isEmpty() ? Item.Status.UNSOLD : Item.Status.SOLD);
+                item.setStatus(bids.isEmpty() ? Item.Status.QUEUE : Item.Status.SOLD);
                 if (!bids.isEmpty())
                     item.setSoldPrice(bids.get(0).getAmount());
                 itemRepos.save(item);
@@ -453,7 +453,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             bidRepos.saveAll(bids);
 
             Item item = auctionItem.getItem();
-            item.setStatus(Item.Status.UNSOLD);
+            item.setStatus(Item.Status.QUEUE);
             itemRepos.save(item);
 
             logger.info("Item {} has {} bids without winner", auctionItem.getAuctionItemId(), bids.size());
