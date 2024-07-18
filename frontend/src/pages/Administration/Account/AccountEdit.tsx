@@ -35,7 +35,7 @@ const formSchema = z.object({
     }),
     phone: z.string().max(15, "Phone must not be longer than 15 characters").optional(),
     role: z.nativeEnum(Roles),
-    balance: z.coerce.number().min(0, "Balance must not be negative"),
+    balance: z.coerce.number().min(0, "Balance must not be negative").max(1000000000, "Balance must not exceed 1,000,000,000"),
     dummy: z.boolean()
 });
 
@@ -94,7 +94,8 @@ export default function AccountEdit() {
                 return "Account updated successfully.";
             },
             error: (err) => {
-               return  getErrorMessage(err);
+                setIsSubmitting(false);
+                return getErrorMessage(err);
             }
         });
         // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
@@ -107,19 +108,6 @@ export default function AccountEdit() {
         //     showErrorToast(err);
         // })
     }
-
-    useEffect(() => {
-        if (isConfirmed) {
-            if (form.getValues) {
-                const values = form.getValues();
-                handleConfirmed(values);
-                setIsConfirmed(false);
-            } else {
-                setIsSubmitting(false)
-            }
-        }
-
-    }, [isConfirmed, form.getValues])
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         // Remove FormData creation and file handling
@@ -189,19 +177,46 @@ export default function AccountEdit() {
     useEffect(() => {
         console.log(form.formState.defaultValues);
         if (!account || account.accountId != parseInt(id)) {
-            fetchAccountById(parseInt(id)).then((res) => {
-                setCurrentAccount(res?.data);
-                form.reset({
-                    accountId: res?.data?.accountId,
-                    nickname: res?.data?.nickname ?? "",
-                    email: res?.data?.email,
-                    phone: res?.data?.phone ?? "",
-                    dummy: res?.data?.dummy ?? false,
-                    balance: res?.data?.balance ?? 0,
-                    role: res.data ? res?.data.role : Roles.MEMBER,
-                });
-                setEditedAccount(res.data);
+
+            const setCurrentAccountPromise = fetchAccountById(parseInt(id));
+
+            toast.promise(setCurrentAccountPromise, {
+                loading: 'Fetching account...',
+                success: (res) => {
+                    setCurrentAccount(res?.data);
+                    form.reset({
+                        accountId: res?.data?.accountId,
+                        nickname: res?.data?.nickname ?? "",
+                        email: res?.data?.email,
+                        phone: res?.data?.phone ?? "",
+                        dummy: res?.data?.dummy ?? false,
+                        balance: res?.data?.balance ?? 0,
+                        role: res.data ? res?.data.role : Roles.MEMBER,
+                    });
+                    setEditedAccount(res.data);
+                    return 'Account fetched successfully';
+                },
+                error: (err) => {
+                    return getErrorMessage(err);
+                }
             });
+
+
+
+
+            // fetchAccountById(parseInt(id)).then((res) => {
+            //     setCurrentAccount(res?.data);
+            //     form.reset({
+            //         accountId: res?.data?.accountId,
+            //         nickname: res?.data?.nickname ?? "",
+            //         email: res?.data?.email,
+            //         phone: res?.data?.phone ?? "",
+            //         dummy: res?.data?.dummy ?? false,
+            //         balance: res?.data?.balance ?? 0,
+            //         role: res.data ? res?.data.role : Roles.MEMBER,
+            //     });
+            //     setEditedAccount(res.data);
+            // });
         }
     }, [])
 

@@ -16,7 +16,7 @@ import {useAuth} from "@/AuthProvider.tsx";
 import {Controller, SubmitHandler, useForm} from "react-hook-form";
 import {API_SERVER} from "@/constants/domain.ts";
 import {toast} from "sonner";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import ChangePassword from "./profile-detail/ChangePassword";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {z} from "zod";

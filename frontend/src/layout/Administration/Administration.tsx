@@ -10,6 +10,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "react-router-dom";
@@ -79,7 +80,7 @@ export default function Administration() {
                     </div>
                     <div className="flex-1">
                         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                            {auth.user.role == "ADMIN" && <Link
+                            {auth.user.role === "ADMIN" && <Link
                                 to="dashboard"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
@@ -87,34 +88,36 @@ export default function Administration() {
                                 Dashboard
                             </Link>}
 
-                            {auth.user.role == "ADMIN" && <Link
+                            {auth.user.role === "ADMIN" && <Link
                                 to="accounts"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <User2 />
                                 Manage Accounts
                             </Link>}
-                            { <Link
+                            {(auth.user.role === "ADMIN" || auth.user.role === "MANAGER" || auth.user.role === "STAFF") && <Link
                                 to="consignments"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <FolderClosed />
                                 Manage Consignments
                             </Link>}
-                            <Link
-                                to="auction-sessions"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <AreaChartIcon />
-                                Manage Auction Session
-                            </Link>
-                            <Link
-                                to="items"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <ShoppingBag />
-                                Manage Items
-                            </Link>
+                            {auth.user.role === "MANAGER" || auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="auction-sessions"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <AreaChartIcon />
+                                    Manage Auction Session
+                                </Link>}
+                            {auth.user.role === "MANAGER" || auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="items"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <ShoppingBag />
+                                    Manage Items
+                                </Link>}
                             <Link
                                 to="blogs"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -122,20 +125,22 @@ export default function Administration() {
                                 <Newspaper />
                                 Manage Blogs
                             </Link>
-                            <Link
-                                to="orders"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <Package />
-                                Manage Orders
-                            </Link>
-                            <Link
-                                to="payments"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <CircleDollarSign />
-                                Manage Payments
-                            </Link>
+                            {auth.user.role === "MANAGER" || auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="orders"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <Package />
+                                    Manage Orders
+                                </Link>}
+                            {auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="payments"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <CircleDollarSign />
+                                    Manage Payments
+                                </Link>}
                         </nav>
                     </div>
                 </div>

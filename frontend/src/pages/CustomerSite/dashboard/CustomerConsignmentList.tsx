@@ -1,6 +1,6 @@
 import { fetchAccountById } from "@/services/AccountsServices";
 import { getCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import React from "react";
 import CustomerConsigmentCard from "./components/CustomerConsigmentCard";
 import { Grid2x2Icon, PlusCircleIcon, WalletCards } from "lucide-react";

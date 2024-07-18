@@ -2,7 +2,7 @@ import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { ConsignmentStatus } from "@/constants/enums";
 import { showErrorToast } from "@/lib/handle-error";
 import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import { toast } from "sonner";
 
 export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {

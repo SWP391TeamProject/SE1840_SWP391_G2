@@ -87,7 +87,9 @@ export default function AccountCreate() {
                 setIsSubmitting(false);
                 return 'Account created successfully';
             },
-            error: (err) => getErrorMessage(err)
+            error: (err) =>{
+                setIsSubmitting(false);
+                return getErrorMessage(err)}
         })
 
 

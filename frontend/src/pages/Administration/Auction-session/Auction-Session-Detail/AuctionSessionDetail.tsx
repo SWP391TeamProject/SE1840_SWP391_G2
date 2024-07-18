@@ -91,7 +91,6 @@ export default function AuctionSessionDetail() {
 
     const handleFinishSession = () => {
         const finishAuctionSessionPromise = finishAuctionSession(currentAuctionSession?.auctionSessionId)
-
         toast.promise(finishAuctionSessionPromise, {
             loading: 'Finishing Auction Session...',
             success:()=>{
@@ -118,9 +117,7 @@ export default function AuctionSessionDetail() {
 
     const handleTerminateSession = () => {
         console.log("here");
-
         const terminateAuctionSessionPromise = terminateAuctionSession(currentAuctionSession?.auctionSessionId)
-
         toast.promise(terminateAuctionSessionPromise, {
             loading: 'Terminating Auction Session...',
             success: (res) => {

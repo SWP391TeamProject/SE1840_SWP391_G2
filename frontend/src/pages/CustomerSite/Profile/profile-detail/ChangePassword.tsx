@@ -55,23 +55,39 @@ export default function ChangePassword({ setIsLoading, isLoading }) {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true)
-        changePassword(auth?.user?.accountId, values).then(res => {
-            console.log(res)
-            setIsLoading(false)
-            toast.success('Password changed successfully!',{
-                position:"bottom-right",
-            })
-            form.reset({
-                oldPassword: "",
-                newPassword: "",
-                confirmPassword: "",
-            });
-        }).catch(err => {
-            showErrorToast(err);
-
-            console.log(err)
-            setIsLoading(false)
+        const changePasswordPromise = changePassword(auth?.user?.accountId, values)
+        
+        toast.promise(changePasswordPromise, {
+            loading: 'Changing password...',
+            success: () => {
+                setIsLoading(false)
+                form.reset({
+                    oldPassword: "",
+                    newPassword: "",
+                    confirmPassword: "",
+                });
+                return 'Password changed successfully!';
+            },
+            error: (err) => showErrorToast(err),
         })
+        
+        // .then(res => {
+        //     console.log(res)
+        //     setIsLoading(false)
+        //     toast.success('Password changed successfully!',{
+        //         position:"bottom-right",
+        //     })
+        //     form.reset({
+        //         oldPassword: "",
+        //         newPassword: "",
+        //         confirmPassword: "",
+        //     });
+        // }).catch(err => {
+        //     showErrorToast(err);
+
+        //     console.log(err)
+        //     setIsLoading(false)
+        // })
     }
 
     return <>

@@ -87,10 +87,10 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: 'accountId',
+    accessorKey: 'account.accountId',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Account ID" />,
-    cell: ({ row }) => row.getValue('accountId'),
-    enableSorting: false,
+    cell: ({ row }) => row.original.accountId,
+    enableSorting: true,
     enableHiding: true,
   },
 ];
