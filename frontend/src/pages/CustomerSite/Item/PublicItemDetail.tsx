@@ -4,7 +4,7 @@ import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation"
 import {useCurrency} from "@/CurrencyProvider"
 import {Link, useParams} from "react-router-dom";
 import {toast} from "sonner";
-import {AxiosResponse} from "axios";
+import {AxiosResponse} from "@/config/axiosConfig.ts";
 import {Item, ItemStatus} from "@/models/Item.ts";
 import {AlertCircle, BoxIcon, GavelIcon, GemIcon} from "lucide-react";
 import {Alert, AlertDescription, AlertTitle,} from "@/components/ui/alert"

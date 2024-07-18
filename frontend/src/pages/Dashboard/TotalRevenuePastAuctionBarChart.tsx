@@ -10,7 +10,7 @@ import MainCard from "./MainCard";
 // third-party
 import ReactApexChart from "react-apexcharts";
 import { getTotalRevenueByPastAuction } from "@/services/StatisticServices";
-import { AxiosResponse } from "axios";
+import { AxiosResponse } from "@/config/axiosConfig.ts";
 
 // chart options
 const columnChartOptions = {

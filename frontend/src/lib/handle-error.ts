@@ -23,7 +23,7 @@ export function getErrorMessage(err: unknown) {
       case 500:
         return "Internal Server Error"
     }
-    return err.message
+    return err.response.data.message
   } else {
     return unknownError
   }

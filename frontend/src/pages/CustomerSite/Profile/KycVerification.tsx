@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { showErrorToast } from "@/lib/handle-error";
 import { getCookie } from "@/utils/cookies";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import { Loader2 } from "lucide-react";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";

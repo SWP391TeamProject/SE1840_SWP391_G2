@@ -1,7 +1,7 @@
 import { API_SERVER } from "@/constants/domain";
 import { PaymentType } from "@/constants/enums";
 import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 
 interface GetPaymentsSchema {
   page: number;

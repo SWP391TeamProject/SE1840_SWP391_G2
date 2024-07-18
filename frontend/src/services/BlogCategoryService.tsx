@@ -1,7 +1,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
 import { getCookie } from '@/utils/cookies';
-import axios from 'axios';
+import axios from "@/config/axiosConfig.ts";
 import { toast } from "sonner";
 
 class BlogCategoryService {

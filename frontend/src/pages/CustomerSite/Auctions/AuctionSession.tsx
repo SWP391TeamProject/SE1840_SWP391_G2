@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
-import axios from 'axios'
+import axios from "@/config/axiosConfig.ts"
 import { toast } from "sonner"
 import { getCookie } from '@/utils/cookies'
 import { fetchAuctionSessionById, registerAuctionSession } from '@/services/AuctionSessionService'

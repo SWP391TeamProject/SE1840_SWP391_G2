@@ -11,7 +11,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { setCookie } from "@/utils/cookies";
 import { AccountStatus, Roles } from "@/constants/enums";
 import { toast } from "sonner";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import { Loader2 } from "lucide-react";
 import googleIcon from "../../assets/icons8-google.svg";
 import { AUTH_SERVER, SERVER_DOMAIN_URL } from "@/constants/domain";
