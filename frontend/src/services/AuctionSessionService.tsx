@@ -5,6 +5,7 @@ import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { showErrorToast } from "@/lib/handle-error";
 import {AuctionSession} from "@/models/AuctionSessionModel.tsx";
 import {Page} from "@/models/Page.ts";
+import { createSearchParams } from "react-router-dom";
 
 const controller = "auction-sessions";
 
@@ -457,4 +458,20 @@ export const fetchAuctionSessionHistoryOfItem = async (itemId?: number, page: nu
           headers: {"Content-Type": "application/json"},
           params: {page, size}
       });
+}
+
+export const removeAuctionItem = async (auctionItemId: any) => {
+    // let params = {
+    //     auctionSessionId: auctionItemId.auctionSessionId,
+    //     itemId: auctionItemId.itemId
+    // }
+    return await axios
+        .get(`${SERVER_DOMAIN_URL}/api/auction-items/delete/${auctionItemId}`, {
+            headers: {
+                "Content-Type": "application/json",
+
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        })
 }

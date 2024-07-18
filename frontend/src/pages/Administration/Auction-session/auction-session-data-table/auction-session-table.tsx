@@ -26,7 +26,7 @@ export default function AcutionSessionsTable({ acutionSessionPromise }: AcutionS
         const fetchData = async () => {
            
             setIsLoading(true)
-            acutionSessionPromise.then((res) => {
+            acutionSessionPromise?.then((res) => {
                 console.log(res)
                 setData(res.data.content);
                 setPageCount(res.data.totalPages);
