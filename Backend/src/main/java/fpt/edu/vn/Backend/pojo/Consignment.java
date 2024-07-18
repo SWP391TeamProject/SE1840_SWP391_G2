@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.pojo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,8 +23,19 @@ public class Consignment {
     @Column(name = "consignment_id")
     private int consignmentId;
 
+    @Email
+    @Column(length = 50)
+    private String contactEmail;
 
-    @Column(length = 30)
+    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    private String contactName;
+
+    @Column(length = 20)
+    private String contactPhone;
+
+
+
+    @Column(length = 25)
     @Enumerated(EnumType.STRING)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
@@ -72,6 +84,11 @@ public class Consignment {
 
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String stamped;
+
+    @Column(length = 10,columnDefinition = "VARCHAR(30)")
+    private String secretCode;
+
+
 
     @CreationTimestamp
     @Column(name = "create_date")

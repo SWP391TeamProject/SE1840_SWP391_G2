@@ -426,7 +426,6 @@ public class DbGenService {
             item.setDescription(obj.get("description").getAsString());
             item.setReservePrice(obj.get("reservePrice").getAsBigDecimal());
             item.setBuyInPrice(obj.get("buyInPrice").getAsBigDecimal());
-            item.setSoldPrice(obj.has("soldPrice") ? obj.get("soldPrice").getAsBigDecimal() : null);
             item.setStatus(Item.Status.valueOf(obj.get("status").getAsString()));
             item.setOwner(accountRepos.getReferenceById(obj.get("ownerId").getAsInt()));
             item = itemRepos.save(item);
@@ -647,7 +646,7 @@ public class DbGenService {
             if (p.meta instanceof Order) {
                 itemRepos.findById(p.itemId).ifPresent((item) -> {
                     Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
-                    item.setOrder(payment.getOrder());
+//                    item.getOrderDetails();
                     itemRepos.save(item);
                 });
             }

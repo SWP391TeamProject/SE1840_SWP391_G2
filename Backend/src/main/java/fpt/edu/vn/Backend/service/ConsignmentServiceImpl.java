@@ -105,7 +105,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignment.setStatus(Consignment.Status.WAITING_STAFF);
             consignment.setDescription(consignmentRequestDTO.getDescription());
             consignment.setUser(accountRepos.findById(consignmentRequestDTO.getAccountId()).orElseThrow(() -> new ConsignmentServiceException("User not found")));
-
+            consignment.setContactEmail(consignmentRequestDTO.getEmail());
+            consignment.setContactName(consignmentRequestDTO.getContactName());
+            consignment.setContactPhone(consignmentRequestDTO.getPhone());
 //                consignment.setConsignmentDetails(List.of(detail));
             consignment = consignmentRepos.save(consignment);
             if (consignmentRequestDTO.getFiles() != null) {

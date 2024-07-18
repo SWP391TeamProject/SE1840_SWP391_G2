@@ -66,6 +66,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private String systemEmail;
 
     private final Map<Integer, AuctionSession.Status> auctionHandlingLock = Collections.synchronizedMap(new HashMap<>());
+    @Autowired
+    private OrderDetailRepos orderDetailRepos;
 
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos,
@@ -154,7 +156,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
-                if (item.getStatus() != Item.Status.QUEUE ) {
+                if (item.getStatus() != Item.Status.QUEUE) {
                     throw new InvalidInputException("Item is not in queue or unsold: " + item.getItemId());
                 }
 
@@ -169,7 +171,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 itemRepos.save(item);
             }
 
-            for (Account a: accountRepos.findByRole(Account.Role.MEMBER)) {
+            for (Account a : accountRepos.findByRole(Account.Role.MEMBER)) {
                 if (!a.isDummy()) { // skip email for dummy accounts
                     MimeMessage message = mailSender.createMimeMessage();
                     MimeMessageHelper helper = new MimeMessageHelper(message, false);
@@ -183,7 +185,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                     htmlContent = htmlContent.replace("{auctionName}", auctionSession.getTitle());
                     htmlContent = htmlContent.replace("{auctionId}", String.valueOf(auctionSession.getAuctionSessionId()));
                     htmlContent = htmlContent.replace("{createDate}", String.valueOf(auctionSession.getCreateDate()));
-                    htmlContent = htmlContent.replace("{auctionImage}", String.valueOf(auctionSession.getAttachments().size()==0?"":auctionSession.getAttachments().get(0).getLink()));
+                    htmlContent = htmlContent.replace("{auctionImage}", String.valueOf(auctionSession.getAttachments().size() == 0 ? "" : auctionSession.getAttachments().get(0).getLink()));
                     helper.setText(htmlContent, true);
                     mailSender.send(message);
                 }
@@ -215,10 +217,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             auctionSession.setStatus(AuctionSession.Status.SCHEDULED);
             AuctionSession savedAuctionSession = auctionSessionRepos.save(auctionSession);
             try {
-                if(auctionDTO.getFiles()!=null && !auctionDTO.getFiles().isEmpty()){
+                if (auctionDTO.getFiles() != null && !auctionDTO.getFiles().isEmpty()) {
                     for (MultipartFile file : auctionDTO.getFiles()) {
-                        attachmentService.uploadAuctionAttachment(file,savedAuctionSession.getAuctionSessionId());
-                    }}
+                        attachmentService.uploadAuctionAttachment(file, savedAuctionSession.getAuctionSessionId());
+                    }
+                }
             } catch (Exception e) {
                 throw new InvalidInputException("Error uploading attachments", e);
             }
@@ -268,13 +271,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItem.getAuctionItemId());
             bidCount += bids.size();
 
+
             Item item = auctionItem.getItem();
-            {
-                item.setStatus(bids.isEmpty() ? Item.Status.QUEUE : Item.Status.SOLD);
-                if (!bids.isEmpty())
-                    item.setSoldPrice(bids.get(0).getAmount());
-                itemRepos.save(item);
-            }
+            item.setStatus(bids.isEmpty() ? Item.Status.QUEUE : Item.Status.SOLD);
+            itemRepos.save(item);
+
 
             for (int i = 0; i < bids.size(); i++) {
                 Bid bid = bids.get(i);
@@ -349,9 +350,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                             account.getEmail(),
                             "[Biddify] Congratulations! You have won an auction",
                             """
-                                    <p>You have won following items from auction %s:</p>
-                                    <ul>%s</ul>
-                             """.formatted(
+                                           <p>You have won following items from auction %s:</p>
+                                           <ul>%s</ul>
+                                    """.formatted(
                                     auction.getTitle(),
                                     participant.wonItems.stream()
                                             .map((a) -> "<li>" + a.getItem().getName() + "</li>")
@@ -480,10 +481,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                             finalAccount.getEmail(),
                             "[Biddify] Auction has been terminated",
                             """
-                                    <p>Due to unexpected circumstances, we have to terminate auction %s</p>
-                                    <p>Your deposit will be refunded to your wallet</p>
-                                    <p>Stay stunned for upcoming updates.</p>
-                             """.formatted(auction.getTitle())
+                                           <p>Due to unexpected circumstances, we have to terminate auction %s</p>
+                                           <p>Your deposit will be refunded to your wallet</p>
+                                           <p>Stay stunned for upcoming updates.</p>
+                                    """.formatted(auction.getTitle())
                     );
                 } catch (MessagingException e) {
                     logger.info("Error sending mail to " + finalAccount.getEmail(), e);
@@ -595,11 +596,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
             throw new InvalidInputException("End date must be after start date");
         }
-        if(auctionDTO.getStatus() == AuctionSession.Status.FINISHED ||
-                auctionDTO.getStatus() == AuctionSession.Status.TERMINATED){
+        if (auctionDTO.getStatus() == AuctionSession.Status.FINISHED ||
+                auctionDTO.getStatus() == AuctionSession.Status.TERMINATED) {
             throw new InvalidInputException("Auction session already ended");
         }
-        if(auctionDTO.getStatus() == AuctionSession.Status.PROGRESSING){
+        if (auctionDTO.getStatus() == AuctionSession.Status.PROGRESSING) {
             throw new InvalidInputException("Auction session already started");
         }
         try {
@@ -617,7 +618,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
     }
 
-   //@Cacheable(key = "#id", value = "auctionSession")
+    //@Cacheable(key = "#id", value = "auctionSession")
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
         try {
@@ -633,27 +634,27 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     @Override
     public void updateAuctionSessionByStatus(UpdateStatusAuctionSessionRequestDTO request) {
 
-            for (Integer auctionSessionId : request.getAuctionSessionId()) {
-                try {
-                    Optional<AuctionSession> auctionSession = auctionSessionRepos.findById(auctionSessionId);
-                    AuctionSession auction = auctionSession.get();
-                    if (auction != null) {
-                        auction.setStatus(AuctionSession.Status.valueOf(request.getStatus().toUpperCase()));
-                        auctionSessionRepos.save(auction);
-                    } else {
-                        throw new ResourceNotFoundException("Auction not found with ID: " + auctionSessionId);
-                    }
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
-                } catch (Exception e) {
-                    throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + auctionSessionId);
+        for (Integer auctionSessionId : request.getAuctionSessionId()) {
+            try {
+                Optional<AuctionSession> auctionSession = auctionSessionRepos.findById(auctionSessionId);
+                AuctionSession auction = auctionSession.get();
+                if (auction != null) {
+                    auction.setStatus(AuctionSession.Status.valueOf(request.getStatus().toUpperCase()));
+                    auctionSessionRepos.save(auction);
+                } else {
+                    throw new ResourceNotFoundException("Auction not found with ID: " + auctionSessionId);
                 }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
+            } catch (Exception e) {
+                throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + auctionSessionId);
             }
+        }
 
     }
 
 
-   //@Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
+    //@Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);

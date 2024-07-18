@@ -47,7 +47,7 @@ public class ItemDTO implements Serializable {
         this.description = item.getDescription();
         this.reservePrice = item.getReservePrice();
         this.buyInPrice = item.getBuyInPrice();
-        this.soldPrice = item.getSoldPrice();
+
         this.status = item.getStatus();
         this.createDate = item.getCreateDate();
         this.updateDate = item.getUpdateDate();
@@ -61,8 +61,6 @@ public class ItemDTO implements Serializable {
         this.measurement = item.getMeasurement();
         this.condition = item.getCondition();
         this.stamped = item.getStamped();
-        if (item.getOrder() != null)
-            this.orderId = item.getOrder().getOrderId();
         if (item.getAttachments() != null)
             this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
         else

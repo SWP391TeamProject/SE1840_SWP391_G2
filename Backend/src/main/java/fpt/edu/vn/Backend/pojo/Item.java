@@ -41,9 +41,6 @@ public class Item {
     @Column(name = "buy_in_price", precision = 20, scale = 8)
     private BigDecimal buyInPrice;
 
-    @Column(name = "sold_price", precision = 20, scale = 8)
-    private BigDecimal soldPrice;
-
     public enum Status {
         QUEUE, IN_AUCTION, SOLD, REMOVED
     }
@@ -87,9 +84,9 @@ public class Item {
     private String stamped;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private  Order order;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jewelry_id")
+    private List<OrderDetail> orderDetails;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "jewelry_id")
