@@ -24,7 +24,7 @@ import React, { Suspense, useEffect, useState } from "react";
 // import { AuctionSessionStatus } from "@/constants/enums";
 import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 import { getAuctions } from "@/services/AuctionSessionService";
-import { AcutionSessionsTable } from "./auction-session-data-table/auction-session-table";
+import AcutionSessionsTable from "./auction-session-data-table/auction-session-table";
 import { useLocation } from "react-router-dom";
 
 export default function AuctionSessionList() {
