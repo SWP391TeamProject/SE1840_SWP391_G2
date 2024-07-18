@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication
 @EnableScheduling
 @Slf4j
-@EnableCaching
+//@EnableCaching
 public class BackendApplication {
 
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);

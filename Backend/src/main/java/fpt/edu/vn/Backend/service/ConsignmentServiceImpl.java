@@ -40,10 +40,9 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@CacheConfig(cacheNames = "consignments")
+//@CacheConfig(cacheNames = "consignments")
 public class ConsignmentServiceImpl implements ConsignmentService {
 
-    private final RedisCacheManager cacheManager;
     AccountService accountService;
     ConsignmentRepos consignmentRepos;
     AccountRepos accountRepos;
@@ -55,13 +54,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     AttachmentService attachmentService;
 
     @Autowired
-    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos, RedisCacheManager cacheManager) {
+    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos) {
         this.consignmentRepos = consignmentRepos;
         this.accountRepos = accountRepos;
         this.accountService = accountService;
         this.consignmentDetailRepos = consignmentDetailRepos;
         this.notificationRepos = notificationRepos;
-        this.cacheManager = cacheManager;
     }
 
     @NotNull
@@ -83,7 +81,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         );
     }
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
     //todo thís need to be migrated to new schema defintion no more detail
     public ConsignmentDTO requestConsignmentCreate(ConsignmentRequestDTO consignmentRequestDTO) {
         try {
@@ -126,7 +124,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     //todo: this need to be migrated to the new entity definition this one neeed a neww detail
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public ConsignmentDetailDTO submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId) {
         try {
@@ -162,7 +160,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     //todo: this need to be migrated to the new entity definition
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDetailDTO submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId) {
 
         try {
@@ -207,7 +205,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public void confirmJewelryReceived(int consignmentId) {
         try {
@@ -226,7 +224,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public void approveFinalEvaluation(int consignmentId, int accountId, String description) {
         try {
@@ -265,7 +263,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public void rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason) {
         try {
@@ -302,7 +300,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public ConsignmentDTO custAcceptInitialEvaluation(int consignmentId) {
         try {
@@ -321,7 +319,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public ConsignmentDTO custRejectInitialEvaluation(int consignmentId) {
         try {
@@ -340,7 +338,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public ConsignmentDTO custAcceptFinaltialEvaluation(int consignmentId) {
         try {
@@ -359,7 +357,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public ConsignmentDTO custRejectFinaltialEvaluation(int consignmentId) {
         try {
@@ -379,7 +377,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
 
     public void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment) {
         try {
@@ -441,7 +439,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "consignments")
+   //@Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "consignments")
     public Page<ConsignmentDTO> getAllConsignments(Pageable pageable) {
         Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
@@ -450,12 +448,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     //TODO : redesing the logic for get all staff consignment this need refactor
     @Override
     public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
-        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrStaff_AccountIdOrderByStatus(Consignment.Status.WAITING_STAFF,staffId,pageable);
+        Page<Consignment> consignmentPage = consignmentRepos.findByStatusOrStaff_AccountId(Consignment.Status.WAITING_STAFF,staffId,pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
     }
 
     @Override
-    @Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort+ 'status:'+#status", value = "consignments")
+   //@Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort+ 'status:'+#status", value = "consignments")
     public Page<ConsignmentDTO> getConsignmentsByStatus(String status, Pageable
             pageable, int accID) {
         Consignment.Status enumStatus = Consignment.Status.valueOf(status.toUpperCase());
@@ -482,7 +480,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @Cacheable(key = "#userId + #pageable.pageNumber + #pageable.pageSize", value = "consignments")
+   //@Cacheable(key = "#userId + #pageable.pageNumber + #pageable.pageSize", value = "consignments")
     public Page<ConsignmentDTO> getConsignmentsByUserId(int userId,Pageable pageable ){
         Page<Consignment> consignmentPage = consignmentRepos.findAllByUser_AccountId(userId, pageable);
 //        consignmentPage.stream().filter(consignment -> consignment.getStatus().equals(Consignment.Status.FINISHED)).forEach(consignment -> {
@@ -498,7 +496,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
 
     @Override
-    @Cacheable(key = "#consignmentId", value = "consignments")
+   //@Cacheable(key = "#consignmentId", value = "consignments")
     public Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId) {
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow();
         List<ConsignmentDetailDTO> consignmentDetailDTOs = new ArrayList<>();
@@ -517,7 +515,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
     public ResponseEntity<ConsignmentDTO> deleteConsignment(int id) {
         if (consignmentRepos.findByConsignmentId(id) == null) {
             throw new ConsignmentServiceException("Consignment not found");
@@ -530,7 +528,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     //Todo: refactor this to be the first consignment detail of the consignment
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDTO takeConsignment(int consignmentId, int accountId) {
         Account account = accountRepos.findById(accountId).orElseThrow(
                 () -> new ConsignmentServiceException("Account not found : " + accountId));
@@ -547,7 +545,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
 
     @Override
-    @CacheEvict(value = "consignments", allEntries = true)
+    //@CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDTO receivedConsignment(int consignmentId) {
         Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
                 () -> new ConsignmentServiceException("Consignment not found : " + consignmentId));

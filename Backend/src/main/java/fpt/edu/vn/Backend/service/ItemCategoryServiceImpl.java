@@ -23,7 +23,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
 
 
     @Override
-    @CacheEvict(value = "itemCategory",allEntries = true)
+    //@CacheEvict(value = "itemCategory",allEntries = true)
     public ItemCategoryDTO createItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
         ItemCategory itemCategory = new ItemCategory();
         itemCategory.setName(itemCategoryRequestDTO.getName());
@@ -37,7 +37,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     }
 
     @Override
-    @CacheEvict(value = "itemCategory",allEntries = true)
+    //@CacheEvict(value = "itemCategory",allEntries = true)
     public ItemCategoryDTO updateItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
         Optional<ItemCategory> optionalItemCategory = itemCategoryRepos.findById(itemCategoryRequestDTO.getItemCategoryId());
         if (optionalItemCategory.isPresent()) {
@@ -54,7 +54,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     }
 
     @Override
-    @CacheEvict(key = "#id", value = "itemCategory")
+    //@CacheEvict(key = "#id", value = "itemCategory")
     public ResponseEntity<ItemCategoryDTO> deleteItemCategory(int id) {
         if (itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems() != null
                 && !itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems().isEmpty()) {
@@ -69,7 +69,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     }
 
     @Override
-    @Cacheable(key = "#id", value = "itemCategory")
+   //@Cacheable(key = "#id", value = "itemCategory")
     public ItemCategoryDTO getItemCategoryById(int id) {
         Optional<ItemCategory> optionalItemCategory = itemCategoryRepos.findById(id);
         if (optionalItemCategory.isPresent()) {
@@ -81,7 +81,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     }
 
     @Override
-    @Cacheable(key = "#pageable", value = "itemCategory")
+   //@Cacheable(key = "#pageable", value = "itemCategory")
     public Page<ItemCategoryDTO> getAllItemCategories(Pageable pageable) {
         Page<ItemCategory> itemCategoryPage = itemCategoryRepos.findAll(pageable);
         return itemCategoryPage.map(ItemCategoryDTO::new);
