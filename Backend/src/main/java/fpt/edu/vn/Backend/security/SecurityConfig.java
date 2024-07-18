@@ -101,6 +101,7 @@ public class SecurityConfig {
                                 "/api/item-categories/**",
                                 "/test",
                                 "/.well-known/**",
+                                "/test-only/**",
                                 "/api/blog-categories/**",
                                 "/api/blogs/**",
                                 "/api/items/**",
