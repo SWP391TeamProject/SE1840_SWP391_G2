@@ -22,7 +22,7 @@ import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialo
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { getErrorMessage } from '@/lib/handle-error';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
 
 const phoneRegex = new RegExp(
     /^[0-9\-\+]{10}$/
@@ -90,6 +90,7 @@ export default function AccountCreate() {
             error: (err) =>{
                 setIsSubmitting(false);
                 return getErrorMessage(err)}
+                
         })
 
 

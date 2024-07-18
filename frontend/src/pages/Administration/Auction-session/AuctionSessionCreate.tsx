@@ -137,7 +137,7 @@ export default function AuctionSessionCreate() {
                                     <input type="datetime-local" className="cursor-pointer bg-background text-foreground" {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    this is the start date of the auction session
+                                    this is the end date of the auction session
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
