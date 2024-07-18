@@ -12,6 +12,7 @@ import {useAppDispatch, useAppSelector} from "@/redux/hooks.tsx";
 import {getOwnedItems} from "@/services/ItemService.ts";
 import {setCurrentPageList, setItems} from "@/redux/reducers/Inventory.ts";
 import {Item} from "@/models/Item.ts";
+import { toast } from "sonner";
 
 const Inventory = () => {
   const inventoryList = useAppSelector((state) => state.inventory);
@@ -30,7 +31,13 @@ const Inventory = () => {
   };
 
   const handlePageSelect = (pageNumber: number) => {
-    fetchInventory(pageNumber);
+    const inventoryPromise= fetchInventory(pageNumber);
+
+    toast.promise(inventoryPromise, {
+      loading: "Loading...",
+      success: <b>Inventory loaded!</b>,
+      error: <b>Could not load inventory!</b>,
+    })
   }
 
   useEffect(() => {

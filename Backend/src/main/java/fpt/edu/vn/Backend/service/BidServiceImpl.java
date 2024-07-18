@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
+import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.AuctionItem;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
@@ -108,6 +109,7 @@ public class BidServiceImpl implements BidService {
         for (BidDTO bid : bids) {
             BidResponse response = new BidResponse();
             response.setBidId(bid.getBidId());
+            response.setAuctionItemId(bid.getAuctionItemId());
             response.setAccount(new AccountDTO(accountRepos.findById(bid.getAccountId()).orElseThrow(
                     () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
             )));
@@ -118,4 +120,12 @@ public class BidServiceImpl implements BidService {
         return responses;
     }
 
+    @Override
+    public List<BidDTO> getBidsByAuctionId(int auctionId) {
+        try {
+            return bidRepos.findAllByAuctionItem_AuctionSession_AuctionSessionId(auctionId).stream().map(BidDTO::new).toList();
+        }catch (Exception e){
+            throw new InvalidInputException("Invalid auction item id: " + auctionId);
+        }
+    }
 }
