@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 import { Item, ItemStatus } from "@/models/Item.ts";
 import { Page } from "@/models/Page.ts";
 import { getCookie, removeCookie } from "@/utils/cookies";

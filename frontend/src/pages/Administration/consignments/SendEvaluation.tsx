@@ -214,13 +214,13 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                                             {isLoading ?
-                                                <Button variant={"destructive"} type="submit" className="w-[150px]" disabled>
+                                                <Button variant={"default"} type="submit" className="w-[150px]" disabled>
                                                     <Loader2 className="animate-spin" />
                                                     Submitting...
                                                 </Button>
                                                 :
 
-                                                <Button variant={"destructive"} type="submit" className="w-[150px]" onClick={() => {
+                                                <Button variant={"default"} type="submit" className="w-[150px]" onClick={() => {
                                                     if (form.formState.isValid) {
                                                         console.log(form.getValues())
                                                         onSubmit(form.getValues()); // Wait for onSubmit to complete

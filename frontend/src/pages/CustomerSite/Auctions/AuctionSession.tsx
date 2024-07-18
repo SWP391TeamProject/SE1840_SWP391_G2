@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
-import axios from 'axios'
-import { toast } from 'react-toastify'
+import axios from "@/config/axiosConfig.ts"
+import { toast } from "sonner"
 import { getCookie } from '@/utils/cookies'
 import { fetchAuctionSessionById, registerAuctionSession } from '@/services/AuctionSessionService'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
@@ -21,8 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { set } from 'date-fns'
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession'
 import { useAuth } from '@/AuthProvider'
-import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 import { showErrorToast } from '@/lib/handle-error'
+import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 
 
 
@@ -135,7 +135,7 @@ export default function AuctionSession() {
             })
             toast.success("Registered Successfully",
                 {
-                    
+
                 }
             );
         }).catch(err => {
@@ -170,10 +170,10 @@ export default function AuctionSession() {
             return (
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant="default"  onClick={()=>{
-                            if(!auth.user.kyc){
+                        <Button variant="default" onClick={() => {
+                            if (!auth.user.kyc) {
                                 setShowKycPopup(true);
-                                return ;
+                                return;
                             }
                         }}>Register to bid</Button>
                     </AlertDialogTrigger>
@@ -211,12 +211,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default" onClick={()=>{
-                            if(!auth.user.kyc){
-                                setShowKycPopup(true);
-                                return ;
-                            }
-                        }} >Register to bid</Button>
+                    <Button variant="default" onClick={() => {
+                        if (!auth.user.kyc) {
+                            setShowKycPopup(true);
+                            return;
+                        }
+                    }} >Register to bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader >
@@ -226,7 +226,7 @@ export default function AuctionSession() {
                             directly withdraw your balance.
                             <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>Auction Registration Fee: {currency.format({ amount: fee })}</p>
+                            '>Auction Registration Fee: {currency.format(fee)}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -279,7 +279,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default">Place Bid</Button>
+                    <Button variant="default" onClick={() => {
+                        if (!auth.user.kyc) {
+                            setShowKycPopup(true);
+                            return;
+                        }
+                    }}>Place Bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
@@ -290,7 +295,7 @@ export default function AuctionSession() {
                             Do you want to continue?
                             <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>Auction Registration Fee: {currency.format({ amount: fee })}</p>
+                            '>Auction Registration Fee: {currency.format(fee)}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -303,7 +308,6 @@ export default function AuctionSession() {
     }
 
     const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-        console.log(item, auctionId, bidders.includes(userId));
         navigate(`/auctions/${auctionId}/${item.name}`, {
             state: {
                 id: {
@@ -344,11 +348,11 @@ export default function AuctionSession() {
                                     <ClockIcon className="h-5 w-5" />
 
                                     {(auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
-                                      new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
+                                        new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
                                         <span>Ends in <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime></span> : <></>}
 
                                     {(auctionSession?.status === AuctionSessionStatus.FINISHED ||
-                                      new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
+                                        new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
                                         <div className="text-pink-500 dark:text-pink-400 font-semibold">
                                             Auction Ended
                                         </div> : <></>}
@@ -359,7 +363,7 @@ export default function AuctionSession() {
                                         </div>}
 
                                     {(auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
-                                      new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
+                                        new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
                                         <span>Starts in <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime></span> : <></>}
 
                                 </div>
@@ -434,22 +438,18 @@ export default function AuctionSession() {
                                     </CardContent>
                                     <div className='mt-auto space-y-2 p-4'>
                                         {/* <div className="flex items-center justify-between mt-5"> */}
-                                        <div className="text-primary-500 font-medium space-y-3">{currency.format({
-                                            amount: parseFloat(item?.currentPrice)
-                                        })}</div>
+                                        <div className="text-primary-500 font-medium space-y-3">{currency.format(item?.currentPrice)}</div>
                                         {/* </div> */}
                                         {
                                             auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
                                                 <div className="rounded-md bg-yellow-300 p-2 text-red-500">
-                                                    Won: {currency.format({
-                                                        amount: item?.currentPrice
-                                                    })}
+                                                    Won: {currency.format(item?.currentPrice)}
                                                 </div> :
                                                 <>
                                                     {bidders.includes(userId) ? (
                                                         <Button className='space-y-2' onClick={() => {
                                                             let name = item?.itemDTO.name;
-                                                            navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
+                                                            navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: auctionSession?.status === AuctionSessionStatus.PROGRESSING } });
                                                         }}>Place Bid</Button>
                                                     ) : (
                                                         <RegisterAlert></RegisterAlert>
@@ -505,7 +505,7 @@ export default function AuctionSession() {
                     </div>
                 </div>
             </main >
-            {showKycPopup && <KycVerificationPopup />}
+            <KycVerificationPopup open={showKycPopup} setOpen={setShowKycPopup} />
 
         </div >
     )

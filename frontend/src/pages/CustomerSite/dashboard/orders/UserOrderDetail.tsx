@@ -48,6 +48,7 @@ export function UserOrderDetail() {
             shippingNote: ""
         }
     });
+    const [subtotal, setSubtotal] = useState(0);
 
     useEffect(() => {
         getOrderById(orderId).then((res) => {
@@ -56,14 +57,13 @@ export function UserOrderDetail() {
                 return
             }
             if (res.data.payment.status !== PaymentStatus.SUCCESS) {
-                toast.error('Invalid order!', {
-                    
-                });
+                toast.error('Invalid order!');
                 return
             }
             dispatch(setCurrentOrder(res.data));
             orderUpdateForm.setValue("shippingAddress", res.data.shippingAddress);
             orderUpdateForm.setValue("shippingNote", res.data.shippingNote);
+            setSubtotal(res.data.itemDTOS.reduce((acc, item) => acc + item.soldPrice, 0));
             setLoading(false);
         }).catch((e) => {
             console.error(e);
@@ -160,7 +160,7 @@ export function UserOrderDetail() {
                               </div>
                               <div className="text-right">
                                   <div
-                                    className="font-medium">{currency.format({amount: item.soldPrice})}</div>
+                                    className="font-medium">{currency.format(item.soldPrice)}</div>
                               </div>
                           </div>
                         ))}
@@ -173,16 +173,16 @@ export function UserOrderDetail() {
                             <div className="space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                    <span>{currency.format(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Fee</span>
-                                    <span>{currency.format({amount: 0})}</span>
+                                    <span>{currency.format(order.payment.paymentAmount-subtotal)}</span>
                                 </div>
                                 <Separator/>
                                 <div className="flex justify-between font-bold">
                                     <span>Total</span>
-                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                    <span>{currency.format(order.payment.paymentAmount)}</span>
                                 </div>
                             </div>
                             <Button className="bg-green-600 flex justify-center items-center gap-2" disabled>

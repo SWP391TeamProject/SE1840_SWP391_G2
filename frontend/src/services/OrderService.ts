@@ -3,7 +3,7 @@ import { PaymentStatus } from "@/constants/enums";
 import { Page } from "@/models/Page";
 import {Order, ShippingStatus} from "@/models/newModel/order";
 import { getCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 
 // Service methods
 const baseUrl = API_SERVER + "/orders";

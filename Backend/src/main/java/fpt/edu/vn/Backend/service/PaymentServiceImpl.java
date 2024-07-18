@@ -70,11 +70,11 @@ public class PaymentServiceImpl implements PaymentService {
             }
             log.info("payment amount: " + payment.getPaymentAmount());
 
-            if (payment.getPaymentAmount().compareTo(new BigDecimal(5)) < 0) {
-                throw new InvalidInputException("Amount must be greater than 5 USD");
+            if (payment.getPaymentAmount().compareTo(new BigDecimal(1)) < 0) {
+                throw new InvalidInputException("Amount must be greater than 1 USD");
             }
-            if (payment.getPaymentAmount().compareTo(new BigDecimal(500000000)) > 0) {
-                throw new InvalidInputException("Amount must be smaller than 500,000,000 USD");
+            if (payment.getPaymentAmount().compareTo(new BigDecimal(100_000_000)) > 0) {
+                throw new InvalidInputException("Amount must be smaller than 100,000,000 USD");
             }
 
             payment.setType(paymentRequest.getType());

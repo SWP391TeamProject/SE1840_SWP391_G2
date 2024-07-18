@@ -113,7 +113,7 @@ export const getColumns = (): ColumnDef<Order>[] => [
         <>
           <div className="flex space-x-2">
           <span className="max-w-[10rem] truncate font-medium">
-            {currency.format({amount: row.original.payment.paymentAmount})}
+            {currency.format(row.original.payment.paymentAmount)}
           </span>
           </div>
         </>)

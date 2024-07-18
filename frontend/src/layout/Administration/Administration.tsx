@@ -1,6 +1,6 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag, CircleDollarSign,Package } from 'lucide-react'
+import { Bell, PanelLeft, Search, AreaChartIcon, FolderClosed, User2, Menu, Newspaper, ShoppingBag, CircleDollarSign, Package } from 'lucide-react'
 import { createContext, useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import {
@@ -10,17 +10,19 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "react-router-dom";
 import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
 import logo from "@/assets/icon.png";
+import { useAuth } from '@/AuthProvider'
 
 export const ConsignmentsContext = createContext([]);
 
 export default function Administration() {
     const location = useLocation();
-
+    const auth = useAuth();
     const [consignments] = useState([]);
     const [arrayPath, setArrayPath] = useState([""]);
     const breadcrumbs = [
@@ -78,42 +80,44 @@ export default function Administration() {
                     </div>
                     <div className="flex-1">
                         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                            <Link
+                            {auth.user.role === "ADMIN" && <Link
                                 to="dashboard"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <Menu />
                                 Dashboard
-                            </Link>
+                            </Link>}
 
-                            <Link
+                            {auth.user.role === "ADMIN" && <Link
                                 to="accounts"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <User2 />
                                 Manage Accounts
-                            </Link>
-                            <Link
+                            </Link>}
+                            {(auth.user.role === "ADMIN" || auth.user.role === "MANAGER" || auth.user.role === "STAFF") && <Link
                                 to="consignments"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                             >
                                 <FolderClosed />
                                 Manage Consignments
-                            </Link>
-                            <Link
-                                to="auction-sessions"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <AreaChartIcon />
-                                Manage Auction Session
-                            </Link>
-                            <Link
-                                to="items"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <ShoppingBag />
-                                Manage Items
-                            </Link>
+                            </Link>}
+                            {auth.user.role === "MANAGER" || auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="auction-sessions"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <AreaChartIcon />
+                                    Manage Auction Session
+                                </Link>}
+                            {auth.user.role === "MANAGER" || auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="items"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <ShoppingBag />
+                                    Manage Items
+                                </Link>}
                             <Link
                                 to="blogs"
                                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -121,20 +125,22 @@ export default function Administration() {
                                 <Newspaper />
                                 Manage Blogs
                             </Link>
-                            <Link
-                                to="orders"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <Package />
-                                Manage Orders
-                            </Link>
-                            <Link
-                                to="payments"
-                                className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                            >
-                                <CircleDollarSign />
-                                Manage Payments
-                            </Link>
+                            {auth.user.role === "MANAGER" || auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="orders"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <Package />
+                                    Manage Orders
+                                </Link>}
+                            {auth.user.role === "ADMIN" &&
+                                <Link
+                                    to="payments"
+                                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                                >
+                                    <CircleDollarSign />
+                                    Manage Payments
+                                </Link>}
                         </nav>
                     </div>
                 </div>

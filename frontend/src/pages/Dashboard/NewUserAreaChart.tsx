@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 // third-party
 import ReactApexChart from 'react-apexcharts';
 import { getNewUsersByYear } from '@/services/StatisticServices';
-import { AxiosResponse } from 'axios';
+import { AxiosResponse } from "@/config/axiosConfig.ts";
 
 // chart options
 const areaChartOptions = {

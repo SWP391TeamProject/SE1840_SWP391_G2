@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "@/config/axiosConfig.ts";
 import { Item, ItemStatus } from '@/models/Item';
 import { Page } from '@/models/Page';
 import { API_SERVER } from '@/constants/domain';

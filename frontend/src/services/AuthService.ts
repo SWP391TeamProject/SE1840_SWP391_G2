@@ -4,7 +4,7 @@ import { Login } from "@/models/Login";
 import { Register } from "@/models/Register";
 import { getCookie } from "@/utils/cookies";
 import { AUTH_SERVER } from "@/constants/domain";
-import {AxiosResponse} from "axios";
+import {AxiosResponse} from "@/config/axiosConfig.ts";
 
 const baseUrl = AUTH_SERVER;
 

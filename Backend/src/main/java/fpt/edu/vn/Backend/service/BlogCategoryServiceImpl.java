@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@CacheConfig(cacheNames = "blogCategory")
+//@CacheConfig(cacheNames = "blogCategory")
 public class BlogCategoryServiceImpl implements BlogCategoryService{
 
     private final BlogCategoryRepos blogCategoryRepos;
@@ -27,7 +27,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    @Cacheable(key = "#pageable", value = "blogCategory")
+   //@Cacheable(key = "#pageable", value = "blogCategory")
     public Page<BlogCategoryDTO> getAllBlogCategories(Pageable pageable) {
         Page<BlogCategory> blogCategories = blogCategoryRepos.findAll(pageable);
         if (blogCategories.isEmpty()) {
@@ -37,7 +37,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    @Cacheable(key = "#id", value = "blogCategory")
+   //@Cacheable(key = "#id", value = "blogCategory")
     public BlogCategoryDTO getBlogCategoryById(int id) {
         return new BlogCategoryDTO(blogCategoryRepos.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Invalid blog category id: " + id)
@@ -45,7 +45,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    @CacheEvict(value = "blogCategory", allEntries = true)
+    ////@CacheEvict(value = "blogCategory", allEntries = true)
     public BlogCategoryDTO createBlogCategory(String name) {
         BlogCategory blogCategory = new BlogCategory();
         blogCategory.setName(name);
@@ -55,7 +55,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    @Cacheable(key = "#name", value = "blogCategory")
+   //@Cacheable(key = "#name", value = "blogCategory")
     public BlogCategoryDTO getBlogCategoryByName(String name) {
         BlogCategory blogCategory = blogCategoryRepos.findBlogCategoryByName(name);
         if(blogCategory != null) {
@@ -65,7 +65,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    @CacheEvict(value = "blogCategory", allEntries = true)
+    //@CacheEvict(value = "blogCategory", allEntries = true)
     public BlogCategoryDTO updateBlogCategory(int id, BlogCategory blogCategory) {
         if (!blogCategoryRepos.existsById(id)) {
             throw new ResourceNotFoundException("Invalid blog category id: " + id);
@@ -75,7 +75,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     }
 
     @Override
-    @CacheEvict(value = "blogCategory", allEntries = true)
+    //@CacheEvict(value = "blogCategory", allEntries = true)
 
     public void deleteBlogCategory(int id) {
         blogCategoryRepos.deleteById(id);

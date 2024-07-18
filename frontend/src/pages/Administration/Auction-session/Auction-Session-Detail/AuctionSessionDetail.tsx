@@ -21,7 +21,7 @@ import { Loader2 } from "lucide-react";
 import { inviteAll } from "@/services/NotificationService";
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog";
 import { ConfirmationButton } from "@/components/confirmation/confirmation-button";
-import { showErrorToast } from "@/lib/handle-error";
+import { getErrorMessage, showErrorToast } from "@/lib/handle-error";
 
 const formSchema = z.object({
     auctionSessionId: z.number(),
@@ -90,40 +90,80 @@ export default function AuctionSessionDetail() {
     }, [auctionSession]);
 
     const handleFinishSession = () => {
-        finishAuctionSession(currentAuctionSession?.auctionSessionId).then((res) => {
-            console.log(res);
-            toast.success('Auction Session Finished Successfully',{
-                position:"bottom-right",
-            });
-        }).catch((err) => {
-            showErrorToast(err)
+        const finishAuctionSessionPromise = finishAuctionSession(currentAuctionSession?.auctionSessionId)
+        toast.promise(finishAuctionSessionPromise, {
+            loading: 'Finishing Auction Session...',
+            success:()=>{
+                setIsLoading(false);
+                return 'Auction Session Finished Successfully'},
+            error: (error) => {
+                setIsLoading(false);
+                return getErrorMessage(error)
+            },
+        })
 
-        });
+
+
+        // finishAuctionSession(currentAuctionSession?.auctionSessionId).then((res) => {
+        //     console.log(res);
+        //     toast.success('Auction Session Finished Successfully',{
+        //         position:"bottom-right",
+        //     });
+        // }).catch((err) => {
+        //     showErrorToast(err)
+
+        // });
     }
 
     const handleTerminateSession = () => {
         console.log("here");
-        terminateAuctionSession(currentAuctionSession?.auctionSessionId).then((res) => {
-            console.log(res);
-            toast.success('Auction Session Terminated Successfully',{
-                position:"bottom-right",
-            });
-        }).catch((err) => {
-            showErrorToast(err)
-        });
+        const terminateAuctionSessionPromise = terminateAuctionSession(currentAuctionSession?.auctionSessionId)
+        toast.promise(terminateAuctionSessionPromise, {
+            loading: 'Terminating Auction Session...',
+            success: (res) => {
+                setIsLoading(false);
+                return 'Auction Session Terminated Successfully'
+            },
+            error: (error) => {
+                setIsLoading(false);
+                return getErrorMessage(error)
+            },
+        })
+
+        // terminateAuctionSession(currentAuctionSession?.auctionSessionId).then((res) => {
+        //     console.log(res);
+        //     toast.success('Auction Session Terminated Successfully',{
+        //         position:"bottom-right",
+        //     });
+        // }).catch((err) => {
+        //     showErrorToast(err)
+        // });
     }
 
     const handleInviteAll = () => {
         console.log('here')
-        inviteAll(currentAuctionSession?.auctionSessionId).then((res) => {
-            console.log(res);
-            toast.success(`Invite All to Auction ${currentAuctionSession?.auctionSessionId} Successfully`,{
-                position:"bottom-right",
-            });
-        }).catch((err) => {
-            showErrorToast(err)
+        const inviteAllPromise = inviteAll(currentAuctionSession?.auctionSessionId)
+        toast.promise(inviteAllPromise, {
+            loading: 'Inviting All Users...',
+            success: (res) => {
+                setIsLoading(false);
+                return 'Invite All to Auction Successfully'
+            },
+            error: (error) => {
+                setIsLoading(false);
+                return getErrorMessage(error)
+            },
+        })
 
-        });
+        // inviteAll(currentAuctionSession?.auctionSessionId).then((res) => {
+        //     console.log(res);
+        //     toast.success(`Invite All to Auction ${currentAuctionSession?.auctionSessionId} Successfully`,{
+        //         position:"bottom-right",
+        //     });
+        // }).catch((err) => {
+        //     showErrorToast(err)
+
+        // });
     }
 
     const handleConfirmed = (values: z.infer<typeof formSchema>) => {
@@ -131,16 +171,32 @@ export default function AuctionSessionDetail() {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         console.log(values);
-        updateAuctionSession(values).then((res) => {
-            console.log(res);
-            toast.success('Auction Session Updated Successfully',{
-                position:"bottom-right",
-            });
-            setIsLoading(false);
-        }).catch((err) => {
-            showErrorToast(err)
-            setIsLoading(false)
-        });
+        const updateAuctionSessionPromise = updateAuctionSession(values)
+        toast.promise(updateAuctionSessionPromise, {
+            loading: 'Updating Auction Session...',
+            success: () => {
+                setIsLoading(false);
+                return 'Auction Session Updated Successfully'
+            },
+            error: (error) => {
+                setIsLoading(false);
+                return getErrorMessage(error)
+            },
+        })
+
+
+
+
+        // updateAuctionSession(values).then((res) => {
+        //     console.log(res);
+        //     toast.success('Auction Session Updated Successfully',{
+        //         position:"bottom-right",
+        //     });
+        //     setIsLoading(false);
+        // }).catch((err) => {
+        //     showErrorToast(err)
+        //     setIsLoading(false)
+        // });
     }
 
     const confirm = () => {
@@ -188,7 +244,7 @@ export default function AuctionSessionDetail() {
 
                                         {
                                             currentAuctionSession?.status === AuctionSessionStatus.PROGRESSING
-                                            && 
+                                            &&
                                             // <Button type="button" onClick={handleFinishSession} className="m-2">Finish Session</Button>
                                             <ConfirmationButton onSuccess={handleFinishSession} message={"Are you sure to Finish this session?"} title={"Confirmation"} label={"Ok"} description={"This action cannot be undone."} className="m-2">Finish Session</ConfirmationButton>
                                         }

@@ -57,6 +57,7 @@ export function OrderCheckout() {
       shippingNote: ""
     }
   });
+  const [subtotal, setSubtotal] = useState(0);
 
   useEffect(() => {
     getOrderById(orderId).then((res) => {
@@ -71,6 +72,7 @@ export function OrderCheckout() {
         return
       }
       dispatch(setCurrentOrder(res.data));
+      setSubtotal(res.data.itemDTOS.reduce((total, item) => total + item.soldPrice , 0));
       setLoading(false);
     }).catch((e) => {
       console.error(e);
@@ -160,7 +162,7 @@ export function OrderCheckout() {
                   </div>
                   <div className="text-right">
                     <div
-                      className="font-medium">{currency.format({amount: item.soldPrice})}</div>
+                      className="font-medium">{currency.format(item.soldPrice)}</div>
                   </div>
                 </div>
               ))}
@@ -173,16 +175,16 @@ export function OrderCheckout() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                  <span>{currency.format(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Fee</span>
-                  <span>{currency.format({amount: 0})}</span>
+                  <span>{currency.format(order.payment.paymentAmount-subtotal)}</span>
                 </div>
                 <Separator/>
                 <div className="flex justify-between font-bold">
                   <span>Total</span>
-                  <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                  <span>{currency.format(order.payment.paymentAmount)}</span>
                 </div>
               </div>
               <Card>
@@ -193,7 +195,7 @@ export function OrderCheckout() {
                 <CardContent>
                   <div className="flex justify-between">
                     <span>Your balance</span>
-                    <span>{currency.format({amount: auth.user?.balance})}</span>
+                    <span>{currency.format(auth.user?.balance)}</span>
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -210,7 +212,7 @@ export function OrderCheckout() {
                   </AlertTitle>
                   <AlertDescription>
                     You need to deposit another&nbsp;
-                    {currency.format({amount: order.payment.paymentAmount - auth.user?.balance})}&nbsp;
+                    {currency.format(order.payment.paymentAmount - auth.user?.balance)}&nbsp;
                     to cover this order.
                   </AlertDescription>
                 </Alert>}

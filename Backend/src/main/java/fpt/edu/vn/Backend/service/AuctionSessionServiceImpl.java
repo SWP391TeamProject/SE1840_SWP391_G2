@@ -40,7 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
-@CacheConfig(cacheNames = "auctionSession")
+//@CacheConfig(cacheNames = "auctionSession")
 public class AuctionSessionServiceImpl implements AuctionSessionService {
     private final AuctionSessionRepos auctionSessionRepos;
     private static final Logger logger = LoggerFactory.getLogger(AuctionSessionServiceImpl.class);
@@ -87,7 +87,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(key = "#auctionSessionId",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(key = "#auctionSessionId",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
         Account a = accountRepos.findById(accountId).orElseThrow(
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
@@ -137,12 +137,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "auctionSession", allEntries = true),
-            @CacheEvict(cacheNames = "item", allEntries = true),
-            // Add more @CacheEvict annotations as needed
-    })
+    //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+//    @Caching(evict = {
+//            //@CacheEvict(cacheNames = "auctionSession", allEntries = true),
+//            //@CacheEvict(cacheNames = "item", allEntries = true),
+//            // Add more //@CacheEvict annotations as needed
+//    })
     public boolean assignAuctionSession(AssignAuctionItemDTO assign) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
@@ -196,7 +196,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
     }
 
-    @CacheEvict(key = "#auctionDTO.getAuctionSessionId()",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(key = "#auctionDTO.getAuctionSessionId()",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionCreateDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
@@ -229,7 +229,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void finishAuction(int auctionSessionId) {
         AuctionSession auction = auctionSessionRepos.findById(auctionSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid auction session id: " + auctionSessionId));
@@ -424,7 +424,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         auctionHandlingLock.remove(auctionSessionId);
     }
 
-    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public void terminateAuction(int auctionSessionId) {
         AuctionSession auction = auctionSessionRepos.findById(auctionSessionId)
@@ -519,7 +519,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void startAuction(int auctionSessionId) {
         AuctionSession auction = auctionSessionRepos.findById(auctionSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid auction session id: " + auctionSessionId));
@@ -587,7 +587,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    @CacheEvict(key = "#auctionDTO.getAuctionSessionId()", cacheNames = "auctionSession",value = "auctionSession",allEntries = true)
+    //@CacheEvict(key = "#auctionDTO.getAuctionSessionId()", cacheNames = "auctionSession",value = "auctionSession",allEntries = true)
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
         if (auctionDTO.getStartDate().isBefore(LocalDateTime.now())) {
             throw new InvalidInputException("Start date must be in the future");
@@ -617,7 +617,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
     }
 
-    @Cacheable(key = "#id", value = "auctionSession")
+   //@Cacheable(key = "#id", value = "auctionSession")
     @Override
     public AuctionSessionDTO getAuctionSessionById(int id) {
         try {
@@ -653,7 +653,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
 
-    @Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
+   //@Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
     public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
         Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);

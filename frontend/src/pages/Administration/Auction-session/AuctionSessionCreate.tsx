@@ -20,7 +20,6 @@ import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
-import { set } from "date-fns"
 import { formatDate } from "@/lib/utils"
 import { showErrorToast } from "@/lib/handle-error"
 
@@ -172,8 +171,8 @@ export default function AuctionSessionCreate() {
                 message={form.formState.isDirty
                     ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'} End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'}`
                     : ''} label="Confirm"
-                onSuccess={confirm} 
-            />
+                onSuccess={confirm} />
+
         </Form>
     )
 }

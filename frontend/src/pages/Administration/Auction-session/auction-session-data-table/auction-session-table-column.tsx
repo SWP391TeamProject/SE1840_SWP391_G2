@@ -114,7 +114,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
         {row.getValue("auctionItems")?.length}
       </div>
     ),
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "status",

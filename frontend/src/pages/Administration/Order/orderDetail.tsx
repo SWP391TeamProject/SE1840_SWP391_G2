@@ -7,7 +7,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getOrderById, updateOrder} from "@/services/OrderService";
 import {setCurrentOrder} from "@/redux/reducers/Orders";
-import {toast} from "react-toastify";
+import {toast} from "sonner";
 import {
     AlertCircle,
     CircleAlert,
@@ -29,25 +29,23 @@ export function OrderDetail() {
     const currency = useCurrency();
     const [loading, setLoading] = useState(true);
     const [customer, setCustomer] = useState({} as Account);
+    const [subtotal, setSubtotal] = useState(0);
 
     useEffect(() => {
         getOrderById(orderId).then((res) => {
             dispatch(setCurrentOrder(res.data));
+            setSubtotal(res.data.itemDTOS.reduce((acc, cur) => acc + cur.soldPrice, 0));
             fetchAccountById(res.data.payment.accountId).then((res) => {
                 setCustomer(res.data as Account);
             }).catch((e) => {
                 console.error(e);
-                toast.error('Error when loading customer detail!', {
-                    position: "bottom-right",
-                });
+                toast.error('Error when loading customer detail!');
             }).finally(() => {
                 setLoading(false);
             });
         }).catch((e) => {
             console.error(e);
-            toast.error('Error when loading order detail!', {
-                position: "bottom-right",
-            });
+            toast.error('Error when loading order detail!');
         });
     }, []);
 
@@ -56,15 +54,11 @@ export function OrderDetail() {
         updateOrder(orderId, {shippingStatus}).then((res) => {
             dispatch(setCurrentOrder(res.data));
             setLoading(false);
-            toast.success('Delivery status updated!', {
-                position: "bottom-right",
-            });
+            toast.success('Delivery status updated!');
         }).catch((e) => {
             setLoading(false);
             console.error(e);
-            toast.error('Error when updating order!', {
-                position: "bottom-right",
-            });
+            toast.error('Error when updating order!');
         });
     };
 
@@ -119,7 +113,7 @@ export function OrderDetail() {
                                     </div>
                                     <div className="text-right">
                                         <div
-                                          className="font-medium">{currency.format({amount: item.soldPrice})}</div>
+                                          className="font-medium">{currency.format(item.soldPrice)}</div>
                                     </div>
                                 </div>
                               ))}
@@ -133,16 +127,16 @@ export function OrderDetail() {
                             <div className="space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                    <span>{currency.format(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Fee</span>
-                                    <span>{currency.format({amount: 0})}</span>
+                                    <span>{currency.format(order.payment.paymentAmount-subtotal)}</span>
                                 </div>
                                 <Separator/>
                                 <div className="flex justify-between font-bold">
                                     <span>Total</span>
-                                    <span>{currency.format({amount: order.payment.paymentAmount})}</span>
+                                    <span>{currency.format(order.payment.paymentAmount)}</span>
                                 </div>
                                 { order.payment.status === PaymentStatus.PENDING &&
                                   <div className="flex justify-between font-bold">

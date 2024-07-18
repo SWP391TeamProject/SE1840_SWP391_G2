@@ -1,8 +1,8 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
 import { getCookie } from '@/utils/cookies';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import axios from "@/config/axiosConfig.ts";
+import { toast } from "sonner";
 
 class BlogCategoryService {
     private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;

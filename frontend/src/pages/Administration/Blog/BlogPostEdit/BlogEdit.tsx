@@ -21,7 +21,8 @@ import BlogImageGallery from "./BlogImageGallery";
 import BlogCategory from "./BlogCategory";
 import { setCurrentBlogPost } from "@/redux/reducers/Blogs";
 import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog";
-import { showErrorToast } from "@/lib/handle-error";
+import { getErrorMessage, showErrorToast } from "@/lib/handle-error";
+import { set } from "date-fns";
 
 const formSchema = z.object({
   categoryId: z.any({
@@ -137,35 +138,79 @@ export default function BlogEdit() {
 
   const handleConfirmed = (values: z.infer<typeof formSchema>) => {
     console.log(values);
-    BlogService.updateBlog(blog?.postId || parseInt(id), values).then((res) => {
-      console.log(form);
-      console.log(res)
-      BlogService.getBlogById(parseInt(id)).then((res) => {
-        blog = res.data;
-        setCurrentBlog(res.data);
-        dispatch(setCurrentBlogPost(res.data));
-      })
-      toast.success('Blog updated successfully!', {
-        
-      });
-      form.reset({
-        categoryId: res.data.category?.blogCategoryId,
-        userId: JSON.parse(getCookie('user'))?.id || 0,
-        title: res.data.title,
-        content: res.data.content,
-        files: [],
-        deletedFiles: [],
-      })
+    const promise = () => new Promise((resolve, reject) => {
+      BlogService.updateBlog(blog?.postId || parseInt(id), values).then((res) => {
+        console.log(form);
+        console.log(res)
+        BlogService.getBlogById(parseInt(id)).then((res) => {
+          blog = res.data;
+          setCurrentBlog(res.data);
+          dispatch(setCurrentBlogPost(res.data));
+        })
+        toast.success('Blog updated successfully!', {
+          
+        });
+        form.reset({
+          categoryId: res.data.category?.blogCategoryId,
+          userId: JSON.parse(getCookie('user'))?.id || 0,
+          title: res.data.title,
+          content: res.data.content,
+          files: [],
+          deletedFiles: [],
+        })
 
-      values = form.getValues();
-      console.log(form);
-      console.log(values);
-      setIsLoading(false);
-    }).catch((err) => {
-      setIsLoading(false);
-      showErrorToast(err);
-      return;
+        values = form.getValues();
+        console.log(form);
+        console.log(values);
+        setIsLoading(false);
+      }).catch((err) => {
+        setIsLoading(false);
+        showErrorToast(err);
+        return;
+      })
     })
+
+    const updatePromise = BlogService.updateBlog(blog?.postId || parseInt(id), values);
+
+    toast.promise(updatePromise, {
+      loading: 'Updating blog...',
+      success: 'Blog updated successfully!',
+      error: (error) => {
+        // showErrorToast(error);
+        setIsLoading(false);
+        return getErrorMessage(error); // Return a ReactNode or a Promise<ReactNode> here
+      },
+    })
+
+    // BlogService.updateBlog(blog?.postId || parseInt(id), values).then((res) => {
+    //   console.log(form);
+    //   console.log(res)
+    //   BlogService.getBlogById(parseInt(id)).then((res) => {
+    //     blog = res.data;
+    //     setCurrentBlog(res.data);
+    //     dispatch(setCurrentBlogPost(res.data));
+    //   })
+    //   toast.success('Blog updated successfully!', {
+        
+    //   });
+    //   form.reset({
+    //     categoryId: res.data.category?.blogCategoryId,
+    //     userId: JSON.parse(getCookie('user'))?.id || 0,
+    //     title: res.data.title,
+    //     content: res.data.content,
+    //     files: [],
+    //     deletedFiles: [],
+    //   })
+
+    //   values = form.getValues();
+    //   console.log(form);
+    //   console.log(values);
+    //   setIsLoading(false);
+    // }).catch((err) => {
+    //   setIsLoading(false);
+    //   showErrorToast(err);
+    //   return;
+    // })
   }
 
   const confirm = () => {

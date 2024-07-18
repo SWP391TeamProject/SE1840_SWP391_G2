@@ -1,6 +1,6 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { getCookie, removeCookie } from '@/utils/cookies';
-import axios from 'axios';
+import axios from "@/config/axiosConfig.ts";
 
 
 interface GetBlogsSchema {

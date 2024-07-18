@@ -21,7 +21,7 @@ import { setCurrentAccount } from '@/redux/reducers/Accounts';
 import { Checkbox } from "@/components/ui/checkbox.tsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
@@ -35,7 +35,7 @@ const formSchema = z.object({
     }),
     phone: z.string().max(15, "Phone must not be longer than 15 characters").optional(),
     role: z.nativeEnum(Roles),
-    balance: z.coerce.number().min(0, "Balance must not be negative"),
+    balance: z.coerce.number().min(0, "Balance must not be negative").max(1000000000, "Balance must not exceed 1,000,000,000"),
     dummy: z.boolean()
 });
 
@@ -84,23 +84,30 @@ export default function AccountEdit() {
             dummy: data.dummy,
             status: account?.status
         }
-        updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
-            console.log(res);
-            toast.success("Account updated successfully.");
-            setIsSubmitting(false);
-            dispatch(setCurrentAccount(res?.data))
-        }).catch((err) => {
-            console.log(err);
-            showErrorToast(err);
-        })
-    }
-    
-    const confirm = () => {
-        setIsConfirmed(true);
-        setShowTrigger(false);
-        setIsSubmitting(true);
-    }
+        const updateAccountServicePromise = updateAccountService(updatedAccount, updatedAccount.accountId);
 
+        toast.promise(updateAccountServicePromise, {
+            loading: 'Updating account...',
+            success: (res) => {
+                setIsSubmitting(false);
+                dispatch(setCurrentAccount(res?.data));
+                return "Account updated successfully.";
+            },
+            error: (err) => {
+                setIsSubmitting(false);
+                return getErrorMessage(err);
+            }
+        });
+        // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
+        //     console.log(res);
+        //     toast.success("Account updated successfully.");
+        //     setIsSubmitting(false);
+        //     dispatch(setCurrentAccount(res?.data))
+        // }).catch((err) => {
+        //     console.log(err);
+        //     showErrorToast(err);
+        // })
+    }
     useEffect(() => {
         if (isConfirmed) {
             if (form.getValues) {
@@ -118,6 +125,34 @@ export default function AccountEdit() {
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         // Remove FormData creation and file handling
         setShowTrigger(true);
+        // let updatedAccount = {
+        //     accountId: data.accountId,
+        //     email: data.email,
+        //     nickname: data.nickname,
+        //     phone: data.phone,
+        //     avatar: null,
+        //     balance: data.balance,
+        //     role: data.role,
+        //     dummy: data.dummy,
+        //     status: account?.status
+        // }
+        // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
+        //     console.log(res);
+        //     // dispatch(setCurrentAccount(res))
+        //     if(res){
+        //         toast.success("Account Updated Successfully")
+        //         navigate("/admin/accounts/");
+        //     }
+        // })
+
+        // console.log(updatedAccount);
+    };
+
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsSubmitting(true);
+
     }
 
     useEffect(() => {
@@ -155,19 +190,46 @@ export default function AccountEdit() {
     useEffect(() => {
         console.log(form.formState.defaultValues);
         if (!account || account.accountId != parseInt(id)) {
-            fetchAccountById(parseInt(id)).then((res) => {
-                setCurrentAccount(res?.data);
-                form.reset({
-                    accountId: res?.data?.accountId,
-                    nickname: res?.data?.nickname ?? "",
-                    email: res?.data?.email,
-                    phone: res?.data?.phone ?? "",
-                    dummy: res?.data?.dummy ?? false,
-                    balance: res?.data?.balance ?? 0,
-                    role: res.data ? res?.data.role : Roles.MEMBER,
-                });
-                setEditedAccount(res.data);
+
+            const setCurrentAccountPromise = fetchAccountById(parseInt(id));
+
+            toast.promise(setCurrentAccountPromise, {
+                loading: 'Fetching account...',
+                success: (res) => {
+                    setCurrentAccount(res?.data);
+                    form.reset({
+                        accountId: res?.data?.accountId,
+                        nickname: res?.data?.nickname ?? "",
+                        email: res?.data?.email,
+                        phone: res?.data?.phone ?? "",
+                        dummy: res?.data?.dummy ?? false,
+                        balance: res?.data?.balance ?? 0,
+                        role: res.data ? res?.data.role : Roles.MEMBER,
+                    });
+                    setEditedAccount(res.data);
+                    return 'Account fetched successfully';
+                },
+                error: (err) => {
+                    return getErrorMessage(err);
+                }
             });
+
+
+
+
+            // fetchAccountById(parseInt(id)).then((res) => {
+            //     setCurrentAccount(res?.data);
+            //     form.reset({
+            //         accountId: res?.data?.accountId,
+            //         nickname: res?.data?.nickname ?? "",
+            //         email: res?.data?.email,
+            //         phone: res?.data?.phone ?? "",
+            //         dummy: res?.data?.dummy ?? false,
+            //         balance: res?.data?.balance ?? 0,
+            //         role: res.data ? res?.data.role : Roles.MEMBER,
+            //     });
+            //     setEditedAccount(res.data);
+            // });
         }
     }, [])
 

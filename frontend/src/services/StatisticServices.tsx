@@ -1,6 +1,6 @@
 import { API_SERVER } from "@/constants/domain";
 import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 
 export const getNewUsersByYear = async (year: number) => {
   let params = {

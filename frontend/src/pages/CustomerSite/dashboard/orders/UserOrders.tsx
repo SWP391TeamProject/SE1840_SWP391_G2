@@ -170,7 +170,7 @@ export const UserOrders = () => {
             {orders.currentPageList?.map((order) => (
               <TableRow key={order.orderId}>
                 <TableCell className="font-medium">{order.orderId}</TableCell>
-                <TableCell>{currency.format({amount: order.payment.paymentAmount})}</TableCell>
+                <TableCell>{currency.format(order.payment.paymentAmount)}</TableCell>
                 <TableCell>{order.shippingAddress}</TableCell>
                 <TableCell>{new Date(order.createDate).toUTCString()}</TableCell>
                 <TableHead>{

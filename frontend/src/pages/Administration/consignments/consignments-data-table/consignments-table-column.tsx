@@ -88,7 +88,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
     cell: ({ row }) => row.original.staff?.nickname ? row.original.staff.nickname : "",
   },
   {
-    accessorKey: "requester",
+    accessorKey: "user.nickname",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Requester Name" />
 
@@ -98,7 +98,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
         {row.original.user.nickname ? row.original.user.nickname : ""}
       </div>
     ),
-    enableSorting: false,
+    enableSorting: true,
 
   },
   {

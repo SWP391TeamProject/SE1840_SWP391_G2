@@ -19,9 +19,10 @@ import { useNavigate } from "react-router-dom";
 import { Role } from '@/models/newModel/account';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getErrorMessage } from '@/lib/handle-error';
 
 const phoneRegex = new RegExp(
     /^[0-9\-\+]{10}$/
@@ -77,13 +78,29 @@ export default function AccountCreate() {
             status: AccountStatus.ACTIVE,
             dummy: data.dummy
         }
-        createAccountService(createdAccount).then((res) => {
-            console.log(res);
-            toast.success("Account created successfully");
-            setIsSubmitting(false);
+
+        const createAccountServicePromise = createAccountService(createdAccount);
+
+        toast.promise(createAccountServicePromise, {
+            loading: 'Creating account...',
+            success: ()=>{
+                setIsSubmitting(false);
+                return 'Account created successfully';
+            },
+            error: (err) =>{
+                setIsSubmitting(false);
+                return getErrorMessage(err)}
         })
+
+
+
+        // createAccountService(createdAccount).then((res) => {
+        //     console.log(res);
+        //     toast.success("Account created successfully");
+        //     setIsSubmitting(false);
+        // })
     }
-    
+
     const confirm = () => {
         setIsConfirmed(true);
         setShowTrigger(false);
