@@ -17,6 +17,9 @@ public class ConsignmentDTO implements Serializable {
     private AccountDTO user;
     private AccountDTO staff;
     private String description;
+    private String contactEmail;
+    private String contactPhone;
+    private String contactName;
     private String color;
     private double weight;
     private String metal;
@@ -40,6 +43,9 @@ public class ConsignmentDTO implements Serializable {
         if (this.staff != null) {
             this.staff.setPassword("");
         }
+        this.contactEmail = consignment.getContactEmail();
+        this.contactPhone = consignment.getContactPhone();
+        this.contactName = consignment.getContactName();
         this.description = consignment.getDescription();
         this.color = consignment.getColor();
         this.weight = consignment.getWeight();

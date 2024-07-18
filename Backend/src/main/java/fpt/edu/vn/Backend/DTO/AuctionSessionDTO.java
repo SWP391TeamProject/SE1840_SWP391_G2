@@ -30,6 +30,7 @@ public class AuctionSessionDTO implements Serializable {
     private Set<AuctionItemDTO> auctionItems;
     private Set<DepositDTO> deposits;
 
+
     public static AuctionSessionDTO minimal(AuctionSession auctionSession) {
         return AuctionSessionDTO.builder()
                 .auctionSessionId(auctionSession.getAuctionSessionId())

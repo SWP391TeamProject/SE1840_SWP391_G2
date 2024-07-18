@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -70,13 +67,20 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
         BigDecimal totalPay = BigDecimal.ZERO;
 
+        List<OrderDetail> orderDetails = new ArrayList<>();
+
         Order order = new Order();
         order.setItems(new HashSet<>());
         for (AuctionItemId itemId : itemIds) {
             AuctionItem item = auctionItemRepos.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Item not found", "id", itemId));
             order.getItems().add(item.getItem());
+            orderDetails.add(OrderDetail.builder()
+                    .item(item.getItem())
+                    .soldPrice(item.getCurrentPrice())
+                    .build());
             totalPay = totalPay.add(item.getCurrentPrice());
+
         }
 
         Payment payment = new Payment();
@@ -91,13 +95,15 @@ public class OrderServiceImpl implements OrderService {
 
         order.setPayment(payment);
 
-        BigDecimal fee = totalPay.multiply(BigDecimal.valueOf(0.045));
+//        BigDecimal fee = totalPay.multiply(BigDecimal.valueOf(0.045));
         if (fee.compareTo(BigDecimal.valueOf(225)) < 0) {
             fee = BigDecimal.valueOf(225);
         } else if (fee.compareTo(BigDecimal.valueOf(4500)) > 0) {
             fee = BigDecimal.valueOf(4500);
         }
         order.setFee(fee);
+        order = orderRepository.save(order);
+        order.setOrderDetails(orderDetails);
         order = orderRepository.save(order);
 
         log.info("Order {} account {} must pay {} with fee {}", order.getOrderId(), accountId, payment.getPaymentAmount(), fee);
@@ -292,10 +298,10 @@ public class OrderServiceImpl implements OrderService {
         // handle order for seller
         BigDecimal sumSoldPrice = new BigDecimal(0);
         {
-            for (Item item : order.getItems()) {
-                BigDecimal price = item.getSoldPrice();
+            for (OrderDetail orderDetail : order.getOrderDetails()) {
+                BigDecimal price = orderDetail.getSoldPrice();
                 sumSoldPrice = sumSoldPrice.add(price);
-                Account seller = item.getOwner();
+                Account seller = orderDetail.getItem().getOwner();
                 seller.setBalance(seller.getBalance().add(price));
                 accountRepos.save(seller);
                 Payment rewardPayment = Payment.builder()
@@ -310,12 +316,12 @@ public class OrderServiceImpl implements OrderService {
                         NotificationDTO.builder()
                                 .message(String.format(
                                         "You have received the revenue from selling item %s!",
-                                        item.getName()
+                                        orderDetail.getItem().getName()
                                 ))
                                 .userId(seller.getAccountId())
                                 .build());
                 log.info("Account {} gained {} from selling item {} in order {}",
-                        seller.getAccountId(), price, item.getItemId(), orderId);
+                        seller.getAccountId(), price, orderDetail.getItem().getItemId(), orderId);
             }
         }
 
@@ -331,9 +337,8 @@ public class OrderServiceImpl implements OrderService {
                 "Order is not in PENDING status");
         payment.setStatus(Payment.Status.FAILED);
         paymentRepository.save(payment);
-        for (Item item : order.getItems()) {
-            item.setOrder(null);
-            item.setStatus(Item.Status.UNSOLD);
+        for (OrderDetail orderDetail : order.getOrderDetails()) {
+            orderDetail.getItem().setStatus(Item.Status.QUEUE);
         }
         itemRepos.saveAll(order.getItems());
         log.info("Released items {} due to order cancellation", order.getItems().stream()

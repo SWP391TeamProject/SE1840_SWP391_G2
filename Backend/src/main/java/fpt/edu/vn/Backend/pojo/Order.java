@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -50,6 +51,10 @@ public class Order {
         DELIVERING,
         DELIVERED
     }
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private List<OrderDetail> orderDetails;
 
     @Override
     public int hashCode() {
