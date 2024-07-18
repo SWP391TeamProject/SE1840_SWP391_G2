@@ -25,6 +25,7 @@ interface ConfirmationButtonProps
   label: string
   description: string
   className?: string
+  variant?: string
 }
 
 export function ConfirmationButton({
@@ -34,11 +35,11 @@ export function ConfirmationButton({
   onSuccess,
   className,
   description,
+  variant,
   ...props
 }: ConfirmationButtonProps) {
   const [open, setOpen] = React.useState(false);
   const onConfirm = () => {
-    console.log(onSuccess)
     onSuccess();
     setOpen(false)
   }
@@ -76,7 +77,7 @@ export function ConfirmationButton({
               </DialogFooter>
             </DialogContent>
           </Dialog> */}
-      <Button type="button" className={className} onClick={() => { setOpen(true) }}>
+      <Button type="button" variant={variant} className={className} onClick={() => { setOpen(true) }}>
         {props.children}
       </Button>
     </>

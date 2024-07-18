@@ -108,11 +108,23 @@ export default function AccountEdit() {
         //     showErrorToast(err);
         // })
     }
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsSubmitting(false)
+            }
+        }
+
+    }, [isConfirmed, form.getValues])
+
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         // Remove FormData creation and file handling
         setShowTrigger(true);
-
         // let updatedAccount = {
         //     accountId: data.accountId,
         //     email: data.email,
@@ -140,6 +152,7 @@ export default function AccountEdit() {
         setIsConfirmed(true);
         setShowTrigger(false);
         setIsSubmitting(true);
+
     }
 
     useEffect(() => {

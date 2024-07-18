@@ -9,11 +9,12 @@ import { useParams } from "react-router-dom"
 import { getItemsByStatus } from "@/services/ItemService"
 import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession"
-import { assignItem, fetchAuctionSessionById } from "@/services/AuctionSessionService"
+import { assignItem, fetchAuctionSessionById, removeAuctionItem } from "@/services/AuctionSessionService"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { ItemStatus } from "@/models/Item"
 import { toast } from "sonner"
 import { showErrorToast } from "@/lib/handle-error"
+import { ConfirmationButton } from "@/components/confirmation/confirmation-button"
 
 export default function AssignAuctionItem() {
  
@@ -22,13 +23,13 @@ export default function AssignAuctionItem() {
   const param = useParams<{ id: string }>()
   const dispatch = useAppDispatch()
   const [selectedItems, setSelectedItems] = useState([])
+  const [existingItems, setExistingItems] = useState([])
   const currencyFormatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   });
 
   useEffect(() => {
-    console.log('hello')
     getItemsByStatus(ItemStatus.QUEUE, 0, 10).then((res) => {
       setAvailableItems(res?.data?.content);
       console.log(res?.data?.content);
@@ -36,13 +37,27 @@ export default function AssignAuctionItem() {
       console.error(err)
     })
 
-    if (!auction) {
+    if (!auction || auction.auctionSessionId != param.id) {
       fetchAuctionSessionById(param.id).then((res) => {
         console.log(res)
         dispatch(setCurrentAuctionSession(res?.data))
+        let tempArr = res.data.auctionItems.map((item) => {
+          return item.itemDTO
+        })
+        console.log(tempArr)
+        setSelectedItems(tempArr)
+        setExistingItems(tempArr)
       })
+    } else {
+      setSelectedItems(auction.auctionItems.map((item) => {
+        return item?.itemDTO
+      }))
+      setExistingItems(auction.auctionItems.map((item) => {
+        return item?.itemDTO
+      }))
     }
   }, [])
+  
   const handleAssign = (item: any) => {
     if (!selectedItems.find(i => i.itemId === item.itemId)) {
       setSelectedItems([...selectedItems, item]);
@@ -55,10 +70,32 @@ export default function AssignAuctionItem() {
   // }, [selectedItems, availableItems])
 
   const handleUnassign = (item: any) => {
-    setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
-    let tempList = [...availableItems, item];
-    tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
-    setAvailableItems(tempList);
+    let existingItem = existingItems.find(i => i.itemId == item.itemId)
+    if (existingItem) {
+      let auctionItem = auction.auctionItems.find(i => i.itemDTO.itemId == existingItem.itemId)
+      console.log(auctionItem);
+      removeAuctionItem(auctionItem?.id).then((res) => {
+        // toast.success('Item Unassigned', {
+        //   position: "bottom-right",
+        // });
+        // let tempList = [...availableItems, item];
+        // tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
+        // setAvailableItems(tempList);
+        // setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
+        setExistingItems(existingItems.filter(i => i.itemId !== item.itemId))
+      }).catch((err) => {
+        showErrorToast(err)
+      });
+    } 
+    // else {
+      setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
+      let tempList = [...availableItems, item];
+      tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
+      setAvailableItems(tempList);
+      toast.success('Item Unassigned', {
+        position: "bottom-right",
+      });
+    // }
   }
 
   const handleSave = () => {
@@ -86,9 +123,9 @@ export default function AssignAuctionItem() {
         <div className="flex justify-between items-center md:col-span-2">
           <h2 className="text-2xl font-bold">Assign Items</h2>
           <div className="flex space-x-2">
-            <Button variant="outline" disabled={selectedItems.length == 0} onClick={handleClear}>
+            {/* <Button variant="outline" disabled={selectedItems.length == 0} onClick={handleClear}>
               Clear Selected
-            </Button>
+            </Button> */}
             <Button disabled={selectedItems.length == 0} onClick={handleSave}>Save Selected</Button>
           </div>
         </div>
@@ -143,14 +180,23 @@ export default function AssignAuctionItem() {
               <TableBody>
                 {selectedItems && selectedItems.map((item: any) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.itemId}</TableCell>
+                    <TableCell className="font-medium">{item?.itemId}</TableCell>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
                     {/* <TableCell>{item.description}</TableCell> */}
                     <TableCell>
-                      <Button size="sm" variant="outline" onClick={() => handleUnassign(item)}>
+                      {/* <Button size="sm" variant="outline" onClick={() => handleUnassign(item)}>
                         Remove
-                      </Button>
+                      </Button> */}
+                      <ConfirmationButton
+                        message={`Item ${item.itemId} will be removed from this auction session.`}
+                        title={"Are you sure to unassign this item?"}
+                        label={"Remove"}
+                        description={""}
+                        onSuccess={() => handleUnassign(item)}
+                        variant="outline">
+                        Remove
+                      </ConfirmationButton>
                     </TableCell>
                   </TableRow>
                 ))}
