@@ -135,6 +135,7 @@ const options = {
   appearance: appearance,
 };
 ReactDOM.createRoot(document.getElementById("root")!).render(
+  
   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 
     <GoogleOAuthProvider

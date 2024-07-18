@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -12,35 +11,22 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
+import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
+import { ConsignmentStatus } from "@/constants/enums";
+import { setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
+import { fetchAllConsignmentsService, fetchConsignmentsByStatusService, getConsignments } from "@/services/ConsignmentService";
 import {
-    PlusCircle,
-    MoreHorizontal,
-    ListFilter,
+    ListFilter
 } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ConsignmentContactPreference, ConsignmentDetailType, ConsignmentStatus } from "@/constants/enums";
-import { fetchAllConsignmentsService, fetchConsignmentsByStatusService, getConsignments, takeConsignment } from "@/services/ConsignmentService";
-import { setCurrentConsignment, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Consignments";
-import PagingIndexes from "@/components/pagination/PagingIndexes";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
-import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 import { ConsignmentsTable } from "./consignments-data-table/consignments-table";
 
 export default function ConsignmentList() {
@@ -144,11 +130,7 @@ export default function ConsignmentList() {
             setConsignmentPromise(getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: selectedStatus}));
       }, [pageSize, pageNumber, sort])
 
-    useEffect(() => {
-        // fetchConsignments(consignmentsList.currentPageNumber);
-        // dispatch(setCurrentPageList(consignmentsList.value));
-        setStatusFilter("all");
-    }, []);
+
 
     return (
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">

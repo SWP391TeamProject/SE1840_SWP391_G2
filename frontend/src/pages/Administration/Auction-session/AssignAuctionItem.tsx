@@ -11,6 +11,9 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession"
 import { assignItem, fetchAuctionSessionById } from "@/services/AuctionSessionService"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import { ItemStatus } from "@/models/Item"
+import { toast } from "sonner"
+import { showErrorToast } from "@/lib/handle-error"
 
 export default function AssignAuctionItem() {
  
@@ -26,7 +29,7 @@ export default function AssignAuctionItem() {
 
   useEffect(() => {
     console.log('hello')
-    getItemsByStatus("QUEUE", 0, 10).then((res) => {
+    getItemsByStatus(ItemStatus.QUEUE, 0, 10).then((res) => {
       setAvailableItems(res?.data?.content);
       console.log(res?.data?.content);
     }).catch((err) => {
@@ -65,8 +68,10 @@ export default function AssignAuctionItem() {
     })
     assignItem(auction?.auctionSessionId, tempList).then((res) => {
       console.log(res);
+      toast.success("Items assigned successfully.")
     }).catch((err) => {
       console.error(err)
+      showErrorToast(err) 
     })
   }
   const handleClear = () => {

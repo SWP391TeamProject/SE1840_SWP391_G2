@@ -10,37 +10,40 @@ import { ItemsTableToolbarActions } from "./items-table-toolbar-actions";
 import { DataTableFilterField } from "@/types";
 import { Item } from "@/models/newModel/item";
 import { ItemStatus } from "@/constants/enums";
+import { set } from "date-fns";
+import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 interface ItemTableProps {
     itemPromise: ReturnType<typeof getItems>;
 }
 
-export function ItemsTable({ itemPromise }: ItemTableProps) {
+export default function ItemsTable({ itemPromise }: ItemTableProps) {
     const [data, setData] = React.useState([]);
     const [pageCount, setPageCount] = React.useState(0);
-
+    const [isLoading, setIsLoading] = React.useState(false);
     // Memoize the columns so they don't re-render on every render
     const columns = React.useMemo(() => getColumns(), []);
 
     const status = ["UNSOLD",
         "SOLD",
         "IN_AUCTION",
-       "QUEUE",
+        "QUEUE",
         "VALUATING"]
-    
+
     const filterFields: DataTableFilterField<JewelryItem>[] = [
         {
-          label: "Status",
-          value: "status",
-          options: status.map((status) => ({
-            label: status[0]?.toUpperCase() + status.slice(1),
-            value: status,
-            withCount: false,
-          })),
+            label: "Status",
+            value: "status",
+            options: status.map((status) => ({
+                label: status[0]?.toUpperCase() + status.slice(1),
+                value: status,
+                withCount: false,
+            })),
         },
-      ]
+    ]
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
             if (itemPromise) {
                 const content = (await itemPromise).content;
                 const totalPages = (await itemPromise).totalPages;
@@ -48,6 +51,7 @@ export function ItemsTable({ itemPromise }: ItemTableProps) {
                 setPageCount(totalPages);
                 console.log(content);
                 console.log(totalPages);
+                setIsLoading(false);
             }
         };
         fetchData();
@@ -61,17 +65,27 @@ export function ItemsTable({ itemPromise }: ItemTableProps) {
     });
 
     return (
-        <DataTable
-            table={table}
-            floatingBar={
-                <ItemsTableFloatingBar table={table} />
-            }
-                    >
-        
-    
-        <DataTableToolbar table={table}>
-          <ItemsTableToolbarActions table={table} />
-        </DataTableToolbar>
-        </DataTable >
+        <>{isLoading
+            ?
+            <DataTableSkeleton
+                columnCount={7}
+                searchableColumnCount={0}
+                filterableColumnCount={0}
+                cellWidths={["10rem", "40rem", "12rem", "12rem", "12rem", "12rem", "8rem"]}
+                shrinkZero
+            />
+            :
+            <DataTable
+                table={table}
+                floatingBar={
+                    <ItemsTableFloatingBar table={table} />
+                }
+            >
+                <DataTableToolbar table={table}>
+                    <ItemsTableToolbarActions table={table} />
+                </DataTableToolbar>
+            </DataTable >
+        }
+        </>
     );
 }

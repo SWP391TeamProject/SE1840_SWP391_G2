@@ -20,9 +20,9 @@ const baseUrl = `${API_SERVER}/items`;
 export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
   try {
     const {
-      page,
-      size,
-      sort,
+      page=1,
+      size=10,
+      sort="createDate,desc",
       order,
       minPrice,
       maxPrice,
@@ -33,7 +33,7 @@ export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
     const params: Record<string, any> = {
       page: page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
-      sort,
+      sort:sort,
       minPrice,
       maxPrice,
       status: status ? status.toUpperCase() : undefined,

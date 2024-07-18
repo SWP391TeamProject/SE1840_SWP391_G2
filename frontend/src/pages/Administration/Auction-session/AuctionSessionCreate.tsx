@@ -166,6 +166,7 @@ export default function AuctionSessionCreate() {
             </form>
             <ConfirmationDialog
                 open={showTrigger}
+                description="Are you sure to create this auction session?"
                 onOpenChange={setShowTrigger}
                 title="Are you sure to create this auction session?"
                 message={form.formState.isDirty

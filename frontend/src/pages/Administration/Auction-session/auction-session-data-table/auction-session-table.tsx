@@ -9,27 +9,29 @@ import { fetchAccountsService } from "@/services/AccountsServices";
 import { AcutionSessionsTableFloatingBar } from "./auction-session-table-floating-bar";
 import { AcutionSessionsTableToolbarActions } from "./auction-session-table-toolbar-actions";
 import { getAuctions } from "@/services/AuctionSessionService";
+import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 interface AcutionSessionTableProps {
     acutionSessionPromise: ReturnType<typeof getAuctions>;
 }
 
-export function AcutionSessionsTable({ acutionSessionPromise }: AcutionSessionTableProps) {
+export default function AcutionSessionsTable({ acutionSessionPromise }: AcutionSessionTableProps) {
     const [data, setData] = React.useState([]);
     const [pageCount, setPageCount] = React.useState(0);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     // Memoize the columns so they don't re-render on every render
     const columns = React.useMemo(() => getColumns(), []);
 
     React.useEffect(() => {
         const fetchData = async () => {
-            if (acutionSessionPromise) {
-                const content = (await acutionSessionPromise).data.content;
-                const totalPages = (await acutionSessionPromise).data.totalPages;
-                setData(content);
-                setPageCount(totalPages);
-                console.log(content);
-                console.log(totalPages);
-            }
+           
+            setIsLoading(true)
+            acutionSessionPromise.then((res) => {
+                console.log(res)
+                setData(res.data.content);
+                setPageCount(res.data.totalPages);
+                setIsLoading(false);
+            })
         };
         fetchData();
     }, [acutionSessionPromise]);
@@ -42,17 +44,30 @@ export function AcutionSessionsTable({ acutionSessionPromise }: AcutionSessionTa
     });
 
     return (
-        <DataTable
-            table={table}
-            floatingBar={
-                <AcutionSessionsTableFloatingBar table={table} />
-            }
-                    >
-        
-    
-        <DataTableToolbar table={table}>
-          <AcutionSessionsTableToolbarActions table={table} />
-        </DataTableToolbar>
-        </DataTable >
+        <>{
+            isLoading ?
+                <DataTableSkeleton
+                    columnCount={7}
+                    cellWidths={["10rem", "10rem", "10rem", "10rem", "10rem", "10rem", "8rem"]}
+                    shrinkZero
+                />
+
+                :
+                <DataTable
+                    table={table}
+                    floatingBar={
+                        <AcutionSessionsTableFloatingBar table={table} />
+                    }
+                >
+
+
+                    <DataTableToolbar table={table}>
+                        <AcutionSessionsTableToolbarActions table={table} />
+                    </DataTableToolbar>
+                </DataTable >
+        }
+
+        </>
+
     );
 }

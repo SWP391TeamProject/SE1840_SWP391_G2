@@ -13,23 +13,25 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Roles } from '@/constants/enums';
 import { fetchAccountById, updateAccountService } from "@/services/AccountsServices.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { setCurrentAccount } from '@/redux/reducers/Accounts';
-import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import { Checkbox } from "@/components/ui/checkbox.tsx";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { toast } from 'react-toastify';
+import { showErrorToast } from '@/lib/handle-error';
+import { toast } from 'sonner';
+
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 
 const formSchema = z.object({
     accountId: z.number(),
     nickname: z.string().min(5, "Nickname must be at least 5 characters")
-      .max(20, "Nickname must not be longer than 20 characters"),
+        .max(40, "Nickname must not be longer than 40 characters"),
     email: z.string().email({
-      message: "Invalid email address.",
+        message: "Invalid email address.",
     }),
     phone: z.string().max(15, "Phone must not be longer than 15 characters").optional(),
     role: z.nativeEnum(Roles),
@@ -42,6 +44,7 @@ export default function AccountEdit() {
     const account = useAppSelector((state) => state.accounts.currentAccount);
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const dispatch = useAppDispatch();
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isConfirmed, setIsConfirmed] = useState(false);
     const [showTrigger, setShowTrigger] = useState(false);
@@ -83,12 +86,38 @@ export default function AccountEdit() {
         }
         updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
             console.log(res);
-            // dispatch(setCurrentAccount(res))
-            if(res){
-                toast.success("Account Updated Successfully")
-                navigate("/admin/accounts/");
-            }
+            toast.success("Account updated successfully.");
+            setIsSubmitting(false);
+            dispatch(setCurrentAccount(res?.data))
+        }).catch((err) => {
+            console.log(err);
+            showErrorToast(err);
         })
+    }
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsSubmitting(true);
+    }
+
+
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsSubmitting(false)
+            }
+        }
+
+    }, [isConfirmed, form.getValues])
+
+
+    const onSubmit = (data: z.infer<typeof formSchema>) => {
+        // Remove FormData creation and file handling
+        setShowTrigger(true);
 
     }
     const onSubmit = (data: z.infer<typeof formSchema>) => {
@@ -176,7 +205,7 @@ export default function AccountEdit() {
     }, [])
 
     return (
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8" style={{float: 'left'}}>
+        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8" style={{ float: 'left' }}>
             <div key="1" className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -252,14 +281,14 @@ export default function AccountEdit() {
                                 <FormItem>
                                     <FormLabel>Balance (in USD)</FormLabel>
                                     <FormControl>
-                                        <Input {...field} type='number'/>
+                                        <Input {...field} type='number' />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <FormField
-                            
+
                             control={form.control}
                             name="role"
                             render={({ field }) => (
@@ -309,42 +338,43 @@ export default function AccountEdit() {
                         />
 
                         <FormField
-                          control={form.control}
-                          name="dummy"
-                          render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Dummy?</FormLabel>
-                                <FormControl>
-                                  <div>
-                                    <Alert variant="destructive">
-                                      <AlertCircle className="h-4 w-4" />
-                                      <AlertTitle>Note</AlertTitle>
-                                      <AlertDescription>
-                                        A dummy account is an account used for testing purposes.<br/>
-                                        <b>NO email will be sent to these accounts.</b>
-                                      </AlertDescription>
-                                    </Alert>
-                                    <div className="mt-2">
-                                      <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                      />
-                                      <span className="ml-2">Enable dummy</span>
-                                    </div>
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        {isSubmitting
-                            ? <Button variant={"destructive"} disabled>
-                                <Loader2 className='animate-spin' />
-                            </Button>
-                            :
-                            <Button variant={"destructive"} type="submit">
-                                Submit
-                            </Button>
+                            control={form.control}
+                            name="dummy"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Dummy?</FormLabel>
+                                    <FormControl>
+                                        <div>
+                                            <Alert variant="destructive">
+                                                <AlertCircle className="h-4 w-4" />
+                                                <AlertTitle>Note</AlertTitle>
+                                                <AlertDescription>
+                                                    A dummy account is an account used for testing purposes.<br />
+                                                    <b>NO email will be sent to these accounts.</b>
+                                                </AlertDescription>
+                                            </Alert>
+                                            <div className="mt-2">
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                                <span className="ml-2">Enable dummy</span>
+                                            </div>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />{
+                            isSubmitting
+                                ?
+                                <Button disabled>
+                                    <Loader2 className="animate-spin" size={24} />
+                                </Button>
+                                :
+                                <Button variant={"default"} type="submit">
+                                    Submit
+                                </Button>
                         }
                     </form>
                 </Form>
@@ -358,6 +388,15 @@ export default function AccountEdit() {
                     title='Confirmation'
                 />
             </div>
+            <ConfirmationDialog
+                open={showTrigger}
+                description="this will update the account"
+                onOpenChange={setShowTrigger}
+                title="Update Account"
+                message={"Are you sure to update this account?"}
+                label="Confirm"
+                onSuccess={confirm}
+            />
         </main>
     )
 }
