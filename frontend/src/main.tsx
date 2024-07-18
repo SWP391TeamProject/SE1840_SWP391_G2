@@ -19,7 +19,6 @@ import { AuthProvider } from "./AuthProvider.tsx";
 import { Roles } from "./constants/enums.tsx";
 import AuctionList from "./pages/CustomerSite/Auctions/AuctionList.tsx";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AccountEdit from "./pages/Administration/Account/AccountEdit.tsx";
 import AccountCreate from "./pages/Administration/Account/AccountCreate.tsx";
@@ -136,14 +135,13 @@ const options = {
 };
 ReactDOM.createRoot(document.getElementById("root")!).render(
   
-  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" >
 
     <GoogleOAuthProvider
       clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
       {/* <Elements stripe={stripePromise} options={options}> */}
 
       <QueryClientProvider client={queryClient}>
-        <ToastContainer autoClose={3000} pauseOnHover={false} closeOnClick />
         <Provider store={store}>
           <AuthProvider>
             <CurrencyProvider>
@@ -317,8 +315,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}
-                <Toaster position="bottom-center" richColors />
-
+                <Toaster position="bottom-right" richColors closeButton/>
               </TooltipProvider>
             </CurrencyProvider>
           </AuthProvider>
