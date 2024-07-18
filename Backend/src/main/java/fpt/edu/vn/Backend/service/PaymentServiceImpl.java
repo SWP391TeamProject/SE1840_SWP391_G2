@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.service;
 
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
@@ -145,15 +146,36 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentDTO createPayment(PaymentDTO paymentDTO) {
+        Preconditions.checkNotNull(paymentDTO.getPaymentAmount());
+        Preconditions.checkState(
+                paymentDTO.getType() == Payment.Type.DEPOSIT ||
+                paymentDTO.getType() == Payment.Type.WITHDRAW,
+                "Can only create deposit or withdraw payment");
+        Preconditions.checkState(paymentDTO.getPaymentAmount().signum() > 0,
+                "Payment amount must be greater than 0");
+
+        Account acc = accountRepos.findById(paymentDTO.getAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentDTO.getAccountId()));
+        Preconditions.checkState(paymentDTO.getType() != Payment.Type.WITHDRAW ||
+                        acc.getBalance().subtract(paymentDTO.getPaymentAmount()).signum() >= 0,
+                "Insufficient balance");
+
         Payment payment = new Payment();
         payment.setPaymentAmount(paymentDTO.getPaymentAmount());
         payment.setCreateDate(LocalDateTime.now());
         payment.setType(paymentDTO.getType());
-        payment.setStatus(paymentDTO.getStatus());
-        payment.setMethod(paymentDTO.getMethod());
-        payment.setAccount(accountRepos.findById(paymentDTO.getAccountId())
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentDTO.getAccountId())));
+        payment.setStatus(Payment.Status.SUCCESS); // must always SUCCESS
+        payment.setMethod(Payment.Method.MANUAL); // must always MANUAL
+        payment.setAccount(acc);
         Payment savedPayment = paymentRepos.save(payment);
+
+        if (paymentDTO.getType() == Payment.Type.DEPOSIT) {
+            acc.setBalance(acc.getBalance().add(paymentDTO.getPaymentAmount()));
+        } else if (paymentDTO.getType() == Payment.Type.WITHDRAW) {
+            acc.setBalance(acc.getBalance().subtract(paymentDTO.getPaymentAmount()));
+        }
+        accountRepos.save(acc);
+
         return new PaymentDTO(savedPayment);
     }
 

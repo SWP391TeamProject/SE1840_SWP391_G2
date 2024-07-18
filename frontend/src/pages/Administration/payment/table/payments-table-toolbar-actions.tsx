@@ -44,7 +44,7 @@ export function PaymentsTableToolbarActions({
         <DownloadIcon className="mr-2 size-4" aria-hidden="true" />
         Export
       </Button>
-      {/* <Button
+      <Button
         variant="outline"
         size="sm"
         onClick={() =>
@@ -53,7 +53,7 @@ export function PaymentsTableToolbarActions({
       >
         <PlusIcon className="mr-2 size-4" aria-hidden="true" />
         Create
-      </Button> */}
+      </Button>
       {/**
        * Other actions can be added here.
        * For example, import, view, etc.

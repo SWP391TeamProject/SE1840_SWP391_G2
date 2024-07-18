@@ -12,6 +12,23 @@ interface GetPaymentsSchema {
   type?: string
 }
 
+export const createPayment = (dto : {
+  type?: 'DEPOSIT' | 'WITHDRAW',
+  amount?: number,
+  accountId?: number}) => {
+  return axios
+    .put(API_SERVER + "/payments", {
+      paymentAmount: dto.amount,
+      type: dto.type,
+      accountId: dto.accountId
+    } ,{
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    });
+};
+
 export const getPayments = async (input: GetPaymentsSchema) => {
 
   try {

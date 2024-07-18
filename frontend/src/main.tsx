@@ -99,6 +99,7 @@ import {
   OrderCheckout
 } from "@/pages/CustomerSite/dashboard/orders/OrderCheckout.tsx";
 import { Toaster } from "@/components/ui/sonner"
+import PaymentCreate from "@/pages/Administration/payment/PaymentCreate.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -257,7 +258,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                           <Route path="payments/:id"
                             element={<ItemDetail />}></Route>
                           <Route path="payments/create"
-                            element={<ItemCreate />}></Route>
+                            element={<PaymentCreate />}></Route>
                         </Route>
                         <Route element={<PrivateRoute
                           allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
