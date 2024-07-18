@@ -308,7 +308,6 @@ export default function AuctionSession() {
     }
 
     const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-        console.log(item, auctionId, bidders.includes(userId));
         navigate(`/auctions/${auctionId}/${item.name}`, {
             state: {
                 id: {
@@ -450,7 +449,7 @@ export default function AuctionSession() {
                                                     {bidders.includes(userId) ? (
                                                         <Button className='space-y-2' onClick={() => {
                                                             let name = item?.itemDTO.name;
-                                                            navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
+                                                            navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: auctionSession?.status === AuctionSessionStatus.PROGRESSING } });
                                                         }}>Place Bid</Button>
                                                     ) : (
                                                         <RegisterAlert></RegisterAlert>

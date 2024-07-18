@@ -1,6 +1,8 @@
 package fpt.edu.vn.Backend.DTO.response;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AuctionItemDTO;
+import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
 import lombok.Data;
 
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 public class BidResponse implements Serializable {
     private int bidId;
     private AccountDTO account;
+    private AuctionItemId auctionItemId;
     private BigDecimal price;
 
     public BidResponse(int bidId, AccountDTO account, BigDecimal price) {

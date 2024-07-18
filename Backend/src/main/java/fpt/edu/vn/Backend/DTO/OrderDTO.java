@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.pojo.Order;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 public class OrderDTO implements Serializable {
     private int orderId;
     private Set<ItemDTO> itemDTOS;
+    private BigDecimal fee;
     private String shippingAddress;
     private String shippingNote;
     private Order.ShippingStatus shippingStatus;
@@ -22,6 +24,7 @@ public class OrderDTO implements Serializable {
     public OrderDTO(Order order){
         this.orderId = order.getOrderId();
         this.itemDTOS = order.getItems().stream().map(ItemDTO::new).collect(Collectors.toSet());
+        this.fee = order.getFee();
         this.payment = new PaymentDTO(order.getPayment());
         this.shippingAddress = order.getShippingAddress();
         this.shippingNote = order.getShippingNote();

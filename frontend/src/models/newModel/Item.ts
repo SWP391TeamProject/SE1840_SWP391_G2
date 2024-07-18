@@ -7,7 +7,7 @@ export interface Item{
     category?:ItemCategory;
     name?:string;
     description?:string;
-    reversePrice?:number;
+    reservePrice?:number;
     buyInPrice?:number;
     status?:ItemStatus;
     createDate?:Date;
