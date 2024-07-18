@@ -1,7 +1,5 @@
 package fpt.edu.vn.Backend.exception;
 
-import java.util.Date;
-
 import fpt.edu.vn.Backend.oauth2.exception.OAuth2AuthenticationProcessingException;
 import io.jsonwebtoken.JwtException;
 import jdk.jfr.Description;
@@ -9,11 +7,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.Date;
 
 @RestController
 @ControllerAdvice
@@ -90,4 +91,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(),new Date());
     return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.BAD_REQUEST, request);
   }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),ex.getMessage(),new Date());
+    return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.UNAUTHORIZED, request);
+  }
+
 }
