@@ -55,6 +55,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.BAD_REQUEST, request);
   }
 
+  @ExceptionHandler(MappingException.class)
+  public ResponseEntity<Object> handleMappingException(MappingException ex, WebRequest request) {
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(),new Date());
+    return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.BAD_REQUEST, request);
+  }
+
   @ExceptionHandler(AuthorizationException.class)
   public ResponseEntity<Object> handleAuthorizationException(AuthorizationException ex, WebRequest request) {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),ex.getMessage(),new Date());

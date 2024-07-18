@@ -30,6 +30,11 @@ public class TestOnlyController {
         throw new CooldownException("Cooldown exception occurred");
     }
 
+    @GetMapping("/mapping")
+    public void testMappingException() {
+        throw new MappingException("Mapping exception occurred");
+    }
+
     @GetMapping("/authorization")
     public void testAuthorizationException() {
         throw new AuthorizationException("Authorization failed");

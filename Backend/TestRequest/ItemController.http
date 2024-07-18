@@ -1,5 +1,5 @@
 ###
-GET http://localhost:8080/api/items/
+GET https://localhost:8080/api/items/?page=-1
 
 ### Response
 #{
@@ -149,18 +149,18 @@ GET http://localhost:8080/api/items/owner/1
 GET http://localhost:8080/api/items/detail/1
 
 ###
-POST http://localhost:8080/api/items/create
+POST https://localhost:8080/api/items/create
 Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzY29wZSI6WyJBRE1JTiJdLCJ1c2VySWQiOjEsInN1YiI6ImFjYzFAZ21haWwuY29tIiwiaWF0IjoxNzIxMjg3MzYzLCJleHAiOjE3MjEyOTIzNjMsImp0aSI6Ijg1ODA1MzRhLWUyOTYtNDVjMy1iYzQwLWU4ZjUwZjUyYThlYSJ9.hOHuRZzwaCXH9cdntMc-WJrT-gxdlOgx5QUY8ImsUEyNg_wemGxYYaV7oi3ikqvr_2j_sxdBr_CYRtZWhkKkQQ
 
 {
   "categoryId" : 1,
   "name" : "Bi kíp pass môn",
   "description" : "Pass mọi môn học FPT",
-  "reservePrice" : 1000,
+  "reservePrice" : -5,
   "buyInPrice" : 10000,
   "status" : "QUEUE",
-  "ownerId" : 1,
-  "orderId" : null
+  "ownerId" : 1
 }
 
 ### Response

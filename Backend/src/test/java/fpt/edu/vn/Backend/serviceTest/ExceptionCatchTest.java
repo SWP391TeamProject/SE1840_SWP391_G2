@@ -61,6 +61,16 @@ public class ExceptionCatchTest {
     }
 
     @Test
+    public void testMappingException() throws Exception {
+        mockMvc.perform(get("/test-only/mapping"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Mapping exception occurred"))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
     public void testAuthorizationException() throws Exception {
         mockMvc.perform(get("/test-only/authorization"))
                 .andExpect(status().isUnauthorized())
