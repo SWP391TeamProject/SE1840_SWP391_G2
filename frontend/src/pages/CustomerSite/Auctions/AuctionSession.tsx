@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
 import axios from 'axios'
-import { toast } from 'react-toastify'
+import { toast } from "sonner"
 import { getCookie } from '@/utils/cookies'
 import { fetchAuctionSessionById, registerAuctionSession } from '@/services/AuctionSessionService'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
