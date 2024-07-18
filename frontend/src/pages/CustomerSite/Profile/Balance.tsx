@@ -41,6 +41,11 @@ import {
 import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table";
 import {createSearchParams, useNavigate} from "react-router-dom";
 
+const amountSuggestions: { [key in CurrencyType]: number[] } = {
+  [CurrencyType.USD]: [50, 100, 500, 1000, 5000, 10_000],
+  [CurrencyType.VND]: [50_000, 100_000, 500_000, 1_000_000, 5_000_000, 10_000_000]
+};
+
 export default function Balance() {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -53,9 +58,9 @@ export default function Balance() {
     amount: z.string().min(1, {message: "Please enter amount"})
       .refine((val) => {
         const usd = currency.convert(parseInt(val), currencyChoiceRef.current, CurrencyType.USD);
-        return usd >= 5 && usd <= 500000000;
+        return usd >= 1 && usd <= 100_000_000;
       }, {
-        message: "Your deposit must be at least 5 USD and not exceed 500M USD",
+        message: "Your deposit must be at least 1 USD and not exceed 100M USD",
       })
   });
 
@@ -162,7 +167,7 @@ export default function Balance() {
         </CardHeader>
         <CardContent>
           <CardDescription className="text-2xl">
-            {currency.format({amount: auth.user.balance})}
+            {currency.format(auth.user.balance)}
           </CardDescription>
         </CardContent>
       </Card>
@@ -175,109 +180,99 @@ export default function Balance() {
         <CardContent>
           <Form {...form}>
             <form className="space-y-4">
-              <div className="grid w-full items-center gap-8">
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({field}) => (
-                    <FormItem className="space-y-3">
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex flex-col space-y-1"
-                        >
-                          {
-                            [5000, 10000, 100000, 500000, 1000000, 5000000].map((v) =>
-                              (<FormItem key={v}
-                                         className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem
-                                    onClick={() => handleOtherCheckbox(false)}
-                                    value={v.toString()}/>
-                                </FormControl>
-                                <FormLabel
-                                  className="text-base font-normal peer-checked:font-semibold peer-checked:text-primary">
-                                  {v}
-                                </FormLabel>
-                              </FormItem>)
-                            )
-                          }
-                          <FormItem
-                            className="flex items-center space-x-3 space-y-0">
-                            <FormControl>
-                              <RadioGroupItem
-                                onClick={() => handleOtherCheckbox(true)}
-                                value=""
-                              />
-                            </FormControl>
-                            <FormLabel
-                              className="text-base font-medium peer-checked:font-semibold peer-checked:text-primary">
-                              Other Amount
-                            </FormLabel>
-                          </FormItem>
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                disabled={!isOtherAmount}
-                                placeholder="Enter amount"
-                                type="number"
-                                {...field}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )}
-                />
-              </div>
 
-              <Tabs defaultValue="VND" onValueChange={(v) => {
-                const ct = CurrencyType[v];
-                setCurrencyChoice(ct);
-                currencyChoiceRef.current = ct;
-                form.trigger();
+              <Tabs defaultValue="VND" onValueChange={async (v) => {
+                handleOtherCheckbox(true);
+                form.reset({amount: undefined});
+                setCurrencyChoice(CurrencyType[v]);
+                currencyChoiceRef.current = CurrencyType[v];
               }}>
                 <TabsList>
                   <TabsTrigger value="VND">Pay in VND</TabsTrigger>
                   <TabsTrigger value="USD">Pay in USD</TabsTrigger>
                 </TabsList>
+
+                <div className="flex flex-col gap-8 p-15 my-10">
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({field}) => (
+                      <FormItem className="space-y-3">
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-col space-y-1"
+                          >
+                            {
+                              amountSuggestions[currencyChoice].map((v) =>
+                                (<FormItem key={v}
+                                           className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      onClick={() => handleOtherCheckbox(false)}
+                                      value={v.toString()}/>
+                                  </FormControl>
+                                  <FormLabel
+                                    className="text-base font-normal peer-checked:font-semibold peer-checked:text-primary">
+                                    {currency.format(v, {
+                                      baseCurrency: currencyChoice,
+                                      exchangeMoney: false
+                                    })}
+                                  </FormLabel>
+                                </FormItem>)
+                              )
+                            }
+                            <FormItem
+                              className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem
+                                  onClick={() => handleOtherCheckbox(true)}
+                                  value=""
+                                />
+                              </FormControl>
+                              <FormLabel
+                                className="text-base font-medium peer-checked:font-semibold peer-checked:text-primary">
+                                Other Amount
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  disabled={!isOtherAmount}
+                                  placeholder="Enter amount"
+                                  type="number"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage/>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <TabsContent value="VND">
                   <Table className="pointer-events-none">
                     <TableBody>
                       <TableRow>
                         <TableCell className="font-medium">Total</TableCell>
                         <TableCell className="text-right">
-                          <p>{currency.format({
-                            amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
-                            exchangeMoney: false,
-                            currency: CurrencyType.VND
+                          <p>{currency.format(watchAmount.length === 0 ? "0" : watchAmount, {
+                            baseCurrency: currencyChoice,
+                            exchangeMoney: false
                           })}</p>
-                          {
-                            currency.getCurrencyType() !== CurrencyType.VND &&
-                            <p>{currency.format({
-                              amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
-                              baseCurrency: CurrencyType.VND
-                            })}</p>
-                          }
                         </TableCell>
                       </TableRow>
-                      {
-                        currency.getCurrencyType() !== CurrencyType.USD &&
-                        <TableRow>
-                          <TableCell
-                            className="font-medium">Exchanged</TableCell>
-                          <TableCell className="text-right">
-                            <p>{currency.format({
-                              amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
-                              baseCurrency: CurrencyType.VND,
-                              currency: CurrencyType.USD
-                            })}</p>
-                          </TableCell>
-                        </TableRow>
-                      }
+                      <TableRow>
+                        <TableCell className="font-medium">Exchanged</TableCell>
+                        <TableCell className="text-right">
+                          <p>{currency.format(watchAmount.length === 0 ? "0" : watchAmount,
+                            {baseCurrency: currencyChoice})}</p>
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Table>
 
@@ -288,8 +283,8 @@ export default function Balance() {
                       If you are going to pay with VNPAY, your fund will be
                       exchanged
                       to USD automatically at the exchange rate of 1 USD =&nbsp;
-                      {currency.format({
-                        amount: 1,
+                      {currency.format(1, {
+                        baseCurrency: CurrencyType.USD,
                         currency: CurrencyType.VND
                       })}
                     </AlertDescription>
@@ -305,18 +300,7 @@ export default function Balance() {
                       <TableRow>
                         <TableCell className="font-medium">Total</TableCell>
                         <TableCell className="text-right">
-                          <p>{currency.format({
-                            amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
-                            exchangeMoney: false,
-                            currency: CurrencyType.USD
-                          })}</p>
-                          {
-                            currency.getCurrencyType() !== CurrencyType.USD &&
-                            <p>{currency.format({
-                              amount: parseInt(watchAmount.length === 0 ? "0" : watchAmount),
-                              baseCurrency: CurrencyType.USD
-                            })}</p>
-                          }
+                          <p>{currency.format(watchAmount.length === 0 ? 0 : watchAmount)}</p>
                         </TableCell>
                       </TableRow>
                     </TableBody>

@@ -117,12 +117,12 @@ export function PublicItemDetail() {
                 <div className="inline-flex">
                   <GemIcon className="h-6 w-6"/>
                   <span
-                    className="pl-2">Reserve price: {currency.format({amount: item.reservePrice})}</span>
+                    className="pl-2">Reserve price: {currency.format(item.reservePrice)}</span>
                 </div>
                 {item.buyInPrice && <div className="inline-flex">
                   <GemIcon className="h-6 w-6"/>
                   <span
-                    className="pl-2">Buy in price: {currency.format({amount: item.buyInPrice})}</span>
+                    className="pl-2">Buy in price: {currency.format(item.buyInPrice)}</span>
                 </div>}
 
                 {item.status == ItemStatus.QUEUE &&

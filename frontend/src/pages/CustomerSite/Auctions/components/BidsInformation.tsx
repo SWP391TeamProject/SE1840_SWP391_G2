@@ -39,9 +39,7 @@ export default function BidsInformation({ ...props }) {
             <div className='basis-4/12 flex justify-center gap-2  items-center w-full '>
                 <p><ArrowUp /></p>
                 <p>High Bid </p>
-                <p className='font-semibold '> {currency.format({
-                    amount: props.price ?? (props.bids.length > 0 ? props.bids[0].price : 0)
-                })}</p>
+                <p className='font-semibold '> {currency.format(props.price ?? (props.bids.length > 0 ? props.bids[0].price : 0))}</p>
             </div>
             <div className='basis-4/12 flex  justify-center gap-2 items-center w-full '>
                 <p><HashIcon /></p>

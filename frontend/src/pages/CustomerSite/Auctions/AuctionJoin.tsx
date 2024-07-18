@@ -265,7 +265,7 @@ export default function AuctionJoin() {
           </CardHeader>
           <CardContent>
             {bids[0].account.nickname} won the auction
-            <p className='text-foreground font-semibold'>{currency.format({ amount: bids[0].price })}</p>
+            <p className='text-foreground font-semibold'>{currency.format(bids[0].price)}</p>
           </CardContent>
         </Card>
         </div>

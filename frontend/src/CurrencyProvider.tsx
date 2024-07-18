@@ -1,53 +1,27 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState
-} from 'react';
+import React, {createContext, ReactNode, useContext, useEffect} from 'react';
 import {getExchangeRates} from "@/services/CurrencyService.ts";
 
 export enum CurrencyType {
   USD = 'USD',
-  EUR = 'EUR',
-  GBP = 'GBP',
-  CNY = 'CNY',
-  JPY = 'JPY',
   VND = 'VND',
-  BTC = 'BTC',
 }
 
 export const currencyNames: { [key in CurrencyType]: string } = {
   [CurrencyType.USD]: 'US Dollar',
-  [CurrencyType.VND]: 'Vietnamese Dong',
-  [CurrencyType.EUR]: 'Euro',
-  [CurrencyType.GBP]: 'British Pound',
-  [CurrencyType.CNY]: 'Chinese Yuan',
-  [CurrencyType.JPY]: 'Japanese Yen',
-  [CurrencyType.BTC]: 'Bitcoin',
+  [CurrencyType.VND]: 'Vietnamese Dong'
 };
-
-export const currencySymbol: Partial<{ [key in CurrencyType]: string }> = {
-  [CurrencyType.BTC]: '₿',
-}
 
 const defaultExchangeRates: { [key in CurrencyType]: number } = {
   [CurrencyType.USD]: 1,
-  [CurrencyType.VND]: 25_000,
-  [CurrencyType.EUR]: 0.93,
-  [CurrencyType.GBP]: 0.79,
-  [CurrencyType.CNY]: 7.26,
-  [CurrencyType.JPY]: 159.48,
-  [CurrencyType.BTC]: 0.000016,
+  [CurrencyType.VND]: 25_275
 };
 
 export const StandardCurrency = CurrencyType.USD;
 
 export type FormatOptions = {
-  amount: number;
   minFractionDigits?: number;
   maxFractionDigits?: number;
-  baseCurrency?: CurrencyType;
+  baseCurrency?: CurrencyType; // currency of amount, always convert to USD
   currency?: CurrencyType;
   format?: 'full' | 'compact' | 'auto';
   fractionDigits?: 'always' | 'zero';
@@ -55,13 +29,9 @@ export type FormatOptions = {
 }
 
 interface ICurrencyContext {
-  getCurrencyType: () => CurrencyType;
-  setCurrencyType: (type: CurrencyType) => void;
-  format: (opts: FormatOptions) => string;
+  format: (amount: FormatOptions | number | string, opts?: FormatOptions) => string;
   convert: (amount: number, baseCurrency: CurrencyType, targetCurrency: CurrencyType) => number;
 }
-
-const currencyFormatPreferenceKey = "currencyFormatPreference";
 
 const CurrencyContext = createContext<ICurrencyContext | undefined>(undefined);
 
@@ -78,73 +48,67 @@ export const CurrencyProvider: React.FC<{
     });
   }, []);
 
-  const [currencyType, setCurrencyType] = useState<CurrencyType>(
-    () => (localStorage.getItem(currencyFormatPreferenceKey) as CurrencyType) || CurrencyType.USD
-  );
-
-  const setCurrency = (type: CurrencyType) => {
-    setCurrencyType(type);
-    localStorage.setItem(currencyFormatPreferenceKey, type);
+  const format = (amount: number | string | undefined | null, opts: FormatOptions = {
+    minFractionDigits: 1,
+    maxFractionDigits: 8,
+    baseCurrency: StandardCurrency,
+    currency: StandardCurrency,
+    format: 'auto',
+    fractionDigits: 'zero',
+    exchangeMoney: true
+  }) => {
+    if (!amount)
+      amount = 0;
+    if (typeof amount === 'number') {
+      return _format(amount, opts)
+    }
+    if (typeof amount === 'string') {
+      return _format(parseFloat(amount), opts)
+    }
   };
 
-  const getCurrencyType = () => {
-    return currencyType;
-  };
-
-  const format = ({
-                    amount: number,
-                    minFractionDigits = 1,
-                    maxFractionDigits = 8,
-                    baseCurrency = StandardCurrency,
-                    currency = currencyType,
-                    format = 'auto',
-                    fractionDigits = 'zero',
-                    exchangeMoney = true
-                  }: FormatOptions) => {
+  const _format = (amount: number, {
+    minFractionDigits = 1,
+    maxFractionDigits = 8,
+    baseCurrency = StandardCurrency,
+    currency = StandardCurrency,
+    format = 'auto',
+    fractionDigits = 'zero',
+    exchangeMoney = true
+  }: FormatOptions) => {
     let suffix = "";
     if (exchangeMoney) {
-      number *= exchangeRates[currency];
-      number /= exchangeRates[baseCurrency];
+      amount *= exchangeRates[currency];
+      amount /= exchangeRates[baseCurrency];
     }
 
-    if (format == 'auto' && Math.log10(number) + 1 > 15) {
+    if (format == 'auto' && Math.log10(amount) + 1 > 15) {
       format = 'compact';
     }
 
     if (format == 'compact') {
       const SI_SYMBOL = ["", "k", "M", "G", "T", "P", "E"];
 
-      const tier = Math.log10(Math.abs(number)) / 3 | 0;
+      const tier = Math.log10(Math.abs(amount)) / 3 | 0;
       if (tier > 0) {
         suffix = SI_SYMBOL[tier];
-        number /= Math.pow(10, tier * 3);
-        number = Math.round(number * 10) / 10;
+        amount /= Math.pow(10, tier * 3);
+        amount = Math.round(amount * 10) / 10;
       }
     }
 
-    if (fractionDigits == 'zero' && number >= 1) {
+    if (fractionDigits == 'zero' && amount >= 1) {
       minFractionDigits = 0;
       maxFractionDigits = 0;
     }
 
-    let formatted;
-    if (currencySymbol[currency] === undefined) {
-      formatted = new Intl.NumberFormat("en-US", {
-        style: 'currency',
-        currency: currency,
-        minimumFractionDigits: minFractionDigits,
-        maximumFractionDigits: maxFractionDigits,
-        useGrouping: true
-      }).format(number);
-    } else {
-      formatted = currencySymbol[currency] + " " + new Intl.NumberFormat("en-US", {
-        style: 'currency',
-        currency: CurrencyType.USD,
-        minimumFractionDigits: minFractionDigits,
-        maximumFractionDigits: maxFractionDigits,
-        useGrouping: true
-      }).format(number).substring(1);
-    }
+    let formatted = new Intl.NumberFormat("en-US", {
+      style: 'currency',
+      currency: exchangeMoney ? currency : baseCurrency,
+      minimumFractionDigits: minFractionDigits,
+      maximumFractionDigits: maxFractionDigits,
+      useGrouping: true
+    }).format(amount);
 
     function removeTrailingZeros(numStr: string) {
       if (!numStr.includes('.')) {
@@ -175,7 +139,7 @@ export const CurrencyProvider: React.FC<{
 
   return (
     <CurrencyContext.Provider
-      value={{getCurrencyType, setCurrencyType: setCurrency, format, convert}}>
+      value={{format, convert}}>
       {children}
     </CurrencyContext.Provider>
   );

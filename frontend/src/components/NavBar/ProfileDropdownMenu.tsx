@@ -91,10 +91,7 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
             <Link to={'/profile/balance'}>
               <div className="flex gap-2">
                 <WalletIcon className="w-4" />
-                {currency.format({
-                  amount: auth.user.balance,
-                  format: 'compact'
-                })}
+                {currency.format(auth.user.balance,{format: 'compact'})}
               </div>
             </Link>
           </DropdownMenuItem>
