@@ -29,10 +29,12 @@ export function OrderDetail() {
     const currency = useCurrency();
     const [loading, setLoading] = useState(true);
     const [customer, setCustomer] = useState({} as Account);
+    const [subtotal, setSubtotal] = useState(0);
 
     useEffect(() => {
         getOrderById(orderId).then((res) => {
             dispatch(setCurrentOrder(res.data));
+            setSubtotal(res.data.itemDTOS.reduce((acc, cur) => acc + cur.soldPrice, 0));
             fetchAccountById(res.data.payment.accountId).then((res) => {
                 setCustomer(res.data as Account);
             }).catch((e) => {
@@ -45,9 +47,7 @@ export function OrderDetail() {
             });
         }).catch((e) => {
             console.error(e);
-            toast.error('Error when loading order detail!', {
-                position: "bottom-right",
-            });
+            toast.error('Error when loading order detail!');
         });
     }, []);
 
@@ -56,15 +56,11 @@ export function OrderDetail() {
         updateOrder(orderId, {shippingStatus}).then((res) => {
             dispatch(setCurrentOrder(res.data));
             setLoading(false);
-            toast.success('Delivery status updated!', {
-                position: "bottom-right",
-            });
+            toast.success('Delivery status updated!');
         }).catch((e) => {
             setLoading(false);
             console.error(e);
-            toast.error('Error when updating order!', {
-                position: "bottom-right",
-            });
+            toast.error('Error when updating order!');
         });
     };
 
@@ -133,11 +129,11 @@ export function OrderDetail() {
                             <div className="space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>{currency.format(order.payment.paymentAmount)}</span>
+                                    <span>{currency.format(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Fee</span>
-                                    <span>{currency.format(0)}</span>
+                                    <span>{currency.format(order.payment.paymentAmount-subtotal)}</span>
                                 </div>
                                 <Separator/>
                                 <div className="flex justify-between font-bold">
