@@ -169,15 +169,11 @@ export default function AuctionSessionCreate() {
                 description="Are you sure to create this auction session?"
                 onOpenChange={setShowTrigger}
                 title="Are you sure to create this auction session?"
-                message={
-                    form.formState.isDirty
-                        ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'
-                        } End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'
-                        }`
-                        : ''
-                } label="Confirm"
-                onSuccess={confirm}
-            />
+                message={form.formState.isDirty
+                    ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'} End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'}`
+                    : ''} label="Confirm"
+                onSuccess={confirm} 
+                description={""} />
         </Form>
     )
 }

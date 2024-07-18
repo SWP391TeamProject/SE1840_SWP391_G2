@@ -24,10 +24,11 @@ import React, { Suspense, useEffect, useState } from "react";
 // import { AuctionSessionStatus } from "@/constants/enums";
 import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
 import { getAuctions } from "@/services/AuctionSessionService";
-import AcutionSessionsTable from "./auction-session-data-table/auction-session-table";
+import { AcutionSessionsTable } from "./auction-session-data-table/auction-session-table";
+import { useLocation } from "react-router-dom";
 
 export default function AuctionSessionList() {
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
@@ -37,8 +38,110 @@ export default function AuctionSessionList() {
   let sort = url.searchParams.get("sort");
   const auctionStates = ["Upcoming", "Past", "Active"];
   const [auctionSessionPromise, setAuctionSessionPromise] = useState<Promise<any>>();
-//TODO: fix this rendering state
-  const handleFilterClick = (filter: string) => {
+  const location = useLocation();
+
+  // const auctionSessionPromise = getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter});
+
+  // const fetchAuctionSessions = async (pageNumber: number, filter?: string) => {
+  //   try {
+  //     let res;
+  //     setIsLoading(true);
+  //     if (search && search?.length > 0) {
+  //       res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
+  //     } else {
+  //       switch (filter) {
+  //         case "upcoming":
+  //           res = await fetchUpcomingAuctionSessions(pageNumber, 10);
+  //           break;
+  //         case "past":
+  //           res = await fetchPastAuctionSessions(pageNumber, 10);
+  //           break;
+  //         case "live":
+  //           res = await fetchActiveAuctionSessions(pageNumber, 10);
+  //           break;
+  //         default:
+  //           res = await fetchAllAuctionSessions(pageNumber, 10);
+  //       }
+  //     }
+
+  //     if (res) {
+  //       console.log(res?.data.content);
+  //       // dispatch(setAuctionSessions(list.data.content));
+  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
+  //       let paging: any = {
+  //         pageNumber: res.data.number,
+  //         totalPages: res.data.totalPages
+  //       }
+  //       dispatch(setCurrentPageNumber(paging));
+  //       setIsLoading(false);
+  //     }
+
+  //   } catch (error) {
+  //     console.log(error);
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const handleAssignAuctionItemClick = (auctionSessionId: number) => {
+  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+  //   console.log(auctionSession);
+    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
+  //   dispatch(setCurrentAuctionSession(auctionSession));
+  //   navigate(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
+  // }
+
+  // const handleEditClick = (auctionSessionId: number) => {
+  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+  //   console.log(auctionSession);
+    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
+  //   dispatch(setCurrentAuctionSession(auctionSession));
+  //   navigate("/admin/auctionSessions/edit");
+  // }
+
+  // const handleCreateClick = () => {
+    // let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
+    // console.log(auctionSession);
+    // // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
+    // dispatch(setCurrentAuctionSession(auctionSession));
+  //   navigate("/admin/auction-sessions/create");
+  // }
+
+  // const handleSuspendClick = (auctionSessionId: number) => {
+    // console.log(auctionSession);
+    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
+    // dispatch(setCurrentAuctionSession(auctionSession));
+    // navigate("/admin/auctionSessions/edit");
+    // deleteAuctionSessionService(auctionSessionId.toString()).then((res) => {
+    //   console.log(res);
+    // })
+  // }
+  // const handleDetailClick = (auctionSessionId: number) => {
+  //   console.log(auctionSessionId);
+
+  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId === auctionSessionId);
+  //   console.log(auctionSession);
+  //   dispatch(setCurrentAuctionSession(auctionSession));
+  //   navigate(`/admin/auction-sessions/${auctionSessionId}`);
+  // }
+
+  // const handlePageSelect = (pageNumber: number) => {
+  //   fetchAuctionSessions(pageNumber, statusFilter);
+  // }
+
+  // const handleFilterClick = (filter: string) => {
+
+  //   url.searchParams.delete("search");
+  //   window.history.replaceState(null, "", url.toString());
+  //   search = null;
+
+  //   if (filter !== statusFilter){
+  //     fetchAuctionSessions(0, filter);
+  //     setStatusFilter(filter);
+  //   }
+    
+  // }
+
+   const handleFilterClick = (filter: string) => {
     url.searchParams.delete("search");
     window.history.replaceState(null, "", url.toString());
     search = null;
@@ -59,8 +162,23 @@ export default function AuctionSessionList() {
       });
   }, [pageSize, pageNumber, sort])
   useEffect(() => {
-    console.log('hello')
-  }, [pageSize, pageNumber, sort]);
+    console.log(pageNumber);
+    console.log(Number.parseInt(pageSize));
+    if (Number.parseInt(pageNumber) >= 1)
+      setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter }));
+  }, [pageSize, pageNumber])
+
+  useEffect(() => {
+    // fetchAuctionSessions(0);
+    // setStatusFilter("all");
+    // if (Number.parseInt(pageNumber) != undefined)
+    //   setAuctionSessionPromise(getAuctions({ page: 1, size: Number.parseInt(pageSize), status: statusFilter }));
+    console.log(url);
+  }, []);
+
+  useEffect(() => {
+  }, [location])
+
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">

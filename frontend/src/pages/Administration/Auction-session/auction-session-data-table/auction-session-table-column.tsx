@@ -140,9 +140,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       //     <Badge variant="default" className="bg-green-500">{ConsignmentStatus[row.status]}</Badge> :
       //     <Badge variant="destructive">{ConsignmentStatus[row.status]}</Badge>}
     ,
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
+
   },
   {
     id: "actions",
@@ -151,11 +149,6 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false)
       const  nav = useNavigate();
       const dispatch = useAppDispatch();
-
-      const handleEditClick = (accountId: number) => {
-        // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-        nav(`/admin/accounts/${accountId}`);
-      }
 
       const handleDetailClick = (auctionSessionId: number) => {
         nav(`/admin/auction-sessions/${auctionSessionId}`);

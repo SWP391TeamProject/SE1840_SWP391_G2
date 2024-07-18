@@ -82,7 +82,7 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <Badge variant="outline">{row.original.category.name}</Badge>
-        <span className="max-w-[20rem] truncate font-medium">
+        <span className="max-w-[10rem] truncate font-medium">
           {row.getValue("name")}
         </span>
       </div>

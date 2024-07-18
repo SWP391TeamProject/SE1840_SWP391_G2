@@ -23,6 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
+
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 
 const formSchema = z.object({
@@ -44,6 +45,9 @@ export default function AccountEdit() {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const dispatch = useAppDispatch();
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const [showTrigger, setShowTrigger] = useState(false);
     const [editedAccount, setEditedAccount] = useState({
         accountId: 0,
         nickname: "",
@@ -65,9 +69,7 @@ export default function AccountEdit() {
             dummy: false
         },
     });
-    const [isConfirmed, setIsConfirmed] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [showTrigger, setShowTrigger] = useState(false);
+
     const handleConfirmed = (data: z.infer<typeof formSchema>) => {
         setIsConfirmed(true);
         setShowTrigger(false);
@@ -117,7 +119,52 @@ export default function AccountEdit() {
         // Remove FormData creation and file handling
         setShowTrigger(true);
 
+    }
+    const onSubmit = (data: z.infer<typeof formSchema>) => {
+        // Remove FormData creation and file handling
+        setShowTrigger(true);
+
+        // let updatedAccount = {
+        //     accountId: data.accountId,
+        //     email: data.email,
+        //     nickname: data.nickname,
+        //     phone: data.phone,
+        //     avatar: null,
+        //     balance: data.balance,
+        //     role: data.role,
+        //     dummy: data.dummy,
+        //     status: account?.status
+        // }
+        // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
+        //     console.log(res);
+        //     // dispatch(setCurrentAccount(res))
+        //     if(res){
+        //         toast.success("Account Updated Successfully")
+        //         navigate("/admin/accounts/");
+        //     }
+        // })
+
+        // console.log(updatedAccount);
     };
+
+    const confirm = () => {
+        setIsConfirmed(true);
+        setShowTrigger(false);
+        setIsSubmitting(true);
+    }
+
+    useEffect(() => {
+        if (isConfirmed) {
+            if (form.getValues) {
+                const values = form.getValues();
+                handleConfirmed(values);
+                setIsConfirmed(false);
+            } else {
+                setIsSubmitting(false)
+            }
+        }
+
+    }, [isConfirmed, form.getValues])
 
     // useEffect(() => {
     //     if (!account || account.accountId != parseInt(id)) {
@@ -329,10 +376,17 @@ export default function AccountEdit() {
                                     Submit
                                 </Button>
                         }
-
-
                     </form>
                 </Form>
+                <ConfirmationDialog
+                    description='This action cannot be undone.'
+                    label='Ok'
+                    message='Are you sure to update this account?'
+                    onSuccess={confirm}
+                    open={showTrigger}
+                    onOpenChange={setShowTrigger}
+                    title='Confirmation'
+                />
             </div>
             <ConfirmationDialog
                 open={showTrigger}
