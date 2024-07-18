@@ -45,12 +45,13 @@ public class Item {
     private BigDecimal soldPrice;
 
     public enum Status {
-        QUEUE, IN_AUCTION, SOLD, UNSOLD, REMOVED
+        QUEUE, IN_AUCTION, SOLD, REMOVED
     }
 
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private Status status;
+
 
     @CreationTimestamp
     @Column(name = "create_date")

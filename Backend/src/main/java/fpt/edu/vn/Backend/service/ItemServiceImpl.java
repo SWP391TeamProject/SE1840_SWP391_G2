@@ -39,11 +39,6 @@ public class ItemServiceImpl implements ItemService {
             Item.Status.SOLD, Set.of(
                     Item.Status.SOLD
             ),
-            Item.Status.UNSOLD, Set.of(
-                    Item.Status.UNSOLD,
-                    Item.Status.QUEUE,
-                    Item.Status.REMOVED
-            ),
             Item.Status.REMOVED, Set.of(
                     Item.Status.REMOVED
             )
