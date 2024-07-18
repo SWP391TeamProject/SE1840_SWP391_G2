@@ -226,7 +226,7 @@ export default function AuctionSession() {
                             directly withdraw your balance.
                             <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>Auction Registration Fee: {currency.format({ amount: fee })}</p>
+                            '>Auction Registration Fee: {currency.format(fee)}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -290,7 +290,7 @@ export default function AuctionSession() {
                             Do you want to continue?
                             <p className='
                             text-red-500 dark:text-red-400 font-semibold
-                            '>Auction Registration Fee: {currency.format({ amount: fee })}</p>
+                            '>Auction Registration Fee: {currency.format(fee)}</p>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -434,16 +434,12 @@ export default function AuctionSession() {
                                     </CardContent>
                                     <div className='mt-auto space-y-2 p-4'>
                                         {/* <div className="flex items-center justify-between mt-5"> */}
-                                        <div className="text-primary-500 font-medium space-y-3">{currency.format({
-                                            amount: parseFloat(item?.currentPrice)
-                                        })}</div>
+                                        <div className="text-primary-500 font-medium space-y-3">{currency.format(item?.currentPrice)}</div>
                                         {/* </div> */}
                                         {
                                             auctionSession?.status === AuctionSessionStatus.FINISHED && new Date(auctionSession?.endDate) < new Date() ?
                                                 <div className="rounded-md bg-yellow-300 p-2 text-red-500">
-                                                    Won: {currency.format({
-                                                        amount: item?.currentPrice
-                                                    })}
+                                                    Won: {currency.format(item?.currentPrice)}
                                                 </div> :
                                                 <>
                                                     {bidders.includes(userId) ? (

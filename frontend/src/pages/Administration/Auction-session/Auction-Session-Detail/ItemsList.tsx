@@ -41,12 +41,8 @@ export default function ItemsList({ ...props }) {
               <TableRow className="bg-accent" key={item?.id.itemId}>
                 <TableCell>{item?.id.itemId}</TableCell>
                 <TableCell className="hidden sm:table-cell">{item?.itemDTO.name}</TableCell>
-                <TableCell className="hidden sm:table-cell">{currency.format({
-                  amount: item?.itemDTO.reservePrice
-                })}</TableCell>
-                <TableCell className="hidden md:table-cell">{currency.format({
-                  amount: item?.currentPrice
-                })}</TableCell>
+                <TableCell className="hidden sm:table-cell">{currency.format(item?.itemDTO.reservePrice)}</TableCell>
+                <TableCell className="hidden md:table-cell">{currency.format(item?.currentPrice)}</TableCell>
               </TableRow>
             ))}
             
