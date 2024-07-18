@@ -48,9 +48,9 @@ export const exportBids = async () => {
 };
 
 
-export const fetchBidsByAuctionItemId = async (auctionId: number, itemId: number) => {
+export const fetchBidsByAuctionId = async (auctionId: number) => {
   return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/bids/` + auctionId + `/` + itemId, {
+    .get(`${SERVER_DOMAIN_URL}/api/bids/auction/` + auctionId, {
       headers: {
         "Content-Type": "application/json",
 

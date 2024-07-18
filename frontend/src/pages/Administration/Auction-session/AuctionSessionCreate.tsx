@@ -171,8 +171,7 @@ export default function AuctionSessionCreate() {
                 message={form.formState.isDirty
                     ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'} End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'}`
                     : ''} label="Confirm"
-                onSuccess={confirm} 
-                description={""} />
+                onSuccess={confirm} />
         </Form>
     )
 }

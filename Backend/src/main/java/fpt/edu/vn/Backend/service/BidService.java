@@ -21,4 +21,7 @@ public interface BidService {
     BidDTO getBidById(int id);
     @Nullable BidDTO getHighestBid(AuctionItemId auctionId);
     List<BidResponse> toBidResponse(List<BidDTO> bids);
+
+    List<BidDTO> getBidsByAuctionId(int auctionId);
+
 }

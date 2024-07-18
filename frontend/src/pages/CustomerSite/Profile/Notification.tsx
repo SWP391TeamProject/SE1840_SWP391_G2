@@ -46,6 +46,7 @@ import {
     decreaseUnreadNotificationCount
 } from "@/redux/reducers/UnreadNotificationCountReducer.ts";
 import PagingIndexes from "@/components/pagination/PagingIndexes";
+import { toast } from "sonner";
 
 export default function NotificationsList() {
     const notificationsList = useAppSelector((state) => state.notifications);
@@ -84,7 +85,13 @@ export default function NotificationsList() {
     }
 
     useEffect(() => {
-        fetchAllNotifications();
+        const notificationPromise = fetchAllNotifications();
+
+        toast.promise(notificationPromise, {
+            loading: "Loading...",
+            success: "Notifications loaded!",
+            error: "Could not load notifications!",
+        });
     }, []);
 
     return (
