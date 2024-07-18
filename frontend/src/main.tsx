@@ -317,7 +317,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}
-                <Toaster position="bottom-center" richColors />
+                <Toaster position="bottom-right" richColors />
 
               </TooltipProvider>
             </CurrencyProvider>
