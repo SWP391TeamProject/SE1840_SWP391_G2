@@ -83,13 +83,16 @@ public class OrderServiceImpl implements OrderService {
         payment.setType(Payment.Type.AUCTION_ORDER);
         payment.setStatus(Payment.Status.PENDING);
         payment.setAccount(account);
-        payment.setPaymentAmount(totalPay.multiply(BigDecimal.valueOf(1.045)));
+        BigDecimal fee = totalPay.multiply(BigDecimal.valueOf(0.045));
+        fee =fee.min(new BigDecimal(4000));
+        fee= fee.max(new BigDecimal(225));
+        payment.setPaymentAmount(totalPay.add(fee));
         payment = paymentRepository.save(payment);
 
         order.setPayment(payment);
         order = orderRepository.save(order);
 
-        log.info("Order {} account {} must pay {}", order.getOrderId(), accountId, payment.getPaymentAmount());
+        log.info("Order {} account {} must pay {} with fee {}", order.getOrderId(), accountId, payment.getPaymentAmount(), fee);
 
         notificationService.sendNotificationToUserGroup(
                 NotificationDTO.builder()

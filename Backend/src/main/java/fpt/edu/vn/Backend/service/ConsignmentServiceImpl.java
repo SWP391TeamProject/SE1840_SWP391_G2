@@ -128,6 +128,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     public ConsignmentDetailDTO submitInitialEvaluation(int consignmentId, String evaluation, BigDecimal price, int accountId) {
         try {
+            if(price.compareTo(BigDecimal.valueOf(100)) < 0){
+                throw new ConsignmentServiceException("Price must be greater than 100");
+            }
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getConsignmentDetails().stream().anyMatch(detail ->
                     detail.getType().equals(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION))) {
@@ -164,6 +167,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public ConsignmentDetailDTO submitFinalEvaluationUpdate(int consignmentId, String evaluation, BigDecimal price, int accountId) {
 
         try {
+            if(price.compareTo(BigDecimal.valueOf(100)) < 0){
+                throw new ConsignmentServiceException("Price must be greater than 100");
+            }
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getConsignmentDetails().stream().noneMatch(detail ->
                     detail.getType().equals(ConsignmentDetail.ConsignmentType.INITIAL_EVALUATION))) {

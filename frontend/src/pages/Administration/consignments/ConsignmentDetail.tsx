@@ -301,7 +301,7 @@ export default function ConsignmentDetail() {
                                             })()}</CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <div contentEditable='true' dangerouslySetInnerHTML={{ __html: item.description }}></div>
+                                        <div dangerouslySetInnerHTML={{ __html: item.description }}></div>
                                         <p>price:{item.price ? item.price : "not specified"}</p>
                                         <div className="w-ful flex justify-between">
                                             <p>Initiator: {item.account.nickname}</p>
@@ -339,7 +339,7 @@ export default function ConsignmentDetail() {
                                     Material: {consignment?.material}
                                 </p>
                             </div>
-                            <div contentEditable='true' dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
+                            <div dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
                             <div className="w-ful flex justify-between">
                                 <p>Requester: {consignment?.user?.nickname}</p>
                             </div>
