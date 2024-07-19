@@ -69,6 +69,16 @@ export default function AuctionSessionDetail() {
     }
 
     useEffect(() => {
+        if(auctionSession){
+            setCurrentAuctionSession(auctionSession);
+            form.reset({
+                auctionSessionId: auctionSession.auctionSessionId,
+                title: auctionSession.title,
+                startDate: auctionSession.startDate,
+                endDate: auctionSession.endDate,
+                status: auctionSession.status,
+            })
+        }
         if (!auctionSession || auctionSession.auctionSessionId != Number.parseInt(id)) {
             console.log(auctionSession);
             fetchAuctionSessionById(parseInt(id)).then((res) => {
@@ -84,6 +94,13 @@ export default function AuctionSessionDetail() {
             });
         } else {
             setCurrentAuctionSession(auctionSession);
+            form.reset({
+                auctionSessionId: auctionSession.auctionSessionId,
+                title: auctionSession.title,
+                startDate: auctionSession.startDate,
+                endDate: auctionSession.endDate,
+                status: auctionSession.status,
+            })
             // form.reset({...auctionSession});
             console.log(auctionSession);
         }
