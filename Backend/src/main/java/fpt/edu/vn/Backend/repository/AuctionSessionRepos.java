@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.pojo.AuctionSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integer> {
+public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integer>, JpaSpecificationExecutor<AuctionSession> {
     List<AuctionSession> findByStartDateAfter(LocalDateTime startDate);
     Page<AuctionSession> findByEndDateBefore(LocalDateTime endDate, Pageable pageable);
     Page<AuctionSession> findByStartDateAfter(LocalDateTime startDate, Pageable pageable);

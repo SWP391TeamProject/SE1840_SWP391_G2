@@ -655,12 +655,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     @Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
     @Override
-    public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
+    public Page<AuctionSessionDTO> getAllAuctionSessions(String keyword,Pageable pageable) {
+        AuctionSessionSpecification spec = new AuctionSessionSpecification(keyword);
+        Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(spec,pageable);
         if (auctionSessions.isEmpty()) {
             throw new ResourceNotFoundException("No auction sessions found");
         }
-        return auctionSessions.map(AuctionSessionDTO::new);
+        return auctionSessionRepos.findAll(spec,pageable).map(AuctionSessionDTO::new);
     }
 
     @Override
@@ -712,5 +713,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         helper.setSubject(title);
         helper.setText(content, true);
         mailSender.send(message);
+    }
+
+    @Override
+    public Page<AuctionSession> searchAuctionSession(String keyword, Pageable pageable) {
+        AuctionSessionSpecification spec = new AuctionSessionSpecification(keyword);
+        return auctionSessionRepos.findAll(spec, pageable);
     }
 }

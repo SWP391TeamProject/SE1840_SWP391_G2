@@ -444,8 +444,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     @Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "consignments")
-    public Page<ConsignmentDTO> getAllConsignments(Pageable pageable) {
-        Page<Consignment> consignmentPage = consignmentRepos.findAll(pageable);
+    public Page<ConsignmentDTO> getAllConsignments(String keyword,Pageable pageable) {
+        ConsignmentSpecification spec = new ConsignmentSpecification(keyword);
+        Page<Consignment> consignmentPage = consignmentRepos.findAll(spec,pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
     }
 
@@ -561,7 +562,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             throw new ConsignmentServiceException("Consignment is not in SENDING status");
         }
     }
-
 
 
 }

@@ -63,8 +63,8 @@ public class AccountServiceImplTest {
         Page<Account> accounts = new PageImpl<>(Arrays.asList(account1, account2));
 
         when(accountRepos.findAll(PageRequest.of(0, 2))).thenReturn(accounts);
-
-        Page<AccountDTO> result = accountService.getAccounts(PageRequest.of(0, 2));
+        String keyword="admin";
+        Page<AccountDTO> result = accountService.getAccounts(keyword,PageRequest.of(0, 2));
 
         assertEquals(2, result.getContent().size());
     }
@@ -75,8 +75,8 @@ public class AccountServiceImplTest {
         Page<Account> accounts = Page.empty();
 
         when(accountRepos.findAll(PageRequest.of(0, 2))).thenReturn(accounts);
-
-        Page<AccountDTO> result = accountService.getAccounts(PageRequest.of(0, 2));
+        String keyword="admin";
+        Page<AccountDTO> result = accountService.getAccounts(keyword,PageRequest.of(0, 2));
 
         assertEquals(0, result.getContent().size());
     }

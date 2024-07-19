@@ -217,6 +217,13 @@ public class ItemServiceImpl implements ItemService {
         return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(ItemDTO::new);
     }
 
+    @Override
+    public Page<ItemDTO> searchItems(String keyword, Pageable pageable) {
+        ItemSpecification spec = new ItemSpecification(keyword);
+        Page<Item> result = itemRepos.findAll(spec,pageable);
+        return result.map(ItemDTO::new);
+    }
+
     @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {

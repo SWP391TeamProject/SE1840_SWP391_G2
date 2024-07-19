@@ -33,4 +33,5 @@ public interface ItemService {
     @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice);
     @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name);
     @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name,Item.Status status);
+    Page<ItemDTO> searchItems(String keyword,Pageable pageable);
 }

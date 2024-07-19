@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
+import fpt.edu.vn.Backend.service.AuctionSessionSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class AuctionSessionController {
     private AccountService accountService;
 
     @GetMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@PageableDefault(size = 50) Pageable pageable) {
-        return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
+    public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@RequestParam(required = false) String keyword,@PageableDefault(size = 50) Pageable pageable) {
+        return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(keyword,pageable), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -54,7 +55,7 @@ public class AuctionSessionController {
                                                                              @PathVariable String title) {
         log.info("Get accounts with name: {}", title);
         if (title == null) {
-            return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(pageable), HttpStatus.OK);
+            return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(title,pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(auctionSessionService.getAuctionSessionsByTitle(pageable, title), HttpStatus.OK);
     }
@@ -66,8 +67,8 @@ public class AuctionSessionController {
     }
 
     @GetMapping("/active")
-    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession( @PageableDefault(size = 10) Pageable pageable) {
-        List<AuctionSessionDTO> listA=auctionSessionService.getAllAuctionSessions(pageable).stream().filter(
+    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession(@RequestParam(required = false) String keyword, @PageableDefault(size = 10) Pageable pageable) {
+        List<AuctionSessionDTO> listA=auctionSessionService.getAllAuctionSessions(keyword,pageable).stream().filter(
                 auctionSessionDTO ->
                         auctionSessionDTO.getStatus() != AuctionSession.Status.FINISHED &&
                         auctionSessionDTO.getStatus() != AuctionSession.Status.TERMINATED

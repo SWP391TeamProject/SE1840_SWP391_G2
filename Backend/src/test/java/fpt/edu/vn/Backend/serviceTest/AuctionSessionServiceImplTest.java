@@ -138,8 +138,8 @@ public class AuctionSessionServiceImplTest {
         Pageable pageable = PageRequest.of(0, 50);
         Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
         when(auctionSessionRepos.findAll(pageable)).thenReturn(auctionSessionPage);
-
-        Page<AuctionSessionDTO> result = auctionSessionService.getAllAuctionSessions(pageable);
+        String keyword = "sumeer";
+        Page<AuctionSessionDTO> result = auctionSessionService.getAllAuctionSessions(keyword,pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -319,8 +319,8 @@ public class AuctionSessionServiceImplTest {
     @Test
     void getAllAuctionSessions_NoAuctionSessionsFound() {
         when(auctionSessionRepos.findAll(PageRequest.of(0, 10))).thenReturn(Page.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAllAuctionSessions(PageRequest.of(0, 10)));
+        String keyword = "summer";
+        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAllAuctionSessions(keyword,PageRequest.of(0, 10)));
     }
 
     @Test

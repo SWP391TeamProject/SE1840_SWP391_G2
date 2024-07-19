@@ -104,8 +104,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable) {
-        return accountRepos.findAll(pageable).map(this::mapEntityToDTO);
+    public @NotNull Page<AccountDTO> getAccounts(String keyword,@NotNull Pageable pageable) {
+        AccountSpecification spec = new AccountSpecification(keyword);
+        return accountRepos.findAll(spec,pageable).map(this::mapEntityToDTO);
     }
 
     @Override

@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import fpt.edu.vn.Backend.DTO.ItemDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,7 +23,7 @@ public interface AuctionSessionService {
 
     void updateAuctionSessionByStatus(UpdateStatusAuctionSessionRequestDTO request);
 
-    Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable);
+    Page<AuctionSessionDTO> getAllAuctionSessions(String keyword,Pageable pageable);
 
     Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable);
 
@@ -43,4 +44,6 @@ public interface AuctionSessionService {
     Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable);
 
     Page<AuctionSessionDTO> getPastAuctionOfItem(Pageable pageable, int itemId);
+
+    Page<AuctionSession> searchAuctionSession(String keyword, Pageable pageable);
 }

@@ -9,6 +9,7 @@ import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
@@ -47,7 +48,8 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@PageableDefault(size = 50) Pageable pageable, Authentication authentication) {
+    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(required = false) String keyword,
+                                                                  @PageableDefault(size = 50) Pageable pageable, Authentication authentication) {
         try {
 
             AccountDTO acc = accountService.getAccountByEmail(authentication.getName());
@@ -61,7 +63,7 @@ public class ConsignmentController {
                         return new ResponseEntity<>(staffPage, HttpStatus.OK);
                     }
                     case MANAGER, ADMIN: {
-                        Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(pageable);
+                        Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(keyword,pageable);
                         if (consignments == null || consignments.isEmpty()) {
                             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                         }
@@ -229,8 +231,9 @@ public class ConsignmentController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         List<ConsignmentDTO> listConsignments;
+        String keyword = "";
         {
-            listConsignments = consignmentService.getAllConsignments( Pageable.ofSize(1000)).toList();
+            listConsignments = consignmentService.getAllConsignments(keyword,Pageable.ofSize(1000)).toList();
         }
 
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

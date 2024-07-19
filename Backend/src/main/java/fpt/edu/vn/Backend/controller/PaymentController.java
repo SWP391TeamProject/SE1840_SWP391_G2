@@ -42,9 +42,10 @@ public class PaymentController {
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(
             @PageableDefault(size = 50) Pageable pageable,
             @RequestParam(required = false) Payment.Type type,
-            @RequestParam(required = false) Payment.Status status
+            @RequestParam(required = false) Payment.Status status,
+            @RequestParam(required = false) String keyword
     ) {
-        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status));
+        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status,keyword));
     }
 
     @GetMapping("/{id}")

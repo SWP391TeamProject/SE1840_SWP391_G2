@@ -353,6 +353,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Page<OrderDTO> searchOrders(String keyword,Pageable pageable) {
+        OrderSpecification spec = new OrderSpecification(keyword);
+        return orderRepository.findAll(spec,pageable).map(OrderDTO::new);
+    }
+
+    @Override
     public Page<OrderDTO> getAllOrdersByUserId(int userId, Pageable pageable) {
         return orderRepository.findAllByPayment_Account_AccountId(userId, pageable).map(OrderDTO::new);
     }
