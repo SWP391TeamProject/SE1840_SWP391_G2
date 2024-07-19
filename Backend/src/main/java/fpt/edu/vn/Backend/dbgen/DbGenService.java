@@ -540,6 +540,7 @@ public class DbGenService {
                     auctionItem.setItem(itemRepos.getReferenceById(obj.get("itemId").getAsInt()));
                     auctionItem.setCurrentPrice(obj.get("currentPrice").getAsBigDecimal());
                     auctionItem.setBidCount(obj.get("bidCount").getAsInt());
+                    auctionItem.setParticipantCount(obj.get("participantCount").getAsInt());
                     auctionItem = auctionItemRepos.save(auctionItem);
                     {
                         Map<String, Object> paramMap = new HashMap<>();
