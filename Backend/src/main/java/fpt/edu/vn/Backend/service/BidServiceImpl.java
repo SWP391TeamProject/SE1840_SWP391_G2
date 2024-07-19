@@ -102,7 +102,7 @@ public class BidServiceImpl implements BidService {
         newBid = bidRepos.save(newBid);
         auctionItem.setBidCount(auctionItem.getBidCount() + 1);
         if (newParticipant) {
-            auctionItem.setBidCount(auctionItem.getBidCount() + 1);
+            auctionItem.setParticipantCount(auctionItem.getParticipantCount() + 1);
         }
         auctionItemRepos.save(auctionItem);
         return new BidDTO(newBid);
