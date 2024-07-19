@@ -333,6 +333,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public List<PaymentDTO> getUserPayments( String email) {
+        List<PaymentDTO> paymentList = paymentRepos.findAllByAccount_Email(email).stream().map(PaymentDTO::new).collect(Collectors.toList());
+        return paymentList;
+    }
+
+    @Override
     public String capturePayment(PaymentCaptureRequestDTO dto) {
         if (dto.getMethod() == Payment.Method.PAYPAL) {
             PaypalCaptureResponseDTO res = paypalService.captureOrder(dto.getOrderId());

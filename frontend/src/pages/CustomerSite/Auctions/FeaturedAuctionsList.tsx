@@ -1,56 +1,53 @@
-import CountDownTime from "@/components/countdownTimer/CountDownTime";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from "@/redux/reducers/AuctionSession";
-import { fetchFeaturedAuctionSessions } from "@/services/AuctionSessionService";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import CountDownTime from '@/components/countdownTimer/CountDownTime';
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from '@/redux/reducers/AuctionSession';
+import { fetchFeaturedAuctionSessions } from '@/services/AuctionSessionService';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function FeaturedAuctionsList() {
   const auctionSessionList = useAppSelector((state) => state.auctionSessions);
   const dispatch = useAppDispatch();
   const date = new Date();
 
-  const { isLoading,isPending, isError, data, error } = useQuery({
+  const { isLoading, isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
     queryFn: () => fetchFeaturedAuctionSessions(auctionSessionList.currentPageNumber, 10),
   });
 
-
-
   const handleViewDetailsClick = (id: any) => {
-    let session = auctionSessionList.value.find(s => s.auctionSessionId == id);
+    let session = auctionSessionList.value.find((s) => s.auctionSessionId == id);
     if (session) {
       dispatch(setCurrentAuctionSession(session));
     }
-  }
+  };
 
   useEffect(() => {
-    dispatch(setCurrentPageNumber({currentPageNumber: 0, totalPages: 0}));
-    window.scrollTo(0, 0)
-  }, [])
+    dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }));
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
-
     if (data) {
       console.log('data', data);
       dispatch(setAuctionSessions(data?.data.content));
-      dispatch(setCurrentPageNumber({pageNumber: data?.data.number, totalPages: data?.data.totalPages}));
+      dispatch(setCurrentPageNumber({ pageNumber: data?.data.number, totalPages: data?.data.totalPages }));
     }
   }, [data]);
 
   if (isPending) {
-    return <LoadingAnimation/>
+    return <LoadingAnimation />;
   }
 
-  if(isLoading){
-    return <LoadingAnimation/>
+  if (isLoading) {
+    return <LoadingAnimation />;
   }
   if (isError) {
-    return <span>Error: {error.message}</span>
+    return <span>Error: {error.message}</span>;
   }
 
   // We can assume by this point that `isSuccess === true`
@@ -76,36 +73,38 @@ export default function FeaturedAuctionsList() {
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.startDate ? new Date(session.startDate).toLocaleString() : ""}
-                        {" "}-{" "}
-                        {session.endDate ? new Date(session.endDate).toLocaleString() : ""}
+                        {session.startDate ? new Date(session.startDate).toLocaleString() : ''} -{' '}
+                        {session.endDate ? new Date(session.endDate).toLocaleString() : ''}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <PackageIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <div className="text-sm font-medium">{session.auctionItems ? session.auctionItems.length : 0} Items</div>
+                      <div className="text-sm font-medium">
+                        {session.auctionItems ? session.auctionItems.length : 0} Items
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.startDate && new Date(session.startDate).getTime() > date.getTime() ?
+                        {session.startDate && new Date(session.startDate).getTime() > date.getTime() ? (
                           <>
                             Starts in <CountDownTime end={new Date(session.startDate)}></CountDownTime>
-                          </> :
-                          (session.endDate && new Date(session.endDate).getTime() > date.getTime()
-                            ? <>
-                              Ends in <CountDownTime end={new Date(session.endDate)}></CountDownTime>
-                            </> :
-                            <div className="text-pink-500 dark:text-pink-400 font-semibold">
-                              Auction Ended
-                            </div>)
-                        }
+                          </>
+                        ) : session.endDate && new Date(session.endDate).getTime() > date.getTime() ? (
+                          <>
+                            Ends in <CountDownTime end={new Date(session.endDate)}></CountDownTime>
+                          </>
+                        ) : (
+                          <div className="text-pink-500 dark:text-pink-400 font-semibold">Auction Ended</div>
+                        )}
                       </div>
                     </div>
-                    <Button variant={"default"} asChild>
+                    <Button variant={'default'} asChild>
                       <Link
                         to={`/auctions/${session.auctionSessionId}`}
-                        onClick={() => { handleViewDetailsClick(session.auctionSessionId) }}
+                        onClick={() => {
+                          handleViewDetailsClick(session.auctionSessionId);
+                        }}
                       >
                         View Details
                       </Link>
@@ -118,7 +117,7 @@ export default function FeaturedAuctionsList() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function CalendarIcon(props: any) {
@@ -140,7 +139,7 @@ function CalendarIcon(props: any) {
       <rect width="18" height="18" x="3" y="4" rx="2" />
       <path d="M3 10h18" />
     </svg>
-  )
+  );
 }
 
 function PackageIcon(props: any) {
@@ -162,7 +161,7 @@ function PackageIcon(props: any) {
       <path d="m3.3 7 8.7 5 8.7-5" />
       <path d="M12 22V12" />
     </svg>
-  )
+  );
 }
 
 function ClockIcon(props: any) {
@@ -182,5 +181,5 @@ function ClockIcon(props: any) {
       <circle cx="12" cy="12" r="10" />
       <polyline points="12 6 12 12 16 14" />
     </svg>
-  )
+  );
 }

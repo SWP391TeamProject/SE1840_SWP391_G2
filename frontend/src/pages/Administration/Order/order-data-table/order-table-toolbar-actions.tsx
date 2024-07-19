@@ -1,34 +1,29 @@
-"use client"
+'use client';
 
-import { type Task } from "@/db/schema"
-import { DownloadIcon } from "@radix-ui/react-icons"
-import { type Table } from "@tanstack/react-table"
+import { type Task } from '@/db/schema';
+import { DownloadIcon } from '@radix-ui/react-icons';
+import { type Table } from '@tanstack/react-table';
 
-import { exportTableToCSV } from "@/lib/export"
-import { Button } from "@/components/ui/button"
-import { DeleteOrdersDialog } from "./delete-order-dialog"
-import { PlusIcon } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+import { exportTableToCSV } from '@/lib/export';
+import { Button } from '@/components/ui/button';
+import { DeleteOrdersDialog } from './delete-order-dialog';
+import { PlusIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // import { CreateTaskDialog } from "./create-task-dialog"
 // import { DeleteTasksDialog } from "./delete-tasks-dialog"
 
 interface TasksTableToolbarActionsProps {
-  table: Table<Task>
+  table: Table<Task>;
 }
 
-export function OrdersTableToolbarActions({
-  table,
-}: TasksTableToolbarActionsProps) {
-    const nav = useNavigate()
+export function OrdersTableToolbarActions({ table }: TasksTableToolbarActionsProps) {
+  const nav = useNavigate();
   return (
     <div className="flex items-center gap-2">
-     
       {table.getFilteredSelectedRowModel().rows.length > 0 ? (
         <DeleteOrdersDialog
-          items={table
-            .getFilteredSelectedRowModel()
-            .rows.map((row) => row.original)}
+          items={table.getFilteredSelectedRowModel().rows.map((row) => row.original)}
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
       ) : null}
@@ -37,8 +32,8 @@ export function OrdersTableToolbarActions({
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "tasks",
-            excludeColumns: ["select", "actions"],
+            filename: 'tasks',
+            excludeColumns: ['select', 'actions'],
           })
         }
       >
@@ -60,5 +55,5 @@ export function OrdersTableToolbarActions({
        * For example, import, view, etc.
        */}
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-export interface Evaluation{
-    accountId?:number;
-    evaluation?:string;
-    price?:number;
-    consignmentId?:number;
-    files?:[];
+export interface Evaluation {
+  accountId?: number;
+  evaluation?: string;
+  price?: number;
+  consignmentId?: number;
+  files?: [];
 }

@@ -1,4 +1,4 @@
-import axios from "@/config/axiosConfig.ts";
+import axios from '@/config/axiosConfig.ts';
 import { Item, ItemStatus } from '@/models/Item';
 import { Page } from '@/models/Page';
 import { API_SERVER } from '@/constants/domain';
@@ -19,35 +19,27 @@ const baseUrl = `${API_SERVER}/items`;
 
 export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
   try {
-    const {
-      page=1,
-      size=10,
-      sort="createDate,desc",
-      order,
-      minPrice,
-      maxPrice,
-      status
-    } = input;
+    const { page = 1, size = 10, sort = 'createDate,desc', order, minPrice, maxPrice, status } = input;
 
     // Prepare query parameters
     const params: Record<string, any> = {
       page: page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
-      sort:sort,
+      sort: sort,
       minPrice,
       maxPrice,
       status: status ? status.toUpperCase() : undefined,
-      order
+      order,
     };
 
     // Make the API call
     const response = await axios.get<Page<Item>>(`${baseUrl}/`, {
-        headers:{
-            "Content-Type": "application/json",
-            "Authorization" : `Bearer ${getCookie("token")}`
-        },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getCookie('token')}`,
+      },
       params,
-    },);
+    });
 
     return response.data;
   } catch (err) {
@@ -56,20 +48,9 @@ export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
   }
 };
 
-export const getItemsByCategoryId = async (
-  categoryId: number,
-  input: GetItemsSchema
-): Promise<Page<Item>> => {
+export const getItemsByCategoryId = async (categoryId: number, input: GetItemsSchema): Promise<Page<Item>> => {
   try {
-    const {
-      page,
-      size,
-      sort = 'createDate',
-      order,
-      minPrice,
-      maxPrice,
-      status
-    } = input;
+    const { page, size, sort = 'createDate', order, minPrice, maxPrice, status } = input;
 
     const params: Record<string, any> = {
       page: page - 1,
@@ -78,7 +59,7 @@ export const getItemsByCategoryId = async (
       minPrice,
       maxPrice,
       status: status ? status.toUpperCase() : undefined,
-      order
+      order,
     };
 
     const response = await axios.get<Page<Item>>(`${baseUrl}/category/${categoryId}`, {
@@ -97,20 +78,14 @@ export const getItemsByName = async (
   input: Omit<GetItemsSchema, 'minPrice' | 'maxPrice'>
 ): Promise<Page<Item>> => {
   try {
-    const {
-      page,
-      size,
-      sort = 'createDate',
-      order,
-      status
-    } = input;
+    const { page, size, sort = 'createDate', order, status } = input;
 
     const params: Record<string, any> = {
       page: page - 1,
       size,
       sort,
       status: status ? status.toUpperCase() : undefined,
-      order
+      order,
     };
 
     const response = await axios.get<Page<Item>>(`${baseUrl}/search/${name}`, {
@@ -124,15 +99,11 @@ export const getItemsByName = async (
   }
 };
 
-export const getItemsByStatus = async (
-  status: ItemStatus,
-  page: number,
-  size: number
-): Promise<Page<Item>> => {
+export const getItemsByStatus = async (status: ItemStatus, page: number, size: number): Promise<Page<Item>> => {
   try {
     const params = {
       page: page - 1,
-      size
+      size,
     };
 
     const response = await axios.get<Page<Item>>(`${baseUrl}/status/${status}`, {
@@ -146,15 +117,11 @@ export const getItemsByStatus = async (
   }
 };
 
-export const getItemsByOwnerId = async (
-  ownerId: number,
-  page: number,
-  size: number
-): Promise<Page<Item>> => {
+export const getItemsByOwnerId = async (ownerId: number, page: number, size: number): Promise<Page<Item>> => {
   try {
     const params = {
       page: page - 1,
-      size
+      size,
     };
 
     const response = await axios.get<Page<Item>>(`${baseUrl}/owner/${ownerId}`, {

@@ -1,69 +1,48 @@
-import * as React from "react"
-import {
-  ArrowUpIcon,
-  CheckCircledIcon,
-  Cross2Icon,
-  DownloadIcon,
-  ReloadIcon,
-  TrashIcon,
-} from "@radix-ui/react-icons"
-import { SelectTrigger } from "@radix-ui/react-select"
-import { type Table } from "@tanstack/react-table"
-import { toast } from "sonner"
+import * as React from 'react';
+import { ArrowUpIcon, CheckCircledIcon, Cross2Icon, DownloadIcon, ReloadIcon, TrashIcon } from '@radix-ui/react-icons';
+import { SelectTrigger } from '@radix-ui/react-select';
+import { type Table } from '@tanstack/react-table';
+import { toast } from 'sonner';
 
-import { exportTableToCSV } from "@/lib/export"
-import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Kbd } from "@/components/kbd"
-import { fetchAccountsService } from "@/services/AccountsServices"
-import { AccountStatus } from "@/constants/enums"
+import { exportTableToCSV } from '@/lib/export';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Kbd } from '@/components/kbd';
+import { fetchAccountsService } from '@/services/AccountsServices';
+import { AccountStatus } from '@/constants/enums';
 
 // import { deleteitems, updateitems } from "../_lib/actions"
 
 interface consignmentsTableFloatingBarProps {
-  table: Table<ReturnType<typeof fetchAccountsService>>
+  table: Table<ReturnType<typeof fetchAccountsService>>;
 }
 
-
 export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatingBarProps) {
-  const rows = table.getFilteredSelectedRowModel().rows
- 
-  const [isPending, startTransition] = React.useTransition()
-  const [method, setMethod] = React.useState<
-    "update-status" | "update-priority" | "export" | "delete"
-  >()
+  const rows = table.getFilteredSelectedRowModel().rows;
+
+  const [isPending, startTransition] = React.useTransition();
+  const [method, setMethod] = React.useState<'update-status' | 'update-priority' | 'export' | 'delete'>();
 
   // Clear selection on Escape key press
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        table.toggleAllRowsSelected(false)
+      if (event.key === 'Escape') {
+        table.toggleAllRowsSelected(false);
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [table])
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [table]);
 
   return (
     <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit px-4">
       <div className="w-full overflow-x-auto">
         <div className="mx-auto flex w-fit items-center gap-2 rounded-md border bg-card p-2 shadow-2xl">
           <div className="flex h-7 items-center rounded-md border border-dashed pl-2.5 pr-1">
-            <span className="whitespace-nowrap text-xs">
-              {rows.length} selected
-            </span>
+            <span className="whitespace-nowrap text-xs">{rows.length} selected</span>
             <Separator orientation="vertical" className="ml-2 mr-1" />
             <Tooltip>
               <TooltipTrigger asChild>
@@ -73,10 +52,7 @@ export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatin
                   className="size-5 hover:border"
                   onClick={() => table.toggleAllRowsSelected(false)}
                 >
-                  <Cross2Icon
-                    className="size-3.5 shrink-0"
-                    aria-hidden="true"
-                  />
+                  <Cross2Icon className="size-3.5 shrink-0" aria-hidden="true" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent className="flex items-center border bg-accent px-2 py-1 font-semibold text-foreground dark:bg-zinc-900">
@@ -116,16 +92,10 @@ export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatin
                       className="size-7 border data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
                       disabled={isPending}
                     >
-                      {isPending && method === "update-status" ? (
-                        <ReloadIcon
-                          className="size-3.5 animate-spin"
-                          aria-hidden="true"
-                        />
+                      {isPending && method === 'update-status' ? (
+                        <ReloadIcon className="size-3.5 animate-spin" aria-hidden="true" />
                       ) : (
-                        <CheckCircledIcon
-                          className="size-3.5"
-                          aria-hidden="true"
-                        />
+                        <CheckCircledIcon className="size-3.5" aria-hidden="true" />
                       )}
                     </Button>
                   </TooltipTrigger>
@@ -137,11 +107,7 @@ export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatin
               <SelectContent align="center">
                 <SelectGroup>
                   {Object.keys(AccountStatus).map((status) => (
-                    <SelectItem
-                      key={status}
-                      value={status}
-                      className="capitalize"
-                    >
+                    <SelectItem key={status} value={status} className="capitalize">
                       {status}
                     </SelectItem>
                   ))}
@@ -155,22 +121,19 @@ export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatin
                   size="icon"
                   className="size-7 border"
                   onClick={() => {
-                    setMethod("export")
+                    setMethod('export');
 
                     startTransition(() => {
                       exportTableToCSV(table, {
-                        excludeColumns: ["select", "actions"],
+                        excludeColumns: ['select', 'actions'],
                         onlySelected: true,
-                      })
-                    })
+                      });
+                    });
                   }}
                   disabled={isPending}
                 >
-                  {isPending && method === "export" ? (
-                    <ReloadIcon
-                      className="size-3.5 animate-spin"
-                      aria-hidden="true"
-                    />
+                  {isPending && method === 'export' ? (
+                    <ReloadIcon className="size-3.5 animate-spin" aria-hidden="true" />
                   ) : (
                     <DownloadIcon className="size-3.5" aria-hidden="true" />
                   )}
@@ -186,28 +149,25 @@ export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatin
                   variant="secondary"
                   size="icon"
                   className="size-7 border"
-                //   onClick={() => {
-                //     setMethod("delete")
+                  //   onClick={() => {
+                  //     setMethod("delete")
 
-                //     startTransition(async () => {
-                //       const { error } = await deleteitems({
-                //         ids: rows.map((row) => row.original.id),
-                //       })
+                  //     startTransition(async () => {
+                  //       const { error } = await deleteitems({
+                  //         ids: rows.map((row) => row.original.id),
+                  //       })
 
-                //       if (error) {
-                //         return
-                //       }
+                  //       if (error) {
+                  //         return
+                  //       }
 
-                //       table.toggleAllRowsSelected(false)
-                //     })
-                //   }}
-                //   disabled={isPending}
+                  //       table.toggleAllRowsSelected(false)
+                  //     })
+                  //   }}
+                  //   disabled={isPending}
                 >
-                  {isPending && method === "delete" ? (
-                    <ReloadIcon
-                      className="size-3.5 animate-spin"
-                      aria-hidden="true"
-                    />
+                  {isPending && method === 'delete' ? (
+                    <ReloadIcon className="size-3.5 animate-spin" aria-hidden="true" />
                   ) : (
                     <TrashIcon className="size-3.5" aria-hidden="true" />
                   )}
@@ -221,5 +181,5 @@ export function ConsignmentsTableFloatingBar({ table }: consignmentsTableFloatin
         </div>
       </div>
     </div>
-  )
+  );
 }

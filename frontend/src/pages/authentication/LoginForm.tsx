@@ -1,21 +1,21 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { useAuth } from "@/AuthProvider";
-import { useLocation, useNavigate } from "react-router-dom";
-import { setCookie } from "@/utils/cookies";
-import { AccountStatus, Roles } from "@/constants/enums";
-import { toast } from "sonner";
-import axios from "@/config/axiosConfig.ts";
-import { Loader2 } from "lucide-react";
-import googleIcon from "../../assets/icons8-google.svg";
-import { AUTH_SERVER, SERVER_DOMAIN_URL } from "@/constants/domain";
-import { showErrorToast } from "@/lib/handle-error";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { useAuth } from '@/AuthProvider';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { setCookie } from '@/utils/cookies';
+import { AccountStatus, Roles } from '@/constants/enums';
+import { toast } from 'sonner';
+import axios from '@/config/axiosConfig.ts';
+import { Loader2 } from 'lucide-react';
+import googleIcon from '../../assets/icons8-google.svg';
+import { AUTH_SERVER, SERVER_DOMAIN_URL } from '@/constants/domain';
+import { showErrorToast } from '@/lib/handle-error';
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -25,7 +25,7 @@ type FormValues = {
 function LoginForm() {
   const location = useLocation();
   const navigate = useNavigate();
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || '/';
   const loginForm = useRef<HTMLDivElement>(null);
   const [isLogin, setIsLogin] = useState(false);
   const searchParams = new URLSearchParams(location.search);
@@ -35,35 +35,34 @@ function LoginForm() {
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     setIsLogin(true);
-    axios.post(`${AUTH_SERVER}/login`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      }
-    })
+    axios
+      .post(`${AUTH_SERVER}/login`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       .then((res) => {
         if (res.data.status == AccountStatus.DISABLED) {
-          setCookie("unactivated-user", JSON.stringify(res.data), 30000);
-          navigate("/auth/unactivated");
-          return
+          setCookie('unactivated-user', JSON.stringify(res.data), 30000);
+          navigate('/auth/unactivated');
+          return;
         }
         if (res.data.redirect2fa) {
-          navigate("/auth/verify-2fa");
-          return
+          navigate('/auth/verify-2fa');
+          return;
         }
         setIsLogin(false);
-        setCookie("token", res.data.accessToken, 30000);
-        setCookie("user", JSON.stringify(res.data), 30000);
+        setCookie('token', res.data.accessToken, 30000);
+        setCookie('user', JSON.stringify(res.data), 30000);
         auth.fetchProfile();
         if ([Roles.ADMIN, Roles.STAFF, Roles.MANAGER].includes(res.data.role)) {
-          navigate("/admin");
+          navigate('/admin');
         } else {
           navigate(from, { replace: true });
         }
-        toast.success("Logged in successfully!", {
-          
-        });
+        toast.success('Logged in successfully!', {});
       })
-      .catch(err => {
+      .catch((err) => {
         showErrorToast(err);
         setIsLogin(false);
       });
@@ -74,35 +73,34 @@ function LoginForm() {
       gsap.from(loginForm.current, {
         y: -100,
         duration: 2,
-        ease: "power2.inOut",
+        ease: 'power2.inOut',
       });
     },
     { scope: loginForm }
   );
 
   useEffect(() => {
-    console.log(token)
+    console.log(token);
     if (token !== null) {
-      axios.get(AUTH_SERVER + "/login-with-google?token=" + token)
-        .then(res => {
+      axios
+        .get(AUTH_SERVER + '/login-with-google?token=' + token)
+        .then((res) => {
           setIsLogin(false);
           console.log(res.data);
-          setCookie("token", res.data.accessToken, 30000);
-          setCookie("user", JSON.stringify(res.data), 30000);
+          setCookie('token', res.data.accessToken, 30000);
+          setCookie('user', JSON.stringify(res.data), 30000);
           auth.fetchProfile();
           if ([Roles.ADMIN, Roles.STAFF, Roles.MANAGER].includes(res.data.role)) {
-            navigate("/admin/accounts");
+            navigate('/admin/accounts');
           } else {
-            navigate(from, { replace: true, });
+            navigate(from, { replace: true });
           }
-          toast.success("Logged in successfully!", {
-            
-          });
+          toast.success('Logged in successfully!', {});
         })
-        .catch(err => {
+        .catch((err) => {
           showErrorToast(err);
           setIsLogin(false);
-        })
+        });
     }
   }, []);
 
@@ -113,21 +111,13 @@ function LoginForm() {
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardHeader className="">
-          <CardTitle className="text-4xl text-center text-bold">
-            Welcome Back 👋
-          </CardTitle>
+          <CardTitle className="text-4xl text-center text-bold">Welcome Back 👋</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                {...register("email")}
-                placeholder="m@example.com"
-                required
-              />
+              <Input id="email" type="email" {...register('email')} placeholder="m@example.com" required />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -136,27 +126,19 @@ function LoginForm() {
                   Forgot your password?
                 </a>
               </div>
-              <Input
-                id="password"
-                type="password"
-                {...register("password")}
-                required
-              />
+              <Input id="password" type="password" {...register('password')} required />
             </div>
 
-
-
-            {isLogin
-              ? <Button disabled className="bg-orange-600">
+            {isLogin ? (
+              <Button disabled className="bg-orange-600">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Please wait
               </Button>
-              : <Button
-                type="submit"
-                className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
-              >
+            ) : (
+              <Button type="submit" className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700">
                 Login
-              </Button>}
+              </Button>
+            )}
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?&nbsp;
@@ -175,7 +157,6 @@ function LoginForm() {
             Login with Google
           </Button>
         </CardContent>
-
       </form>
     </Card>
   );

@@ -1,161 +1,165 @@
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {changePassword} from "@/services/AuthService";
-import { useAuth } from "@/AuthProvider";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import {containsWhitespace} from "@/lib/validator.ts";
-import { showErrorToast } from "@/lib/handle-error";
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { changePassword } from '@/services/AuthService';
+import { useAuth } from '@/AuthProvider';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
+import { containsWhitespace } from '@/lib/validator.ts';
+import { showErrorToast } from '@/lib/handle-error';
 
-const formSchema = z.object({
-    oldPassword: z.string({
-        message: "Old password is required",
-    }).min(8, "Old password must contain at least 8 characters")
-      .max(50, "Old password must contain at most 50 characters"),
-    newPassword: z.string({
-        message: "New password is required",
-    }).min(8, "New password must contain at least 8 characters")
-      .max(30, "New password must contain at most 30 characters")
+const formSchema = z
+  .object({
+    oldPassword: z
+      .string({
+        message: 'Old password is required',
+      })
+      .min(8, 'Old password must contain at least 8 characters')
+      .max(50, 'Old password must contain at most 50 characters'),
+    newPassword: z
+      .string({
+        message: 'New password is required',
+      })
+      .min(8, 'New password must contain at least 8 characters')
+      .max(30, 'New password must contain at most 30 characters')
       .refine((val) => !containsWhitespace(val), {
-          message: "Password should not contain spaces.",
+        message: 'Password should not contain spaces.',
       }),
     confirmPassword: z.string(),
-}).superRefine((data, ctx) => {
+  })
+  .superRefine((data, ctx) => {
     if (data.oldPassword === data.newPassword) {
-        ctx.addIssue({
-            path: ["newPassword"],
-            message: "New password is the same as the old one",
-            code: "custom",
-        });
+      ctx.addIssue({
+        path: ['newPassword'],
+        message: 'New password is the same as the old one',
+        code: 'custom',
+      });
     }
     if (data.newPassword !== data.confirmPassword) {
-        ctx.addIssue({
-            path: ["confirmPassword"],
-            message: "Passwords do not match",
-            code: "custom",
-        });
+      ctx.addIssue({
+        path: ['confirmPassword'],
+        message: 'Passwords do not match',
+        code: 'custom',
+      });
     }
-});
+  });
 
 export default function ChangePassword({ setIsLoading, isLoading }) {
-    const auth = useAuth()
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            oldPassword: "",
-            newPassword: "",
-            confirmPassword: "",
-        },
-    })
+  const auth = useAuth();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        setIsLoading(true)
-        const changePasswordPromise = changePassword(auth?.user?.accountId, values)
-        
-        toast.promise(changePasswordPromise, {
-            loading: 'Changing password...',
-            success: () => {
-                setIsLoading(false)
-                form.reset({
-                    oldPassword: "",
-                    newPassword: "",
-                    confirmPassword: "",
-                });
-                return 'Password changed successfully!';
-            },
-            error: (err) => showErrorToast(err),
-        })
-        
-        // .then(res => {
-        //     console.log(res)
-        //     setIsLoading(false)
-        //     toast.success('Password changed successfully!',{
-        //         position:"bottom-right",
-        //     })
-        //     form.reset({
-        //         oldPassword: "",
-        //         newPassword: "",
-        //         confirmPassword: "",
-        //     });
-        // }).catch(err => {
-        //     showErrorToast(err);
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    const changePasswordPromise = changePassword(auth?.user?.accountId, values);
 
-        //     console.log(err)
-        //     setIsLoading(false)
-        // })
-    }
+    toast.promise(changePasswordPromise, {
+      loading: 'Changing password...',
+      success: () => {
+        setIsLoading(false);
+        form.reset({
+          oldPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+        return 'Password changed successfully!';
+      },
+      error: (err) => showErrorToast(err),
+    });
 
-    return <>
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Change Password</CardTitle>
-                        <CardDescription>
-                            Update your password.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="oldPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Current Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="Enter current password" {...field} />
-                                    </FormControl>
+    // .then(res => {
+    //     console.log(res)
+    //     setIsLoading(false)
+    //     toast.success('Password changed successfully!',{
+    //         position:"bottom-right",
+    //     })
+    //     form.reset({
+    //         oldPassword: "",
+    //         newPassword: "",
+    //         confirmPassword: "",
+    //     });
+    // }).catch(err => {
+    //     showErrorToast(err);
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="newPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>New Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="Enter new password" {...field} />
-                                    </FormControl>
+    //     console.log(err)
+    //     setIsLoading(false)
+    // })
+  }
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Confirm Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="Confirm new password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </CardContent>
-                    <CardFooter>
-                        {
-                            isLoading ?
-                                <Button disabled>
-                                    <Loader2 className="animate-spin" />
-                                </Button>
-                                : <Button type="submit">Change Password</Button>
-                        }
+  return (
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Change Password</CardTitle>
+              <CardDescription>Update your password.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="oldPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter current password" {...field} />
+                    </FormControl>
 
-                    </CardFooter>
-                </Card>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter new password" {...field} />
+                    </FormControl>
 
-            </form>
-        </Form>
-    </>;
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Confirm new password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+            <CardFooter>
+              {isLoading ? (
+                <Button disabled>
+                  <Loader2 className="animate-spin" />
+                </Button>
+              ) : (
+                <Button type="submit">Change Password</Button>
+              )}
+            </CardFooter>
+          </Card>
+        </form>
+      </Form>
+    </>
+  );
 }

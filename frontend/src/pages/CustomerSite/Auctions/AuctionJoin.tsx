@@ -8,19 +8,19 @@ import { getCookie } from '@/utils/cookies';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { fetchBidsByAuctionId, fetchBidsByAuctionItemId } from '@/services/BidsService';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import Autoplay from "embla-carousel-autoplay"
-import { toast } from "sonner";
+import Autoplay from 'embla-carousel-autoplay';
+import { toast } from 'sonner';
 import { set } from 'date-fns';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
-import { useCurrency } from "@/CurrencyProvider.tsx";
+import { useCurrency } from '@/CurrencyProvider.tsx';
 import PlaceBid from './components/PlaceBid';
 import { fetchAuctionSessionById } from '@/services/AuctionSessionService';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import CountDownTime from '@/components/countdownTimer/CountDownTime';
-import "yet-another-react-lightbox/styles.css";
+import 'yet-another-react-lightbox/styles.css';
 
-import "yet-another-react-lightbox/plugins/thumbnails.css";
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import ImageGallery from './components/ImageGallery';
 import { ArrowBigUp, HashIcon, Timer } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +30,6 @@ import { AuctionSessionStatus } from '@/constants/enums';
 import { Item } from '@/models/newModel/item';
 import { AuctionItem } from '@/models/newModel/auctionItem';
 import Confetti from 'react-confetti-boom';
-
 
 export default function AuctionJoin() {
   const currency = useCurrency();
@@ -48,7 +47,7 @@ export default function AuctionJoin() {
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
   const [isJoin, setIsJoin] = useState(true);
-  const auctionSession = useAppSelector(state => state.auctionSessions.currentAuctionSession);
+  const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSending, setIsSending] = useState(false);
@@ -56,19 +55,18 @@ export default function AuctionJoin() {
   let timer;
 
   useEffect(() => {
-
-    if (!getCookie("user")) {
+    if (!getCookie('user')) {
       setAllow(false);
       return;
     }
-    if (accountId === null && getCookie("user")) {
-      setAccountId(JSON.parse(getCookie("user"))?.id);
+    if (accountId === null && getCookie('user')) {
+      setAccountId(JSON.parse(getCookie('user'))?.id);
     }
     window.onpopstate = function () {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
-    if (getCookie("user") && JSON.parse(getCookie("user")) && allow !== false) {
+    if (getCookie('user') && JSON.parse(getCookie('user')) && allow !== false) {
       setAllow(true);
     } else {
       setAllow(false);
@@ -76,14 +74,15 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    if (allow === false || !getCookie("user")) {
+    if (allow === false || !getCookie('user')) {
       setIsJoin(false);
       setClient(null);
       toast.dismiss();
       return;
     }
     const newClient = new Client({
-      brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
+      brokerURL:
+        `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
 
       onConnect: () => {
         newClient.subscribe('/topic/public/' + auctionId, onMessageReceived);
@@ -93,13 +92,14 @@ export default function AuctionJoin() {
             body: JSON.stringify({
               auctionItemId: location.state.id,
               payment: {
-                accountId: JSON.parse(getCookie("user")).id
-              }
-            })
+                accountId: JSON.parse(getCookie('user')).id,
+              },
+            }),
           });
           setIsJoin(false);
         }, 10);
-      }, onDisconnect: () => {
+      },
+      onDisconnect: () => {
         console.log('Disconnected');
         clearTimeout(timer);
       },
@@ -119,16 +119,12 @@ export default function AuctionJoin() {
     };
   }, [allow]);
 
-
-
   const onMessageReceived = (payload: IMessage) => {
     setIsJoin(false);
     console.log(payload);
 
-    if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
-      toast.error(payload.body.split(":")[0], {
-
-      });
+    if (payload.body.split(':')[payload.body.split(':').length - 1] == 'ERROR') {
+      toast.error(payload.body.split(':')[0], {});
       client?.forceDisconnect();
       client?.deactivate({ force: true });
       setClient(null);
@@ -137,21 +133,16 @@ export default function AuctionJoin() {
       return;
     }
     if (JSON.parse(payload.body).statusCodeValue == 400) {
-      if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
-        toast.error(JSON.parse(payload.body)?.body?.message, {
-
-        });
+      if (payload.headers['message-id'].includes(JSON.parse(payload.body).body?.id)) {
+        toast.error(JSON.parse(payload.body)?.body?.message, {});
         setIsSending(false);
       }
       return;
     }
     const message = JSON.parse(payload.body).body;
     console.log(message);
-    if (message?.status == "JOIN" || message?.status == "BID") {
-      if (message?.status == "BID")
-        toast.info(message?.message, {
-
-        });
+    if (message?.status == 'JOIN' || message?.status == 'BID') {
+      if (message?.status == 'BID') toast.info(message?.message, {});
       setIsSending(false);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
@@ -164,9 +155,7 @@ export default function AuctionJoin() {
     if (client != null) {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
-        toast.error("Please enter a valid number", {
-
-        });
+        toast.error('Please enter a valid number', {});
         return;
       }
       client.publish({
@@ -174,245 +163,275 @@ export default function AuctionJoin() {
         body: JSON.stringify({
           auctionItemId: location.state.id,
           payment: {
-            accountId: JSON.parse(getCookie("user")).id,
-            paymentAmount: paymentAmount
-          }
-        })
+            accountId: JSON.parse(getCookie('user')).id,
+            paymentAmount: paymentAmount,
+          },
+        }),
       });
       (document.getElementById('price') as HTMLInputElement).value = '';
     }
-
   };
 
   useEffect(() => {
-    fetchBidsByAuctionId(auctionId).then((res) => {
-      console.log(res);
-      setBids(res.data);
-      bids.sort((a, b) => { return a.price - b.price });
-    }).catch((err) => {
-      console.log(err);
-    });
-
+    fetchBidsByAuctionId(auctionId)
+      .then((res) => {
+        console.log(res);
+        setBids(res.data);
+        bids.sort((a, b) => {
+          return a.price - b.price;
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [price]);
   useEffect(() => {
     if (!auctionSession) {
-      fetchAuctionSessionById(auctionId).then((res) => {
-        dispatch(setCurrentAuctionSession(res?.data));
-        console.log("reload in ", new Date(res?.data?.endDate).getTime() - new Date().getTime());
-        if (new Date(res?.data?.endDate) > new Date()) {
-          console.log("reload in ", new Date(res?.data?.endDate).getTime() - new Date().getTime());
-          timer = setTimeout(() => {
+      fetchAuctionSessionById(auctionId)
+        .then((res) => {
+          dispatch(setCurrentAuctionSession(res?.data));
+          console.log('reload in ', new Date(res?.data?.endDate).getTime() - new Date().getTime());
+          if (new Date(res?.data?.endDate) > new Date()) {
+            console.log('reload in ', new Date(res?.data?.endDate).getTime() - new Date().getTime());
+            timer = setTimeout(
+              () => {
+                console.log('Reloading...');
+                window.location.reload();
+              },
+              new Date(res?.data?.endDate).getTime() - new Date().getTime() - 500
+            );
+          } else {
+            setAllow(false);
+            setShowCofetti(true);
+            setTimeout(() => {
+              setShowCofetti(false);
+            }, 5000);
+          }
+          if (new Date(res?.data?.startDate) > new Date()) {
+            console.log('reload in ', new Date(res?.data?.startDate).getTime() - new Date().getTime());
+            setTimeout(
+              () => {
+                if (
+                  res?.data?.deposits?.filter(
+                    (deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id
+                  ).length > 0
+                ) {
+                  window.location.reload();
+                }
+              },
+              new Date(res?.data?.startDate).getTime() - new Date().getTime() - 100
+            );
+          } else if (new Date(res?.data?.endDate) > new Date()) {
+            setAllow(
+              res?.data?.deposits?.filter((deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id)
+                .length > 0
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log('reload in ', new Date(auctionSession?.endDate).getTime() - new Date().getTime());
+      if (new Date(auctionSession?.endDate) > new Date()) {
+        console.log('reload in ', new Date(auctionSession?.endDate).getTime() - new Date().getTime());
+        timer = setTimeout(
+          () => {
             console.log('Reloading...');
             window.location.reload();
-          }, (new Date(res?.data?.endDate).getTime() - new Date().getTime() - 500));
-        } else {
-          setAllow(false);
-          setShowCofetti(true);
-          setTimeout(() => {
-            setShowCofetti(false);
-          }, 5000)
-        }
-        if (new Date(res?.data?.startDate) > new Date()) {
-          console.log("reload in ", new Date(res?.data?.startDate).getTime() - new Date().getTime());
-          setTimeout(() => {
-            if (res?.data?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0) {
-              window.location.reload()
-            }
-          }, (new Date(res?.data?.startDate).getTime() - new Date().getTime() - 100));
-        } else if (new Date(res?.data?.endDate) > new Date()) {
-          setAllow(res?.data?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0)
-        }
-      }).catch((err) => {
-        console.log(err);
-      })
-    } else {
-      console.log("reload in ", new Date(auctionSession?.endDate).getTime() - new Date().getTime());
-      if (new Date(auctionSession?.endDate) > new Date()) {
-        console.log("reload in ", new Date(auctionSession?.endDate).getTime() - new Date().getTime());
-        timer = setTimeout(() => {
-          console.log('Reloading...');
-          window.location.reload();
-        }, (new Date(auctionSession?.endDate).getTime() - new Date().getTime() - 500));
+          },
+          new Date(auctionSession?.endDate).getTime() - new Date().getTime() - 500
+        );
       } else {
         setAllow(false);
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);
-        }, 5000)
+        }, 5000);
       }
       if (new Date(auctionSession?.startDate) > new Date()) {
-        console.log("reload in ", new Date(auctionSession?.startDate).getTime() - new Date().getTime());
-        setTimeout(() => {
-          if (auctionSession?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0) {
-            window.location.reload()
-          }
-        }, (new Date(auctionSession?.startDate).getTime() - new Date().getTime() - 100));
+        console.log('reload in ', new Date(auctionSession?.startDate).getTime() - new Date().getTime());
+        setTimeout(
+          () => {
+            if (
+              auctionSession?.deposits?.filter(
+                (deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id
+              ).length > 0
+            ) {
+              window.location.reload();
+            }
+          },
+          new Date(auctionSession?.startDate).getTime() - new Date().getTime() - 100
+        );
       } else if (new Date(auctionSession?.endDate) > new Date()) {
-        setAllow(auctionSession?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0)
+        setAllow(
+          auctionSession?.deposits?.filter((deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id)
+            .length > 0
+        );
       }
     }
-  }, [])
+  }, []);
   const handleViewItemDetailsClick = async (item: AuctionItem) => {
     // console.log(item, auctionId, bidders.includes(userId));
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
     if (itemDTO.itemId !== item.itemDTO.itemId) {
-
       setItemDTO(item.itemDTO);
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     } else {
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
-
-
-  }
+  };
 
   return (
     <>
-      {
-        showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] && <div className='fixed z-10 bg-red-200/15 w-full h-full'>
-          <Confetti mode='fall' colors={['#ff577f', '#ff884b']} />
-          <Card className='w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+      {showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] && (
+        <div className="fixed z-10 bg-red-200/15 w-full h-full">
+          <Confetti mode="fall" colors={['#ff577f', '#ff884b']} />
+          <Card className="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <CardHeader>
               <CardTitle>Congratulations</CardTitle>
             </CardHeader>
             <CardContent>
               {bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.nickname} won the auction
-              <p className='text-foreground font-semibold'>{currency.format(bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price)}</p>
+              <p className="text-foreground font-semibold">
+                {currency.format(bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price)}
+              </p>
             </CardContent>
           </Card>
         </div>
-      }
-      {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
-        auctionSession != undefined ?
-          <div className="flex flex-col min-h-screen container p-3 gap-10">
-            <section className="justify-center items-center  w-full h-fit ">
-              <h1 className=" text-2lg font-bold   ">
-                {itemDTO.name}
-              </h1>
-              <div className='flex flex-wrap justify-between items-center drop-shadow-xl'>
-                <div className=' w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 '>
-                  <ImageGallery itemDTO={itemDTO} />
-                </div>
-                <div className=' w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start'>
-                  <h2 className='text-lg font-semibold'>Bids</h2>
-                  <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
-                    {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId).map((bid) => (
-                      <div className="flex items-center justify-between" key={bid?.bidId}>
-                        <div className="flex items-center gap-2">
-                          <Avatar className="w-8 h-8 border">
-                            <img src={bid?.account.avatar?.link} alt="@username" />
-                            <AvatarFallback>N/A</AvatarFallback>
-                          </Avatar>
-                          <p>{bid?.account.nickname}</p>
+      )}
+      {isJoin ? (
+        <LoadingAnimation message="Please wait, Joining auction..." />
+      ) : auctionSession != undefined ? (
+        <div className="flex flex-col min-h-screen container p-3 gap-10">
+          <section className="justify-center items-center  w-full h-fit ">
+            <h1 className=" text-2lg font-bold   ">{itemDTO.name}</h1>
+            <div className="flex flex-wrap justify-between items-center drop-shadow-xl">
+              <div className=" w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 ">
+                <ImageGallery itemDTO={itemDTO} />
+              </div>
+              <div className=" w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start">
+                <h2 className="text-lg font-semibold">Bids</h2>
+                <ScrollArea className="h-48 overflow-hidden p-4 w-full">
+                  {!bids ? (
+                    <div className="m-auto w-full h-full">no bidder </div>
+                  ) : (
+                    bids
+                      ?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)
+                      .map((bid) => (
+                        <div className="flex items-center justify-between" key={bid?.bidId}>
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-8 h-8 border">
+                              <img src={bid?.account.avatar?.link} alt="@username" />
+                              <AvatarFallback>N/A</AvatarFallback>
+                            </Avatar>
+                            <p>{bid?.account.nickname}</p>
+                          </div>
+                          <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
                         </div>
-                        <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
-                      </div>
+                      ))
+                  )}
+                </ScrollArea>
+                {allow ? (
+                  <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
+                    <BidsInformation
+                      auctionSession={auctionSession}
+                      price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0}
+                      bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
+                    />
+                    <div className="mx-auto">
+                      <PlaceBid
+                        auctionId={auctionId}
+                        itemId={itemDTO?.itemId}
+                        setIsSending={setIsSending}
+                        isSending={isSending}
+                        sendMessage={sendMessage}
+                        onMessageReceived={onMessageReceived}
+                        endDate={auctionSession?.endDate} // Added optional chaining for safety
+                        name={itemDTO?.name}
+                        image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                        client={client}
+                        currentBid={
+                          bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price ||
+                          itemDTO?.reservePrice // Check if bids is defined and not empty
+                        }
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-12 md:mt-16 lg:mt-20 container">
+                    <div className="drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5">
+                      <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                    </div>
+                    <div className="grid gap-4 ">
+                      <Link to={`/auctions/${auctionId}`}>
+                        <Button type="submit" className="w-full">
+                          Go to Auction
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+          <section className=" justify-center items-center  w-full h-full mt-11 ">
+            <div className="flex gap-2 flex-wrap ">
+              <div className="basis-full md:basis-4/6 gap-1/6 h-fit">
+                <h1 className=" text-2lg font-bold  mb-9  ">Item Description</h1>
+                <div className="  " dangerouslySetInnerHTML={{ __html: itemDTO?.description }} />
+              </div>
+              <div className="basis-full md:basis-1/6 fixed left-0 top-0">
+                <h1 className=" text-2lg font-bold  mb-9  text-center ">Other Item in this Auction</h1>
+                <div className="flex gap-2 flex-col items-center">
+                  <ScrollArea className="h-screen overflow-hidden p-4 w-full">
+                    {auctionSession.auctionItems.map((item) => (
+                      <Card className="w-80 h-fit max-w-[360px]">
+                        <CardHeader>
+                          <img
+                            src={
+                              item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
+                                ? item.itemDTO.attachments[0].link
+                                : ''
+                            }
+                            alt="item"
+                            className="w-[360px]"
+                          />
+                        </CardHeader>
+                        <CardContent>
+                          <h1 className="text-lg font-semibold">{item.itemDTO.name}</h1>
+                          <BidsInformation
+                            auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
+                            price={
+                              bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)[0]?.price || 0
+                            } // Use optional chaining and provide a default value of 0 if highestBid is undefined
+                            bids={bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)} // Use optional chaining for numberOfBids
+                          />
+                          <CardFooter>
+                            <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item)}>
+                              Join
+                            </Button>
+                          </CardFooter>
+                        </CardContent>
+                      </Card>
                     ))}
                   </ScrollArea>
-                  {allow ?
-                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
-                      <BidsInformation auctionSession={auctionSession} price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0} bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)} />
-                      <div className='mx-auto'>
-                        <PlaceBid
-                          auctionId={auctionId}
-                          itemId={itemDTO?.itemId}
-                          setIsSending={setIsSending}
-                          isSending={isSending}
-                          sendMessage={sendMessage}
-                          onMessageReceived={onMessageReceived}
-                          endDate={auctionSession?.endDate} // Added optional chaining for safety
-                          name={itemDTO?.name}
-                          image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
-                          client={client}
-                          currentBid={
-                            (bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || itemDTO?.reservePrice) // Check if bids is defined and not empty
-                          }
-                        />
-                      </div>
-
-                    </div>
-
-                    :
-                    <div className="mt-12 md:mt-16 lg:mt-20 container">
-                      <div className='drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5' >
-                        <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                      </div>
-                      <div className="grid gap-4 ">
-                        <Link to={`/auctions/${auctionId}`} >
-                          <Button type="submit" className="w-full">
-                            Go to Auction
-                          </Button>
-                        </Link>
-
-                      </div>
-                    </div>
-                  }
-
-                </div>
-
-              </div>
-            </section>
-            <section className=" justify-center items-center  w-full h-full mt-11 " >
-              <div className='flex gap-2 flex-wrap '>
-                <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
-                  <h1 className=" text-2lg font-bold  mb-9  ">
-                    Item Description
-                  </h1>
-                  <div className="  "
-                    dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
-                  />
-                </div>
-                <div className='basis-full md:basis-1/6 fixed left-0 top-0'>
-                  <h1 className=" text-2lg font-bold  mb-9  text-center ">
-                    Other Item in this Auction
-                  </h1>
-                  <div className='flex gap-2 flex-col items-center'>
-                    <ScrollArea className="h-screen overflow-hidden p-4 w-full" >
-                    {
-                      auctionSession.auctionItems.map((item) => (
-                        <Card className='w-80 h-fit max-w-[360px]'>
-                          <CardHeader>
-                            <img src={item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0 ? item.itemDTO.attachments[0].link : ""} alt="item" className='w-[360px]' />
-                          </CardHeader>
-                          <CardContent>
-                            <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
-                            <BidsInformation
-                              auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
-                              price={bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)[0]?.price || 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
-                              bids={bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)} // Use optional chaining for numberOfBids
-                            />
-                            <CardFooter>
-
-                              <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item)}>
-                                Join
-                              </Button>
-                            </CardFooter>
-                          </CardContent>
-
-                        </Card>
-                      ))
-                    }
-                    </ScrollArea>
-                  </div>
-
-
                 </div>
               </div>
-
-            </section>
-
-
-          </div > : <LoadingAnimation message='Please wait, Joining auction...' />
-      }
+            </div>
+          </section>
+        </div>
+      ) : (
+        <LoadingAnimation message="Please wait, Joining auction..." />
+      )}
     </>
-
   );
 }

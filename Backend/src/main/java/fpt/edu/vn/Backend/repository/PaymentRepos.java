@@ -25,4 +25,7 @@ public interface PaymentRepos extends JpaRepository<Payment, Integer> {
 
 
     Page<Payment> findAllByType(Payment.Type type, Pageable pageable);
+
+    List<Payment> findAllByAccount_Email(String email);
+
 }

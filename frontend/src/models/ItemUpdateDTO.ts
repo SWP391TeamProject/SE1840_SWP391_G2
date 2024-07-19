@@ -1,4 +1,4 @@
-import {ItemStatus} from "@/models/Item.ts";
+import { ItemStatus } from '@/models/Item.ts';
 
 export interface ItemUpdateDTO {
   itemId?: number;

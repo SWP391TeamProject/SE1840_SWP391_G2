@@ -1,11 +1,11 @@
-import axios from "@/config/axiosConfig";
-import {API_SERVER} from "@/constants/domain";
+import axios from '@/config/axiosConfig';
+import { API_SERVER } from '@/constants/domain';
 
-const baseUrl = API_SERVER + "/currency";
+const baseUrl = API_SERVER + '/currency';
 
 const currencyHeader = {
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     // "Access-Control-Allow-Origin": "*"
   },
 };

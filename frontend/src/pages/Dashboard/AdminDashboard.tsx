@@ -1,76 +1,76 @@
-import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
-import Avatar from "@mui/material/Avatar";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
 //project import
-import MainCard from "./MainCard";
-import AnalyticEcommerce from "../../components/component/AnalyticEcommerce";
-import PaymentsBarChart from "./PaymentsBarChart";
+import MainCard from './MainCard';
+import AnalyticEcommerce from '../../components/component/AnalyticEcommerce';
+import PaymentsBarChart from './PaymentsBarChart';
 // import ReportAreaChart from "../../pages/Dashboard/ReportAreaChart";
-import UniqueVisitorCard from "@/pages/Dashboard/UniqueVisitorCard";
-import PastAuctionReportCard from "./PastAuctionReportCard";
+import UniqueVisitorCard from '@/pages/Dashboard/UniqueVisitorCard';
+import PastAuctionReportCard from './PastAuctionReportCard';
 // import GeolocationMap from "./GeolocationMap";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   getPaymentByStatus,
   getTotalItemSold,
   getTotalOrder,
   getTotalSale,
   getUserThisMonth,
-} from "@/services/StatisticServices";
+} from '@/services/StatisticServices';
 
 const avatarSX = {
   width: 36,
   height: 36,
-  fontSize: "1rem",
+  fontSize: '1rem',
 };
 
 const actionSX = {
   mt: 0.75,
   ml: 1,
-  top: "auto",
-  right: "auto",
-  alignSelf: "flex-start",
-  transform: "none",
+  top: 'auto',
+  right: 'auto',
+  alignSelf: 'flex-start',
+  transform: 'none',
 };
 
 const status = [
   {
-    value: "WITHDRAW",
-    label: "WITHDRAW",
+    value: 'WITHDRAW',
+    label: 'WITHDRAW',
   },
   {
-    value: "DEPOSIT",
-    label: "DEPOSIT",
+    value: 'DEPOSIT',
+    label: 'DEPOSIT',
   },
   {
-    value: "AUCTION_DEPOSIT",
-    label: "AUCTION_DEPOSIT",
+    value: 'AUCTION_DEPOSIT',
+    label: 'AUCTION_DEPOSIT',
   },
   {
-    value: "AUCTION_BID",
-    label: "AUCTION_BID",
+    value: 'AUCTION_BID',
+    label: 'AUCTION_BID',
   },
   {
-    value: "AUCTION_ORDER",
-    label: "AUCTION_ORDER",
+    value: 'AUCTION_ORDER',
+    label: 'AUCTION_ORDER',
   },
   {
-    value: "AUCTION_DEPOSIT_REFUND",
-    label: "AUCTION_DEPOSIT_REFUND",
+    value: 'AUCTION_DEPOSIT_REFUND',
+    label: 'AUCTION_DEPOSIT_REFUND',
   },
   {
-    value: "CONSIGNMENT_REWARD",
-    label: "CONSIGNMENT_REWARD",
+    value: 'CONSIGNMENT_REWARD',
+    label: 'CONSIGNMENT_REWARD',
   },
 ];
 
@@ -107,10 +107,7 @@ const AdminDashboard = () => {
 
         const paymentWithdrawResponse = await getPaymentByStatus(selectedLabel);
         if (Array.isArray(paymentWithdrawResponse)) {
-          const totalPayment = paymentWithdrawResponse.reduce(
-            (sum, item) => sum + item.totalAmount,
-            0
-          );
+          const totalPayment = paymentWithdrawResponse.reduce((sum, item) => sum + item.totalAmount, 0);
           setTotalPayment(totalPayment);
         }
 
@@ -120,7 +117,7 @@ const AdminDashboard = () => {
           setTotalSale(totalSaleResponse.data);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
@@ -129,8 +126,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-10">
-
-
       <Grid container rowSpacing={4.5} columnSpacing={2.75}>
         {/* row 1 */}
         {/* <Grid item xs={12} sx={{ mb: -2.25 }}>
@@ -140,14 +135,14 @@ const AdminDashboard = () => {
           <AnalyticEcommerce
             title="Total Item Sold"
             count={totalItem.toLocaleString()}
-          // percentage={59.3}
+            // percentage={59.3}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <AnalyticEcommerce
             title="This Month New Users"
             count={newUsersThisMonth.toLocaleString()}
-          // percentage={20.5}
+            // percentage={20.5}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -169,11 +164,7 @@ const AdminDashboard = () => {
           />
         </Grid>
 
-        <Grid
-          item
-          md={8}
-          sx={{ display: { sm: "none", md: "block", lg: "none" } }}
-        />
+        <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
 
         {/* row 2 */}
         <Grid item xs={12} md={7} lg={8}>
@@ -194,7 +185,7 @@ const AdminDashboard = () => {
                 value={selectedLabel}
                 onChange={handleChange}
                 sx={{
-                  "& .MuiInputBase-input": { py: 0.75, fontSize: "0.875rem" },
+                  '& .MuiInputBase-input': { py: 0.75, fontSize: '0.875rem' },
                 }}
               >
                 {status.map((option) => (
@@ -211,9 +202,7 @@ const AdminDashboard = () => {
                 <Typography variant="h6" color="text.secondary">
                   This Year Statistics
                 </Typography>
-                <Typography variant="h3">
-                  ${totalPayment.toLocaleString()}
-                </Typography>
+                <Typography variant="h3">${totalPayment.toLocaleString()}</Typography>
               </Stack>
             </Box>
             <PaymentsBarChart selectedLabel={selectedLabel} />
@@ -264,28 +253,22 @@ const AdminDashboard = () => {
               sx={{
                 px: 0,
                 py: 0,
-                "& .MuiListItemButton-root": {
+                '& .MuiListItemButton-root': {
                   py: 1.5,
-                  "& .MuiAvatar-root": avatarSX,
-                  "& .MuiListItemSecondaryAction-root": {
+                  '& .MuiAvatar-root': avatarSX,
+                  '& .MuiListItemSecondaryAction-root': {
                     ...actionSX,
-                    position: "relative",
+                    position: 'relative',
                   },
                 },
               }}
             >
               <ListItemButton divider>
                 <ListItemAvatar>
-                  <Avatar
-                    sx={{ color: "success.main", bgcolor: "success.lighter" }}
-                  >
-                    {/* <GiftOutlined /> */}
-                  </Avatar>
+                  <Avatar sx={{ color: 'success.main', bgcolor: 'success.lighter' }}>{/* <GiftOutlined /> */}</Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={
-                    <Typography variant="subtitle1">Order #002434</Typography>
-                  }
+                  primary={<Typography variant="subtitle1">Order #002434</Typography>}
                   secondary="Today, 2:00 AM"
                 />
                 <ListItemSecondaryAction>
@@ -301,16 +284,12 @@ const AdminDashboard = () => {
               </ListItemButton>
               <ListItemButton divider>
                 <ListItemAvatar>
-                  <Avatar
-                    sx={{ color: "primary.main", bgcolor: "primary.lighter" }}
-                  >
+                  <Avatar sx={{ color: 'primary.main', bgcolor: 'primary.lighter' }}>
                     {/* <MessageOutlined /> */}
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={
-                    <Typography variant="subtitle1">Order #984947</Typography>
-                  }
+                  primary={<Typography variant="subtitle1">Order #984947</Typography>}
                   secondary="5 August, 1:45 PM"
                 />
                 <ListItemSecondaryAction>
@@ -326,14 +305,10 @@ const AdminDashboard = () => {
               </ListItemButton>
               <ListItemButton>
                 <ListItemAvatar>
-                  <Avatar sx={{ color: "error.main", bgcolor: "error.lighter" }}>
-                    {/* <SettingOutlined /> */}
-                  </Avatar>
+                  <Avatar sx={{ color: 'error.main', bgcolor: 'error.lighter' }}>{/* <SettingOutlined /> */}</Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={
-                    <Typography variant="subtitle1">Order #988784</Typography>
-                  }
+                  primary={<Typography variant="subtitle1">Order #988784</Typography>}
                   secondary="7 hours ago"
                 />
                 <ListItemSecondaryAction>
@@ -350,7 +325,6 @@ const AdminDashboard = () => {
             </List>
           </MainCard>
         </Grid>
-
 
         {/* grid bracket */}
       </Grid>

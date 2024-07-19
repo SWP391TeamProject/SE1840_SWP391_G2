@@ -68,9 +68,7 @@ export const getColumns = (): ColumnDef<Transaction>[] => [
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       return (
-        <Badge 
-          variant={status === 'SUCCESS' ? 'default' : status === 'PENDING' ? 'secondary' : 'destructive'}
-        >
+        <Badge variant={status === 'SUCCESS' ? 'default' : status === 'PENDING' ? 'secondary' : 'destructive'}>
           {status}
         </Badge>
       );

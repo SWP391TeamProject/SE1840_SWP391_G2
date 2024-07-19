@@ -1,16 +1,19 @@
-import "./styles.css";
+import './styles.css';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Link } from 'react-router-dom';
+import { Button } from '../ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import {
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
-import { Button } from "../ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "../ui/navigation-menu";
-import { useAuth } from "@/AuthProvider.tsx";
-import { MenuIcon } from "lucide-react";
-import logo from "@/assets/icon.png";
-import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
-
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from '../ui/navigation-menu';
+import { useAuth } from '@/AuthProvider.tsx';
+import { MenuIcon } from 'lucide-react';
+import logo from '@/assets/icon.png';
+import ProfileDropdownMenu from '@/components/NavBar/ProfileDropdownMenu.tsx';
 
 export default function DashBoardNavBar() {
   const auth = useAuth();
@@ -28,39 +31,46 @@ export default function DashBoardNavBar() {
           <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink asChild >
-                  <Link to="/dashboard" className={navigationMenuTriggerStyle()}>Home</Link>
+                <NavigationMenuLink asChild>
+                  <Link to="/dashboard" className={navigationMenuTriggerStyle()}>
+                    Home
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink asChild >
-                  <Link to="/dashboard/consignments" className={navigationMenuTriggerStyle()}>Consignments</Link>
+                <NavigationMenuLink asChild>
+                  <Link to="/dashboard/consignments" className={navigationMenuTriggerStyle()}>
+                    Consignments
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink asChild >
-                  <Link to="/dashboard/bids" className={navigationMenuTriggerStyle()}>Bids</Link>
+                <NavigationMenuLink asChild>
+                  <Link to="/dashboard/bids" className={navigationMenuTriggerStyle()}>
+                    Bids
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink asChild >
-                  <Link to="/dashboard/orders" className={navigationMenuTriggerStyle()}>Orders</Link>
+                <NavigationMenuLink asChild>
+                  <Link to="/dashboard/orders" className={navigationMenuTriggerStyle()}>
+                    Orders
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                {
-                  auth.isAuthenticated() &&
+                {auth.isAuthenticated() && (
                   <ProfileDropdownMenu>
                     <DropdownMenuItem asChild className="cursor-pointer">
                       <Link to={'/'}>Switch to auctioning</Link>
                     </DropdownMenuItem>
                   </ProfileDropdownMenu>
-                }
+                )}
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </nav>
-        <Sheet >
+        <Sheet>
           <SheetTrigger asChild>
             <Button className="lg:hidden ml-auto" size="icon" variant="outline">
               <MenuIcon className="h-6 w-6" />
@@ -68,30 +78,21 @@ export default function DashBoardNavBar() {
             </Button>
           </SheetTrigger>
           <SheetContent className="bg-white" side="right">
-            {auth?.isAuthenticated() &&
+            {auth?.isAuthenticated() && (
               <ProfileDropdownMenu>
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link to={'/'}>Switch to auctioning</Link>
                 </DropdownMenuItem>
               </ProfileDropdownMenu>
-            }
+            )}
             <div className="grid gap-2 py-6">
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold "
-                to="/dashboard"
-              >
+              <Link className="flex w-full items-center py-2 text-lg font-semibold " to="/dashboard">
                 Home
               </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="/dashboard/consignments"
-              >
+              <Link className="flex w-full items-center py-2 text-lg font-semibold" to="/dashboard/consignments">
                 Consignments
               </Link>
-              <Link
-                className="flex w-full items-center py-2 text-lg font-semibold"
-                to="/dashboard/bids"
-              >
+              <Link className="flex w-full items-center py-2 text-lg font-semibold" to="/dashboard/bids">
                 Bids
               </Link>
             </div>

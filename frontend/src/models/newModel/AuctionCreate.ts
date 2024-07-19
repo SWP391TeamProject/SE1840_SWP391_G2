@@ -1,6 +1,6 @@
-export interface AuctionCreate{
-    title?:string;
-    startDate?:Date;
-    endDate?:Date;
-    files?:[];
+export interface AuctionCreate {
+  title?: string;
+  startDate?: Date;
+  endDate?: Date;
+  files?: [];
 }

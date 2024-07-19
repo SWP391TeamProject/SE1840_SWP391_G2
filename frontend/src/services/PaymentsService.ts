@@ -1,8 +1,8 @@
-import { API_SERVER } from "@/constants/domain";
-import { PaymentType } from "@/constants/enums";
-import { showErrorToast } from "@/lib/handle-error";
-import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
+import { API_SERVER } from '@/constants/domain';
+import { PaymentType } from '@/constants/enums';
+import { showErrorToast } from '@/lib/handle-error';
+import { getCookie, removeCookie } from '@/utils/cookies';
+import axios from 'axios';
 
 interface GetPaymentsSchema {
   page: number;
@@ -10,37 +10,29 @@ interface GetPaymentsSchema {
   sort?: string;
   order?: 'asc' | 'desc';
   status?: string;
-  type?: string
+  type?: string;
 }
 
-export const createPayment = (dto : {
-  type?: 'DEPOSIT' | 'WITHDRAW',
-  amount?: number,
-  accountId?: number}) => {
-  return axios
-    .put(API_SERVER + "/payments", {
+export const createPayment = (dto: { type?: 'DEPOSIT' | 'WITHDRAW'; amount?: number; accountId?: number }) => {
+  return axios.put(
+    API_SERVER + '/payments',
+    {
       paymentAmount: dto.amount,
       type: dto.type,
-      accountId: dto.accountId
-    } ,{
+      accountId: dto.accountId,
+    },
+    {
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    });
+    }
+  );
 };
 
 export const getPayments = async (input: GetPaymentsSchema) => {
-
   try {
-    const {
-      page,
-      size,
-      sort,
-      order,
-      status,
-      type
-    } = input;
+    const { page, size, sort, order, status, type } = input;
 
     // Prepare query parameters
     const params: Record<string, any> = {
@@ -49,53 +41,54 @@ export const getPayments = async (input: GetPaymentsSchema) => {
       sort,
       status: status ? status.toUpperCase() : undefined,
       order,
-      type
+      type,
     };
 
-    const response = await axios
-      .get(API_SERVER + "/payments", {
-        headers: {
-          "Content-Type": "application/json",
+    const response = await axios.get(API_SERVER + '/payments', {
+      headers: {
+        'Content-Type': 'application/json',
 
-          Authorization:
-            "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-        },
-        params: params
-      })
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+      params: params,
+    });
 
     return response.data;
-  } 
-  catch (err) {
+  } catch (err) {
     console.log(err);
     if (err?.response.status == 401) {
-      removeCookie("user");
-      removeCookie("token");
+      removeCookie('user');
+      removeCookie('token');
     }
-  };
+  }
 };
 
-export const fetchPaymentssService = async (pageNumber: number, pageSize: number,sort?:string,type?:PaymentType) => {
+export const fetchPaymentssService = async (
+  pageNumber: number,
+  pageSize: number,
+  sort?: string,
+  type?: PaymentType
+) => {
   let params = {
     page: pageNumber,
     size: pageSize | 10,
-    sort:sort,
-    type:type
-  }
+    sort: sort,
+    type: type,
+  };
   return await axios
-    .get(API_SERVER + "/payments", {
+    .get(API_SERVER + '/payments', {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-      params: params
+      params: params,
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
@@ -103,95 +96,95 @@ export const fetchPaymentssByName = async (pageNumber: number, pageSize: number,
   let params = {
     page: pageNumber,
     size: pageSize,
-  }
+  };
   return await axios
-    .get(API_SERVER + "/payments/search/"+name, {
+    .get(API_SERVER + '/payments/search/' + name, {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-      params: params
+      params: params,
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
+export const fetchPaymentsHistory = async () => {
+  return await axios.get(API_SERVER + '/payments/history', {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+  });
+};
+
 export const fetchPaymentsById = async (id: number) => {
   return await axios
-    .get(API_SERVER + "/payments/" + id, {
+    .get(API_SERVER + '/payments/' + id, {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization
-          : "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
 export const createPaymentsService = async (data: any) => {
   return await axios
-    .post(API_SERVER + "/payments/", data, {
+    .post(API_SERVER + '/payments/', data, {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
 export const updatePaymentsService = async (data: any, id: number) => {
   return await axios
-    .put(API_SERVER + "/payments/" + id, data, {
+    .put(API_SERVER + '/payments/' + id, data, {
       headers: {
-        "Content-Type": "application/json",
-         
+        'Content-Type': 'application/json',
 
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
-
-
-
 export const deletePaymentsService = async (id: string) => {
   return await axios
-    .post(API_SERVER + "/payments/" + id, {
+    .post(API_SERVER + '/payments/' + id, {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => console.log(err));
@@ -199,49 +192,56 @@ export const deletePaymentsService = async (id: string) => {
 
 export const activatePaymentsService = async (id: string) => {
   return await axios
-    .put(API_SERVER + "/payments/activate/" + id, null ,{
+    .put(API_SERVER + '/payments/activate/' + id, null, {
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => console.log(err));
 };
 
 export const createPaymentWithVNPAY = async (values: any) => {
-  return await axios.post(`${API_SERVER}/payments/create`, {
-    ...values,
-    paymentId: "",
-    type: "DEPOSIT",
-    status: "PENDING",
-    accountId: JSON.parse(getCookie("user")).id || 0,
-    ipAddr: "",
-    orderInfoType: "DEPOSIT",
-    method: "VNPAY"
-  }, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+  return await axios.post(
+    `${API_SERVER}/payments/create`,
+    {
+      ...values,
+      paymentId: '',
+      type: 'DEPOSIT',
+      status: 'PENDING',
+      accountId: JSON.parse(getCookie('user')).id || 0,
+      ipAddr: '',
+      orderInfoType: 'DEPOSIT',
+      method: 'VNPAY',
     },
-  });
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+    }
+  );
 };
 
 export const createPaymentWithPAYPAL = (values: any) => {
-  return axios.post(`${API_SERVER}/payments/create`, {
-    ...values,
-    paymentId: "",
-    type: "DEPOSIT",
-    status: "PENDING",
-    accountId: JSON.parse(getCookie("user")).id || 0,
-    ipAddr: "",
-    orderInfoType: "DEPOSIT",
-    method: "PAYPAL"
-  }, {
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+  return axios.post(
+    `${API_SERVER}/payments/create`,
+    {
+      ...values,
+      paymentId: '',
+      type: 'DEPOSIT',
+      status: 'PENDING',
+      accountId: JSON.parse(getCookie('user')).id || 0,
+      ipAddr: '',
+      orderInfoType: 'DEPOSIT',
+      method: 'PAYPAL',
     },
-  });
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+    }
+  );
 };
