@@ -24,5 +24,5 @@ public interface BidRepos extends JpaRepository<Bid, Integer> {
             "WHERE ai.auctionItemId = :auctionItemId")
     List<Account> findAllParticipantsByAuctionItemId(AuctionItemId auctionItemId);
 
-    List<Bid> findAllByAuctionItem_AuctionSession_AuctionSessionId(int auctionId);
+    List<Bid> findAllByAuctionItem_AuctionSession_AuctionSessionIdOrderByAmountDesc(int auctionId);
 }
