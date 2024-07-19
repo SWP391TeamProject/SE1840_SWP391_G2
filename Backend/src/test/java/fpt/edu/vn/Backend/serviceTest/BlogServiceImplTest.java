@@ -158,8 +158,8 @@ public class BlogServiceImplTest {
     @DisplayName("Should get all blogs successfully")
     public void getAllBlogsSuccess() {
         when(blogPostRepos.findAll(any(PageRequest.class))).thenReturn(Page.empty());
-
-        Page<BlogPostDTO> result = blogService.getAllBlogs(PageRequest.of(0, 5));
+        String keyword = "";
+        Page<BlogPostDTO> result = blogService.getAllBlogs(keyword,PageRequest.of(0, 5));
 
         assertEquals(0, result.getTotalElements());
     }

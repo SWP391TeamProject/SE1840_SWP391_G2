@@ -53,10 +53,12 @@ public class AccountController {
     @GetMapping("/")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 50) Pageable pageable,
-                                                        @RequestParam(required = false,name = "Role") Account.Role role) {
+                                                        @RequestParam(required = false,name = "Role") Account.Role role,
+                                                        @RequestParam(required = false) String keyword
+                                                        ) {
         log.info("Get accounts with role: {}", role);
         if (role == null) {
-            return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
+            return new ResponseEntity<>(accountService.getAccounts(keyword,pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
     }
@@ -68,9 +70,10 @@ public class AccountController {
     @GetMapping("/search/{name}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> searchAccounts(@PageableDefault(size = 50) Pageable pageable,
+                                                        @RequestParam(required = false) String keyword,
                                                         @PathVariable String name) {
         if (name == null) {
-            return new ResponseEntity<>(accountService.getAccounts(pageable), HttpStatus.OK);
+            return new ResponseEntity<>(accountService.getAccounts(keyword,pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(accountService.getAccountsByNameOrEmail(pageable, name), HttpStatus.OK);
     }
@@ -167,8 +170,9 @@ public class AccountController {
             throw new InvalidInputException("You are not authorized to perform this action");
         }
         List<AccountDTO> listAccounts;
+        String keyword = "";
         {
-            listAccounts = accountService.getAccounts(PageRequest.of(0, 1000)).getContent();
+            listAccounts = accountService.getAccounts(keyword,PageRequest.of(0, 1000)).getContent();
         }
 
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

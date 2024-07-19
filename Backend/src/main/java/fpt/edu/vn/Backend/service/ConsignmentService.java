@@ -5,6 +5,7 @@ import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
+import fpt.edu.vn.Backend.pojo.Consignment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public interface ConsignmentService {
     // Reads
     ConsignmentDTO getConsignmentById(int id);
 
-    Page<ConsignmentDTO> getAllConsignments(Pageable pageable);
+    Page<ConsignmentDTO> getAllConsignments(String keyword,Pageable pageable);
 
     Page<ConsignmentDTO> getAllStaffConsignments(int staffId, Pageable pageable);
 

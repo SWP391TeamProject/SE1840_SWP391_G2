@@ -23,7 +23,7 @@ public interface AccountService {
     }
     @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole);
 
-    @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable);
+    @NotNull Page<AccountDTO> getAccounts(String keyword,@NotNull Pageable pageable);
     @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles);
     @NotNull Page<AccountDTO> getAccountsByNameOrEmail(@NotNull Pageable pageable, String name);
 

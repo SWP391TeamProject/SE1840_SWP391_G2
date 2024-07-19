@@ -180,18 +180,25 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<PaymentDTO> getAllPayment(Pageable pageable, Payment.Type type, Payment.Status status) {
+    public Page<PaymentDTO> getAllPayment(Pageable pageable, Payment.Type type, Payment.Status status,String keyword) {
         Page<Payment> payments;
         if (type != null) {
             payments = paymentRepos.findAllByType(type, pageable);
         } else if (status != null) {
             payments = paymentRepos.findAllByStatus(status, pageable);
+        } else if (keyword != null) {
+            payments = searchPayment(keyword,pageable);
         } else {
             payments = paymentRepos.findAll(pageable);
         }
         return new PageImpl<>(payments.getContent().stream().map(PaymentDTO::new).collect(Collectors.toList()), pageable, payments.getTotalElements());
     }
 
+    @Override
+    public Page<Payment> searchPayment(String keyword,Pageable pageable){
+        PaymentSpecification spec = new PaymentSpecification(keyword);
+        return paymentRepos.findAll(spec,pageable);
+    }
 
     @Override
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {

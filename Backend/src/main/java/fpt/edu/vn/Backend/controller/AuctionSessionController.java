@@ -10,6 +10,7 @@ import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
+import fpt.edu.vn.Backend.service.AuctionSessionSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

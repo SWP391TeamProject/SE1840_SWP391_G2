@@ -59,8 +59,9 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
    //@Cacheable(key = "#pageable", value = "blog")
-    public Page<BlogPostDTO> getAllBlogs(Pageable pageable) {
-        return blogPostRepos.findAll(pageable).map(BlogPostDTO::new);
+    public Page<BlogPostDTO> getAllBlogs(String keyword,Pageable pageable) {
+        BlogSpecification spec = new BlogSpecification(keyword);
+        return blogPostRepos.findAll(spec,pageable).map(BlogPostDTO::new);
     }
 
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {

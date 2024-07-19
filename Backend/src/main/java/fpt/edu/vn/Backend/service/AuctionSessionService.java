@@ -3,8 +3,10 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import org.jetbrains.annotations.Nullable;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,6 +19,9 @@ public interface AuctionSessionService {
     AuctionSessionDTO createAuctionSession(AuctionCreateDTO auctionDTO);
 
     AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO);
+
+
+//     Page<AuctionSessionDTO> getAllAuctionSessions(String keyword,Pageable pageable);
 
     AuctionSessionDTO getAuctionSessionById(int id, @Nullable Integer accountId);
 
@@ -40,4 +45,5 @@ public interface AuctionSessionService {
     void terminateAuction(int auctionSessionId);
 
     void startAuction(int auctionSessionId);
+
 }

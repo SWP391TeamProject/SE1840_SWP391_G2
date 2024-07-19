@@ -30,4 +30,5 @@ public interface OrderService {
 
 
     OrderDTO updateOrder(int id, OrderUpdateDTO dto);
+    Page<OrderDTO> searchOrders(String keyword,Pageable pageable);
 }

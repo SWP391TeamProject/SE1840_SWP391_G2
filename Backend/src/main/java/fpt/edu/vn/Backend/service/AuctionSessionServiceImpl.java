@@ -657,6 +657,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                                                       @Nullable Integer accountId) {
         return auctionSessionRepos.findByCriteria(status, search, fromDate, toDate, pageable)
                 .map(a -> mapAuctionSessionToDTO(a, accountId));
+
     }
 
     private void sendMail(String targetEmail, String title, String content) throws MessagingException {
@@ -668,4 +669,5 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         helper.setText(content, true);
         mailSender.send(message);
     }
+
 }

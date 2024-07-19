@@ -119,6 +119,8 @@ public class AuctionSessionServiceImplTest {
     }
 
 
+
+
 //    @Test
 //    @DisplayName("Test get auction session by id")
 //    public void testGetAuctionSessionById() {
@@ -309,6 +311,7 @@ public class AuctionSessionServiceImplTest {
         assertThrows(InvalidInputException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
 
+
 //    @Test
 //    void getAuctionSessionById_AuctionSessionNotFound() {
 //        when(auctionSessionRepos.findById(any())).thenReturn(Optional.empty());
@@ -336,5 +339,6 @@ public class AuctionSessionServiceImplTest {
 //
 //        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAuctionSessionsByTitle(PageRequest.of(0, 10), "Test"));
 //    }
+
 
 }
