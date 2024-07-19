@@ -152,7 +152,7 @@ public class BidServiceImpl implements BidService {
     @Override
     public List<BidDTO> getBidsByAuctionId(int auctionId) {
         try {
-            return bidRepos.findAllByAuctionItem_AuctionSession_AuctionSessionId(auctionId).stream().map(BidDTO::new).toList();
+            return bidRepos.findAllByAuctionItem_AuctionSession_AuctionSessionIdOrderByAmountDesc(auctionId).stream().map(BidDTO::new).toList();
         }catch (Exception e){
             throw new InvalidInputException("Invalid auction item id: " + auctionId);
         }
