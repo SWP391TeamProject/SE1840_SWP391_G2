@@ -24,8 +24,8 @@ import { Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { fetchConsignmentByConsignmentId } from '@/services/ConsignmentService';
 import { ConsignmentStatus } from '@/constants/enums';
-import { Consignment } from '@/models/newModel/consignment';
 import { showErrorToast } from '@/lib/handle-error';
+import Consignment from '@/models/consignment';
 const formSchema = z
   .object({
     accountId: z.number(),
@@ -224,8 +224,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
                         } else {
                           console.log(form.getValues());
                           console.log(form.formState); // Log the errors
-                          showErrorToast(error);
-
+                          showErrorToast(form.formState.errors);
                           setOpen(true);
                         }
                       }}
