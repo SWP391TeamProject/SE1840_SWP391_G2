@@ -670,9 +670,4 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         mailSender.send(message);
     }
 
-    @Override
-    public Page<AuctionSession> searchAuctionSession(String keyword, Pageable pageable) {
-        AuctionSessionSpecification spec = new AuctionSessionSpecification(keyword);
-        return auctionSessionRepos.findAll(spec, pageable);
-    }
 }
