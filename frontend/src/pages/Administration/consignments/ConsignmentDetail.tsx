@@ -29,9 +29,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Consignment } from '@/models/newModel/consignment';
 import ConsignmentDialog from './ConsignmentDialog';
 import { showErrorToast } from '@/lib/handle-error';
+import Consignment from '@/models/consignment';
 
 export default function ConsignmentDetail() {
   const param = useParams();
@@ -227,7 +227,7 @@ export default function ConsignmentDetail() {
 
   return (
     <div className="flex flex-col justify-start w-full h-full m-0 p-3">
-      <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 overflow-hidden ">
+      <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 ">
         <Card className="basis-3/6">
           <CardHeader>
             <CardTitle>Consignment #{consignment?.consignmentId}</CardTitle>
@@ -313,10 +313,17 @@ export default function ConsignmentDetail() {
               })()}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <p>Create Date: {new Date(consignment?.createDate).toLocaleDateString('en-US')}</p>
-            <p>Prefer contact: {consignment?.preferContact}</p>
+          <CardContent >
+            <div>
+              <p className="text-gray-700 mb-2">
+                <strong>Create Date:</strong> {new Date(consignment?.createDate).toLocaleDateString('en-US')}
+              </p>
+              <p className="text-gray-700">
+                <strong>Prefer Contact:</strong> {consignment?.preferContact ?? 'Not provided'}
+              </p>
+            </div>
           </CardContent>
+
           <CardFooter>{Action()}</CardFooter>
         </Card>
         <Card className="basis-2/6 h-fit  ">
@@ -324,8 +331,8 @@ export default function ConsignmentDetail() {
             <CardTitle className="flex flex-row justify-between items-center">
               <h3>Customer information</h3>
               <Avatar>
-                <AvatarImage src={consignment?.user?.avatar?.link || ''} />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={consignment?.user.avatar?.link || ''} />
+                <AvatarFallback>{consignment?.user.nickname?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
             </CardTitle>
 
@@ -333,26 +340,80 @@ export default function ConsignmentDetail() {
               {Array.isArray(consignment?.consignmentDetails) ? consignment?.user?.email : null}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-white shadow-md rounded-lg p-6">
             <div className="flex justify-between items-center">
               <div className="flex flex-col w-full">
-                <p>Name: {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.nickname : null}</p>
-                <p>Email: {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.email : null}</p>
-                <p>
-                  Phone: {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.phone : 'not provided'}
+                <p className="text-gray-700 mb-2">
+                  <strong>Name:</strong>{' '}
+                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.nickname : 'Not provided'}
+                </p>
+                <p className="text-gray-700 mb-2">
+                  <strong>Email:</strong>{' '}
+                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.email : 'Not provided'}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Phone:</strong>{' '}
+                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.phone : 'Not provided'}
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-      <div className="flex justify-start flex-row w-full mt-1 gap-2 ">
-        <div className="basis-2/3 flex w-full">
-          <ScrollArea className="w-2/3 h-96 border rounded-xl ">
-            {Array.isArray(consignment?.consignmentDetails)
-              ? consignment.consignmentDetails.reverse().map((item, index) => {
+      <div className="w-full h-fit p-3  mb-3 drop-shadow-lg flex justify-start flex-row  flex-wrap gap-2 ">
+        <Card className="w-3/6">
+          <CardHeader>
+            <CardTitle>
+              Consignment Detail <ConsignmentDialog consignment={consignment} />
+            </CardTitle>
+            <CardDescription>
+              This is the detail that the customer has provided
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="bg-white shadow-md rounded-lg p-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-gray-700">
+                  <strong>Color:</strong> {consignment?.color ?? 'Not provided'}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Measurement:</strong> {consignment?.measurement ?? 'Not provided'}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Weight:</strong> {consignment?.weight ?? 'Not provided'}g
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-700">
+                  <strong>Gemstone:</strong> {consignment?.gemstone ?? 'Not provided'}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Stamped:</strong> {consignment?.stamped ?? 'Not provided'}
+                </p>
+              </div>
+            </div>
+            <div className="w-full flex justify-between mt-4">
+              <p className="text-gray-700">
+                <strong>Requester:</strong> {consignment?.user?.nickname ?? 'Not provided'}
+              </p>
+            </div>
+            <div className="mt-4 text-gray-700" dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
+          </CardContent>
+        </Card>
+        {/* <div className="basis-2/3 flex w-full"> */}
+        <Card className="w-2/6 min-h-96 border rounded-xl ">
+          <CardHeader>
+            <CardTitle>Activity History</CardTitle>
+            <CardDescription>
+              This is where you can see the history of this consignment
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-hidden">
+            <ScrollArea className="w-full h-80 border rounded-xl ">
+              {Array.isArray(consignment?.consignmentDetails)
+                ? consignment.consignmentDetails.map((item, index) => {
                   return (
-                    <Card key={index} className="w-full">
+                    <Card key={index} className="w-full p-3">
                       <CardHeader>
                         <CardTitle>
                           Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} />
@@ -411,40 +472,28 @@ export default function ConsignmentDetail() {
                           })()}
                         </CardDescription>
                       </CardHeader>
-                      <CardContent>
-                        <div dangerouslySetInnerHTML={{ __html: item.description }}></div>
-                        <p>price:{item.price ? item.price : 'not specified'}</p>
-                        <div className="w-ful flex justify-between">
-                          <p>Initiator: {item.account.nickname}</p>
+                      <CardContent className="bg-white shadow-md rounded-lg p-6">
+                        <div>
+                          <p className="text-gray-700 mb-2">
+                            <strong>Create Date:</strong> {item?.createDate ?? 'Not provided'}
+                          </p>
+                          <p className="text-gray-700 mb-2">
+                            <strong>Initiator:</strong> {item.account.nickname}
+                          </p>
+                          <div className="text-gray-700 mb-4" dangerouslySetInnerHTML={{ __html: item.description }}></div>
+                          <p className="text-gray-700">
+                            <strong>Price:</strong> {item.price ? item.price : 'Not specified'}
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
                   );
                 })
-              : null}
-          </ScrollArea>
-          <Card className="w-1/3">
-            <CardHeader>
-              <CardTitle>
-                Consignment Detail <ConsignmentDialog consignment={consignment} />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <p>Color: {consignment?.color}</p>
-                <p>Size: {consignment?.size}</p>
-                <p>Weight: {consignment?.weight}</p>
-                <p>Brand: {consignment?.brand}</p>
-                <p>Age: {consignment?.age}</p>
-                <p>Material: {consignment?.material}</p>
-              </div>
-              <div dangerouslySetInnerHTML={{ __html: consignment?.description }}></div>
-              <div className="w-ful flex justify-between">
-                <p>Requester: {consignment?.user?.nickname}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                : null}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+        {/* </div> */}
       </div>
     </div>
   );
