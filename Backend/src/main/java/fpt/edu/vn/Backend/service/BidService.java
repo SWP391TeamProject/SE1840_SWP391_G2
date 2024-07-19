@@ -2,11 +2,16 @@ package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.BidDTO;
+import fpt.edu.vn.Backend.DTO.BidReplyDTO;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Set;
@@ -21,6 +26,10 @@ public interface BidService {
     BidDTO getBidById(int id);
     @Nullable BidDTO getHighestBid(AuctionItemId auctionId);
     List<BidResponse> toBidResponse(List<BidDTO> bids);
+    BidReplyDTO addUser(@Payload BidDTO bidDTO,
+                        @DestinationVariable int auctionSessionId,
+                        @DestinationVariable int itemId, Authentication authentication,
+                        SimpMessageHeaderAccessor headerAccessor);
 
     List<BidDTO> getBidsByAuctionId(int auctionId);
 

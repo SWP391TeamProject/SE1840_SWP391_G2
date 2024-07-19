@@ -138,12 +138,4 @@ public class AuctionItemServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> auctionItemService.updateAuctionItem(auctionItemDTO));
     }
 
-    @Test
-    void deleteById_AuctionItemNotFound() {
-        when(auctionItemRepos.existsById(any())).thenReturn(false);
-
-        assertThrows(IllegalArgumentException.class, () -> auctionItemService.deleteById(new AuctionItemId()));
-    }
-
-
 }

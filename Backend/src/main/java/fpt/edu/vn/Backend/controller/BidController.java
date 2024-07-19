@@ -159,21 +159,7 @@ public class BidController {
                                                @DestinationVariable int auctionSessionId,
                                                @DestinationVariable int itemId, Authentication authentication,
                                                SimpMessageHeaderAccessor headerAccessor) {
-        AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
-        AuctionSessionDTO auctionSessionDTO = auctionSessionService.getAuctionSessionById(auctionSessionId);
-        AccountDTO persistedAccount = accountService.getAccountByEmail(authentication.getName());
-        if (persistedAccount == null) {
-            return new ResponseEntity<>(new BidReplyDTO("You are not login yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
-        }
-        if (auctionSessionDTO.getDeposits().stream().noneMatch(depositDTO -> depositDTO.getPayment().getAccountId() == persistedAccount.getAccountId())) {
-            return new ResponseEntity<>(new BidReplyDTO("You have not registered to this auction yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
-        }
-        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
-        BidDTO highestBid = bidService.getHighestBid(auctionItemId);
-        BigDecimal currentBid = highestBid == null ? auctionItemService.getAuctionItemById(auctionItemId)
-                .getItemDTO().getReservePrice()
-                : highestBid.getAmount();
-        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", currentBid, BidReplyDTO.Status.JOIN));
+        return ResponseEntity.ok(bidService.addUser(bidDTO, auctionSessionId, itemId, authentication, headerAccessor));
     }
 }
 
