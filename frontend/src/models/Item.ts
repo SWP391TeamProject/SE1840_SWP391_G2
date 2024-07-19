@@ -1,6 +1,6 @@
-import {ItemCategory} from "@/models/ItemCategory.ts";
-import {Account} from "@/models/AccountModel.tsx";
-import {Attachment} from "@/models/Attachment.ts";
+import { ItemCategory } from '@/models/ItemCategory.ts';
+import { Account } from '@/models/AccountModel.tsx';
+import { Attachment } from '@/models/Attachment.ts';
 
 export interface Item {
   itemId?: number;
@@ -25,11 +25,11 @@ export interface Item {
 }
 
 export enum ItemStatus {
-  QUEUE = "QUEUE",
-  IN_AUCTION = "IN_AUCTION",
-  SOLD = "SOLD",
-  UNSOLD = "UNSOLD",
-  REMOVED = "REMOVED"
+  QUEUE = 'QUEUE',
+  IN_AUCTION = 'IN_AUCTION',
+  SOLD = 'SOLD',
+  UNSOLD = 'UNSOLD',
+  REMOVED = 'REMOVED',
 }
 
 type StatusMap = {
@@ -37,19 +37,10 @@ type StatusMap = {
 };
 
 const VALID_TRANSITIONS: StatusMap = {
-  [ItemStatus.QUEUE]: new Set([
-    ItemStatus.QUEUE,
-    ItemStatus.REMOVED,
-  ]),
-  [ItemStatus.IN_AUCTION]: new Set([
-    ItemStatus.IN_AUCTION,
-  ]),
+  [ItemStatus.QUEUE]: new Set([ItemStatus.QUEUE, ItemStatus.REMOVED]),
+  [ItemStatus.IN_AUCTION]: new Set([ItemStatus.IN_AUCTION]),
   [ItemStatus.SOLD]: new Set([ItemStatus.SOLD]),
-  [ItemStatus.UNSOLD]: new Set([
-    ItemStatus.UNSOLD,
-    ItemStatus.QUEUE,
-    ItemStatus.REMOVED,
-  ]),
+  [ItemStatus.UNSOLD]: new Set([ItemStatus.UNSOLD, ItemStatus.QUEUE, ItemStatus.REMOVED]),
   [ItemStatus.REMOVED]: new Set([ItemStatus.REMOVED]),
 };
 

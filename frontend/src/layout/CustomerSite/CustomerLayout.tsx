@@ -1,19 +1,19 @@
-import NavBar from "@/components/NavBar/NavBar";
-import { useTheme } from "@/components/component/ThemeProvider";
-import Footer from "@/components/footer/Footer";
-import { getCookie } from "@/utils/cookies";
-import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import NavBar from '@/components/NavBar/NavBar';
+import { useTheme } from '@/components/component/ThemeProvider';
+import Footer from '@/components/footer/Footer';
+import { getCookie } from '@/utils/cookies';
+import { useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
 
 export default function CustomerLayout() {
-  const theme = getCookie("themeMode");
+  const theme = getCookie('themeMode');
   const { setTheme } = useTheme();
   // const nav = useNavigate();
   // useEffect(() => {
   //   document.title = "Consignment | Biddify";
 
   //   // fetchConsignmentsService();
-  // }, [nav]);  
+  // }, [nav]);
   useEffect(() => {
     if (theme) {
       setTheme(JSON.parse(theme));
@@ -21,7 +21,6 @@ export default function CustomerLayout() {
   }, []);
 
   return (
-
     <div className="bg-background text-foreground min-h-screen">
       <div className="sticky top-0 z-20 w-full ">
         <NavBar />

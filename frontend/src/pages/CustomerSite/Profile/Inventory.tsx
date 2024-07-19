@@ -1,18 +1,11 @@
-import {useEffect} from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import PagingIndexes from "@/components/pagination/PagingIndexes.tsx";
-import {useAppDispatch, useAppSelector} from "@/redux/hooks.tsx";
-import {getOwnedItems} from "@/services/ItemService.ts";
-import {setCurrentPageList, setItems} from "@/redux/reducers/Inventory.ts";
-import {Item} from "@/models/Item.ts";
-import { toast } from "sonner";
+import { useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import PagingIndexes from '@/components/pagination/PagingIndexes.tsx';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks.tsx';
+import { getOwnedItems } from '@/services/ItemService.ts';
+import { setCurrentPageList, setItems } from '@/redux/reducers/Inventory.ts';
+import { Item } from '@/models/Item.ts';
+import { toast } from 'sonner';
 
 const Inventory = () => {
   const inventoryList = useAppSelector((state) => state.inventory);
@@ -31,14 +24,14 @@ const Inventory = () => {
   };
 
   const handlePageSelect = (pageNumber: number) => {
-    const inventoryPromise= fetchInventory(pageNumber);
+    const inventoryPromise = fetchInventory(pageNumber);
 
     toast.promise(inventoryPromise, {
-      loading: "Loading...",
+      loading: 'Loading...',
       success: <b>Inventory loaded!</b>,
       error: <b>Could not load inventory!</b>,
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     fetchInventory();
@@ -60,7 +53,7 @@ const Inventory = () => {
                 </CardHeader>
                 <CardContent>
                   <img
-                    src={item.attachments[0].link}
+                    src={item.attachments[0]?.link ?? 'https://placehold.co/600x400'}
                     width={300}
                     height={200}
                     alt="Auction Item"
@@ -76,7 +69,8 @@ const Inventory = () => {
             <PagingIndexes
               pageNumber={inventoryList.currentPageNumber ? inventoryList.currentPageNumber : 0}
               totalPages={inventoryList.totalPages}
-              pageSelectCallback={handlePageSelect}></PagingIndexes>
+              pageSelectCallback={handlePageSelect}
+            ></PagingIndexes>
           </div>
         </CardFooter>
       </Card>

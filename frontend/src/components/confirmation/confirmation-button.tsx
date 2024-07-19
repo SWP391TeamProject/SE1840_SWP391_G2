@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { type Row } from "@tanstack/react-table"
+import * as React from 'react';
+import { type Row } from '@tanstack/react-table';
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -13,19 +13,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { ConfirmationDialog } from "./confirmation-dialog"
+} from '@/components/ui/dialog';
+import { ConfirmationDialog } from './confirmation-dialog';
 
-
-interface ConfirmationButtonProps
-  extends React.ComponentPropsWithoutRef<typeof Dialog> {
-  onSuccess?: () => void
-  message: string
-  title: string
-  label: string
-  description: string
-  className?: string
-  variant?: string
+interface ConfirmationButtonProps extends React.ComponentPropsWithoutRef<typeof Dialog> {
+  onSuccess?: () => void;
+  message: string;
+  title: string;
+  label: string;
+  description: string;
+  className?: string;
+  variant?: string;
 }
 
 export function ConfirmationButton({
@@ -41,8 +39,8 @@ export function ConfirmationButton({
   const [open, setOpen] = React.useState(false);
   const onConfirm = () => {
     onSuccess();
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   return (
     <>
@@ -77,10 +75,16 @@ export function ConfirmationButton({
               </DialogFooter>
             </DialogContent>
           </Dialog> */}
-      <Button type="button" variant={variant} className={className} onClick={() => { setOpen(true) }}>
+      <Button
+        type="button"
+        variant={variant}
+        className={className}
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
         {props.children}
       </Button>
     </>
-
-  )
+  );
 }

@@ -1,3 +1,3 @@
-export interface BidReply{
-    bids?:[number];
+export interface BidReply {
+  bids?: [number];
 }

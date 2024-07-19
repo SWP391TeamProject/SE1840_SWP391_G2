@@ -1,6 +1,6 @@
-export interface BlogCategory{
-    blogCategoryId?:number;
-    name?:string;
-    createDate?:Date;
-    updateDate?:Date;
+export interface BlogCategory {
+  blogCategoryId?: number;
+  name?: string;
+  createDate?: Date;
+  updateDate?: Date;
 }

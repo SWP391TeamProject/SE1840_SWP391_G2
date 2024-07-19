@@ -1,8 +1,8 @@
-import Administration from "@/layout/Administration/Administration";
+import Administration from '@/layout/Administration/Administration';
 // import HomeLayout from "@/layout/HomeLayout/HomeLayout";
-import LoginLayout from "@/layout/LoginLayout/LoginLayout";
-import AccountsList from "@/pages/Administration/Account/AccountsList";
-import path from "path";
+import LoginLayout from '@/layout/LoginLayout/LoginLayout';
+import AccountsList from '@/pages/Administration/Account/AccountsList';
+import path from 'path';
 
 const routes = [
   // {
@@ -10,20 +10,21 @@ const routes = [
   //   element: <HomeLayout />,
   // },
   {
-    path: "/login",
+    path: '/login',
     element: <LoginLayout />,
   },
   {
-    path: "/admin",
+    path: '/admin',
     element: <Administration />,
-    children: [{
-      path: "accounts",
-      element: <AccountsList />,
-    },
-    ]
+    children: [
+      {
+        path: 'accounts',
+        element: <AccountsList />,
+      },
+    ],
   },
   {
-    path: "/sign-up",
+    path: '/sign-up',
     element: <LoginLayout />,
   },
 ];

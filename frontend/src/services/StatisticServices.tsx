@@ -1,63 +1,60 @@
-import { API_SERVER } from "@/constants/domain";
-import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "@/config/axiosConfig.ts";
+import { API_SERVER } from '@/constants/domain';
+import { getCookie, removeCookie } from '@/utils/cookies';
+import axios from '@/config/axiosConfig.ts';
 
 export const getNewUsersByYear = async (year: number) => {
   let params = {
-    year: year
-  }
+    year: year,
+  };
   return await axios
-    .get(API_SERVER + "/statistics/users/filter-by-year", {
+    .get(API_SERVER + '/statistics/users/filter-by-year', {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-      params: params
+      params: params,
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 export const getUserThisMonth = async () => {
   return await axios
-    .get(API_SERVER + "/statistics/users/filter-by-month", {
+    .get(API_SERVER + '/statistics/users/filter-by-month', {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
 export const getTotalOrder = async () => {
   return await axios
-    .get(API_SERVER + "/statistics/totals/order", {
+    .get(API_SERVER + '/statistics/totals/order', {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization
-          : "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
@@ -87,16 +84,16 @@ export const getPaymentByStatus = async (type?: string) => {
   try {
     const response = await axios.get(url, {
       headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + JSON.parse(getCookie("user"))?.accessToken || "",
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken || '',
       },
     });
     return response.data; // Return response data
   } catch (err) {
-    console.error("Error fetching revenue data:", err);
+    console.error('Error fetching revenue data:', err);
     if (err?.response?.status === 401) {
-      removeCookie("user");
-      removeCookie("token");
+      removeCookie('user');
+      removeCookie('token');
     }
     throw err; // Re-throw error for handling elsewhere if needed
   }
@@ -104,65 +101,58 @@ export const getPaymentByStatus = async (type?: string) => {
 
 export const getTotalItemSold = async () => {
   return await axios
-    .get(API_SERVER + "/statistics/totals/item_sold", {
+    .get(API_SERVER + '/statistics/totals/item_sold', {
       headers: {
-        "Content-Type": "application/json",
-         
+        'Content-Type': 'application/json',
 
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
-
-
-
 export const getTotalSale = async () => {
   return await axios
-    .get(API_SERVER + "/statistics/total/sales", {
+    .get(API_SERVER + '/statistics/total/sales', {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };
 
 export const getTotalRevenueByPastAuction = async (year: number) => {
   let params = {
-    year: year
-  }
+    year: year,
+  };
   return await axios
-    .get(API_SERVER + "/statistics/auctions/filter-by-year", {
+    .get(API_SERVER + '/statistics/auctions/filter-by-year', {
       headers: {
-        "Content-Type": "application/json",
-         
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-      params: params
+      params: params,
     })
     .catch((err) => {
       console.log(err);
       if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
+        removeCookie('user');
+        removeCookie('token');
       }
     });
 };

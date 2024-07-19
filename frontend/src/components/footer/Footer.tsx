@@ -1,7 +1,7 @@
-import { GavelIcon } from "lucide-react";
-import React from "react";
-import { Link } from "react-router-dom";
-import logo from "@/assets/icon.png";
+import { GavelIcon } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import logo from '@/assets/icon.png';
 
 export default function Footer() {
   return (
@@ -26,9 +26,7 @@ export default function Footer() {
               Contact
             </Link>
           </nav>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            © 2024 Biddify. All rights reserved.
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">© 2024 Biddify. All rights reserved.</p>
         </div>
       </footer>
     </>

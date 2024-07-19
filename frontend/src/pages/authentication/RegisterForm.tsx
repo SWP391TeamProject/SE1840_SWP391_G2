@@ -1,44 +1,43 @@
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {useRef, useState} from "react";
-import gsap from "gsap";
-import {useGSAP} from "@gsap/react";
-import {useForm} from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {z} from "zod";
-import {register} from "@/services/AuthService";
-import {useNavigate} from "react-router-dom";
-import {toast} from "sonner";
-import {setCookie} from "@/utils/cookies.ts";
-import {Loader2} from "lucide-react";
-import { showErrorToast } from "@/lib/handle-error";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useRef, useState } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { register } from '@/services/AuthService';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { setCookie } from '@/utils/cookies.ts';
+import { Loader2 } from 'lucide-react';
+import { showErrorToast } from '@/lib/handle-error';
 
 gsap.registerPlugin(useGSAP);
 
 const formSchema = z
   .object({
-    name: z.string().min(5, {
-      message: "Nickname must be at least 5 characters.",
-    }).max(20, {
-      message: "Nickname must not be longer than 20 characters.",
-    }),
+    name: z
+      .string()
+      .min(5, {
+        message: 'Nickname must be at least 5 characters.',
+      })
+      .max(20, {
+        message: 'Nickname must not be longer than 20 characters.',
+      }),
     email: z.string().email({
-      message: "Invalid email address.",
+      message: 'Invalid email address.',
     }),
-    password: z.string().min(8, {
-      message: "Password must be at least 8 characters.",
-    }).max(30, {
-      message: "Password must not be longer than 30 characters.",
-    }),
+    password: z
+      .string()
+      .min(8, {
+        message: 'Password must be at least 8 characters.',
+      })
+      .max(30, {
+        message: 'Password must not be longer than 30 characters.',
+      }),
     // rememberMe: z.boolean(),
     confirmPassword: z.string(),
   })
@@ -47,48 +46,49 @@ const formSchema = z
       return data.password === data.confirmPassword;
     },
     {
-      message: "Passwords do not match.",
-      path: ["confirmPassword"],
+      message: 'Passwords do not match.',
+      path: ['confirmPassword'],
     }
   );
 
 function RegisterForm() {
   const RegisterForm = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    register(values).then((res) => {
-      console.log(res);
-      toast.success("Account created successfully. Please login.", {
-        
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+    setIsLoading(true);
+    register(values)
+      .then((res) => {
+        console.log(res);
+        toast.success('Account created successfully. Please login.', {
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+        setIsLoading(false);
+        setCookie('unactivated-user', JSON.stringify(res), 30000);
+        nav('/auth/unactivated');
+      })
+      .catch((err) => {
+        setIsLoading(false);
+        console.log(err);
+        showErrorToast(err);
       });
-      setIsLoading(false)
-      setCookie("unactivated-user", JSON.stringify(res), 30000);
-      nav("/auth/unactivated");
-    }).catch((err) => {
-      setIsLoading(false)
-      console.log(err)
-      showErrorToast(err);
-    });
 
     console.log(values);
   }
@@ -98,10 +98,10 @@ function RegisterForm() {
       gsap.from(RegisterForm.current, {
         y: -50,
         duration: 2,
-        ease: "power2.inOut",
+        ease: 'power2.inOut',
       });
     },
-    {scope: RegisterForm}
+    { scope: RegisterForm }
   );
 
   return (
@@ -112,9 +112,7 @@ function RegisterForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader className="">
-            <CardTitle className="text-4xl text-center text-bold">
-              Register 👋
-            </CardTitle>
+            <CardTitle className="text-4xl text-center text-bold">Register 👋</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
@@ -122,13 +120,13 @@ function RegisterForm() {
                 <FormField
                   control={form.control}
                   name="name"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
                         <Input type="text" placeholder="Your name" {...field} />
                       </FormControl>
-                      <FormMessage/>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -137,13 +135,13 @@ function RegisterForm() {
                 <FormField
                   control={form.control}
                   name="email"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="Your email" {...field} />
                       </FormControl>
-                      <FormMessage/>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -152,13 +150,13 @@ function RegisterForm() {
                 <FormField
                   control={form.control}
                   name="password"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="******" {...field} />
                       </FormControl>
-                      <FormMessage/>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -167,29 +165,28 @@ function RegisterForm() {
                 <FormField
                   control={form.control}
                   name="confirmPassword"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="******" {...field} />
                       </FormControl>
-                      <FormMessage/>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
 
-              {isLoading
-                ? <Button disabled className="bg-orange-600">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+              {isLoading ? (
+                <Button disabled className="bg-orange-600">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Please wait
                 </Button>
-                : <Button
-                  type="submit"
-                  className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700"
-                >
+              ) : (
+                <Button type="submit" className="w-full bg-orange-600 rounded-xl text-white hover:bg-orange-700">
                   Register
-                </Button>}
+                </Button>
+              )}
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?&nbsp;
@@ -198,7 +195,6 @@ function RegisterForm() {
               </a>
             </div>
           </CardContent>
-
         </form>
       </Form>
     </Card>

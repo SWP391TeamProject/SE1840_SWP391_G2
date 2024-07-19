@@ -1,21 +1,13 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 export default function Details({ ...props }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Session Detail</CardTitle>
-        <CardDescription>
-          This is the detail of the session
-        </CardDescription>
+        <CardDescription>This is the detail of the session</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
@@ -42,7 +34,7 @@ export default function Details({ ...props }) {
                   <FormLabel>Start date</FormLabel>
                   <FormControl>
                     {/* <DateTimePicker {...field} />  */}
-                    <Input type="datetime-local"  className="bg-background text-foreground"  {...field} />
+                    <Input type="datetime-local" className="bg-background text-foreground" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -55,7 +47,7 @@ export default function Details({ ...props }) {
                 <FormItem>
                   <FormLabel>End date</FormLabel>
                   <FormControl>
-                    <Input type="datetime-local"  className="bg-background text-foreground"  {...field} />
+                    <Input type="datetime-local" className="bg-background text-foreground" {...field} />
                     {/* <DateTimePicker {...field} /> */}
                   </FormControl>
                   <FormMessage />
@@ -66,5 +58,5 @@ export default function Details({ ...props }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

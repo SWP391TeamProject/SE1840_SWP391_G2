@@ -13,18 +13,18 @@ const areaChartOptions = {
     height: 340,
     type: 'line',
     toolbar: {
-      show: false
-    }
+      show: false,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   stroke: {
     curve: 'smooth',
-    width: 1.5
+    width: 1.5,
   },
   grid: {
-    strokeDashArray: 4
+    strokeDashArray: 4,
   },
   xaxis: {
     type: 'datetime',
@@ -36,26 +36,26 @@ const areaChartOptions = {
       '2018-09-19T03:30:00.000Z',
       '2018-10-19T04:30:00.000Z',
       '2018-11-19T05:30:00.000Z',
-      '2018-12-19T06:30:00.000Z'
+      '2018-12-19T06:30:00.000Z',
     ],
     labels: {
-      format: 'MMM'
+      format: 'MMM',
     },
     axisBorder: {
-      show: false
+      show: false,
     },
     axisTicks: {
-      show: false
-    }
+      show: false,
+    },
   },
   yaxis: {
-    show: false
+    show: false,
   },
   tooltip: {
     x: {
-      format: 'MM'
-    }
-  }
+      format: 'MM',
+    },
+  },
 };
 
 // ==============================|| REPORT AREA CHART ||============================== //
@@ -108,50 +108,59 @@ export default function ReportAreaChart() {
     }));
   }, [primary, secondary, line, theme]);
 
-  const [series,setSeries] = useState([
+  const [series, setSeries] = useState([
     {
       name: 'Series 1',
-      data: [58, 115, 28, 83, 63, 75, 35, 55]
+      data: [58, 115, 28, 83, 63, 75, 35, 55],
     },
   ]);
 
   useEffect(() => {
     getPaymentByStatus()
-      .then(response => {
-      
+      .then((response) => {
         if (Array.isArray(response)) {
           const data = response;
           const monthNames = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
           ];
-  
-          const formattedData = data.map(item => {
+
+          const formattedData = data.map((item) => {
             const date = new Date(item.date);
             const monthName = monthNames[date.getMonth()];
             return { ...item, monthName };
           });
-  
+
           setSeries([
             {
-              data: data.map(item => item.totalAmount),
-              name: 'Payments1'
+              data: data.map((item) => item.totalAmount),
+              name: 'Payments1',
             },
           ]);
-  
+
           setOptions((prevState) => ({
             ...prevState,
             xaxis: {
               ...prevState.xaxis,
-              categories: data.map(item => item.date)
-            }
+              categories: data.map((item) => item.date),
+            },
           }));
         } else {
-          console.error("Response data is not an array", response);
+          console.error('Response data is not an array', response);
         }
       })
-      .catch(error => {
-        console.error("Error fetching data", error);
+      .catch((error) => {
+        console.error('Error fetching data', error);
       });
   }, []);
 

@@ -10,7 +10,7 @@ import {
   PaymentStatus,
   PaymentType,
   RoleName,
-} from "./enums";
+} from './enums';
 
 export interface Account {
   accountId?: number;
@@ -157,7 +157,7 @@ export interface Order {
   orderId?: number;
   createDate?: Date;
   shipAddress?: string;
-  payment?:Payment;
+  payment?: Payment;
   auctionItemDTOS: Item[];
 }
 

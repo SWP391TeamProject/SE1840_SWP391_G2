@@ -1,11 +1,11 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { ReloadIcon, TrashIcon } from "@radix-ui/react-icons"
-import { type Row } from "@tanstack/react-table"
-import { toast } from "sonner"
+import * as React from 'react';
+import { ReloadIcon, TrashIcon } from '@radix-ui/react-icons';
+import { type Row } from '@tanstack/react-table';
+import { toast } from 'sonner';
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -15,23 +15,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 
-
-interface DeleteTasksDialogProps
-  extends React.ComponentPropsWithoutRef<typeof Dialog> {
-  items: Row<any>["original"][]
-  showTrigger?: boolean
-  onSuccess?: () => void
+interface DeleteTasksDialogProps extends React.ComponentPropsWithoutRef<typeof Dialog> {
+  items: Row<any>['original'][];
+  showTrigger?: boolean;
+  onSuccess?: () => void;
 }
 
-export function DeleteAccountsDialog({
-    items,
-  showTrigger = true,
-  onSuccess,
-  ...props
-}: DeleteTasksDialogProps) {
-  const [isDeletePending, startDeleteTransition] = React.useTransition()
+export function DeleteAccountsDialog({ items, showTrigger = true, onSuccess, ...props }: DeleteTasksDialogProps) {
+  const [isDeletePending, startDeleteTransition] = React.useTransition();
 
   return (
     <Dialog {...props}>
@@ -47,9 +40,9 @@ export function DeleteAccountsDialog({
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your{" "}
+            This action cannot be undone. This will permanently delete your{' '}
             <span className="font-medium">{items.length}</span>
-            {items.length === 1 ? " task" : " tasks"} from our servers.
+            {items.length === 1 ? ' task' : ' tasks'} from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:space-x-0">
@@ -60,33 +53,25 @@ export function DeleteAccountsDialog({
             aria-label="Delete selected rows"
             variant="destructive"
             onClick={() => {
-            //   startDeleteTransition(async () => {
-            //     const { error } = await deleteItem({
-            //       ids: items.map((task) => items.id),
-            //     })
-
-            //     if (error) {
-            //       toast.error(error)
-            //       return
-            //     }
-
-            //     props.onOpenChange?.(false)
-            //     toast.success("Tasks deleted")
-            //     onSuccess?.()
-            //   })
+              //   startDeleteTransition(async () => {
+              //     const { error } = await deleteItem({
+              //       ids: items.map((task) => items.id),
+              //     })
+              //     if (error) {
+              //       return
+              //     }
+              //     props.onOpenChange?.(false)
+              //     toast.success("Tasks deleted")
+              //     onSuccess?.()
+              //   })
             }}
             disabled={isDeletePending}
           >
-            {isDeletePending && (
-              <ReloadIcon
-                className="mr-2 size-4 animate-spin"
-                aria-hidden="true"
-              />
-            )}
+            {isDeletePending && <ReloadIcon className="mr-2 size-4 animate-spin" aria-hidden="true" />}
             Delete
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -3,119 +3,128 @@
  * @see https://v0.dev/t/TMzlSp5CzlB
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { useParams } from "react-router-dom"
-import { getItemsByStatus } from "@/services/ItemService"
-import { useAppDispatch, useAppSelector } from "@/redux/hooks"
-import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession"
-import { assignItem, fetchAuctionSessionById, removeAuctionItem } from "@/services/AuctionSessionService"
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
-import { ItemStatus } from "@/models/Item"
-import { toast } from "sonner"
-import { showErrorToast } from "@/lib/handle-error"
-import { ConfirmationButton } from "@/components/confirmation/confirmation-button"
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { useParams } from 'react-router-dom';
+import { getItemsByStatus } from '@/services/ItemService';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
+import { assignItem, fetchAuctionSessionById, removeAuctionItem } from '@/services/AuctionSessionService';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { ItemStatus } from '@/models/Item';
+import { toast } from 'sonner';
+import { showErrorToast } from '@/lib/handle-error';
+import { ConfirmationButton } from '@/components/confirmation/confirmation-button';
 
 export default function AssignAuctionItem() {
- 
-  const auction = useAppSelector((state) => state.auctionSessions.currentAuctionSession)
-  const [availableItems, setAvailableItems] = useState([])
-  const param = useParams<{ id: string }>()
-  const dispatch = useAppDispatch()
-  const [selectedItems, setSelectedItems] = useState([])
-  const [existingItems, setExistingItems] = useState([])
+  const auction = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
+  const [availableItems, setAvailableItems] = useState([]);
+  const param = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [existingItems, setExistingItems] = useState([]);
   const currencyFormatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   });
 
   useEffect(() => {
-    getItemsByStatus(ItemStatus.QUEUE, 0, 10).then((res) => {
-      setAvailableItems(res?.data?.content);
-      console.log(res?.data?.content);
-    }).catch((err) => {
-      console.error(err)
-    })
+    getItemsByStatus(ItemStatus.QUEUE, 0, 10)
+      .then((res) => {
+        setAvailableItems(res?.data?.content);
+        console.log(res?.data?.content);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
     if (!auction || auction.auctionSessionId != param.id) {
       fetchAuctionSessionById(param.id).then((res) => {
-        console.log(res)
-        dispatch(setCurrentAuctionSession(res?.data))
+        console.log(res);
+        dispatch(setCurrentAuctionSession(res?.data));
         let tempArr = res.data.auctionItems.map((item) => {
-          return item.itemDTO
-        })
-        console.log(tempArr)
-        setSelectedItems(tempArr)
-        setExistingItems(tempArr)
-      })
+          return item.itemDTO;
+        });
+        console.log(tempArr);
+        setSelectedItems(tempArr);
+        setExistingItems(tempArr);
+      });
     } else {
-      setSelectedItems(auction.auctionItems.map((item) => {
-        return item?.itemDTO
-      }))
-      setExistingItems(auction.auctionItems.map((item) => {
-        return item?.itemDTO
-      }))
+      setSelectedItems(
+        auction.auctionItems.map((item) => {
+          return item?.itemDTO;
+        })
+      );
+      setExistingItems(
+        auction.auctionItems.map((item) => {
+          return item?.itemDTO;
+        })
+      );
     }
-  }, [])
-  
+  }, []);
+
   const handleAssign = (item: any) => {
-    if (!selectedItems.find(i => i.itemId === item.itemId)) {
+    if (!selectedItems.find((i) => i.itemId === item.itemId)) {
       setSelectedItems([...selectedItems, item]);
-      setAvailableItems(availableItems.filter(i => i.itemId !== item.itemId));
+      setAvailableItems(availableItems.filter((i) => i.itemId !== item.itemId));
     }
-  }
+  };
 
   // useEffect(() => {
   //   console.log("here");
   // }, [selectedItems, availableItems])
 
   const handleUnassign = (item: any) => {
-    let existingItem = existingItems.find(i => i.itemId == item.itemId)
+    let existingItem = existingItems.find((i) => i.itemId == item.itemId);
     if (existingItem) {
-      let auctionItem = auction.auctionItems.find(i => i.itemDTO.itemId == existingItem.itemId)
+      let auctionItem = auction.auctionItems.find((i) => i.itemDTO.itemId == existingItem.itemId);
       console.log(auctionItem);
-      removeAuctionItem(auctionItem?.id).then((res) => {
-        // toast.success('Item Unassigned', {
-        //   position: "bottom-right",
-        // });
-        // let tempList = [...availableItems, item];
-        // tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
-        // setAvailableItems(tempList);
-        // setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
-        setExistingItems(existingItems.filter(i => i.itemId !== item.itemId))
-      }).catch((err) => {
-        showErrorToast(err)
-      });
-    } 
+      removeAuctionItem(auctionItem?.id)
+        .then((res) => {
+          // toast.success('Item Unassigned', {
+          //   position: "bottom-right",
+          // });
+          // let tempList = [...availableItems, item];
+          // tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
+          // setAvailableItems(tempList);
+          // setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
+          setExistingItems(existingItems.filter((i) => i.itemId !== item.itemId));
+        })
+        .catch((err) => {
+          showErrorToast(err);
+        });
+    }
     // else {
-      setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
-      let tempList = [...availableItems, item];
-      tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
-      setAvailableItems(tempList);
-      toast.success('Item Unassigned', {
-        position: "bottom-right",
-      });
+    setSelectedItems(selectedItems.filter((i) => i.itemId !== item.itemId));
+    let tempList = [...availableItems, item];
+    tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
+    setAvailableItems(tempList);
+    toast.success('Item Unassigned', {
+      position: 'bottom-right',
+    });
     // }
-  }
+  };
 
   const handleSave = () => {
     var tempList: any[] = [];
-    selectedItems.forEach(item => {
-        tempList.push(item.itemId);
-    })
-    assignItem(auction?.auctionSessionId, tempList).then((res) => {
-      console.log(res);
-      toast.success("Items assigned successfully.")
-    }).catch((err) => {
-      console.error(err)
-      showErrorToast(err) 
-    })
-  }
+    selectedItems.forEach((item) => {
+      tempList.push(item.itemId);
+    });
+    assignItem(auction?.auctionSessionId, tempList)
+      .then((res) => {
+        console.log(res);
+        toast.success('Items assigned successfully.');
+      })
+      .catch((err) => {
+        console.error(err);
+        showErrorToast(err);
+      });
+  };
   const handleClear = () => {
     let tempList = selectedItems.concat(availableItems).sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
     setAvailableItems(tempList);
-    setSelectedItems([])
-  }
+    setSelectedItems([]);
+  };
 
   return (
     <>
@@ -126,7 +135,9 @@ export default function AssignAuctionItem() {
             {/* <Button variant="outline" disabled={selectedItems.length == 0} onClick={handleClear}>
               Clear Selected
             </Button> */}
-            <Button disabled={selectedItems.length == 0} onClick={handleSave}>Save Selected</Button>
+            <Button disabled={selectedItems.length == 0} onClick={handleSave}>
+              Save Selected
+            </Button>
           </div>
         </div>
         <div className="border rounded-lg shadow-sm">
@@ -145,19 +156,20 @@ export default function AssignAuctionItem() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {availableItems && availableItems.map((item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.itemId}</TableCell>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
-                    {/* <TableCell>{item.description}</TableCell> */}
-                    <TableCell>
-                      <Button size="sm" variant="outline" onClick={() => handleAssign(item)}>
-                        Select
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {availableItems &&
+                  availableItems.map((item: any) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.itemId}</TableCell>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
+                      {/* <TableCell>{item.description}</TableCell> */}
+                      <TableCell>
+                        <Button size="sm" variant="outline" onClick={() => handleAssign(item)}>
+                          Select
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </div>
@@ -178,33 +190,35 @@ export default function AssignAuctionItem() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {selectedItems && selectedItems.map((item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item?.itemId}</TableCell>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
-                    {/* <TableCell>{item.description}</TableCell> */}
-                    <TableCell>
-                      {/* <Button size="sm" variant="outline" onClick={() => handleUnassign(item)}>
+                {selectedItems &&
+                  selectedItems.map((item: any) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item?.itemId}</TableCell>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
+                      {/* <TableCell>{item.description}</TableCell> */}
+                      <TableCell>
+                        {/* <Button size="sm" variant="outline" onClick={() => handleUnassign(item)}>
                         Remove
                       </Button> */}
-                      <ConfirmationButton
-                        message={`Item ${item.itemId} will be removed from this auction session.`}
-                        title={"Are you sure to unassign this item?"}
-                        label={"Remove"}
-                        description={""}
-                        onSuccess={() => handleUnassign(item)}
-                        variant="outline">
-                        Remove
-                      </ConfirmationButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                        <ConfirmationButton
+                          message={`Item ${item.itemId} will be removed from this auction session.`}
+                          title={'Are you sure to unassign this item?'}
+                          label={'Remove'}
+                          description={''}
+                          onSuccess={() => handleUnassign(item)}
+                          variant="outline"
+                        >
+                          Remove
+                        </ConfirmationButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }

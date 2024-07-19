@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { ReloadIcon, TrashIcon } from "@radix-ui/react-icons"
-import { type Row } from "@tanstack/react-table"
+import * as React from 'react';
+import { ReloadIcon, TrashIcon } from '@radix-ui/react-icons';
+import { type Row } from '@tanstack/react-table';
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -14,26 +14,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { AccountStatus } from "@/constants/enums"
-import { activateAccountService, deleteAccountService } from "@/services/AccountsServices"
-import { toast } from "sonner"
-import { showErrorToast } from "@/lib/handle-error"
+} from '@/components/ui/dialog';
+import { AccountStatus } from '@/constants/enums';
+import { activateAccountService, deleteAccountService } from '@/services/AccountsServices';
+import { toast } from 'sonner';
+import { showErrorToast } from '@/lib/handle-error';
 
-interface DeleteTasksDialogProps
-  extends React.ComponentPropsWithoutRef<typeof Dialog> {
-  items: Row<any>["original"][]
-  showTrigger?: boolean
-  onSuccess?: () => void
+interface DeleteTasksDialogProps extends React.ComponentPropsWithoutRef<typeof Dialog> {
+  items: Row<any>['original'][];
+  showTrigger?: boolean;
+  onSuccess?: () => void;
 }
 
-export function DeleteAccountsDialog({
-    items,
-  showTrigger = true,
-  onSuccess,
-  ...props
-}: DeleteTasksDialogProps) {
-  const [isDeletePending, startDeleteTransition] = React.useTransition()
+export function DeleteAccountsDialog({ items, showTrigger = true, onSuccess, ...props }: DeleteTasksDialogProps) {
+  const [isDeletePending, startDeleteTransition] = React.useTransition();
 
   return (
     <Dialog {...props}>
@@ -49,9 +43,8 @@ export function DeleteAccountsDialog({
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This will suspend your{" "}
-            <span className="font-medium">{items.length}</span>
-            {items.length === 1 ? " account" : " accounts"} on our servers.
+            This will suspend your <span className="font-medium">{items.length}</span>
+            {items.length === 1 ? ' account' : ' accounts'} on our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:space-x-0">
@@ -60,45 +53,40 @@ export function DeleteAccountsDialog({
           </DialogClose>
           <Button
             aria-label="Delete selected rows"
-            variant={items[0].status == AccountStatus.ACTIVE ? "destructive" : "default"}
+            variant={items[0].status == AccountStatus.ACTIVE ? 'destructive' : 'default'}
             onClick={() => {
               startDeleteTransition(() => {
-                if(items.length == 1){
-                  if(items[0].status == AccountStatus.ACTIVE){
-                        deleteAccountService(items[0].accountId).then((res) => {
-                          if(res)
-                            toast.success("Account suspended")
-                        }).catch((err) => {
-                          showErrorToast(err)
-                        })
-                            
-                  } 
-                  else if(items[0].status == AccountStatus.DISABLED){
-                       activateAccountService(items[0].accountId).then((res) => {
-                          if(res)
-                            toast.success("Account activated")
-                        }).catch((err) => {
-                          showErrorToast(err)
-                        })      
-                  } else if (items[0].status == AccountStatus.DISABLED){
-  
+                if (items.length == 1) {
+                  if (items[0].status == AccountStatus.ACTIVE) {
+                    deleteAccountService(items[0].accountId)
+                      .then((res) => {
+                        if (res) toast.success('Account suspended');
+                      })
+                      .catch((err) => {
+                        showErrorToast(err);
+                      });
+                  } else if (items[0].status == AccountStatus.DISABLED) {
+                    activateAccountService(items[0].accountId)
+                      .then((res) => {
+                        if (res) toast.success('Account activated');
+                      })
+                      .catch((err) => {
+                        showErrorToast(err);
+                      });
+                  } else if (items[0].status == AccountStatus.DISABLED) {
                   }
-              }
-              props.onOpenChange?.(false)
-              onSuccess?.()})
+                }
+                props.onOpenChange?.(false);
+                onSuccess?.();
+              });
             }}
             disabled={isDeletePending}
           >
-            {isDeletePending && (
-              <ReloadIcon
-                className="mr-2 size-4 animate-spin"
-                aria-hidden="true"
-              />
-            )}
-            {items[0].status == AccountStatus.ACTIVE ? "Suspend" : "Activate"}
+            {isDeletePending && <ReloadIcon className="mr-2 size-4 animate-spin" aria-hidden="true" />}
+            {items[0].status == AccountStatus.ACTIVE ? 'Suspend' : 'Activate'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

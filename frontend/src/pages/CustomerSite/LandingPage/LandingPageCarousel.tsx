@@ -1,23 +1,19 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { Link } from "react-router-dom";
-import Autoplay from "embla-carousel-autoplay";
-import { Button } from "@/components/ui/button";
-import thumbnail1 from "@/assets/thumnail1.jpg";
-import thumbnail2 from "@/assets/thumnail2.jpg";
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Link } from 'react-router-dom';
+import Autoplay from 'embla-carousel-autoplay';
+import { Button } from '@/components/ui/button';
+import thumbnail1 from '@/assets/thumnail1.jpg';
+import thumbnail2 from '@/assets/thumnail2.jpg';
 
 export default function LandingPageCarousel() {
   return (
     <>
-      <Carousel className="w-full flex justify-center content-center  bg-background text-foreground  "
+      <Carousel
+        className="w-full flex justify-center content-center  bg-background text-foreground  "
         plugins={[
           Autoplay({
             delay: 3000,
             pauseOnHover: true,
-
           }),
         ]}
       >
@@ -31,27 +27,23 @@ export default function LandingPageCarousel() {
                       Consign Your Jewelry
                     </h1>
                     <p className="max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                      Sell your rare and unique jewelry through our premier
-                      online auction house.
+                      Sell your rare and unique jewelry through our premier online auction house.
                     </p>
                     <div className="space-x-4 md:mt-6">
                       <Button variant="default" className="w-fit" asChild>
-
-                        <Link
-                          to="/create-consignment"
-                        >
-                          Consign an Item
-                        </Link>
+                        <Link to="/create-consignment">Consign an Item</Link>
                       </Button>
-
                     </div>
                   </div>
                   <div className="relative flex items-center">
-                    <Carousel className="w-full" plugins={[
-                      Autoplay({
-                        delay: 3000,
-                      }),
-                    ]}>
+                    <Carousel
+                      className="w-full"
+                      plugins={[
+                        Autoplay({
+                          delay: 3000,
+                        }),
+                      ]}
+                    >
                       <CarouselContent>
                         <CarouselItem>
                           <img
@@ -89,44 +81,42 @@ export default function LandingPageCarousel() {
                       Participate in Our Exclusive Auctions
                     </h1>
                     <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                      Participate in our exclusive auctions and discover rare
-                      and unique jewelry you won't find anywhere else.
+                      Participate in our exclusive auctions and discover rare and unique jewelry you won't find anywhere
+                      else.
                     </p>
                     <div className="space-x-4 md:mt-6">
                       <Button variant="default" className="w-fit">
-                        <Link
-                          to="auctions"
-                        >
-                          Participate in Auction
-                        </Link>
+                        <Link to="auctions">Participate in Auction</Link>
                       </Button>
-
                     </div>
                   </div>
                   <div className="relative flex items-center">
-                    <Carousel className="w-full" plugins={[
-                      Autoplay({
-                        delay: 3000,
-                      }),
-                    ]}>
+                    <Carousel
+                      className="w-full"
+                      plugins={[
+                        Autoplay({
+                          delay: 3000,
+                        }),
+                      ]}
+                    >
                       <CarouselContent>
                         <CarouselItem>
                           <img
-                              alt="Hero"
-                              className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
-                              height="550"
-                              src={thumbnail1}
-                              width="550"
+                            alt="Hero"
+                            className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
+                            height="550"
+                            src={thumbnail1}
+                            width="550"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
                         </CarouselItem>
                         <CarouselItem>
                           <img
-                              alt="Hero"
-                              className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
-                              height="550"
-                              src={thumbnail2}
-                              width="550"
+                            alt="Hero"
+                            className="mx-auto aspect-video overflow-hidden rounded-xl object-bottom sm:w-full lg:aspect-square"
+                            height="550"
+                            src={thumbnail2}
+                            width="550"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
                         </CarouselItem>
@@ -134,7 +124,6 @@ export default function LandingPageCarousel() {
                     </Carousel>
                   </div>
                 </div>
-
               </div>
             </section>
           </CarouselItem>

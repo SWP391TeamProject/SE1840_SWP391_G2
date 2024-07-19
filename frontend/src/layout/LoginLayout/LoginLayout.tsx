@@ -1,6 +1,6 @@
-import RegisterForm from "@/pages/authentication/RegisterForm";
-import { Suspense, lazy } from "react";
-const LoginForm = lazy(() => import("@/pages/authentication/LoginForm"));
+import RegisterForm from '@/pages/authentication/RegisterForm';
+import { Suspense, lazy } from 'react';
+const LoginForm = lazy(() => import('@/pages/authentication/LoginForm'));
 export default function LoginLayout() {
   return (
     <>

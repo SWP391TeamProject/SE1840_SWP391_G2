@@ -1,19 +1,27 @@
-import "./styles.css";
+import './styles.css';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { ChevronDownIcon, MenuIcon } from "lucide-react";
-import { useAuth } from "@/AuthProvider.tsx";
-import ModeToggle from "../component/ModeToggle";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "../ui/navigation-menu";
-import logo from "@/assets/icon.png";
-import ProfileDropdownMenu from "@/components/NavBar/ProfileDropdownMenu.tsx";
+} from '@/components/ui/dropdown-menu';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '../ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { ChevronDownIcon, MenuIcon } from 'lucide-react';
+import { useAuth } from '@/AuthProvider.tsx';
+import ModeToggle from '../component/ModeToggle';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '../ui/navigation-menu';
+import logo from '@/assets/icon.png';
+import ProfileDropdownMenu from '@/components/NavBar/ProfileDropdownMenu.tsx';
 
 export default function NavBar() {
   const auth = useAuth();
@@ -30,41 +38,49 @@ export default function NavBar() {
 
         <nav className="hidden lg:flex items-center gap-6 ml-auto w-fit">
           <Button variant="outline" className="ml-auto" asChild>
-            <Link to="/create-consignment" onClick={()=>{
-              !auth.isAuthenticated() && nav("/auth/login")
-            }}>Put Your Item For Auction</Link>
+            <Link
+              to="/create-consignment"
+              onClick={() => {
+                !auth.isAuthenticated() && nav('/auth/login');
+              }}
+            >
+              Put Your Item For Auction
+            </Link>
           </Button>
           <NavigationMenu className="hidden lg:flex items-center gap-6 ml-auto">
             <NavigationMenuList>
-
               <NavigationMenuItem>
                 {!auth.isAuthenticated() ? (
-                  <Button
-                    className="flex items-center gap-2  "
-                    variant="default"
-                    asChild
-                  >
+                  <Button className="flex items-center gap-2  " variant="default" asChild>
                     <Link to="/auth/login">Login</Link>
                   </Button>
-                ) : ''}
+                ) : (
+                  ''
+                )}
               </NavigationMenuItem>
 
-
-     
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Auctions</NavigationMenuTrigger>
                 <NavigationMenuContent className="md:w-36">
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                    <Link to="/auctions" className={navigationMenuTriggerStyle()} >Auctions</Link>
+                    <Link to="/auctions" className={navigationMenuTriggerStyle()}>
+                      Auctions
+                    </Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                    <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>Featured</Link>
+                    <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>
+                      Featured
+                    </Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                    <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>Past Auctions</Link>
+                    <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>
+                      Past Auctions
+                    </Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                    <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
+                    <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">
+                      Upcoming
+                    </Link>
                   </NavigationMenuLink>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -105,17 +121,14 @@ export default function NavBar() {
             <div className="grid gap-2 py-6">
               {!auth.isAuthenticated() ? (
                 <SheetTrigger asChild>
-                  <Button
-                    className="flex items-center gap-2  "
-                    variant="default"
-                    asChild
-                  >
+                  <Button className="flex items-center gap-2  " variant="default" asChild>
                     <Link to="/auth/login">Login</Link>
                   </Button>
                 </SheetTrigger>
-              ) : ''}
+              ) : (
+                ''
+              )}
               <DropdownMenu>
-
                 <DropdownMenuTrigger className="flex w-full items-center py-2 text-lg font-semibold">
                   Auctions
                   <ChevronDownIcon className="h-4 w-4 ml-1" />
@@ -124,55 +137,54 @@ export default function NavBar() {
                 <DropdownMenuContent align="start">
                   <DropdownMenuItem>
                     <SheetTrigger asChild>
-                      <Link to="/auctions" className={navigationMenuTriggerStyle()}>Auctions</Link>
+                      <Link to="/auctions" className={navigationMenuTriggerStyle()}>
+                        Auctions
+                      </Link>
                     </SheetTrigger>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <SheetTrigger asChild>
-                      <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>Featured</Link>
+                      <Link to="/auctions/featured" className={navigationMenuTriggerStyle()}>
+                        Featured
+                      </Link>
                     </SheetTrigger>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <SheetTrigger asChild>
-                      <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>Past Auctions</Link>
+                      <Link to="/auctions/past" className={navigationMenuTriggerStyle()}>
+                        Past Auctions
+                      </Link>
                     </SheetTrigger>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <SheetTrigger asChild>
-                      <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">Upcoming</Link>
+                      <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">
+                        Upcoming
+                      </Link>
                     </SheetTrigger>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <SheetTrigger asChild>
-                <Link
-                  className="flex w-full items-center py-2 text-lg font-semibold"
-                  to="/about"
-                >
+                <Link className="flex w-full items-center py-2 text-lg font-semibold" to="/about">
                   About
                 </Link>
               </SheetTrigger>
               <SheetTrigger asChild>
-                <Link
-                  className="flex w-full items-center py-2 text-lg font-semibold"
-                  to="/blogs"
-                >
+                <Link className="flex w-full items-center py-2 text-lg font-semibold" to="/blogs">
                   Blog
                 </Link>
               </SheetTrigger>
               <SheetTrigger asChild>
-                <Link
-                  className="flex w-full items-center py-2 text-lg font-semibold"
-                  to="/contact"
-                >
+                <Link className="flex w-full items-center py-2 text-lg font-semibold" to="/contact">
                   Contact
                 </Link>
               </SheetTrigger>
             </div>
           </SheetContent>
         </Sheet>
-      </header >
+      </header>
     </>
   );
 }

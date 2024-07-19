@@ -1,26 +1,22 @@
-import {useAuth} from "@/AuthProvider.tsx";
-import {useCurrency} from "@/CurrencyProvider.tsx";
-import {useAppSelector} from "@/redux/hooks.tsx";
-import {logout} from "@/services/AuthService.ts";
-import {removeCookie} from "@/utils/cookies.ts";
+import { useAuth } from '@/AuthProvider.tsx';
+import { useCurrency } from '@/CurrencyProvider.tsx';
+import { useAppSelector } from '@/redux/hooks.tsx';
+import { logout } from '@/services/AuthService.ts';
+import { removeCookie } from '@/utils/cookies.ts';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu.tsx";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
-import {Link} from "react-router-dom";
-import React, {ReactNode, useEffect} from "react";
-import {Roles} from "@/constants/enums.tsx";
-import {WalletIcon, BadgeCheck } from "lucide-react";
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.tsx';
+import { Link } from 'react-router-dom';
+import React, { ReactNode, useEffect } from 'react';
+import { Roles } from '@/constants/enums.tsx';
+import { WalletIcon, BadgeCheck } from 'lucide-react';
 
 interface ProfileDropdownMenuProps {
   children?: ReactNode;
@@ -32,10 +28,10 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
   const unreadNoti = useAppSelector((state) => state.unreadNotificationCount);
   const handleSignout = function () {
     logout().then(function () {
-      removeCookie("user");
-      removeCookie('token')
+      removeCookie('user');
+      removeCookie('token');
       window.location.href = '/auth/login';
-    })
+    });
   };
 
   return (
@@ -47,7 +43,11 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
               <AvatarImage src={auth.user.avatar?.link} alt="avatar" />
               <AvatarFallback> {auth.user.nickname[0]}</AvatarFallback>
             </Avatar>
-            {unreadNoti.count > 0 ? <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">{unreadNoti.count}</span> : null}
+            {unreadNoti.count > 0 ? (
+              <span className="absolute right-[-5px] top-[-5px] w-6 h-6 bg-red-500 text-white rounded-full text-center">
+                {unreadNoti.count}
+              </span>
+            ) : null}
           </div>
         </DropdownMenuTrigger>
 
@@ -55,17 +55,19 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
           <DropdownMenuLabel>
             <div className="flex">
               <div className="pr-2 pt-1">{auth.user.nickname}</div>
-              {auth.user.kyc && <Tooltip>
-                <TooltipTrigger asChild>
-                  <BadgeCheck />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>KYC Verified</p>
-                </TooltipContent>
-              </Tooltip>}
+              {auth.user.kyc && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <BadgeCheck />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>KYC Verified</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </DropdownMenuLabel>
-          
+
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild className="cursor-pointer">
             <Link to={'/profile/overview'}>Profile</Link>
@@ -91,17 +93,15 @@ export default function ProfileDropdownMenu({ children }: ProfileDropdownMenuPro
             <Link to={'/profile/balance'}>
               <div className="flex gap-2">
                 <WalletIcon className="w-4" />
-                {currency.format(auth.user.balance,{format: 'compact'})}
+                {currency.format(auth.user.balance, { format: 'compact' })}
               </div>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {React.Children.count(children) > 0 && (
-            <>
-              {children}
-            </>
-          )}
-          <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">Logout</DropdownMenuItem>
+          {React.Children.count(children) > 0 && <>{children}</>}
+          <DropdownMenuItem onClick={handleSignout} className="cursor-pointer">
+            Logout
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

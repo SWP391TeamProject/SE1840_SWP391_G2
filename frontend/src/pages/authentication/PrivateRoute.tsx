@@ -1,6 +1,6 @@
-import { Roles } from "@/constants/enums";
-import { getCookie } from "@/utils/cookies";
-import { useLocation, Navigate, Outlet } from "react-router-dom";
+import { Roles } from '@/constants/enums';
+import { getCookie } from '@/utils/cookies';
+import { useLocation, Navigate, Outlet } from 'react-router-dom';
 
 type RolesEnum = {
   allowedRoles: Roles[];
@@ -8,16 +8,16 @@ type RolesEnum = {
 
 const PrivateRoute = ({ allowedRoles }: RolesEnum) => {
   const location = useLocation();
-  const userCookie = getCookie("user");
+  const userCookie = getCookie('user');
   let parsedUser = null;
   if (userCookie) {
     try {
       parsedUser = JSON.parse(userCookie);
     } catch (error) {
-      console.error("Error parsing user cookie", error);
+      console.error('Error parsing user cookie', error);
     }
   }
-  
+
   return allowedRoles?.includes(parsedUser?.role) ? (
     <Outlet />
   ) : parsedUser?.email ? (
