@@ -84,7 +84,7 @@ public class OrderController {
     @PostMapping("/pay/{id}")
     public ResponseEntity<OrderDTO> payOrder(Principal principal, @PathVariable int id,
                                              @RequestBody OrderPayRequestDTO dto) {
-        JwtUser user = Authorizer.getUser(principal);
+        JwtUser user = Authorizer.requireUser(principal);
         return ResponseEntity.ok(orderService.payOrder(user.getUserId(), id, dto));
     }
 }

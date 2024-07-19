@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 import fpt.edu.vn.Backend.pojo.AuctionSession;
+import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,7 +28,7 @@ public class WebSocketEventListener {
     @Autowired
     private SimpMessageSendingOperations messagingTemplate;
     @Autowired
-    private AuctionSessionService auctionSessionService;
+    private AuctionSessionRepos auctionSessionRepos;
 
     public static Map<String, Set<String>> topicSessions = new ConcurrentHashMap<>();
 
@@ -58,22 +60,18 @@ public class WebSocketEventListener {
             topicSessions.put(topic, sessions);
         } else
             topicSessions.get(topic).add(headerAccessor.getSessionId());
+        String[] args = topic.split("/");
 
-        assert topic != null;
-        if (auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])) == null) {
+        Optional<AuctionSession> as = auctionSessionRepos.findById(Integer.parseInt(args[3])); 
+        if (as.isEmpty()) {
             logger.info("Auction session not found");
-            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3] + "/" + topic.split("/")[4], "Auction session not found:0:ERROR");
-//            throw new ResourceNotFoundException("Auction session not found");
-        } else if (auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus() == AuctionSession.Status.FINISHED) {
+            messagingTemplate.convertAndSend("/topic/public/" + args[3] + "/" + args[4], "Auction session not found:0:ERROR");
+        } else if (as.get().getStatus() == AuctionSession.Status.FINISHED) {
             logger.info("Auction session ended");
-            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3] + "/" + topic.split("/")[4], "Auction session has ended:0:ERROR");
-//            throw new ResourceNotFoundException("Auction session has ended");
-
-        } else if (auctionSessionService.getAuctionSessionById(Integer.parseInt(topic.split("/")[3])).getStatus() == AuctionSession.Status.SCHEDULED) {
+            messagingTemplate.convertAndSend("/topic/public/" + args[3] + "/" + args[4], "Auction session has ended:0:ERROR");
+        } else if (as.get().getStatus() == AuctionSession.Status.SCHEDULED) {
             logger.info("Auction session not started");
-            messagingTemplate.convertAndSend("/topic/public/" + topic.split("/")[3] + "/" + topic.split("/")[4], "Auction session not started:0:ERROR");
-//            throw new ResourceNotFoundException("Auction session not started");
-
+            messagingTemplate.convertAndSend("/topic/public/" + args[3] + "/" + args[4], "Auction session not started:0:ERROR");
         }
     }
 }

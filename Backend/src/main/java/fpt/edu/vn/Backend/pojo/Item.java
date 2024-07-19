@@ -83,7 +83,6 @@ public class Item {
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String stamped;
 
-
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "jewelry_id")
     private List<OrderDetail> orderDetails;
@@ -91,6 +90,10 @@ public class Item {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "jewelry_id")
     private Set<Attachment> attachments;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consignment_reward_payment_id")
+    private Payment consignmentRewardPayment;
 
     @Override
     public int hashCode() {

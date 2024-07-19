@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.service;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.request.ItemUpdateDTO;
@@ -11,6 +12,7 @@ import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +90,24 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         this.itemServiceImpl = itemServiceImpl;
     }
 
+    public AuctionSessionDTO mapAuctionSessionToDTO(AuctionSession pojo, @Nullable Integer accountId) {
+        AuctionSessionDTO dto = new AuctionSessionDTO();
+        dto.setAuctionSessionId(pojo.getAuctionSessionId());
+        dto.setStartDate(pojo.getStartDate());
+        dto.setEndDate(pojo.getEndDate());
+        dto.setStatus(pojo.getStatus());
+        dto.setCreateDate(pojo.getCreateDate());
+        dto.setUpdateDate(pojo.getUpdateDate());
+        dto.setTitle(pojo.getTitle());
+        dto.setDescription(pojo.getDescription());
+        dto.setAttachments(pojo.getAttachments() != null ? pojo.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet()) : new HashSet<>());
+        dto.setAuctionItems(pojo.getAuctionItems() != null ? pojo.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet()) : new HashSet<>());
+        dto.setParticipantCount(pojo.getParticipantCount());
+        if (accountId != null)
+            dto.setHasDeposited(depositRepos.hasDeposited(pojo.getAuctionSessionId(), accountId));
+        return dto;
+    }
+
     @Override
     //@CacheEvict(key = "#auctionSessionId",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
@@ -95,6 +115,17 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
         AuctionSession auctionSession = auctionSessionRepos.findById(auctionSessionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction session not found:" + auctionSessionId));
+        Preconditions.checkState(
+                LocalDateTime.now().isAfter(auctionSession.getStartDate()),
+                "Auction session has not yet started");
+        Preconditions.checkState(
+                auctionSession.getStatus() != AuctionSession.Status.FINISHED &&
+                        auctionSession.getStatus() != AuctionSession.Status.TERMINATED,
+                "Auction session has been ended");
+        Preconditions.checkState(
+                LocalDateTime.now().isBefore(auctionSession.getEndDate()),
+                "Auction session has been ended");
+
         List<Item> items = new ArrayList<>();
         for (AuctionItem auctionItem : auctionSession.getAuctionItems()) {
             items.add(auctionItem.getItem());
@@ -109,13 +140,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 .multiply(BigDecimal.valueOf(4.5 / 100d));
         depositAmount = depositAmount.max(minPrice);
         depositAmount = depositAmount.min(maxPrice);
+
         if (a.getBalance().compareTo(depositAmount) >= 0) {
-            auctionSession.getDeposits().stream().filter(deposit -> deposit.getPayment().getAccount().getAccountId() == accountId)
-                    .findFirst().ifPresent(deposit -> {
-                        throw new InvalidInputException("Account already registered for auction session");
-                    });
+            Preconditions.checkState(!depositRepos.hasDeposited(auctionSessionId, accountId), "Already deposited");
             a.setBalance(a.getBalance().subtract(depositAmount));
             accountRepos.save(a);
+
             Payment payment = new Payment();
             payment.setAccount(a);
             payment.setPaymentAmount(depositAmount);
@@ -130,9 +160,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             deposit = depositRepos.save(deposit);
 
             auctionSession.getDeposits().add(deposit);
-            auctionSessionRepos.save(auctionSession);
+            auctionSession = auctionSessionRepos.save(auctionSession);
 
-            return new AuctionSessionDTO(auctionSession);
+            return mapAuctionSessionToDTO(auctionSession, accountId);
         } else {
             throw new ResourceNotFoundException("Account balance is not enough to register for auction session");
         }
@@ -225,7 +255,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             } catch (Exception e) {
                 throw new InvalidInputException("Error uploading attachments", e);
             }
-            return new AuctionSessionDTO(savedAuctionSession);
+            return mapAuctionSessionToDTO(savedAuctionSession, null);
         } catch (Exception e) {
             throw new InvalidInputException("Error creating auction session", e);
         }
@@ -560,26 +590,13 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable) {
+    public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable,@Nullable Integer accountId) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 5);
         }
-        List<AuctionSession> auctionSessionList = auctionSessionRepos.findByStartDateAfter(LocalDateTime.now());
-        BigDecimal evaluationThreshold = new BigDecimal(2);
-        List<AuctionSessionDTO> featuredAuctionSessions = auctionSessionList.stream().filter(
-                        auctionSession -> {
-                            BigDecimal totalEvaluation = auctionSession.getAuctionItems().stream()
-                                    .map(auctionItem -> auctionItem.getItem().getReservePrice())
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-                            return auctionSession.getStatus() == AuctionSession.Status.SCHEDULED
-                                    && !auctionSession.getAuctionItems().isEmpty()
-                                    && !auctionSession.getDeposits().isEmpty()
-                                    && totalEvaluation.compareTo(evaluationThreshold) >= 0;
-                        }
-                ).map(AuctionSessionDTO::new).
-                collect(Collectors.toList());
-        logger.info("Featured auction sessions: " + featuredAuctionSessions.size());
-        return new PageImpl<>(featuredAuctionSessions, pageable, featuredAuctionSessions.size());
+        return auctionSessionRepos.findByCriteriaHasParticipant(
+                Set.of(AuctionSession.Status.SCHEDULED), null, LocalDateTime.now(),
+                null, pageable).map(a -> mapAuctionSessionToDTO(a, accountId));
     }
 
     @Override
@@ -620,11 +637,11 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
     //@Cacheable(key = "#id", value = "auctionSession")
     @Override
-    public AuctionSessionDTO getAuctionSessionById(int id) {
+    public AuctionSessionDTO getAuctionSessionById(int id, @Nullable Integer accountId) {
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(id).orElseThrow(() ->
                     new ResourceNotFoundException("Auction Session Id Not Found"));
-            return new AuctionSessionDTO(auctionSession);
+            return mapAuctionSessionToDTO(auctionSession, accountId);
         } catch (Exception e) {
             logger.error("Error processing auction session id: " + id, e);
             throw new ResourceNotFoundException("Error processing auction session", e);
@@ -632,77 +649,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
 
     @Override
-    public void updateAuctionSessionByStatus(UpdateStatusAuctionSessionRequestDTO request) {
-
-        for (Integer auctionSessionId : request.getAuctionSessionId()) {
-            try {
-                Optional<AuctionSession> auctionSession = auctionSessionRepos.findById(auctionSessionId);
-                AuctionSession auction = auctionSession.get();
-                if (auction != null) {
-                    auction.setStatus(AuctionSession.Status.valueOf(request.getStatus().toUpperCase()));
-                    auctionSessionRepos.save(auction);
-                } else {
-                    throw new ResourceNotFoundException("Auction not found with ID: " + auctionSessionId);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid status value: " + request.getStatus().toUpperCase());
-            } catch (Exception e) {
-                throw new ConsignmentServiceException("An error occurred while updating auction with ID: " + auctionSessionId);
-            }
-        }
-
-    }
-
-
-    //@Cacheable(key = "'all '+#pageable != null ? #pageable.toString() : 'default'", value = "auctionSession")
-    @Override
-    public Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> auctionSessions = auctionSessionRepos.findAll(pageable);
-        if (auctionSessions.isEmpty()) {
-            throw new ResourceNotFoundException("No auction sessions found");
-        }
-        return auctionSessions.map(AuctionSessionDTO::new);
-    }
-
-    @Override
-    public Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> pastAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.FINISHED, pageable);
-        if (pastAuctionSessions.isEmpty()) {
-            logger.warn("No past auction sessions found");
-            throw new ResourceNotFoundException("No past auction sessions found");
-        }
-        return pastAuctionSessions.map(AuctionSessionDTO::new);
-
-
-    }
-
-    @Override
-    public Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable, String title) {
-        Page<AuctionSessionDTO> a = auctionSessionRepos.findByTitleContaining(title, pageable)
-                .map(AuctionSessionDTO::new);
-        if (a.isEmpty()) {
-            logger.warn("No auction sessions with title:" + title + " found");
-            throw new ResourceNotFoundException("No auction sessions with title:" + title + " found");
-        }
-        return a;
-    }
-
-    @Override
-    public Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable) {
-        Page<AuctionSession> upcomingAuctionSessions = auctionSessionRepos.findAllByStatus(AuctionSession.Status.SCHEDULED, pageable);
-
-        if (upcomingAuctionSessions == null) {
-            logger.warn("Auction session repository returned null");
-            throw new ResourceNotFoundException("No upcoming auction sessions found");
-        }
-
-        if (upcomingAuctionSessions.isEmpty()) {
-            logger.warn("No upcoming auction sessions found");
-            throw new ResourceNotFoundException("No upcoming auction sessions found");
-        }
-
-        return upcomingAuctionSessions.map(AuctionSessionDTO::new);
-
+    public Page<AuctionSessionDTO> getAuctionSessions(Pageable pageable,
+                                                      @Nullable Set<AuctionSession.Status> status,
+                                                      @Nullable String search,
+                                                      @Nullable LocalDateTime fromDate,
+                                                      @Nullable LocalDateTime toDate,
+                                                      @Nullable Integer accountId) {
+        return auctionSessionRepos.findByCriteria(status, search, fromDate, toDate, pageable)
+                .map(a -> mapAuctionSessionToDTO(a, accountId));
     }
 
     private void sendMail(String targetEmail, String title, String content) throws MessagingException {

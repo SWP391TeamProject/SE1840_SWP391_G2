@@ -37,9 +37,4 @@ public class OrderDetail {
 
     @CreationTimestamp
     private LocalDateTime createDate;
-
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
-
-
 }

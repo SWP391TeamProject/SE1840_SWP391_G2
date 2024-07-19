@@ -7,6 +7,7 @@ import lombok.Data;
 public class Deposit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "transaction_id") // use transaction id as deposit id
     private int depositId;
 
     @ManyToOne(fetch = FetchType.LAZY)

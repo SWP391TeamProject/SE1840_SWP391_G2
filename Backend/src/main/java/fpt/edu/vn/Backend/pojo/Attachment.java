@@ -60,5 +60,9 @@ public class Attachment {
     @Column(name = "update_date")
     private LocalDateTime updateDate;
 
+    @Override
+    public int hashCode() {
+        return attachmentId;
+    }
 }
 

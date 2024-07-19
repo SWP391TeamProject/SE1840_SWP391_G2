@@ -34,7 +34,7 @@ public class ItemDTO implements Serializable {
     private String measurement;
     private String condition;
     private String stamped;
-    private Integer orderId;
+    private Integer consignmentRewardPaymentId;
     private Set<AttachmentDTO> attachments;
 
     public ItemDTO(Item item) {
@@ -61,6 +61,9 @@ public class ItemDTO implements Serializable {
         this.measurement = item.getMeasurement();
         this.condition = item.getCondition();
         this.stamped = item.getStamped();
+        if (item.getStatus() == Item.Status.SOLD &&
+                item.getConsignmentRewardPayment() != null)
+            this.consignmentRewardPaymentId = item.getConsignmentRewardPayment().getPaymentId();
         if (item.getAttachments() != null)
             this.attachments = item.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet());
         else

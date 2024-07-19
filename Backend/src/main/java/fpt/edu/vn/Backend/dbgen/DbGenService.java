@@ -487,9 +487,11 @@ public class DbGenService {
             AuctionSession auctionSession = new AuctionSession();
             auctionSession.setAuctionSessionId(obj.get("id").getAsInt());
             auctionSession.setTitle(obj.get("title").getAsString());
+            auctionSession.setDescription(obj.get("description").getAsString());
             auctionSession.setStartDate(parseDate(obj.get("startDate").getAsString()));
             auctionSession.setEndDate(parseDate(obj.get("endDate").getAsString()));
             auctionSession.setStatus(AuctionSession.Status.valueOf(obj.get("status").getAsString()));
+            auctionSession.setParticipantCount(obj.get("participantCount").getAsInt());
             auctionSession = auctionSessionRepos.save(auctionSession);
             {
                 Map<String, Object> paramMap = new HashMap<>();
@@ -537,6 +539,7 @@ public class DbGenService {
                     auctionItem.setAuctionSession(auctionSession);
                     auctionItem.setItem(itemRepos.getReferenceById(obj.get("itemId").getAsInt()));
                     auctionItem.setCurrentPrice(obj.get("currentPrice").getAsBigDecimal());
+                    auctionItem.setBidCount(obj.get("bidCount").getAsInt());
                     auctionItem = auctionItemRepos.save(auctionItem);
                     {
                         Map<String, Object> paramMap = new HashMap<>();
@@ -609,8 +612,10 @@ public class DbGenService {
                     meta = new Order();
                     if (obj.has("orderAddress"))
                         ((Order) meta).setShippingAddress(obj.get("orderAddress").getAsString());
-                    if (obj.has("soldPrice"))
+                    if (auctionItem.has("soldPrice")) {
                         soldPrice = auctionItem.get("soldPrice").getAsBigDecimal();
+                        ((Order) meta).setFee(payment.getPaymentAmount().subtract(soldPrice));
+                    }
                 }
             }
 

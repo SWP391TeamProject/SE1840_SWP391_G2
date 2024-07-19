@@ -3,13 +3,13 @@ package fpt.edu.vn.Backend.service;
 import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
-import fpt.edu.vn.Backend.DTO.ItemDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 
 public interface AuctionSessionService {
@@ -17,18 +17,19 @@ public interface AuctionSessionService {
     AuctionSessionDTO createAuctionSession(AuctionCreateDTO auctionDTO);
 
     AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO);
-    
-    AuctionSessionDTO getAuctionSessionById(int id);
 
-    void updateAuctionSessionByStatus(UpdateStatusAuctionSessionRequestDTO request);
+    AuctionSessionDTO getAuctionSessionById(int id, @Nullable Integer accountId);
 
-    Page<AuctionSessionDTO> getAllAuctionSessions(Pageable pageable);
+    Page<AuctionSessionDTO> getAuctionSessions(Pageable pageable,
+                                               @Nullable Set<AuctionSession.Status> status,
+                                               @Nullable String search,
+                                               @Nullable LocalDateTime fromDate,
+                                               @Nullable LocalDateTime toDate,
+                                               @Nullable Integer accountId);
 
-    Page<AuctionSessionDTO> getPastAuctionSessions(Pageable pageable);
+    Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable, @Nullable Integer accountId);
 
-    Page<AuctionSessionDTO> getUpcomingAuctionSessions(Pageable pageable);
-
-    Page<AuctionSessionDTO> getAuctionSessionsByTitle(Pageable pageable,String title);
+    Page<AuctionSessionDTO> getPastAuctionOfItem(Pageable pageable, int itemId);
 
     AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId);
 
@@ -39,8 +40,4 @@ public interface AuctionSessionService {
     void terminateAuction(int auctionSessionId);
 
     void startAuction(int auctionSessionId);
-
-    Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable);
-
-    Page<AuctionSessionDTO> getPastAuctionOfItem(Pageable pageable, int itemId);
 }

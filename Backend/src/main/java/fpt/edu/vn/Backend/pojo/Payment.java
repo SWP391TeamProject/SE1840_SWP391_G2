@@ -67,6 +67,9 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @OneToOne(mappedBy = "consignmentRewardPayment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Item consignmentRewardItem;
+
     @CreationTimestamp
     private LocalDateTime createDate;
 

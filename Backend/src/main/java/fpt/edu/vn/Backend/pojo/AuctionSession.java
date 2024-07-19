@@ -23,9 +23,11 @@ public class AuctionSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int auctionSessionId;
 
-
     @Column(name = "title", length = 100, columnDefinition = "NVARCHAR(100)")
     private String title;
+
+    @Column(name = "description", length = 4000, columnDefinition = "NVARCHAR(4000)")
+    private String description;
 
     private LocalDateTime startDate;
 
@@ -39,8 +41,8 @@ public class AuctionSession {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
 
-//    @Column(name = "is_featured")
-//    private byte isFeatured;
+    @Column(name = "participant_count", columnDefinition = "int default 0")
+    private int participantCount;
 
     @CreationTimestamp
     @Column(name = "create_date")

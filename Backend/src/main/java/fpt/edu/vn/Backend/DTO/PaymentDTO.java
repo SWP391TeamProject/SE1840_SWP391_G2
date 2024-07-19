@@ -20,6 +20,9 @@ public class PaymentDTO implements Serializable {
     private Payment.Status status;
     private Payment.Method method;
     private int accountId;
+    private Integer consignmentRewardItemId;
+    private Integer depositAuctionId;
+
     public PaymentDTO(Payment payment) {
         if (payment == null) return;
         this.id = payment.getPaymentId();
@@ -28,6 +31,10 @@ public class PaymentDTO implements Serializable {
         this.type = payment.getType();
         this.status = payment.getStatus();
         this.method = payment.getMethod();
-        this.accountId = payment.getAccount().getAccountId()    ;
+        this.accountId = payment.getAccount().getAccountId();
+        if (type == Payment.Type.CONSIGNMENT_REWARD)
+            this.consignmentRewardItemId = payment.getConsignmentRewardItem().getItemId();
+        if (type == Payment.Type.AUCTION_DEPOSIT)
+            this.depositAuctionId = payment.getDeposit().getAuctionSession().getAuctionSessionId();
     }
 }

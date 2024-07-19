@@ -129,7 +129,7 @@ public class ItemController {
 
     @GetMapping("/inventory")
     public Page<ItemDTO> getInventory(Principal principal, @PageableDefault(size = 30) Pageable pageable) {
-        JwtUser jwtUser = Authorizer.getUser(principal);
+        JwtUser jwtUser = Authorizer.requireUser(principal);
         return itemService.getItemsByBuyerId(pageable, jwtUser.getUserId());
     }
 
