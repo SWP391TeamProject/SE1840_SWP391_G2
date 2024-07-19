@@ -17,6 +17,7 @@ import { useAppDispatch } from "@/redux/hooks"
 import { AccountStatus, AuctionSessionStatus } from "@/constants/enums"
 import { formatDate } from "@/lib/utils"
 import { MoreHorizontal } from "lucide-react"
+import { setCurrentAuctionSession } from "@/redux/reducers/AuctionSession"
 
 // Define the JewelryItem type based on the provided JSON structure
 type AuctionSession = {
@@ -150,12 +151,14 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       const  nav = useNavigate();
       const dispatch = useAppDispatch();
 
-      const handleDetailClick = (auctionSessionId: number) => {
-        nav(`/admin/auction-sessions/${auctionSessionId}`);
-      }
+      const handleDetailClick = (auctionSession: any) => {
+        dispatch(setCurrentAuctionSession(auctionSession))
+        nav(`/admin/auction-sessions/${auctionSession.auctionSessionId}`);     
+       }
 
-      const handleAssignAuctionItemClick = (auctionSessionId: number) => {
-        nav(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
+      const handleAssignAuctionItemClick = (auctionSession: any) => {
+        dispatch(setCurrentAuctionSession(auctionSession))
+        nav(`/admin/auction-sessions/${auctionSession.auctionSessionId}/assign-items`);
       }
       return (
         <>
@@ -194,8 +197,8 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => { handleDetailClick(row.original.auctionSessionId) }}>Detail</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(row.original.auctionSessionId) }}>Assign Items</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { handleDetailClick(row.original) }}>Detail</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { handleAssignAuctionItemClick(row.original) }}>Assign Items</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </>

@@ -49,6 +49,19 @@ export default function AuctionSession() {
     const [auciton, setAuction] = useState(auctionSession);
 
     useEffect(() => {
+        if(auctionSession != null && auctionSession.status === AuctionSessionStatus.PROGRESSING){
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + auctionSession.auctionSessionId)
+                .then(res => {
+                    console.log(res.data);
+                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setAuction(res.data);
+                    setSessionAttachments(res.data.attachments);
+                })
+                .catch(err => {
+                    showErrorToast(err);
+                    console.log(err);
+                })
+        } else
         if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
