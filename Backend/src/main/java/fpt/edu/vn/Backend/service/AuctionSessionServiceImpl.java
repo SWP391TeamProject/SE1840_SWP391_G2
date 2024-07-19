@@ -301,11 +301,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             List<Bid> bids = bidRepos.findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(auctionItem.getAuctionItemId());
             bidCount += bids.size();
 
-
             Item item = auctionItem.getItem();
             item.setStatus(bids.isEmpty() ? Item.Status.QUEUE : Item.Status.SOLD);
             itemRepos.save(item);
-
 
             for (int i = 0; i < bids.size(); i++) {
                 Bid bid = bids.get(i);
@@ -426,26 +424,20 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (p.getStatus() != Payment.Status.PENDING)
                 continue;
             Account account = p.getAccount();
-            Participant participant = participants.get(account.getAccountId());
-            // If win at least 1 item, then we proceed the deposit
-            if (participant != null && !participant.wonItems.isEmpty()) {
-                p.setStatus(Payment.Status.SUCCESS);
-            } else {
-                p.setStatus(Payment.Status.FAILED);
-                account.setBalance(account.getBalance().add(p.getPaymentAmount()));
-                accountRepos.save(account);
-                scheduledNotifications.add(
-                        NotificationDTO.builder()
-                                .message(String.format(
-                                        "Your deposit has been refunded from auction %s",
-                                        auction.getTitle()
-                                ))
-                                .userId(account.getAccountId())
-                                .build()
-                );
-                logger.info("Refunded deposit id {} for account {}", deposit.getDepositId(), account.getAccountId());
-            }
+            account.setBalance(account.getBalance().add(p.getPaymentAmount()));
+            accountRepos.save(account);
+            scheduledNotifications.add(
+                    NotificationDTO.builder()
+                            .message(String.format(
+                                    "Your deposit has been refunded from auction %s",
+                                    auction.getTitle()
+                            ))
+                            .userId(account.getAccountId())
+                            .build()
+            );
+            p.setStatus(Payment.Status.SUCCESS);
             paymentRepos.save(p);
+            logger.info("Refunded deposit id {} for account {}", deposit.getDepositId(), account.getAccountId());
         }
 
         auction.setStatus(AuctionSession.Status.FINISHED);

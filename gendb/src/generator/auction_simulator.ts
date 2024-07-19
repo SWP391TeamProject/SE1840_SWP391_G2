@@ -209,6 +209,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
                   auctionItems.push({
                       bidCount: bidCount,
+                      participantCount: participants.length,
                       id: auctionItemId++,
                       itemId: item.id,
                       currentPrice: currentPrice,

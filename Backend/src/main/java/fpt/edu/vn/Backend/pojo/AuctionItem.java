@@ -43,6 +43,9 @@ public class AuctionItem {
     @Column(name = "bid_count", columnDefinition = "int default 0")
     private int bidCount;
 
+    @Column(name = "participant_count", columnDefinition = "int default 0")
+    private int participantCount;
+
     @CreationTimestamp
     @Column(name = "create_date")
     private LocalDateTime createDate;

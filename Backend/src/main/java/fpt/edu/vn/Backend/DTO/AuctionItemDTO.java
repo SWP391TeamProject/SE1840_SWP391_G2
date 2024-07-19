@@ -21,11 +21,13 @@ public class AuctionItemDTO implements Serializable {
     private ItemDTO itemDTO;
     private BigDecimal currentPrice;
     private int numberOfBids;
+    private int participantCount;
 
     public AuctionItemDTO(AuctionItem auctionItem) {
         this.id = auctionItem.getAuctionItemId();
         this.itemDTO = new ItemDTO(auctionItem.getItem());
         this.currentPrice = auctionItem.getCurrentPrice();
         this.numberOfBids = auctionItem.getBidCount();
+        this.participantCount = auctionItem.getParticipantCount();
     }
 }
