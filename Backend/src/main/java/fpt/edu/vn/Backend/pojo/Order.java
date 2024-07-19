@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,13 +22,10 @@ import java.util.Set;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "transaction_id") // use transaction id as order id
     private int orderId;
 
-    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "order_id")
-    private Set<Item> Items;
-
+    @Column(name = "fee", precision = 20, scale = 8)
     private BigDecimal fee;
 
     @Column(name = "shipping_address")
@@ -50,6 +48,10 @@ public class Order {
         DELIVERING,
         DELIVERED
     }
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private List<OrderDetail> orderDetails;
 
     @Override
     public int hashCode() {

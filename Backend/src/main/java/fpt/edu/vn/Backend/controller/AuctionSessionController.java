@@ -1,8 +1,12 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.AccountDTO;
+import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
+import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
+import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
@@ -20,14 +24,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 @CrossOrigin("*")
 @RestController
@@ -37,135 +39,115 @@ public class AuctionSessionController {
     @Autowired
     private AuctionSessionService auctionSessionService;
     @Autowired
-    private AttachmentService attachmentService;
-    @Autowired
     private AccountService accountService;
 
     @GetMapping(value = "/", produces = "application/json")
-    public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(@RequestParam(required = false) String keyword,@PageableDefault(size = 50) Pageable pageable) {
-        return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(keyword,pageable), HttpStatus.OK);
+    public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(
+            Principal principal,
+            @PageableDefault(size = 50) Pageable pageable) {
+        return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
+                pageable, null, null, null, null,
+                Authorizer.getUserId(principal)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AuctionSessionDTO> getAuctionSessionById(@PathVariable int id) {
-        return new ResponseEntity<>(auctionSessionService.getAuctionSessionById(id), HttpStatus.OK);
+    public ResponseEntity<AuctionSessionDTO> getAuctionSessionById(
+            Principal principal,
+            @PathVariable int id) {
+        return new ResponseEntity<>(
+                auctionSessionService.getAuctionSessionById(id, Authorizer.getUserId(principal)),
+                HttpStatus.OK);
     }
+
     @GetMapping("/search/{title}")
-    public ResponseEntity<Page<AuctionSessionDTO>> getAuctionsByNameAndEmail(@PageableDefault(size = 200) Pageable pageable,
-                                                                             @PathVariable String title) {
-        log.info("Get accounts with name: {}", title);
-        if (title == null) {
-            return new ResponseEntity<>(auctionSessionService.getAllAuctionSessions(title,pageable), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(auctionSessionService.getAuctionSessionsByTitle(pageable, title), HttpStatus.OK);
+    public ResponseEntity<Page<AuctionSessionDTO>> searchAuction(
+            Principal principal,
+            @PageableDefault(size = 200) Pageable pageable,
+            @PathVariable String title) {
+        return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
+                pageable, null, title, null, null,
+                Authorizer.getUserId(principal)));
     }
 
     @GetMapping("/history-item/{itemId}")
     public ResponseEntity<Page<AuctionSessionDTO>> getPastAuctionOfItem(@PageableDefault(size = 200) Pageable pageable,
-                                                                      @PathVariable int itemId) {
+                                                                        @PathVariable int itemId) {
         return new ResponseEntity<>(auctionSessionService.getPastAuctionOfItem(pageable, itemId), HttpStatus.OK);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession(@RequestParam(required = false) String keyword, @PageableDefault(size = 10) Pageable pageable) {
-        List<AuctionSessionDTO> listA=auctionSessionService.getAllAuctionSessions(keyword,pageable).stream().filter(
-                auctionSessionDTO ->
-                        auctionSessionDTO.getStatus() != AuctionSession.Status.FINISHED &&
-                        auctionSessionDTO.getStatus() != AuctionSession.Status.TERMINATED
-        ).toList();
-
-        return new ResponseEntity<>( new PageImpl<>(listA), HttpStatus.OK);
-    }
-
-    @GetMapping("/inactive")
-    public ResponseEntity<Page<AuctionSessionDTO>> getInactiveAuctionSession() {
-        return null;
+    public ResponseEntity<Page<AuctionSessionDTO>> getActiveAuctionSession(
+            Principal principal,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
+                pageable,
+                Set.of(AuctionSession.Status.PROGRESSING, AuctionSession.Status.SCHEDULED),
+                null, null, null,
+                Authorizer.getUserId(principal)));
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<Page<AuctionSessionDTO>> getUpcomingAuctionSession(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumb,pageSize);
-        return new ResponseEntity<>(auctionSessionService.getUpcomingAuctionSessions(pageable), HttpStatus.OK);
+    public ResponseEntity<Page<AuctionSessionDTO>> getUpcomingAuctionSession(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int pageNumb,
+            @RequestParam(defaultValue = "50") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumb, pageSize);
+        return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
+                pageable,
+                Set.of(AuctionSession.Status.SCHEDULED),
+                null, null, null,
+                Authorizer.getUserId(principal)));
     }
-    @GetMapping("/past")
-    public ResponseEntity<Page<AuctionSessionDTO>> getPastAuctionSession() {
-        return null;
-    }
-
 
     @GetMapping("/completed")
-    public ResponseEntity<Page<AuctionSessionDTO>> getCompletedAuctionSession(@RequestParam(defaultValue = "0") int pageNumb, @RequestParam(defaultValue = "50") int pageSize) {
-
-        Pageable pageable = PageRequest.of(pageNumb,pageSize);
-        return new ResponseEntity<>(auctionSessionService.getPastAuctionSessions(pageable), HttpStatus.OK);
+    public ResponseEntity<Page<AuctionSessionDTO>> getCompletedAuctionSession(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int pageNumb,
+            @RequestParam(defaultValue = "50") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumb, pageSize);
+        return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
+                pageable,
+                Set.of(AuctionSession.Status.FINISHED, AuctionSession.Status.TERMINATED),
+                null, null, null,
+                Authorizer.getUserId(principal)));
     }
 
     @GetMapping("/featured")
-    public ResponseEntity<Page<AuctionSessionDTO>> getFeaturedAuctionSession(@RequestParam(required = false) @PageableDefault(size = 50) Pageable pageable) {
-        return new ResponseEntity<>(auctionSessionService.getFeaturedAuctionSessions(pageable), HttpStatus.OK);
-    }
-
-    @GetMapping("/current")
-    public ResponseEntity<AuctionSessionDTO> getCurrentAuctionSession() {
-        return null;
+    public ResponseEntity<Page<AuctionSessionDTO>> getFeaturedAuctionSession(
+            Principal principal,
+            @RequestParam(required = false)
+            @PageableDefault(size = 50) Pageable pageable
+    ) {
+        return new ResponseEntity<>(
+                auctionSessionService.getFeaturedAuctionSessions(pageable, Authorizer.getUserId(principal)),
+                HttpStatus.OK);
     }
 
     @PostMapping("/")
     public ResponseEntity<AuctionSessionDTO> createAuctionSession(@ModelAttribute AuctionCreateDTO auctionDTO) {
-
-        AuctionSessionDTO auctionSessionDTO=auctionSessionService.createAuctionSession(auctionDTO);
-
+        AuctionSessionDTO auctionSessionDTO = auctionSessionService.createAuctionSession(auctionDTO);
         return new ResponseEntity<>(auctionSessionDTO, HttpStatus.OK);
     }
 
     @PostMapping("/assign-auction-session")
-    public ResponseEntity<AssignAuctionItemDTO> assignAuctionItem(@RequestBody AssignAuctionItemDTO assignAuctionItemDTO){
-        if(!auctionSessionService.assignAuctionSession(assignAuctionItemDTO)){
+    public ResponseEntity<AssignAuctionItemDTO> assignAuctionItem(@RequestBody AssignAuctionItemDTO assignAuctionItemDTO) {
+        if (!auctionSessionService.assignAuctionSession(assignAuctionItemDTO)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-
 
     @PutMapping("/{id}")
     public ResponseEntity<AuctionSessionDTO> updateAuctionSession(@RequestBody AuctionSessionDTO auctionDTO) {
         return new ResponseEntity<>(auctionSessionService.updateAuctionSession(auctionDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAuctionSession( @PathVariable String id) {
-        return null;
-    }
-
     @GetMapping("/register/{id}")
-    public ResponseEntity<AuctionSessionDTO> registerAuctionSession(@PathVariable int id, Authentication authentication) {
-
-        AccountDTO a = accountService.getAccountByEmail(authentication.getName());
-        if (a == null) {
-            log.error("Account not found");
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        AuctionSessionDTO auctionSession = auctionSessionService.getAuctionSessionById(id);
-        if(auctionSession.getEndDate().isBefore(LocalDateTime.now())){
-            log.error("Auction session has ended");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(auctionSession.getStatus() == AuctionSession.Status.TERMINATED){
-            log.error("Auction session has been terminated");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(auctionSession.getStatus() == AuctionSession.Status.FINISHED){
-            log.error("Auction session has finished");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        if(auctionSession.getDeposits().stream()
-                .anyMatch(depositDTO -> depositDTO.getPayment().getAccountId()==a.getAccountId())){
-            log.error("Account has already registered for this auction session");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(auctionSessionService.registerAuctionSession(id, a.getAccountId()), HttpStatus.OK);
+    public ResponseEntity<AuctionSessionDTO> registerAuctionSession(
+            Principal principal, @PathVariable int id) {
+        return new ResponseEntity<>(
+                auctionSessionService.registerAuctionSession(id, Authorizer.requireUser(principal).getUserId()),
+                HttpStatus.OK);
     }
 
     @GetMapping("/finish/{id}")
@@ -181,10 +163,4 @@ public class AuctionSessionController {
         auctionSessionService.terminateAuction(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    @PostMapping("/updateStatus")
-    public ResponseEntity<Void> updateAuctionSessionByStatus(@RequestBody(required = false) UpdateStatusAuctionSessionRequestDTO auctionSessionDTOList) {
-        auctionSessionService.updateAuctionSessionByStatus(auctionSessionDTOList);
-        return ResponseEntity.ok().build();
-    }
-
 }

@@ -23,7 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { mailRegex, phoneRegex } from "@/constants/regex";
-const MAX_FILE_SIZE = 5000000;
+const MAX_FILE_measurement = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -38,23 +38,18 @@ import { Link } from "react-router-dom";
 const formSchema = z.object({
   accountId: z.number(),
   email: z.string().regex(mailRegex, { message: "Invalid email address" }),
-  phone: z.string().regex(phoneRegex,
-    { message: "Invalid phone number.must be 10-digit phone number." }),
-  contactName: z.string(),
-    age: z.coerce.number().min(0, { message: "invalid age" }),
-    material: z.string(),
-    brand:z.string(),
-    color:z.string(),
-    size:z.string(),
-    weight:z.coerce.number().max(100000000).min(0),
+  phone: z.string().regex(phoneRegex, { message: "Invalid phone number. Must be a 10-digit phone number." }),
+  contactName: z.string().min(1, { message: "Contact name cannot be empty" }),
+  // age: z.coerce.number().min(0, { message: "Age must be a positive number" }),
+  metal: z.string().optional(),
+  condition: z.string().optional(),
+  gemstone: z.string().optional(),
+  measurement: z.string().optional(),
+  stamped: z.string().optional(),
+  weight: z.coerce.number().max(10000, { message: "Weight cannot exceed 10000g" }).min(0, { message: "Weight must be a positive number" }),
   preferContact: z.enum(["email", "phone", "text", "any"]),
-  description: z.string().min(10, {
-    message: "Description must be between 10 and 500 characters"
-  }).max(500, {
-    message: "Description must be between 10 and 500 characters"
-  }),
-  files: z.array(z.any()).min(1).max(5, { message: "You can only upload up to 5 images" })
-
+  description: z.string().min(10, { message: "Description must be between 10 and 500 characters" }).max(500, { message: "Description must be between 10 and 500 characters" }),
+  files: z.array(z.any()).min(1, { message: "You must upload at least 1 image" }).max(5, { message: "You can only upload up to 5 images" })
 });
 
 export default function ConsignmentInititalForm() {
@@ -68,10 +63,16 @@ export default function ConsignmentInititalForm() {
     defaultValues: {
       accountId: auth.user.accountId,
       email: auth.user.email,
-      phone:  auth.user.phone,
+      phone: auth.user.phone,
       contactName: auth.user.nickname,
       preferContact: "any",
       description: "",
+      metal: "",
+      condition: "",
+      gemstone: "",
+      measurement: "",
+      stamped: "",
+      weight: 0,
       files: [],
     },
   });
@@ -93,11 +94,11 @@ export default function ConsignmentInititalForm() {
         toast.success("Consignment created successfully", {
           position: "bottom-right",
         });
-      }  
+      }
       setIsLoading(false);
     }).catch((err) => {
       if (err.response.status === 413) {
-        toast.error("File size is too large", {
+        toast.error("File measurement is too large", {
           position: "bottom-right",
         });
       } else {
@@ -134,6 +135,7 @@ export default function ConsignmentInititalForm() {
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                   <input type="hidden" name="accountId" value={JSON.parse(getCookie("user"))?.id} />
+
                   <FormField
                     control={form.control}
                     name="contactName"
@@ -142,19 +144,18 @@ export default function ConsignmentInititalForm() {
                         <FormLabel>Contact Name</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="enter your prefer contact name here"
+                            placeholder="Enter your preferred contact name here"
                             defaultValue={JSON.parse(getCookie("user"))?.nickname}
-                            readOnly
+                            
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription>
-                          this is the Name we used to contact you
-                        </FormDescription>
+                        <FormDescription>This is the name we use to contact you</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="email"
@@ -162,19 +163,19 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your Email"
+                          <Input
+                            placeholder="Your Email"
                             defaultValue={JSON.parse(getCookie("user"))?.email}
-                            readOnly
+                            
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription>
-                          this is the email we used to contact you
-                        </FormDescription>
+                        <FormDescription>This is the email we use to contact you</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="phone"
@@ -182,19 +183,25 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input placeholder="enter your phone number here"
-                            readOnly
-                            {...field} />
+                          <Input
+                            placeholder="Enter your phone number here"
+                            
+                            {...field}
+                          />
                         </FormControl>
-                        <FormDescription>
-                          this is the phone we used to contact you
-                        </FormDescription>
+                        <FormDescription>This is the phone we use to contact you</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <h3 className="text-md font-semibold text-red-600">If you want to modify this information, please navigate to your <span className="underline"><Link to={"/profile/overview"} >profile </Link> </span> .
+
+                  <h3 className="text-md font-semibold text-red-600">
+                    If you want to modify this information, please navigate to your
+                    <span className="underline">
+                      <Link to={"/profile/overview"}>profile</Link>
+                    </span>.
                   </h3>
+
                   <FormField
                     control={form.control}
                     name="preferContact"
@@ -223,17 +230,13 @@ export default function ConsignmentInititalForm() {
                               <FormControl>
                                 <RadioGroupItem value="text" />
                               </FormControl>
-                              <FormLabel className="font-normal">
-                                Text message
-                              </FormLabel>
+                              <FormLabel className="font-normal">Text message</FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                               <FormControl>
                                 <RadioGroupItem value="any" />
                               </FormControl>
-                              <FormLabel className="font-normal">
-                                Any of the above
-                              </FormLabel>
+                              <FormLabel className="font-normal">Any of the above</FormLabel>
                             </FormItem>
                           </RadioGroup>
                         </FormControl>
@@ -241,90 +244,112 @@ export default function ConsignmentInititalForm() {
                       </FormItem>
                     )}
                   />
-                  <div className="flex flex-row justify-between">
-                  <FormField
-                    control={form.control}
-                    name="age"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Age</FormLabel>
-                        <FormControl>
-                          <Input type="text" placeholder="enter item age" {...field}  className="w-36"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="material"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Material</FormLabel>
-                        <FormControl>
-                          <Input placeholder="enter item material" {...field} className="w-36"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="brand"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Brand</FormLabel>
-                        <FormControl>
-                          <Input placeholder="enter item brand" {...field} className="w-36"/>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  </div>
-                  <div className="flex flex-row justify-between">
-                  <FormField
-                    control={form.control}
-                    name="color"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Color</FormLabel>
-                        <FormControl>
-                          <Input placeholder="enter item color" {...field} className="w-36"/>
-                        </FormControl>
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="size"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Size</FormLabel>
-                        <FormControl>
-                          <Input placeholder="enter item size" {...field} className="w-36"/>
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="weight"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Weight</FormLabel>
-                        <FormControl>
-                          <Input type="text" placeholder="enter item weight" {...field} className="w-36" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="flex flex-row justify-start gap-3">
+                    <FormField
+                      control={form.control}
+                      name="metal"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Metal</FormLabel>
+                          <FormControl>
+                            <Input type="text" placeholder="Enter item metal" {...field} className="w-36" />
+                          </FormControl>
+                          <FormDescription>
+                            Enter the metal of the item (e.g. gold, silver, etc.)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="condition"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Condition</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter item condition" {...field} className="w-36" />
+                          </FormControl>
+                          <FormDescription>
+                            Enter the condition of the item (e.g. new, used, etc.)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="gemstone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gemstone</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter item gemstone" {...field} className="w-36" />
+                          </FormControl>
+                          <FormDescription>
+                            Enter the gemstone of the item (if any)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
+
+                  <div className="flex flex-row justify-start gap-3">
+                    <FormField
+                      control={form.control}
+                      name="measurement"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>measurement</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter item measurement" {...field} className="w-36" />
+                          </FormControl>
+                          <FormDescription>
+                            Enter the measurement of the item in cm(e.g 2-1/4 x 1/2 cm)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Weight</FormLabel>
+                          <FormControl>
+                            <Input type="text" placeholder="Enter item weight" {...field} className="w-36" />
+                          </FormControl>
+                          <FormDescription>
+                            Enter the weight of the item in grams
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="stamped"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Stamped</FormLabel>
+                          <FormControl>
+                            <Input type="text" placeholder="Enter stamp details" {...field} className="w-36" />
+                          </FormControl>
+                          <FormDescription>
+                            Enter any stamp details on the item (e.g. 925, 14k, etc.)
+                          </FormDescription>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                  </div>
+
+
 
                   <FormField
                     control={form.control}
@@ -333,17 +358,16 @@ export default function ConsignmentInititalForm() {
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          {/* <Input type="" placeholder="sadasd" {...field} /> */}
-                          <Textarea placeholder="enter your item description here" {...field} />
+                          <Textarea placeholder="Enter your item description here" {...field} />
                         </FormControl>
                         <FormDescription>
-                          Describe the item you'd like to consign. Include any relevant
-                          details about the item's condition, history, and provenance.
+                          Provide any additional detail of the  item you'd like to consign. Include any relevant details about the item's condition, history, and provenance.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                   <ScrollArea className="h-[200px]">
                     <FormField
                       control={form.control}
@@ -353,31 +377,30 @@ export default function ConsignmentInititalForm() {
                       )}
                     />
                   </ScrollArea>
-                  {form.getFieldState("files").invalid && form.control._formValues["files"].length <= 0 ? <p className="text-red-400 font-bold">
-                    *You must include at least a image of your item
-                  </p> : <></>
-                  }
 
-                  {form.getFieldState("files").invalid && form.control._formValues["files"].length > 5 ? <p className="text-red-400 font-bold">
-                    *You can only upload up to 5 images
-                  </p> : <></>
-                  }
+                  {form.getFieldState("files").invalid && form.control._formValues["files"].length <= 0 ? (
+                    <p className="text-red-400 font-bold">*You must include at least one image of your item</p>
+                  ) : null}
 
-                  {/* <DropzoneComponent /> */}
-                  {isLoading ?
+                  {form.getFieldState("files").invalid && form.control._formValues["files"].length > 5 ? (
+                    <p className="text-red-400 font-bold">*You can only upload up to 5 images</p>
+                  ) : null}
+
+                  {isLoading ? (
                     <Button variant={"default"} disabled>
                       Loading
                     </Button>
-                    :
+                  ) : (
                     <div className="sticky bottom-2 flex flex-col justify-center w-full">
                       <Separator className="my-2 w-full" />
-                      <Button variant={"default"} type="submit" className="" >
+                      <Button variant={"default"} type="submit">
                         Submit
                       </Button>
                     </div>
-                  }
+                  )}
                 </form>
               </Form>
+
             </div>
 
             <div className="hidden md:block basis-2/4 p-5">

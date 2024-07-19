@@ -1,6 +1,6 @@
 import {CrawledItem} from "../model/crawled_item";
 import {Account, Role} from "../model/account";
-import {fa, faker} from "@faker-js/faker";
+import {faker} from "@faker-js/faker";
 import {
     Consignment,
     ConsignmentStatus,
@@ -13,10 +13,27 @@ import {
 import dayjs from "dayjs";
 import {ITEM_MAX_PRICE, ITEM_MIN_PRICE, NUMBER_OF_CONSIGNMENT} from "../config";
 
-const materialNames: string[] = [
-    'Gold', 'Silver', 'Platinum', 'Diamond', 'Pearl', 'Ruby', 'Emerald',
-    'Sapphire', 'Opal', 'Amber', 'Jade', 'Quartz', 'Amethyst', 'Aquamarine',
-    'Topaz', 'Garnet', 'Turquoise', 'Onyx', 'Lapis Lazuli', 'Coral'
+const metalNames: string[] = [
+    "Gold",
+    "Silver",
+    "Platinum",
+    "Palladium",
+    "Titanium",
+    "Copper",
+    "Bronze",
+    "Brass",
+    "Iron",
+    "Steel",
+    "Aluminum",
+    "Nickel",
+    "Zinc",
+    "Chromium",
+    "Lead",
+    "Tin",
+    "Magnesium",
+    "Cobalt",
+    "Tungsten",
+    "Mercury"
 ];
 
 const colorNames: string[] = [
@@ -25,11 +42,43 @@ const colorNames: string[] = [
     'Lavender', 'Maroon', 'Navy', 'Cyan', 'Magenta'
 ];
 
-const brandNames: string[] = [
+const stampedNames: string[] = [
     'Cartier', 'Tiffany & Co.', 'Bvlgari', 'Harry Winston', 'Van Cleef & Arpels',
     'Graff', 'Mikimoto', 'Piaget', 'Boucheron', 'Chopard', 'De Beers', 'David Yurman',
     'Buccellati', 'Fred Leighton', 'Chaumet', 'Dior', 'Rolex', 'Hermès',
     'Gucci', 'Swarovski'
+];
+
+const gemstoneNames: string[] = [
+    "Amethyst",
+    "Emerald",
+    "Ruby",
+    "Sapphire",
+    "Diamond",
+    "Opal",
+    "Topaz",
+    "Turquoise",
+    "Garnet",
+    "Jade",
+    "Aquamarine",
+    "Peridot",
+    "Citrine",
+    "Lapis Lazuli",
+    "Moonstone",
+    "Onyx",
+    "Quartz",
+    "Tanzanite",
+    "Zircon",
+    "Spinel"
+];
+
+const itemConditions: string[] = [
+    "New",
+    "Like New",
+    "Very Good",
+    "Good",
+    "Acceptable",
+    "Fair"
 ];
 
 const requestReceivedMessages: string[] = [
@@ -146,6 +195,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
         const staffId = faker.helpers.arrayElement(roleToAccounts.STAFF).id;
         const managerId = faker.helpers.arrayElement(roleToAccounts.MANAGER).id;
         let status: ConsignmentStatus = ConsignmentStatus.WAITING_STAFF;
+        let secretCode: string | undefined = undefined;
 
         if (status == ConsignmentStatus.WAITING_STAFF && faker.number.float() < 0.95) {
             status = ConsignmentStatus.IN_INITIAL_EVALUATION;
@@ -163,6 +213,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
         }
 
         if (status == ConsignmentStatus.IN_INITIAL_EVALUATION && faker.number.float() < 0.95) {
+            secretCode = faker.string.numeric({length: 6});
             status = ConsignmentStatus.SENDING;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
         }
@@ -185,8 +236,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
         if (status == ConsignmentStatus.IN_FINAL_EVALUATION && faker.number.float() < 0.95) {
             const type = faker.number.float() < 0.95 ?
               ConsignmentDetailType.MANAGER_ACCEPTED : ConsignmentDetailType.MANAGER_REJECTED;
-            status = type == ConsignmentDetailType.MANAGER_ACCEPTED ?
-              ConsignmentStatus.FINISHED : ConsignmentStatus.TERMINATED;
+            status = ConsignmentStatus.WAITING_SELLER;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
             details.push({
                 accountId: managerId,
@@ -202,21 +252,32 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             });
         }
 
+        if (status == ConsignmentStatus.WAITING_SELLER && faker.number.float() < 0.95) {
+            status = faker.number.float() < 0.95 ? ConsignmentStatus.TO_ITEM : ConsignmentStatus.TERMINATED;
+            updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+        }
+
         consignmentList.push({
             __name: crawledItem.name,
             __categoryId: crawledItem.categoryId,
             id: i + 1,
-            senderId: sender.id,
+            userId: sender.id,
+            staffId: staffId,
             status: status,
-            age: faker.number.int({ min: 50, max: 2000 }),
-            brand: faker.helpers.arrayElement(brandNames),
+            stamped: faker.helpers.arrayElement(stampedNames),
             color: faker.helpers.arrayElement(colorNames),
             description: crawledItem.description,
-            material: faker.helpers.arrayElement(materialNames),
-            size: `${faker.number.int({ min: 10, max: 50 })} x ${faker.number.int({ min: 10, max: 50 })} cm`,
-            weight: `${faker.number.int({ min: 5, max: 300 })} gram`,
+            metal: faker.helpers.arrayElement(metalNames),
+            measurement: `${faker.number.int({ min: 50, max: 500 })} x ${faker.number.int({ min: 50, max: 500 })} mm`,
+            weight: faker.number.int({ min: 5, max: 300 }),
+            condition: faker.helpers.arrayElement(itemConditions),
+            gemstone: faker.helpers.arrayElement(gemstoneNames),
+            secretCode: secretCode,
             imageURLs: crawledItem.imageUrls,
             preferContact: faker.helpers.enumValue(ContactPreference),
+            contactEmail: faker.number.float() < 0.5 ? faker.internet.email() : sender.email,
+            contactName: faker.number.float() < 0.5 ? faker.person.fullName() : sender.nickname,
+            contactPhone: faker.number.float() < 0.5 ? "0" + faker.string.numeric(9) : sender.phone,
             createDate: sendDate.toDate(),
             updateDate: updateDate.toDate(),
             details

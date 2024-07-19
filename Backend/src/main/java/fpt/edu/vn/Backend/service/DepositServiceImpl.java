@@ -26,32 +26,6 @@ public class DepositServiceImpl implements DepositService{
     @Autowired
     private PaymentRepos paymentRepos;
 
-
-    @Override
-    public DepositDTO createDeposit(DepositRequest depositRequest) {
-        try {
-            Deposit deposit = new Deposit();
-            Optional<AuctionSession> auctionSessionOptional = auctionSessionRepos.findById(depositRequest.getAuctionSessionId());
-            if (auctionSessionOptional.isPresent()) {
-                deposit.setAuctionSession(auctionSessionOptional.get());
-            } else {
-                throw new InvalidInputException("Auction Item not found");
-            }
-            int paymentId = depositRequest.getPaymentId();
-            Optional<Payment> paymentOptional = paymentRepos.findById(paymentId);
-            if (paymentOptional.isPresent()) {
-                deposit.setPayment(paymentOptional.get());
-            } else {
-                throw new InvalidInputException("Payment not found");
-            }
-
-            deposit = depositRepos.save(deposit);
-            return new DepositDTO(deposit);
-        } catch (Exception ex) {
-            throw new InvalidInputException("Failed to create deposit: " + ex.getMessage());
-        }
-    }
-
     @Override
     public DepositDTO getDepositById(int depositId) {
         try {

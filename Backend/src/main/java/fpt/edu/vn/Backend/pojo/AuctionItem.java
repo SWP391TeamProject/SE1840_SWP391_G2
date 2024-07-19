@@ -40,6 +40,8 @@ public class AuctionItem {
     })
     private Set<Bid> bids;
 
+    @Column(name = "bid_count", columnDefinition = "int default 0")
+    private int bidCount;
 
     @CreationTimestamp
     @Column(name = "create_date")

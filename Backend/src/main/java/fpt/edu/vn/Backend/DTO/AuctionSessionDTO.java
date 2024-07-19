@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class AuctionSessionDTO implements Serializable {
     private int auctionSessionId;
     private String title;
+    private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private AuctionSession.Status status;
@@ -28,29 +29,19 @@ public class AuctionSessionDTO implements Serializable {
     private LocalDateTime updateDate;
     private Set<AttachmentDTO> attachments;
     private Set<AuctionItemDTO> auctionItems;
-    private Set<DepositDTO> deposits;
+    private boolean hasDeposited;
+    private int participantCount;
 
     public static AuctionSessionDTO minimal(AuctionSession auctionSession) {
         return AuctionSessionDTO.builder()
                 .auctionSessionId(auctionSession.getAuctionSessionId())
                 .title(auctionSession.getTitle())
+                .description(auctionSession.getDescription())
                 .startDate(auctionSession.getStartDate())
                 .endDate(auctionSession.getEndDate())
                 .status(auctionSession.getStatus())
+                .participantCount(auctionSession.getParticipantCount())
                 .build();
-    }
-
-    public AuctionSessionDTO(AuctionSession auctionSession) {
-        this.auctionSessionId = auctionSession.getAuctionSessionId();
-        this.startDate = auctionSession.getStartDate();
-        this.endDate = auctionSession.getEndDate();
-        this.status = auctionSession.getStatus();
-        this.createDate = auctionSession.getCreateDate();
-        this.updateDate = auctionSession.getUpdateDate();
-        this.title = auctionSession.getTitle();
-        this.attachments = auctionSession.getAttachments() != null ? auctionSession.getAttachments().stream().map(AttachmentDTO::new).collect(Collectors.toSet()) : new HashSet<>();
-        this.auctionItems = auctionSession.getAuctionItems() != null ? auctionSession.getAuctionItems().stream().map(AuctionItemDTO::new).collect(Collectors.toSet()) : new HashSet<>();
-        this.deposits = auctionSession.getDeposits() != null ? auctionSession.getDeposits().stream().map(DepositDTO::new).collect(Collectors.toSet()) : new HashSet<>();
     }
 
 

@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
-@CacheConfig (cacheNames = "item")
+//@CacheConfig (cacheNames = "item")
 public class ItemServiceImpl implements ItemService {
     private static final Map<Item.Status, Set<Item.Status>> VALID_TRANSITIONS = Map.of(
             Item.Status.QUEUE, Set.of(
@@ -38,11 +38,6 @@ public class ItemServiceImpl implements ItemService {
             ),
             Item.Status.SOLD, Set.of(
                     Item.Status.SOLD
-            ),
-            Item.Status.UNSOLD, Set.of(
-                    Item.Status.UNSOLD,
-                    Item.Status.QUEUE,
-                    Item.Status.REMOVED
             ),
             Item.Status.REMOVED, Set.of(
                     Item.Status.REMOVED
@@ -111,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
     public @NotNull ItemDTO createItem(@NotNull ItemUpdateDTO requestDTO) throws IOException {
         requestDTO.setStatus(Item.Status.QUEUE); // always QUEUE
         requestDTO.setItemId(null); // always create new item
@@ -132,13 +127,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Cacheable(value = "item", key = "#id")
+   //@Cacheable(value = "item", key = "#id")
     public ItemDTO getItemById(int id) {
         return itemRepos.findById(id).map(ItemDTO::new).orElse(null);
     }
 
     @Override
-    @CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
+    //@CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
     public @NotNull ItemDTO updateItem(@NotNull ItemUpdateDTO item) {
         Preconditions.checkNotNull(item.getItemId(), "Item is not identifiable");
         Item it = itemRepos.findById(item.getItemId())
@@ -174,48 +169,49 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
     public @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable) {
         return itemRepos.findAll(pageable).map(ItemDTO::new);
     }
 
     @Override
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
     public @NotNull Page<ItemDTO> getItemsByPrice(@NotNull Pageable pageable, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndStatus(BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice), Item.Status.IN_AUCTION, pageable)
                 .map(ItemDTO::new);
     }
 
 
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #status.toString()", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #status.toString()", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status) {
         return itemRepos.findItemByStatus(status, pageable).map(ItemDTO::new);
     }
 
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #ownerId", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #ownerId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByOwnerId(@NotNull Pageable pageable, int ownerId) {
         return itemRepos.findItemByOwnerAccountId(ownerId, pageable).map(ItemDTO::new);
     }
 
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #buyerId", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #buyerId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByBuyerId(@NotNull Pageable pageable, int buyerId) {
         return itemRepos.findItemByBuyerAccountId(buyerId, pageable).map(ItemDTO::new);
     }
 
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name) {
         return itemRepos.findItemByNameContaining(name, pageable).map(ItemDTO::new);
     }
 
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name + #status", value = "item")
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #name + #status", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name, Item.Status status) {
         return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(ItemDTO::new);
     }
+
 
     @Override
     public Page<ItemDTO> searchItems(String keyword, Pageable pageable) {
@@ -224,19 +220,20 @@ public class ItemServiceImpl implements ItemService {
         return result.map(ItemDTO::new);
     }
 
-    @Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId", value = "item")
+   
+   //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId) {
         return itemRepos.findItemByItemCategoryItemCategoryId(categoryId, pageable).map(ItemDTO::new);
     }
 
-    @Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId + #status.toString()", value = "item")
+   //@Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId + #status.toString()", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryId(@NotNull Pageable pageable, int categoryId, Item.Status status) {
         return itemRepos.findItemByItemCategoryItemCategoryIdAndStatus(categoryId,status, pageable).map(ItemDTO::new);
     }
 
-    @Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId  + #minPrice + #maxPrice", value = "item")
+   //@Cacheable(key="'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId  + #minPrice + #maxPrice", value = "item")
     @Override
     public @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice) {
         return itemRepos.findItemByReservePriceBetweenAndItemCategory_ItemCategoryIdAndStatus( BigDecimal.valueOf(minPrice), BigDecimal.valueOf(maxPrice),categoryId,Item.Status.IN_AUCTION, pageable)

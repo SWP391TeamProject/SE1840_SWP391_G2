@@ -3,8 +3,9 @@ import axios from '@/config/axiosConfig.ts';
 import { toast } from "sonner";
 import { SERVER_DOMAIN_URL } from "@/constants/domain";
 import { showErrorToast } from "@/lib/handle-error";
-import {AuctionSession} from "@/models/AuctionSessionModel.tsx";
-import {Page} from "@/models/Page.ts";
+import { AuctionSession } from "@/models/AuctionSessionModel.tsx";
+import { Page } from "@/models/Page.ts";
+import { createSearchParams } from "react-router-dom";
 
 const controller = "auction-sessions";
 
@@ -34,7 +35,7 @@ export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
         })
         .catch((err) => {
             toast.error(err.response.data.message, {
-                
+
             });
             if (err?.response.status == 401) {
                 removeCookie("user");
@@ -454,7 +455,23 @@ export const terminateAuctionSession = async (auctionSessionId: number) => {
 
 export const fetchAuctionSessionHistoryOfItem = async (itemId?: number, page: number = 0, size: number = 10) => {
     return await axios.get<Page<AuctionSession>>(`${SERVER_DOMAIN_URL}/api/${controller}/history-item/${itemId}`, {
-          headers: {"Content-Type": "application/json"},
-          params: {page, size}
-      });
+        headers: { "Content-Type": "application/json" },
+        params: { page, size }
+    });
+}
+
+export const removeAuctionItem = async (auctionItemId: any) => {
+    // let params = {
+    //     auctionSessionId: auctionItemId.auctionSessionId,
+    //     itemId: auctionItemId.itemId
+    // }
+
+    return await axios
+        .post(`${SERVER_DOMAIN_URL}/api/auction-items/delete`,auctionItemId, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization:
+                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+            },
+        })
 }

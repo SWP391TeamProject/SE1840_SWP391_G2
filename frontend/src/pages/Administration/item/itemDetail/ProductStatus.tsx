@@ -40,8 +40,10 @@ export default function ProductStatus(props: {
           render={({field}) => (
             <FormItem>
               <FormControl>
-                <Select onValueChange={field.onChange}
-                        defaultValue={field.value}>
+                <Select disabled={selection.length < 2}
+                
+                onValueChange={field.onChange}
+                        defaultValue={field.value} >
                   <SelectTrigger id="status" aria-label="Select status">
                     <SelectValue placeholder="Select status"/>
                   </SelectTrigger>

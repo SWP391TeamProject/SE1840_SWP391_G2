@@ -1,5 +1,6 @@
 import { API_SERVER } from "@/constants/domain";
 import { PaymentType } from "@/constants/enums";
+import { showErrorToast } from "@/lib/handle-error";
 import { getCookie, removeCookie } from "@/utils/cookies";
 import axios from "axios";
 
@@ -11,6 +12,23 @@ interface GetPaymentsSchema {
   status?: string;
   type?: string
 }
+
+export const createPayment = (dto : {
+  type?: 'DEPOSIT' | 'WITHDRAW',
+  amount?: number,
+  accountId?: number}) => {
+  return axios
+    .put(API_SERVER + "/payments", {
+      paymentAmount: dto.amount,
+      type: dto.type,
+      accountId: dto.accountId
+    } ,{
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      },
+    });
+};
 
 export const getPayments = async (input: GetPaymentsSchema) => {
 
@@ -190,4 +208,40 @@ export const activatePaymentsService = async (id: string) => {
       },
     })
     .catch((err) => console.log(err));
+};
+
+export const createPaymentWithVNPAY = async (values: any) => {
+  return await axios.post(`${API_SERVER}/payments/create`, {
+    ...values,
+    paymentId: "",
+    type: "DEPOSIT",
+    status: "PENDING",
+    accountId: JSON.parse(getCookie("user")).id || 0,
+    ipAddr: "",
+    orderInfoType: "DEPOSIT",
+    method: "VNPAY"
+  }, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+    },
+  });
+};
+
+export const createPaymentWithPAYPAL = (values: any) => {
+  return axios.post(`${API_SERVER}/payments/create`, {
+    ...values,
+    paymentId: "",
+    type: "DEPOSIT",
+    status: "PENDING",
+    accountId: JSON.parse(getCookie("user")).id || 0,
+    ipAddr: "",
+    orderInfoType: "DEPOSIT",
+    method: "PAYPAL"
+  }, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+    },
+  });
 };

@@ -4,7 +4,7 @@ import {AccountStatus, Roles} from "./constants/enums";
 import {useAppDispatch} from "@/redux/hooks.tsx";
 import {getCookie, removeCookie} from "@/utils/cookies.ts";
 import {API_SERVER} from "@/constants/domain.ts";
-import axios from "./config/axiosConfig.ts";
+import axios from "@/config/axiosConfig.ts";
 import {AuthResponse} from "@/models/AuthResponse.ts";
 import {countUnreadNotifications} from "@/services/NotificationService.ts";
 import {

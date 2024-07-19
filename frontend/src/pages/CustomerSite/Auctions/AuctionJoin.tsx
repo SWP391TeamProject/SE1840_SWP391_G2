@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { getCookie } from '@/utils/cookies';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { fetchBidsByAuctionItemId } from '@/services/BidsService';
+import { fetchBidsByAuctionId, fetchBidsByAuctionItemId } from '@/services/BidsService';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay"
 import { toast } from "sonner";
@@ -40,10 +40,10 @@ export default function AuctionJoin() {
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
   const auth = useAuth();
-  let auctionId = location.state.id.auctionSessionId;
-  let itemId = location.state.id.itemId;
-  let itemDTO = location.state.itemDTO;
-  let endDate = location.state.endDate;
+  const auctionId = location.state.id.auctionSessionId;
+  const itemId = location.state.id.itemId;
+  const [itemDTO, setItemDTO] = useState<Item>(location.state.itemDTO);
+  const endDate = location.state.endDate;
   console.log(location.state);
   const [allow, setAllow] = useState(location.state.allow);
   const [bids, setBids] = useState<YourBidType[]>([]);
@@ -53,6 +53,7 @@ export default function AuctionJoin() {
   const navigate = useNavigate();
   const [isSending, setIsSending] = useState(false);
   const [showCofetti, setShowCofetti] = useState(false);
+  let timer;
 
   useEffect(() => {
 
@@ -72,11 +73,9 @@ export default function AuctionJoin() {
     } else {
       setAllow(false);
     }
-  }, [itemId]);
+  }, [itemDTO]);
 
   useEffect(() => {
-    let timer;
-    setIsJoin(true);
     if (allow === false || !getCookie("user")) {
       setIsJoin(false);
       setClient(null);
@@ -85,12 +84,12 @@ export default function AuctionJoin() {
     }
     const newClient = new Client({
       brokerURL: `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie("user")).accessToken,
-  
+
       onConnect: () => {
-        newClient.subscribe('/topic/public/' + auctionId + '/' + itemId, onMessageReceived);
+        newClient.subscribe('/topic/public/' + auctionId, onMessageReceived);
         setTimeout(() => {
           newClient.publish({
-            destination: '/app/chat.addUser/' + auctionId + '/' + itemId,
+            destination: '/app/chat.addUser/' + auctionId + '/' + itemDTO.itemId,
             body: JSON.stringify({
               auctionItemId: location.state.id,
               payment: {
@@ -99,16 +98,8 @@ export default function AuctionJoin() {
             })
           });
           setIsJoin(false);
-        }, 1000);
-        console.log("reload in ", new Date(endDate).getTime() - new Date().getTime());
-        if(new Date(endDate) > new Date()) {
-          console.log("reload in ", new Date(endDate).getTime() - new Date().getTime());
-          timer = setTimeout(() => {
-            console.log('Reloading...');
-            window.location.reload();
-          }, (new Date(endDate).getTime() - new Date().getTime() -500));
-        }
-      },onDisconnect: () => {
+        }, 10);
+      }, onDisconnect: () => {
         console.log('Disconnected');
         clearTimeout(timer);
       },
@@ -123,10 +114,10 @@ export default function AuctionJoin() {
     return () => {
       if (newClient.connected) {
         newClient.deactivate();
-        newClient.unsubscribe('/topic/public/' + auctionId + '/' + itemId);
+        newClient.unsubscribe('/topic/public/' + auctionId);
       }
     };
-  }, [allow, itemId]);
+  }, [allow]);
 
 
 
@@ -136,7 +127,7 @@ export default function AuctionJoin() {
 
     if (payload.body.split(":")[payload.body.split(":").length - 1] == "ERROR") {
       toast.error(payload.body.split(":")[0], {
-        
+
       });
       client?.forceDisconnect();
       client?.deactivate({ force: true });
@@ -148,7 +139,7 @@ export default function AuctionJoin() {
     if (JSON.parse(payload.body).statusCodeValue == 400) {
       if (payload.headers["message-id"].includes(JSON.parse(payload.body).body?.id)) {
         toast.error(JSON.parse(payload.body)?.body?.message, {
-          
+
         });
         setIsSending(false);
       }
@@ -159,9 +150,9 @@ export default function AuctionJoin() {
     if (message?.status == "JOIN" || message?.status == "BID") {
       if (message?.status == "BID")
         toast.info(message?.message, {
-          
+
         });
-        setIsSending(false);
+      setIsSending(false);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
     setIsReceived(!isReceived);
@@ -174,7 +165,7 @@ export default function AuctionJoin() {
       const paymentAmount = (document.getElementById('price') as HTMLInputElement).value;
       if (!/^\d+(\.\d+)?$/.test(paymentAmount)) {
         toast.error("Please enter a valid number", {
-          
+
         });
         return;
       }
@@ -194,18 +185,10 @@ export default function AuctionJoin() {
   };
 
   useEffect(() => {
-    fetchBidsByAuctionItemId(auctionId, itemId).then((res) => {
+    fetchBidsByAuctionId(auctionId).then((res) => {
       console.log(res);
       setBids(res.data);
       bids.sort((a, b) => { return a.price - b.price });
-      console.log(res.data.length > 0 , new Date(endDate) < new Date());
-      if (res.data.length > 0 && new Date(endDate) < new Date()) {
-        console.log("here");
-        setShowCofetti(true);
-        setTimeout(() => {
-          setShowCofetti(false);
-        },5000)
-      }
     }).catch((err) => {
       console.log(err);
     });
@@ -215,29 +198,66 @@ export default function AuctionJoin() {
     if (!auctionSession) {
       fetchAuctionSessionById(auctionId).then((res) => {
         dispatch(setCurrentAuctionSession(res?.data));
+        console.log("reload in ", new Date(res?.data?.endDate).getTime() - new Date().getTime());
+        if (new Date(res?.data?.endDate) > new Date()) {
+          console.log("reload in ", new Date(res?.data?.endDate).getTime() - new Date().getTime());
+          timer = setTimeout(() => {
+            console.log('Reloading...');
+            window.location.reload();
+          }, (new Date(res?.data?.endDate).getTime() - new Date().getTime() - 500));
+        } else {
+          setAllow(false);
+          setShowCofetti(true);
+          setTimeout(() => {
+            setShowCofetti(false);
+          }, 5000)
+        }
+        if (new Date(res?.data?.startDate) > new Date()) {
+          console.log("reload in ", new Date(res?.data?.startDate).getTime() - new Date().getTime());
+          setTimeout(() => {
+            if (res?.data?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0) {
+              window.location.reload()
+            }
+          }, (new Date(res?.data?.startDate).getTime() - new Date().getTime() - 100));
+        } else if (new Date(res?.data?.endDate) > new Date()) {
+          setAllow(res?.data?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0)
+        }
       }).catch((err) => {
         console.log(err);
       })
+    } else {
+      console.log("reload in ", new Date(auctionSession?.endDate).getTime() - new Date().getTime());
+      if (new Date(auctionSession?.endDate) > new Date()) {
+        console.log("reload in ", new Date(auctionSession?.endDate).getTime() - new Date().getTime());
+        timer = setTimeout(() => {
+          console.log('Reloading...');
+          window.location.reload();
+        }, (new Date(auctionSession?.endDate).getTime() - new Date().getTime() - 500));
+      } else {
+        setAllow(false);
+        setShowCofetti(true);
+        setTimeout(() => {
+          setShowCofetti(false);
+        }, 5000)
+      }
+      if (new Date(auctionSession?.startDate) > new Date()) {
+        console.log("reload in ", new Date(auctionSession?.startDate).getTime() - new Date().getTime());
+        setTimeout(() => {
+          if (auctionSession?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0) {
+            window.location.reload()
+          }
+        }, (new Date(auctionSession?.startDate).getTime() - new Date().getTime() - 100));
+      } else if (new Date(auctionSession?.endDate) > new Date()) {
+        setAllow(auctionSession?.deposits?.filter(deposit => deposit?.payment.accountId == JSON.parse(getCookie("user")).id).length > 0)
+      }
     }
   }, [])
-  const handleViewItemDetailsClick = async (item: AuctionItem, auctionId: number) => {
+  const handleViewItemDetailsClick = async (item: AuctionItem) => {
     // console.log(item, auctionId, bidders.includes(userId));
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
-    if (itemId !== item.itemDTO.itemId) {
-      
-      navigate(`/auctions/${auctionId}/${item.itemDTO.name}`, {
-        state: {
-          id: {
-            auctionSessionId: auctionId,
-            itemId: item.itemDTO.itemId
-          },
-          itemDTO: item.itemDTO,
-          endDate: auctionSession?.endDate,
-          allow: auctionSession.deposits.map((deposit) => {
-            return deposit.payment.accountId;
-          }).includes(auth.user.accountId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING
-        }
-      });
+    if (itemDTO.itemId !== item.itemDTO.itemId) {
+
+      setItemDTO(item.itemDTO);
       window.scrollTo({
         top: 0,
         left: 0,
@@ -256,20 +276,20 @@ export default function AuctionJoin() {
 
   return (
     <>
-    {
-      showCofetti && <div className='fixed z-10 bg-red-200/15 w-full h-full'>
-        <Confetti mode='fall'  colors={['#ff577f', '#ff884b']} />
-        <Card className='w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
-          <CardHeader>
-            <CardTitle>Congratulations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {bids[0].account.nickname} won the auction
-            <p className='text-foreground font-semibold'>{currency.format(bids[0].price)}</p>
-          </CardContent>
-        </Card>
+      {
+        showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] && <div className='fixed z-10 bg-red-200/15 w-full h-full'>
+          <Confetti mode='fall' colors={['#ff577f', '#ff884b']} />
+          <Card className='w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+            <CardHeader>
+              <CardTitle>Congratulations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.nickname} won the auction
+              <p className='text-foreground font-semibold'>{currency.format(bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price)}</p>
+            </CardContent>
+          </Card>
         </div>
-    }
+      }
       {isJoin ? <LoadingAnimation message='Please wait, Joining auction...' /> :
         auctionSession != undefined ?
           <div className="flex flex-col min-h-screen container p-3 gap-10">
@@ -284,7 +304,7 @@ export default function AuctionJoin() {
                 <div className=' w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start'>
                   <h2 className='text-lg font-semibold'>Bids</h2>
                   <ScrollArea className="h-48 overflow-hidden p-4 w-full" >
-                    {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.map((bid) => (
+                    {!bids ? <div className='m-auto w-full h-full'>no bidder </div> : bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId).map((bid) => (
                       <div className="flex items-center justify-between" key={bid?.bidId}>
                         <div className="flex items-center gap-2">
                           <Avatar className="w-8 h-8 border">
@@ -298,95 +318,96 @@ export default function AuctionJoin() {
                     ))}
                   </ScrollArea>
                   {allow ?
-                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700
-                  ">
-                    <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                    <div className='mx-auto'>
-                      <PlaceBid 
-                        auctionId={auctionId}
-                        itemId={itemId}
-                        setIsSending={setIsSending}
-                        isSending={isSending}
-                        sendMessage={sendMessage}
-                        onMessageReceived={onMessageReceived}
-                        endDate={auctionSession?.endDate} // Added optional chaining for safety
-                        name={itemDTO?.name}
-                        image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
-                        client={client}
-                        currentBid={
-                          price ?? (bids && bids.length > 0 ? bids[0].price : 0) // Check if bids is defined and not empty
-                        }
-                      />
-                    </div>
-
-                  </div>
-
-                  :
-                  <div className="mt-12 md:mt-16 lg:mt-20 container">
-                    <div className='drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5' >
-                      <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                    </div>
-                    <div className="grid gap-4 ">
-                      <Link to={`/auctions/${auctionId}` } >
-                        <Button type="submit" className="w-full">
-                          Go to Auction
-                        </Button>
-                      </Link>
+                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
+                      <BidsInformation auctionSession={auctionSession} price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0} bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)} />
+                      <div className='mx-auto'>
+                        <PlaceBid
+                          auctionId={auctionId}
+                          itemId={itemDTO?.itemId}
+                          setIsSending={setIsSending}
+                          isSending={isSending}
+                          sendMessage={sendMessage}
+                          onMessageReceived={onMessageReceived}
+                          endDate={auctionSession?.endDate} // Added optional chaining for safety
+                          name={itemDTO?.name}
+                          image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                          client={client}
+                          currentBid={
+                            (bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || itemDTO?.reservePrice) // Check if bids is defined and not empty
+                          }
+                        />
+                      </div>
 
                     </div>
-                  </div>
-                }
 
-              </div>
+                    :
+                    <div className="mt-12 md:mt-16 lg:mt-20 container">
+                      <div className='drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5' >
+                        <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
+                      </div>
+                      <div className="grid gap-4 ">
+                        <Link to={`/auctions/${auctionId}`} >
+                          <Button type="submit" className="w-full">
+                            Go to Auction
+                          </Button>
+                        </Link>
 
-            </div>
-          </section>
-          <section className=" justify-center items-center  w-full h-full mt-11 " >
-            <div className='flex gap-2 flex-wrap '>
-              <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
-                <h1 className=" text-2lg font-bold  mb-9  ">
-                  Item Description
-                </h1>
-                <div className="  "
-                  dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
-                />
-              </div>
-              <div className='basis-full md:basis-1/6'>
-                <h1 className=" text-2lg font-bold  mb-9  text-center ">
-                  Other Item in this Auction
-                </h1>
-                <div className='flex gap-2 flex-col items-center'>
-                  {
-                    auctionSession.auctionItems.map((item) => (
-                      <Card className='w-80 h-fit max-w-[360px]'>
-                        <CardHeader>
-                          <img src={item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0 ? item.itemDTO.attachments[0].link : ""} alt="item" className='w-[360px]' />
-                        </CardHeader>
-                        <CardContent>
-                          <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
-                          <BidsInformation
-                            auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
-                            price={item?.highestBid ?? 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
-                            bids={item?.numberOfBids > 0 ? item.numberOfBids : 0} // Use optional chaining for numberOfBids
-                          />
-                          <CardFooter>
-
-                            <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item, auctionId)}>
-                              Join
-                            </Button>
-                          </CardFooter>
-                        </CardContent>
-
-                      </Card>
-                    ))
+                      </div>
+                    </div>
                   }
+
                 </div>
 
-
               </div>
-            </div>
+            </section>
+            <section className=" justify-center items-center  w-full h-full mt-11 " >
+              <div className='flex gap-2 flex-wrap '>
+                <div className='basis-full md:basis-4/6 gap-1/6 h-fit'>
+                  <h1 className=" text-2lg font-bold  mb-9  ">
+                    Item Description
+                  </h1>
+                  <div className="  "
+                    dangerouslySetInnerHTML={{ __html: itemDTO?.description }}
+                  />
+                </div>
+                <div className='basis-full md:basis-1/6 fixed left-0 top-0'>
+                  <h1 className=" text-2lg font-bold  mb-9  text-center ">
+                    Other Item in this Auction
+                  </h1>
+                  <div className='flex gap-2 flex-col items-center'>
+                    <ScrollArea className="h-screen overflow-hidden p-4 w-full" >
+                    {
+                      auctionSession.auctionItems.map((item) => (
+                        <Card className='w-80 h-fit max-w-[360px]'>
+                          <CardHeader>
+                            <img src={item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0 ? item.itemDTO.attachments[0].link : ""} alt="item" className='w-[360px]' />
+                          </CardHeader>
+                          <CardContent>
+                            <h1 className='text-lg font-semibold'>{item.itemDTO.name}</h1>
+                            <BidsInformation
+                              auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
+                              price={bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)[0]?.price || 0} // Use optional chaining and provide a default value of 0 if highestBid is undefined
+                              bids={bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)} // Use optional chaining for numberOfBids
+                            />
+                            <CardFooter>
 
-          </section>
+                              <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item)}>
+                                Join
+                              </Button>
+                            </CardFooter>
+                          </CardContent>
+
+                        </Card>
+                      ))
+                    }
+                    </ScrollArea>
+                  </div>
+
+
+                </div>
+              </div>
+
+            </section>
 
 
           </div > : <LoadingAnimation message='Please wait, Joining auction...' />

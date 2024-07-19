@@ -1,11 +1,14 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Order;
+import fpt.edu.vn.Backend.pojo.OrderDetail;
 import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,22 +16,27 @@ import java.util.stream.Collectors;
 @Data
 public class OrderDTO implements Serializable {
     private int orderId;
-    private Set<ItemDTO> itemDTOS;
     private BigDecimal fee;
     private String shippingAddress;
     private String shippingNote;
     private Order.ShippingStatus shippingStatus;
     private PaymentDTO payment;
     private LocalDateTime createDate;
+    private List<OrderDetailDTO> orderDetails = new ArrayList<>();
+    private BigDecimal subtotal;
 
     public OrderDTO(Order order){
         this.orderId = order.getOrderId();
-        this.itemDTOS = order.getItems().stream().map(ItemDTO::new).collect(Collectors.toSet());
         this.fee = order.getFee();
         this.payment = new PaymentDTO(order.getPayment());
         this.shippingAddress = order.getShippingAddress();
         this.shippingNote = order.getShippingNote();
         this.shippingStatus = order.getShippingStatus();
+        if (order.getOrderDetails() != null) {
+            this.orderDetails = order.getOrderDetails().stream().map(OrderDetailDTO::new).collect(Collectors.toList());
+            this.subtotal = order.getOrderDetails().stream()
+                    .reduce(BigDecimal.ZERO, (a, b) -> a.add(b.getSoldPrice()), BigDecimal::add);
+        }
         this.createDate = order.getPayment().getCreateDate();
     }
 }

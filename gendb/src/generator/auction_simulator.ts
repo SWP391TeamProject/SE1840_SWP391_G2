@@ -65,15 +65,17 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
               });
               console.log(`Generating auction: ${auctionId}, status: ${status}, items: ${numOfItems}`);
 
+              let participantCounter: Set<number> = new Set();
+
               for (let j = 0; j < numOfItems; j++) {
                   const item = items.find(i => i.status == ItemStatus.QUEUE &&
-                    i.createDate < startDate
-                    && !excludeItems.has(i.id));
+                    i.createDate < startDate && !excludeItems.has(i.id));
                   if (item == undefined) {
                       console.log(`> No item available to assign to auction`);
                       continue outer;
                   }
                   item.status = ItemStatus.IN_AUCTION;
+                  // do not handle multiple auctions for the same item, im too lazy
                   excludeItems.add(item.id);
 
                   let currentPrice = 0;
@@ -90,6 +92,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                   const localBids: Bid[] = [];
 
                   for (let participant of participants) {
+                      participantCounter.add(participant.id);
                       const depositPrice = item.reservePrice * faker.number.float({
                           min: 0.01,
                           max: 0.1
@@ -122,12 +125,12 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
                       currentPrice = Math.max(currentPrice, depositPrice);
                   }
+                  let bidCount = 0;
 
                   if (status != AuctionStatus.SCHEDULED) {
                       // bidding
                       let virtualDate = dayjs(startDate);
                       let lastBidder: Account | undefined = undefined;
-                      let bidCount = 0;
                       const maxVirtualDate = status == AuctionStatus.FINISHED ? endDate.getTime() :
                         Math.min(endDate.getTime(), now.getTime());
 
@@ -168,7 +171,6 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
 
                           if (currentPrice >= item.reservePrice && lastBidder !== undefined) {
                               item.status = ItemStatus.SOLD;
-                              item.soldPrice = currentPrice;
 
                               // order
                               const orderDate = virtualDate.add(faker.number.int({
@@ -184,7 +186,8 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                                   accountId: lastBidder.id,
                                   createDate: orderDate,
                                   auctionItem: {
-                                      itemId: item.id
+                                      itemId: item.id,
+                                      soldPrice: currentPrice
                                   },
                                   orderAddress: faker.location.streetAddress({useFullAddress: true})
                               });
@@ -194,19 +197,18 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                               localBids.filter(b => b.accountId == lastBidder.id)
                                 .forEach(b => b.status = BidStatus.SUCCESS);
 
-                              // set auction deposit of winner to success
-                              // set auction deposit of losers to failed
-                              deposits.filter(d => d.accountId == lastBidder.id)
-                                .forEach(d => d.status = PaymentStatus.SUCCESS);
+                              // set auction deposit of all to success
+                              deposits.forEach(d => d.status = PaymentStatus.SUCCESS);
                               console.log(`> Winner: ${lastBidder.id}`);
                           } else {
-                              item.status = ItemStatus.UNSOLD;
+                              item.status = ItemStatus.QUEUE;
                               console.log(`> No winner`);
                           }
                       }
                   }
 
                   auctionItems.push({
+                      bidCount: bidCount,
                       id: auctionItemId++,
                       itemId: item.id,
                       currentPrice: currentPrice,
@@ -221,6 +223,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
               auctionSessions.push({
                   id: auctionId,
                   title: "Auction #" + auctionId,
+                  description: faker.lorem.lines(),
                   startDate: startDate,
                   endDate: endDate,
                   status: status,
@@ -230,7 +233,8 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                   imageURLs: auctionItems.map(i => items[i.itemId - 1])
                     .flatMap(i => i.imageURLs)
                     .slice(0, faker.number.int({min: 3, max: 10})),
-                  items: auctionItems
+                  items: auctionItems,
+                  participantCount: participantCounter.size
               });
           }
     }

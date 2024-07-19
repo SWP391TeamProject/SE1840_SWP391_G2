@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@CacheConfig(cacheNames = "consignmentDetail")
+//@CacheConfig(cacheNames = "consignmentDetail")
 public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     private ConsignmentDetailRepos consignmentDetailRepos;
     private AttachmentRepos attachmentRepos;
@@ -42,13 +42,13 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
-    @Cacheable(key = "#pageable.pageNumber",value = "consignmentDetail")
+   //@Cacheable(key = "#pageable.pageNumber",value = "consignmentDetail")
     public Page<ConsignmentDetailDTO> getAllConsignmentsDetail(Pageable pageable) {
         return consignmentDetailRepos.findAll(pageable).map(this::mapToDTO);
     }
 
     @Override
-    @Cacheable(key = "#consignmentId",value = "consignmentDetail")
+   //@Cacheable(key = "#consignmentId",value = "consignmentDetail")
     public List<ConsignmentDetailDTO> getConsignmentsDetailByConsignmentId(int consignmentId) {
         List<ConsignmentDetail> consignmentDetails = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId);
         return consignmentDetails.stream()
@@ -57,7 +57,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
-    @Cacheable(key = "#consignmentDetailId",value = "consignmentDetail")
+   //@Cacheable(key = "#consignmentDetailId",value = "consignmentDetail")
     public ConsignmentDetailDTO getConsignmentDetailById(int consignmentDetailId) {
         ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)
                 .orElseThrow(() -> new ResourceNotFoundException("Consignment detail not found with id " + consignmentDetailId));
@@ -65,7 +65,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
     }
 
     @Override
-    @CacheEvict(value = "consignmentDetail", allEntries = true)
+    //@CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
         try {
             ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -100,7 +100,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
 
     @Override
-    @CacheEvict(value = "consignmentDetail", allEntries = true)
+    //@CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
             // Find the existing ConsignmentDetail object by ID
             ConsignmentDetail consignmentDetail = consignmentDetailRepos.findById(consignmentDetailId)

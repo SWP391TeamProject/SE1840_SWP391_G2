@@ -69,6 +69,16 @@ export default function AuctionSessionDetail() {
     }
 
     useEffect(() => {
+        if(auctionSession){
+            setCurrentAuctionSession(auctionSession);
+            form.reset({
+                auctionSessionId: auctionSession.auctionSessionId,
+                title: auctionSession.title,
+                startDate: auctionSession.startDate,
+                endDate: auctionSession.endDate,
+                status: auctionSession.status,
+            })
+        }
         if (!auctionSession || auctionSession.auctionSessionId != Number.parseInt(id)) {
             console.log(auctionSession);
             fetchAuctionSessionById(parseInt(id)).then((res) => {
@@ -84,6 +94,13 @@ export default function AuctionSessionDetail() {
             });
         } else {
             setCurrentAuctionSession(auctionSession);
+            form.reset({
+                auctionSessionId: auctionSession.auctionSessionId,
+                title: auctionSession.title,
+                startDate: auctionSession.startDate,
+                endDate: auctionSession.endDate,
+                status: auctionSession.status,
+            })
             // form.reset({...auctionSession});
             console.log(auctionSession);
         }
@@ -91,7 +108,6 @@ export default function AuctionSessionDetail() {
 
     const handleFinishSession = () => {
         const finishAuctionSessionPromise = finishAuctionSession(currentAuctionSession?.auctionSessionId)
-
         toast.promise(finishAuctionSessionPromise, {
             loading: 'Finishing Auction Session...',
             success:()=>{
@@ -118,9 +134,7 @@ export default function AuctionSessionDetail() {
 
     const handleTerminateSession = () => {
         console.log("here");
-
         const terminateAuctionSessionPromise = terminateAuctionSession(currentAuctionSession?.auctionSessionId)
-
         toast.promise(terminateAuctionSessionPromise, {
             loading: 'Terminating Auction Session...',
             success: (res) => {

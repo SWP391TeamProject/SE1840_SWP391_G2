@@ -18,6 +18,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +65,10 @@ public class DbGenService {
     private AuctionItemRepos auctionItemRepos;
     @Autowired
     private PaymentRepos paymentRepos;
+    @Autowired
+    private OrderRepos orderRepos;
+    @Autowired
+    private OrderDetailRepos orderDetailRepos;
     @Autowired
     private BidRepos bidRepos;
     @Autowired
@@ -235,19 +240,24 @@ public class DbGenService {
             JsonObject obj = element.getAsJsonObject();
             Consignment consignment = new Consignment();
             consignment.setConsignmentId(obj.get("id").getAsInt());
-            consignment.setUser(accountRepos.getReferenceById(obj.get("senderId").getAsInt()));
+            consignment.setUser(accountRepos.getReferenceById(obj.get("userId").getAsInt()));
+            consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
             consignment.setStatus(Consignment.Status.valueOf(obj.get("status").getAsString()));
             consignment.setPreferContact(Consignment.preferContact.valueOf(obj.get("preferContact").getAsString()));
             consignment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
             consignment.setUpdateDate(parseDate(obj.get("updateDate").getAsString()));
             consignment.setDescription(obj.get("description").getAsString());
             consignment.setColor(obj.get("color").getAsString());
-            consignment.setWeight(Double.parseDouble(obj.get("weight").getAsString()));
+            consignment.setWeight(obj.get("weight").getAsDouble());
             consignment.setMeasurement(obj.get("measurement").getAsString());
             consignment.setCondition(obj.get("condition").getAsString());
             consignment.setMetal(obj.get("metal").getAsString());
             consignment.setGemstone(obj.get("gemstone").getAsString());
             consignment.setStamped(obj.get("stamped").getAsString());
+            consignment.setContactEmail(obj.get("contactEmail").getAsString());
+            consignment.setContactName(obj.get("contactName").getAsString());
+            consignment.setContactPhone(obj.get("contactPhone").getAsString());
+            consignment.setSecretCode(obj.has("secretCode") ? obj.get("secretCode").getAsString() : null);
 
             {
                 List<Attachment> attachments = new ArrayList<>();
@@ -426,7 +436,6 @@ public class DbGenService {
             item.setDescription(obj.get("description").getAsString());
             item.setReservePrice(obj.get("reservePrice").getAsBigDecimal());
             item.setBuyInPrice(obj.get("buyInPrice").getAsBigDecimal());
-            item.setSoldPrice(obj.has("soldPrice") ? obj.get("soldPrice").getAsBigDecimal() : null);
             item.setStatus(Item.Status.valueOf(obj.get("status").getAsString()));
             item.setOwner(accountRepos.getReferenceById(obj.get("ownerId").getAsInt()));
             item = itemRepos.save(item);
@@ -478,9 +487,11 @@ public class DbGenService {
             AuctionSession auctionSession = new AuctionSession();
             auctionSession.setAuctionSessionId(obj.get("id").getAsInt());
             auctionSession.setTitle(obj.get("title").getAsString());
+            auctionSession.setDescription(obj.get("description").getAsString());
             auctionSession.setStartDate(parseDate(obj.get("startDate").getAsString()));
             auctionSession.setEndDate(parseDate(obj.get("endDate").getAsString()));
             auctionSession.setStatus(AuctionSession.Status.valueOf(obj.get("status").getAsString()));
+            auctionSession.setParticipantCount(obj.get("participantCount").getAsInt());
             auctionSession = auctionSessionRepos.save(auctionSession);
             {
                 Map<String, Object> paramMap = new HashMap<>();
@@ -528,6 +539,7 @@ public class DbGenService {
                     auctionItem.setAuctionSession(auctionSession);
                     auctionItem.setItem(itemRepos.getReferenceById(obj.get("itemId").getAsInt()));
                     auctionItem.setCurrentPrice(obj.get("currentPrice").getAsBigDecimal());
+                    auctionItem.setBidCount(obj.get("bidCount").getAsInt());
                     auctionItem = auctionItemRepos.save(auctionItem);
                     {
                         Map<String, Object> paramMap = new HashMap<>();
@@ -559,11 +571,13 @@ public class DbGenService {
             public Payment parent;
             public Object meta;
             public Integer itemId;
+            public BigDecimal soldPrice;
 
-            public PreparedPayment(Payment parent, Object meta, Integer itemId) {
+            public PreparedPayment(Payment parent, Object meta, Integer itemId, BigDecimal soldPrice) {
                 this.parent = parent;
                 this.meta = meta;
                 this.itemId = itemId;
+                this.soldPrice = soldPrice;
             }
         }
 
@@ -583,6 +597,7 @@ public class DbGenService {
 
             Object meta = null;
             Integer itemId = null;
+            BigDecimal soldPrice = null;
 
             switch (payment.getType()) {
                 case AUCTION_DEPOSIT -> {
@@ -597,10 +612,14 @@ public class DbGenService {
                     meta = new Order();
                     if (obj.has("orderAddress"))
                         ((Order) meta).setShippingAddress(obj.get("orderAddress").getAsString());
+                    if (auctionItem.has("soldPrice")) {
+                        soldPrice = auctionItem.get("soldPrice").getAsBigDecimal();
+                        ((Order) meta).setFee(payment.getPaymentAmount().subtract(soldPrice));
+                    }
                 }
             }
 
-            preparedPayments.put(payment.getPaymentId(), new PreparedPayment(payment, meta, itemId));
+            preparedPayments.put(payment.getPaymentId(), new PreparedPayment(payment, meta, itemId, soldPrice));
         }
 
         /////////////////////////////
@@ -646,9 +665,14 @@ public class DbGenService {
         for (PreparedPayment p : preparedPayments.values()) {
             if (p.meta instanceof Order) {
                 itemRepos.findById(p.itemId).ifPresent((item) -> {
-                    Payment payment = paymentRepos.findById(p.parent.getPaymentId()).orElseThrow();
-                    item.setOrder(payment.getOrder());
-                    itemRepos.save(item);
+                    Order order = orderRepos.findById(p.parent.getPaymentId()).orElseThrow();
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.setId(new OrderDetailKey(order.getOrderId(), item.getItemId()));
+                    orderDetail.setOrder(order);
+                    orderDetail.setItem(item);
+                    orderDetail.setSoldPrice(p.soldPrice);
+                    orderDetail.setOrder(order);
+                    orderDetailRepos.save(orderDetail);
                 });
             }
         }

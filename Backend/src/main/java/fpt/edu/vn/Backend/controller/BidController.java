@@ -67,6 +67,11 @@ public class BidController {
         return ResponseEntity.ok(bidService.toBidResponse(bidService.getBidsByAuctionItemId(auctionItemId)));
     }
 
+    @GetMapping("/api/bids/auction/{auctionSessionId}")
+    public ResponseEntity<List<BidResponse>> getBidsByAuctionId(@PathVariable int auctionSessionId) {
+        return ResponseEntity.ok(bidService.toBidResponse(bidService.getBidsByAuctionId(auctionSessionId)));
+    }
+
     @GetMapping("/api/bids/export")
     public ResponseEntity<byte[]> exportToExcel(Authentication authentication) throws IOException {
         AccountDTO account = accountService.getAccountByEmail(authentication.getName());
@@ -97,7 +102,7 @@ public class BidController {
     }
 
     @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
-    @SendTo("/topic/public/{auctionSessionId}/{itemId}")
+    @SendTo("/topic/public/{auctionSessionId}")
     @Transactional
     public ResponseEntity<BidReplyDTO> sendMessage(@Payload BidDTO bidDTO,
                                                    @DestinationVariable int auctionSessionId,
@@ -116,24 +121,24 @@ public class BidController {
             log.info(bidDTO.getAccountId() + " bid " + bidDTO.getAmount() + " on " + auctionItemId.getItemId() + "," + auctionItemId.getAuctionSessionId());
 
             if (highestBid != null && Objects.equals(bidDTO.getAccountId(), highestBid.getAccountId())) {
-                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Right now, you are the highest bidder.\n" +
+                return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),auctionItemId, "Right now, you are the highest bidder.\n" +
                         "Hold off until someone outbids you.", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
             }
             if (currentBid.compareTo(BigDecimal.valueOf(15000)) < 0) {
                 if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(100))) < 0) {
-                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 100", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),auctionItemId, "Your bid must be higher than the current bid by at least 100", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             } else if (currentBid.compareTo(BigDecimal.valueOf(15000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(50000)) < 0) {
                 if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(250))) < 0) {
-                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 250", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),auctionItemId, "Your bid must be higher than the current bid by at least 250", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             } else if (currentBid.compareTo(BigDecimal.valueOf(50000)) >= 0 && currentBid.compareTo(BigDecimal.valueOf(200000)) < 0) {
                 if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(500))) < 0) {
-                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 500", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),auctionItemId, "Your bid must be higher than the current bid by at least 500", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             } else {
                 if (bidDTO.getAmount().compareTo(currentBid.add(new BigDecimal(1000))) < 0) {
-                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(), "Your bid must be higher than the current bid by at least 1000", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new BidReplyDTO(headerAccessor.getSessionId(),auctionItemId, "Your bid must be higher than the current bid by at least 1000", null, BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
                 }
             }
             bidDTO.setStatus(Bid.Status.PENDING);
@@ -148,27 +153,13 @@ public class BidController {
     }
 
     @MessageMapping("/chat.addUser/{auctionSessionId}/{itemId}")
-    @SendTo("/topic/public/{auctionSessionId}/{itemId}")
+    @SendTo("/topic/public/{auctionSessionId}")
     @Transactional
     public ResponseEntity<BidReplyDTO> addUser(@Payload BidDTO bidDTO,
                                                @DestinationVariable int auctionSessionId,
                                                @DestinationVariable int itemId, Authentication authentication,
                                                SimpMessageHeaderAccessor headerAccessor) {
-        AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
-        AuctionSessionDTO auctionSessionDTO = auctionSessionService.getAuctionSessionById(auctionSessionId);
-        AccountDTO persistedAccount = accountService.getAccountByEmail(authentication.getName());
-        if (persistedAccount == null) {
-            return new ResponseEntity<>(new BidReplyDTO("You are not login yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
-        }
-        if (auctionSessionDTO.getDeposits().stream().noneMatch(depositDTO -> depositDTO.getPayment().getAccountId() == persistedAccount.getAccountId())) {
-            return new ResponseEntity<>(new BidReplyDTO("You have not registered to this auction yet", BidReplyDTO.Status.ERROR), HttpStatus.BAD_REQUEST);
-        }
-        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("user", persistedAccount);
-        BidDTO highestBid = bidService.getHighestBid(auctionItemId);
-        BigDecimal currentBid = highestBid == null ? auctionItemService.getAuctionItemById(auctionItemId)
-                .getItemDTO().getReservePrice()
-                : highestBid.getAmount();
-        return ResponseEntity.ok(new BidReplyDTO(persistedAccount.getNickname() + " join the auction", currentBid, BidReplyDTO.Status.JOIN));
+        return ResponseEntity.ok(bidService.addUser(bidDTO, auctionSessionId, itemId, authentication, headerAccessor));
     }
 }
 

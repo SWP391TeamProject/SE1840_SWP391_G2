@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -43,11 +44,14 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
 
     @Override
-    public Map<CurrencyType, Double> getExchangeRates() {
+    public Map<CurrencyType, BigDecimal> getExchangeRates() {
         fetchExchangeRates();
-        Map<CurrencyType, Double> rates = new HashMap<>();
+        Map<CurrencyType, BigDecimal> rates = new HashMap<>();
         for (Map.Entry<Object, Object> e : redisTemplate.opsForHash().entries(EXCHANGE_RATE_KEY).entrySet()) {
-            rates.put(CurrencyType.valueOf((String) e.getKey()), (Double) e.getValue());
+            if (e.getValue() instanceof Double)
+                rates.put(CurrencyType.valueOf((String) e.getKey()), BigDecimal.valueOf((Double) e.getValue()));
+            else if (e.getValue() instanceof BigDecimal)
+                rates.put(CurrencyType.valueOf((String) e.getKey()), (BigDecimal) e.getValue());
         }
         return Collections.unmodifiableMap(rates);
     }
@@ -93,7 +97,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         for (Map.Entry<String, JsonElement> entry : dataObject.entrySet()) {
             JsonObject currencyObject = entry.getValue().getAsJsonObject();
             String code = currencyObject.get("code").getAsString();
-            double value = currencyObject.get("value").getAsDouble();
+            BigDecimal value = currencyObject.get("value").getAsBigDecimal();
             redisTemplate.opsForHash().put(EXCHANGE_RATE_KEY, code, value);
         }
 

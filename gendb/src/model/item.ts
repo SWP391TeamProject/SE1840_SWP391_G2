@@ -3,15 +3,15 @@ export interface Item {
     categoryId: number,
     name: string,
     color: string,
-    size: string,
-    weight: string,
-    brand: string,
-    age: number,
-    material: string;
+    measurement: string,
+    weight: number,
+    condition: string,
+    stamped: string,
+    metal: string;
+    gemstone: string;
     description: string,
     reservePrice: number,
     buyInPrice: number,
-    soldPrice?: number,
     status: ItemStatus,
     imageURLs: string[],
     createDate: Date,
@@ -23,6 +23,5 @@ export interface Item {
 export enum ItemStatus {
     QUEUE = "QUEUE",
     IN_AUCTION = "IN_AUCTION",
-    SOLD = "SOLD",
-    UNSOLD = "UNSOLD"
+    SOLD = "SOLD"
 }

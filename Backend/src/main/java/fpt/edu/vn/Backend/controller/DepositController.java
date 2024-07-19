@@ -23,12 +23,6 @@ public class DepositController {
     @Autowired
     private DepositService depositService;
 
-    @PostMapping("/create")
-    public ResponseEntity<DepositDTO> createDeposit(@RequestBody DepositRequest depositRequest) {
-        DepositDTO createdDeposit = depositService.createDeposit(depositRequest);
-        return ResponseEntity.ok(createdDeposit);
-    }
-
     @GetMapping("/{depositId}")
     public ResponseEntity<DepositDTO> getDepositById(Principal principal, @PathVariable int depositId) {
         DepositDTO depositDTO = depositService.getDepositById(depositId);

@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@CacheConfig(cacheNames = "blog")
+//@CacheConfig(cacheNames = "blog")
 public class BlogServiceImpl implements BlogService {
     private static final Logger log = LoggerFactory.getLogger(BlogServiceImpl.class);
     @Autowired
@@ -58,7 +58,7 @@ public class BlogServiceImpl implements BlogService {
 
 
     @Override
-    @Cacheable(key = "#pageable", value = "blog")
+   //@Cacheable(key = "#pageable", value = "blog")
     public Page<BlogPostDTO> getAllBlogs(String keyword,Pageable pageable) {
         BlogSpecification spec = new BlogSpecification(keyword);
         return blogPostRepos.findAll(spec,pageable).map(BlogPostDTO::new);
@@ -77,7 +77,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @Cacheable(key = "#id", value = "blog")
+   //@Cacheable(key = "#id", value = "blog")
     public BlogPostDTO getBlogById(int id) {
         return blogPostRepos.findByPostId(id).map(BlogPostDTO::new).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + id));
     }
@@ -94,7 +94,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @CacheEvict(allEntries = true, value = "blog", beforeInvocation = true)
+    //@CacheEvict(allEntries = true, value = "blog", beforeInvocation = true)
     public BlogPostDTO createBlog(BlogCreateDTO blogCreateDTO) {
         BlogPostDTO blogPostDTO = new BlogPostDTO();
         blogPostDTO.setTitle(blogCreateDTO.getTitle());
@@ -133,7 +133,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @CacheEvict(allEntries = true, value = "blog",cacheNames = "blog")
+    //@CacheEvict(allEntries = true, value = "blog",cacheNames = "blog")
     public BlogPostDTO updateBlog(BlogUpdateDTO blogUpdateDTO) {
         BlogPostDTO blogPostDTO = blogPostRepos.findByPostId(blogUpdateDTO.getPostId()).map(BlogPostDTO::new).orElseThrow(
                 () -> new ResourceNotFoundException("Invalid blog id: " + blogUpdateDTO.getPostId()
@@ -171,7 +171,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @CacheEvict(allEntries = true, value = "blog")
+    //@CacheEvict(allEntries = true, value = "blog")
     public BlogPostDTO deleteAttachment(int postId, int attachmentId) {
         BlogPost blogPost = blogPostRepos.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + postId));
         List<AttachmentDTO> attachmentDTOS = blogPost.getAttachments().stream().map(AttachmentDTO::new).toList();
@@ -190,19 +190,19 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @CacheEvict(allEntries = true, value = "blog")
+    //@CacheEvict(allEntries = true, value = "blog")
     public void deleteBlog(int id) {
         blogPostRepos.delete(blogPostRepos.findByPostId(id).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + id)));
     }
 
     @Override
-    @Cacheable(key = "#keyword", value = "blog")
+   //@Cacheable(key = "#keyword", value = "blog")
     public Page<BlogPostDTO> searchBlog(String keyword, Pageable pageable) {
         return blogPostRepos.findAllByContentIsContainingIgnoreCase(keyword, pageable).map(BlogPostDTO::new);
     }
 
     @Override
-    @Cacheable(key = "#categoryId", value = "blog")
+   //@Cacheable(key = "#categoryId", value = "blog")
     public Page<BlogPostDTO> getBlogByCategory(int categoryId, Pageable pageable) {
         return blogPostRepos.findAllByCategoryBlogCategoryId(categoryId, pageable).map(BlogPostDTO::new);
     }

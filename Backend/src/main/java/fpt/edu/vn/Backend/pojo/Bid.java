@@ -32,6 +32,7 @@ public class Bid {
     public enum Status {
         PENDING, SUCCESS, FAILED
     }
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(name = "amount", precision = 20, scale = 8)

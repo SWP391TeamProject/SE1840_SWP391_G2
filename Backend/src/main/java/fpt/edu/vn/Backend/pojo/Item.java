@@ -41,16 +41,14 @@ public class Item {
     @Column(name = "buy_in_price", precision = 20, scale = 8)
     private BigDecimal buyInPrice;
 
-    @Column(name = "sold_price", precision = 20, scale = 8)
-    private BigDecimal soldPrice;
-
     public enum Status {
-        QUEUE, IN_AUCTION, SOLD, UNSOLD, REMOVED
+        QUEUE, IN_AUCTION, SOLD, REMOVED
     }
 
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private Status status;
+
 
     @CreationTimestamp
     @Column(name = "create_date")
@@ -85,14 +83,17 @@ public class Item {
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String stamped;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private  Order order;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jewelry_id")
+    private List<OrderDetail> orderDetails;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "jewelry_id")
     private Set<Attachment> attachments;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "consignment_reward_payment_id")
+    private Payment consignmentRewardPayment;
 
     @Override
     public int hashCode() {

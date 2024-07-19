@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.DTO;
 
+import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 public class BidReplyDTO implements Serializable {
     private String id;
+    private AuctionItemId auctionItemId;
     private String message;
     private BigDecimal currentPrice;
     private Status status;

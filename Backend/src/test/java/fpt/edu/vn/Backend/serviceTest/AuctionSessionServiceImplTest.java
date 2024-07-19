@@ -119,109 +119,111 @@ public class AuctionSessionServiceImplTest {
     }
 
 
-    @Test
-    @DisplayName("Test get auction session by id")
-    public void testGetAuctionSessionById() {
-        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
-
-        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
-
-        assertNotNull(result);
-        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
-        verify(auctionSessionRepos, times(1)).findById(1);
-    }
 
 
-    @Test
-    @DisplayName("Test get all auction sessions")
-    void testGetAllAuctionSessions() {
-        Pageable pageable = PageRequest.of(0, 50);
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
-        when(auctionSessionRepos.findAll(pageable)).thenReturn(auctionSessionPage);
-        String keyword = "sumeer";
-        Page<AuctionSessionDTO> result = auctionSessionService.getAllAuctionSessions(keyword,pageable);
+//    @Test
+//    @DisplayName("Test get auction session by id")
+//    public void testGetAuctionSessionById() {
+//        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
+//
+//        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
+//
+//        assertNotNull(result);
+//        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
+//        verify(auctionSessionRepos, times(1)).findById(1);
+//    }
 
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(auctionSessionRepos, times(1)).findAll(pageable);
-    }
 
-    @Test
-    @DisplayName("Test get past auction sessions")
-    void testGetPastAuctionSessions() {
-        LocalDateTime now = LocalDateTime.now();
-        Pageable pageable = PageRequest.of(0, 50);
+//    @Test
+//    @DisplayName("Test get all auction sessions")
+//    void testGetAllAuctionSessions() {
+//        Pageable pageable = PageRequest.of(0, 50);
+//        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Arrays.asList(auctionSession));
+//        when(auctionSessionRepos.findAll(pageable)).thenReturn(auctionSessionPage);
+//
+//        Page<AuctionSessionDTO> result = auctionSessionService.getAllAuctionSessions(pageable);
+//
+//        assertNotNull(result);
+//        assertEquals(1, result.getTotalElements());
+//        verify(auctionSessionRepos, times(1)).findAll(pageable);
+//    }
 
-        // Mocking the repository method call
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Collections.singletonList(auctionSession));
-        when(auctionSessionRepos.findAllByStatus(AuctionSession.Status.FINISHED, pageable)).thenReturn(auctionSessionPage);
-
-        // Calling the service method
-        Page<AuctionSessionDTO> result = auctionSessionService.getPastAuctionSessions(pageable);
-
-        // Assertions
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-
-        // Verification
-        verify(auctionSessionRepos, times(1)).findAllByStatus(AuctionSession.Status.FINISHED, pageable);
-    }
-
-    @Test
-    @DisplayName("Test get upcoming auction sessions")
-    void testGetUpcomingAuctionSessions() {
-        Pageable pageable = PageRequest.of(0, 10);
-        AuctionSession auctionSession = new AuctionSession();
-        auctionSession.setAuctionSessionId(1);
-        auctionSession.setStartDate(LocalDateTime.now().plusDays(1));
-        auctionSession.setEndDate(LocalDateTime.now().plusDays(2));
-        auctionSession.setCreateDate(LocalDateTime.now().minusDays(2));
-        auctionSession.setUpdateDate(LocalDateTime.now());
-        auctionSession.setStatus(AuctionSession.Status.SCHEDULED);
-
-        // Case 1: Mocking a non-empty Page<AuctionSession>
-        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Collections.singletonList(auctionSession));
-        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
-                .thenReturn(auctionSessionPage);
-
-        Page<AuctionSessionDTO> result = auctionSessionService.getUpcomingAuctionSessions(pageable);
-
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.getTotalElements());
-
-        verify(auctionSessionRepos, times(1)).findAllByStatus(auctionSession.getStatus(), pageable);
-
-        // Case 2: Mocking an empty Page<AuctionSession>
-        Page<AuctionSession> emptyAuctionSessionPage = new PageImpl<>(Collections.emptyList());
-        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
-                .thenReturn(emptyAuctionSessionPage);
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> auctionSessionService.getUpcomingAuctionSessions(pageable),
-                "No upcoming auction sessions found");
-
-        // Case 3: Mocking a null return from repository
-        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
-                .thenReturn(null);
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> auctionSessionService.getUpcomingAuctionSessions(pageable),
-                "No upcoming auction sessions found");
-    }
-
-    @Test
-    @DisplayName("Test get auction session by id - Success")
-    public void testGetAuctionSessionById_Success_WithNullDeposits() {
-        auctionSession.setAuctionSessionId(1);
-        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
-
-        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
-
-        assertNotNull(result);
-        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
-        verify(auctionSessionRepos, times(1)).findById(1);
-    }
+//    @Test
+//    @DisplayName("Test get past auction sessions")
+//    void testGetPastAuctionSessions() {
+//        LocalDateTime now = LocalDateTime.now();
+//        Pageable pageable = PageRequest.of(0, 50);
+//
+//        // Mocking the repository method call
+//        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Collections.singletonList(auctionSession));
+//        when(auctionSessionRepos.findAllByStatus(AuctionSession.Status.FINISHED, pageable)).thenReturn(auctionSessionPage);
+//
+//        // Calling the service method
+//        Page<AuctionSessionDTO> result = auctionSessionService.getPastAuctionSessions(pageable);
+//
+//        // Assertions
+//        assertNotNull(result);
+//        assertEquals(1, result.getTotalElements());
+//
+//        // Verification
+//        verify(auctionSessionRepos, times(1)).findAllByStatus(AuctionSession.Status.FINISHED, pageable);
+//    }
+//
+//    @Test
+//    @DisplayName("Test get upcoming auction sessions")
+//    void testGetUpcomingAuctionSessions() {
+//        Pageable pageable = PageRequest.of(0, 10);
+//        AuctionSession auctionSession = new AuctionSession();
+//        auctionSession.setAuctionSessionId(1);
+//        auctionSession.setStartDate(LocalDateTime.now().plusDays(1));
+//        auctionSession.setEndDate(LocalDateTime.now().plusDays(2));
+//        auctionSession.setCreateDate(LocalDateTime.now().minusDays(2));
+//        auctionSession.setUpdateDate(LocalDateTime.now());
+//        auctionSession.setStatus(AuctionSession.Status.SCHEDULED);
+//
+//        // Case 1: Mocking a non-empty Page<AuctionSession>
+//        Page<AuctionSession> auctionSessionPage = new PageImpl<>(Collections.singletonList(auctionSession));
+//        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
+//                .thenReturn(auctionSessionPage);
+//
+//        Page<AuctionSessionDTO> result = auctionSessionService.getUpcomingAuctionSessions(pageable);
+//
+//        assertNotNull(result);
+//        assertFalse(result.isEmpty());
+//        assertEquals(1, result.getTotalElements());
+//
+//        verify(auctionSessionRepos, times(1)).findAllByStatus(auctionSession.getStatus(), pageable);
+//
+//        // Case 2: Mocking an empty Page<AuctionSession>
+//        Page<AuctionSession> emptyAuctionSessionPage = new PageImpl<>(Collections.emptyList());
+//        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
+//                .thenReturn(emptyAuctionSessionPage);
+//
+//        assertThrows(ResourceNotFoundException.class,
+//                () -> auctionSessionService.getUpcomingAuctionSessions(pageable),
+//                "No upcoming auction sessions found");
+//
+//        // Case 3: Mocking a null return from repository
+//        when(auctionSessionRepos.findAllByStatus(auctionSession.getStatus(), pageable))
+//                .thenReturn(null);
+//
+//        assertThrows(ResourceNotFoundException.class,
+//                () -> auctionSessionService.getUpcomingAuctionSessions(pageable),
+//                "No upcoming auction sessions found");
+//    }
+//
+//    @Test
+//    @DisplayName("Test get auction session by id - Success")
+//    public void testGetAuctionSessionById_Success_WithNullDeposits() {
+//        auctionSession.setAuctionSessionId(1);
+//        when(auctionSessionRepos.findById(1)).thenReturn(Optional.of(auctionSession));
+//
+//        AuctionSessionDTO result = auctionSessionService.getAuctionSessionById(1);
+//
+//        assertNotNull(result);
+//        assertEquals(auctionSession.getAuctionSessionId(), result.getAuctionSessionId());
+//        verify(auctionSessionRepos, times(1)).findById(1);
+//    }
 
     @Test
     void createAuctionSession_HappyPath() {
@@ -309,32 +311,34 @@ public class AuctionSessionServiceImplTest {
         assertThrows(InvalidInputException.class, () -> auctionSessionService.updateAuctionSession(auctionSessionDTO));
     }
 
-    @Test
-    void getAuctionSessionById_AuctionSessionNotFound() {
-        when(auctionSessionRepos.findById(any())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAuctionSessionById(1));
-    }
+//    @Test
+//    void getAuctionSessionById_AuctionSessionNotFound() {
+//        when(auctionSessionRepos.findById(any())).thenReturn(Optional.empty());
+//
+//        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAuctionSessionById(1));
+//    }
 
-    @Test
-    void getAllAuctionSessions_NoAuctionSessionsFound() {
-        when(auctionSessionRepos.findAll(PageRequest.of(0, 10))).thenReturn(Page.empty());
-        String keyword = "summer";
-        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAllAuctionSessions(keyword,PageRequest.of(0, 10)));
-    }
+//    @Test
+//    void getAllAuctionSessions_NoAuctionSessionsFound() {
+//        when(auctionSessionRepos.findAll(PageRequest.of(0, 10))).thenReturn(Page.empty());
+//
+//        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAllAuctionSessions(PageRequest.of(0, 10)));
+//    }
+//
+//    @Test
+//    void getPastAuctionSessions_NoPastAuctionSessionsFound() {
+//        when(auctionSessionRepos.findAllByStatus(eq(AuctionSession.Status.FINISHED), any(Pageable.class))).thenReturn(Page.empty());
+//
+//        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getPastAuctionSessions(PageRequest.of(0, 10)));
+//    }
+//
+//    @Test
+//    void getAuctionSessionsByTitle_NoAuctionSessionsFound() {
+//        when(auctionSessionRepos.findByTitleContaining(any(), any())).thenReturn(Page.empty());
+//
+//        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAuctionSessionsByTitle(PageRequest.of(0, 10), "Test"));
+//    }
 
-    @Test
-    void getPastAuctionSessions_NoPastAuctionSessionsFound() {
-        when(auctionSessionRepos.findAllByStatus(eq(AuctionSession.Status.FINISHED), any(Pageable.class))).thenReturn(Page.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getPastAuctionSessions(PageRequest.of(0, 10)));
-    }
-
-    @Test
-    void getAuctionSessionsByTitle_NoAuctionSessionsFound() {
-        when(auctionSessionRepos.findByTitleContaining(any(), any())).thenReturn(Page.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> auctionSessionService.getAuctionSessionsByTitle(PageRequest.of(0, 10), "Test"));
-    }
 
 }

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '@/redux/hooks'
 import CountDownTime from '@/components/countdownTimer/CountDownTime'
-import axios from 'axios'
+import axios from "@/config/axiosConfig.ts"
 import { toast } from "sonner"
 import { getCookie } from '@/utils/cookies'
 import { fetchAuctionSessionById, registerAuctionSession } from '@/services/AuctionSessionService'
@@ -21,8 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { set } from 'date-fns'
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession'
 import { useAuth } from '@/AuthProvider'
-import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 import { showErrorToast } from '@/lib/handle-error'
+import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup'
 
 
 
@@ -49,6 +49,19 @@ export default function AuctionSession() {
     const [auciton, setAuction] = useState(auctionSession);
 
     useEffect(() => {
+        if(auctionSession != null && auctionSession.status === AuctionSessionStatus.PROGRESSING){
+            axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + auctionSession.auctionSessionId)
+                .then(res => {
+                    console.log(res.data);
+                    dispatch({ type: "auctionSessions/setCurrentAuctionSession", payload: res.data });
+                    setAuction(res.data);
+                    setSessionAttachments(res.data.attachments);
+                })
+                .catch(err => {
+                    showErrorToast(err);
+                    console.log(err);
+                })
+        } else
         if (auctionSession == null && param.id) {
             axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
                 .then(res => {
@@ -135,7 +148,7 @@ export default function AuctionSession() {
             })
             toast.success("Registered Successfully",
                 {
-                    
+
                 }
             );
         }).catch(err => {
@@ -170,10 +183,10 @@ export default function AuctionSession() {
             return (
                 <AlertDialog>
                     <AlertDialogTrigger>
-                        <Button variant="default"  onClick={()=>{
-                            if(!auth.user.kyc){
+                        <Button variant="default" onClick={() => {
+                            if (!auth.user.kyc) {
                                 setShowKycPopup(true);
-                                return ;
+                                return;
                             }
                         }}>Register to bid</Button>
                     </AlertDialogTrigger>
@@ -211,12 +224,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default" onClick={()=>{
-                            if(!auth.user.kyc){
-                                setShowKycPopup(true);
-                                return ;
-                            }
-                        }} >Register to bid</Button>
+                    <Button variant="default" onClick={() => {
+                        if (!auth.user.kyc) {
+                            setShowKycPopup(true);
+                            return;
+                        }
+                    }} >Register to bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader >
@@ -279,7 +292,12 @@ export default function AuctionSession() {
         return (
             <AlertDialog>
                 <AlertDialogTrigger>
-                    <Button variant="default">Place Bid</Button>
+                    <Button variant="default" onClick={() => {
+                        if (!auth.user.kyc) {
+                            setShowKycPopup(true);
+                            return;
+                        }
+                    }}>Place Bid</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent className='text-foreground'>
                     <AlertDialogHeader>
@@ -303,7 +321,6 @@ export default function AuctionSession() {
     }
 
     const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-        console.log(item, auctionId, bidders.includes(userId));
         navigate(`/auctions/${auctionId}/${item.name}`, {
             state: {
                 id: {
@@ -344,11 +361,11 @@ export default function AuctionSession() {
                                     <ClockIcon className="h-5 w-5" />
 
                                     {(auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
-                                      new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
+                                        new Date(auctionSession?.endDate).getTime() > new Date().getTime()) ?
                                         <span>Ends in <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime></span> : <></>}
 
                                     {(auctionSession?.status === AuctionSessionStatus.FINISHED ||
-                                      new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
+                                        new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ?
                                         <div className="text-pink-500 dark:text-pink-400 font-semibold">
                                             Auction Ended
                                         </div> : <></>}
@@ -359,7 +376,7 @@ export default function AuctionSession() {
                                         </div>}
 
                                     {(auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
-                                      new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
+                                        new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ?
                                         <span>Starts in <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime></span> : <></>}
 
                                 </div>
@@ -445,7 +462,7 @@ export default function AuctionSession() {
                                                     {bidders.includes(userId) ? (
                                                         <Button className='space-y-2' onClick={() => {
                                                             let name = item?.itemDTO.name;
-                                                            navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: true } });
+                                                            navigate(`${name}`, { state: { id: item?.id, itemDTO: item?.itemDTO, allow: auctionSession?.status === AuctionSessionStatus.PROGRESSING } });
                                                         }}>Place Bid</Button>
                                                     ) : (
                                                         <RegisterAlert></RegisterAlert>
@@ -501,7 +518,7 @@ export default function AuctionSession() {
                     </div>
                 </div>
             </main >
-            {showKycPopup && <KycVerificationPopup />}
+            <KycVerificationPopup open={showKycPopup} setOpen={setShowKycPopup} />
 
         </div >
     )

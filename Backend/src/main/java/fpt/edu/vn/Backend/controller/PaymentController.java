@@ -38,7 +38,7 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @GetMapping()
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(
             @PageableDefault(size = 50) Pageable pageable,
             @RequestParam(required = false) Payment.Type type,
@@ -52,7 +52,7 @@ public class PaymentController {
     public ResponseEntity<PaymentDTO> getPaymentById(Principal principal, @PathVariable int id) {
         try {
             PaymentDTO paymentDTO = paymentService.getPaymentById(id);
-            Authorizer.expectAdminOrUserId(principal, paymentDTO.getAccountId());
+            Authorizer.expectManagerOrUserId(principal, paymentDTO.getAccountId());
             return ResponseEntity.ok(paymentDTO);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -61,9 +61,16 @@ public class PaymentController {
         }
     }
 
+    @PutMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+    public ResponseEntity<PaymentDTO> producePayment(@RequestBody PaymentDTO paymentRequest) {
+        PaymentDTO createdPayment = paymentService.createPayment(paymentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createPayment(Principal principal, @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) throws UnsupportedEncodingException {
-        Authorizer.expectAdminOrUserId(principal, paymentRequest.getAccountId());
+        Authorizer.expectManagerOrUserId(principal, paymentRequest.getAccountId());
         paymentRequest.setIpAddr(request.getRemoteAddr());
         String createdPayment = paymentService.createPayment(paymentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);

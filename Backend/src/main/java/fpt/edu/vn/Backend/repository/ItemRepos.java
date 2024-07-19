@@ -34,8 +34,9 @@ public interface ItemRepos extends JpaRepository<Item, Integer>, JpaSpecificatio
     List<Item> findByStatus(Item.Status status);
 
     @Query("SELECT i FROM Item i " +
-            "JOIN i.order o " +
-            "JOIN o.payment p " +
-            "WHERE p.account.accountId = :accountId")
+            "JOIN i.orderDetails o " +
+            "JOIN o.order p " +
+            "JOIN p.payment pa "+
+            "WHERE pa.account.accountId = :accountId")
     Page<Item> findItemByBuyerAccountId(@Param("accountId") Integer accountId, Pageable pageable);
 }

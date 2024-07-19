@@ -3,7 +3,7 @@ import { Roles } from "@/constants/enums";
 import { Account } from "@/models/AccountModel";
 import { Page } from "@/models/Page";
 import { getCookie, removeCookie } from "@/utils/cookies";
-import axios from "axios";
+import axios from "@/config/axiosConfig.ts";
 
 interface GetAccountsSchema {
   page: number;
@@ -125,19 +125,10 @@ export const updateAccountService = async (data: any, id: number) => {
     .put(API_SERVER + "/accounts/" + id, data, {
       headers: {
         "Content-Type": "application/json",
-
-
         Authorization:
           "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
       },
     })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie("user");
-        removeCookie("token");
-      }
-    });
 };
 
 

@@ -5,8 +5,6 @@ import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.DTO.OrderDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderPayRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderUpdateDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
-import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.*;
@@ -27,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -40,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private final OrderRepos orderRepository;
+    private final OrderDetailRepos orderDetailRepos;
     private final PaymentRepos paymentRepository;
     private final AccountRepos accountRepos;
     private final AuctionItemRepos auctionItemRepos;
@@ -50,11 +46,12 @@ public class OrderServiceImpl implements OrderService {
     private String systemEmail;
 
     @Autowired
-    public OrderServiceImpl(OrderRepos orderRepository, PaymentRepos paymentRepository,
-                            AccountRepos accountRepos, AuctionItemRepos auctionItemRepos,
-                            ItemRepos itemRepos,
+    public OrderServiceImpl(OrderRepos orderRepository, OrderDetailRepos orderDetailRepos,
+                            PaymentRepos paymentRepository, AccountRepos accountRepos,
+                            AuctionItemRepos auctionItemRepos, ItemRepos itemRepos,
                             NotificationService notificationService, JavaMailSender mailSender) {
         this.orderRepository = orderRepository;
+        this.orderDetailRepos = orderDetailRepos;
         this.paymentRepository = paymentRepository;
         this.accountRepos = accountRepos;
         this.auctionItemRepos = auctionItemRepos;
@@ -70,34 +67,38 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
         BigDecimal totalPay = BigDecimal.ZERO;
 
+        List<OrderDetail> orderDetails = new ArrayList<>();
+
         Order order = new Order();
-        order.setItems(new HashSet<>());
         for (AuctionItemId itemId : itemIds) {
             AuctionItem item = auctionItemRepos.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Item not found", "id", itemId));
-            order.getItems().add(item.getItem());
+            orderDetails.add(OrderDetail.builder()
+                    .id(new OrderDetailKey(order.getOrderId(), item.getAuctionItemId().getItemId()))
+                    .item(item.getItem())
+                    .order(order)
+                    .soldPrice(item.getCurrentPrice())
+                    .build());
             totalPay = totalPay.add(item.getCurrentPrice());
         }
+
+        BigDecimal fee = totalPay.multiply(BigDecimal.valueOf(0.045));
+        fee = fee.min(new BigDecimal(4000));
+        fee = fee.max(new BigDecimal(225));
 
         Payment payment = new Payment();
         payment.setType(Payment.Type.AUCTION_ORDER);
         payment.setStatus(Payment.Status.PENDING);
         payment.setAccount(account);
-        payment.setPaymentAmount(totalPay.multiply(BigDecimal.valueOf(1.045)));
+        payment.setPaymentAmount(totalPay.add(fee));
         payment = paymentRepository.save(payment);
 
         order.setPayment(payment);
-
-        BigDecimal fee = totalPay.multiply(BigDecimal.valueOf(0.045));
-        if (fee.compareTo(BigDecimal.valueOf(225)) < 0) {
-            fee = BigDecimal.valueOf(225);
-        } else if (fee.compareTo(BigDecimal.valueOf(4500)) > 0) {
-            fee = BigDecimal.valueOf(4500);
-        }
         order.setFee(fee);
         order = orderRepository.save(order);
+        order.setOrderDetails(orderDetailRepos.saveAll(orderDetails));
 
-        log.info("Order {} account {} must pay {}", order.getOrderId(), accountId, payment.getPaymentAmount());
+        log.info("Order {} account {} must pay {} with fee {}", order.getOrderId(), accountId, payment.getPaymentAmount(), fee);
 
         notificationService.sendNotificationToUserGroup(
                 NotificationDTO.builder()
@@ -287,14 +288,15 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // handle order for seller
-        BigDecimal sumSoldPrice = new BigDecimal(0);
         {
-            for (Item item : order.getItems()) {
-                BigDecimal price = item.getSoldPrice();
-                sumSoldPrice = sumSoldPrice.add(price);
+            for (OrderDetail orderDetail : order.getOrderDetails()) {
+                Item item = orderDetail.getItem();
+                BigDecimal price = orderDetail.getSoldPrice();
+
                 Account seller = item.getOwner();
                 seller.setBalance(seller.getBalance().add(price));
                 accountRepos.save(seller);
+
                 Payment rewardPayment = Payment.builder()
                         .paymentAmount(price)
                         .account(seller)
@@ -303,20 +305,27 @@ public class OrderServiceImpl implements OrderService {
                         .method(Payment.Method.MANUAL)
                         .build();
                 paymentRepository.save(rewardPayment);
+
+                Preconditions.checkState(item.getConsignmentRewardPayment() == null);
+                Preconditions.checkState(item.getStatus() == Item.Status.SOLD);
+                item.setConsignmentRewardPayment(rewardPayment);
+                itemRepos.save(item);
+
                 notificationService.sendNotification(
                         NotificationDTO.builder()
                                 .message(String.format(
-                                        "You have received the revenue from selling item %s!",
-                                        item.getName()
+                                        "You have received $%.2f from selling item %s!",
+                                        price,
+                                        orderDetail.getItem().getName()
                                 ))
                                 .userId(seller.getAccountId())
                                 .build());
                 log.info("Account {} gained {} from selling item {} in order {}",
-                        seller.getAccountId(), price, item.getItemId(), orderId);
+                        seller.getAccountId(), price, orderDetail.getItem().getItemId(), orderId);
             }
         }
 
-        log.info("System fee = {}", orderPayment.getPaymentAmount().subtract(sumSoldPrice));
+        log.info("System fee = {}", order.getFee());
 
         return new OrderDTO(order);
     }
@@ -328,15 +337,18 @@ public class OrderServiceImpl implements OrderService {
                 "Order is not in PENDING status");
         payment.setStatus(Payment.Status.FAILED);
         paymentRepository.save(payment);
-        for (Item item : order.getItems()) {
-            item.setOrder(null);
-            item.setStatus(Item.Status.UNSOLD);
-        }
-        itemRepos.saveAll(order.getItems());
-        log.info("Released items {} due to order cancellation", order.getItems().stream()
+
+        itemRepos.saveAll(order.getOrderDetails().stream()
+                .map(OrderDetail::getItem)
+                .peek(d -> d.setStatus(Item.Status.QUEUE))
+                .collect(Collectors.toList()));
+
+        log.info("Released items {} due to order cancellation", order.getOrderDetails().stream()
+                .map(OrderDetail::getItem)
                 .map(Item::getItemId)
                 .map(String::valueOf)
                 .collect(Collectors.joining(",")));
+
         notificationService.sendNotification(
                 NotificationDTO.builder()
                         .message(String.format(

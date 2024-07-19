@@ -137,7 +137,7 @@ export default function AuctionSessionCreate() {
                                     <input type="datetime-local" className="cursor-pointer bg-background text-foreground" {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                    this is the start date of the auction session
+                                    this is the end date of the auction session
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
@@ -171,8 +171,8 @@ export default function AuctionSessionCreate() {
                 message={form.formState.isDirty
                     ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'} End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'}`
                     : ''} label="Confirm"
-                onSuccess={confirm} 
-                description={""} />
+                onSuccess={confirm} />
+
         </Form>
     )
 }

@@ -7,13 +7,10 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom";
 export default function KycVerificationPopup({open, setOpen}) {
-
-
     const nav = useNavigate();
     const handleVerify = () => {
         nav("/profile/kyc");

@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DepositService {
-    DepositDTO createDeposit(DepositRequest depositRequest);
     DepositDTO getDepositById(int depositId);
     Page<DepositDTO> getAllDeposits(Pageable pageable);
     DepositDTO updateDeposit(DepositRequest depositRequest);

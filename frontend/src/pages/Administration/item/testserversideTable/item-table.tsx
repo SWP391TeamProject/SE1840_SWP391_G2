@@ -71,11 +71,12 @@ export default function ItemsTable({ itemPromise }: ItemTableProps) {
                 columnCount={7}
                 searchableColumnCount={0}
                 filterableColumnCount={0}
-                cellWidths={["10rem", "40rem", "12rem", "12rem", "12rem", "12rem", "8rem"]}
+                cellWidths={["10rem", "20rem", "12rem", "12rem", "12rem", "12rem", "8rem"]}
                 shrinkZero
+           
             />
             :
-            <DataTable
+            <DataTable     
                 table={table}
                 floatingBar={
                     <ItemsTableFloatingBar table={table} />
