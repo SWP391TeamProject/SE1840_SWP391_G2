@@ -146,7 +146,8 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
                 consignmentDetail.getPrice(),
                 consignmentDetail.getConsignment().getConsignmentId(),
                 new AccountDTO(consignmentDetail.getAccount()),
-                attachmentIds
+                attachmentIds,
+                consignmentDetail.getCreateDate()
         );
     }
 }

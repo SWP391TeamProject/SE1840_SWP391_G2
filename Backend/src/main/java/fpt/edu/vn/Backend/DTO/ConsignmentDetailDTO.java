@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,9 @@ public class ConsignmentDetailDTO implements Serializable {
     private int consignmentId; // Use int for the Consignment reference in DTO
     private AccountDTO account; // Use int for the Account reference in DTO
     private List<AttachmentDTO> attachments; // Use List of Integer for the Attachment references in DTO
-    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, AccountDTO accountId, List<AttachmentDTO> attachmentIds) {
+    private LocalDateTime createDate;
+
+    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, AccountDTO accountId, List<AttachmentDTO> attachmentIds, LocalDateTime createDate) {
         this.consignmentDetailId = consignmentDetailId;
         this.description = description;
         this.status = type;
@@ -32,7 +35,7 @@ public class ConsignmentDetailDTO implements Serializable {
         this.account = accountId;
         this.attachments = attachmentIds;
         if(account!=null) account.setPassword("");
-
+        this.createDate = createDate;
     }
 
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
@@ -46,6 +49,7 @@ public class ConsignmentDetailDTO implements Serializable {
                 .map(AttachmentDTO::new)
                 .collect(Collectors.toList());
         if(account!=null) account.setPassword("");
+        this.createDate = consignmentDetail.getCreateDate();
     }
 
 }
