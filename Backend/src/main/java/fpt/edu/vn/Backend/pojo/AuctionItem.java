@@ -40,10 +40,10 @@ public class AuctionItem {
     })
     private Set<Bid> bids;
 
-    @Column(name = "bid_count", columnDefinition = "int default 0")
+    @Column(name = "bid_count", columnDefinition = "int default 0", nullable = false)
     private int bidCount;
 
-    @Column(name = "participant_count", columnDefinition = "int default 0")
+    @Column(name = "participant_count", columnDefinition = "int default 0", nullable = false)
     private int participantCount;
 
     @CreationTimestamp

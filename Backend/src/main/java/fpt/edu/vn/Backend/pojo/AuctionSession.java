@@ -41,7 +41,7 @@ public class AuctionSession {
         SCHEDULED, PROGRESSING, FINISHED, TERMINATED
     }
 
-    @Column(name = "participant_count", columnDefinition = "int default 0")
+    @Column(name = "participant_count", columnDefinition = "int default 0", nullable = false)
     private int participantCount;
 
     @CreationTimestamp
