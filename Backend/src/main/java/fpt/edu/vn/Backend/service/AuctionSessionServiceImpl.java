@@ -237,6 +237,16 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (auctionDTO.getEndDate().isBefore(auctionDTO.getStartDate())) {
             throw new InvalidInputException("End date must be after start date");
         }
+        AuctionSession conflictingSession = auctionSessionRepos.getConflictingSession(
+                auctionDTO.getStartDate(), auctionDTO.getEndDate());
+        if (conflictingSession != null) {
+            throw new InvalidInputException(String.format(
+                    "There is an already scheduled auction session %d between %s and %s",
+                    conflictingSession.getAuctionSessionId(),
+                    conflictingSession.getStartDate(),
+                    conflictingSession.getEndDate()
+            ));
+        }
         try {
             AuctionSession auctionSession = new AuctionSession();
             auctionSession.setTitle(auctionDTO.getTitle());
