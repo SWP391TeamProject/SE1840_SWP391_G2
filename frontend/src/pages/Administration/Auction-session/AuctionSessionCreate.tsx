@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { formatDate } from '@/lib/utils';
 import { showErrorToast } from '@/lib/handle-error';
+import { useNavigate } from 'react-router-dom';
+import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 
 const FormSchema = z.object({
   title: z.string().min(2, {
@@ -26,6 +28,8 @@ const FormSchema = z.object({
 
 export default function AuctionSessionCreate() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const nav = useNavigate();
+  const dispatch = useAppDispatch();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -40,9 +44,11 @@ export default function AuctionSessionCreate() {
     setIsConfirmed(true);
     setShowTrigger(false);
     createAuctionSession(values)
-      .then(() => {
+      .then((res) => {
         setIsSubmitting(false);
         toast.success('Auction session created successfully.', {});
+        dispatch(setCurrentAuctionSession(res.data));
+        nav(`/admin/auction-sessions/${res.data.auctionSessionId}/assign-items`);
       })
       .catch((err) => {
         setIsSubmitting(false);
