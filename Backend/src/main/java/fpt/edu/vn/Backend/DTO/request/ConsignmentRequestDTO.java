@@ -18,7 +18,7 @@ public class ConsignmentRequestDTO implements Serializable {
     private String email;
     private String preferContact;
     private String color;
-    private double weight;
+    private Double weight;
     private String metal;
     private String gemstone;
     private String measurement;

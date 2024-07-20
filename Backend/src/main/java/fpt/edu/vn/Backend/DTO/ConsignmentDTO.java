@@ -21,7 +21,7 @@ public class ConsignmentDTO implements Serializable {
     private String contactPhone;
     private String contactName;
     private String color;
-    private double weight;
+    private Double weight;
     private String metal;
     private String gemstone;
     private String measurement;

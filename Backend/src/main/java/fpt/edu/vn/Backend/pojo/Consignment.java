@@ -68,7 +68,8 @@ public class Consignment {
     @Column(length = 30)
     private String color;
 
-    private double weight;
+    @Column(name = "weight", nullable = true)
+    private Double weight;
 
     @Column(length = 30)
     private String metal;

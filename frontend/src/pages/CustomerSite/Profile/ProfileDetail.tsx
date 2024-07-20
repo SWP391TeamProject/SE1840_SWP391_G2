@@ -16,6 +16,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
+import {phoneRegex} from "@/constants/regex.ts";
 
 type ProfileAvatar = {
   files?: FileList;
@@ -28,8 +29,7 @@ const profileDetailsSchema = z.object({
     .max(20, 'Nickname must not be longer than 20 characters'),
   phone: z
     .string()
-    .length(10, 'Phone number must be 10 digits')
-    .regex(/^\d+$/, 'Phone number must contain only digits')
+    .regex(phoneRegex, 'Invalid phone number. Must be a 10 to 12 digits phone number.')
     .optional(),
 });
 
