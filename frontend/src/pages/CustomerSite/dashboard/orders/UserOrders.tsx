@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/CurrencyProvider';
 import CountDownTime from '@/components/countdownTimer/CountDownTime';
 import dayjs from 'dayjs';
+import {formatDate} from "@/lib/utils.ts";
 
 export const UserOrders = () => {
   const orders = useAppSelector((state) => state.orders);
@@ -159,7 +160,7 @@ export const UserOrders = () => {
                 <TableCell className="font-medium">{order.orderId}</TableCell>
                 <TableCell>{currency.format(order.payment.paymentAmount)}</TableCell>
                 <TableCell>{order.shippingAddress}</TableCell>
-                <TableCell>{new Date(order.createDate).toUTCString()}</TableCell>
+                <TableCell>{formatDate(order.createDate)}</TableCell>
                 <TableHead>
                   {order.payment.status === PaymentStatus.SUCCESS ? (
                     <p className="text-green-600 capitalize">{order.shippingStatus.toLowerCase()}</p>
@@ -174,17 +175,15 @@ export const UserOrders = () => {
                   )}
                 </TableHead>
                 <TableCell>
-                  {order.payment.status === PaymentStatus.SUCCESS ? (
-                    <Button variant="outline" size="sm" onClick={() => handleViewDetailsClick(order.orderId)}>
-                      View Details
-                    </Button>
-                  ) : order.payment.status === PaymentStatus.PENDING &&
+                  {order.payment.status === PaymentStatus.PENDING &&
                     dayjs().isBefore(dayjs(order.createDate).add(7, 'days')) ? (
                     <Button variant="default" size="sm" onClick={() => handleCheckoutClick(order.orderId)}>
                       Check out
                     </Button>
                   ) : (
-                    <p></p>
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetailsClick(order.orderId)}>
+                      View Details
+                    </Button>
                   )}
                 </TableCell>
               </TableRow>

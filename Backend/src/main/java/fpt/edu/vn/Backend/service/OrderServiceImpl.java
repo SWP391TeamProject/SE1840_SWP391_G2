@@ -248,7 +248,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO getOrderById(int orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidInputException("Order not found"));
-        return new OrderDTO(order);
+        return OrderDTO.detailed(order);
     }
 
     @Override
@@ -327,7 +327,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("System fee = {}", order.getFee());
 
-        return new OrderDTO(order);
+        return OrderDTO.detailed(order);
     }
     @Transactional
     @Override
@@ -427,7 +427,7 @@ public class OrderServiceImpl implements OrderService {
             order.setShippingNote(dto.getShippingNote());
         }
 
-        return new OrderDTO(orderRepository.save(order));
+        return OrderDTO.detailed(orderRepository.save(order));
     }
 
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)

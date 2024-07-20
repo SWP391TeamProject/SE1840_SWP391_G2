@@ -25,6 +25,23 @@ public class OrderDTO implements Serializable {
     private List<OrderDetailDTO> orderDetails = new ArrayList<>();
     private BigDecimal subtotal;
 
+    public static OrderDTO detailed(Order order) {
+        OrderDTO dto = new OrderDTO();
+        dto.orderId = order.getOrderId();
+        dto.fee = order.getFee();
+        dto.payment = new PaymentDTO(order.getPayment());
+        dto.shippingAddress = order.getShippingAddress();
+        dto.shippingNote = order.getShippingNote();
+        dto.shippingStatus = order.getShippingStatus();
+        if (order.getOrderDetails() != null) {
+            dto.orderDetails = order.getOrderDetails().stream().map(OrderDetailDTO::full).collect(Collectors.toList());
+            dto.subtotal = order.getOrderDetails().stream()
+                    .reduce(BigDecimal.ZERO, (a, b) -> a.add(b.getSoldPrice()), BigDecimal::add);
+        }
+        dto.createDate = order.getPayment().getCreateDate();
+        return dto;
+    }
+
     public OrderDTO(Order order){
         this.orderId = order.getOrderId();
         this.fee = order.getFee();
@@ -33,7 +50,7 @@ public class OrderDTO implements Serializable {
         this.shippingNote = order.getShippingNote();
         this.shippingStatus = order.getShippingStatus();
         if (order.getOrderDetails() != null) {
-            this.orderDetails = order.getOrderDetails().stream().map(OrderDetailDTO::new).collect(Collectors.toList());
+            this.orderDetails = order.getOrderDetails().stream().map(OrderDetailDTO::minimal).collect(Collectors.toList());
             this.subtotal = order.getOrderDetails().stream()
                     .reduce(BigDecimal.ZERO, (a, b) -> a.add(b.getSoldPrice()), BigDecimal::add);
         }
