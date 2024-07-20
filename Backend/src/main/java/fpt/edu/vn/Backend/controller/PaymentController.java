@@ -43,9 +43,9 @@ public class PaymentController {
             @PageableDefault(size = 50) Pageable pageable,
             @RequestParam(required = false) Payment.Type type,
             @RequestParam(required = false) Payment.Status status,
-            @RequestParam(required = false) String keyword
+            @RequestParam(required = false) String search
     ) {
-        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status,keyword));
+        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status,search));
     }
 
     @GetMapping("/{id}")

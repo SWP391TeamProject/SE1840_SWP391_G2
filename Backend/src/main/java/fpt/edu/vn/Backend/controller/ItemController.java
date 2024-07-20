@@ -58,7 +58,7 @@ public class ItemController {
     public Page<ItemDTO> getItems( @PageableDefault Pageable pageable,
                                   @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
                                   @RequestParam(required = false) String order, @RequestParam(required = false) String status,
-                                   @RequestParam(required = false) String keyword
+                                   @RequestParam(required = false) String search
     ) {
         System.out.println("Pageable: " + pageable.toString());
         if (order != null) {
@@ -66,8 +66,8 @@ public class ItemController {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
             }
         }
-        if(keyword != null){
-            return itemService.searchItems(keyword, pageable);
+        if(search != null){
+            return itemService.searchItems(search, pageable);
         }
         if (minPrice != null && maxPrice != null) {
             return itemService.getItemsByPrice(pageable, minPrice, maxPrice);

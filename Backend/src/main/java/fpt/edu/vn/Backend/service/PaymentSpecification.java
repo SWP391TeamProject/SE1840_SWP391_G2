@@ -23,11 +23,11 @@ public class PaymentSpecification implements Specification<Payment> {
         Join<Payment, Account> joinAccount = root.join("account",JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.like(root.get("paymentAmount"),"%" + keyword + "%"));
-        predicates.add(criteriaBuilder.like(root.get("status"),"%" + keyword + "%"));
+        predicates.add(criteriaBuilder.like(root.get("paymentAmount").as(String.class),"%" + keyword + "%"));
+        predicates.add(criteriaBuilder.like(root.get("status").as(String.class),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("method"),"%" + keyword + "%"));
-        predicates.add(criteriaBuilder.like(root.get("type"),"%" + keyword + "%"));
-        predicates.add(criteriaBuilder.like(root.get("createDate"),"%" + keyword + "%"));
+        predicates.add(criteriaBuilder.like(root.get("type").as(String.class),"%" + keyword + "%"));
+        predicates.add(criteriaBuilder.like(root.get("createDate").as(String.class),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(joinAccount.get("accountId"),"%" + keyword + "%"));
 
         return criteriaBuilder.or(predicates.toArray(new Predicate[0]));

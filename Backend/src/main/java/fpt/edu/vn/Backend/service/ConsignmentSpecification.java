@@ -24,9 +24,9 @@ public class ConsignmentSpecification implements Specification<Consignment> {
         List<Predicate> predicates = new ArrayList<>();
 
         predicates.add(criteriaBuilder.like(root.get("preferContact"),"%" + keyword + "%"));
-        predicates.add(criteriaBuilder.like(root.get("createDate"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("updateDate"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("status"), "%" + keyword +"%"));
+        predicates.add(criteriaBuilder.like(root.get("createDate").as(String.class), "%" + keyword +"%"));
+        predicates.add(criteriaBuilder.like(root.get("updateDate").as(String.class), "%" + keyword +"%"));
+        predicates.add(criteriaBuilder.like(root.get("status").as(String.class), "%" + keyword +"%"));
         predicates.add(criteriaBuilder.like(root.get("gemstone"), "%" + keyword +"%"));
         predicates.add(criteriaBuilder.like(root.get("measurement"), "%" + keyword +"%"));
         predicates.add(criteriaBuilder.like(root.get("condition"), "%" + keyword +"%"));

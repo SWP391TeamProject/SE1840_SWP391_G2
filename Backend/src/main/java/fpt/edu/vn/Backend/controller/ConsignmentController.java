@@ -1,6 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
 
+
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
@@ -48,7 +49,7 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(required = false) String keyword,
+    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(required = false) String search,
                                                                   @PageableDefault(size = 50) Pageable pageable, Authentication authentication) {
         try {
 
@@ -63,7 +64,7 @@ public class ConsignmentController {
                         return new ResponseEntity<>(staffPage, HttpStatus.OK);
                     }
                     case MANAGER, ADMIN: {
-                        Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(keyword,pageable);
+                        Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(search,pageable);
                         if (consignments == null || consignments.isEmpty()) {
                             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                         }

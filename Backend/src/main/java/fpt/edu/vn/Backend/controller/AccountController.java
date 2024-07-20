@@ -54,11 +54,11 @@ public class AccountController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 50) Pageable pageable,
                                                         @RequestParam(required = false,name = "Role") Account.Role role,
-                                                        @RequestParam(required = false) String keyword
+                                                        @RequestParam(required = false) String search
                                                         ) {
         log.info("Get accounts with role: {}", role);
         if (role == null) {
-            return new ResponseEntity<>(accountService.getAccounts(keyword,pageable), HttpStatus.OK);
+            return new ResponseEntity<>(accountService.getAccounts(search,pageable), HttpStatus.OK);
         }
         return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
     }

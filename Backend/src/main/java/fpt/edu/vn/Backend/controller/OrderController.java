@@ -32,15 +32,15 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Page<OrderDTO>> getAllOrders(@PageableDefault(size = 50, sort = "payment.paymentAmount") Pageable pageable,
                                                        @RequestParam(required = false) String order,
-                                                       @RequestParam(required = false) String keyword,
+                                                       @RequestParam(required = false) String search,
                                                        @RequestParam(required = false) String status) {
         if (order != null) {
             if (order.equals("desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
             }
         }
-        if(keyword != null){
-            return ResponseEntity.ok(orderService.searchOrders(keyword,pageable));
+        if(search != null){
+            return ResponseEntity.ok(orderService.searchOrders(search,pageable));
         }
         if (status != null) {
             Payment.Status filter = Payment.Status.valueOf(status.toUpperCase());

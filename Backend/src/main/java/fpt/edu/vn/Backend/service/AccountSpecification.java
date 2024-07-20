@@ -25,8 +25,8 @@ public class AccountSpecification implements Specification<Account> {
         List<Predicate> predicate = new ArrayList<>();
         predicate.add(criteriaBuilder.like(root.get("email"),"%" + keyword + "%"));
         predicate.add(criteriaBuilder.like(root.get("phone"), "%" + keyword + "%"));
-        predicate.add(criteriaBuilder.like(root.get("role"),"%" + keyword +"%"));
-        predicate.add(criteriaBuilder.like(root.get("status"),"%"+keyword+"%"));
+        predicate.add(criteriaBuilder.like(root.get("role").as(String.class),"%" + keyword +"%"));
+        predicate.add(criteriaBuilder.like(root.get("status").as(String.class),"%"+keyword+"%"));
 
         return criteriaBuilder.or(predicate.toArray(new Predicate[0]));
     }
