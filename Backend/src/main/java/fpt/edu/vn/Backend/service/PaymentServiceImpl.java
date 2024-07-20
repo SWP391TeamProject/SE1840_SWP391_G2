@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setMethod(paymentRequest.getMethod());
 
             if (payment.getMethod() == Payment.Method.VNPAY) {
-                BigDecimal exchangeRate = BigDecimal.valueOf(currencyService.getExchangeRate(CurrencyType.VND));
+                BigDecimal exchangeRate = currencyService.getExchangeRate(CurrencyType.VND);
                 log.info("exchange rate to VND: " + exchangeRate);
                 BigDecimal newAmount = paymentRequest.getAmount().divide(exchangeRate, 10, RoundingMode.HALF_DOWN);
                 payment.setPaymentAmount(newAmount);

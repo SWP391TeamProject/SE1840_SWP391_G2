@@ -25,10 +25,10 @@ public class CurrencyServiceImpl implements CurrencyService {
     private static final String EXCHANGE_RATE_KEY = "CurrencyExchangeRates";
     private static final String LAST_FETCH_KEY = "CurrencyExchangeRateFetchTime";
     private static final Logger logger = LoggerFactory.getLogger(CurrencyServiceImpl.class);
-    private static final EnumMap<CurrencyType, Double> COMPUTED_RATES = new EnumMap<>(CurrencyType.class);
+    private static final EnumMap<CurrencyType, BigDecimal> COMPUTED_RATES = new EnumMap<>(CurrencyType.class);
 
     static {
-        COMPUTED_RATES.put(CurrencyType.USD, 1.0);
+        COMPUTED_RATES.put(CurrencyType.USD, BigDecimal.ONE);
     }
 
 
@@ -58,10 +58,14 @@ public class CurrencyServiceImpl implements CurrencyService {
     }
     @Transactional
     @Override
-    public Double getExchangeRate(CurrencyType currency) {
+    public BigDecimal getExchangeRate(CurrencyType currency) {
         fetchExchangeRates();
         Object v = redisTemplate.opsForHash().get(EXCHANGE_RATE_KEY, currency.name());
-        return v == null ? null : (Double) v;
+        if (v instanceof BigDecimal)
+            return (BigDecimal) v;
+        else if (v instanceof Double)
+            return BigDecimal.valueOf((Double) v);
+        return null;
     }
     @Transactional
     @Override
