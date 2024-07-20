@@ -1,17 +1,17 @@
 package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Payment;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @ToString
+@Builder
 public class PaymentDTO implements Serializable {
     private int id;
     private BigDecimal paymentAmount;
@@ -19,6 +19,7 @@ public class PaymentDTO implements Serializable {
     private Payment.Type type;
     private Payment.Status status;
     private Payment.Method method;
+    private String failedReason;
     private int accountId;
     private Integer consignmentRewardItemId;
     private Integer depositAuctionId;
@@ -31,6 +32,7 @@ public class PaymentDTO implements Serializable {
         this.type = payment.getType();
         this.status = payment.getStatus();
         this.method = payment.getMethod();
+        this.failedReason = payment.getFailedReason();
         this.accountId = payment.getAccount().getAccountId();
         if (type == Payment.Type.CONSIGNMENT_REWARD)
             this.consignmentRewardItemId = payment.getConsignmentRewardItem().getItemId();

@@ -4,6 +4,7 @@ package fpt.edu.vn.Backend.service;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import fpt.edu.vn.Backend.DTO.NotificationDTO;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.*;
 import fpt.edu.vn.Backend.DTO.response.PaypalCaptureResponseDTO;
@@ -21,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -34,6 +37,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,13 +48,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepos paymentRepos;
     private final AccountRepos accountRepos;
     private final CurrencyService currencyService;
+    private final NotificationService notificationService;
     private final PaypalService paypalService;
 
     @Autowired
-    public PaymentServiceImpl(PaymentRepos paymentRepos, AccountRepos accountRepos, CurrencyService currencyService, PaypalService paypalService) {
+    public PaymentServiceImpl(PaymentRepos paymentRepos, AccountRepos accountRepos, CurrencyService currencyService, NotificationService notificationService, PaypalService paypalService) {
         this.paymentRepos = paymentRepos;
         this.accountRepos = accountRepos;
         this.currencyService = currencyService;
+        this.notificationService = notificationService;
         this.paypalService = paypalService;
     }
 
@@ -78,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new InvalidInputException("Amount must be smaller than 100,000,000 USD");
             }
 
-            payment.setType(paymentRequest.getType());
+            payment.setType(Payment.Type.DEPOSIT); // must always be DEPOSIT
             payment.setStatus(Payment.Status.PENDING);
             payment.setAccount(accountRepos.findByAccountId(paymentRequest.getAccountId())
                     .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId())));
@@ -109,25 +115,6 @@ public class PaymentServiceImpl implements PaymentService {
             e.printStackTrace();
             System.err.println("An error occurred while creating payment: " + e.getMessage());
             throw new InvalidInputException("Failed to create payment", e);
-        }
-    }
-
-    @Override
-    public PaymentDTO updatePayment(PaymentRequest paymentRequest) {
-        try {
-            Payment payment = paymentRepos.findById(paymentRequest.getPaymentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentRequest.getPaymentId()));
-            if (payment.getStatus().equals(Payment.Status.PENDING)) {
-                payment.setStatus(paymentRequest.getStatus());
-                if (paymentRequest.getStatus().equals(Payment.Status.SUCCESS)) {
-                    payment.getAccount().setBalance(payment.getAccount().getBalance().add(payment.getPaymentAmount()));
-                }
-            }
-            Payment updatedPayment = paymentRepos.save(payment);
-            return new PaymentDTO(updatedPayment);
-        } catch (Exception e) {
-            System.err.println("An error occurred while updating payment: " + e.getMessage());
-            throw new ResourceNotFoundException("Failed to update payment", e);
         }
     }
 
@@ -204,7 +191,10 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
         Payment payment = paymentRepos.findById(paymentDTO.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentDTO.getId()));
+        Preconditions.checkState(payment.getStatus() == Payment.Status.PENDING,
+                "Can only update pending payment");
         payment.setStatus(paymentDTO.getStatus());
+        payment.setFailedReason(paymentDTO.getFailedReason());
         Payment updatedPayment = paymentRepos.save(payment);
         return new PaymentDTO(updatedPayment);
     }
@@ -353,9 +343,10 @@ public class PaymentServiceImpl implements PaymentService {
                 String status = new Gson().fromJson(res.getResponse(), JsonObject.class)
                         .getAsJsonPrimitive("status").getAsString();
                 log.info("Payment order ID = {}, trans ID = {}, status = {} ", dto.getOrderId(), res.getTransId(), status);
-                updatePayment(PaymentRequest.builder()
-                        .paymentId(res.getTransId())
+                updatePayment(PaymentDTO.builder()
+                        .id(res.getTransId())
                         .status(status.equals("COMPLETED") ? Payment.Status.SUCCESS : Payment.Status.FAILED)
+                        .failedReason(status.equals("COMPLETED") ? null : "Failed to process payment callback from PAYPAL")
                         .build());
             }
             return res.getResponse();
@@ -366,7 +357,33 @@ public class PaymentServiceImpl implements PaymentService {
     private String normalize(String str) {
         return StringUtils.stripAccents(str).replaceAll("[^\\w ]", "");
     }
+
+    @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)
+    @Transactional
+    public void scheduleFixedRateTask() {
+        List<Payment> list = paymentRepos.findAllPendingPaymentWithPaymentCreatedBefore(
+                LocalDateTime.now().minusDays(7),
+                Payment.Type.WITHDRAW
+        );
+        list.addAll(paymentRepos.findAllPendingPaymentWithPaymentCreatedBefore(
+                LocalDateTime.now().minusDays(3),
+                Payment.Type.DEPOSIT
+        ));
+        if (list.isEmpty()) return;
+        List<NotificationDTO> toSend = new ArrayList<>();
+        for (Payment p : list) {
+            log.info("Cancelling payment {} due to inactivity", p.getPaymentId());
+            p.setStatus(Payment.Status.FAILED);
+            p.setFailedReason("Payment expired due to inactivity");
+            toSend.add(NotificationDTO.builder()
+                    .message(String.format(
+                            "Your payment #%d was cancelled due to inactivity.",
+                            p.getPaymentId()
+                    ))
+                    .userId(p.getAccount().getAccountId())
+                    .build());
+        }
+        paymentRepos.saveAll(list);
+        notificationService.sendBulkNotification(toSend);
+    }
 }
-
-
-

@@ -116,15 +116,16 @@ public class PaymentController {
             if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
                 log.info("Payment success");
 
-                paymentService.updatePayment(PaymentRequest.builder()
-                        .paymentId(Integer.parseInt(paymentId))
+                paymentService.updatePayment(PaymentDTO.builder()
+                        .id(Integer.parseInt(paymentId))
                         .status(Payment.Status.SUCCESS)
                         .build());
                 return 1;
             } else {
-                paymentService.updatePayment(PaymentRequest.builder()
-                        .paymentId(Integer.parseInt(paymentId))
+                paymentService.updatePayment(PaymentDTO.builder()
+                        .id(Integer.parseInt(paymentId))
                         .status(Payment.Status.FAILED)
+                        .failedReason("Failed to process payment callback from VNPAY")
                         .build());
                 return 0;
             }

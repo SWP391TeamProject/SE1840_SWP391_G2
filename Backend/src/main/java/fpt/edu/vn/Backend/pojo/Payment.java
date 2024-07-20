@@ -34,6 +34,9 @@ public class Payment {
     @Column(name = "transaction_status")
     private Status status;
 
+    @Column(name = "failed_reason", length = 1000, columnDefinition = "NVARCHAR(1000)")
+    private String failedReason;
+
     public enum Method {
         VNPAY, PAYPAL,MANUAL
     }

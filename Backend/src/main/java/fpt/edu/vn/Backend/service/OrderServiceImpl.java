@@ -336,6 +336,7 @@ public class OrderServiceImpl implements OrderService {
         Preconditions.checkState(payment.getStatus() == Payment.Status.PENDING,
                 "Order is not in PENDING status");
         payment.setStatus(Payment.Status.FAILED);
+        payment.setFailedReason("Order cancelled due to not paying within the deadline");
         paymentRepository.save(payment);
 
         itemRepos.saveAll(order.getOrderDetails().stream()

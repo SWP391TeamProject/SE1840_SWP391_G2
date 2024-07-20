@@ -13,8 +13,6 @@ public interface PaymentService {
 
     String createPayment(PaymentRequest paymentRequest) throws UnsupportedEncodingException;
 
-    PaymentDTO updatePayment(PaymentRequest paymentRequest);
-
     PaymentDTO getPaymentById(int id);
 
     Page<PaymentDTO> getAllPayment(Pageable pageable, Payment.Type type, Payment.Status status,String keyword);
