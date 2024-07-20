@@ -28,7 +28,7 @@ public class Order {
     @Column(name = "fee", precision = 20, scale = 8)
     private BigDecimal fee;
 
-    @Column(name = "shipping_address")
+    @Column(name = "shipping_address",columnDefinition ="NVARCHAR(1000)" )
     private String shippingAddress;
 
     @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)

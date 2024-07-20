@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { z } from 'zod';
+import { Input } from '@/components/ui/input';
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -170,6 +171,7 @@ export default function KycVerification() {
                                   maxFiles={1}
                                   fieldMessage="Drag 'n' drop your front identity images here, or click to select images"
                                 />
+                                {/* <Input  {...field} type="file" /> */}
                               </FormControl>
                               <FormMessage />
                             </FormItem>

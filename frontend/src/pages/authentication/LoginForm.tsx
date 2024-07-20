@@ -16,6 +16,7 @@ import { Loader2 } from 'lucide-react';
 import googleIcon from '../../assets/icons8-google.svg';
 import { AUTH_SERVER, SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
+import { PasswordInput } from '@/components/form/password-input';
 gsap.registerPlugin(useGSAP);
 type FormValues = {
   email: string;
@@ -32,6 +33,7 @@ function LoginForm() {
   const token = searchParams.get('token');
   const { register, handleSubmit } = useForm<FormValues>();
   const auth = useAuth();
+  const [password, setPassword] = useState('');
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     setIsLogin(true);
@@ -126,7 +128,14 @@ function LoginForm() {
                   Forgot your password?
                 </a>
               </div>
-              <Input id="password" type="password" {...register('password')} required />
+              <PasswordInput
+                id="password"
+                {...register('password')}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+              />
+              {/* <Input id="password" type="password" {...register('password')} required /> */}
             </div>
 
             {isLogin ? (

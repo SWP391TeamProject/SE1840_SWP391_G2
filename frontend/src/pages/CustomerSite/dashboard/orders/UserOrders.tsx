@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '@/CurrencyProvider';
 import CountDownTime from '@/components/countdownTimer/CountDownTime';
 import dayjs from 'dayjs';
-import {formatDate} from "@/lib/utils.ts";
+import { formatDate } from '@/lib/utils.ts';
 
 export const UserOrders = () => {
   const orders = useAppSelector((state) => state.orders);
@@ -176,7 +176,7 @@ export const UserOrders = () => {
                 </TableHead>
                 <TableCell>
                   {order.payment.status === PaymentStatus.PENDING &&
-                    dayjs().isBefore(dayjs(order.createDate).add(7, 'days')) ? (
+                  dayjs().isBefore(dayjs(order.createDate).add(7, 'days')) ? (
                     <Button variant="default" size="sm" onClick={() => handleCheckoutClick(order.orderId)}>
                       Check out
                     </Button>

@@ -133,9 +133,7 @@ public class AuctionSessionController {
 
     @PostMapping("/assign-auction-session")
     public ResponseEntity<AssignAuctionItemDTO> assignAuctionItem(@RequestBody AssignAuctionItemDTO assignAuctionItemDTO) {
-        if (!auctionSessionService.assignAuctionSession(assignAuctionItemDTO)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        auctionSessionService.assignAuctionSession(assignAuctionItemDTO) ;
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

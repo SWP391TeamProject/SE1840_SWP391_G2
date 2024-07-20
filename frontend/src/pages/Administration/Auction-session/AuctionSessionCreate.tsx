@@ -16,6 +16,7 @@ import { formatDate } from '@/lib/utils';
 import { showErrorToast } from '@/lib/handle-error';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
+import { useAppDispatch } from '@/redux/hooks';
 
 const FormSchema = z.object({
   title: z.string().min(2, {

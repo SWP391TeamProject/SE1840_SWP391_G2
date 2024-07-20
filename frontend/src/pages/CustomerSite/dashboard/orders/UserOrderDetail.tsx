@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { getOrderById, updateOrder } from '@/services/OrderService';
 import { setCurrentOrder } from '@/redux/reducers/Orders';
 import { toast } from 'sonner';
-import {CircleAlert, CircleCheck} from 'lucide-react';
+import { CircleAlert, CircleCheck } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea.tsx';
 import { PaymentStatus } from '@/constants/enums.tsx';
 import { ShippingStatus } from '@/models/newModel/order';
 import { showErrorToast } from '@/lib/handle-error';
+import SearchAddress from '@/components/ui/search-address';
 
 const orderUpdateSchema = z.object({
   shippingAddress: z
@@ -111,6 +112,7 @@ export function UserOrderDetail() {
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={orderUpdateForm.control}
                       name="shippingNote"
@@ -139,8 +141,9 @@ export function UserOrderDetail() {
                 <div key={detail.item.itemId} className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
                   <img
                     src={
-                      detail.item.attachments && detail.item.attachments.length > 0 ?
-                        detail.item.attachments[0].link : '/placeholder.svg'
+                      detail.item.attachments && detail.item.attachments.length > 0
+                        ? detail.item.attachments[0].link
+                        : '/placeholder.svg'
                     }
                     alt="Product Image"
                     width={80}
@@ -178,19 +181,21 @@ export function UserOrderDetail() {
                     <span>{currency.format(order.payment.paymentAmount)}</span>
                   </div>
                 </div>
-                {order.payment.status === PaymentStatus.SUCCESS &&
+                {order.payment.status === PaymentStatus.SUCCESS && (
                   <Button className="bg-green-600 flex justify-center items-center gap-2" disabled>
                     <CircleCheck className="w-5 h-5" />
                     Order Paid
-                  </Button>}
-                {order.payment.status === PaymentStatus.FAILED &&
+                  </Button>
+                )}
+                {order.payment.status === PaymentStatus.FAILED && (
                   <Button className="bg-red-600 flex justify-center items-center gap-2" disabled>
                     <CircleAlert className="w-5 h-5" />
                     Order Overdue
-                  </Button>}
+                  </Button>
+                )}
               </div>
             </div>
-            {order.payment.status === PaymentStatus.SUCCESS &&
+            {order.payment.status === PaymentStatus.SUCCESS && (
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
                 <h2 className="text-2xl font-bold mb-4">Delivery Tracking</h2>
                 <div className="flex flex-col gap-5">
@@ -211,7 +216,8 @@ export function UserOrderDetail() {
                     <span className="break-all">{order.shippingNote}</span>
                   </div>
                 </div>
-              </div>}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -181,13 +181,15 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             AuctionSession auctionSession = auctionSessionRepos.findById(assign.getAuctionSessionId())
                     .orElseThrow(() -> new ResourceNotFoundException("Auction Session not found: " + assign.getAuctionSessionId()));
             if (auctionSession.getStatus() != AuctionSession.Status.SCHEDULED) {
-                throw new InvalidInputException("Auction session not in SCHEDULED state: " + assign.getAuctionSessionId());
+                logger.info("Auction session {} not in SCHEDULED state", assign.getAuctionSessionId());
+                throw new InvalidInputException("Auction session not in SCHEDULED state ");
             }
 
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
                 if (item.getStatus() != Item.Status.QUEUE) {
+                    logger.info("Item {} is not in queue or unsold", item.getItemId());
                     throw new InvalidInputException("Item is not in queue or unsold: " + item.getItemId());
                 }
 
@@ -225,7 +227,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return true;
         } catch (Exception e) {
             logger.error("Error assigning auction session", e);
-            return false;
+            throw new InvalidInputException(e.getMessage());
         }
     }
     @Transactional
@@ -594,7 +596,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     }
     @Transactional
     @Override
-    public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable,@Nullable Integer accountId) {
+    public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable, @Nullable Integer accountId) {
         if (pageable == null) {
             pageable = PageRequest.of(0, 5);
         }

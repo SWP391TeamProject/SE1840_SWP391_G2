@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 public class AuctionCreateDTO implements Serializable {
     private String title;
+    
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private List<MultipartFile> files;

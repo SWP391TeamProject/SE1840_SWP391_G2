@@ -112,7 +112,7 @@ export default function AuctionList() {
                           handleViewDetailsClick(session.auctionSessionId);
                         }}
                       >
-                        View Details
+                        Detail
                       </Link>
                     </Button>
                   </div>
