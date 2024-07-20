@@ -527,6 +527,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (p.getStatus() != Payment.Status.PENDING)
                 continue;
             p.setStatus(Payment.Status.FAILED);
+            p.setFailedReason("Auction has been terminated");
             p = paymentRepos.save(p);
 
             Account account = p.getAccount();

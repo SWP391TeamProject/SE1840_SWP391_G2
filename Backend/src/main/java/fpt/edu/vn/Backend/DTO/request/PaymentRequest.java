@@ -19,6 +19,7 @@ public class PaymentRequest implements Serializable {
     private Payment.Type type;
     private Payment.Status status;
     private Payment.Method method;
+    private String failedReason;
     private int accountId;
     private String ipAddr;
     private PaymentOrderInfoType orderInfoType;

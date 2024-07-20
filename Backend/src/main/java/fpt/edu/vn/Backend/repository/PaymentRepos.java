@@ -30,4 +30,6 @@ public interface PaymentRepos extends JpaRepository<Payment, Integer>, JpaSpecif
 
     List<Payment> findAllByAccount_Email(String email);
 
+    @Query("SELECT p FROM Payment p WHERE p.status = 'PENDING' AND p.type = :type AND p.createDate <= :dayAgo")
+    List<Payment> findAllPendingPaymentWithPaymentCreatedBefore(LocalDateTime dayAgo, Payment.Type type);
 }
