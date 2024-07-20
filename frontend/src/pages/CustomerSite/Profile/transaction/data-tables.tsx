@@ -50,12 +50,8 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     }
   }, [selectedDateRange]);
   return (
-    <div className="rounded-md border">
-      <div className="flex items-center py-4 p-7">
-        {/* <DatePickerWithRange 
-                setSelectedDateRange={setSelectedDateRange}
-                /> */}
-      </div>
+    <>
+      <DataTablePagination table={table} />
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -88,7 +84,6 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           )}
         </TableBody>
       </Table>
-      <DataTablePagination table={table} />
-    </div>
+    </>
   );
 }

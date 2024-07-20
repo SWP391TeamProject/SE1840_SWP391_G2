@@ -7,8 +7,8 @@ const profileNavItems = [
   { title: 'Preferences', href: '/profile/preferences' },
   { title: 'Inventory', href: '/profile/inventory' },
   { title: 'Balance', href: '/profile/balance' },
+  { title: 'Transactions', href: '/profile/transactions' },
   { title: 'KYC', href: '/profile/kyc' },
-  { title: 'transactions', href: '/profile/transactions' },
 ];
 
 export default function Profile() {
@@ -16,7 +16,7 @@ export default function Profile() {
     <>
       <div className="container min-h-screen flex flex-col md:flex-row gap-8 md:gap-16 bg-background text-foreground py-8">
         {/* Vertical Sidebar */}
-        <nav className="w-64 md:min-h-screen border-gray-200 flex flex-row md:flex-col">
+        <nav className="w-full md:w-56 md:min-h-screen border-gray-200 flex flex-row md:flex-col flex-wrap">
           {profileNavItems.map((item) => (
             <NavLink
               key={item.href}
@@ -34,10 +34,8 @@ export default function Profile() {
         </nav>
 
         {/* Main Content Area */}
-        <div className="grow">
-          <div className="max-w-2xl m-auto">
-            <Outlet />
-          </div>
+        <div className="w-full flex justify-center">
+          <Outlet />
         </div>
       </div>
     </>
