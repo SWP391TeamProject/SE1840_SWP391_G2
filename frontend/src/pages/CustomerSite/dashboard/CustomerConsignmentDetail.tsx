@@ -2,9 +2,16 @@ import { ConsignmentDetailType, ConsignmentStatus } from '@/constants/enums';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from '@/services/ConsignmentService';
+import {
+  acceptFinalEva,
+  acceptInitialEva,
+  fetchConsignmentByConsignmentId,
+  rejectFinalEva,
+  rejectInitialEva,
+} from '@/services/ConsignmentService';
 import { toast } from 'sonner';
-import { showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
+import { get } from 'http';
 
 export default function CustomerConsignmentDetail() {
   const location = useLocation();
@@ -13,6 +20,22 @@ export default function CustomerConsignmentDetail() {
   const [custConsignment, setCusConsignment] = useState(consignment);
   const [custConsignmentDetail, setCustConsignmentDetail] = useState(null);
   const nav = useNavigate();
+  const loc = useLocation();
+
+  useEffect(() => {
+    if (!consignment) {
+      toast.promise(fetchConsignmentByConsignmentId(consignmentId), {
+        loading: 'Loading...',
+        success: (res) => {
+          setCusConsignment(res.data);
+          return 'Consignment loaded';
+        },
+        error: (err) => {
+          return getErrorMessage(err);
+        },
+      });
+    }
+  }, [consignment]);
 
   const acceptEvaluation = () => {
     if (custConsignment.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {

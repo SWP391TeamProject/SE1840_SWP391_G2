@@ -1,6 +1,5 @@
-
 import { Item } from '@/models/Item.ts';
-import {Payment} from "@/models/payment.ts";
+import { Payment } from '@/models/payment.ts';
 
 interface OrderDetail {
   itemId: number;

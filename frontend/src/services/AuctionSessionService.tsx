@@ -346,7 +346,6 @@ export const registerAuctionSession = async (id: number) => {
   return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/register/${id}`, {
     headers: {
       'Content-Type': 'application/json',
-
       Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
     },
   });
@@ -354,11 +353,16 @@ export const registerAuctionSession = async (id: number) => {
 export const assignItem = async (id: number, assignItem: any) => {
   console.log(assignItem);
   console.log(id);
+  let formattedItem = assignItem.map((item: any) => {
+    return item.itemId;
+  });
+  console.log('formatted data:', formattedItem);
+
   return await axios.post(
     `${SERVER_DOMAIN_URL}/api/auction-sessions/assign-auction-session`,
     {
       auctionSessionId: id,
-      item: assignItem,
+      item: formattedItem,
     },
     {
       headers: {

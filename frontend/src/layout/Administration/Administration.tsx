@@ -29,6 +29,7 @@ import { useLocation } from 'react-router-dom';
 import ProfileDropdownMenu from '@/components/NavBar/ProfileDropdownMenu.tsx';
 import logo from '@/assets/icon.png';
 import { useAuth } from '@/AuthProvider';
+import { Roles } from '@/constants/enums';
 
 export const ConsignmentsContext = createContext([]);
 

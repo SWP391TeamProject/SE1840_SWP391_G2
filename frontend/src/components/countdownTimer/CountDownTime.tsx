@@ -24,8 +24,10 @@ const formatTime = (time: number): string => {
     return `${hoursString}:${minutesString}:${secondsString}`;
   } else if (minutes > 0) {
     return `${minutesString}:${secondsString}`;
-  } else {
+  } else if (seconds > 0) {
     return `00:${secondsString}`;
+  } else {
+    window.location.reload();
   }
 };
 

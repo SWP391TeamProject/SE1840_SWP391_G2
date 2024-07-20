@@ -17,7 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { mailRegex, phoneRegex } from '@/constants/regex';
 import thumbnail1 from '@/assets/thumnail1.jpg';
 import { useAuth } from '@/AuthProvider';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const formSchema = z.object({
   accountId: z.number(),
@@ -30,11 +30,12 @@ const formSchema = z.object({
   gemstone: z.string().optional(),
   measurement: z.string().optional(),
   stamped: z.string().optional(),
-  weight: z.string().optional().refine(
-    value => value === '' || value === undefined ||
-    (Number(value) > 0 && Number(value) < 10000), {
-    message: 'Weight must be positive and below 10000. Leave blank if you do not know.',
-  }),
+  weight: z
+    .string()
+    .optional()
+    .refine((value) => value === '' || value === undefined || (Number(value) > 0 && Number(value) < 10000), {
+      message: 'Weight must be positive and below 10000. Leave blank if you do not know.',
+    }),
   preferContact: z.enum(['email', 'phone', 'text', 'any']),
   description: z
     .string()
@@ -87,7 +88,7 @@ export default function ConsignmentInititalForm() {
           toast.success('Consignment created successfully', {
             position: 'bottom-right',
           });
-          nav("/dashboard/consignments")
+          nav('/dashboard/consignments');
         }
         setIsLoading(false);
       })
@@ -120,9 +121,10 @@ export default function ConsignmentInititalForm() {
               <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">List your item for consignment</h1>
               <p className="mt-2 text-gray-500 dark:text-gray-400">
                 Fill out the form below to list your item for consignment. We'll review your submission and get back to
-                you within 2 business days.<br/>
-                <b className="text-red-500">Only one item may be submitted per form.</b>&nbsp;
-                To consign multiple items, please submit separate requests.
+                you within 2 business days.
+                <br />
+                <b className="text-red-500">Only one item may be submitted per form.</b>&nbsp; To consign multiple
+                items, please submit separate requests.
               </p>
             </div>
 
@@ -242,9 +244,8 @@ export default function ConsignmentInititalForm() {
                 <h1 className="text-2xl font-bold">Jewelry information</h1>
 
                 <p className="text-gray-500 dark:text-gray-400">
-                  Please provide a detailed description of your item.
-                  If any information is unknown, please leave the corresponding field blank.
-                  A subsequent analysis of your item will be conducted by our experts.
+                  Please provide a detailed description of your item. If any information is unknown, please leave the
+                  corresponding field blank. A subsequent analysis of your item will be conducted by our experts.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -313,7 +314,9 @@ export default function ConsignmentInititalForm() {
                         <FormControl>
                           <Input type="text" placeholder="Enter item weight" {...field} />
                         </FormControl>
-                        <FormDescription>Enter the weight of the item in grams. Leave blank if you do not know.</FormDescription>
+                        <FormDescription>
+                          Enter the weight of the item in grams. Leave blank if you do not know.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

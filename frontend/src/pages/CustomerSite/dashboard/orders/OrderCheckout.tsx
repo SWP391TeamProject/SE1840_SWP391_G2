@@ -4,7 +4,7 @@ import { useCurrency } from '@/CurrencyProvider.tsx';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { getOrderById, payOrder } from '@/services/OrderService';
 import { setCurrentOrder } from '@/redux/reducers/Orders';
 import { toast } from 'sonner';
@@ -15,22 +15,28 @@ import { AlertCircle, Wallet } from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { PaymentStatus } from '@/constants/enums.tsx';
 import { showErrorToast } from '@/lib/handle-error';
-import {
-  ConfirmationDialog
-} from "@/components/confirmation/confirmation-dialog.tsx";
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog.tsx';
+const SearchAddress = lazy(() => import('@/components/ui/search-address'));
 
 const orderCheckoutSchema = z.object({
   shippingAddress: z
     .string({
-      message: 'Address is required',
+      // message: 'Address is required',
     })
-    .min(8, 'Address must contain at least 8 characters')
-    .max(300, 'Address must contain at most 300 characters'),
+    .optional(),
   shippingNote: z.string().optional(),
 });
 
@@ -42,6 +48,7 @@ export function OrderCheckout() {
   const order = useAppSelector((state) => state.orders.currentOrder);
   const currency = useCurrency();
   const [loading, setLoading] = useState(true);
+  const [address, setAddress] = useState('');
   const orderCheckoutForm = useForm<z.infer<typeof orderCheckoutSchema>>({
     resolver: zodResolver(orderCheckoutSchema),
     defaultValues: {
@@ -66,13 +73,24 @@ export function OrderCheckout() {
         showErrorToast(e);
       });
   }, []);
+  useEffect(() => {
+    if (address) {
+      // orderCheckoutForm.setValue('shippingAddress', orderCheckoutForm.getFieldState('shippingAddress') + address);
+    }
+    console.log(orderCheckoutForm);
+  }, [address]);
 
   const checkout = async () => {
     setShowTrigger(false);
     const ok = await orderCheckoutForm.trigger();
     if (!ok) return;
     setLoading(true);
-    payOrder(orderId, orderCheckoutForm.getValues())
+    const formData = orderCheckoutForm.getValues();
+    const submitData = {
+      shippingAddress: formData.shippingAddress + address,
+      shippingNote: formData.shippingNote,
+    };
+    payOrder(orderId, submitData)
       .then((res) => {
         dispatch(setCurrentOrder(res.data));
         nav('/dashboard/order/' + orderId);
@@ -95,17 +113,33 @@ export function OrderCheckout() {
             <div className="pb-6">
               <Form {...orderCheckoutForm}>
                 <div className="flex flex-col gap-2">
+                  <div className="App">
+                    <SearchAddress
+                      onSelectLocation={(location) => {
+                        console.log(location);
+
+                        setAddress(location.label);
+                      }}
+                    />
+                  </div>
                   <FormField
                     control={orderCheckoutForm.control}
                     name="shippingAddress"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Address</FormLabel>
+                        <FormLabel>Additonal address information</FormLabel>
                         <FormControl>
-                          <Input placeholder="The place to receive your order"
-                            type="text" {...field} required />
+                          <Input
+                            placeholder="provide additional detail   (e.g. apartment, suite, unit, building, floor, etc.)"
+                            type="text"
+                            {...field}
+                            required
+                          />
                         </FormControl>
                         <FormMessage />
+                        <FormDescription>
+                          Please provide any missing address information to ensure successful delivery.
+                        </FormDescription>
                       </FormItem>
                     )}
                   />
@@ -136,8 +170,9 @@ export function OrderCheckout() {
                 <div key={detail.item.itemId} className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
                   <img
                     src={
-                      detail.item.attachments && detail.item.attachments.length > 0 ?
-                        detail.item.attachments[0].link : '/placeholder.svg'
+                      detail.item.attachments && detail.item.attachments.length > 0
+                        ? detail.item.attachments[0].link
+                        : '/placeholder.svg'
                     }
                     alt="Product Image"
                     width={80}
@@ -202,7 +237,10 @@ export function OrderCheckout() {
                   </AlertDescription>
                 </Alert>
               )}
-              <Button onClick={() => setShowTrigger(true)} disabled={order.payment.paymentAmount - auth.user?.balance > 0}>
+              <Button
+                onClick={() => setShowTrigger(true)}
+                disabled={order.payment.paymentAmount - auth.user?.balance > 0}
+              >
                 Buy now
               </Button>
               <ConfirmationDialog
