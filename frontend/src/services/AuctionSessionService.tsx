@@ -16,7 +16,6 @@ interface getAuctionsSchema {
   order?: 'asc' | 'desc';
   status?: string;
   search?: string;
-
 }
 
 export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
@@ -61,8 +60,8 @@ export const getAuctions = async (input: getAuctionsSchema) => {
         let params = {
           pageNumb: page - 1,
           pageSize: size ? size : 10,
-          search:input.search,  
-          sort:input.sort
+          search: input.search,
+          sort: input.sort,
         };
         return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
           headers: {
@@ -75,7 +74,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
         let params = {
           pageNumb: page - 1,
           pageSize: size ? size : 10,
-          search:input.search,
+          search: input.search,
         };
 
         return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
@@ -89,7 +88,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
         let params = {
           page: page ? page - 1 : 0,
           size: size ?? 10,
-          search:input.search,
+          search: input.search,
         };
 
         return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
@@ -104,7 +103,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
           page: page - 1, // Spring Boot uses 0-based page index
           size: size ? size : 10,
           sort,
-          search:input.search,
+          search: input.search,
           status: status ? status.toUpperCase() : undefined,
           order,
           principal: JSON.parse(getCookie('user')).accessToken || '',

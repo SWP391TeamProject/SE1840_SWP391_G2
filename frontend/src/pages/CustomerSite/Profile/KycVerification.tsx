@@ -1,4 +1,4 @@
-import {useAuth} from '@/AuthProvider';
+import { useAuth } from '@/AuthProvider';
 import DropzoneComponent from '@/components/drop-zone/DropZoneComponent';
 import {
   AlertDialog,
@@ -8,33 +8,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Button} from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import {showErrorToast} from '@/lib/handle-error';
-import {getCookie} from '@/utils/cookies';
-import {zodResolver} from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { showErrorToast } from '@/lib/handle-error';
+import { getCookie } from '@/utils/cookies';
+import { zodResolver } from '@hookform/resolvers/zod';
 import axios from '@/config/axiosConfig.ts';
-import {Loader2} from 'lucide-react';
-import React, {useEffect} from 'react';
-import {useForm} from 'react-hook-form';
-import {toast} from 'sonner';
+import { Loader2 } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
-import {z} from 'zod';
+import { z } from 'zod';
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -146,8 +132,7 @@ export default function KycVerification() {
             <Card>
               <CardHeader>
                 <CardTitle>Ekyc Detail</CardTitle>
-                <CardDescription>View and manage your verification
-                  details</CardDescription>
+                <CardDescription>View and manage your verification details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4">
@@ -157,7 +142,7 @@ export default function KycVerification() {
                         <FormField
                           control={form.control}
                           name="frontImage"
-                          render={({field}) => (
+                          render={({ field }) => (
                             <FormItem>
                               <FormLabel>Front Image</FormLabel>
                               <FormControl>
@@ -169,14 +154,14 @@ export default function KycVerification() {
                                                 "
                                 />
                               </FormControl>
-                              <FormMessage/>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
                         <FormField
                           control={form.control}
                           name="backImage"
-                          render={({field}) => (
+                          render={({ field }) => (
                             <FormItem>
                               <FormLabel>Back Image</FormLabel>
                               <FormControl>
@@ -186,35 +171,29 @@ export default function KycVerification() {
                                   fieldMessage="Drag 'n' drop your front identity images here, or click to select images"
                                 />
                               </FormControl>
-                              <FormMessage/>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
                     ) : (
-                      <div
-                        className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+                      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
                         <div className="space-y-4">
                           <div className="text-gray-900">
                             <p className="font-semibold">
-                              CardID: <span
-                              className="font-normal">{kycDetail.cardId}</span>
+                              CardID: <span className="font-normal">{kycDetail.cardId}</span>
                             </p>
                             <p className="font-semibold">
-                              FullName: <span
-                              className="font-normal">{kycDetail.fullName}</span>
+                              FullName: <span className="font-normal">{kycDetail.fullName}</span>
                             </p>
                             <p className="font-semibold">
-                              Birthday: <span
-                              className="font-normal">{kycDetail.birthday}</span>
+                              Birthday: <span className="font-normal">{kycDetail.birthday}</span>
                             </p>
                             <p className="font-semibold">
-                              Gender: <span
-                              className="font-normal">{kycDetail.gender ? 'Male' : 'Female'}</span>
+                              Gender: <span className="font-normal">{kycDetail.gender ? 'Male' : 'Female'}</span>
                             </p>
                             <p className="font-semibold">
-                              Address: <span
-                              className="font-normal">{kycDetail.address}</span>
+                              Address: <span className="font-normal">{kycDetail.address}</span>
                             </p>
                           </div>
                         </div>
@@ -229,7 +208,7 @@ export default function KycVerification() {
                   <div className="flex gap-4">
                     {isLoading ? (
                       <Button disabled>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Please wait
                       </Button>
                     ) : (
@@ -261,8 +240,7 @@ const showStatusModal = (status: submissionStatus) => {
         {status === submissionStatus.ERROR
           ? '  There was an error submitting your KYC verification. Please upload a better images and try again.'
           : ' Your KYC verification has been submitted successfully.You can now participate in the auction on our platform.'}
-        Your KYC verification has been submitted successfully. You can now
-        participate in the auction on our platform.
+        Your KYC verification has been submitted successfully. You can now participate in the auction on our platform.
         <AlertDialogFooter>
           <AlertDialogAction>
             <Button>Close</Button>

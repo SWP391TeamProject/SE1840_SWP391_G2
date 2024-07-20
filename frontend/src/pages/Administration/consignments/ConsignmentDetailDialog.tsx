@@ -14,7 +14,7 @@ import { ConsignmentDetail } from '@/models/newModel/consignmentDetail';
 interface consignmentDetaiDialog {
   consignmentDetail: ConsignmentDetail;
 }
-export default function ConsignmentDetailDialog({consignmentDetail}: consignmentDetaiDialog) {
+export default function ConsignmentDetailDialog({ consignmentDetail }: consignmentDetaiDialog) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -33,7 +33,7 @@ export default function ConsignmentDetailDialog({consignmentDetail}: consignment
                   alt="Product"
                   className="aspect-square rounded-md object-cover basis-1/3"
                   height="300"
-                  loading='lazy'
+                  loading="lazy"
                   src={attachment.link}
                   width="300"
                 />

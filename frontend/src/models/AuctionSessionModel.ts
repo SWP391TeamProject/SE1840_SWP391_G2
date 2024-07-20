@@ -15,7 +15,7 @@ export interface AuctionSession {
   attachments?: [];
 }
 
-export interface auctionSessionSchema  {
+export interface auctionSessionSchema {
   auctionSessionId: Number;
   title: String;
   description: String;
@@ -26,5 +26,4 @@ export interface auctionSessionSchema  {
   updateDate: Date;
   attachments: Attachment[];
   auctionItems: AuctionItem[];
-  
-};
+}

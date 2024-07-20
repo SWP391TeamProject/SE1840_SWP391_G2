@@ -259,9 +259,7 @@ export default function AuctionSession() {
             <AlertDialogDescription>
               This action cannot be undone. This will directly withdraw your balance.
               <p
-                className="
-                            text-red-500 dark:text-red-400 font-semibold
-                            "
+                className="  text-red-500 dark:text-red-400 font-semibold"
               >
                 Auction Registration Fee: {currency.format(fee)}
               </p>
@@ -391,7 +389,7 @@ export default function AuctionSession() {
                   <ClockIcon className="h-5 w-5" />
 
                   {auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
-                  new Date(auctionSession?.endDate).getTime() > new Date().getTime() ? (
+                    new Date(auctionSession?.endDate).getTime() > new Date().getTime() ? (
                     <span>
                       Ends in <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime>
                     </span>
@@ -400,7 +398,7 @@ export default function AuctionSession() {
                   )}
 
                   {auctionSession?.status === AuctionSessionStatus.FINISHED ||
-                  new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
+                    new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
                     <div className="text-pink-500 dark:text-pink-400 font-semibold">Auction Ended</div>
                   ) : (
                     <></>
@@ -411,7 +409,7 @@ export default function AuctionSession() {
                   )}
 
                   {auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
-                  new Date(auctionSession?.startDate).getTime() > new Date().getTime() ? (
+                    new Date(auctionSession?.startDate).getTime() > new Date().getTime() ? (
                     <span>
                       Starts in <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime>
                     </span>
@@ -423,14 +421,14 @@ export default function AuctionSession() {
 
                 {bidders.includes(userId)
                   ? auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
-                      <Button
-                        onClick={() =>
-                          scrollTo({ top: document.getElementById('auction-items')?.offsetTop, behavior: 'smooth' })
-                        }
-                      >
-                        Place Bid
-                      </Button>
-                    )
+                    <Button
+                      onClick={() =>
+                        scrollTo({ top: document.getElementById('auction-items')?.offsetTop, behavior: 'smooth' })
+                      }
+                    >
+                      Place Bid
+                    </Button>
+                  )
                   : auctionSession?.status === AuctionSessionStatus.SCHEDULED && <ConfirmRegister></ConfirmRegister>}
               </div>
             </div>
@@ -474,65 +472,65 @@ export default function AuctionSession() {
               {/* {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => ( */}
               {items
                 ? items.map((item) => (
-                    <Card key={item.id.itemId} className="min-w-52 flex flex-col items-stretch">
-                      <div className="group relative">
-                        <img
-                          src={
-                            item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
-                              ? item.itemDTO.attachments[0].link
-                              : ''
-                          }
-                          width={300}
-                          height={200}
-                          alt="Auction Item"
-                          className="rounded-t-lg object-cover w-full "
-                        />
-                        <div
-                          className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                          onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession.auctionSessionId)}
-                        >
-                          <Button>Detail</Button>
-                        </div>
+                  <Card key={item.id.itemId} className="min-w-52 flex flex-col items-stretch">
+                    <div className="group relative">
+                      <img
+                        src={
+                          item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
+                            ? item.itemDTO.attachments[0].link
+                            : ''
+                        }
+                        width={300}
+                        height={200}
+                        alt="Auction Item"
+                        className="rounded-t-lg object-cover w-full "
+                      />
+                      <div
+                        className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                        onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession.auctionSessionId)}
+                      >
+                        <Button>Detail</Button>
                       </div>
+                    </div>
 
-                      <CardContent className="space-y-2 p-4">
-                        <h3 className="text-sm font-semibold">{item.itemDTO.name}</h3>
-                      </CardContent>
-                      <div className="mt-auto space-y-2 p-4">
-                        {/* <div className="flex items-center justify-between mt-5"> */}
-                        <div className="text-primary-500 font-medium space-y-3">
-                         Current Price: {currency.format(item?.currentPrice)}
-                        </div>
-                        {/* </div> */}
-                        {auctionSession?.status === AuctionSessionStatus.FINISHED &&
-                        new Date(auctionSession?.endDate) < new Date() ? (
-                          <SoldFor item={item} currency={currency} />
-                        ) : (
-                          <>
-                            {bidders.includes(userId) ? (
-                              <Button
-                                className="space-y-2"
-                                onClick={() => {
-                                  let name = item?.itemDTO.name;
-                                  navigate(`${name}`, {
-                                    state: {
-                                      id: item?.id,
-                                      itemDTO: item?.itemDTO,
-                                      allow: auctionSession?.status === AuctionSessionStatus.PROGRESSING,
-                                    },
-                                  });
-                                }}
-                              >
-                                Place Bid
-                              </Button>
-                            ) : (
-                              <RegisterAlert></RegisterAlert>
-                            )}
-                          </>
-                        )}
+                    <CardContent className="space-y-2 p-4">
+                      <h3 className="text-sm font-semibold">{item.itemDTO.name}</h3>
+                    </CardContent>
+                    <div className="mt-auto space-y-2 p-4">
+                      {/* <div className="flex items-center justify-between mt-5"> */}
+                      <div className="text-primary-500 font-medium space-y-3">
+                        Current Price: {currency.format(item?.currentPrice)}
                       </div>
-                    </Card>
-                  ))
+                      {/* </div> */}
+                      {auctionSession?.status === AuctionSessionStatus.FINISHED &&
+                        new Date(auctionSession?.endDate) < new Date() ? (
+                        <SoldFor item={item} currency={currency} />
+                      ) : (
+                        <>
+                          {bidders.includes(userId) ? (
+                            <Button
+                              className="space-y-2"
+                              onClick={() => {
+                                let name = item?.itemDTO.name;
+                                navigate(`${name}`, {
+                                  state: {
+                                    id: item?.id,
+                                    itemDTO: item?.itemDTO,
+                                    allow: auctionSession?.status === AuctionSessionStatus.PROGRESSING,
+                                  },
+                                });
+                              }}
+                            >
+                              Place Bid
+                            </Button>
+                          ) : (
+                            <RegisterAlert></RegisterAlert>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                ))
                 : 'No Item'}
             </div>
           </div>
@@ -568,9 +566,7 @@ export default function AuctionSession() {
                 <CardTitle>About the Auction</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p>
-                  {auctionSession?.description}
-                </p>
+                <p>{auctionSession?.description}</p>
                 {/* <Button variant="outline">View All Items</Button> */}
               </CardContent>
             </Card>

@@ -26,7 +26,7 @@ class BlogService {
           size: size || 10,
           sort,
           order,
-          search:input.search
+          search: input.search,
         };
         response = await axios.get(`${this.BASE_URL}/category?categoryId=${categoryId}`, {
           headers: {
@@ -41,7 +41,7 @@ class BlogService {
           size: size ? size : 10,
           sort,
           order,
-          search:input.search
+          search: input.search,
         };
 
         response = await axios.get(`${this.BASE_URL}/`, {

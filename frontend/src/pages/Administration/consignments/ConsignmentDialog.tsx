@@ -16,10 +16,10 @@ import { Consignment } from '@/models/newModel/consignment';
 
 interface consignmentDialog {
   attachments: Attachment[];
-  status:ConsignmentStatus;
+  status: ConsignmentStatus;
 }
 
-export default function ConsignmentDialog({attachments,status}: consignmentDialog) {
+export default function ConsignmentDialog({ attachments, status }: consignmentDialog) {
   return (
     <Dialog>
       <DialogTrigger asChild>

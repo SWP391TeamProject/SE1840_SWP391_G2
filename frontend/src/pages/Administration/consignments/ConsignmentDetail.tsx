@@ -179,7 +179,7 @@ export default function ConsignmentDetail() {
 
   const callBackFunction = () => {
     setState(!state);
-  }
+  };
 
   const Action = () => {
     const length = consignment?.consignmentDetails?.length;
@@ -369,7 +369,10 @@ export default function ConsignmentDetail() {
         <Card className="w-3/6">
           <CardHeader>
             <CardTitle>
-              Consignment Detail {consignment?.attachments !== undefined && <ConsignmentDialog status={consignment.status} attachments={consignment.attachments} />}
+              Consignment Detail{' '}
+              {consignment?.attachments !== undefined && (
+                <ConsignmentDialog status={consignment.status} attachments={consignment.attachments} />
+              )}
             </CardTitle>
             <CardDescription>This is the detail that the customer has provided</CardDescription>
           </CardHeader>
@@ -411,93 +414,92 @@ export default function ConsignmentDetail() {
           </CardHeader>
           <CardContent className="overflow-hidden">
             <ScrollArea className="w-full h-80 border rounded-xl ">
-              {Array.isArray(consignment?.consignmentDetails)
-                ? consignment.consignmentDetails.map((item, index) => {
-                    return (
-                      <Card key={index} className="w-full p-3">
-                        <CardHeader>
-                          <CardTitle>
-                            Consignment Detail #{index + 1} {item?.attachments !== undefined &&<ConsignmentDetailDialog consignmentDetail={item} />}
-                          </CardTitle>
-                          <CardDescription>
-                            {(() => {
-                              switch (item.status) {
-                                case ConsignmentDetailType.MANAGER_REJECTED:
-                                  return (
-                                    <Badge
-                                      variant="default"
-                                      className="bg-yellow-500 w-[150px] text-center flex justify-center items-center"
-                                    >
-                                      Manager Rejected
-                                    </Badge>
-                                  );
-                                case ConsignmentDetailType.INITIAL_EVALUATION:
-                                  return (
-                                    <Badge
-                                      variant="default"
-                                      className="bg-green-500 w-[150px] text-center flex justify-center items-center"
-                                    >
-                                      Initial Evaluation
-                                    </Badge>
-                                  );
-                                case ConsignmentDetailType.FINAL_EVALUATION:
-                                  return (
-                                    <Badge
-                                      variant="default"
-                                      className="bg-blue-500 w-[150px] text-center flex justify-center items-center"
-                                    >
-                                      Final Evaluation
-                                    </Badge>
-                                  );
-                                case ConsignmentDetailType.MANAGER_ACCEPTED:
-                                  return (
-                                    <Badge
-                                      variant="default"
-                                      className="bg-indigo-500 w-[150px] text-center flex justify-center items-center"
-                                    >
-                                      Manager Accepted
-                                    </Badge>
-                                  );
-                                case ConsignmentDetailType.REQUEST:
-                                  return (
-                                    <Badge
-                                      variant="default"
-                                      className="bg-purple-500 w-[150px] text-center flex justify-center items-center"
-                                    >
-                                      Request
-                                    </Badge>
-                                  );
-                                default:
-                                  return <Badge variant="destructive">Unknown Status</Badge>;
-                              }
-                            })()}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="bg-white shadow-md rounded-lg p-6">
-                          <div> 
-                            <p className="text-gray-700 mb-2">
-                              <strong>Create Date:</strong> {formatDate(item?.createDate) ?? 'Not provided'}
-                            </p>
-                            <p className="text-gray-700 mb-2">
-                              <strong>Initiator:</strong> {item.account.nickname}
-                            </p>
-                            <div
-                              className="text-gray-700 mb-4"
-                              dangerouslySetInnerHTML={{ __html: item.description }}
-                            ></div>
-                            <p className="text-gray-700">
-                              <strong>Evaluate Price:</strong> {item.price ? item.price : 'Not specified'}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })
-                : 
-                <p>
-                  No activity history
-                </p>
-                }
+              {Array.isArray(consignment?.consignmentDetails) ? (
+                consignment.consignmentDetails.map((item, index) => {
+                  return (
+                    <Card key={index} className="w-full p-3">
+                      <CardHeader>
+                        <CardTitle>
+                          Consignment Detail #{index + 1}{' '}
+                          {item?.attachments !== undefined && <ConsignmentDetailDialog consignmentDetail={item} />}
+                        </CardTitle>
+                        <CardDescription>
+                          {(() => {
+                            switch (item.status) {
+                              case ConsignmentDetailType.MANAGER_REJECTED:
+                                return (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-yellow-500 w-[150px] text-center flex justify-center items-center"
+                                  >
+                                    Manager Rejected
+                                  </Badge>
+                                );
+                              case ConsignmentDetailType.INITIAL_EVALUATION:
+                                return (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-green-500 w-[150px] text-center flex justify-center items-center"
+                                  >
+                                    Initial Evaluation
+                                  </Badge>
+                                );
+                              case ConsignmentDetailType.FINAL_EVALUATION:
+                                return (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-blue-500 w-[150px] text-center flex justify-center items-center"
+                                  >
+                                    Final Evaluation
+                                  </Badge>
+                                );
+                              case ConsignmentDetailType.MANAGER_ACCEPTED:
+                                return (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-indigo-500 w-[150px] text-center flex justify-center items-center"
+                                  >
+                                    Manager Accepted
+                                  </Badge>
+                                );
+                              case ConsignmentDetailType.REQUEST:
+                                return (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-purple-500 w-[150px] text-center flex justify-center items-center"
+                                  >
+                                    Request
+                                  </Badge>
+                                );
+                              default:
+                                return <Badge variant="destructive">Unknown Status</Badge>;
+                            }
+                          })()}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="bg-white shadow-md rounded-lg p-6">
+                        <div>
+                          <p className="text-gray-700 mb-2">
+                            <strong>Create Date:</strong> {formatDate(item?.createDate) ?? 'Not provided'}
+                          </p>
+                          <p className="text-gray-700 mb-2">
+                            <strong>Initiator:</strong> {item.account.nickname}
+                          </p>
+                          <div
+                            className="text-gray-700 mb-4"
+                            dangerouslySetInnerHTML={{ __html: item.description }}
+                          ></div>
+                          <p className="text-gray-700">
+                            <strong>Evaluate Price:</strong> {item.price ? item.price : 'Not specified'}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              ) : (
+                <p>No activity history</p>
+              )}
             </ScrollArea>
           </CardContent>
         </Card>

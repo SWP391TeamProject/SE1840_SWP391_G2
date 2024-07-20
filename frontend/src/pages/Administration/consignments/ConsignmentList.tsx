@@ -37,7 +37,7 @@ export default function ConsignmentList() {
   let pageSize = url.searchParams.get('per_page');
   const [consignmentPromise, setConsignmentPromise] = useState<Promise<any>>();
 
-  const search = url.searchParams.get('search')
+  const search = url.searchParams.get('search');
 
   // const consignmentPromise = getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: selectedStatus});
 
@@ -98,19 +98,16 @@ export default function ConsignmentList() {
           size: Number.parseInt(pageSize),
           sort: sort,
           status: selectedStatus,
-          search:search
+          search: search,
         })
-      )
+      );
     }
-  }, [pageSize, pageNumber, sort,search]);
+  }, [pageSize, pageNumber, sort, search]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="all">
-        <div className="flex items-center">
-
-
-        </div>
+        <div className="flex items-center"></div>
         <TabsContent value={statusFilter}>
           {/* {isLoading ?
                         <LoadingAnimation />

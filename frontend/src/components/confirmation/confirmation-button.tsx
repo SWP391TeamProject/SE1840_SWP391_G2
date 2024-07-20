@@ -24,7 +24,7 @@ interface ConfirmationButtonProps extends React.ComponentPropsWithoutRef<typeof 
   description: string;
   className?: string;
   variant?: string;
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 export function ConfirmationButton({

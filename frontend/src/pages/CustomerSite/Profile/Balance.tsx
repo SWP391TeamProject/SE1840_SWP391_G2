@@ -231,7 +231,12 @@ export default function Balance() {
                               </FormItem>
                               <FormItem>
                                 <FormControl>
-                                  <Input disabled={!isOtherAmount} placeholder="Enter amount" type="number" {...field} />
+                                  <Input
+                                    disabled={!isOtherAmount}
+                                    placeholder="Enter amount"
+                                    type="number"
+                                    {...field}
+                                  />
                                 </FormControl>
                               </FormItem>
                             </RadioGroup>

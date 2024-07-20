@@ -65,9 +65,15 @@ export default function AuctionSessionList() {
     console.log(Number.parseInt(pageSize));
     if (Number.parseInt(pageNumber) >= 1)
       setAuctionSessionPromise(
-        getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter,sort:sort ,search:search })
+        getAuctions({
+          page: Number.parseInt(pageNumber),
+          size: Number.parseInt(pageSize),
+          status: statusFilter,
+          sort: sort,
+          search: search,
+        })
       );
-  }, [pageSize, pageNumber,search,sort]);
+  }, [pageSize, pageNumber, search, sort]);
 
   useEffect(() => {
     // fetchAuctionSessions(0);

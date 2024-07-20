@@ -6,7 +6,7 @@ import { getOwnedItems } from '@/services/ItemService.ts';
 import { setCurrentPageList, setItems } from '@/redux/reducers/Inventory.ts';
 import { Item } from '@/models/Item.ts';
 import { toast } from 'sonner';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const Inventory = () => {
   const inventoryList = useAppSelector((state) => state.inventory);
@@ -59,7 +59,9 @@ const Inventory = () => {
                   />
                 </CardHeader>
                 <CardContent>
-                  <Link to={`/item/${item.itemId}`} className="text-lg font-semibold">{item.name}</Link>
+                  <Link to={`/item/${item.itemId}`} className="text-lg font-semibold">
+                    {item.name}
+                  </Link>
                 </CardContent>
               </Card>
             ))}

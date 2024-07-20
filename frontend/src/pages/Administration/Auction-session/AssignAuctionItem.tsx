@@ -110,7 +110,9 @@ export default function AssignAuctionItem() {
     // selectedItems.forEach((item) => {
     //   tempList.push(item.itemId);
     // });
-    tempList = selectedItems.concat(existingItems.filter(item2 => !selectedItems.some(item1 => item1.itemId == item2.itemId)));
+    tempList = selectedItems.concat(
+      existingItems.filter((item2) => !selectedItems.some((item1) => item1.itemId == item2.itemId))
+    );
     assignItem(auction?.auctionSessionId, tempList)
       .then((res) => {
         console.log(res);

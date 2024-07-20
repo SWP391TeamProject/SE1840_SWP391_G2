@@ -56,7 +56,7 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
         size: size ? size : 10,
         sort,
         order,
-        search:input.search
+        search: input.search,
       };
 
       return await axios.get(`${SERVER_DOMAIN_URL}/api/consignments/`, {

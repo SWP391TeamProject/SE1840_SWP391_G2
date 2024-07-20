@@ -100,8 +100,8 @@ export function PublicItemDetail() {
               <div className="flex flex-col gap-3">
                 <h1 className="text-3xl font-bold">{item.name}</h1>
                 <Separator />
-                <div className='flex'>
-                  <div className='basis-3/6 flex flex-col'>
+                <div className="flex">
+                  <div className="basis-3/6 flex flex-col">
                     <div className="inline-flex">
                       <BoxIcon className="h-6 w-6" />
                       <span className="pl-2">{item.category.name}</span>
@@ -117,7 +117,7 @@ export function PublicItemDetail() {
                       </div>
                     )}
                   </div>
-                  <div className='basis-3/6'>
+                  <div className="basis-3/6">
                     {item.status == ItemStatus.QUEUE && (
                       <Alert variant="default">
                         <AlertCircle className="h-5 w-5" />
@@ -199,8 +199,6 @@ export function PublicItemDetail() {
                     </i>
                   </CardFooter>
                 </Card>
-
-
               </div>
             </div>
           </div>
