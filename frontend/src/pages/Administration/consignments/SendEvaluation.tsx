@@ -52,7 +52,7 @@ const formSchema = z
     files: true,
   });
 
-export default function SendEvaluationForm({ consignmentParent }: { consignmentParent: Consignment }) {
+export default function SendEvaluationForm({callBack, consignmentParent }: {callBack: Function, consignmentParent: Consignment }) {
   // const param = useParams();
 
   const [consignment, setConsignment] = useState<Consignment | undefined>(undefined);
@@ -99,6 +99,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
           setOpen(false);
           console.log(res);
           setIsLoading(false);
+          callBack();
         })
         .catch((error) => {
           showErrorToast(error);
@@ -115,6 +116,7 @@ export default function SendEvaluationForm({ consignmentParent }: { consignmentP
           setOpen(false);
           console.log(res);
           setIsLoading(false);
+          callBack();
         })
         .catch((error) => {
           showErrorToast(error);

@@ -176,12 +176,16 @@ export default function ConsignmentDetail() {
     });
   };
 
+  const callBackFunction = () => {
+    setState(!state);
+  }
+
   const Action = () => {
     const length = consignment?.consignmentDetails?.length;
     if (JSON.parse(getCookie('user')).role === Roles.STAFF) {
       if (consignment?.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {
         if (!consignment?.consignmentDetails?.some((detail) => detail?.status === 'INITIAL_EVALUATION')) {
-          return <SendEvaluationForm consignmentParent={consignment} />;
+          return <SendEvaluationForm callBack={() => callBackFunction()} consignmentParent={consignment} />;
         } else {
           return <Badge className="bg-amber-400">Waiting Seller Accept</Badge>;
         }
@@ -192,7 +196,7 @@ export default function ConsignmentDetail() {
         } else if (consignment?.consignmentDetails[length - 1]?.status === 'FINAL_EVALUATION') {
           return <Badge className="bg-amber-400">Waiting Manager Accept</Badge>;
         } else {
-          return <SendEvaluationForm consignmentParent={consignment} />;
+          return <SendEvaluationForm callBack={() => callBackFunction()} consignmentParent={consignment} />;
         }
       }
       if (consignment?.status === ConsignmentStatus.SENDING) {
