@@ -14,7 +14,7 @@ import {
   Package,
 } from 'lucide-react';
 import { createContext, useEffect, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,6 +35,7 @@ export const ConsignmentsContext = createContext([]);
 export default function Administration() {
   const location = useLocation();
   const auth = useAuth();
+  const nav = useNavigate();
   const [consignments] = useState([]);
   const [arrayPath, setArrayPath] = useState(['']);
   const breadcrumbs = [<BreadcrumbItem key={1}></BreadcrumbItem>];
@@ -66,6 +67,16 @@ export default function Administration() {
     console.log(breadcrumbs);
   }, [location]);
 
+  const handleSearch = (e) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('search', e.currentTarget.value);
+    const newSearch = searchParams.toString();
+    const newUrl = `${window.location.pathname}?${newSearch}`;
+    window.history.replaceState({ path: newUrl }, '', newUrl);
+    nav(newUrl);
+    console.log('New URL:', newUrl); // Debugging the new URL
+  };
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] bg-background text-foreground">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -96,7 +107,7 @@ export default function Administration() {
 
               {auth.user.role === 'ADMIN' && (
                 <Link
-                  to="accounts"
+                  to="accounts?page=1"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                 >
                   <User2 />
@@ -235,15 +246,16 @@ export default function Administration() {
             </Sheet>
             <Breadcrumb className="hidden md:flex">{loadBreadcrumbs()}</Breadcrumb>
             <div className="relative ml-auto flex-1 md:grow-0">
-              <form action="" method="get">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-                  name="search"
-                />
-              </form>
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+                name="search"
+                onKeyUp={(e) => {
+                  handleSearch(e);
+                }}
+              />
             </div>
             <ProfileDropdownMenu></ProfileDropdownMenu>
           </header>

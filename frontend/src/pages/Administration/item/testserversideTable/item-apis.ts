@@ -9,6 +9,7 @@ interface GetItemsSchema {
   page: number;
   size: number;
   sort?: string;
+  search?: string;
   order?: 'asc' | 'desc';
   minPrice?: number;
   maxPrice?: number;
@@ -26,6 +27,7 @@ export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
       page: page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort: sort,
+      search: input.search,
       minPrice,
       maxPrice,
       status: status ? status.toUpperCase() : undefined,
@@ -41,7 +43,7 @@ export const getItems = async (input: GetItemsSchema): Promise<Page<Item>> => {
       params,
     });
 
-    return response.data;
+    return response?.data;
   } catch (err) {
     console.error('Error fetching items:', err);
     throw err;

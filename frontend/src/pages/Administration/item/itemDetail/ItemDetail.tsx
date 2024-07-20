@@ -20,7 +20,7 @@ import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialo
 import { setCurrentItem } from '@/redux/reducers/Items.tsx';
 import { ItemStatus } from '@/models/Item.ts';
 import ProductProperties from '@/pages/Administration/item/itemDetail/ProductProperties.tsx';
-import { showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
 
 const formSchema = z.object({
   itemId: z.number(),
@@ -57,14 +57,43 @@ const formSchema = z.object({
     .min(0, {
       message: 'Buy in price must be at least 0.',
     }),
-  color: z.string().optional(),
-  size: z.string().optional(),
-  weight: z.string().optional(),
-  brand: z.string().optional(),
-  age: z.string().regex(/^\d*$/, {
-    message: 'Age must be a number.',
-  }),
-  material: z.string().optional(),
+  color: z
+    .string()
+    .min(3, {
+      message: 'Color must be at least 3 characters long.',
+    })
+    .optional(),
+  measurement: z
+    .string()
+    .min(1, {
+      message: 'Measurement must not be empty.',
+    })
+    .optional(),
+  weight: z.coerce.number().optional(),
+  metal: z
+    .string()
+    .min(1, {
+      message: 'Metal must not be empty.',
+    })
+    .optional(),
+  gemstone: z
+    .string()
+    .min(1, {
+      message: 'Gemstone must not be empty.',
+    })
+    .optional(),
+  condition: z
+    .string()
+    .min(1, {
+      message: 'Condition must not be empty.',
+    })
+    .optional(),
+  stamped: z
+    .string()
+    .min(1, {
+      message: 'Brand/Stamped must not be empty.',
+    })
+    .optional(),
   status: z.nativeEnum(ItemStatus),
 });
 
@@ -85,18 +114,19 @@ export default function ItemDetail() {
       reservePrice: 0,
       buyInPrice: 0,
       color: '',
-      size: '',
-      weight: '',
-      brand: '',
-      age: '',
-      material: '',
+      measurement: '',
+      weight: 0,
+      metal: '',
+      gemstone: '',
+      stamped: '',
       status: ItemStatus.QUEUE,
     },
   });
 
   useEffect(() => {
-    getItemById(itemId)
-      .then((res) => {
+    toast.promise(getItemById(itemId), {
+      loading: 'loading item detail...',
+      success: (res) => {
         const i = res.data;
         dispatch(setCurrentItem(i));
         form.reset({
@@ -107,19 +137,22 @@ export default function ItemDetail() {
           reservePrice: i.reservePrice,
           buyInPrice: i.buyInPrice,
           color: i.color,
-          size: i.size,
+          measurement: i.measurement,
           weight: i.weight,
-          brand: i.brand,
-          age: (i.age || 0).toString(),
-          material: i.material,
+          metal: i.metal,
+          gemstone: (i.gemstone || 0).toString(),
+          stamped: i.stamped,
+          condition: i.condition,
           status: i.status,
         });
         setIsLoading(false);
-      })
-      .catch((e) => {
+        return 'Item loaded successfully!';
+      },
+      error: (e) => {
         console.error(e);
-        showErrorToast(e);
-      });
+        return getErrorMessage(e);
+      },
+    });
   }, []);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -133,7 +166,6 @@ export default function ItemDetail() {
     const dto: DTO = {
       ...values,
       categoryId: parseInt(values.categoryId),
-      age: values.age.length == 0 ? undefined : parseInt(values.age),
     };
 
     if (item.status != ItemStatus.QUEUE) {

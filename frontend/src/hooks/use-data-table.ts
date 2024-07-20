@@ -102,6 +102,7 @@ const schema = z.object({
   page: z.coerce.number().default(1),
   per_page: z.coerce.number().optional(),
   sort: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export function useDataTable<TData, TValue>({
@@ -123,6 +124,7 @@ export function useDataTable<TData, TValue>({
   const page = search.page;
   const perPage = search.per_page ?? defaultPerPage;
   const sort = search.sort ?? defaultSort;
+  const searchQuery = search.search ?? '';
   const [column, order] = sort?.split('.') ?? [];
 
   // Memoize computation of searchableColumns and filterableColumns
@@ -197,6 +199,7 @@ export function useDataTable<TData, TValue>({
       `${pathname}?${createQueryString({
         page: pageIndex + 1,
         per_page: pageSize,
+        search: searchQuery,
       })}`,
       { replace: true } // This is somewhat equivalent to { scroll: false } in Next.js, but for navigation behavior. Adjust as needed.
     );

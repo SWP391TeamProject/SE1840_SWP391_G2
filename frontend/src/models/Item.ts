@@ -3,25 +3,24 @@ import { Account } from '@/models/AccountModel.tsx';
 import { Attachment } from '@/models/Attachment.ts';
 
 export interface Item {
-  itemId?: number;
-  category?: ItemCategory;
-  name?: string;
-  description?: string;
-  reservePrice?: number;
-  buyInPrice?: number;
-  soldPrice?: number;
-  status?: ItemStatus;
-  createDate?: Date;
-  updateDate?: Date;
-  owner?: Account;
-  color?: string;
-  size?: string;
-  weight?: string;
-  brand?: string;
-  age?: number;
-  material?: string;
-  orderId?: number;
-  attachments?: Attachment[];
+  itemId: number;
+  category: ItemCategory;
+  name: string;
+  description: string;
+  reservePrice: number;
+  buyInPrice: number;
+  status: ItemStatus;
+  createDate: string;
+  updateDate: string;
+  owner: Account;
+  color: string;
+  weight: number;
+  metal: string;
+  gemstone: string;
+  measurement: string;
+  condition: string;
+  stamped: string;
+  attachments: Attachment[];
 }
 
 export enum ItemStatus {

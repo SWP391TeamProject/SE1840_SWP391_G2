@@ -12,6 +12,8 @@ import { Item } from '@/models/newModel/item';
 import { ItemStatus } from '@/constants/enums';
 import { set } from 'date-fns';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/handle-error';
 interface ItemTableProps {
   itemPromise: ReturnType<typeof getItems>;
 }
@@ -47,9 +49,20 @@ export default function ItemsTable({ itemPromise }: ItemTableProps) {
         setPageCount(totalPages);
         console.log(content);
         console.log(totalPages);
-        setIsLoading(false);
       }
     };
+    toast.promise(fetchData(), {
+      loading: 'Loading...',
+      success: (res) => {
+        setIsLoading(false);
+        return 'Items loaded successfully!';
+      },
+      error: (err) => {
+        setIsLoading(false);
+        return getErrorMessage(err);
+      },
+    });
+
     fetchData();
   }, [itemPromise]);
 
@@ -64,10 +77,10 @@ export default function ItemsTable({ itemPromise }: ItemTableProps) {
     <>
       {isLoading ? (
         <DataTableSkeleton
-          columnCount={7}
+          columnCount={6}
           searchableColumnCount={0}
           filterableColumnCount={0}
-          cellWidths={['10rem', '20rem', '12rem', '12rem', '12rem', '12rem', '8rem']}
+          cellWidths={['10rem', '20rem', '8rem', '8rem', '8rem', '8rem', '8rem']}
           shrinkZero
         />
       ) : (

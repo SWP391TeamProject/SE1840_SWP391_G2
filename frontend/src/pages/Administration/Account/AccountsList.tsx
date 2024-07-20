@@ -1,49 +1,27 @@
-import { Badge } from '@/components/ui/badge';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from '@/redux/reducers/Accounts';
-import {
-  fetchAccountsService,
-  deleteAccountService,
-  fetchAccountsByName,
-  activateAccountService,
-} from '@/services/AccountsServices.ts';
-import { PlusCircle, MoreHorizontal, ListFilter } from 'lucide-react';
+import { setCurrentAccount } from '@/redux/reducers/Accounts';
+import { fetchAccountsService, deleteAccountService, activateAccountService } from '@/services/AccountsServices.ts';
+import { ListFilter } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 
-import { AccountStatus, RoleName, Roles } from '@/constants/enums';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import PagingIndexes from '@/components/pagination/PagingIndexes';
-import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
-import { useNavigate } from 'react-router-dom';
+import { RoleName } from '@/constants/enums';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
 import { AccountsTable } from './account-data-table/account-table';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Account } from '@/models/AccountModel';
 import { Page } from '@/models/Page';
-import { ConfirmationButton } from '@/components/confirmation/confirmation-button';
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
@@ -53,13 +31,14 @@ export default function AccountsList() {
   const [seletedRole, setSelectedRole] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
-  let search = url.searchParams.get('search');
+  // let search = url.searchParams.get('search');
   const [reload, setReload] = useState(false);
   let pageNumber = url.searchParams.get('page');
   let sort = url.searchParams.get('sort');
   let pageSize = url.searchParams.get('per_page');
   const [accountPromise, setAccountPromise] = useState<Promise<Page<Account>>>();
-
+  const loc = useLocation();
+  const search = loc.search;
   // const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""});
 
   // const fetchAccounts = async (pageNumber: number, role?: Roles) => {
@@ -200,6 +179,7 @@ export default function AccountsList() {
 
   useEffect(() => {
     console.log(pageNumber);
+    // if (!loc?.state) {
     if (Number.parseInt(pageNumber) >= 1)
       setAccountPromise(
         fetchAccountsService({
@@ -207,18 +187,21 @@ export default function AccountsList() {
           size: Number.parseInt(pageSize),
           sort: sort,
           role: seletedRole,
+          search: search,
         })
       );
-  }, [pageSize, pageNumber, sort]);
+    // }
+    console.log(search);
+  }, [pageNumber, pageSize, sort, search]);
 
   useEffect(() => {
     // fetchAccounts(accountsList.currentPageNumber);
     setRoleFilter('all');
   }, [reload]);
 
-  useEffect(() => {
-    console.log(url);
-  }, [url]);
+  // useEffect(() => {
+  //   console.log(url);
+  // }, [url]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">

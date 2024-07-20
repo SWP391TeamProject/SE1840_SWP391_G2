@@ -9,42 +9,36 @@ interface GetAccountsSchema {
   page: number;
   size: number;
   sort?: string;
+  search?: string;
   order?: 'asc' | 'desc';
   status?: string;
   role?: string;
 }
 
 export const fetchAccountsService = async (input: GetAccountsSchema) => {
-  try {
-    const { page, size, sort, order, status, role } = input;
+  const { page, size, sort, order, status, role } = input;
 
-    // Prepare query parameters
-    const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
-      size: size ? size : 10,
-      sort,
-      status: status ? status.toUpperCase() : undefined,
-      order,
-      Role: role ? role : undefined,
-    };
+  // Prepare query parameters
+  const params: Record<string, any> = {
+    page: page - 1, // Spring Boot uses 0-based page index
+    size: size ? size : 10,
+    sort,
+    status: status ? status.toUpperCase() : undefined,
+    order,
+    search: input.search,
+    Role: role ? role : undefined,
+  };
 
-    const response = await axios.get<Page<Account>>(API_SERVER + '/accounts/', {
-      headers: {
-        'Content-Type': 'application/json',
+  const response = await axios.get<Page<Account>>(API_SERVER + '/accounts/', {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-      },
-      params: params,
-    });
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+    params: params,
+  });
 
-    return response.data;
-  } catch (err) {
-    console.log(err);
-    if (err?.response.status == 401) {
-      removeCookie('user');
-      removeCookie('token');
-    }
-  }
+  return response.data;
 };
 
 export const fetchAccountsByName = async (pageNumber: number, pageSize: number, name: string) => {

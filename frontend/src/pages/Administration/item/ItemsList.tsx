@@ -79,124 +79,47 @@ export default function ItemsList() {
   const [seletedStatus, setSelectedStatus] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
-  let search = url.searchParams.get('search');
+  const [search, setSearch] = useState('');
   let pageNumber = url.searchParams.get('page');
   let sort = url.searchParams.get('sort');
   let pageSize = url.searchParams.get('per_page');
   const [itemPromise, setItemPromise] = useState<Promise<any>>();
-
-  const currency = useCurrency();
-  // const itemPromise = getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort , status: seletedStatus});
-
-  const fetchItems = async (pageNumber: number, status?: ItemStatus) => {
-    try {
-      let res;
-      setIsLoading(true);
-      if (search != null) {
-        res = await getItemsByName(pageNumber, 5, search);
-      } else if (status) {
-        res = await getItemsByStatus(status, pageNumber, 5);
-      } else {
-        res = await getItems(pageNumber, 5);
-      }
-      console.log(res);
-      if (res) {
-        // dispatch(setItems(list.data.content));
-        dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-        let paging: any = {
-          pageNumber: res.data.number,
-          totalPages: res.data.totalPages,
-        };
-        dispatch(setCurrentPageNumber(paging));
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
-  const handleEditClick = (itemId: number) => {
-    let item = itemsList.value.find((item) => item.itemId == itemId);
-    console.log(item);
-    // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-    dispatch(setCurrentItem(item));
-    navigate(`/admin/items/${itemId}`);
-  };
-
-  // const handlePageSelect = (pageNumber: number) => {
-  //   if (statusFilter === "all") {
-  //     fetchItems(pageNumber);
-  //   } else {
-  //     fetchItems(pageNumber, statusFilter as ItemStatus);
-  //   }
-  // }
-
-  // const handleCreateClick = () => {
-  // let item = itemsList.value.find(item => item.itemId == itemId);
-  // console.log(item);
-  // // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-  // dispatch(setCurrentItem(item));
-  //   navigate("/admin/items/create");
-  // }
-
-  // const handleSuspendClick = (itemId: number) => {
-  // console.log(item);
-  // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-  // dispatch(setCurrentItem(item));
-  // navigate("/admin/items/edit");
-  // deleteItemsetCurrentItemService(itemId.toString()).then((res) => {
-  //   console.log(res);
-  // })
-  // }
-
-  // const handleFilterClick = (status: ItemStatus[], filter: any) => {
-  //   console.log(filter);
-  //   console.log(statusFilter);
-
-  //   if (filter.toString() != statusFilter) {
-  //     url.searchParams.delete("search");
-  //     window.history.replaceState(null, "", url.toString());
-  //     search = null;
-
-  //     if (filter == "all") {
-  //       fetchItems(0);
-  //     } else {
-  //       fetchItems(0, status[0]);
-  //     }
-  //   }
-
-  //   // let filteredList = itemsList.value.filter(x => status.includes(x.status));
-  //   // console.log(filteredList);
-  //   // dispatch(setCurrentPageList(filteredList));
-  //   setStatusFilter(filter);
-  // }
-
-  // const handleStatusFilterSelect = (...event: any) => {
-  //   console.log(event);
-  //   if (event[0] === "All") {
-  //     setSelectedStatus("");
-  //   } else {
-  //     setSelectedStatus(event[0]);
-  //   }
-  // }
+  const nav = useNavigate();
+  const location = useLocation(); // Use location correctly
 
   const handleFilterClick = (status: string) => {
     console.log(status);
     if (status === '') {
       setItemPromise(
-        getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: status })
+        getItems({
+          page: Number.parseInt(pageNumber),
+          size: Number.parseInt(pageSize),
+          sort: sort,
+          status: status,
+          search: search,
+        })
       );
       setSelectedStatus('');
     } else {
       setItemPromise(
-        getItems({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: status })
+        getItems({
+          page: Number.parseInt(pageNumber),
+          size: Number.parseInt(pageSize),
+          sort: sort,
+          status: status,
+          search: search,
+        })
       );
       setSelectedStatus(status);
     }
   };
-
-  useEffect(() => {}, [itemsList]);
+  useEffect(() => {
+    console.log('Location changed:', location); // Debugging the location object
+    const urlParams = new URLSearchParams(location.search);
+    const searchParam = urlParams.get('search') || '';
+    console.log('Search parameter:', searchParam); // Debugging the search parameter
+    setSearch(searchParam);
+  }, [location]);
 
   useEffect(() => {
     if (Number.parseInt(pageNumber) >= 1)
@@ -205,10 +128,11 @@ export default function ItemsList() {
           page: Number.parseInt(pageNumber),
           size: Number.parseInt(pageSize),
           sort: sort,
+          search: search,
           status: seletedStatus,
         })
       );
-  }, [pageSize, pageNumber, sort]);
+  }, [pageSize, pageNumber, sort, search]);
 
   useEffect(() => {
     // fetchItems(itemsList.currentPageNumber);

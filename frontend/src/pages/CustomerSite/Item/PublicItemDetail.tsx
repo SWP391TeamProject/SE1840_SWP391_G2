@@ -100,73 +100,107 @@ export function PublicItemDetail() {
               <div className="flex flex-col gap-3">
                 <h1 className="text-3xl font-bold">{item.name}</h1>
                 <Separator />
-
-                <div className="inline-flex">
-                  <BoxIcon className="h-6 w-6" />
-                  <span className="pl-2">{item.category.name}</span>
-                </div>
-                <div className="inline-flex">
-                  <GemIcon className="h-6 w-6" />
-                  <span className="pl-2">Reserve price: {currency.format(item.reservePrice)}</span>
-                </div>
-                {item.buyInPrice && (
-                  <div className="inline-flex">
-                    <GemIcon className="h-6 w-6" />
-                    <span className="pl-2">Buy in price: {currency.format(item.buyInPrice)}</span>
+                <div className='flex'>
+                  <div className='basis-3/6 flex flex-col'>
+                    <div className="inline-flex">
+                      <BoxIcon className="h-6 w-6" />
+                      <span className="pl-2">{item.category.name}</span>
+                    </div>
+                    <div className="inline-flex">
+                      <GemIcon className="h-6 w-6" />
+                      <span className="pl-2">Reserve price: {currency.format(item.reservePrice)}</span>
+                    </div>
+                    {item.buyInPrice && (
+                      <div className="inline-flex">
+                        <GemIcon className="h-6 w-6" />
+                        <span className="pl-2">Buy in price: {currency.format(item.buyInPrice)}</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                  <div className='basis-3/6'>
+                    {item.status == ItemStatus.QUEUE && (
+                      <Alert variant="default">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle>
+                          <h3 className="text-lg">Status</h3>
+                        </AlertTitle>
+                        <AlertDescription>This item is not in any auction. Check later!</AlertDescription>
+                      </Alert>
+                    )}
+                    {item.status == ItemStatus.IN_AUCTION && (
+                      <Alert variant="default">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle>
+                          <h3 className="text-lg">Status</h3>
+                        </AlertTitle>
+                        <AlertDescription>
+                          This item is in a upcoming or progressing auction.
+                          {pastAuction.length > 0 && (
+                            <div className="mt-5">
+                              <Button variant="default" size="sm" asChild>
+                                <Link to={`/auctions/${pastAuction[0].auctionSessionId}`}>
+                                  <GavelIcon className="w-4 h-4 mr-2" /> Join auction
+                                </Link>
+                              </Button>
+                            </div>
+                          )}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    {item.status == ItemStatus.SOLD && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle>
+                          <h3 className="text-lg">Status</h3>
+                        </AlertTitle>
+                        <AlertDescription>This item has been sold.</AlertDescription>
+                      </Alert>
+                    )}
+                    {item.status == ItemStatus.UNSOLD && (
+                      <Alert variant="default">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle>
+                          <h3 className="text-lg">Status</h3>
+                        </AlertTitle>
+                        <AlertDescription>
+                          This item has not been sold successfully before.
+                          <br />
+                          It might come back in the future. Stay stunned!
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                </div>
 
-                {item.status == ItemStatus.QUEUE && (
-                  <Alert variant="default">
-                    <AlertCircle className="h-5 w-5" />
-                    <AlertTitle>
-                      <h3 className="text-lg">Status</h3>
-                    </AlertTitle>
-                    <AlertDescription>This item is not in any auction. Check later!</AlertDescription>
-                  </Alert>
-                )}
-                {item.status == ItemStatus.IN_AUCTION && (
-                  <Alert variant="default">
-                    <AlertCircle className="h-5 w-5" />
-                    <AlertTitle>
-                      <h3 className="text-lg">Status</h3>
-                    </AlertTitle>
-                    <AlertDescription>
-                      This item is in a upcoming or progressing auction.
-                      {pastAuction.length > 0 && (
-                        <div className="mt-5">
-                          <Button variant="default" size="sm" asChild>
-                            <Link to={`/auctions/${pastAuction[0].auctionSessionId}`}>
-                              <GavelIcon className="w-4 h-4 mr-2" /> Join auction
-                            </Link>
-                          </Button>
-                        </div>
-                      )}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {item.status == ItemStatus.SOLD && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-5 w-5" />
-                    <AlertTitle>
-                      <h3 className="text-lg">Status</h3>
-                    </AlertTitle>
-                    <AlertDescription>This item has been sold.</AlertDescription>
-                  </Alert>
-                )}
-                {item.status == ItemStatus.UNSOLD && (
-                  <Alert variant="default">
-                    <AlertCircle className="h-5 w-5" />
-                    <AlertTitle>
-                      <h3 className="text-lg">Status</h3>
-                    </AlertTitle>
-                    <AlertDescription>
-                      This item has not been sold successfully before.
-                      <br />
-                      It might come back in the future. Stay stunned!
-                    </AlertDescription>
-                  </Alert>
-                )}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Properties</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableBody>
+                        {['color', 'measurement', 'weight', 'stamped', 'age', 'metal']
+                          .filter((key) => item.hasOwnProperty(key) && item[key])
+                          .map((key) => {
+                            return (
+                              <TableRow>
+                                <TableCell className="font-medium capitalize">{key}</TableCell>
+                                <TableCell>{item[key]}</TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                  <CardFooter>
+                    <i className="text-sm">
+                      Please note that item evaluations are subject to error; we advise independent verification before
+                      bidding.
+                    </i>
+                  </CardFooter>
+                </Card>
+
+
               </div>
             </div>
           </div>
@@ -210,14 +244,14 @@ export function PublicItemDetail() {
               )}
             </div>
             <div className="w-full lg:basis-4/12 xl:basis-3/12">
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <CardTitle>Properties</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableBody>
-                      {['color', 'size', 'weight', 'brand', 'age', 'material']
+                      {['color', 'measurement', 'weight', 'stamped', 'age', 'metal']
                         .filter((key) => item.hasOwnProperty(key) && item[key])
                         .map((key) => {
                           return (
@@ -236,7 +270,7 @@ export function PublicItemDetail() {
                     bidding.
                   </i>
                 </CardFooter>
-              </Card>
+              </Card> */}
             </div>
           </div>
         </div>
