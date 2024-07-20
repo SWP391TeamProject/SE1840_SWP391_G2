@@ -165,206 +165,208 @@ export default function Balance() {
 
   return (
     <>
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle className="text-2xl">Current Balance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CardDescription className="text-2xl">{currency.format(auth.user.balance)}</CardDescription>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Top Up Your Balance</CardTitle>
-        </CardHeader>
+      <div className="w-full lg:w-3/4 xl:w-1/2 flex flex-col gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Current Balance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CardDescription className="text-2xl">{currency.format(auth.user.balance)}</CardDescription>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Top Up Your Balance</CardTitle>
+          </CardHeader>
 
-        <CardContent>
-          <Form {...form}>
-            <form className="space-y-4">
-              <Tabs
-                defaultValue="VND"
-                onValueChange={async (v) => {
-                  handleOtherCheckbox(true);
-                  form.reset({ amount: undefined });
-                  setCurrencyChoice(CurrencyType[v]);
-                  currencyChoiceRef.current = CurrencyType[v];
-                }}
-              >
-                <TabsList>
-                  <TabsTrigger value="VND">Pay in VND</TabsTrigger>
-                  <TabsTrigger value="USD">Pay in USD</TabsTrigger>
-                </TabsList>
+          <CardContent>
+            <Form {...form}>
+              <form className="space-y-4">
+                <Tabs
+                  defaultValue="VND"
+                  onValueChange={async (v) => {
+                    handleOtherCheckbox(true);
+                    form.reset({ amount: undefined });
+                    setCurrencyChoice(CurrencyType[v]);
+                    currencyChoiceRef.current = CurrencyType[v];
+                  }}
+                >
+                  <TabsList>
+                    <TabsTrigger value="VND">Pay in VND</TabsTrigger>
+                    <TabsTrigger value="USD">Pay in USD</TabsTrigger>
+                  </TabsList>
 
-                <div className="flex flex-col gap-8 p-15 my-10">
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            {amountSuggestions[currencyChoice].map((v) => (
-                              <FormItem key={v} className="flex items-center space-x-3 space-y-0">
+                  <div className="flex flex-col gap-8 p-15 my-10">
+                    <FormField
+                      control={form.control}
+                      name="amount"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              {amountSuggestions[currencyChoice].map((v) => (
+                                <FormItem key={v} className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem onClick={() => handleOtherCheckbox(false)} value={v.toString()} />
+                                  </FormControl>
+                                  <FormLabel className="text-base font-normal peer-checked:font-semibold peer-checked:text-primary">
+                                    {currency.format(v, {
+                                      baseCurrency: currencyChoice,
+                                      exchangeMoney: false,
+                                    })}
+                                  </FormLabel>
+                                </FormItem>
+                              ))}
+                              <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                  <RadioGroupItem onClick={() => handleOtherCheckbox(false)} value={v.toString()} />
+                                  <RadioGroupItem onClick={() => handleOtherCheckbox(true)} value="" />
                                 </FormControl>
-                                <FormLabel className="text-base font-normal peer-checked:font-semibold peer-checked:text-primary">
-                                  {currency.format(v, {
-                                    baseCurrency: currencyChoice,
-                                    exchangeMoney: false,
-                                  })}
+                                <FormLabel className="text-base font-medium peer-checked:font-semibold peer-checked:text-primary">
+                                  Other Amount
                                 </FormLabel>
                               </FormItem>
-                            ))}
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem onClick={() => handleOtherCheckbox(true)} value="" />
-                              </FormControl>
-                              <FormLabel className="text-base font-medium peer-checked:font-semibold peer-checked:text-primary">
-                                Other Amount
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem>
-                              <FormControl>
-                                <Input disabled={!isOtherAmount} placeholder="Enter amount" type="number" {...field} />
-                              </FormControl>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                              <FormItem>
+                                <FormControl>
+                                  <Input disabled={!isOtherAmount} placeholder="Enter amount" type="number" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                <TabsContent value="VND">
-                  <Table className="pointer-events-none">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium">Total</TableCell>
-                        <TableCell className="text-right">
-                          <p>
-                            {currency.format(watchAmount.length === 0 ? '0' : watchAmount, {
-                              baseCurrency: currencyChoice,
-                              exchangeMoney: false,
-                            })}
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Exchanged</TableCell>
-                        <TableCell className="text-right">
-                          <p>
-                            {currency.format(watchAmount.length === 0 ? '0' : watchAmount, {
-                              baseCurrency: currencyChoice,
-                            })}
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                  <TabsContent value="VND">
+                    <Table className="pointer-events-none">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium">Total</TableCell>
+                          <TableCell className="text-right">
+                            <p>
+                              {currency.format(watchAmount.length === 0 ? '0' : watchAmount, {
+                                baseCurrency: currencyChoice,
+                                exchangeMoney: false,
+                              })}
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Exchanged</TableCell>
+                          <TableCell className="text-right">
+                            <p>
+                              {currency.format(watchAmount.length === 0 ? '0' : watchAmount, {
+                                baseCurrency: currencyChoice,
+                              })}
+                            </p>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
 
-                  <Alert variant="destructive" className="my-5">
-                    <ExclamationTriangleIcon className="h-4 w-4" />
-                    <AlertTitle>NOTE</AlertTitle>
-                    <AlertDescription>
-                      If you are going to pay with VNPAY, your fund will be exchanged to USD automatically at the
-                      exchange rate of 1 USD =&nbsp;
-                      {currency.format(1, {
-                        baseCurrency: CurrencyType.USD,
-                        currency: CurrencyType.VND,
-                      })}
-                    </AlertDescription>
-                  </Alert>
+                    <Alert variant="destructive" className="my-5">
+                      <ExclamationTriangleIcon className="h-4 w-4" />
+                      <AlertTitle>NOTE</AlertTitle>
+                      <AlertDescription>
+                        If you are going to pay with VNPAY, your fund will be exchanged to USD automatically at the
+                        exchange rate of 1 USD =&nbsp;
+                        {currency.format(1, {
+                          baseCurrency: CurrencyType.USD,
+                          currency: CurrencyType.VND,
+                        })}
+                      </AlertDescription>
+                    </Alert>
 
-                  <Button onClick={form.handleSubmit(payWithVNPay)} className="w-full h-[40px]">
-                    Pay with VNPAY
-                  </Button>
-                </TabsContent>
-                <TabsContent value="USD">
-                  <Table className="pointer-events-none">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium">Total</TableCell>
-                        <TableCell className="text-right">
-                          <p>{currency.format(watchAmount.length === 0 ? 0 : watchAmount)}</p>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                    <Button onClick={form.handleSubmit(payWithVNPay)} className="w-full h-[40px]">
+                      Pay with VNPAY
+                    </Button>
+                  </TabsContent>
+                  <TabsContent value="USD">
+                    <Table className="pointer-events-none">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium">Total</TableCell>
+                          <TableCell className="text-right">
+                            <p>{currency.format(watchAmount.length === 0 ? 0 : watchAmount)}</p>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
 
-                  <PayPalScriptProvider options={paypalOptions}>
-                    <PayPalButtons
-                      style={{
-                        layout: 'vertical',
-                        color: 'blue',
-                        shape: 'pill',
-                        label: 'pay',
-                        height: 40,
-                      }}
-                      createOrder={async () => {
-                        await form.handleSubmit(payWithPaypal)();
-                        return paypalOrderIdRef.current;
-                      }}
-                      onApprove={async (data, actions) => {
-                        try {
-                          const orderData: any = await callbackPaypal(data.orderID);
-                          // Three cases to handle:
-                          //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-                          //   (2) Other non-recoverable errors -> Show a failure message
-                          //   (3) Successful transaction -> Show confirmation or thank you message
-                          const errorDetail = orderData?.details?.[0];
-                          if (errorDetail?.issue === 'INSTRUMENT_DECLINED') {
-                            // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-                            // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
-                            return actions.restart();
-                          } else if (errorDetail) {
+                    <PayPalScriptProvider options={paypalOptions}>
+                      <PayPalButtons
+                        style={{
+                          layout: 'vertical',
+                          color: 'blue',
+                          shape: 'pill',
+                          label: 'pay',
+                          height: 40,
+                        }}
+                        createOrder={async () => {
+                          await form.handleSubmit(payWithPaypal)();
+                          return paypalOrderIdRef.current;
+                        }}
+                        onApprove={async (data, actions) => {
+                          try {
+                            const orderData: any = await callbackPaypal(data.orderID);
+                            // Three cases to handle:
+                            //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                            //   (2) Other non-recoverable errors -> Show a failure message
+                            //   (3) Successful transaction -> Show confirmation or thank you message
+                            const errorDetail = orderData?.details?.[0];
+                            if (errorDetail?.issue === 'INSTRUMENT_DECLINED') {
+                              // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                              // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
+                              return actions.restart();
+                            } else if (errorDetail) {
+                              navigate({
+                                pathname: '/payment-status',
+                                search: createSearchParams({
+                                  status: 'error',
+                                  error: errorDetail.description,
+                                }).toString(),
+                              });
+                            } else {
+                              // (3) Successful transaction -> Show confirmation or thank you message
+                              // Or go to another URL:  actions.redirect('thank_you.html');
+                              console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                              toast.success('Payment success', {
+                                position: 'top-right',
+                              });
+                              navigate({
+                                pathname: '/payment-status',
+                                search: createSearchParams({
+                                  amount: orderData['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
+                                  status: 'success',
+                                  currency: 'USD',
+                                }).toString(),
+                              });
+                            }
+                          } catch (error) {
+                            console.error(error);
                             navigate({
                               pathname: '/payment-status',
                               search: createSearchParams({
                                 status: 'error',
-                                error: errorDetail.description,
-                              }).toString(),
-                            });
-                          } else {
-                            // (3) Successful transaction -> Show confirmation or thank you message
-                            // Or go to another URL:  actions.redirect('thank_you.html');
-                            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-                            toast.success('Payment success', {
-                              position: 'top-right',
-                            });
-                            navigate({
-                              pathname: '/payment-status',
-                              search: createSearchParams({
-                                amount: orderData['purchase_units'][0]['payments']['captures'][0]['amount']['value'],
-                                status: 'success',
-                                currency: 'USD',
+                                error: error,
                               }).toString(),
                             });
                           }
-                        } catch (error) {
-                          console.error(error);
-                          navigate({
-                            pathname: '/payment-status',
-                            search: createSearchParams({
-                              status: 'error',
-                              error: error,
-                            }).toString(),
-                          });
-                        }
-                      }}
-                    />
-                  </PayPalScriptProvider>
-                </TabsContent>
-              </Tabs>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                        }}
+                      />
+                    </PayPalScriptProvider>
+                  </TabsContent>
+                </Tabs>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }

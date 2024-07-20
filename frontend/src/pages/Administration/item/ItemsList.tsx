@@ -81,7 +81,7 @@ export default function ItemsList() {
   const url = new URL(window.location.href);
   const [search, setSearch] = useState('');
   let pageNumber = url.searchParams.get('page');
-  let sort = url.searchParams.get('sort');
+  let sort = url.searchParams.get('sort') || 'createDate,desc';
   let pageSize = url.searchParams.get('per_page');
   const [itemPromise, setItemPromise] = useState<Promise<any>>();
   const nav = useNavigate();

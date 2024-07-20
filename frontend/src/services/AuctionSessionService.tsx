@@ -100,6 +100,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
           sort,
           status: status ? status.toUpperCase() : undefined,
           order,
+          principal: JSON.parse(getCookie('user')).accessToken || '',
         };
 
         return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {

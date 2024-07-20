@@ -32,7 +32,7 @@ export default function ProfilePreferences() {
   };
 
   return (
-    <div>
+    <div className="w-full lg:w-3/4 xl:w-1/2 flex flex-col gap-12">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <Card>

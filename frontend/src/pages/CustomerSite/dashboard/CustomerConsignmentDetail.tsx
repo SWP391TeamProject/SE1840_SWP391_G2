@@ -1,6 +1,6 @@
 import { ConsignmentDetailType, ConsignmentStatus } from '@/constants/enums';
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { acceptFinalEva, acceptInitialEva, rejectFinalEva, rejectInitialEva } from '@/services/ConsignmentService';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ export default function CustomerConsignmentDetail() {
   const consignmentId = location.state.consignmentId;
   const [custConsignment, setCusConsignment] = useState(consignment);
   const [custConsignmentDetail, setCustConsignmentDetail] = useState(null);
+  const nav = useNavigate();
 
   const acceptEvaluation = () => {
     if (custConsignment.status === ConsignmentStatus.IN_INITIAL_EVALUATION) {
@@ -19,6 +20,7 @@ export default function CustomerConsignmentDetail() {
         .then((res) => {
           setCusConsignment(res.data);
           toast.success('Initial Evaluation Accepted', {});
+          nav('/dashboard/consignments');
         })
         .catch((err) => {
           showErrorToast(err);
@@ -28,6 +30,7 @@ export default function CustomerConsignmentDetail() {
         .then((res) => {
           setCusConsignment(res.data);
           toast.success('Final Evaluation Accepted', {});
+          nav('/dashboard/consignments');
         })
         .catch((err) => {
           showErrorToast(err);
@@ -40,6 +43,7 @@ export default function CustomerConsignmentDetail() {
         .then((res) => {
           setCusConsignment(res.data);
           toast.success('Initial Evaluation Rejected', {});
+          nav('/dashboard/consignments');
         })
         .catch((err) => {
           showErrorToast(err);
@@ -49,6 +53,7 @@ export default function CustomerConsignmentDetail() {
         .then((res) => {
           setCusConsignment(res.data);
           toast.success('Final Evaluation Rejected', {});
+          nav('/dashboard/consignments');
         })
         .catch((err) => {
           showErrorToast(err);

@@ -24,6 +24,7 @@ interface ConfirmationButtonProps extends React.ComponentPropsWithoutRef<typeof 
   description: string;
   className?: string;
   variant?: string;
+  disabled?: boolean
 }
 
 export function ConfirmationButton({
@@ -34,6 +35,7 @@ export function ConfirmationButton({
   className,
   description,
   variant,
+  disabled,
   ...props
 }: ConfirmationButtonProps) {
   const [open, setOpen] = React.useState(false);
@@ -82,6 +84,7 @@ export function ConfirmationButton({
         onClick={() => {
           setOpen(true);
         }}
+        disabled={disabled}
       >
         {props.children}
       </Button>
