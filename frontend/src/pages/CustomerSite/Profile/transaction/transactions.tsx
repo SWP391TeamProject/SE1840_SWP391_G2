@@ -34,7 +34,7 @@ export default function Transactions() {
     });
   }, []);
   return (
-    <Card className="w-full">
+    <Card className="w-full lg:w-3/4">
       <CardHeader>
         <CardTitle>Transactions</CardTitle>
         <CardDescription>View your recent transactions.</CardDescription>

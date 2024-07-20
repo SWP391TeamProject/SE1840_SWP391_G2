@@ -1,13 +1,5 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -18,7 +10,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setCurrentPageList, setCurrentPageNumber, setNotifications } from '@/redux/reducers/Notifications';
+import { setCurrentPageList, setNotifications } from '@/redux/reducers/Notifications';
 import { getNotifications, markNotificationRead } from '@/services/NotificationService';
 import { useEffect } from 'react';
 import { MoreHorizontal } from 'lucide-react';
@@ -30,7 +22,7 @@ export default function NotificationsList() {
   const notificationsList = useAppSelector((state) => state.notifications);
   const dispatch = useAppDispatch();
 
-  const fetchAllNotifications = async (page = 0, size = 50) => {
+  const fetchAllNotifications = async (page = 0, size = 10) => {
     try {
       const list = await getNotifications(page, size);
       if (list) {
@@ -73,7 +65,7 @@ export default function NotificationsList() {
   }, []);
 
   return (
-    <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+    <div className="w-full lg:w-3/4">
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
@@ -149,6 +141,6 @@ export default function NotificationsList() {
           </Card>
         </TabsContent>
       </Tabs>
-    </main>
+    </div>
   );
 }
