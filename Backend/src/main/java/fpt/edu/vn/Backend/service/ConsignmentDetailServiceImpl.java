@@ -132,7 +132,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
 
     }
     @Transactional
-    private ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
+    public ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
         List<AttachmentDTO> attachmentIds = null;
         if (consignmentDetail.getAttachments() != null) {
             attachmentIds = consignmentDetail.getAttachments().stream()
@@ -146,7 +146,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
                 consignmentDetail.getType().toString(), // Convert enum to string
                 consignmentDetail.getPrice(),
                 consignmentDetail.getConsignment().getConsignmentId(),
-                new AccountDTO(consignmentDetail.getAccount()),
+                AccountDTO.redacted(consignmentDetail.getAccount()),
                 attachmentIds,
                 consignmentDetail.getCreateDate()
         );
