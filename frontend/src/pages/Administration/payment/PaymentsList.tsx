@@ -42,7 +42,7 @@ export default function PaymentsList() {
   const [reload, setReload] = useState(false);
 
   let pageNumber = url.searchParams.get('page');
-  let sort = url.searchParams.get('sort');
+  let sort = url.searchParams.get('sort') || 'createDate,desc';
   let pageSize = url.searchParams.get('per_page');
   const [paymentPromise, setPaymentPromise] = useState<Promise<any>>();
 

@@ -35,8 +35,8 @@ export const OrderList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const url = new URL(window.location.href);
   let pageNumber = url.searchParams.get('page');
-  let sort = url.searchParams.get('sort')?.split('%2')[0].replace('_', '.').replace('amount', 'paymentAmount');
-  let sortDir = url.searchParams.get('sort')?.split('%2')[1];
+  let sort = url.searchParams.get('sort')?.split('%2')[0].replace('_', '.').replace('amount', 'paymentAmount') || 'createDate';
+  let sortDir = url.searchParams.get('sort')?.split('%2')[1] || 'desc';
   let pageSize = url.searchParams.get('per_page');
   const [orderPromise, setOrderPromise] = useState<Promise<any>>();
 

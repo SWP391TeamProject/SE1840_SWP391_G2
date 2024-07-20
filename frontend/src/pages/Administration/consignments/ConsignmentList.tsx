@@ -33,7 +33,7 @@ export default function ConsignmentList() {
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
   let pageNumber = url.searchParams.get('page');
-  let sort = url.searchParams.get('sort');
+  let sort = url.searchParams.get('sort') || 'createDate,desc';
   let pageSize = url.searchParams.get('per_page');
   const [consignmentPromise, setConsignmentPromise] = useState<Promise<any>>();
 
@@ -126,7 +126,8 @@ export default function ConsignmentList() {
   };
 
   useEffect(() => {
-    if (Number.parseInt(pageNumber) >= 1)
+    if (Number.parseInt(pageNumber) >= 1) {
+      console.log(sort);
       setConsignmentPromise(
         getConsignments({
           page: Number.parseInt(pageNumber),
@@ -134,7 +135,8 @@ export default function ConsignmentList() {
           sort: sort,
           status: selectedStatus,
         })
-      );
+      )
+    } 
   }, [pageSize, pageNumber, sort]);
 
   return (

@@ -107,9 +107,10 @@ export default function AssignAuctionItem() {
 
   const handleSave = () => {
     var tempList: any[] = [];
-    selectedItems.forEach((item) => {
-      tempList.push(item.itemId);
-    });
+    // selectedItems.forEach((item) => {
+    //   tempList.push(item.itemId);
+    // });
+    tempList = selectedItems.concat(existingItems.filter(item2 => !selectedItems.some(item1 => item1.itemId == item2.itemId)));
     assignItem(auction?.auctionSessionId, tempList)
       .then((res) => {
         console.log(res);
@@ -135,9 +136,20 @@ export default function AssignAuctionItem() {
             {/* <Button variant="outline" disabled={selectedItems.length == 0} onClick={handleClear}>
               Clear Selected
             </Button> */}
-            <Button disabled={selectedItems.length == 0} onClick={handleSave}>
+            {/* <Button disabled={selectedItems.length == 0} onClick={handleSave}>
               Save Selected
-            </Button>
+            </Button> */}
+            <ConfirmationButton
+              message={`New selected items will be assigned to this auction session.`}
+              title={'Are you sure to save selected items?'}
+              label={'Remove'}
+              description={''}
+              onSuccess={() => handleSave()}
+              variant="outline"
+              disabled={selectedItems.length == 0}
+            >
+              Save Selected
+            </ConfirmationButton>
           </div>
         </div>
         <div className="border rounded-lg shadow-sm">
