@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface CurrencyService {
     Map<CurrencyType, BigDecimal> getExchangeRates();
-    Double getExchangeRate(CurrencyType currency);
+    BigDecimal getExchangeRate(CurrencyType currency);
     long getLastUpdate();
 }
