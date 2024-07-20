@@ -54,7 +54,7 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public List<AccountDTO> getParticipants(AuctionItemId auctionItemId) {
-        return bidRepos.findAllParticipantsByAuctionItemId(auctionItemId).stream().map(AccountDTO::new).toList();
+        return bidRepos.findAllParticipantsByAuctionItemId(auctionItemId).stream().map(AccountDTO::redacted).toList();
     }
 
     @Override
@@ -129,7 +129,7 @@ public class BidServiceImpl implements BidService {
             BidResponse response = new BidResponse();
             response.setBidId(bid.getBidId());
             response.setAuctionItemId(bid.getAuctionItemId());
-            response.setAccount(new AccountDTO(accountRepos.findById(bid.getAccountId()).orElseThrow(
+            response.setAccount(AccountDTO.redacted(accountRepos.findById(bid.getAccountId()).orElseThrow(
                     () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
             )));
             response.getAccount().setPassword(null);

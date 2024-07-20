@@ -28,7 +28,7 @@ public class BlogPostDTO implements Serializable {
     public BlogPostDTO(BlogPost blogPost) {
         this.postId = blogPost.getPostId();
         this.category = new BlogCategoryDTO(blogPost.getCategory());
-        this.author = new AccountDTO(blogPost.getAuthor());
+        this.author = AccountDTO.redacted(blogPost.getAuthor());
         this.title = blogPost.getTitle();
         this.content = blogPost.getContent();
         this.createDate = blogPost.getCreateDate();

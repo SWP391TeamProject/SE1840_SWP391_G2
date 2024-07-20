@@ -521,7 +521,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     .status(detail.getType().toString())
                     .price(detail.getPrice())
                     .consignmentId(detail.getConsignment().getConsignmentId())
-                    .account(new AccountDTO(detail.getAccount()))
+                    .account(AccountDTO.redacted(detail.getAccount()))
                     .attachments(detail.getAttachments().stream().map(AttachmentDTO::new).toList())
                     .createDate(detail.getCreateDate())
                     .build());

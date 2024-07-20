@@ -34,6 +34,7 @@ public class AccountDTO implements Serializable {
                 .nickname(account.getNickname())
                 .status(account.getStatus())
                 .role(account.getRole())
+                .dummy(account.isDummy())
                 .avatar(account.getAvatarUrl() == null ? null : new AttachmentDTO(account.getAvatarUrl()))
                 .build();
     }
