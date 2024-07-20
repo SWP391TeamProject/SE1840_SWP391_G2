@@ -20,20 +20,24 @@ public class ConsignmentSpecification implements Specification<Consignment> {
         if(keyword == null || keyword.isEmpty()){
             return criteriaBuilder.conjunction();
         }
-        Join<Consignment, Account> joinStaff = root.join("staff", JoinType.LEFT);
         List<Predicate> predicates = new ArrayList<>();
-
+        predicates.add(criteriaBuilder.like(root.get("consignmentId").as(String.class),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("preferContact"),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("createDate").as(String.class), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("updateDate").as(String.class), "%" + keyword +"%"));
         predicates.add(criteriaBuilder.like(root.get("status").as(String.class), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("gemstone"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("measurement"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("condition"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("stamped"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(root.get("metal"), "%" + keyword +"%"));
-        predicates.add(criteriaBuilder.like(joinStaff.get("nickname"), "%" + keyword +"%"));
 
+
+        Join<Consignment, Account> joinUser = root.join("user", JoinType.LEFT);
+        Join<Consignment, Account> joinStaff = root.join("staff", JoinType.LEFT);
+
+        predicates.add(criteriaBuilder.or(
+                criteriaBuilder.isNull(joinUser.get("accountId")),
+                criteriaBuilder.like(joinUser.get("nickname"), "%" + keyword + "%")
+        ));
+        predicates.add(criteriaBuilder.or(
+                criteriaBuilder.isNull(joinStaff.get("accountId")),
+                criteriaBuilder.like(joinStaff.get("nickname"), "%" + keyword + "%")
+        ));
         return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
     }
 }

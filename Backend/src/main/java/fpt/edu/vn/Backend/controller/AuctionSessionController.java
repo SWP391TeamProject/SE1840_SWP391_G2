@@ -44,7 +44,9 @@ public class AuctionSessionController {
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(
             Principal principal,
-            @PageableDefault(size = 50) Pageable pageable) {
+            @PageableDefault(size = 50) Pageable pageable
+
+    ) {
         return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
                 pageable, null, null, null, null,
                 Authorizer.getUserId(principal)));
