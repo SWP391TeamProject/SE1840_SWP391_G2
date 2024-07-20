@@ -13,6 +13,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -42,7 +43,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     public void initialize() {
         fetchExchangeRates();
     }
-
+    @Transactional
     @Override
     public Map<CurrencyType, BigDecimal> getExchangeRates() {
         fetchExchangeRates();
@@ -55,14 +56,14 @@ public class CurrencyServiceImpl implements CurrencyService {
         }
         return Collections.unmodifiableMap(rates);
     }
-
+    @Transactional
     @Override
     public Double getExchangeRate(CurrencyType currency) {
         fetchExchangeRates();
         Object v = redisTemplate.opsForHash().get(EXCHANGE_RATE_KEY, currency.name());
         return v == null ? null : (Double) v;
     }
-
+    @Transactional
     @Override
     public long getLastUpdate() {
         Object v = redisTemplate.opsForValue().get(LAST_FETCH_KEY);

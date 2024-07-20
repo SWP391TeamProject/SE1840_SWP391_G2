@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -67,6 +68,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO mapEntityToDTO(@NotNull Attachment attachment, @NotNull AttachmentDTO attachmentDTO) {
         attachmentDTO.setAttachmentId(attachment.getAttachmentId());
         if (attachment.getLink() != null) {
@@ -80,6 +82,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public @NotNull Attachment mapDTOToEntity(@NotNull AttachmentDTO attachmentDTO, @NotNull Attachment attachment) {
         attachment.setAttachmentId(attachmentDTO.getAttachmentId());
         attachment.setUpdateDate(attachmentDTO.getUpdateDate());
@@ -91,6 +94,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadAttachment(@NotNull MultipartFile file) throws IOException {
         MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
         MimeType mimeType;
@@ -125,6 +129,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public void deleteAttachment(int attachmentId) {
         Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
@@ -137,6 +142,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadAccountAttachment(@NotNull MultipartFile file, int accountId) throws IOException {
         Optional<Account> optionalAccount = accountRepos.findById(accountId);
 
@@ -172,6 +178,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadConsignmentDetailAttachment(@NotNull MultipartFile file, int consignmentDetailId) {
         Optional<ConsignmentDetail> optionalConsignmentDetail = consignmentDetailRepos.findById(consignmentDetailId);
         if (optionalConsignmentDetail.isEmpty()) {
@@ -211,6 +218,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         return mapEntityToDTO(attachment);
     }
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadConsignmentAttachment(@NotNull MultipartFile file, int consignmentId) {
         Optional<Consignment> optionalConsignmentDetail = consignmentRepos.findById(consignmentId);
         if (optionalConsignmentDetail.isEmpty()) {
@@ -251,6 +259,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadItemAttachment(@NotNull MultipartFile file, Integer itemId) throws IOException {
         // Get the Item object from the itemId
         Item item = itemRepository.findById(itemId)
@@ -284,6 +293,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public  void deleteItemAttachment(int attachmentId, int itemId) {
         Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
@@ -295,6 +305,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadBlogAttachment(@NotNull MultipartFile file, Integer blogId) throws IOException {
         // Get the Item object from the itemId
         BlogPost blog = blogPostRepos.findById(blogId)
@@ -327,6 +338,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         return mapEntityToDTO(attachment);
     }
     @Override
+    @Transactional
     public @NotNull AttachmentDTO uploadAuctionAttachment(@NotNull MultipartFile file, Integer auctionId) throws IOException {
         // Get the Item object from the itemId
         AuctionSession auction = auctionRepos.findById(auctionId)

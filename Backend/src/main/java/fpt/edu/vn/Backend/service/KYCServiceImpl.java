@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -52,7 +53,7 @@ public class KYCServiceImpl implements KYCService {
         InputStream is = multipart.getInputStream();
         return ImageIO.read(is);
     }
-
+    @Transactional
     public String parseDate(String dateString) {
         // Adjusted pattern to match the input string format
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -64,7 +65,7 @@ public class KYCServiceImpl implements KYCService {
         System.out.println(formattedDate);  // Outputs: 2004-05-07
         return formattedDate;
     }
-
+    @Transactional
     public boolean validateImage(MultipartFile imageFile) throws IOException {
         // Check if the image file size is less than or equal to 5 MB
         final long maxFileSize = 5 * 1024 * 1024; // 5 MB in bytes
@@ -88,6 +89,7 @@ public class KYCServiceImpl implements KYCService {
 
         return true; // Image passes all validations
     }
+    @Transactional
     public CitizenCardFrontFace verifyFrontFaceImage(MultipartFile fronfaceImage) {
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
         try {
@@ -113,7 +115,7 @@ public class KYCServiceImpl implements KYCService {
 
         return null;
     }
-
+    @Transactional
     public CitizenCardBackFace verifyBackFaceImage(MultipartFile backFaceImage) {
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
         try {
@@ -139,14 +141,14 @@ public class KYCServiceImpl implements KYCService {
 
         return null;
     }
-
+    @Transactional
     @Override
     public CitizenCardDTO kycDetail(Authentication authentication)  {
         Optional<Account> account = accountRepos.findByEmail(authentication.getName());
         return new CitizenCardDTO(account.get().getCitizenCard());
 
     }
-
+    @Transactional
     @Override
     public CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException {
 

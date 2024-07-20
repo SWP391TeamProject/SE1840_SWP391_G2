@@ -25,6 +25,7 @@ public class PaymentSpecification implements Specification<Payment> {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(criteriaBuilder.like(root.get("paymentAmount").as(String.class),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("status").as(String.class),"%" + keyword + "%"));
+        predicates.add(criteriaBuilder.like(root.get("paymentId").as(String.class), "%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("method"),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("type").as(String.class),"%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("createDate").as(String.class),"%" + keyword + "%"));

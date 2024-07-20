@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -63,7 +64,7 @@ public class BlogServiceImpl implements BlogService {
         BlogSpecification spec = new BlogSpecification(keyword);
         return blogPostRepos.findAll(spec,pageable).map(BlogPostDTO::new);
     }
-
+    @Transactional
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {
         BlogPost blogPost = new BlogPost();
         blogPost.setPostId(blogPostDTO.getPostId());
@@ -81,7 +82,7 @@ public class BlogServiceImpl implements BlogService {
     public BlogPostDTO getBlogById(int id) {
         return blogPostRepos.findByPostId(id).map(BlogPostDTO::new).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + id));
     }
-
+    @Transactional
     public BlogPostDTO createBlog(BlogPostDTO BlogPostDTO) {
         BlogPost blogPost = blogPostRepos.save(toEntity(BlogPostDTO));
 
@@ -92,7 +93,7 @@ public class BlogServiceImpl implements BlogService {
 
         return new BlogPostDTO(blogPost);
     }
-
+    @Transactional
     @Override
     //@CacheEvict(allEntries = true, value = "blog", beforeInvocation = true)
     public BlogPostDTO createBlog(BlogCreateDTO blogCreateDTO) {
@@ -120,7 +121,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
 
-
+    @Transactional
     public BlogPostDTO updateBlog(BlogPostDTO BlogPostDTO) {
         return blogPostRepos.findById(BlogPostDTO.getPostId()).map(blogPost -> {
             blogPost.setTitle(BlogPostDTO.getTitle());
@@ -131,7 +132,7 @@ public class BlogServiceImpl implements BlogService {
             return new BlogPostDTO(blogPostRepos.save(blogPost));
         }).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + BlogPostDTO.getPostId()));
     }
-
+    @Transactional
     @Override
     //@CacheEvict(allEntries = true, value = "blog",cacheNames = "blog")
     public BlogPostDTO updateBlog(BlogUpdateDTO blogUpdateDTO) {
@@ -169,7 +170,7 @@ public class BlogServiceImpl implements BlogService {
 
         return blogPostDTO;
     }
-
+    @Transactional
     @Override
     //@CacheEvict(allEntries = true, value = "blog")
     public BlogPostDTO deleteAttachment(int postId, int attachmentId) {
@@ -188,7 +189,7 @@ public class BlogServiceImpl implements BlogService {
         blogPost.setAttachments(attachments);
         return new BlogPostDTO(blogPostRepos.save(blogPost));
     }
-
+    @Transactional
     @Override
     //@CacheEvict(allEntries = true, value = "blog")
     public void deleteBlog(int id) {

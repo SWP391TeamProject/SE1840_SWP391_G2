@@ -26,12 +26,13 @@ public class AuctionSessionSpecification implements Specification<AuctionSession
         List<Predicate> predicates = new ArrayList<>();
 
         // Add predicates for each field you want to search
+        predicates.add(criteriaBuilder.like(root.get("auctionSessionId"), "%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("title"), "%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("status").as(String.class), "%" + keyword + "%"));
-        predicates.add(criteriaBuilder.like(root.get("createDate").as(String.class), "%" + keyword + "%"));
-        predicates.add(criteriaBuilder.like(root.get("updateDate").as(String.class), "%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("startDate").as(String.class), "%" + keyword + "%"));
         predicates.add(criteriaBuilder.like(root.get("endDate").as(String.class), "%" + keyword + "%"));
+        predicates.add(criteriaBuilder.like(root.get("participantCount").as(String.class), "%" + keyword + "%"));
+
         // Combine predicates using OR operator
         return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
     }

@@ -23,6 +23,7 @@ public class AccountSpecification implements Specification<Account> {
             return criteriaBuilder.conjunction();
         }
         List<Predicate> predicate = new ArrayList<>();
+        predicate.add(criteriaBuilder.like(root.get("accountId"),"%" + keyword + "%"));
         predicate.add(criteriaBuilder.like(root.get("email"),"%" + keyword + "%"));
         predicate.add(criteriaBuilder.like(root.get("phone"), "%" + keyword + "%"));
         predicate.add(criteriaBuilder.like(root.get("role").as(String.class),"%" + keyword +"%"));

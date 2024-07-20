@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,7 +64,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
                 .orElseThrow(() -> new ResourceNotFoundException("Consignment detail not found with id " + consignmentDetailId));
         return new ConsignmentDetailDTO(consignmentDetail);
     }
-
+    @Transactional
     @Override
     //@CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
@@ -98,7 +99,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
         }
     }
 
-
+    @Transactional
     @Override
     //@CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
@@ -130,7 +131,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             return new ConsignmentDetailDTO(savedConsignmentDetail);
 
     }
-
+    @Transactional
     private ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
         List<AttachmentDTO> attachmentIds = null;
         if (consignmentDetail.getAttachments() != null) {
