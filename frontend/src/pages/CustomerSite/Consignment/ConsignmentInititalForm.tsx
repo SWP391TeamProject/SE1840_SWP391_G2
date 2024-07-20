@@ -114,13 +114,15 @@ export default function ConsignmentInititalForm() {
         <div className="w-full min-h-screen flex flex-row flex-nowrap container">
           <div
             key="1"
-            className="flex gap-3 justify-start align-top flex-col basis-4/4 md:basis-2/4 max-w-6xl p-4 sm:p-6 md:p-8"
+            className="flex gap-6 justify-start align-top flex-col basis-4/4 md:basis-2/4 max-w-6xl p-4 sm:p-6 md:p-8"
           >
             <div>
               <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">List your item for consignment</h1>
               <p className="mt-2 text-gray-500 dark:text-gray-400">
                 Fill out the form below to list your item for consignment. We'll review your submission and get back to
-                you within 2 business days.
+                you within 2 business days.<br/>
+                <b className="text-red-500">Only one item may be submitted per form.</b>&nbsp;
+                To consign multiple items, please submit separate requests.
               </p>
             </div>
 
@@ -238,6 +240,12 @@ export default function ConsignmentInititalForm() {
                 <Separator />
 
                 <h1 className="text-2xl font-bold">Jewelry information</h1>
+
+                <p className="text-gray-500 dark:text-gray-400">
+                  Please provide a detailed description of your item.
+                  If any information is unknown, please leave the corresponding field blank.
+                  A subsequent analysis of your item will be conducted by our experts.
+                </p>
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
