@@ -1,30 +1,15 @@
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ItemStatus } from "@/constants/enums";
-import { Item } from "@/models/Item";
-import { useAppDispatch } from "@/redux/hooks";
-import { setCurrentItem } from "@/redux/reducers/Items";
-import { getItemsByStatus } from "@/services/ItemService";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useParams } from "react-router-dom";
-
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ItemStatus } from '@/constants/enums';
+import { Item } from '@/models/Item';
+import { useAppDispatch } from '@/redux/hooks';
+import { setCurrentItem } from '@/redux/reducers/Items';
+import { getItemsByStatus } from '@/services/ItemService';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useParams } from 'react-router-dom';
 
 const ItemCard = ({ item }: { item: Item }) => {
   return (
@@ -36,8 +21,8 @@ const ItemCard = ({ item }: { item: Item }) => {
           height="225"
           src="/placeholder.svg"
           style={{
-            aspectRatio: "400/225",
-            objectFit: "cover",
+            aspectRatio: '400/225',
+            objectFit: 'cover',
           }}
         />
       </CardHeader>
@@ -116,8 +101,8 @@ export default function AddAuctionItems() {
 
                   <TableCell className="flex justify-center">
                     <Button
-                      variant={"outline"}
-                      size={"sm"}
+                      variant={'outline'}
+                      size={'sm'}
                       onClick={() => {
                         setSelectedItems([...selectedItems, item]);
                       }}

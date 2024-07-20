@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public interface PaymentService {
 
@@ -25,6 +26,8 @@ public interface PaymentService {
     void updatePaymentByStatus(UpdatePaymentStatusRequestDTO request);
 
     String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr) throws UnsupportedEncodingException;
+
+    List<PaymentDTO> getUserPayments(String email);
 
     String capturePayment(PaymentCaptureRequestDTO dto);
     Page<Payment> searchPayment(String keyword,Pageable pageable);

@@ -1,13 +1,12 @@
-import { ConsignmentDetailType } from "@/constants/enums";
-import { Account, Attachment } from "@/constants/interfaces";
+import { ConsignmentDetailType } from '@/constants/enums';
+import { Account, Attachment } from '@/constants/interfaces';
 
-
-export interface ConsignmentDetail{
-    consignmentDetailId?:number;
-    description?:string;
-    status?: ConsignmentDetailType;
-    price?:number;
-    conisgnmentId?:number;
-    account?:Account;
-    attachments?:[Attachment];
+export interface ConsignmentDetail {
+  consignmentDetailId?: number;
+  description?: string;
+  status?: ConsignmentDetailType;
+  price?: number;
+  conisgnmentId?: number;
+  account?: Account;
+  attachments?: [Attachment];
 }

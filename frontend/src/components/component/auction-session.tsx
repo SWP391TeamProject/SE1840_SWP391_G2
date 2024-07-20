@@ -17,21 +17,16 @@ To read more about using these font, please visit the Next.js documentation:
 - App Directory: https://nextjs.org/docs/app/building-your-application/optimizing/fonts
 - Pages Directory: https://nextjs.org/docs/pages/building-your-application/optimizing/fonts
 **/
-import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { CardTitle, CardHeader, CardContent, Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export function AuctionSession() {
   return (
-    <div
-      key="1"
-      className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 p-4 md:p-8 lg:p-12"
-    >
+    <div key="1" className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 p-4 md:p-8 lg:p-12">
       <div className="flex flex-col gap-8">
         <div className="grid gap-2">
           <h1 className="text-3xl font-bold">Auction Name</h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            View this auction lots
-          </p>
+          <p className="text-gray-500 dark:text-gray-400">View this auction lots</p>
         </div>
         <div className="grid gap-6">
           <Card>
@@ -43,9 +38,8 @@ export function AuctionSession() {
                 <div className="grid gap-2">
                   <h2 className="text-xl font-semibold">Spring Art Auction</h2>
                   <p className="text-gray-500 dark:text-gray-400">
-                    Join us for an exciting auction featuring a curated
-                    collection of contemporary art pieces. Bidding starts on May
-                    1st.
+                    Join us for an exciting auction featuring a curated collection of contemporary art pieces. Bidding
+                    starts on May 1st.
                   </p>
                 </div>
                 <Button size="lg">Register</Button>
@@ -69,9 +63,7 @@ export function AuctionSession() {
                   />
                   <div className="grid gap-1">
                     <h3 className="font-semibold">Lot 1: Abstract Painting</h3>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Acrylic on canvas, 24" x 36"
-                    </p>
+                    <p className="text-gray-500 dark:text-gray-400">Acrylic on canvas, 24" x 36"</p>
                     <div className="font-semibold">$1,500 - $2,000</div>
                   </div>
                 </CardContent>
@@ -87,9 +79,7 @@ export function AuctionSession() {
                   />
                   <div className="grid gap-1">
                     <h3 className="font-semibold">Lot 2: Ceramic Vase</h3>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Handcrafted, 8" tall
-                    </p>
+                    <p className="text-gray-500 dark:text-gray-400">Handcrafted, 8" tall</p>
                     <div className="font-semibold">$500 - $800</div>
                   </div>
                 </CardContent>
@@ -105,9 +95,7 @@ export function AuctionSession() {
                   />
                   <div className="grid gap-1">
                     <h3 className="font-semibold">Lot 3: Vintage Typewriter</h3>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Fully restored, 1950s model
-                    </p>
+                    <p className="text-gray-500 dark:text-gray-400">Fully restored, 1950s model</p>
                     <div className="font-semibold">$300 - $500</div>
                   </div>
                 </CardContent>

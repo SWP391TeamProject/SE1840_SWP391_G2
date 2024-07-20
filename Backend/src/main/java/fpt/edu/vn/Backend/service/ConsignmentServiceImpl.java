@@ -520,6 +520,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     .consignmentId(detail.getConsignment().getConsignmentId())
                     .account(new AccountDTO(detail.getAccount()))
                     .attachments(detail.getAttachments().stream().map(AttachmentDTO::new).toList())
+                    .createDate(detail.getCreateDate())
                     .build());
         }
         return new PageImpl<>(consignmentDetailDTOs);

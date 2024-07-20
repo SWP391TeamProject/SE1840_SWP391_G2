@@ -84,20 +84,26 @@ public class BidServiceImpl implements BidService {
     @Override
     @Transactional
     public BidDTO createBid(BidDTO bid) {
-        Bid newBid = new Bid();
-        newBid.setBidId(bid.getBidId());
+        Account acc = accountRepos.findById(bid.getAccountId()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
+        );
         AuctionItem auctionItem = auctionItemRepos.findById(bid.getAuctionItemId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid auction item id: " + bid.getAuctionItemId())
         );
+        boolean newParticipant = !bidRepos.existsByAuctionItem_AuctionItemIdAndAccount_AccountId(
+                bid.getAuctionItemId(), bid.getAccountId());
+        Bid newBid = new Bid();
+        newBid.setBidId(bid.getBidId());
         newBid.setAuctionItem(auctionItem);
         newBid.setAmount(bid.getAmount());
         newBid.setStatus(bid.getStatus());
-        newBid.setAccount(accountRepos.findById(bid.getAccountId()).orElseThrow(
-                () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
-        ));
+        newBid.setAccount(acc);
         newBid.setCreatedDate(bid.getCreatedDate());
         newBid = bidRepos.save(newBid);
         auctionItem.setBidCount(auctionItem.getBidCount() + 1);
+        if (newParticipant) {
+            auctionItem.setParticipantCount(auctionItem.getParticipantCount() + 1);
+        }
         auctionItemRepos.save(auctionItem);
         return new BidDTO(newBid);
     }
@@ -152,7 +158,7 @@ public class BidServiceImpl implements BidService {
     @Override
     public List<BidDTO> getBidsByAuctionId(int auctionId) {
         try {
-            return bidRepos.findAllByAuctionItem_AuctionSession_AuctionSessionId(auctionId).stream().map(BidDTO::new).toList();
+            return bidRepos.findAllByAuctionItem_AuctionSession_AuctionSessionIdOrderByAmountDesc(auctionId).stream().map(BidDTO::new).toList();
         }catch (Exception e){
             throw new InvalidInputException("Invalid auction item id: " + auctionId);
         }

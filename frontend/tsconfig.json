@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "noEmitOnError" :false,
+    "noEmitOnError": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

@@ -1,4 +1,4 @@
-import { useFormContext } from "react-hook-form";
+import { useFormContext } from 'react-hook-form';
 
 export default function FileInput({ name }: { name: string }) {
   const { register } = useFormContext();

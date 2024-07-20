@@ -9,20 +9,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog';
 export const DeleteAcc = ({ display }: { display: boolean }) => {
-
   const [show, setShow] = useState(display);
   const handleClose = () => setShow(false);
 
   return (
-    <AlertDialog open={show} >
+    <AlertDialog open={show}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action will ban the account temporary.
-          </AlertDialogDescription>
+          <AlertDialogDescription>This action will ban the account temporary.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleClose}>Cancel</AlertDialogCancel>
@@ -30,6 +27,5 @@ export const DeleteAcc = ({ display }: { display: boolean }) => {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-
   );
-}
+};

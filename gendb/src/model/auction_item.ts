@@ -3,6 +3,7 @@ export interface AuctionItem {
     itemId: number,
     currentPrice: number,
     bidCount: number,
+    participantCount: number,
     createDate: Date,
     updateDate: Date
 }

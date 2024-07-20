@@ -1,15 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit'
-import accountsReducer from './reducers/Accounts'
-import auctionSessionReducer from './reducers/AuctionSession'
-import consignmentsReducer from './reducers/Consignments'
-import itemsReducer from './reducers/Items'
-import inventoryReducer from './reducers/Inventory'
-import notificationsReducer from './reducers/Notifications'
-import paymentsReducer from './reducers/Payments'
-import blogReducer from './reducers/Blogs' // Import the 'blogReducer' from the appropriate file
-import orderReducer from './reducers/Orders' // Import the 'blogReducer' from the appropriate file
-import unreadNotificationCountReducer
-  from "@/redux/reducers/UnreadNotificationCountReducer.ts";
+import { configureStore } from '@reduxjs/toolkit';
+import accountsReducer from './reducers/Accounts';
+import auctionSessionReducer from './reducers/AuctionSession';
+import consignmentsReducer from './reducers/Consignments';
+import itemsReducer from './reducers/Items';
+import inventoryReducer from './reducers/Inventory';
+import notificationsReducer from './reducers/Notifications';
+import paymentsReducer from './reducers/Payments';
+import blogReducer from './reducers/Blogs'; // Import the 'blogReducer' from the appropriate file
+import orderReducer from './reducers/Orders'; // Import the 'blogReducer' from the appropriate file
+import unreadNotificationCountReducer from '@/redux/reducers/UnreadNotificationCountReducer.ts';
 
 export const store = configureStore({
   reducer: {
@@ -24,8 +23,8 @@ export const store = configureStore({
     unreadNotificationCount: unreadNotificationCountReducer,
     payments: paymentsReducer,
   },
-})
+});
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
-export type AppStore = typeof store
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export type AppStore = typeof store;

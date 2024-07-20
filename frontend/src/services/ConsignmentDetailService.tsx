@@ -1,89 +1,83 @@
- import { SERVER_DOMAIN_URL } from "@/constants/domain";
-import { getCookie } from "@/utils/cookies";
-import axios from "@/config/axiosConfig.ts";
+import { SERVER_DOMAIN_URL } from '@/constants/domain';
+import { getCookie } from '@/utils/cookies';
+import axios from '@/config/axiosConfig.ts';
 
 const URL = `${SERVER_DOMAIN_URL}/api/consignmentDetails/`;
 
-export const fetchConsigntmentDetailByConsignmentId = async (id:number) => {
+export const fetchConsigntmentDetailByConsignmentId = async (id: number) => {
   return await axios
-    .get(URL+id, {
+    .get(URL + id, {
       headers: {
-        "Content-Type": "application/json",
-          
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .then((res) => {
       console.log(res.data);
-      return res}) // return the data here
+      return res;
+    }) // return the data here
     .catch((err) => {
       console.log(err);
       throw err; // make sure to throw the error so it can be caught by the query
     });
 };
-export const fetchConsigntmentDetailByConsignmentDetailId = async (id:number) => {
-    return await axios
-      .get(URL+"detail/"+id, {
-        headers: {
-          "Content-Type": "application/json",
-            
-          Authorization:
-            "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-        },
-      })
-      .then((res) => {
-        
-        return res.data}) // return the data here
-      .catch((err) => {
-        console.log(err);
-        throw err; // make sure to throw the error so it can be caught by the query
-      });
-  };
-export const updateConsignmentDetailService = async (data: any,id :number) => {
+export const fetchConsigntmentDetailByConsignmentDetailId = async (id: number) => {
   return await axios
-    .put(URL+"update/"+id, data, {
+    .get(URL + 'detail/' + id, {
       headers: {
-        "Content-Type": "application/json",
-          
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+    })
+    .then((res) => {
+      return res.data;
+    }) // return the data here
+    .catch((err) => {
+      console.log(err);
+      throw err; // make sure to throw the error so it can be caught by the query
+    });
+};
+export const updateConsignmentDetailService = async (data: any, id: number) => {
+  return await axios
+    .put(URL + 'update/' + id, data, {
+      headers: {
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .catch((err) => console.log(err));
 };
 
 export const createInitialEvaluation = async (data: any) => {
-  return await axios
-    .post(URL+"createInitialEvaluation", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-          
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-      },
-    })
+  return await axios.post(URL + 'createInitialEvaluation', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+  });
 };
 export const createFinalEvaluation = async (data: any) => {
-  return await axios
-    .post(URL+"createFinalEvaluation", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-          
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-      },
-    })
+  return await axios.post(URL + 'createFinalEvaluation', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+  });
 };
 
 export const exportConsignmentDetails = async () => {
   return await fetch(`${SERVER_DOMAIN_URL}/api/consignmentDetails/export`, {
     method: 'GET',
     headers: {
-      Authorization:
-        "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
     },
-  }).then((response) => response.blob())
+  })
+    .then((response) => response.blob())
     .then((blob) => {
       // Create a blob URL and create a link element to trigger the download
       const blobUrl = window.URL.createObjectURL(blob);
@@ -97,5 +91,5 @@ export const exportConsignmentDetails = async () => {
     })
     .catch((error) => {
       console.error('Error fetching Excel file:', error);
-    });;
+    });
 };

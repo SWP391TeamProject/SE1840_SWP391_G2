@@ -53,4 +53,15 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
 
     @Query("SELECT aj.auctionSession FROM AuctionItem aj WHERE aj.auctionItemId.itemId = :itemId ORDER BY aj.auctionSession.startDate DESC, aj.auctionSession.endDate DESC")
     Page<AuctionSession> findAuctionSessionsHasItem(int itemId, Pageable pageable);
+
+    @Query("""
+        SELECT auction FROM AuctionSession auction 
+        WHERE auction.status <> 'TERMINATED' AND 
+        ((:startDate BETWEEN auction.startDate AND auction.endDate) OR 
+        (:endDate BETWEEN auction.startDate AND auction.endDate) OR 
+        (auction.startDate BETWEEN :startDate AND :endDate) OR 
+        (auction.endDate BETWEEN :startDate AND :endDate))
+    """)
+    AuctionSession getConflictingSession(@Param("startDate") LocalDateTime startDate,
+                                      @Param("endDate") LocalDateTime endDate);
 }

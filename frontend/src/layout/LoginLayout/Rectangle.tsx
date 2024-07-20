@@ -1,7 +1,7 @@
-import React from "react";
-import { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import React from 'react';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(useGSAP);
 
@@ -15,8 +15,8 @@ export default function Rectangle() {
         scaleX: 0.5,
         scaleY: 0.5,
         rotate: 360,
-        animation: "bounce 2s infinite",
-        ease: "power2.inOut",
+        animation: 'bounce 2s infinite',
+        ease: 'power2.inOut',
       });
     },
     { scope: rectangleObject }

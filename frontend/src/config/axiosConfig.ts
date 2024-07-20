@@ -2,7 +2,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import axios from 'axios';
 import { redirect, useNavigate } from 'react-router-dom';
-import {removeCookie} from "@/utils/cookies.ts";
+import { removeCookie } from '@/utils/cookies.ts';
 
 const instance = axios.create({
   // You can put your base URL here
@@ -10,7 +10,6 @@ const instance = axios.create({
 });
 
 instance.interceptors.response.use(
-
   function (response) {
     // If the response was successful, just return it
     return response;

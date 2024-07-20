@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 // third-party
 import ReactApexChart from 'react-apexcharts';
 import { getNewUsersByYear } from '@/services/StatisticServices';
-import { AxiosResponse } from "@/config/axiosConfig.ts";
+import { AxiosResponse } from '@/config/axiosConfig.ts';
 
 // chart options
 const areaChartOptions = {
@@ -14,15 +14,15 @@ const areaChartOptions = {
     height: 450,
     type: 'area',
     toolbar: {
-      show: false
-    }
+      show: false,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   stroke: {
     curve: 'smooth',
-    width: 2
+    width: 2,
   },
   grid: {
     strokeDashArray: 4,
@@ -33,7 +33,7 @@ const areaChartOptions = {
 };
 
 interface MonthlyUserData {
-  month: number,
+  month: number;
   totalUser: number;
 }
 
@@ -52,15 +52,25 @@ export default function NewUserAreaChart({ slot }) {
   const [series, setSeries] = useState([]);
   const getMonthName = (monthNumber) => {
     const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return monthNames[monthNumber - 1];
   };
 
   useEffect(() => {
     getNewUsersByYear(new Date().getUTCFullYear()).then((response: AxiosResponse<GetMonthlyUserResponse>) => {
-      const data: MonthlyUserData[] = response.data; 
+      const data: MonthlyUserData[] = response.data;
       setOptions((prevState) => ({
         ...prevState,
         colors: [theme.palette.primary.main, theme.palette.primary[700]],
@@ -94,7 +104,7 @@ export default function NewUserAreaChart({ slot }) {
 
   useEffect(() => {
     getNewUsersByYear(new Date().getUTCFullYear()).then((response: AxiosResponse<GetMonthlyUserResponse>) => {
-      const data:MonthlyUserData[] = response.data;
+      const data: MonthlyUserData[] = response.data;
       setSeries([
         {
           name: 'Page Views',

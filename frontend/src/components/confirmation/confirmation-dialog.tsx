@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { type Row } from "@tanstack/react-table"
+import * as React from 'react';
+import { type Row } from '@tanstack/react-table';
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -13,17 +13,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 
-
-interface ConfirmationDialogProps
-  extends React.ComponentPropsWithoutRef<typeof Dialog> {
-  showTrigger?: boolean
-  onSuccess: () => void
-  message: string
-  title: string
-  label: string
-  description: string
+interface ConfirmationDialogProps extends React.ComponentPropsWithoutRef<typeof Dialog> {
+  showTrigger?: boolean;
+  onSuccess: () => void;
+  message: string;
+  title: string;
+  label: string;
+  description: string;
 }
 
 export function ConfirmationDialog({
@@ -39,17 +37,13 @@ export function ConfirmationDialog({
 
   return (
     <>
-      <Dialog {...props} >
+      <Dialog {...props}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>
-              {description}
-            </DialogDescription>
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <div className="w grid gap-4 py-4">
-              {message}
-          </div>
+          <div className="w grid gap-4 py-4">{message}</div>
           <DialogFooter className="gap-2 sm:space-x-0">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
@@ -69,6 +63,5 @@ export function ConfirmationDialog({
           //   {label}
           // </Button> */}
     </>
-
-  )
+  );
 }

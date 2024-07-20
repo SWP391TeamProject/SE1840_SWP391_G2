@@ -1,6 +1,6 @@
-export interface ItemCategory{
-    itemCategoryId?:number;
-    name?:string;
-    createDate?:Date;
-    updateDate?:Date;
+export interface ItemCategory {
+  itemCategoryId?: number;
+  name?: string;
+  createDate?: Date;
+  updateDate?: Date;
 }

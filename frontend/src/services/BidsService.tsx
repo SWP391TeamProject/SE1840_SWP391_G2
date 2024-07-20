@@ -1,21 +1,19 @@
-import { SERVER_DOMAIN_URL } from "@/constants/domain";
-import { getCookie } from "@/utils/cookies";
-import axios from "@/config/axiosConfig.ts";
-
+import { SERVER_DOMAIN_URL } from '@/constants/domain';
+import { getCookie } from '@/utils/cookies';
+import axios from '@/config/axiosConfig.ts';
 
 export const fetchBidsByAccount = async (id: number) => {
   return await axios
     .get(`${SERVER_DOMAIN_URL}/api/bids/` + id, {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
 
-        Authorization:
-          "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
     })
     .then((res) => {
       console.log(res.data.content);
-      return res
+      return res;
     }) // return the data here
     .catch((err) => {
       console.log(err);
@@ -27,10 +25,10 @@ export const exportBids = async () => {
   return await fetch(`${SERVER_DOMAIN_URL}/api/bids/export`, {
     method: 'GET',
     headers: {
-      Authorization:
-        "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
     },
-  }).then((response) => response.blob())
+  })
+    .then((response) => response.blob())
     .then((blob) => {
       // Create a blob URL and create a link element to trigger the download
       const blobUrl = window.URL.createObjectURL(blob);
@@ -44,27 +42,22 @@ export const exportBids = async () => {
     })
     .catch((error) => {
       console.error('Error fetching Excel file:', error);
-    });;
+    });
 };
-
 
 export const fetchBidsByAuctionId = async (auctionId: number) => {
   return await axios
     .get(`${SERVER_DOMAIN_URL}/api/bids/auction/` + auctionId, {
       headers: {
-        "Content-Type": "application/json",
-
+        'Content-Type': 'application/json',
       },
     })
     .then((res) => {
       console.log(res.data.content);
-      return res
+      return res;
     }) // return the data here
     .catch((err) => {
       console.log(err);
       throw err; // make sure to throw the error so it can be caught by the query
     });
 };
-
-
-

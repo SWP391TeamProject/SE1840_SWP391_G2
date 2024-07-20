@@ -11,12 +11,11 @@ import Box from '@mui/material/Box';
 import MainCard from './MainCard';
 import NewUserAreaChart from './NewUserAreaChart';
 
-
 // ==============================|| DEFAULT - UNIQUE VISITOR ||============================== //
 
 export default function UniqueVisitorCard() {
   const [slot, setSlot] = useState('month');
-  
+
   return (
     <>
       <Grid container alignItems="center" justifyContent="space-between">

@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -80,6 +81,11 @@ public class PaymentController {
     public ResponseEntity<String> capturePayment(@RequestBody PaymentCaptureRequestDTO dto) {
         String res = paymentService.capturePayment(dto);
         return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<PaymentDTO>> getPaymentHistory(Principal principal) {
+        return ResponseEntity.ok(paymentService.getUserPayments(principal.getName() ));
     }
 
     @GetMapping("/vnpay_ipn")

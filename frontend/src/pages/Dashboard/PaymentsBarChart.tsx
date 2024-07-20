@@ -14,40 +14,40 @@ const barChartOptions = {
     type: 'bar',
     height: 365,
     toolbar: {
-      show: false
-    }
+      show: false,
+    },
   },
   plotOptions: {
     bar: {
       columnWidth: '45%',
-      borderRadius: 4
-    }
+      borderRadius: 4,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   xaxis: {
     categories: [],
     axisBorder: {
-      show: false
+      show: false,
     },
     axisTicks: {
-      show: false
-    }
+      show: false,
+    },
   },
   yaxis: {
-    show: false
+    show: false,
   },
   grid: {
-    show: false
-  }
+    show: false,
+  },
 };
 
 // ==============================|| MONTHLY BAR CHART ||============================== //
 
 export default function PaymentsBarChart({ selectedLabel }) {
   const theme = useTheme();
-  
+
   const { primary, secondary } = theme.palette.text;
   const info = theme.palette.info.light;
 
@@ -61,29 +61,39 @@ export default function PaymentsBarChart({ selectedLabel }) {
         ...prevState.xaxis,
         labels: {
           style: {
-            colors: new Array(12).fill(secondary) // Assuming 12 months
-          }
-        }
-      }
+            colors: new Array(12).fill(secondary), // Assuming 12 months
+          },
+        },
+      },
     }));
   }, [primary, info, secondary]);
 
-  const [series,setSeries] = useState([
+  const [series, setSeries] = useState([
     {
-      data: [80, 95, 70, 42, 65, 55, 78]
-    }
+      data: [80, 95, 70, 42, 65, 55, 78],
+    },
   ]);
 
   useEffect(() => {
     getPaymentByStatus(selectedLabel)
-      .then(response => {
+      .then((response) => {
         if (Array.isArray(response)) {
           const data = response;
           const monthNames = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
           ];
-          const formattedData = data.map(item => {
+          const formattedData = data.map((item) => {
             const date = new Date(item.date);
             const monthName = monthNames[date.getMonth()];
             return { ...item, monthName };
@@ -91,26 +101,25 @@ export default function PaymentsBarChart({ selectedLabel }) {
 
           setSeries([
             {
-              data: formattedData.map(item => item.totalAmount)
-            }
+              data: formattedData.map((item) => item.totalAmount),
+            },
           ]);
-  
+
           setOptions((prevState) => ({
             ...prevState,
             xaxis: {
               ...prevState.xaxis,
-              categories: formattedData.map(item => item.monthName)
-            }
+              categories: formattedData.map((item) => item.monthName),
+            },
           }));
         } else {
-          console.error("Response data is not an array", response);
+          console.error('Response data is not an array', response);
         }
       })
-      .catch(error => {
-        console.error("Error fetching data", error);
+      .catch((error) => {
+        console.error('Error fetching data', error);
       });
   }, [selectedLabel]);
-
 
   return (
     <Box id="chart" sx={{ bgcolor: 'transparent' }}>

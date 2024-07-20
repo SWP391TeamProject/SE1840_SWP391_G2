@@ -40,7 +40,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(InvalidInputException.class)
   public ResponseEntity<Object> handleBadRequestException(Exception ex, WebRequest request) {
-    ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), extractMessage(ex), new Date());
+    ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(),ex.getMessage(), new Date());
     return handleExceptionInternal(ex, error, HEADERS, HttpStatus.BAD_REQUEST, request);
   }
 

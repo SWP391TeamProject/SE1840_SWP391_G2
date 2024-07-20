@@ -1,16 +1,16 @@
-import axios from "@/config/axiosConfig.ts";
-import { AuthResponse } from "@/models/AuthResponse";
-import { Login } from "@/models/Login";
-import { Register } from "@/models/Register";
-import { getCookie } from "@/utils/cookies";
-import { AUTH_SERVER } from "@/constants/domain";
-import {AxiosResponse} from "@/config/axiosConfig.ts";
+import axios from '@/config/axiosConfig.ts';
+import { AuthResponse } from '@/models/AuthResponse';
+import { Login } from '@/models/Login';
+import { Register } from '@/models/Register';
+import { getCookie } from '@/utils/cookies';
+import { AUTH_SERVER } from '@/constants/domain';
+import { AxiosResponse } from '@/config/axiosConfig.ts';
 
 const baseUrl = AUTH_SERVER;
 
 const authHeader = {
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     // "Access-Control-Allow-Origin": "*"
   },
 };
@@ -23,9 +23,13 @@ export const login = async (loginDTO: Login): Promise<AuthResponse> => {
 };
 
 export const logout = async (): Promise<void> => {
-  await axios.post(`${baseUrl}/logout`, {
-    token: JSON.parse(getCookie("user")).accessToken,
-  }, authHeader);
+  await axios.post(
+    `${baseUrl}/logout`,
+    {
+      token: JSON.parse(getCookie('user')).accessToken,
+    },
+    authHeader
+  );
 };
 
 export const loginWithGoogle = async (token: string | null): Promise<AuthResponse> => {
@@ -51,29 +55,27 @@ export const register = async (registerDTO: Register): Promise<AuthResponse> => 
 
 export const requestResetPassword = async (dto: { email: string }): Promise<void> => {
   await axios.post(`${baseUrl}/request-reset-password/`, dto, {
-    ...authHeader
+    ...authHeader,
   });
 };
 
-export const resetPassword = async (dto: { code: string, password: string }): Promise<void> => {
+export const resetPassword = async (dto: { code: string; password: string }): Promise<void> => {
   await axios.post(`${baseUrl}/reset-password/`, dto, {
-    ...authHeader
+    ...authHeader,
   });
 };
 
 export const requestActivateAccount = async (dto: { email: string }): Promise<void> => {
   await axios.post(`${baseUrl}/request-activate-account/`, dto, {
-    ...authHeader
+    ...authHeader,
   });
 };
-
 
 export const requestChangePassword = async (data, id): Promise<void> => {
   await axios.post(`${baseUrl}/change-password/${id}`, data, {
-    ...authHeader
+    ...authHeader,
   });
 };
-
 
 export const activateAccount = async (code: string): Promise<void> => {
   await axios.post(`${baseUrl}/activate-account/`, null, {
@@ -82,7 +84,6 @@ export const activateAccount = async (code: string): Promise<void> => {
   });
 };
 
-
 export const verify2fa = async (code: string): Promise<AxiosResponse<AuthResponse>> => {
   return axios.post<AuthResponse>(`${baseUrl}/verify-2fa/`, null, {
     ...authHeader,
@@ -90,12 +91,15 @@ export const verify2fa = async (code: string): Promise<AxiosResponse<AuthRespons
   });
 };
 
-export const changePassword = async (id: number, dto: {
-  oldPassword?: string;
-  newPassword?: string;
-  confirmPassword?: string;
-}): Promise<void> => {
+export const changePassword = async (
+  id: number,
+  dto: {
+    oldPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }
+): Promise<void> => {
   await axios.post(`${baseUrl}/change-password/${id}`, dto, {
-    ...authHeader
+    ...authHeader,
   });
 };

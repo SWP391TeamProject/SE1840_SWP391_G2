@@ -1,7 +1,7 @@
-import { AuctionItem, Payment } from "@/constants/interfaces";
+import { AuctionItem, Payment } from '@/constants/interfaces';
 
-export interface Bid{
-    bidId?:number;
-    auctionItemId?:AuctionItem;
-    payment?:Payment;
+export interface Bid {
+  bidId?: number;
+  auctionItemId?: AuctionItem;
+  payment?: Payment;
 }

@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 // header style
 const headerSX = {
   p: 2.5,
-  '& .MuiCardHeader-action': { m: '0px auto', alignSelf: 'center' }
+  '& .MuiCardHeader-action': { m: '0px auto', alignSelf: 'center' },
 };
 
 function MainCard(
@@ -33,7 +33,7 @@ function MainCard(
 ) {
   const theme = useTheme();
   boxShadow = theme.palette.mode === 'dark' ? boxShadow || true : boxShadow;
-  
+
   return (
     <Card
       elevation={elevation || 0}
@@ -45,20 +45,24 @@ function MainCard(
         borderColor: 'rgba(0, 0, 0, 0.12)',
         boxShadow: boxShadow ? shadow || theme.shadows[1] : 'inherit',
         ':hover': {
-          boxShadow: boxShadow ? shadow || theme.shadows[1] : 'inherit'
+          boxShadow: boxShadow ? shadow || theme.shadows[1] : 'inherit',
         },
         '& pre': {
           m: 0,
           p: '16px !important',
           fontFamily: theme.typography.fontFamily,
-          fontSize: '0.75rem'
+          fontSize: '0.75rem',
         },
-        ...sx
+        ...sx,
       }}
     >
       {/* card header and action */}
-      {!darkTitle && title && <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'subtitle1' }} title={title} action={secondary} />}
-      {darkTitle && title && <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />}
+      {!darkTitle && title && (
+        <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'subtitle1' }} title={title} action={secondary} />
+      )}
+      {darkTitle && title && (
+        <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />
+      )}
 
       {/* card content */}
       {content && <CardContent sx={contentSX}>{children}</CardContent>}
@@ -84,5 +88,5 @@ MainCard.propTypes = {
   sx: PropTypes.object,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   modal: PropTypes.bool,
-  others: PropTypes.any
+  others: PropTypes.any,
 };
