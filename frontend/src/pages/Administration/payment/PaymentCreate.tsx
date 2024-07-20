@@ -1,43 +1,29 @@
-import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
-import {z} from "zod"
-import {Button} from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {Input} from "@/components/ui/input"
-import {useEffect, useState} from "react"
-import {toast} from "sonner"
-import {useNavigate} from "react-router-dom"
-import {useAuth} from "@/AuthProvider.tsx";
-import LoadingAnimation
-  from "@/components/loadingAnimation/LoadingAnimation.tsx";
-import { ConfirmationDialog } from "@/components/confirmation/confirmation-dialog"
-import {getErrorMessage, showErrorToast} from "@/lib/handle-error"
-import {createPayment} from "@/services/PaymentsService.ts";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {useCurrency} from "@/CurrencyProvider.tsx";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/AuthProvider.tsx';
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation.tsx';
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
+import { createPayment } from '@/services/PaymentsService.ts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useCurrency } from '@/CurrencyProvider.tsx';
 
 enum PaymentType {
-  DEPOSIT = "DEPOSIT",
-  WITHDRAW = "WITHDRAW"
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
 }
 
 const FormSchema = z.object({
   accountId: z.coerce.number(),
   amount: z.coerce.number(),
-  type: z.nativeEnum(PaymentType)
+  type: z.nativeEnum(PaymentType),
 });
 
 export default function PaymentCreate() {
@@ -53,9 +39,9 @@ export default function PaymentCreate() {
     defaultValues: {
       accountId: auth.user.accountId,
       amount: 0,
-      type: undefined
+      type: undefined,
     },
-  })
+  });
 
   function onSubmit(_: z.infer<typeof FormSchema>) {
     setShowTrigger(true);
@@ -64,24 +50,24 @@ export default function PaymentCreate() {
   const handleConfirmed = (data: z.infer<typeof FormSchema>) => {
     toast.promise(createPayment(data), {
       loading: 'Finishing Auction Session...',
-      success:(res)=>{
+      success: (res) => {
         console.log(res);
-        nav("/admin/payments");
-        return 'Payment created successfully!'
+        nav('/admin/payments');
+        return 'Payment created successfully!';
       },
       error: (error) => {
         console.error(error);
         setLoading(false);
-        return getErrorMessage(error)
+        return getErrorMessage(error);
       },
-    })
-  }
+    });
+  };
 
   const confirm = () => {
     setIsConfirmed(true);
     setShowTrigger(false);
     setLoading(true);
-  }
+  };
 
   useEffect(() => {
     if (isConfirmed) {
@@ -93,40 +79,39 @@ export default function PaymentCreate() {
         setLoading(false);
       }
     }
-  }, [isConfirmed, form.getValues])
+  }, [isConfirmed, form.getValues]);
 
   return (
     <>
-      {loading ?
-        <LoadingAnimation/>
-        :
+      {loading ? (
+        <LoadingAnimation />
+      ) : (
         <div className="p-10">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-2/3 space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
               <FormField
                 control={form.control}
                 name="accountId"
-                render={({field}) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Account ID</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormMessage/>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="amount"
-                render={({field}) => (
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount: {currency.format(form.getValues("amount"))}</FormLabel>
+                    <FormLabel>Amount: {currency.format(form.getValues('amount'))}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
-                    <FormMessage/>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -144,7 +129,7 @@ export default function PaymentCreate() {
                       </FormControl>
                       <SelectContent>
                         {Object.keys(PaymentType).map((type) => {
-                          return <SelectItem value={type}>{type}</SelectItem>
+                          return <SelectItem value={type}>{type}</SelectItem>;
                         })}
                       </SelectContent>
                     </Select>
@@ -157,16 +142,16 @@ export default function PaymentCreate() {
             </form>
           </Form>
           <ConfirmationDialog
-            description='This action cannot be undone.'
-            label='Ok'
-            message='Are you sure to Create this payment?'
+            description="This action cannot be undone."
+            label="Ok"
+            message="Are you sure to Create this payment?"
             onSuccess={confirm}
             open={showTrigger}
             onOpenChange={setShowTrigger}
-            title='Confirmation'
+            title="Confirmation"
           />
         </div>
-      }
+      )}
     </>
-  )
+  );
 }

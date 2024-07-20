@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -39,4 +40,15 @@ public interface ItemRepos extends JpaRepository<Item, Integer>, JpaSpecificatio
             "JOIN p.payment pa "+
             "WHERE pa.account.accountId = :accountId")
     Page<Item> findItemByBuyerAccountId(@Param("accountId") Integer accountId, Pageable pageable);
+
+    @Query("SELECT i FROM Item i WHERE " +
+            "(COALESCE(:from, null) IS NULL OR i.createDate >= :from) AND " +
+            "(COALESCE(:to, null) IS NULL OR i.createDate <= :to) AND " +
+            "(:search IS NULL OR LOWER(i.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<Item> findByCriteria(@Param("from") Optional<LocalDate> from,
+                              @Param("to") Optional<LocalDate> to,
+                              @Param("search") Optional<String> search,
+                              Pageable pageable);
+
+
 }

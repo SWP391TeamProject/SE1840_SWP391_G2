@@ -1,62 +1,66 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
 import { getCookie } from '@/utils/cookies';
-import axios from "@/config/axiosConfig.ts";
-import { toast } from "sonner";
+import axios from '@/config/axiosConfig.ts';
+import { toast } from 'sonner';
 
 class BlogCategoryService {
-    private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;
+  private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;
 
-    public static getAllBlogCategories(page?: number, size?: number) {
-        let params = {
-            page: page || 0,
-            size: size || 50,
+  public static getAllBlogCategories(page?: number, size?: number) {
+    let params = {
+      page: page || 0,
+      size: size || 50,
+    };
+    return axios
+      .get(`${this.BASE_URL}/`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        params: params,
+      })
+      .catch((error) => {
+        showErrorToast(error);
+      });
+  }
+
+  public static getBlogCategoryById(id: number) {
+    return axios.get(`${this.BASE_URL}/${id}`);
+  }
+
+  public static createBlogCategory(name: string) {
+    return axios
+      .post(
+        `${this.BASE_URL}/`,
+        { blogCategoryId: -1, name: name, createDate: new Date(), updateDate: new Date() },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+          },
         }
-        return axios.get(`${this.BASE_URL}/`, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            params: params
-        }).catch((error) => {
-            showErrorToast(error);
+      )
+      .catch((error) => {
+        showErrorToast(error);
+      });
+  }
 
-        });
-    }
+  public static updateBlogCategory(id: number, blogCategory: any) {
+    return axios.put(`${this.BASE_URL}/${id}`, blogCategory);
+  }
 
-    public static getBlogCategoryById(id: number) {
-        return axios.get(`${this.BASE_URL}/${id}`);
-    }
-
-    public static createBlogCategory(name: string) {
-
-        return axios.post(`${this.BASE_URL}/`
-            ,{blogCategoryId:-1,name: name,createDate:new Date(),updateDate:new Date()}, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization:
-                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-            }
-        }).catch((error) => {
-            showErrorToast(error);
-        });
-    }
-
-    public static updateBlogCategory(id: number, blogCategory: any) {
-        return axios.put(`${this.BASE_URL}/${id}`, blogCategory);
-    }
-
-    public static deleteBlogCategory(id: number) {
-        return axios.post(`${this.BASE_URL}/delete/${id}`, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization:
-                    "Bearer " + JSON.parse(getCookie("user")).accessToken || "",
-            }
-        }).catch((error) => {
-            showErrorToast(error);
-
-        });
-    }
+  public static deleteBlogCategory(id: number) {
+    return axios
+      .post(`${this.BASE_URL}/delete/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        },
+      })
+      .catch((error) => {
+        showErrorToast(error);
+      });
+  }
 }
 
 export default BlogCategoryService;

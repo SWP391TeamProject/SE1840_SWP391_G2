@@ -22,7 +22,6 @@ public class ItemDTO implements Serializable {
     private String description;
     private BigDecimal reservePrice;
     private BigDecimal buyInPrice;
-    private BigDecimal soldPrice;
     private Item.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;

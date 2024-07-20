@@ -61,13 +61,13 @@ public class ItemController {
                                    @RequestParam(required = false) String search
     ) {
         System.out.println("Pageable: " + pageable.toString());
+        if(search != null && !search.isEmpty()){
+            return itemService.searchItems(search, pageable);
+        }
         if (order != null) {
             if (order.equals("desc")) {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
             }
-        }
-        if(search != null){
-            return itemService.searchItems(search, pageable);
         }
         if (minPrice != null && maxPrice != null) {
             return itemService.getItemsByPrice(pageable, minPrice, maxPrice);

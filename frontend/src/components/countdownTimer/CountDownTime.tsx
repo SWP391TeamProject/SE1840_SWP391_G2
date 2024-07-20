@@ -43,11 +43,7 @@ const CountDownTime: React.FC<Props> = ({ end, className, messageOnEnd }) => {
     }
   }, [timeLeft, end]);
 
-  return (
-    <span className={className}>
-      {timeLeft <= 0 ? messageOnEnd || 'Auction Ended' : formatTime(timeLeft)}
-    </span>
-  );
+  return <span className={className}>{timeLeft <= 0 ? messageOnEnd || 'Auction Ended' : formatTime(timeLeft)}</span>;
 };
 
 export default CountDownTime;

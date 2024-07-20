@@ -1,79 +1,43 @@
-import { Badge } from "@/components/ui/badge";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setCurrentAccount, setCurrentPageList, setCurrentPageNumber } from "@/redux/reducers/Accounts";
-import { fetchAccountsService, deleteAccountService, fetchAccountsByName, activateAccountService } from "@/services/AccountsServices.ts";
-import {
-  PlusCircle,
-  MoreHorizontal,
-  ListFilter,
-} from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setCurrentAccount } from '@/redux/reducers/Accounts';
+import { fetchAccountsService, deleteAccountService, activateAccountService } from '@/services/AccountsServices.ts';
+import { ListFilter } from 'lucide-react';
+import { Suspense, useEffect, useState } from 'react';
 
-import { AccountStatus, RoleName, Roles } from "@/constants/enums";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import PagingIndexes from "@/components/pagination/PagingIndexes";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation";
-import { useNavigate } from "react-router-dom";
-import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
-import { AccountsTable } from "./account-data-table/account-table";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Account } from "@/models/AccountModel";
-import { Page } from "@/models/Page";
-import { ConfirmationButton } from "@/components/confirmation/confirmation-button";
+import { RoleName } from '@/constants/enums';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
+import { AccountsTable } from './account-data-table/account-table';
+import { Account } from '@/models/AccountModel';
+import { Page } from '@/models/Page';
 
 export default function AccountsList() {
   const accountsList: any = useAppSelector((state) => state.accounts);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [roleFilter, setRoleFilter] = useState("");
-  const [seletedRole, setSelectedRole] = useState("");
+  const [roleFilter, setRoleFilter] = useState('');
+  const [seletedRole, setSelectedRole] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
-  let search = url.searchParams.get("search");
+  // let search = url.searchParams.get('search');
   const [reload, setReload] = useState(false);
-  let pageNumber = url.searchParams.get("page");
-  let sort = url.searchParams.get("sort");
-  let pageSize = url.searchParams.get("per_page");
+  let pageNumber = url.searchParams.get('page');
+  let sort = url.searchParams.get('sort');
+  let pageSize = url.searchParams.get('per_page');
   const [accountPromise, setAccountPromise] = useState<Promise<Page<Account>>>();
-
-  // const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""});
+  let search = url.searchParams.get('search'); // const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""});
 
   // const fetchAccounts = async (pageNumber: number, role?: Roles) => {
   //   try {
@@ -105,21 +69,19 @@ export default function AccountsList() {
   //   }
   // };
 
-
-
   const handleEditClick = (accountId: number) => {
-    let account = accountsList.currentPageList.find(account => account.accountId == accountId);
+    let account = accountsList.currentPageList.find((account) => account.accountId == accountId);
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     dispatch(setCurrentAccount(account));
     navigate(`/admin/accounts/${accountId}`);
-  }
+  };
 
   const handleCreateClick = () => {
     // let account = accountsList.value.find(account => account.accountId == accountId);
     // // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
     // dispatch(setCurrentAccount(account));
-    navigate("/admin/accounts/create");
-  }
+    navigate('/admin/accounts/create');
+  };
 
   const handleSuspendClick = (accountId: number) => {
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
@@ -128,8 +90,8 @@ export default function AccountsList() {
     deleteAccountService(accountId.toString()).then((res) => {
       console.log(res);
       setReload(!reload);
-    })
-  }
+    });
+  };
 
   const handleActiveClick = (accountId: number) => {
     // return (<EditAcc account={account!} key={account!.accountId} hidden={false} />);
@@ -137,9 +99,9 @@ export default function AccountsList() {
     // navigate("/admin/accounts/edit");
     activateAccountService(accountId.toString()).then((res) => {
       console.log(res);
-    })
+    });
     setReload(!reload);
-  }
+  };
 
   // const handleFilterClick = (roles: Roles[], filter: string) => {
   //   // let filteredList = accountsList.value.filter(x => status.includes(x.status));
@@ -165,15 +127,29 @@ export default function AccountsList() {
 
   const handleFilterClick = (role: string) => {
     if (role !== seletedRole) {
-      if (role === "All") {
-        setSelectedRole("");
-        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: "" }));
+      if (role === 'All') {
+        setSelectedRole('');
+        setAccountPromise(
+          fetchAccountsService({
+            page: Number.parseInt(pageNumber),
+            size: Number.parseInt(pageSize),
+            sort: sort,
+            role: '',
+          })
+        );
       } else {
         setSelectedRole(role);
-        setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: role }));
+        setAccountPromise(
+          fetchAccountsService({
+            page: Number.parseInt(pageNumber),
+            size: Number.parseInt(pageSize),
+            sort: sort,
+            role: role,
+          })
+        );
       }
     }
-  }
+  };
 
   // const handleRoleFilterSelect = (...event: any) => {
   //   if (event[0] === "All") {
@@ -187,35 +163,43 @@ export default function AccountsList() {
   //   fetchAccounts(pageNumber, accountsList.filter);
   // }
 
-  useEffect(() => {
-
-  }, [seletedRole]);
+  useEffect(() => {}, [seletedRole]);
 
   useEffect(() => {
     // fetchAccounts(accountsList.currentPageNumber);
     // data.then((data) => {
     //   dispatch(setCurrentPageList(data.content));
     // })
-    setRoleFilter("all");
+    setRoleFilter('all');
     // setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""}));
-    console.log(url)
+    console.log(url);
   }, []);
 
   useEffect(() => {
-    console.log(pageNumber)
+    console.log(pageNumber);
+    // if (!loc?.state) {
     if (Number.parseInt(pageNumber) >= 1)
-      setAccountPromise(fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: seletedRole }));
-  }, [pageSize, pageNumber, sort])
+      setAccountPromise(
+        fetchAccountsService({
+          page: Number.parseInt(pageNumber),
+          size: Number.parseInt(pageSize),
+          sort: sort,
+          role: seletedRole,
+          search: search,
+        })
+      );
+    // }
+    console.log(search);
+  }, [pageNumber, pageSize, sort, search]);
 
   useEffect(() => {
     // fetchAccounts(accountsList.currentPageNumber);
-    setRoleFilter("all");
-
+    setRoleFilter('all');
   }, [reload]);
 
-  useEffect(() => {
-    console.log(url)
-  }, [url])
+  // useEffect(() => {
+  //   console.log(url);
+  // }, [url]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -261,15 +245,13 @@ export default function AccountsList() {
               </span>
             </Button>
           </div> */}
-
         </div>
         <TabsContent value={roleFilter}>
           {/* {isLoading ?
             <LoadingAnimation />
             :  */}
           <Card x-chunk="dashboard-06-chunk-0">
-            <CardHeader >
-
+            <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 Accounts
                 {/* <div className="w-full basis-1/2">
@@ -291,7 +273,6 @@ export default function AccountsList() {
                   </span>
                 </ConfirmationButton> */}
               </CardDescription>
-
             </CardHeader>
             <CardContent>
               {/* <Table>
@@ -387,7 +368,7 @@ export default function AccountsList() {
                     columnCount={5}
                     searchableColumnCount={1}
                     filterableColumnCount={2}
-                    cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                    cellWidths={['10rem', '40rem', '12rem', '12rem', '8rem']}
                     shrinkZero
                   />
                 }
@@ -410,22 +391,29 @@ export default function AccountsList() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="h-8 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Role
-                      </span>
+                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Role</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
                     <DropdownMenuLabel>Role</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == ''} onClick={() => handleFilterClick('All')}>
+                    <DropdownMenuCheckboxItem
+                      className="w-9/12"
+                      checked={seletedRole == ''}
+                      onClick={() => handleFilterClick('All')}
+                    >
                       All
                     </DropdownMenuCheckboxItem>
 
-
                     {Object.values(RoleName).map((role) => (
-                      <div className="flex m-1 items-center justify-between" key={role} >
-                        <DropdownMenuCheckboxItem className='w-9/12' checked={seletedRole == role} onClick={() => handleFilterClick(role)} >{role}</DropdownMenuCheckboxItem>
+                      <div className="flex m-1 items-center justify-between" key={role}>
+                        <DropdownMenuCheckboxItem
+                          className="w-9/12"
+                          checked={seletedRole == role}
+                          onClick={() => handleFilterClick(role)}
+                        >
+                          {role}
+                        </DropdownMenuCheckboxItem>
                       </div>
                     ))}
                   </DropdownMenuContent>
@@ -441,7 +429,6 @@ export default function AccountsList() {
             </CardFooter>
           </Card>
           {/* } */}
-
         </TabsContent>
       </Tabs>
       {/* {accountsList.value.map((account) => (

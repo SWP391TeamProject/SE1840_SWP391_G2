@@ -1,172 +1,79 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 // import { fetchAuctionSessionsService, deleteAuctionSessionService } from "@/services/AuctionSessionsServices";
-import {
-  ListFilter
-} from "lucide-react";
-import React, { Suspense, useEffect, useState } from "react";
+import { ListFilter } from 'lucide-react';
+import React, { Suspense, useEffect, useState } from 'react';
 // import { AuctionSessionStatus } from "@/constants/enums";
-import { DataTableSkeleton } from "@/components/data-tables/data-tables-skeleton";
-import { getAuctions } from "@/services/AuctionSessionService";
-import AcutionSessionsTable from "./auction-session-data-table/auction-session-table";
-import { useLocation } from "react-router-dom";
+import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
+import { getAuctions } from '@/services/AuctionSessionService';
+import AcutionSessionsTable from './auction-session-data-table/auction-session-table';
+import { useLocation } from 'react-router-dom';
 
 export default function AuctionSessionList() {
-  const [statusFilter, setStatusFilter] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [statusFilter, setStatusFilter] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
   const url = new URL(window.location.href);
-  let search = url.searchParams.get("search");
-  let pageNumber = url.searchParams.get("page");
-  let pageSize = url.searchParams.get("per_page");
-  let sort = url.searchParams.get("sort");
-  const auctionStates = ["Upcoming", "Past", "Active"];
+  let search = url.searchParams.get('search');
+  let pageNumber = url.searchParams.get('page');
+  let pageSize = url.searchParams.get('per_page');
+  let sort = url.searchParams.get('sort');
+  const auctionStates = ['Upcoming', 'Past', 'Active'];
   const [auctionSessionPromise, setAuctionSessionPromise] = useState<Promise<any>>();
   const location = useLocation();
-
-  // const auctionSessionPromise = getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter});
-
-  // const fetchAuctionSessions = async (pageNumber: number, filter?: string) => {
-  //   try {
-  //     let res;
-  //     setIsLoading(true);
-  //     if (search && search?.length > 0) {
-  //       res = await fetchAuctionSessionByTitle(pageNumber, 10, search);
-  //     } else {
-  //       switch (filter) {
-  //         case "upcoming":
-  //           res = await fetchUpcomingAuctionSessions(pageNumber, 10);
-  //           break;
-  //         case "past":
-  //           res = await fetchPastAuctionSessions(pageNumber, 10);
-  //           break;
-  //         case "live":
-  //           res = await fetchActiveAuctionSessions(pageNumber, 10);
-  //           break;
-  //         default:
-  //           res = await fetchAllAuctionSessions(pageNumber, 10);
-  //       }
-  //     }
-
-  //     if (res) {
-  //       console.log(res?.data.content);
-  //       // dispatch(setAuctionSessions(list.data.content));
-  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-  //       let paging: any = {
-  //         pageNumber: res.data.number,
-  //         totalPages: res.data.totalPages
-  //       }
-  //       dispatch(setCurrentPageNumber(paging));
-  //       setIsLoading(false);
-  //     }
-
-  //   } catch (error) {
-  //     console.log(error);
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // const handleAssignAuctionItemClick = (auctionSessionId: number) => {
-  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
-  //   console.log(auctionSession);
-    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
-  //   dispatch(setCurrentAuctionSession(auctionSession));
-  //   navigate(`/admin/auction-sessions/${auctionSessionId}/assign-items`);
-  // }
-
-  // const handleEditClick = (auctionSessionId: number) => {
-  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
-  //   console.log(auctionSession);
-    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
-  //   dispatch(setCurrentAuctionSession(auctionSession));
-  //   navigate("/admin/auctionSessions/edit");
-  // }
-
-  // const handleCreateClick = () => {
-    // let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId == auctionSessionId);
-    // console.log(auctionSession);
-    // // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
-    // dispatch(setCurrentAuctionSession(auctionSession));
-  //   navigate("/admin/auction-sessions/create");
-  // }
-
-  // const handleSuspendClick = (auctionSessionId: number) => {
-    // console.log(auctionSession);
-    // return (<EditAcc auctionSession={auctionSession!} key={auctionSession!.auctionSessionId} hidden={false} />);
-    // dispatch(setCurrentAuctionSession(auctionSession));
-    // navigate("/admin/auctionSessions/edit");
-    // deleteAuctionSessionService(auctionSessionId.toString()).then((res) => {
-    //   console.log(res);
-    // })
-  // }
-  // const handleDetailClick = (auctionSessionId: number) => {
-  //   console.log(auctionSessionId);
-
-  //   let auctionSession = auctionSessionsList.value.find(auctionSession => auctionSession.auctionSessionId === auctionSessionId);
-  //   console.log(auctionSession);
-  //   dispatch(setCurrentAuctionSession(auctionSession));
-  //   navigate(`/admin/auction-sessions/${auctionSessionId}`);
-  // }
-
-  // const handlePageSelect = (pageNumber: number) => {
-  //   fetchAuctionSessions(pageNumber, statusFilter);
-  // }
-
-  // const handleFilterClick = (filter: string) => {
-
-  //   url.searchParams.delete("search");
-  //   window.history.replaceState(null, "", url.toString());
-  //   search = null;
-
-  //   if (filter !== statusFilter){
-  //     fetchAuctionSessions(0, filter);
-  //     setStatusFilter(filter);
-  //   }
-    
-  // }
-
-   const handleFilterClick = (filter: string) => {
-    url.searchParams.delete("search");
-    window.history.replaceState(null, "", url.toString());
+  const handleFilterClick = (filter: string) => {
+    url.searchParams.delete('search');
+    window.history.replaceState(null, '', url.toString());
     search = null;
     if (filter !== statusFilter) {
-      if (filter === "All") {
-        setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: "" }));
-        setStatusFilter("");
+      if (filter === 'All') {
+        setAuctionSessionPromise(
+          getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: '' })
+        );
+        setStatusFilter('');
       } else {
-        setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: filter }));
+        setAuctionSessionPromise(
+          getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: filter })
+        );
         setStatusFilter(filter);
       }
     }
-  }
-  React.useEffect(() => {
-    if (Number.parseInt(pageNumber) > 0)
-      getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: statusFilter }).then((res) => {
-        setAuctionSessionPromise(Promise.resolve(res));
-      });
-  }, [pageSize, pageNumber, sort])
+  };
+  // React.useEffect(() => {
+  //   if (Number.parseInt(pageNumber) > 0)
+  //     getAuctions({
+  //       page: Number.parseInt(pageNumber),
+  //       size: Number.parseInt(pageSize),
+  //       sort: sort,
+  //       status: statusFilter,
+  //       search: search,
+  //     }).then((res) => {
+  //       setAuctionSessionPromise(Promise.resolve(res));
+  //     });
+  // }, [pageSize, pageNumber, sort,search]);
   useEffect(() => {
     console.log(pageNumber);
     console.log(Number.parseInt(pageSize));
     if (Number.parseInt(pageNumber) >= 1)
-      setAuctionSessionPromise(getAuctions({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), status: statusFilter }));
-  }, [pageSize, pageNumber])
+      setAuctionSessionPromise(
+        getAuctions({
+          page: Number.parseInt(pageNumber),
+          size: Number.parseInt(pageSize),
+          status: statusFilter,
+          sort: sort,
+          search: search,
+        })
+      );
+  }, [pageSize, pageNumber, search, sort]);
 
   useEffect(() => {
     // fetchAuctionSessions(0);
@@ -176,26 +83,17 @@ export default function AuctionSessionList() {
     console.log(url);
   }, []);
 
-  useEffect(() => {
-  }, [location])
-
+  useEffect(() => {}, [location]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="All">
-
         <TabsContent value="All">
-
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                AuctionSessions
+              <CardTitle className="flex justify-between items-center">AuctionSessions</CardTitle>
 
-              </CardTitle>
-
-              <CardDescription>
-                Manage Auctions and view auctions details.
-              </CardDescription>
+              <CardDescription>Manage Auctions and view auctions details.</CardDescription>
             </CardHeader>
             <CardContent>
               <Suspense
@@ -204,34 +102,42 @@ export default function AuctionSessionList() {
                     columnCount={5}
                     searchableColumnCount={1}
                     filterableColumnCount={2}
-                    cellWidths={["10rem", "40rem", "12rem", "12rem", "8rem"]}
+                    cellWidths={['10rem', '40rem', '12rem', '12rem', '8rem']}
                     shrinkZero
                   />
                 }
               >
                 {/**
-           * Passing promises and consuming them using React.use for triggering the suspense fallback.
-           * @see https://react.dev/reference/react/use
-           */}
+                 * Passing promises and consuming them using React.use for triggering the suspense fallback.
+                 * @see https://react.dev/reference/react/use
+                 */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="h-8 gap-1">
                       <ListFilter className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Status
-                      </span>
+                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
                     <DropdownMenuLabel>Status</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem className='w-9/12' checked={statusFilter == ''} onClick={() => handleFilterClick('')}>
+                    <DropdownMenuCheckboxItem
+                      className="w-9/12"
+                      checked={statusFilter == ''}
+                      onClick={() => handleFilterClick('')}
+                    >
                       All
                     </DropdownMenuCheckboxItem>
 
                     {auctionStates.map((state) => (
-                      <div className="flex m-1 items-center justify-between" key={state} >
-                        <DropdownMenuCheckboxItem className='w-9/12' checked={statusFilter == state} onClick={() => handleFilterClick(state)} >{state}</DropdownMenuCheckboxItem>
+                      <div className="flex m-1 items-center justify-between" key={state}>
+                        <DropdownMenuCheckboxItem
+                          className="w-9/12"
+                          checked={statusFilter == state}
+                          onClick={() => handleFilterClick(state)}
+                        >
+                          {state}
+                        </DropdownMenuCheckboxItem>
                       </div>
                     ))}
                   </DropdownMenuContent>

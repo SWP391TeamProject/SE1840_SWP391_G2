@@ -1,20 +1,20 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/' ,
+  base: '/',
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      '@': path.resolve(__dirname, './src'),
     },
-  },build: {
-    outDir: 'build',  // Or 'frontend/build', depending on your setup
+  },
+  build: {
+    outDir: 'build', // Or 'frontend/build', depending on your setup
     emptyOutDir: true,
     sourcemap: true,
     chunkSizeWarningLimit: 1024,
-    
-  }
+  },
 });

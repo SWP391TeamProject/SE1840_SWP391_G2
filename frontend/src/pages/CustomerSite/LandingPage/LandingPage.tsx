@@ -24,17 +24,17 @@ To read more about using these font, please visit the Next.js documentation:
   --radius: 0.875rem;
 }
 **/
-import LandingPageCarousel from "@/pages/CustomerSite/LandingPage/LandingPageCarousel";
-import FeaturedAuctions from "@/pages/CustomerSite/LandingPage/FeaturedAuctions";
-import CategoriesSection from "@/pages/CustomerSite/LandingPage/CategoriesSection";
-import AuctionProcessSection from "@/pages/CustomerSite/LandingPage/AuctionProcessSection";
-import Footer from "../../../components/footer/Footer";
-import { useEffect } from "react";
+import LandingPageCarousel from '@/pages/CustomerSite/LandingPage/LandingPageCarousel';
+import FeaturedAuctions from '@/pages/CustomerSite/LandingPage/FeaturedAuctions';
+import CategoriesSection from '@/pages/CustomerSite/LandingPage/CategoriesSection';
+import AuctionProcessSection from '@/pages/CustomerSite/LandingPage/AuctionProcessSection';
+import Footer from '../../../components/footer/Footer';
+import { useEffect } from 'react';
 
 export function LandingPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [])
+  }, []);
 
   return (
     <div key="1" className="flex flex-col min-h-dvh bg-background text-foreground">

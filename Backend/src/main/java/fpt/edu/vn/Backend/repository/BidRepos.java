@@ -16,6 +16,7 @@ public interface BidRepos extends JpaRepository<Bid, Integer> {
     List<Bid> findAllBidByAuctionItem_AuctionItemIdOrderByAmountDesc(AuctionItemId auctionItemId);
     Page<Bid> findByAccount_AccountId(int accountId, Pageable pageable);
     boolean existsByAuctionItem_AuctionItemId(AuctionItemId auctionItemId);
+    boolean existsByAuctionItem_AuctionItemIdAndAccount_AccountId(AuctionItemId auctionItemId, int accountId);
     Bid findFirstByAuctionItem_AuctionItemIdOrderByAmountDesc(AuctionItemId auctionItemId);
 
     @Query("SELECT DISTINCT a FROM Bid b " +
@@ -24,5 +25,5 @@ public interface BidRepos extends JpaRepository<Bid, Integer> {
             "WHERE ai.auctionItemId = :auctionItemId")
     List<Account> findAllParticipantsByAuctionItemId(AuctionItemId auctionItemId);
 
-    List<Bid> findAllByAuctionItem_AuctionSession_AuctionSessionId(int auctionId);
+    List<Bid> findAllByAuctionItem_AuctionSession_AuctionSessionIdOrderByAmountDesc(int auctionId);
 }

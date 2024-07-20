@@ -49,6 +49,12 @@ public class Order {
         DELIVERED
     }
 
+    @CreationTimestamp
+    private LocalDateTime createDate;
+
+    @UpdateTimestamp
+    private LocalDateTime updateDate;
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private List<OrderDetail> orderDetails;

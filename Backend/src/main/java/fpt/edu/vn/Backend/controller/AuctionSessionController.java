@@ -45,10 +45,10 @@ public class AuctionSessionController {
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(
             Principal principal,
             @PageableDefault(size = 50) Pageable pageable
-
-    ) {
+            ,@RequestParam(required = false) String search
+            ) {
         return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
-                pageable, null, null, null, null,
+                pageable, null, search, null, null,
                 Authorizer.getUserId(principal)));
     }
 
