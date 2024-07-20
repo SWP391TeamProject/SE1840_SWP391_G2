@@ -329,7 +329,7 @@ public class OrderServiceImpl implements OrderService {
 
         return new OrderDTO(order);
     }
-
+    @Transactional
     @Override
     public void cancelOrder(Order order) {
         Payment payment = order.getPayment();
@@ -387,7 +387,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-
+    @Transactional
     @Override
     public OrderDTO updateOrder(int id, OrderUpdateDTO dto) {
         final Map<Order.ShippingStatus, Set<Order.ShippingStatus>> statusMatrix = Map.of(

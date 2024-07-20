@@ -12,6 +12,7 @@ import fpt.edu.vn.Backend.repository.AuctionSessionRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     }
 
     @Override
+    @Transactional
     public AuctionItemDTO createAuctionItem(AuctionItemDTO auctionItemDTO) {
         AuctionItem newAuctionItem = new AuctionItem();
         newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemDTO.getId().getAuctionSessionId()).orElseThrow(
@@ -54,7 +56,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return new AuctionItemDTO(newAuctionItem);
 
     }
-
+    @Transactional
     @Override
     public AuctionItemDTO updateAuctionItem(AuctionItemDTO auctionItemDTO) {
         AuctionItem newAuctionItem = auctionItemRepos.findById(auctionItemDTO.getId()).orElseThrow(
@@ -64,7 +66,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return new AuctionItemDTO(newAuctionItem);
 
     }
-
+    @Transactional
     @Override
     public void deleteById(AuctionItemId id) {
         if (!auctionItemRepos.existsById(id)) {

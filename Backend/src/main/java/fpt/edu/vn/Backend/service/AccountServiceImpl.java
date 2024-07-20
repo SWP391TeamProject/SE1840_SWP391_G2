@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -58,6 +59,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public @NotNull AccountDTO mapEntityToDTO(@NotNull Account account, @NotNull AccountDTO accountDTO) {
         accountDTO.setAccountId(account.getAccountId());
         accountDTO.setNickname(account.getNickname());
@@ -80,6 +82,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole) {
         // avatar dùng method riêng
         account.setAccountId(accountDTO.getAccountId());
@@ -134,6 +137,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
         if(accountRepos.findByEmail(account.getEmail()).isPresent())
             throw new InvalidInputException("Email already exists");
@@ -159,6 +163,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
         Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
         Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
@@ -173,6 +178,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file) {
         try {
             return attachmentServiceImpl.uploadAccountAttachment(file, accountId);
@@ -182,6 +188,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto) throws IllegalAccessException {
         Account a = accountRepos.findByAccountId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));

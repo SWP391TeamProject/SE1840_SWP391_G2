@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -53,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.currencyService = currencyService;
         this.paypalService = paypalService;
     }
-
+    @Transactional
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
         log.info("createPayment: " + paymentRequest);
@@ -111,7 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new InvalidInputException("Failed to create payment", e);
         }
     }
-
+    @Transactional
     @Override
     public PaymentDTO updatePayment(PaymentRequest paymentRequest) {
         try {
@@ -143,7 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-
+    @Transactional
     @Override
     public PaymentDTO createPayment(PaymentDTO paymentDTO) {
         Preconditions.checkNotNull(paymentDTO.getPaymentAmount());
@@ -193,13 +194,13 @@ public class PaymentServiceImpl implements PaymentService {
         }
         return new PageImpl<>(payments.getContent().stream().map(PaymentDTO::new).collect(Collectors.toList()), pageable, payments.getTotalElements());
     }
-
+    @Transactional
     @Override
     public Page<Payment> searchPayment(String keyword,Pageable pageable){
         PaymentSpecification spec = new PaymentSpecification(keyword);
         return paymentRepos.findAll(spec,pageable);
     }
-
+    @Transactional
     @Override
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
         Payment payment = paymentRepos.findById(paymentDTO.getId())
@@ -208,7 +209,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment updatedPayment = paymentRepos.save(payment);
         return new PaymentDTO(updatedPayment);
     }
-
+    @Transactional
     @Override
     public void updatePaymentByStatus(UpdatePaymentStatusRequestDTO request) {
         for (Integer paymentId : request.getPaymentId()) {
@@ -228,7 +229,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
     }
-
+    @Transactional
     @Override
     public String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr) throws UnsupportedEncodingException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -338,7 +339,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return paymentUrl;
     }
-
+    @Transactional
     @Override
     public String capturePayment(PaymentCaptureRequestDTO dto) {
         if (dto.getMethod() == Payment.Method.PAYPAL) {

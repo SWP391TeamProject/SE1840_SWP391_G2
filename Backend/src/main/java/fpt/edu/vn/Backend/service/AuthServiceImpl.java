@@ -40,6 +40,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
         this.passwordEncoder = passwordEncoder;
         this.resourceLoader = resourceLoader;
     }
-
+    @Transactional
     @Override
     public AuthResponseDTO register(RegisterDTO registerDTO) {
         Account newAccount;
@@ -150,7 +151,7 @@ public class AuthServiceImpl implements AuthService {
                 .status(newAccount.getStatus())
                 .build();
     }
-
+    @Transactional
     public void request2fa(@NotNull Account a) throws MessagingException {
         String code;
         do {
@@ -181,7 +182,7 @@ public class AuthServiceImpl implements AuthService {
         verify2faCache.put(code, a.getAccountId(), 10, TimeUnit.MINUTES);
         logger.info("Sending 2FA code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
     }
-
+    @Transactional
     private AuthResponseDTO forceLogin(Account user) {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
         Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(
@@ -193,7 +194,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtGenerator.generateToken(authentication);
         return new AuthResponseDTO(user, token);
     }
-
+    @Transactional
     @Override
     public AuthResponseDTO login(LoginDTO loginDTO) {
         if (loginDTO.getEmail().isEmpty() || loginDTO.getPassword().isEmpty()) {
@@ -228,7 +229,7 @@ public class AuthServiceImpl implements AuthService {
 
         return forceLogin(user);
     }
-
+    @Transactional
     @Override
     public void logout(LogOutRequest request) throws ParseException, JOSEException {
         try {
@@ -249,12 +250,12 @@ public class AuthServiceImpl implements AuthService {
             logger.info("Token already expired");
         }
     }
-
+    @Transactional
     @Override
     public String refreshToken(String token) {
         return "";
     }
-
+    @Transactional
     @Override
     public AuthResponseDTO loginWithGoogle(String token) {
         String email = jwtGenerator.getEmailFromToken(token);
@@ -264,7 +265,7 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponseDTO(user, token);
 
     }
-
+    @Transactional
     @Override
     public AuthResponseDTO loginWithFacebook(String token) {
         String email = jwtGenerator.getEmailFromToken(token);
@@ -272,7 +273,7 @@ public class AuthServiceImpl implements AuthService {
         Account user = userOptional.get();
         return new AuthResponseDTO(user, token);
     }
-
+    @Transactional
     @Override
     public boolean changePassword(int id, ChangePasswordDTO dto) {
         Account a = accountRepos.findById(id)
@@ -290,7 +291,7 @@ public class AuthServiceImpl implements AuthService {
         accountRepos.save(a);
         return true;
     }
-
+    @Transactional
     @Override
     public void requestResetPassword(@NotNull String email) throws MessagingException, IOException {
         Account a = accountRepos.findByEmail(email)
@@ -328,7 +329,7 @@ public class AuthServiceImpl implements AuthService {
         resetPasswordCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
         logger.info("Sending reset password account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
     }
-
+    @Transactional
     @Override
     public boolean confirmResetPassword(@NotNull String resetCode, @NotNull String newPassword) {
         Preconditions.checkState(newPassword.strip().equals(newPassword), "Password must not contain spaces");
@@ -345,7 +346,7 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Reset password for account {} with code {} successfully", id, resetCode);
         return true;
     }
-
+    @Transactional
     @Override
     public void requestActivateAccount(@NotNull String email) throws MailException, MessagingException, IllegalAccessException {
         Account a = accountRepos.findByEmail(email)
@@ -386,7 +387,7 @@ public class AuthServiceImpl implements AuthService {
         activationCodeCache.put(code, a.getAccountId(), 1, TimeUnit.HOURS);
         logger.info("Sending activation code for account {} to {} with code {}", a.getAccountId(), a.getEmail(), code);
     }
-
+    @Transactional
     @Override
     public boolean confirmActivateAccount(@NotNull String activateCode) {
         Integer id = activationCodeCache.get(activateCode);
@@ -402,7 +403,7 @@ public class AuthServiceImpl implements AuthService {
         logger.info("Activated account {} with code {} successfully", id, activateCode);
         return true;
     }
-
+    @Transactional
     @Override
     public AuthResponseDTO confirm2fa(@NotNull String activateCode) {
         Integer id = verify2faCache.get(activateCode);

@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,7 +64,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
         }
         return null;
     }
-
+    @Transactional
     @Override
     //@CacheEvict(value = "blogCategory", allEntries = true)
     public BlogCategoryDTO updateBlogCategory(int id, BlogCategory blogCategory) {
@@ -73,7 +74,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
         blogCategory.setBlogCategoryId(id);
         return new BlogCategoryDTO(blogCategoryRepos.save(blogCategory));
     }
-
+    @Transactional
     @Override
     //@CacheEvict(value = "blogCategory", allEntries = true)
 

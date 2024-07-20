@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class DepositServiceImpl implements DepositService{
             throw new InvalidInputException("Failed to retrieve deposits: " + ex.getMessage());
         }
     }
-
+    @Transactional
     @Override
     public DepositDTO updateDeposit(DepositRequest depositRequest) {
        try {
@@ -73,7 +74,7 @@ public class DepositServiceImpl implements DepositService{
             throw new InvalidInputException("Failed to update deposit: " + ex.getMessage());
         }
     }
-
+    @Transactional
     @Override
     public void deleteDeposit(int depositId) {
         try {

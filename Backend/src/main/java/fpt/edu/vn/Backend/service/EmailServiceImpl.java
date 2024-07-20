@@ -6,6 +6,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.transaction.annotation.Transactional;
 
 public class EmailServiceImpl extends JavaMailSenderImpl implements EmailService {
     private final JavaMailSender mailSender;
@@ -14,6 +15,7 @@ public class EmailServiceImpl extends JavaMailSenderImpl implements EmailService
         this.mailSender = mailSender;
     }
     @Override
+    @Transactional
     public void sendAuctionCancellationEmail(String to, String depositAmount) throws MessagingException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
