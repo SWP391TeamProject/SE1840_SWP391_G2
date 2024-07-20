@@ -38,9 +38,9 @@ public class BlogController {
 
     @GetMapping("/")
     public ResponseEntity<Page<BlogPostDTO>> getAllBlogs(@PageableDefault Pageable pageable,
-                                                         @RequestParam(required = false) String keyword
+                                                         @RequestParam(required = false) String search
     ) {
-        return new ResponseEntity<>(blogService.getAllBlogs(keyword,pageable), HttpStatus.OK);
+        return new ResponseEntity<>(blogService.getAllBlogs(search,pageable), HttpStatus.OK);
     }
 
     @GetMapping("/search")

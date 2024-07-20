@@ -69,7 +69,6 @@ public class ItemController {
                 pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
             }
         }
-
         if (minPrice != null && maxPrice != null) {
             return itemService.getItemsByPrice(pageable, minPrice, maxPrice);
         } else {
