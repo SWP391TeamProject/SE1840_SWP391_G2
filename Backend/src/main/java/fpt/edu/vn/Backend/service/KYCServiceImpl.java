@@ -174,7 +174,7 @@ public class KYCServiceImpl implements KYCService {
             result = barcodeReader.decode(bitmap);
         } catch (NotFoundException e) {
             log.info("Barcode not found");
-            return null;
+            throw new InvalidInputException("Image is not valid, please try again.");
         }
         String decodedText = result. getText();
         log.info("Decoded text: {}", decodedText);

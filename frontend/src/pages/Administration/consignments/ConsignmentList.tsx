@@ -37,6 +37,8 @@ export default function ConsignmentList() {
   let pageSize = url.searchParams.get('per_page');
   const [consignmentPromise, setConsignmentPromise] = useState<Promise<any>>();
 
+  const search = url.searchParams.get('search')
+
   // const consignmentPromise = getConsignments({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, status: selectedStatus});
 
   const fetchConsignments = async (pageNumber: number, status?: ConsignmentStatus) => {
@@ -73,44 +75,6 @@ export default function ConsignmentList() {
     }
   };
 
-  const handlePageSelect = (pageNumber: number) => {
-    if (statusFilter === 'all') {
-      console.log(pageNumber);
-      fetchConsignments(pageNumber);
-    } else {
-      console.log('here');
-      fetchConsignments(pageNumber, statusFilter as ConsignmentStatus);
-    }
-  };
-
-  const handleEditClick = (consignmentId: number) => {
-    let consignment = consignmentsList.value.find((consignment) => consignment.consignmentId == consignmentId);
-    console.log(consignment);
-    // return (<EditAcc consignment={consignment!} key={consignment!.consignmentId} hidden={false} />);
-    dispatch(setCurrentConsignment(consignment));
-    navigate('/admin/consignments/edit');
-  };
-
-  const handleCreateClick = () => {
-    navigate('/admin/consignments/create');
-  };
-
-  const handleDetailClick = (consignmentId: number) => {
-    navigate(`/admin/consignments/${consignmentId}`);
-  };
-
-  // const handleFilterClick = (status: ConsignmentStatus[], filter: string) => {
-  //     if (filter !== statusFilter) {
-  //         if (filter === "all") {
-  //             fetchConsignments(0);
-  //         } else {
-  //             fetchConsignments(0, status[0]);
-  //         }
-  //         setStatusFilter(filter);
-  //     }
-
-  // }
-
   const handleFilterClick = (status: string) => {
     if (status !== selectedStatus) {
       setConsignmentPromise(
@@ -134,54 +98,18 @@ export default function ConsignmentList() {
           size: Number.parseInt(pageSize),
           sort: sort,
           status: selectedStatus,
+          search:search
         })
       )
-    } 
-  }, [pageSize, pageNumber, sort]);
+    }
+  }, [pageSize, pageNumber, sort,search]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="all">
         <div className="flex items-center">
-          {/* <TabsList> */}
-          {/* {JSON.parse(getCookie('user').role) } */}
-          {/* <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED, ConsignmentStatus.IN_FINAL_EVALUATION, ConsignmentStatus.IN_INITIAL_EVALUATION, ConsignmentStatus.SENDING, ConsignmentStatus.WAITING_STAFF, ConsignmentStatus.TERMINATED], "all")} value="all">All</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.WAITING_STAFF], "WAITING_STAFF")} value="WAITING_STAFF">waiting staff</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_INITIAL_EVALUATION], "IN_INITIAL_EVALUATION")} value="IN_INITIAL_EVALUATION">initial evaluation</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.SENDING], "SENDING")} value="SENDING">sending</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.IN_FINAL_EVALUATION], "IN_FINAL_EVALUATION")} value="IN_FINAL_EVALUATION">final evaluation</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.WAITING_SELLER], "WAITING_SELLER")} value="WAITING_SELLER">waiting seller</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.TO_ITEM], "TO_ITEM")} value="TO_ITEM">to item</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.FINISHED], "FINISHED")} value="FINISHED">finished</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterClick([ConsignmentStatus.TERMINATED], "TERMINATED")} value="TERMINATED">inactive</TabsTrigger>
-                    </TabsList> */}
-          <div className="ml-auto flex items-center gap-2">
-            {/* <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-1">
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Filter
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>
-                  Active
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu> */}
-            {/* <Button size="sm" variant="outline" className="h-8 gap-1">
-                                    <File className="h-3.5 w-3.5" />
-                                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                        Export
-                                    </span>
-                                </Button> */}
-          </div>
+
+
         </div>
         <TabsContent value={statusFilter}>
           {/* {isLoading ?

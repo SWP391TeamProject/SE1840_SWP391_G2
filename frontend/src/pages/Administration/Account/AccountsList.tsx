@@ -37,9 +37,7 @@ export default function AccountsList() {
   let sort = url.searchParams.get('sort');
   let pageSize = url.searchParams.get('per_page');
   const [accountPromise, setAccountPromise] = useState<Promise<Page<Account>>>();
-  const loc = useLocation();
-  const search = loc.search;
-  // const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""});
+  let search = url.searchParams.get('search')  // const accountPromise = fetchAccountsService({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, role: ""});
 
   // const fetchAccounts = async (pageNumber: number, role?: Roles) => {
   //   try {

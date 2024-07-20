@@ -50,67 +50,7 @@ export const BlogPostList = () => {
   let sort = url.searchParams.get('sort');
   let pageSize = url.searchParams.get('per_page');
   const [blogPromise, setBlogPromise] = useState<Promise<any>>();
-
-  // const blogPromise = BlogService.getBlogs({ page: Number.parseInt(pageNumber), size: Number.parseInt(pageSize), sort: sort, categoryId: selectedCategory});
-
-  // const fetchBlogs = async (pageNumber: number, categoryId?: number) => {
-  //   try {
-  //     setIsLoading(true);
-  //     let res
-
-  //     if(categoryId){
-  //       res = await BlogService.getBlogByCategory(categoryId, pageNumber, 5);
-  //     } else {
-  //       res = await BlogService.getAllBlogs(pageNumber, 5);
-  //     }
-  //     if (res) {
-  //       console.log(res);
-
-  //       dispatch(setCurrentPageList(res.data.content)); // Update currentPageList here
-  //       let paging: any = {
-  //         pageNumber: res.data.number,
-  //         totalPages: res.data.totalPages
-  //       }
-  //       dispatch(setCurrentPageNumber(paging));
-  //       setIsLoading(false);
-  //     }
-
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     console.log(error);
-  //   }
-  // };
-
-  // const handlePageSelect = (pageNumber: number) => {
-  //   let category = categories.find(category => category.name === filtered);
-  //   fetchBlogs(pageNumber, category?.blogCategoryId);
-  // }
-
-  // const handleEditClick = (blogId: number) => {
-  //   let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
-  // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
-  //   dispatch(setCurrentBlogPost(blog));
-  //   navigate("/admin/blogs/"+blogId+"/edit");
-  // }
-
-  // const handleCreateClick = () => {
-  // let blog = blogsList.value.find(blog => blog.blogId == blogId);
-  // console.log(blog);
-  // // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
-  // dispatch(setCurrentBlog(blog));
-  //   navigate("/admin/blogs/create");
-  // }
-
-  // const handleDetailClick = (blogId: number) => {
-  // console.log(blog);
-  // return (<EditAcc blog={blog!} key={blog!.blogId} hidden={false} />);
-  // dispatch(setCurrentBlog(blog));
-  // navigate("/admin/blogs/edit");
-  //   let blog = blogsList.currentPageList.find(blog => blog.postId == blogId);
-  //   dispatch(setCurrentBlogPost(blog));
-  //   navigate(`/admin/blogs/${blogId}`);
-  // }
-
+  let search = url.searchParams.get('search');
   const handleFilterClick = (category: BlogCategory[], filter: string) => {
     if (filter == 'all') {
       // fetchBlogs(0);
@@ -180,9 +120,10 @@ export const BlogPostList = () => {
           size: Number.parseInt(pageSize),
           sort: sort,
           categoryId: selectedCategory,
+          search: search,
         })
       );
-  }, [pageSize, pageNumber, sort, selectedCategory]);
+  }, [pageSize, pageNumber, sort, selectedCategory,search]);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 ">

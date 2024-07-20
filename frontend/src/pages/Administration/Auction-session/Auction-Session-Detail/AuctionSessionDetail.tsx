@@ -9,7 +9,7 @@ import {
   updateAuctionSession,
 } from '@/services/AuctionSessionService';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import Details from './Details';
 import Status from './Status';
 import TotalValuation from './TotalValuation';
@@ -43,6 +43,7 @@ export default function AuctionSessionDetail() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [showTrigger, setShowTrigger] = useState(false);
   const { id } = useParams<{ id: string }>();
+  const loc = useLocation();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({

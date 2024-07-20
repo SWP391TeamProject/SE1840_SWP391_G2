@@ -4,6 +4,7 @@ import { showErrorToast } from '@/lib/handle-error';
 import { getCookie, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import { toast } from 'sonner';
+import { Search } from 'lucide-react';
 
 export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {
   let params = {
@@ -41,6 +42,7 @@ interface GetConsignmentsSchema {
   order?: 'asc' | 'desc';
   status?: string;
   role?: string;
+  search?: string;
 }
 
 export const getConsignments = async (input: GetConsignmentsSchema) => {
@@ -54,6 +56,7 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
         size: size ? size : 10,
         sort,
         order,
+        search:input.search
       };
 
       return await axios.get(`${SERVER_DOMAIN_URL}/api/consignments/`, {

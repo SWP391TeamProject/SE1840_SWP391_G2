@@ -32,6 +32,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import ConsignmentDialog from './ConsignmentDialog';
 import { showErrorToast } from '@/lib/handle-error';
 import Consignment from '@/models/consignment';
+import { formatDate } from '@/lib/utils';
 
 export default function ConsignmentDetail() {
   const param = useParams();
@@ -368,7 +369,7 @@ export default function ConsignmentDetail() {
         <Card className="w-3/6">
           <CardHeader>
             <CardTitle>
-              Consignment Detail <ConsignmentDialog consignment={consignment} />
+              Consignment Detail {consignment?.attachments !== undefined && <ConsignmentDialog status={consignment.status} attachments={consignment.attachments} />}
             </CardTitle>
             <CardDescription>This is the detail that the customer has provided</CardDescription>
           </CardHeader>
@@ -416,7 +417,7 @@ export default function ConsignmentDetail() {
                       <Card key={index} className="w-full p-3">
                         <CardHeader>
                           <CardTitle>
-                            Consignment Detail #{index + 1} <ConsignmentDetailDialog consignmentDetail={item} />
+                            Consignment Detail #{index + 1} {item?.attachments !== undefined &&<ConsignmentDetailDialog consignmentDetail={item} />}
                           </CardTitle>
                           <CardDescription>
                             {(() => {
@@ -473,9 +474,9 @@ export default function ConsignmentDetail() {
                           </CardDescription>
                         </CardHeader>
                         <CardContent className="bg-white shadow-md rounded-lg p-6">
-                          <div>
+                          <div> 
                             <p className="text-gray-700 mb-2">
-                              <strong>Create Date:</strong> {item?.createDate ?? 'Not provided'}
+                              <strong>Create Date:</strong> {formatDate(item?.createDate) ?? 'Not provided'}
                             </p>
                             <p className="text-gray-700 mb-2">
                               <strong>Initiator:</strong> {item.account.nickname}
@@ -485,14 +486,18 @@ export default function ConsignmentDetail() {
                               dangerouslySetInnerHTML={{ __html: item.description }}
                             ></div>
                             <p className="text-gray-700">
-                              <strong>Price:</strong> {item.price ? item.price : 'Not specified'}
+                              <strong>Evaluate Price:</strong> {item.price ? item.price : 'Not specified'}
                             </p>
                           </div>
                         </CardContent>
                       </Card>
                     );
                   })
-                : null}
+                : 
+                <p>
+                  No activity history
+                </p>
+                }
             </ScrollArea>
           </CardContent>
         </Card>

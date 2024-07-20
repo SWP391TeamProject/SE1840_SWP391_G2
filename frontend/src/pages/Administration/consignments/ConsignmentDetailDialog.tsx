@@ -14,7 +14,7 @@ import { ConsignmentDetail } from '@/models/newModel/consignmentDetail';
 interface consignmentDetaiDialog {
   consignmentDetail: ConsignmentDetail;
 }
-export default function ConsignmentDetailDialog(consignmentDetail: consignmentDetaiDialog) {
+export default function ConsignmentDetailDialog({consignmentDetail}: consignmentDetaiDialog) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -22,17 +22,18 @@ export default function ConsignmentDetailDialog(consignmentDetail: consignmentDe
       </DialogTrigger>
       <DialogContent className="sm:max-w-[660px]">
         <DialogHeader>
-          <DialogTitle>STATUS: {consignmentDetail.consignmentDetail.status}</DialogTitle>
+          <DialogTitle>STATUS: {consignmentDetail.status}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="w-full h-96">
           <div className="flex flex-row justify-start  w-full flex-wrap">
-            {consignmentDetail.consignmentDetail.attachments.map((attachment) => {
+            {consignmentDetail.attachments.map((attachment) => {
               return (
                 <img
                   key={attachment.attachment_id}
                   alt="Product"
                   className="aspect-square rounded-md object-cover basis-1/3"
                   height="300"
+                  loading='lazy'
                   src={attachment.link}
                   width="300"
                 />

@@ -450,7 +450,7 @@ export default function AuctionSession() {
         <div className="grid gap-12 md:grid-cols-[1fr_300px]">
           <div id="auction-items">
             <div className="flex justify-between items-center">
-              <h2 className="mb-8 text-2xl font-bold">Auction Items</h2>
+              <h2 className="mb-8 text-2xl font-bold">Auction Lots</h2>
               <div className="w-full mb-5 basis-1/3">
                 <Select onValueChange={handleCategoryFilter} defaultValue="All">
                   <SelectTrigger>
@@ -501,7 +501,7 @@ export default function AuctionSession() {
                       <div className="mt-auto space-y-2 p-4">
                         {/* <div className="flex items-center justify-between mt-5"> */}
                         <div className="text-primary-500 font-medium space-y-3">
-                          {/* {currency.format(item?.currentPrice)} */}
+                         Current Price: {currency.format(item?.currentPrice)}
                         </div>
                         {/* </div> */}
                         {auctionSession?.status === AuctionSessionStatus.FINISHED &&
@@ -551,7 +551,7 @@ export default function AuctionSession() {
                   <div>{auctionSession?.endDate ? new Date(auctionSession.endDate).toLocaleString() : ''}</div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="text-gray-500 dark:text-gray-400">Number of Items</div>
+                  <div className="text-gray-500 dark:text-gray-400">Number of Lots:</div>
                   <div>{auctionSession?.auctionItems?.length}</div>
                 </div>
                 {/* <Link
@@ -569,9 +569,7 @@ export default function AuctionSession() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p>
-                  This auction features a curated selection of high-quality furniture pieces from top designers. Bid on
-                  items ranging from vintage armchairs to modern sofas and more. Don't miss your chance to add these
-                  unique pieces to your home.
+                  {auctionSession?.description}
                 </p>
                 {/* <Button variant="outline">View All Items</Button> */}
               </CardContent>

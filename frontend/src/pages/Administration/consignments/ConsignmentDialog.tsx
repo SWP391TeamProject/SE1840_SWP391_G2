@@ -9,13 +9,17 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ConsignmentStatus } from '@/constants/enums';
+import { Attachment } from '@/models/Attachment';
+import { Item } from '@/models/Item';
 import { Consignment } from '@/models/newModel/consignment';
 
 interface consignmentDialog {
-  consignment: Consignment;
+  attachments: Attachment[];
+  status:ConsignmentStatus;
 }
 
-export default function ConsignmentDialog(consignment: consignmentDialog) {
+export default function ConsignmentDialog({attachments,status}: consignmentDialog) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -23,11 +27,11 @@ export default function ConsignmentDialog(consignment: consignmentDialog) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[660px]">
         <DialogHeader>
-          <DialogTitle>STATUS: {consignment?.consignment?.status}</DialogTitle>
+          <DialogTitle>STATUS: {status}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="w-full h-96">
           <div className="flex flex-row justify-start  w-full flex-wrap">
-            {consignment?.consignment?.attachments?.map((attachment) => {
+            {attachments?.map((attachment) => {
               return (
                 <img
                   key={attachment.attachmentId}
