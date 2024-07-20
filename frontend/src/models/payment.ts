@@ -14,4 +14,7 @@ export interface Payment {
   status?: PaymentStatus;
   accountId?: number;
   method?: method;
+  consignmentRewardItemId?: number;
+  depositAuctionId?: number;
+  failedReason?: string;
 }

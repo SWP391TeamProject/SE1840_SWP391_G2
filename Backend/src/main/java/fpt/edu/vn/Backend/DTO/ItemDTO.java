@@ -2,6 +2,7 @@ package fpt.edu.vn.Backend.DTO;
 
 import fpt.edu.vn.Backend.pojo.Item;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ItemDTO implements Serializable {
     private Integer itemId;
     private ItemCategoryDTO category;

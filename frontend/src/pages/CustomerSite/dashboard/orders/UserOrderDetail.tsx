@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { getOrderById, updateOrder } from '@/services/OrderService';
 import { setCurrentOrder } from '@/redux/reducers/Orders';
 import { toast } from 'sonner';
-import { CircleCheck } from 'lucide-react';
+import {CircleAlert, CircleCheck} from 'lucide-react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,7 +43,6 @@ export function UserOrderDetail() {
       shippingNote: '',
     },
   });
-  const [subtotal, setSubtotal] = useState(0);
 
   useEffect(() => {
     getOrderById(orderId)
@@ -52,14 +51,9 @@ export function UserOrderDetail() {
           nav('/dashboard/order/checkout/' + orderId);
           return;
         }
-        if (res.data.payment.status !== PaymentStatus.SUCCESS) {
-          toast.error('Invalid order!');
-          return;
-        }
         dispatch(setCurrentOrder(res.data));
         orderUpdateForm.setValue('shippingAddress', res.data.shippingAddress);
         orderUpdateForm.setValue('shippingNote', res.data.shippingNote);
-        setSubtotal(res.data.orderDetails.reduce((acc, item) => acc + item.soldPrice, 0));
         setLoading(false);
       })
       .catch((e) => {
@@ -141,11 +135,12 @@ export function UserOrderDetail() {
             {order.shippingStatus == ShippingStatus.PACKAGING && <Separator className="mb-4" />}
             <h2 className="text-2xl font-bold mb-4">Items</h2>
             <div className="space-y-4">
-              {order?.itemDTOS?.map((item) => (
-                <div key={item.itemId} className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
+              {order?.orderDetails?.map((detail) => (
+                <div key={detail.item.itemId} className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
                   <img
                     src={
-                      item.attachments && item.attachments.length > 0 ? item.attachments[0].link : '/placeholder.svg'
+                      detail.item.attachments && detail.item.attachments.length > 0 ?
+                        detail.item.attachments[0].link : '/placeholder.svg'
                     }
                     alt="Product Image"
                     width={80}
@@ -154,11 +149,11 @@ export function UserOrderDetail() {
                   />
                   <div>
                     <h3 className="font-medium">
-                      <a href={`/item/${item.itemId}`}>{item.name}</a>
+                      <a href={`/item/${detail.item.itemId}`}>{detail.item.name}</a>
                     </h3>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">{currency.format(item.soldPrice)}</div>
+                    <div className="font-medium">{currency.format(detail.soldPrice)}</div>
                   </div>
                 </div>
               ))}
@@ -171,11 +166,11 @@ export function UserOrderDetail() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>{currency.format(subtotal)}</span>
+                    <span>{currency.format(order.subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Fee</span>
-                    <span>{currency.format(order.payment.paymentAmount - subtotal)}</span>
+                    <span>{currency.format(order.fee)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between font-bold">
@@ -183,33 +178,40 @@ export function UserOrderDetail() {
                     <span>{currency.format(order.payment.paymentAmount)}</span>
                   </div>
                 </div>
-                <Button className="bg-green-600 flex justify-center items-center gap-2" disabled>
-                  <CircleCheck className="w-5 h-5" />
-                  Order Paid
-                </Button>
+                {order.payment.status === PaymentStatus.SUCCESS &&
+                  <Button className="bg-green-600 flex justify-center items-center gap-2" disabled>
+                    <CircleCheck className="w-5 h-5" />
+                    Order Paid
+                  </Button>}
+                {order.payment.status === PaymentStatus.FAILED &&
+                  <Button className="bg-red-600 flex justify-center items-center gap-2" disabled>
+                    <CircleAlert className="w-5 h-5" />
+                    Order Overdue
+                  </Button>}
               </div>
             </div>
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
-              <h2 className="text-2xl font-bold mb-4">Delivery Tracking</h2>
-              <div className="flex flex-col gap-5">
-                <div className="flex justify-between gap-3">
-                  <span className="basis-1/3">Delivery Partner</span>
-                  <span>Biddify</span>
+            {order.payment.status === PaymentStatus.SUCCESS &&
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 mt-10 lg:mt-0">
+                <h2 className="text-2xl font-bold mb-4">Delivery Tracking</h2>
+                <div className="flex flex-col gap-5">
+                  <div className="flex justify-between gap-3">
+                    <span className="basis-1/3">Delivery Partner</span>
+                    <span>Biddify</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="basis-1/3">Status</span>
+                    <span className="capitalize">{order.shippingStatus.toLowerCase()}</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="basis-1/3">Address</span>
+                    <span>{order.shippingAddress}</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="basis-1/3">Note</span>
+                    <span className="break-all">{order.shippingNote}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between gap-3">
-                  <span className="basis-1/3">Status</span>
-                  <span className="capitalize">{order.shippingStatus.toLowerCase()}</span>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <span className="basis-1/3">Address</span>
-                  <span>{order.shippingAddress}</span>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <span className="basis-1/3">Note</span>
-                  <span className="break-all">{order.shippingNote}</span>
-                </div>
-              </div>
-            </div>
+              </div>}
           </div>
         </div>
       )}

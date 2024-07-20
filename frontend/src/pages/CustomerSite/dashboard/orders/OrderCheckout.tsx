@@ -20,6 +20,9 @@ import { Input } from '@/components/ui/input.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { PaymentStatus } from '@/constants/enums.tsx';
 import { showErrorToast } from '@/lib/handle-error';
+import {
+  ConfirmationDialog
+} from "@/components/confirmation/confirmation-dialog.tsx";
 
 const orderCheckoutSchema = z.object({
   shippingAddress: z
@@ -46,21 +49,16 @@ export function OrderCheckout() {
       shippingNote: '',
     },
   });
-  const [subtotal, setSubtotal] = useState(0);
+  const [showTrigger, setShowTrigger] = useState(false);
 
   useEffect(() => {
     getOrderById(orderId)
       .then((res) => {
-        if (res.data.payment.status === PaymentStatus.SUCCESS) {
+        if (res.data.payment.status !== PaymentStatus.PENDING) {
           nav('/dashboard/order/' + orderId);
           return;
         }
-        if (res.data.payment.status !== PaymentStatus.PENDING) {
-          toast.error('Invalid order!', {});
-          return;
-        }
         dispatch(setCurrentOrder(res.data));
-        setSubtotal(res.data.orderDetails.reduce((total, item) => total + item.soldPrice, 0));
         setLoading(false);
       })
       .catch((e) => {
@@ -70,6 +68,7 @@ export function OrderCheckout() {
   }, []);
 
   const checkout = async () => {
+    setShowTrigger(false);
     const ok = await orderCheckoutForm.trigger();
     if (!ok) return;
     setLoading(true);
@@ -103,7 +102,8 @@ export function OrderCheckout() {
                       <FormItem>
                         <FormLabel>Address</FormLabel>
                         <FormControl>
-                          <Input type="text" {...field} required />
+                          <Input placeholder="The place to receive your order"
+                            type="text" {...field} required />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,11 +132,12 @@ export function OrderCheckout() {
             <Separator />
             <h2 className="text-2xl font-bold my-4">Items</h2>
             <div className="space-y-4">
-              {order?.itemDTOS?.map((item) => (
-                <div key={item.itemId} className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
+              {order?.orderDetails?.map((detail) => (
+                <div key={detail.item.itemId} className="grid grid-cols-[80px_1fr_80px] items-center gap-4">
                   <img
                     src={
-                      item.attachments && item.attachments.length > 0 ? item.attachments[0].link : '/placeholder.svg'
+                      detail.item.attachments && detail.item.attachments.length > 0 ?
+                        detail.item.attachments[0].link : '/placeholder.svg'
                     }
                     alt="Product Image"
                     width={80}
@@ -145,11 +146,11 @@ export function OrderCheckout() {
                   />
                   <div>
                     <h3 className="font-medium">
-                      <a href={`/item/${item.itemId}`}>{item.name}</a>
+                      <a href={`/item/${detail.item.itemId}`}>{detail.item.name}</a>
                     </h3>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">{currency.format(item.soldPrice)}</div>
+                    <div className="font-medium">{currency.format(detail.soldPrice)}</div>
                   </div>
                 </div>
               ))}
@@ -161,11 +162,11 @@ export function OrderCheckout() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>{currency.format(subtotal)}</span>
+                  <span>{currency.format(order.subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Fee</span>
-                  <span>{currency.format(order.payment.paymentAmount - subtotal)}</span>
+                  <span>{currency.format(order.fee)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold">
@@ -201,9 +202,18 @@ export function OrderCheckout() {
                   </AlertDescription>
                 </Alert>
               )}
-              <Button onClick={() => checkout()} disabled={order.payment.paymentAmount - auth.user?.balance > 0}>
+              <Button onClick={() => setShowTrigger(true)} disabled={order.payment.paymentAmount - auth.user?.balance > 0}>
                 Buy now
               </Button>
+              <ConfirmationDialog
+                description="This action cannot be undone."
+                label="Ok"
+                message="Are you sure to Create this payment?"
+                onSuccess={() => checkout()}
+                open={showTrigger}
+                onOpenChange={setShowTrigger}
+                title="Confirmation"
+              />
             </div>
           </div>
         </div>
