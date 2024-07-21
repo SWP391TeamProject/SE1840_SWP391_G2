@@ -21,6 +21,7 @@ public class PaymentDTO implements Serializable {
     private Payment.Method method;
     private String failedReason;
     private int accountId;
+    private AccountDTO account;
     private Integer consignmentRewardItemId;
     private Integer depositAuctionId;
 
@@ -34,6 +35,7 @@ public class PaymentDTO implements Serializable {
         this.method = payment.getMethod();
         this.failedReason = payment.getFailedReason();
         this.accountId = payment.getAccount().getAccountId();
+        this.account = AccountDTO.minimal(payment.getAccount());
         if (type == Payment.Type.CONSIGNMENT_REWARD)
             this.consignmentRewardItemId = payment.getConsignmentRewardItem().getItemId();
         if (type == Payment.Type.AUCTION_DEPOSIT)

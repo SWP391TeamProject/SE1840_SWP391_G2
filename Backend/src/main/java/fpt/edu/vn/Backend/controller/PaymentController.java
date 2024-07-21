@@ -1,17 +1,21 @@
 package fpt.edu.vn.Backend.controller;
 
 
+import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentCaptureRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
 import fpt.edu.vn.Backend.DTO.request.UpdatePaymentStatusRequestDTO;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -39,14 +44,21 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @GetMapping()
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Page<PaymentDTO>> getAllPayments(
+            Principal principal,
             @PageableDefault(size = 50) Pageable pageable,
             @RequestParam(required = false) Payment.Type type,
             @RequestParam(required = false) Payment.Status status,
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(required = false) Integer user,
             @RequestParam(required = false) String search
     ) {
-        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status,search));
+        JwtUser requester = Authorizer.requireUser(principal);
+        if (!Authorizer.MANAGER.contains(requester.getRole())) {
+            user = requester.getUserId(); // only get payments of current user
+        }
+        return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status, from, to, user, search));
     }
 
     @GetMapping("/{id}")
@@ -69,6 +81,16 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
     }
 
+    @PostMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+    public ResponseEntity<PaymentDTO> updatePayment(@PathVariable int id,
+                                                 @RequestBody PaymentDTO dto) {
+        Preconditions.checkState(dto.getType() == Payment.Type.WITHDRAW,
+                "Can only update pending withdraw payment");
+        dto.setId(id);
+        return ResponseEntity.ok(paymentService.updatePayment(dto));
+    }
+
     @PostMapping("/create")
     public ResponseEntity<String> createPayment(Principal principal, @RequestBody PaymentRequest paymentRequest, HttpServletRequest request) throws UnsupportedEncodingException {
         Authorizer.expectManagerOrUserId(principal, paymentRequest.getAccountId());
@@ -81,11 +103,6 @@ public class PaymentController {
     public ResponseEntity<String> capturePayment(@RequestBody PaymentCaptureRequestDTO dto) {
         String res = paymentService.capturePayment(dto);
         return ResponseEntity.ok(res);
-    }
-
-    @GetMapping("/history")
-    public ResponseEntity<List<PaymentDTO>> getPaymentHistory(Principal principal) {
-        return ResponseEntity.ok(paymentService.getUserPayments(principal.getName() ));
     }
 
     @GetMapping("/vnpay_ipn")

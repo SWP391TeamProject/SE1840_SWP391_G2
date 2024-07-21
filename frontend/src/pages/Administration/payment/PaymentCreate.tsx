@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/AuthProvider.tsx';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation.tsx';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
-import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage } from '@/lib/handle-error';
 import { createPayment } from '@/services/PaymentsService.ts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCurrency } from '@/CurrencyProvider.tsx';
