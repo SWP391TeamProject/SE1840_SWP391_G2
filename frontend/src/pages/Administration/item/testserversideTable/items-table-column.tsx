@@ -12,38 +12,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/redux/hooks';
-import { setCurrentItem } from '@/redux/reducers/Items';
-import { DeleteItemsDialog } from './delete-items-dialog';
+import {Link, useNavigate} from 'react-router-dom';
+import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
+import {Item} from "@/models/Item.ts";
 
-// Define the JewelryItem type based on the provided JSON structure
-export type JewelryItem = {
-  itemId: number;
-  category: {
-    itemCategoryId: number;
-    name: string;
-    createDate: string;
-  };
-  name: string;
-  description: string;
-  reservePrice: number;
-  buyInPrice: number;
-  status: string;
-  createDate: string;
-  updateDate: string;
-  owner: {
-    accountId: number;
-    nickname: string;
-    email: string;
-  };
-  attachments: {
-    attachmentId: number;
-    link: string;
-  }[];
-};
-
-export const getColumns = (): ColumnDef<JewelryItem>[] => [
+export const getColumns = (): ColumnDef<Item>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -81,16 +54,15 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
         <span className="max-w-[10rem] truncate font-medium">{row.getValue('name')}</span>
       </div>
     ),
+    enableSorting: true,
+    enableHiding: false,
   },
   {
     accessorKey: 'reservePrice',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Reserve Price" />,
     cell: ({ row }) => <div className="font-medium">${row.getValue<number>('reservePrice').toLocaleString()}</div>,
-  },
-  {
-    accessorKey: 'buyInPrice',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Buy-In Price" />,
-    cell: ({ row }) => <div className="font-medium">${row.getValue<number>('buyInPrice').toLocaleString()}</div>,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: 'status',
@@ -101,39 +73,37 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
+    enableHiding: true,
   },
   {
     accessorKey: 'createDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
     cell: ({ row }) => formatDate(new Date(row.getValue('createDate'))),
+    enableHiding: true,
   },
   {
     accessorKey: 'owner.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Owner" />,
-    cell: ({ row }) => row.original.owner.nickname,
+    cell: ({row}) => {
+      return (
+        <AccountTooltip account={row.original.owner}>
+          <Link
+            to={`/account/${row.original.owner.accountId}`}>{row.original.owner.nickname}</Link>
+        </AccountTooltip>
+      );
+    },
   },
   {
     id: 'actions',
     cell: ({ row }) => {
-      const [showUpdateItemSheet, setShowUpdateItemSheet] = React.useState(false);
-      const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
       const nav = useNavigate();
-      const dispatch = useAppDispatch();
 
       const handleEditClick = (itemId: number) => {
-        // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
         nav(`/admin/items/${itemId}`);
       };
+
       return (
         <>
-          {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
-          <DeleteItemsDialog
-            open={showDeleteItemDialog}
-            onOpenChange={setShowDeleteItemDialog}
-            items={[row.original]}
-            showTrigger={false}
-            onSuccess={() => row.toggleSelected(false)}
-          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button aria-label="Open menu" variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
@@ -142,7 +112,9 @@ export const getColumns = (): ColumnDef<JewelryItem>[] => [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => handleEditClick(row.original.itemId)}>Edit</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setShowDeleteItemDialog(true)}>Delete</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to={`/item/${row.original.itemId}`} target="_blank">Public View</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </>

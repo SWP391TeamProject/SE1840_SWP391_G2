@@ -56,27 +56,13 @@ public class ItemController {
 
     @GetMapping("/")
     public Page<ItemDTO> getItems( @PageableDefault Pageable pageable,
-                                  @RequestParam(required = false) Integer minPrice, @RequestParam(required = false) Integer maxPrice,
-                                  @RequestParam(required = false) String order, @RequestParam(required = false) String status,
+                                  @RequestParam(required = false) Integer minPrice,
+                                   @RequestParam(required = false) Integer maxPrice,
+                                   @RequestParam(required = false) Item.Status status,
+                                   @RequestParam(required = false) Integer categoryId,
                                    @RequestParam(required = false) String search
     ) {
-        System.out.println("Pageable: " + pageable.toString());
-        if(search != null && !search.isEmpty()){
-            return itemService.searchItems(search, pageable);
-        }
-        if (order != null) {
-            if (order.equals("desc")) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
-            }
-        }
-        if (minPrice != null && maxPrice != null) {
-            return itemService.getItemsByPrice(pageable, minPrice, maxPrice);
-        } else {
-            if (status != null) {
-                return itemService.getItemsByStatus(pageable, Item.Status.valueOf(status.toUpperCase()));
-            }
-            return itemService.getItems(pageable);
-        }
+        return itemService.getItems(pageable, minPrice, maxPrice, status, categoryId, search);
     }
 
     @GetMapping("/category/{categoryId}")
@@ -190,7 +176,8 @@ public class ItemController {
           }
           List<ItemDTO> listItems;
           {
-                listItems = itemService.getItems(PageRequest.of(0, 1000)).getContent();
+                listItems = itemService.getItems(PageRequest.of(0, 1000),
+                        null, null, null, null, null).getContent();
           }
 
           DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

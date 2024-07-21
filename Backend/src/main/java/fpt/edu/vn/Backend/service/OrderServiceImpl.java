@@ -11,6 +11,7 @@ import fpt.edu.vn.Backend.pojo.*;
 import fpt.edu.vn.Backend.repository.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -361,13 +362,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderDTO> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(OrderDTO::new);
-    }
-
-    @Override
-    public Page<OrderDTO> searchOrders(String keyword,Pageable pageable) {
-        OrderSpecification spec = new OrderSpecification(keyword);
+    public Page<OrderDTO> getAllOrders(Pageable pageable,
+                                       @Nullable Payment.Status status,
+                                       @Nullable Order.ShippingStatus shippingStatus,
+                                       @Nullable LocalDateTime fromDate, @Nullable LocalDateTime toDate,
+                                       @Nullable Integer accountId,
+                                       @Nullable String keyword) {
+        OrderSpecification spec = new OrderSpecification(status, shippingStatus, fromDate, toDate, accountId, keyword);
         return orderRepository.findAll(spec,pageable).map(OrderDTO::new);
     }
 

@@ -6,9 +6,11 @@ import fpt.edu.vn.Backend.DTO.request.OrderUpdateDTO;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.pojo.Payment;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public interface OrderService {
@@ -20,7 +22,12 @@ public interface OrderService {
 
     void cancelOrder(Order order);
 
-    Page<OrderDTO> getAllOrders(Pageable pageable);
+    Page<OrderDTO> getAllOrders(Pageable pageable,
+                                @Nullable Payment.Status status,
+                                @Nullable Order.ShippingStatus shippingStatus,
+                                @Nullable LocalDateTime fromDate, @Nullable LocalDateTime toDate,
+                                @Nullable Integer accountId,
+                                @Nullable String keyword);
 
     Page<OrderDTO> getAllOrdersByUserId(int userId, Pageable pageable);
 
@@ -30,5 +37,4 @@ public interface OrderService {
 
 
     OrderDTO updateOrder(int id, OrderUpdateDTO dto);
-    Page<OrderDTO> searchOrders(String keyword,Pageable pageable);
 }

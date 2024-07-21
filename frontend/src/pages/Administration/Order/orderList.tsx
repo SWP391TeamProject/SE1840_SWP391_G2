@@ -1,256 +1,56 @@
-import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
-import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
-import PagingIndexes from '@/components/pagination/PagingIndexes';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PaymentStatus } from '@/constants/enums';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setCurrentOrder, setCurrentPageList, setCurrentPageNumber } from '@/redux/reducers/Orders';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import {PaymentStatus, PaymentType} from '@/constants/enums';
 import { getOrders } from '@/services/OrderService';
-import { ListFilter } from 'lucide-react';
-import React, { Suspense, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {useEffect, useState } from 'react';
+import {useSearchParams} from 'react-router-dom';
 import { OrdersTable } from './order-data-table/order-table';
+import {useDebouncedCallback} from "use-debounce";
+import {getEnumValue, parseDate, parseIntOrUndefined} from "@/lib/utils.ts";
+import {ShippingStatus} from "@/models/newModel/order.ts";
 
 export const OrderList = () => {
-  const orders = useAppSelector((state) => state.orders);
-  const [sortBy, setSortBy] = useState('createDate');
-  const [sortDirection, setSortDirection] = useState('desc');
-  const [filterStatus, setFilterStatus] = useState<PaymentStatus>(null);
-  const [seletedStatus, setSelectedStatus] = useState('');
-  const dispatch = useAppDispatch();
-  const nav = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const url = new URL(window.location.href);
-  let pageNumber = url.searchParams.get('page');
-  let sort =
-    url.searchParams.get('sort')?.split('%2')[0].replace('_', '.').replace('amount', 'paymentAmount') || 'createDate';
-  let sortDir = url.searchParams.get('sort')?.split('%2')[1] || 'desc';
-  let pageSize = url.searchParams.get('per_page');
-  const [orderPromise, setOrderPromise] = useState<Promise<any>>();
+  const [searchParams] = useSearchParams();
+  const [orderPromise, setOrderPromise] = useState<any>();
 
-  // const orderPromise = getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filterStatus);
-
-  // const fetchOrders = (pageNumber: number, pageSize: number, sortBy?: string, sortDirection?: string, filterStatus?: PaymentStatus) => {
-  //     console.log(sortBy, sortDirection, filterStatus);
-  //     setIsLoading(true);
-  //     getOrders(pageNumber, pageSize, sortBy, sortDirection, filterStatus).then((res) => {
-  //         console.log(res);
-  //         dispatch(setCurrentPageList(res.data.content));
-  //         if (res.data.content.length == 0) {
-  //             dispatch(setCurrentPageList([]));
-  //         }
-  //         let paging: any = {
-  //             pageNumber: res.data.number,
-  //             totalPages: res.data.totalPages
-  //         }
-  //         dispatch(setCurrentPageNumber(paging));
-  //         setIsLoading(false);
-  //     }).finally(() => {
-  //         setIsLoading(false);
-  //     })
-  // }
-  useEffect(() => {
-    // if (orders.currentPageList.length === 0) {
-    //     fetchOrders(0, 10, sortBy, sortDirection, filterStatus);
-    // }
-  }, []);
-
-  const handleFilterStatus = (status: string) => {
-    let filter = PaymentStatus[status as keyof typeof PaymentStatus];
-    setOrderPromise(getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filter));
-    setFilterStatus(filter);
-    // fetchOrders(0, 10, sortBy, sortDirection, filter);
-  };
-  // const handleViewDetailsClick = (id: any) => {
-  //     let order = orders.currentPageList.find(b => b.orderId == id);
-  //     if (order) {
-  //         dispatch(setCurrentOrder(order));
-  //     }
-  //     nav("/admin/orders/" + id);
-  // }
-
-  // const handleSortBy = (value: string) => {
-  //     setSortBy(value);
-  //     fetchOrders(0, 10, value, sortDirection, filterStatus);
-  // }
-  // const handleSortDirection = (value: string) => {
-  //     setSortDirection(value);
-  //     fetchOrders(0, 10, sortBy, value, filterStatus);
-  // }
-  // const handlePageSelect = (pageNumber: number) => {
-  //     fetchOrders(pageNumber, 10, sortBy, sortDirection, filterStatus);
-  // }
+  const fetchOrders = useDebouncedCallback(
+    () => {
+      const query = {
+        type: PaymentType.AUCTION_ORDER,
+        status: getEnumValue(PaymentStatus, searchParams.get('status')) as PaymentStatus,
+        shippingStatus: getEnumValue(ShippingStatus, searchParams.get('shippingStatus')) as ShippingStatus,
+        from: parseDate(searchParams.get('from')),
+        to: parseDate(searchParams.get('to')),
+        user: parseIntOrUndefined(searchParams.get('user')),
+        search: searchParams.get('search'),
+        page: parseIntOrUndefined(searchParams.get('page')),
+        size: parseIntOrUndefined(searchParams.get('per_page')),
+        sort: searchParams.get('sort') || 'orderId,desc',
+      };
+      setOrderPromise(getOrders(query));
+    }, 1000
+  );
 
   useEffect(() => {
-    if (Number.parseInt(pageNumber) >= 1)
-      setOrderPromise(
-        getOrders(Number.parseInt(pageNumber) - 1, Number.parseInt(pageSize), sort, sortDir, filterStatus)
-      );
-  }, [pageSize, pageNumber, sort]);
+    fetchOrders();
+  }, [searchParams]);
 
   return (
     <main className="grid flex-1 orders-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="all">
-        {/* <div className="flex orders-center">
-                    <TabsList>
-                        <TabsTrigger onClick={() => handleFilterStatus("all")} value="all">All</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterStatus("PENDING")} value={"PENDING"}>Pending</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterStatus("SUCCESS")} value={"SUCCESS"}>Success</TabsTrigger>
-                        <TabsTrigger onClick={() => handleFilterStatus("FAILED")} value={"FAILED"}>Failed</TabsTrigger>
-
-
-                    </TabsList>
-                </div> */}
-        <TabsContent value={'all'}>
-          {isLoading ? (
-            <LoadingAnimation />
-          ) : (
-            <Card x-chunk="dashboard-06-chunk-0">
-              <CardHeader>
-                <CardTitle className="">
-                  Orders
-                  {/* <div className='flex justify-between'>
-                                        <div className="flex items-center gap-2 m-2 min-w-48 ">
-                                            <label htmlFor="sort-by" className="text-sm font-medium">
-                                                Sort by:
-                                            </label>
-                                            <Select id="sort-by" value={sortBy} onValueChange={(e) => handleSortBy(e)} className="w-40">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="createDate">Date</SelectItem>
-                                                    <SelectItem value="payment.paymentAmount">Total</SelectItem>
-                                                    <SelectItem value="payment.Status">Status</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <Button
-                                                variant={sortDirection === "asc" ? "outline" : "default"}
-                                                size="icon"
-                                                onClick={() => handleSortDirection(sortDirection === "asc" ? "desc" : "asc")}
-                                            >
-                                                <ArrowUpDownIcon className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                        <div className="w-full basis-1/2">
-                                            <PagingIndexes pageNumber={orders.currentPageNumber ? orders.currentPageNumber : 0} totalPages={orders.totalPages} pageSelectCallback={handlePageSelect}></PagingIndexes>
-                                        </div>
-                                    </div> */}
-                </CardTitle>
-
-                <CardDescription>Manage orders and view their details.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Order ID</TableHead>
-                                            <TableHead>Total</TableHead>
-                                            <TableHead>Shipping Address</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead />
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {!orders
-                                            ? <LoadingAnimation />
-                                            : orders.currentPageList?.map((order) => (
-                                                <TableRow key={order.orderId}>
-                                                    <TableCell className="font-medium">{order.orderId}</TableCell>
-                                                    <TableCell>${order.payment.amount}</TableCell>
-                                                    <TableCell>{order.shippingAddress}</TableCell>
-                                                    <TableHead>{order.payment.status}</TableHead>
-                                                    <TableCell>{new Date(order.createDate).toUTCString()}</TableCell>
-                                                    <TableCell>
-                                                        <Button variant="outline" size="sm" onClick={() => handleViewDetailsClick(order.orderId)}>
-                                                            View Details
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                </Table> */}
-                <Suspense
-                  fallback={
-                    <DataTableSkeleton
-                      columnCount={5}
-                      searchableColumnCount={1}
-                      filterableColumnCount={2}
-                      cellWidths={['10rem', '40rem', '12rem', '12rem', '8rem']}
-                      shrinkZero
-                    />
-                  }
-                >
-                  {/* <Select onValueChange={handleRoleFilterSelect} >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Role</SelectLabel>
-                        <SelectItem value="All" key={0}>All</SelectItem>
-                        {Object.values(RoleName).map((role) => (
-                          <SelectItem value={role}>{role}</SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select> */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-8 gap-1">
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuLabel>Role</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem
-                        className="w-9/12"
-                        checked={filterStatus == null}
-                        onClick={() => handleFilterStatus('All')}
-                      >
-                        All
-                      </DropdownMenuCheckboxItem>
-
-                      {Object.values(PaymentStatus).map((state) => (
-                        <div className="flex m-1 items-center justify-between" key={state}>
-                          <DropdownMenuCheckboxItem
-                            className="w-9/12"
-                            checked={filterStatus == state}
-                            onClick={() => handleFilterStatus(state)}
-                          >
-                            {state}
-                          </DropdownMenuCheckboxItem>
-                        </div>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <OrdersTable orderPromise={orderPromise} />
-                </Suspense>
-              </CardContent>
-              <CardFooter>
-                {/* <div className="text-xs text-muted-foreground">
-                                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                                        products
-                                    </div> */}
-              </CardFooter>
-            </Card>
-          )}
+        <TabsContent value="all">
+          <Card x-chunk="dashboard-06-chunk-0">
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                Orders
+              </CardTitle>
+              <CardDescription>Manage orders and view
+                details.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <OrdersTable orderPromise={orderPromise} />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </main>

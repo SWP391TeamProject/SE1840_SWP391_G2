@@ -155,7 +155,7 @@ export const getColumns = (): ColumnDef<Payment>[] => [
         }
         case PaymentType.AUCTION_DEPOSIT: {
           return (
-            <Button size="sm">
+            <Button size="sm" asChild>
               <Link
                 to={`/admin/auction-sessions/${row.original.depositAuctionId}`}
                 target="_blank">View auction</Link>
@@ -164,7 +164,7 @@ export const getColumns = (): ColumnDef<Payment>[] => [
         }
         case PaymentType.AUCTION_ORDER: {
           return (
-            <Button size="sm">
+            <Button size="sm" asChild>
               <Link to={`/admin/orders/${row.original.id}`} target="_blank">View
                 order</Link>
             </Button>
@@ -172,7 +172,7 @@ export const getColumns = (): ColumnDef<Payment>[] => [
         }
         case PaymentType.CONSIGNMENT_REWARD: {
           return (
-            <Button size="sm">
+            <Button size="sm" asChild>
               <Link to={`/admin/items/${row.original.consignmentRewardItemId}`}
                     target="_blank">View item</Link>
             </Button>
