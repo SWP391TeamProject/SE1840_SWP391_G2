@@ -14,6 +14,7 @@ import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.oauth2.exception.AppException;
 import fpt.edu.vn.Backend.oauth2.security.RefreshTokenProvider;
+import fpt.edu.vn.Backend.oauth2.security.UserActivityService;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.RefreshToken;
 import fpt.edu.vn.Backend.repository.AccountRepos;
@@ -81,7 +82,8 @@ public class AuthServiceImpl implements AuthService {
     private RefreshTokenRepos refreshTokenRepos;
     private CustomUserDetailsService customUserDetailService;
     private PasswordEncoderConfig passwordEncoder;
-
+    @Autowired
+    private UserActivityService userActivityService;
     private ResourceLoader resourceLoader;
 
     @Autowired
@@ -217,7 +219,7 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        userActivityService.updateUserActivity(loginDTO.getEmail());
         if (user.isRequire2fa()) {
             try {
                 request2fa(user);
@@ -236,7 +238,7 @@ public class AuthServiceImpl implements AuthService {
             var signToken = refreshTokenProvider.verifyToken(request.getToken(), true);
             String jit = signToken.getJWTClaimsSet().getJWTID();
             Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
-
+            userActivityService.removeUserActivity(jwtGenerator.getEmailFromToken(request.getToken()));
             RefreshToken invalidatedToken =
                     RefreshToken.builder()
                             .refreshToken(jit)
@@ -261,6 +263,7 @@ public class AuthServiceImpl implements AuthService {
         String email = jwtGenerator.getEmailFromToken(token);
         Optional<Account> userOptional = accountRepos.findByEmail(email);
         Account user = userOptional.get();
+        userActivityService.updateUserActivity(email);
 
         return new AuthResponseDTO(user, token);
 

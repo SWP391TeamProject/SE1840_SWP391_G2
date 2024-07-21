@@ -10,6 +10,9 @@ import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -41,6 +44,7 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Autowired
     private AuctionSessionRepos auctionSessionRepos;
+
 
     @Override
     public List<RevenueDTO> getPaymentByStatus(String startDate, String endDate, String type) {
@@ -184,6 +188,7 @@ public class StatisticServiceImpl implements StatisticService {
 
         return result;
     }
+
 
 }
 
