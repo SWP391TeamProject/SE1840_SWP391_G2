@@ -27,7 +27,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
     }
 
     let params = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort: sort ? sort : 'auctionSessionId,desc',
       status: statusSet ? String(statusSet).toUpperCase() : undefined,
@@ -39,7 +39,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
     return await axios.get<Page<AuctionSession>>(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     });
@@ -55,6 +55,7 @@ export const fetchActiveAuctionSessions = async (page?: number, size?: number) =
     .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     })
@@ -74,7 +75,7 @@ export const getActiveAuction = async (input: getAuctionsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort,
       status: status ? status.toUpperCase() : undefined,
@@ -84,6 +85,8 @@ export const getActiveAuction = async (input: getAuctionsSchema) => {
     const response = await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
       headers: {
         'Content-Type': 'application/json',
+
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     });
@@ -108,6 +111,7 @@ export const fetchFeaturedAuctionSessions = async (page?: number, size?: number)
     .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/featured`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     })
@@ -124,6 +128,7 @@ export const fetchPastAuctionSessions = async (page?: number, size?: number) => 
     .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     })
@@ -136,7 +141,7 @@ export const getPastAuction = async (input: getAuctionsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort,
       status: status ? status.toUpperCase() : undefined,
@@ -146,6 +151,7 @@ export const getPastAuction = async (input: getAuctionsSchema) => {
     const response = await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     });
@@ -170,6 +176,7 @@ export const fetchUpcomingAuctionSessions = async (page?: number, size?: number)
     .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     })
@@ -182,7 +189,7 @@ export const getUpcomingAuction = async (input: getAuctionsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort,
       status: status ? status.toUpperCase() : undefined,
@@ -192,6 +199,7 @@ export const getUpcomingAuction = async (input: getAuctionsSchema) => {
     const response = await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     });
@@ -210,7 +218,7 @@ export const fetchAuctionSessionById = async (id: number): Promise<AuctionSessio
   const res = await axios.get<AuctionSession>(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
   return res.data;
@@ -225,6 +233,7 @@ export const fetchAuctionSessionByTitle = async (page?: number, size?: number, t
     .get(`${SERVER_DOMAIN_URL}/api/${controller}/search/${title}`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
       params: params,
     })
@@ -241,7 +250,7 @@ export const createAuctionSession = async (data: any) => {
     headers: {
       'Content-Type': 'multipart/form-data',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
 };
@@ -251,7 +260,7 @@ export const updateAuctionSession = async (data: any) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
 };
@@ -260,7 +269,7 @@ export const registerAuctionSession = async (id: number) => {
   return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/register/${id}`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
 };
@@ -282,7 +291,7 @@ export const assignItem = async (id: number, assignItem: any) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
       },
     }
   );
@@ -293,7 +302,7 @@ export const finishAuctionSession = async (auctionSessionID: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
 };
@@ -302,7 +311,7 @@ export const terminateAuctionSession = async (auctionSessionId: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
 };
@@ -323,7 +332,7 @@ export const removeAuctionItem = async (auctionItemId: any) => {
   return await axios.post(`${SERVER_DOMAIN_URL}/api/auction-items/delete`, auctionItemId, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: `${getCookie('user')? 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken : ''}`,
     },
   });
 };

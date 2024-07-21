@@ -288,6 +288,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (auction.getEndDate().isBefore(LocalDateTime.now())) {
                 terminateAuction(auctionSessionId);
                 return;
+
             }
             logger.warn("Auction session " + auctionSessionId + " not started yet");
             return;

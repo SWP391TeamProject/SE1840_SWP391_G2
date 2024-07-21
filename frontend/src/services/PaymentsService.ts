@@ -40,7 +40,7 @@ export const getPayments = async (input: GetPaymentsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort: sort ? sort : 'paymentId,desc',
       status: status ? status.toUpperCase() : undefined,

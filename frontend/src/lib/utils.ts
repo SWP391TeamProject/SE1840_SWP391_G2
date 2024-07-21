@@ -33,7 +33,10 @@ export function parseDate(dateString: any, fallback?: Date): Date | undefined {
   return date;
 }
 
-export function parseIntOrUndefined(value: string, fallback?: number): number | undefined {
+export function parseIntOrUndefined(value: string | null, fallback: number | undefined = undefined): number | undefined {
+  if (value === null) {
+    return fallback;
+  }
   const parsed = parseInt(value, 10);
   if (isNaN(parsed)) {
     return fallback;
@@ -41,7 +44,7 @@ export function parseIntOrUndefined(value: string, fallback?: number): number | 
   return parsed;
 }
 
-export const formatDateToISO = (date: Date | undefined): string | undefined => {
+export const formatDateToISO = (date: Date | undefined | null): string | undefined => {
   if (!date) {
     return undefined;
   }
