@@ -4,29 +4,20 @@ import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { useCurrency } from '@/CurrencyProvider';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AxiosResponse } from '@/config/axiosConfig.ts';
 import { Item, ItemStatus } from '@/models/Item.ts';
 import { AlertCircle, BoxIcon, GavelIcon, GemIcon } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator.tsx';
 import { Button } from '@/components/ui/button';
 import { fetchAuctionSessionHistoryOfItem } from '@/services/AuctionSessionService.tsx';
 import { AuctionSession } from '@/models/AuctionSessionModel.tsx';
 import { Page } from '@/models/Page.ts';
+import {formatDate} from "@/lib/utils.ts";
+import {AxiosResponse} from "axios";
 
 const noImagePlaceholder = 'https://placehold.co/600x400?text=No+image';
-
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'long', // This will display the full name of the month
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  hour12: false, // Use 24-hour format
-});
 
 export function PublicItemDetail() {
   const currency = useCurrency();
@@ -101,7 +92,7 @@ export function PublicItemDetail() {
                 <h1 className="text-3xl font-bold">{item.name}</h1>
                 <Separator />
                 <div className="flex">
-                  <div className="basis-3/6 flex flex-col">
+                  <div className="basis-3/6 flex flex-col gap-3">
                     <div className="inline-flex">
                       <BoxIcon className="h-6 w-6" />
                       <span className="pl-2">{item.category.name}</span>
@@ -118,15 +109,6 @@ export function PublicItemDetail() {
                     )}
                   </div>
                   <div className="basis-3/6">
-                    {item.status == ItemStatus.QUEUE && (
-                      <Alert variant="default">
-                        <AlertCircle className="h-5 w-5" />
-                        <AlertTitle>
-                          <h3 className="text-lg">Status</h3>
-                        </AlertTitle>
-                        <AlertDescription>This item is not in any auction. Check later!</AlertDescription>
-                      </Alert>
-                    )}
                     {item.status == ItemStatus.IN_AUCTION && (
                       <Alert variant="default">
                         <AlertCircle className="h-5 w-5" />
@@ -179,12 +161,6 @@ export function PublicItemDetail() {
                       </TableBody>
                     </Table>
                   </CardContent>
-                  <CardFooter>
-                    <i className="text-sm">
-                      Please note that item evaluations are subject to error; we advise independent verification before
-                      bidding.
-                    </i>
-                  </CardFooter>
                 </Card>
               </div>
             </div>
@@ -217,8 +193,8 @@ export function PublicItemDetail() {
                             <TableCell className="font-medium">
                               <a href={`/auctions/${a.auctionSessionId}`}>{a.title}</a>
                             </TableCell>
-                            <TableCell>{dateFormatter.format(new Date(a.startDate))}</TableCell>
-                            <TableCell>{dateFormatter.format(new Date(a.endDate))}</TableCell>
+                            <TableCell>{formatDate(new Date(a.startDate))}</TableCell>
+                            <TableCell>{formatDate(new Date(a.endDate))}</TableCell>
                             <TableCell>{a.status}</TableCell>
                           </TableRow>
                         );

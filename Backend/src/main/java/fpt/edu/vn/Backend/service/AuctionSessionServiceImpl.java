@@ -285,6 +285,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return;
         }
         if (auction.getStatus() == AuctionSession.Status.SCHEDULED) {
+            if (auction.getEndDate().isBefore(LocalDateTime.now())) {
+                terminateAuction(auctionSessionId);
+            }
             logger.warn("Auction session " + auctionSessionId + " not started yet");
             return;
         }

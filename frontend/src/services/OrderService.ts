@@ -27,7 +27,7 @@ export const getOrders = async (input: GetOrdersSchema) => {
     status, shippingStatus, from, to, search, user } = input;
 
   let params = {
-    page: page - 1, // Spring Boot uses 0-based page index
+    page: page && page - 1, // Spring Boot uses 0-based page index
     size: size ? size : 10,
     sort: sort ? sort : 'orderId,desc',
     status: status ? status.toUpperCase() : undefined,

@@ -23,7 +23,7 @@ export const fetchAllConsignmentsService = async (input: GetConsignmentSchema) =
   const { page, size, sort, status, from, to, customer, search } = input;
 
   let params = {
-    page: page - 1, // Spring Boot uses 0-based page index
+    page: page && page - 1, // Spring Boot uses 0-based page index
     size: size ? size : 10,
     sort: sort ? sort : 'itemId,desc',
     status: status ? status.toUpperCase() : undefined,
@@ -58,7 +58,7 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
     // Prepare query parameters
     if (status === '') {
       const params: Record<string, any> = {
-        page: page - 1, // Spring Boot uses 0-based page index
+        page: page && page - 1, // Spring Boot uses 0-based page index
         size: size ? size : 10,
         sort,
         order,
@@ -76,7 +76,7 @@ export const getConsignments = async (input: GetConsignmentsSchema) => {
     } else {
       let params = {
         status: status,
-        page: page - 1,
+        page: page && page - 1, // Spring Boot uses 0-based page index
         size: size ? size : 10,
         sort,
         order: order,
