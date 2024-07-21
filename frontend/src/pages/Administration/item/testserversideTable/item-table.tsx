@@ -3,13 +3,11 @@ import * as React from 'react';
 import { useDataTable } from '@/hooks/use-data-table';
 import getColumns from './items-table-column';
 import { DataTable } from '@/components/data-tables/data-table';
-import { getItems } from './item-apis';
 import { ItemsTableFloatingBar } from './items-table-floating-bar';
 import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
 import { ItemsTableToolbarActions } from './items-table-toolbar-actions';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
-import { toast } from 'sonner';
-import { getErrorMessage } from '@/lib/handle-error';
+import {getItems} from "@/services/ItemService.ts";
 
 interface ItemTableProps {
   itemPromise: ReturnType<typeof getItems>;

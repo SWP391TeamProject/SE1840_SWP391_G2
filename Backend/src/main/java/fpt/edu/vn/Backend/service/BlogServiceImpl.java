@@ -13,6 +13,7 @@ import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
 import fpt.edu.vn.Backend.repository.BlogCategoryRepos;
 import fpt.edu.vn.Backend.repository.BlogPostRepos;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,11 +61,11 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
    //@Cacheable(key = "#pageable", value = "blog")
-    public Page<BlogPostDTO> getAllBlogs(String keyword,Pageable pageable) {
-        BlogSpecification spec = new BlogSpecification(keyword);
+    public Page<BlogPostDTO> getAllBlogs(@Nullable String keyword, @Nullable Integer categoryId,  Pageable pageable) {
+        BlogSpecification spec = new BlogSpecification(keyword, categoryId);
         return blogPostRepos.findAll(spec,pageable).map(BlogPostDTO::new);
     }
-    @Transactional
+
     public BlogPost toEntity(BlogPostDTO blogPostDTO) {
         BlogPost blogPost = new BlogPost();
         blogPost.setPostId(blogPostDTO.getPostId());
@@ -194,12 +195,6 @@ public class BlogServiceImpl implements BlogService {
     //@CacheEvict(allEntries = true, value = "blog")
     public void deleteBlog(int id) {
         blogPostRepos.delete(blogPostRepos.findByPostId(id).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + id)));
-    }
-
-    @Override
-   //@Cacheable(key = "#keyword", value = "blog")
-    public Page<BlogPostDTO> searchBlog(String keyword, Pageable pageable) {
-        return blogPostRepos.findAllByContentIsContainingIgnoreCase(keyword, pageable).map(BlogPostDTO::new);
     }
 
     @Override

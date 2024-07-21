@@ -16,51 +16,25 @@ class BlogService {
   private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blogs`;
 
   public static getBlogs = async (input: GetBlogsSchema) => {
-    try {
-      const { page, size, sort, order, categoryId } = input;
-      let response;
+    const { page, size, sort, search, categoryId } = input;
+    let response;
 
-      if (categoryId > -1) {
-        let params = {
-          page: page - 1 || 0,
-          size: size || 10,
-          sort,
-          order,
-          search: input.search,
-        };
-        response = await axios.get(`${this.BASE_URL}/category?categoryId=${categoryId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-          },
-          params: params,
-        });
-      } else {
-        let params: Record<string, any> = {
-          page: page - 1, // Spring Boot uses 0-based page index
-          size: size ? size : 10,
-          sort,
-          order,
-          search: input.search,
-        };
+    let params: Record<string, any> = {
+      page: page - 1, // Spring Boot uses 0-based page index
+      size: size ? size : 10,
+      sort: sort ? sort : 'postId,desc',
+      categoryId,
+      search
+    };
 
-        response = await axios.get(`${this.BASE_URL}/`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-          },
-          params: params,
-        });
-      }
-      // Prepare query parameters
-      return response.data;
-    } catch (err) {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
-    }
+    response = await axios.get(`${this.BASE_URL}/`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+      params: params,
+    });
+    return response;
   };
 
   public static getAllBlogs(page?: number, size?: number) {

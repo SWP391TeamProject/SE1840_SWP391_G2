@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { ArrowUpIcon, CheckCircledIcon, Cross2Icon, DownloadIcon, ReloadIcon, TrashIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon, Cross2Icon, DownloadIcon, ReloadIcon, TrashIcon } from '@radix-ui/react-icons';
 import { SelectTrigger } from '@radix-ui/react-select';
 import { type Table } from '@tanstack/react-table';
-import { toast } from 'sonner';
 
 import { exportTableToCSV } from '@/lib/export';
 import { Button } from '@/components/ui/button';
@@ -12,8 +11,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Kbd } from '@/components/kbd';
 import { fetchAccountsService } from '@/services/AccountsServices';
 import { AccountStatus } from '@/constants/enums';
-
-// import { deleteitems, updateitems } from "../_lib/actions"
 
 interface blogsTableFloatingBarProps {
   table: Table<ReturnType<typeof fetchAccountsService>>;

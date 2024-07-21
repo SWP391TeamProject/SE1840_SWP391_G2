@@ -102,18 +102,14 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
               <DropdownMenuLabel>Status</DropdownMenuLabel>
               <DropdownMenuSeparator/>
               <DropdownMenuCheckboxItem
-                className="w-9/12"
                 checked={status === undefined}
                 onClick={() => setParam('status', undefined)}
               >All</DropdownMenuCheckboxItem>
               {Object.keys(PaymentStatus).map((s) => (
-                <div className="flex m-1 items-center justify-between" key={s}>
-                  <DropdownMenuCheckboxItem
-                    className="w-9/12"
-                    checked={status === s}
-                    onClick={() => setParam('status', s)}
-                  >{s}</DropdownMenuCheckboxItem>
-                </div>
+                <DropdownMenuCheckboxItem
+                  checked={status === s}
+                  onClick={() => setParam('status', s)}
+                >{s}</DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>

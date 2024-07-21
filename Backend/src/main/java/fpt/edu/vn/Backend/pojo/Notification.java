@@ -25,7 +25,7 @@ public class Notification {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @Column(length = 500)
+    @Column(length = 500, columnDefinition = "NVARCHAR(500)")
     private String message;
 
     @Column(name = "is_read")

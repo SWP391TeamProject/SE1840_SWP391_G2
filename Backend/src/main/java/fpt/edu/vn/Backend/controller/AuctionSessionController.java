@@ -1,35 +1,31 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
 import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
-import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.security.Authorizer;
-import fpt.edu.vn.Backend.service.AccountService;
-import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
-import fpt.edu.vn.Backend.service.AuctionSessionSpecification;
+import org.apache.commons.lang3.EnumUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -38,17 +34,23 @@ public class AuctionSessionController {
     private static final Logger log = LoggerFactory.getLogger(AuctionSessionController.class);
     @Autowired
     private AuctionSessionService auctionSessionService;
-    @Autowired
-    private AccountService accountService;
 
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<Page<AuctionSessionDTO>> getAllAuctionSessions(
             Principal principal,
-            @PageableDefault(size = 50) Pageable pageable
-            ,@RequestParam(required = false) String search
-            ) {
+            @PageableDefault(size = 50) Pageable pageable,
+            @Nullable String status,
+            @Nullable String search,
+            @Nullable LocalDateTime fromDate,
+            @Nullable LocalDateTime toDate
+    ) {
+        var statusSet = status == null ? null :
+                Arrays.stream(status.split(","))
+                .map(String::trim).map(s -> {
+                    return EnumUtils.getEnum(AuctionSession.Status.class, s.toUpperCase());
+                }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
         return ResponseEntity.ok(auctionSessionService.getAuctionSessions(
-                pageable, null, search, null, null,
+                pageable, statusSet, search, fromDate, toDate,
                 Authorizer.getUserId(principal)));
     }
 

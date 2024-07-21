@@ -30,6 +30,21 @@ export const getColumns = (): ColumnDef<Payment>[] => [
     enableHiding: false,
   },
   {
+    accessorKey: 'account.nickname',
+    header: ({column}) => <DataTableColumnHeader column={column}
+                                                 title="Account"/>,
+    cell: ({row}) => {
+      return (
+        <AccountTooltip account={row.original.account}>
+          <Link
+            to={`/account/${row.original.account.accountId}`}>{row.original.account.nickname}</Link>
+        </AccountTooltip>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: 'paymentAmount',
     header: ({column}) => <DataTableColumnHeader column={column}
                                                  title="Amount"/>,
@@ -37,16 +52,6 @@ export const getColumns = (): ColumnDef<Payment>[] => [
       const currency = useCurrency();
       return <div
         className="font-medium">{currency.format(row.original.paymentAmount)}</div>;
-    },
-    enableSorting: true,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'createDate',
-    header: ({column}) => <DataTableColumnHeader column={column}
-                                                 title="Create Date"/>,
-    cell: ({row}) => {
-      return <div>{formatDate(row.getValue('createDate'))}</div>;
     },
     enableSorting: true,
     enableHiding: false,
@@ -67,6 +72,14 @@ export const getColumns = (): ColumnDef<Payment>[] => [
     },
   },
   {
+    accessorKey: 'method',
+    header: ({column}) => <DataTableColumnHeader column={column}
+                                                 title="Method"/>,
+    cell: ({row}) => row.getValue('method') || 'N/A',
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: 'status',
     header: ({column}) => <DataTableColumnHeader column={column}
                                                  title="Status"/>,
@@ -84,27 +97,14 @@ export const getColumns = (): ColumnDef<Payment>[] => [
     },
   },
   {
-    accessorKey: 'method',
+    accessorKey: 'createDate',
     header: ({column}) => <DataTableColumnHeader column={column}
-                                                 title="Method"/>,
-    cell: ({row}) => row.getValue('method') || 'N/A',
-    enableSorting: true,
-    enableHiding: true,
-  },
-  {
-    accessorKey: 'account.nickname',
-    header: ({column}) => <DataTableColumnHeader column={column}
-                                                 title="Account"/>,
+                                                 title="Create Date"/>,
     cell: ({row}) => {
-      return (
-        <AccountTooltip account={row.original.account}>
-          <Link
-            to={`/account/${row.original.account.accountId}`}>{row.original.account.nickname}</Link>
-        </AccountTooltip>
-      );
+      return <div>{formatDate(row.getValue('createDate'))}</div>;
     },
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: false,
   },
   {
     id: 'actions',

@@ -3,8 +3,8 @@ import {type Table} from '@tanstack/react-table';
 
 import {exportTableToCSV} from '@/lib/export';
 import {Button} from '@/components/ui/button';
-import {CircleDollarSign, ListFilter, SearchIcon} from 'lucide-react';
-import {useSearchParams} from 'react-router-dom';
+import {CircleDollarSign, ListFilter, PlusIcon, SearchIcon} from 'lucide-react';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -46,6 +46,7 @@ type FormData = {
 };
 
 export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps) {
+  const nav = useNavigate();
   const [categories, setCategories] = useState<ItemCategory[]>([]);
   useEffect(() => {
     getAllItemCategories(0, 50)
@@ -109,18 +110,14 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
               <DropdownMenuLabel>Status</DropdownMenuLabel>
               <DropdownMenuSeparator/>
               <DropdownMenuCheckboxItem
-                className="w-9/12"
                 checked={status === undefined}
                 onClick={() => setParam('status', undefined)}
               >All</DropdownMenuCheckboxItem>
               {Object.keys(ItemStatus).map((s) => (
-                <div className="flex m-1 items-center justify-between" key={s}>
-                  <DropdownMenuCheckboxItem
-                    className="w-9/12"
-                    checked={status === s}
-                    onClick={() => setParam('status', s)}
-                  >{s}</DropdownMenuCheckboxItem>
-                </div>
+                <DropdownMenuCheckboxItem
+                  checked={status === s}
+                  onClick={() => setParam('status', s)}
+                >{s}</DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -136,19 +133,14 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
               <DropdownMenuLabel>Category</DropdownMenuLabel>
               <DropdownMenuSeparator/>
               <DropdownMenuCheckboxItem
-                className="w-9/12"
                 checked={categoryId === undefined}
                 onClick={() => setParam('categoryId', undefined)}
               >All</DropdownMenuCheckboxItem>
               {categories.map((ctg) => (
-                <div className="flex m-1 items-center justify-between"
-                     key={ctg.itemCategoryId}>
-                  <DropdownMenuCheckboxItem
-                    className="w-9/12"
-                    checked={categoryId === ctg.itemCategoryId.toString()}
-                    onClick={() => setParam('categoryId', ctg.itemCategoryId)}
-                  >{ctg.name}</DropdownMenuCheckboxItem>
-                </div>
+                <DropdownMenuCheckboxItem
+                  checked={categoryId === ctg.itemCategoryId.toString()}
+                  onClick={() => setParam('categoryId', ctg.itemCategoryId)}
+                >{ctg.name}</DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -219,6 +211,10 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
         >
           <DownloadIcon className="mr-2 size-4" aria-hidden="true"/>
           Export
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => nav('create')}>
+          <PlusIcon className="mr-2 size-4" aria-hidden="true" />
+          Create
         </Button>
       </div>
     </div>

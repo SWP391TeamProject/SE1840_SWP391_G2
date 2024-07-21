@@ -1,44 +1,39 @@
-import { API_SERVER, SERVER_DOMAIN_URL } from '@/constants/domain';
-import { Roles } from '@/constants/enums';
-import { Account } from '@/models/AccountModel';
-import { Page } from '@/models/Page';
-import { getCookie, removeCookie } from '@/utils/cookies';
+import {API_SERVER, SERVER_DOMAIN_URL} from '@/constants/domain';
+import {Account} from '@/models/AccountModel';
+import {Page} from '@/models/Page';
+import {getCookie, removeCookie} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 interface GetAccountsSchema {
   page: number;
   size: number;
   sort?: string;
-  search?: string;
   order?: 'asc' | 'desc';
   status?: string;
   role?: string;
+  search?: string;
 }
 
 export const fetchAccountsService = async (input: GetAccountsSchema) => {
-  const { page, size, sort, order, status, role } = input;
+  const { page, size, sort, order, status, role, search } = input;
 
-  // Prepare query parameters
   const params: Record<string, any> = {
     page: page - 1, // Spring Boot uses 0-based page index
     size: size ? size : 10,
-    sort,
+    sort: sort ? sort : 'accountId,desc',
     status: status ? status.toUpperCase() : undefined,
+    role: role ? role.toUpperCase() : undefined,
     order,
-    search: input.search,
-    Role: role ? role : undefined,
+    search
   };
 
-  const response = await axios.get<Page<Account>>(API_SERVER + '/accounts/', {
+  return await axios.get<Page<Account>>(API_SERVER + '/accounts/', {
     headers: {
       'Content-Type': 'application/json',
-
       Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
     },
     params: params,
   });
-
-  return response.data;
 };
 
 export const fetchAccountsByName = async (pageNumber: number, pageSize: number, name: string) => {
@@ -101,7 +96,7 @@ export const createAccountService = async (data: any) => {
 };
 
 export const updateAccountService = async (data: any, id: number) => {
-  return await axios.put(API_SERVER + '/accounts/' + id, data, {
+  return await axios.post(API_SERVER + '/accounts/' + id, data, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
@@ -113,7 +108,7 @@ export const deleteAccountService = async (id: string) => {
   console.log(id);
   return await axios
     .post(
-      API_SERVER + '/accounts/' + id,
+      API_SERVER + '/accounts/disable/' + id,
       {},
       {
         headers: {

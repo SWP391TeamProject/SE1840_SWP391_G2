@@ -40,6 +40,18 @@ export const getColumns = (): ColumnDef<Order>[] => [
     enableHiding: false,
   },
   {
+    accessorKey: 'payment.account.nickname',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Account" className="w-[50px]" />,
+    cell: ({row}) => {
+      return (
+        <AccountTooltip account={row.original.payment.account}>
+          <Link
+            to={`/account/${row.original.payment.account.accountId}`}>{row.original.payment.account.nickname}</Link>
+        </AccountTooltip>
+      );
+    },
+  },
+  {
     accessorKey: 'payment.paymentAmount',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Total" className="w-" />,
     cell: ({ row }) => {
@@ -57,18 +69,6 @@ export const getColumns = (): ColumnDef<Order>[] => [
     },
   },
   {
-    accessorKey: 'payment.account.nickname',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Account" className="w-[50px]" />,
-    cell: ({row}) => {
-      return (
-        <AccountTooltip account={row.original.payment.account}>
-          <Link
-            to={`/account/${row.original.payment.account.accountId}`}>{row.original.payment.account.nickname}</Link>
-        </AccountTooltip>
-      );
-    },
-  },
-  {
     accessorKey: 'shippingAddress',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Shipping Address" />,
     cell: ({ row }) => <div className="max-w-[20rem]">{row.original.shippingAddress}</div>,
@@ -81,7 +81,7 @@ export const getColumns = (): ColumnDef<Order>[] => [
         FAILED: 'text-red-500',
         PENDING: 'text-yellow-500',
         PACKAGING: 'text-purple-500',
-        DELIVERING: 'text-black-500',
+        DELIVERING: 'text-gray-500',
         DELIVERED: 'text-green-600',
       };
 

@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.controller;
 
+import com.azure.core.annotation.Post;
 import fpt.edu.vn.Backend.DTO.AccountDTO;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.MonthlyBalanceDTO;
@@ -15,6 +16,7 @@ import fpt.edu.vn.Backend.security.CurrentUser;
 import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,29 +55,14 @@ public class AccountController {
     @GetMapping("/")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 50) Pageable pageable,
-                                                        @RequestParam(required = false,name = "Role") Account.Role role,
-                                                        @RequestParam(required = false) String search
-                                                        ) {
-        log.info("Get accounts with role: {}", role);
-        if (role == null) {
-            return new ResponseEntity<>(accountService.getAccounts(search,pageable), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(accountService.getAccountsByRoles(pageable, Set.of(role)), HttpStatus.OK);
+                                                        @Nullable Account.Role role,
+                                                        @Nullable Account.Status status,
+                                                        @Nullable String search) {
+        return new ResponseEntity<>(accountService.getAccounts(pageable, role, status, search), HttpStatus.OK);
     }
     @GetMapping("/monthly")
     public List<MonthlyBalanceDTO> getMonthlyBalances(@RequestParam int year) {
         return accountService.getMonthlyBalances(year);
-    }
-
-    @GetMapping("/search/{name}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Page<AccountDTO>> searchAccounts(@PageableDefault(size = 50) Pageable pageable,
-                                                        @RequestParam(required = false) String keyword,
-                                                        @PathVariable String name) {
-        if (name == null) {
-            return new ResponseEntity<>(accountService.getAccounts(keyword,pageable), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(accountService.getAccountsByNameOrEmail(pageable, name), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -97,7 +84,7 @@ public class AccountController {
         return new ResponseEntity<>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or authentication.token.claims['userId'] == #id")
     public ResponseEntity<AccountDTO> updateAccount(Principal principal, @RequestBody AccountDTO accountDTO, @PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
@@ -135,7 +122,7 @@ public class AccountController {
         return new ResponseEntity<>(accountService.setAvatar(id, file), HttpStatus.OK);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/disable/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<AccountDTO> disableAccount(@PathVariable int id) {
         if (accountService.getAccountById(id) == null) {
@@ -172,7 +159,7 @@ public class AccountController {
         List<AccountDTO> listAccounts;
         String keyword = "";
         {
-            listAccounts = accountService.getAccounts(keyword,PageRequest.of(0, 1000)).getContent();
+            listAccounts = accountService.getAccounts(PageRequest.of(0, 1000), null, null, keyword).getContent();
         }
 
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");

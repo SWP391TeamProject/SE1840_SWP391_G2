@@ -11,6 +11,8 @@ import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
+import fpt.edu.vn.Backend.security.Authorizer;
+import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.ConsignmentService;
@@ -27,8 +29,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -49,38 +53,19 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(@RequestParam(required = false) String search,
-                                                                  @PageableDefault(size = 50) Pageable pageable, Authentication authentication) {
-        try {
-
-            AccountDTO acc = accountService.getAccountByEmail(authentication.getName());
-            if (acc != null) {
-                Account.Role role = acc.getRole();
-                logger.info(role.toString() + ": " + role.equals(Account.Role.STAFF) + ": " + role.equals(Account.Role.MANAGER));
-                switch (role) {
-                    case STAFF: {
-                        Page<ConsignmentDTO> staffPage = consignmentService.getAllStaffConsignments(acc.getAccountId(),pageable);
-                        logger.info("3");
-                        return new ResponseEntity<>(staffPage, HttpStatus.OK);
-                    }
-                    case MANAGER, ADMIN: {
-                        Page<ConsignmentDTO> consignments = consignmentService.getAllConsignments(search,pageable);
-                        if (consignments == null || consignments.isEmpty()) {
-                            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                        }
-                        logger.info("4");
-                        return new ResponseEntity<>(consignments, HttpStatus.OK);
-                    }
-                }
-            }
-            logger.info("5");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            // Log the exception
-            logger.error("An error occurred while retrieving all consignments: {}", e.getMessage(), e);
-            // Return error response
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(
+            Principal principal,
+            @PageableDefault(size = 50) Pageable pageable,
+            @RequestParam(required = false) Consignment.Status status,
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(required = false) Integer customer,
+            @RequestParam(required = false) String search) {
+        JwtUser requester = Authorizer.requireUser(principal);
+        if (!Authorizer.STAFF.contains(requester.getRole())) {
+            customer = requester.getUserId(); // only get consignment of current user
         }
+        return ResponseEntity.ok(consignmentService.getAllConsignments(pageable, status, from, to, customer, search));
     }
 
     @GetMapping("/{id}")

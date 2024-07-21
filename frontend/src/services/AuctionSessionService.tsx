@@ -1,11 +1,10 @@
 import { getCookie, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-import { toast } from 'sonner';
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
 import { AuctionSession } from '@/models/AuctionSessionModel.tsx';
 import { Page } from '@/models/Page.ts';
-import { createSearchParams } from 'react-router-dom';
+import {formatDateToISO} from "@/lib/utils.ts";
 
 const controller = 'auction-sessions';
 
@@ -13,117 +12,37 @@ interface getAuctionsSchema {
   page: number;
   size: number;
   sort?: string;
-  order?: 'asc' | 'desc';
-  status?: string;
+  status?: string | string[];
+  fromDate?: Date;
+  toDate?: Date;
   search?: string;
 }
 
-export const fetchAllAuctionSessions = async (page?: number, size?: number) => {
-  let params = {
-    page: page ? page - 1 : 0,
-    size: size ? size : 10,
-  };
+export const getAuctions = async (input: getAuctionsSchema) => {
+    const { page, size, sort, status, fromDate, toDate, search } = input;
+    let statusSet = status;
 
-  console.log(params);
+    if (Array.isArray(status)) {
+      statusSet = status.join(',');
+    }
 
-  return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
+    let params = {
+      page: page - 1, // Spring Boot uses 0-based page index
+      size: size ? size : 10,
+      sort: sort ? sort : 'auctionSessionId,desc',
+      status: statusSet ? String(statusSet).toUpperCase() : undefined,
+      fromDate: formatDateToISO(fromDate),
+      toDate: formatDateToISO(toDate),
+      search
+    };
+
+    return await axios.get<Page<AuctionSession>>(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
       params: params,
-    })
-    .catch((err) => {
-      toast.error(err.response.data.message, {});
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
     });
-};
-
-export const getAuctions = async (input: getAuctionsSchema) => {
-  try {
-    const { page, size, sort, order, status } = input;
-
-    // Prepare query parameters
-    // const params: Record<string, any> = {
-    //     page: page - 1, // Spring Boot uses 0-based page index
-    //     size: size ? size : 10,
-    //     sort,
-    //     status: status ? status.toUpperCase() : undefined,
-    //     order,
-    // };
-
-    switch (status) {
-      case 'Upcoming': {
-        let params = {
-          pageNumb: page - 1,
-          pageSize: size ? size : 10,
-          search: input.search,
-          sort: input.sort,
-        };
-        return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/upcoming`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          params: params,
-        });
-      }
-      case 'Past': {
-        let params = {
-          pageNumb: page - 1,
-          pageSize: size ? size : 10,
-          search: input.search,
-        };
-
-        return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/completed`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          params: params,
-        });
-      }
-      case 'Active': {
-        let params = {
-          page: page ? page - 1 : 0,
-          size: size ?? 10,
-          search: input.search,
-        };
-
-        return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/active`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          params: params,
-        });
-      }
-      default: {
-        let params: Record<string, any> = {
-          page: page - 1, // Spring Boot uses 0-based page index
-          size: size ? size : 10,
-          sort,
-          search: input.search,
-          status: status ? status.toUpperCase() : undefined,
-          order,
-          principal: JSON.parse(getCookie('user')).accessToken || '',
-        };
-
-        return await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          params: params,
-        });
-      }
-    }
-  } catch (err) {
-    console.log(err);
-    if (err?.response.status == 401) {
-      removeCookie('user');
-      removeCookie('token');
-    }
-  }
 };
 
 export const fetchActiveAuctionSessions = async (page?: number, size?: number) => {
