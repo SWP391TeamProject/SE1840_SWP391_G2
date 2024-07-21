@@ -10,19 +10,28 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DataTablePagination } from '@/components/data-tables/data-table-pagination';
-import React, { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { DatePickerWithRange } from '@/components/component/date-picker-with-range';
-import { DateRange } from 'react-day-picker';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+import {
+  DataTablePagination
+} from '@/components/data-tables/data-table-pagination';
+import React, {useEffect, useState} from 'react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+                                           columns,
+                                           data
+                                         }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [selectedDateRange, setSelectedDateRange] = useState<undefined>();
@@ -51,7 +60,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   }, [selectedDateRange]);
   return (
     <>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table}/>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -69,9 +78,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+              <TableRow key={row.id}
+                        data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  <TableCell
+                    key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                 ))}
               </TableRow>
             ))

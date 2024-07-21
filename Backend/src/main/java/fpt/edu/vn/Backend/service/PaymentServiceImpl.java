@@ -18,6 +18,7 @@ import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.PaymentRepos;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +63,15 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
+        Preconditions.checkState(paymentRequest.getType() == Payment.Type.DEPOSIT ||
+                paymentRequest.getType() == Payment.Type.WITHDRAW,
+                "Type must be DEPOSIT or WITHDRAW");
         log.info("createPayment: " + paymentRequest);
         try {
             Payment payment = new Payment();
-            payment.setMethod(paymentRequest.getMethod());
+            payment.setMethod(paymentRequest.getType() == Payment.Type.WITHDRAW ?
+                    Payment.Method.MANUAL :
+                    paymentRequest.getMethod());
 
             if (payment.getMethod() == Payment.Method.VNPAY) {
                 BigDecimal exchangeRate = currencyService.getExchangeRate(CurrencyType.VND);
@@ -84,11 +90,24 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new InvalidInputException("Amount must be smaller than 100,000,000 USD");
             }
 
-            payment.setType(Payment.Type.DEPOSIT); // must always be DEPOSIT
+            Account acc = accountRepos.findByAccountId(paymentRequest.getAccountId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId()));
+
+            if (paymentRequest.getType() == Payment.Type.WITHDRAW) {
+                Preconditions.checkState(acc.getBalance().subtract(paymentRequest.getAmount())
+                        .compareTo(BigDecimal.ZERO) >= 0, "Insufficient balance");
+            }
+
+            payment.setType(paymentRequest.getType()); // must always be DEPOSIT
             payment.setStatus(Payment.Status.PENDING);
-            payment.setAccount(accountRepos.findByAccountId(paymentRequest.getAccountId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + paymentRequest.getAccountId())));
+            payment.setAccount(acc);
             Payment savedPayment = paymentRepos.save(payment);
+
+            if (savedPayment.getType() == Payment.Type.WITHDRAW) {
+                acc.setBalance(acc.getBalance().subtract(paymentRequest.getAmount()));
+                accountRepos.save(acc); // lock the withdrawal amount
+                return "Withdraw payment created successfully";
+            }
 
             if (savedPayment.getMethod() == Payment.Method.VNPAY) {
                 VnPayPaymentRequestDTO vnPayPaymentRequestDTO = VnPayPaymentRequestDTO.builder()
@@ -167,25 +186,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<PaymentDTO> getAllPayment(Pageable pageable, Payment.Type type, Payment.Status status,String keyword) {
-        Page<Payment> payments;
-        if (type != null) {
-            payments = paymentRepos.findAllByType(type, pageable);
-        } else if (status != null) {
-            payments = paymentRepos.findAllByStatus(status, pageable);
-        } else if (keyword != null) {
-            payments = searchPayment(keyword,pageable);
-        } else {
-            payments = paymentRepos.findAll(pageable);
-        }
-        return new PageImpl<>(payments.getContent().stream().map(PaymentDTO::new).collect(Collectors.toList()), pageable, payments.getTotalElements());
+    public Page<PaymentDTO> getAllPayment(Pageable pageable,
+                                          @Nullable Payment.Type type, @Nullable Payment.Status status,
+                                          @Nullable LocalDateTime fromDate, @Nullable LocalDateTime toDate,
+                                          @Nullable Integer accountId,
+                                          @Nullable String keyword) {
+        PaymentSpecification spec = new PaymentSpecification(type, status, fromDate, toDate, accountId, keyword);
+        return paymentRepos.findAll(spec, pageable).map(PaymentDTO::new);
     }
-    @Transactional
-    @Override
-    public Page<Payment> searchPayment(String keyword,Pageable pageable){
-        PaymentSpecification spec = new PaymentSpecification(keyword);
-        return paymentRepos.findAll(spec,pageable);
-    }
+
     @Transactional
     @Override
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
@@ -193,6 +202,16 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id " + paymentDTO.getId()));
         Preconditions.checkState(payment.getStatus() == Payment.Status.PENDING,
                 "Can only update pending payment");
+        if (paymentDTO.getStatus() == Payment.Status.SUCCESS && payment.getType() == Payment.Type.DEPOSIT) {
+            Account acc = payment.getAccount();
+            acc.setBalance(acc.getBalance().add(payment.getPaymentAmount()));
+            accountRepos.save(acc);
+        }
+        else if (paymentDTO.getStatus() == Payment.Status.FAILED && payment.getType() == Payment.Type.WITHDRAW) {
+            Account acc = payment.getAccount();
+            acc.setBalance(acc.getBalance().add(payment.getPaymentAmount())); // refund
+            accountRepos.save(acc);
+        }
         payment.setStatus(paymentDTO.getStatus());
         payment.setFailedReason(paymentDTO.getFailedReason());
         Payment updatedPayment = paymentRepos.save(payment);
@@ -327,12 +346,6 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("VnPay URL: " + paymentUrl);
 
         return paymentUrl;
-    }
-    @Transactional
-    @Override
-    public List<PaymentDTO> getUserPayments( String email) {
-        List<PaymentDTO> paymentList = paymentRepos.findAllByAccount_Email(email).stream().map(PaymentDTO::new).collect(Collectors.toList());
-        return paymentList;
     }
 
     @Override

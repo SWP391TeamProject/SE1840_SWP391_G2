@@ -17,7 +17,8 @@ import { PayPalButtons, PayPalScriptProvider, ReactPayPalScriptOptions } from '@
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { createSearchParams, useNavigate } from 'react-router-dom';
+import {createSearchParams, useNavigate} from 'react-router-dom';
+import WithdrawForm from "@/pages/CustomerSite/Profile/WithdrawForm.tsx";
 
 const amountSuggestions: { [key in CurrencyType]: number[] } = {
   [CurrencyType.USD]: [50, 100, 500, 1000, 5000, 10_000],
@@ -168,7 +169,10 @@ export default function Balance() {
       <div className="w-full lg:w-3/4 xl:w-1/2 flex flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Current Balance</CardTitle>
+            <CardTitle className="flex justify-between">
+              <h2 className="text-2xl">Balance</h2>
+              <WithdrawForm />
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <CardDescription className="text-2xl">{currency.format(auth.user.balance)}</CardDescription>

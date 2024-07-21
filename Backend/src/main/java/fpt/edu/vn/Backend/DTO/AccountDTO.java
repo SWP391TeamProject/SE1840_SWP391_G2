@@ -28,6 +28,13 @@ public class AccountDTO implements Serializable {
     private LocalDateTime updateDate;
     private boolean isKyc;
 
+    public static AccountDTO minimal(Account account) {
+        return AccountDTO.builder()
+                .accountId(account.getAccountId())
+                .nickname(account.getNickname())
+                .build();
+    }
+
     public static AccountDTO redacted(Account account) {
         return AccountDTO.builder()
                 .accountId(account.getAccountId())

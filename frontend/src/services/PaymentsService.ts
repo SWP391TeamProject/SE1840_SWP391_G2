@@ -1,8 +1,8 @@
 import { API_SERVER } from '@/constants/domain';
 import { PaymentType } from '@/constants/enums';
-import { showErrorToast } from '@/lib/handle-error';
 import { getCookie, removeCookie } from '@/utils/cookies';
 import axios from 'axios';
+import {formatDateToISO} from "@/lib/utils.ts";
 
 interface GetPaymentsSchema {
   page: number;
@@ -11,6 +11,10 @@ interface GetPaymentsSchema {
   order?: 'asc' | 'desc';
   status?: string;
   type?: string;
+  from?: Date;
+  to?: Date;
+  search?: string;
+  user?: number;
 }
 
 export const createPayment = (dto: { type?: 'DEPOSIT' | 'WITHDRAW'; amount?: number; accountId?: number }) => {
@@ -32,16 +36,20 @@ export const createPayment = (dto: { type?: 'DEPOSIT' | 'WITHDRAW'; amount?: num
 
 export const getPayments = async (input: GetPaymentsSchema) => {
   try {
-    const { page, size, sort, order, status, type } = input;
+    const { page, size, sort,
+      status, type, from, to, search, user } = input;
 
     // Prepare query parameters
     const params: Record<string, any> = {
       page: page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
-      sort,
+      sort: sort ? sort : 'paymentId,desc',
       status: status ? status.toUpperCase() : undefined,
-      order,
       type,
+      from: formatDateToISO(from),
+      to: formatDateToISO(to),
+      search,
+      user
     };
 
     const response = await axios.get(API_SERVER + '/payments', {

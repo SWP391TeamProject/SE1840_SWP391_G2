@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { Form, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useState } from 'react';
 
 import { toast } from 'sonner';
