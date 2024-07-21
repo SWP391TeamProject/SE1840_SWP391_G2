@@ -60,13 +60,13 @@ public class AuthController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/login-with-google")
+    @GetMapping("/login-with-google")
     public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestBody RefreshRequest request) {
         AuthResponseDTO authResponseDTO = authService.loginWithGoogle(request.getToken());
         return ResponseEntity.ok(authResponseDTO);
     }
 
-    @PostMapping("/login-with-facebook")
+    @GetMapping("/login-with-facebook")
     public ResponseEntity<AuthResponseDTO> loginWithFacebook(@RequestParam String token) {
         AuthResponseDTO authResponseDTO = authService.loginWithFacebook(token);
         return ResponseEntity.ok(authResponseDTO);

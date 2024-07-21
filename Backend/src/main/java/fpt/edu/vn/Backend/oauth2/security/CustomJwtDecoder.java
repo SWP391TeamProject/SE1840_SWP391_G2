@@ -6,14 +6,17 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.nimbusds.jose.JOSEException;
 import fpt.edu.vn.Backend.DTO.request.IntrospectRequest;
+import fpt.edu.vn.Backend.oauth2.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
@@ -37,9 +40,9 @@ public class CustomJwtDecoder implements JwtDecoder {
             var response = refreshTokenProvider.introspect(
                     IntrospectRequest.builder().token(token).build());
 
-            if (!response.isValid()) throw new JwtException("Token invalid");
+            if (!response.isValid()) throw new UnauthorizedException();
         } catch (JOSEException | ParseException e) {
-            throw new JwtException(e.getMessage());
+            throw new UnauthorizedException();
         }
 
         if (Objects.isNull(nimbusJwtDecoder)) {
