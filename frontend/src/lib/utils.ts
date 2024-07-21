@@ -50,3 +50,42 @@ export const formatDateToISO = (date: Date | undefined | null): string | undefin
   }
   return dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
 };
+
+export function truncateHtml(html:string, maxLength: number): string {
+  let count = 0;
+  let result = '';
+  let openTags = [];
+  let isTag = false;
+
+  for (let char of html) {
+    if (char === '<') {
+      isTag = true;
+      if (html[count + 1] !== '/') {
+        let tagStart = count + 1;
+        let tagEnd = html.indexOf('>', tagStart);
+        let tag = html.substring(tagStart, tagEnd);
+        if (tag[tag.length - 1] !== '/') { // Ignore self-closing tags
+          openTags.push(tag.split(' ')[0]); // Push tag name, ignoring attributes
+        }
+      } else {
+        openTags.pop(); // Pop on closing tag
+      }
+    } else if (char === '>') {
+      isTag = false;
+      continue;
+    }
+
+    if (!isTag && ++count > maxLength) {
+      break; // Truncate text
+    }
+
+    result += char;
+  }
+
+  while (openTags.length) {
+    let tag = openTags.pop();
+    result += `</${tag}>`; // Close remaining tags
+  }
+
+  return result;
+}

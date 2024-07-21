@@ -64,7 +64,7 @@ export default function NavBar() {
                 <NavigationMenuContent className="md:w-36">
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
                     <Link to="/auctions" className={navigationMenuTriggerStyle()}>
-                      Auctions
+                      All Auctions
                     </Link>
                   </NavigationMenuLink>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
@@ -79,7 +79,7 @@ export default function NavBar() {
                   </NavigationMenuLink>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
                     <Link className={navigationMenuTriggerStyle()} to="/auctions/upcoming">
-                      Upcoming
+                      Live Auctions
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuContent>
