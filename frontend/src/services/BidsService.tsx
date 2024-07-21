@@ -1,6 +1,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { getCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
+import { BidReply } from '@/models/newModel/bidReply';
 
 export const fetchBidsByAccount = async (id: number) => {
   return await axios
@@ -45,7 +46,7 @@ export const exportBids = async () => {
     });
 };
 
-export const fetchBidsByAuctionId = async (auctionId: number) => {
+export const fetchBidsByAuctionId = async (auctionId: number): Promise<BidReply[]> => {
   return await axios
     .get(`${SERVER_DOMAIN_URL}/api/bids/auction/` + auctionId, {
       headers: {
@@ -54,7 +55,7 @@ export const fetchBidsByAuctionId = async (auctionId: number) => {
     })
     .then((res) => {
       console.log(res.data.content);
-      return res;
+      return res.data;
     }) // return the data here
     .catch((err) => {
       console.log(err);

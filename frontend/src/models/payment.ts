@@ -1,5 +1,5 @@
 import { PaymentStatus, PaymentType } from '@/constants/enums';
-import {Account} from "@/constants/interfaces.ts";
+import { Account } from '@/constants/interfaces.ts';
 
 export enum method {
   VNPAY = 'VNPAY',

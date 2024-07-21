@@ -36,7 +36,7 @@ export function OrderDetail() {
         dispatch(setCurrentOrder(res.data));
         fetchAccountById(res.data.payment.accountId)
           .then((res) => {
-            setCustomer(res.data as Account);
+            setCustomer(res);
           })
           .catch((e) => {
             console.error(e);

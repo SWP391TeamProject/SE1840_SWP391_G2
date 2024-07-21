@@ -278,58 +278,65 @@ export function ItemList() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
-            {isLoadingItems
-              ? Array.from({ length: 8 }).map((_, index) => (
-                  // <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3" key={index}>
-                  <Card key={index} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer">
-                    <CardHeader>
-                      <Skeleton className="rounded-t-lg object-cover w-full h-56" />
-                    </CardHeader>
-                    <CardContent className="p-4 flex flex-col gap-2">
-                      <h3 className="text-sm font-bold h-6 mb-6">Loading...</h3>
+            {isLoadingItems ? (
+              Array.from({ length: 8 }).map((_, index) => (
+                // <CarouselItem className="pl-2 md:pl-4 lg:pl-4  basis-full md:basis-1/2 lg:basis-1/3" key={index}>
+                <Card key={index} className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer">
+                  <CardHeader>
+                    <Skeleton className="rounded-t-lg object-cover w-full h-56" />
+                  </CardHeader>
+                  <CardContent className="p-4 flex flex-col gap-2">
+                    <h3 className="text-sm font-bold h-6 mb-6">Loading...</h3>
+                    {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
+                    <div className="flex justify-between items-center h-6">
+                      <div className="text-primary font-bold text-lg">Loading...</div>
+                      <div className="text-muted-foreground text-sm">Loading...</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                // </CarouselItem>
+              ))
+            ) : itemsList.currentPageList.length > 0 ? (
+              itemsList.currentPageList.map((item) => {
+                return (
+                  <Card
+                    key={item.itemId}
+                    className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer"
+                  >
+                    <div className="group relative">
+                      <CardHeader>
+                        <img
+                          src={item.attachments && item.attachments.length > 0 ? item.attachments[0].link : ''}
+                          width={300}
+                          height={200}
+                          alt="Auction Item"
+                          loading="lazy"
+                          className="rounded-t-lg object-cover w-full "
+                        />
+                      </CardHeader>
+                      <div
+                        className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                        onClick={() => handleViewItemDetailsClick(item)}
+                      >
+                        <Button>Detail</Button>
+                      </div>
+                    </div>
+                    <CardContent className="p-4 flex flex-col gap-2 ">
+                      <h3 className="text-sm font-bold h-6 mb-6">{item.name}</h3>
                       {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
                       <div className="flex justify-between items-center h-6">
-                        <div className="text-primary font-bold text-lg">Loading...</div>
-                        <div className="text-muted-foreground text-sm">Loading...</div>
+                        <div className="text-primary font-bold text-lg">{currency.format(item.reservePrice)}</div>
+                        <div className="text-muted-foreground text-sm">{item.category.name}</div>
                       </div>
                     </CardContent>
                   </Card>
-                  // </CarouselItem>
-                ))
-              : itemsList.currentPageList.map((item) => {
-                  return (
-                    <Card
-                      key={item.itemId}
-                      className="bg-background rounded-lg overflow-hidden shadow-lg hover:cursor-pointer"
-                    >
-                      <div className="group relative">
-                        <CardHeader>
-                          <img
-                            src={item.attachments && item.attachments.length > 0 ? item.attachments[0].link : ''}
-                            width={300}
-                            height={200}
-                            alt="Auction Item"
-                            className="rounded-t-lg object-cover w-full "
-                          />
-                        </CardHeader>
-                        <div
-                          className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                          onClick={() => handleViewItemDetailsClick(item)}
-                        >
-                          <Button>Detail</Button>
-                        </div>
-                      </div>
-                      <CardContent className="p-4 flex flex-col gap-2 ">
-                        <h3 className="text-sm font-bold h-6 mb-6">{item.name}</h3>
-                        {/* <div className="text-muted-foreground mb-4 line-clamp-2 h-3" dangerouslySetInnerHTML={{ __html: item.description }}></div> */}
-                        <div className="flex justify-between items-center h-6">
-                          <div className="text-primary font-bold text-lg">{currency.format(item.reservePrice)}</div>
-                          <div className="text-muted-foreground text-sm">{item.category.name}</div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                );
+              })
+            ) : (
+              <div className="grid-cols-4 ">
+                <h1 className="text-2xl font-bold">No items found</h1>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-8">

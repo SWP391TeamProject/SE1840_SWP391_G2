@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { getCookie } from '@/utils/cookies';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { fetchBidsByAuctionId, fetchBidsByAuctionItemId } from '@/services/BidsService';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { fetchBidsByAuctionId } from '@/services/BidsService';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { toast } from 'sonner';
@@ -28,8 +28,11 @@ import BidsInformation from './components/BidsInformation';
 import { useAuth } from '@/AuthProvider';
 import { AuctionSessionStatus } from '@/constants/enums';
 import { Item } from '@/models/newModel/item';
-import { AuctionItem } from '@/models/newModel/auctionItem';
+import { AuctionItem } from '@/models/auctionItem';
 import Confetti from 'react-confetti-boom';
+import { BidReply } from '@/models/bidReply';
+import { formatDate } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AuctionJoin() {
   const currency = useCurrency();
@@ -39,13 +42,10 @@ export default function AuctionJoin() {
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
   const auth = useAuth();
-  const auctionId = location.state.id.auctionSessionId;
-  const itemId = location.state.id.itemId;
-  const [itemDTO, setItemDTO] = useState<Item>(location.state.itemDTO);
-  const endDate = location.state.endDate;
+
+  const [itemDTO, setItemDTO] = useState<Item | undefined>(location.state.itemDTO);
   console.log(location.state);
-  const [allow, setAllow] = useState(location.state.allow);
-  const [bids, setBids] = useState<YourBidType[]>([]);
+  const [bids, setBids] = useState<BidReply[]>([]);
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const dispatch = useAppDispatch();
@@ -53,12 +53,85 @@ export default function AuctionJoin() {
   const [isSending, setIsSending] = useState(false);
   const [showCofetti, setShowCofetti] = useState(false);
   let timer;
+  const loc = useLocation();
+  const nav = useNavigate();
+  const params = useParams();
+  const auctionId: number = Number(params.id);
+
+  // const auctionId = auctionSession.auctionSessionId;
+  // const itemId = location.state.id.itemId;
+
+  const [allow, setAllow] = useState<boolean | undefined>(false);
 
   useEffect(() => {
-    if (!getCookie('user')) {
-      setAllow(false);
-      return;
+    if (!auctionSession) {
+      fetchAuctionSessionById(auctionId)
+        .then((res) => {
+          dispatch(setCurrentAuctionSession(res));
+          console.log(res);
+          setItemDTO(res?.auctionItems[0].itemDTO);
+          setAllow(auctionSession?.hasDeposited);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+
+      fetchBidsByAuctionId(auctionId)
+        .then((res) => {
+          console.log(res);
+          setBids(res);
+          bids.sort((a, b) => {
+            return a.price - b.price;
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
+  }, []);
+  useEffect(() => {
+    console.log('isallow', allow);
+    // console.log("calling", auctionSession);
+    setAllow(auctionSession?.hasDeposited);
+  }, [allow]);
+
+  useEffect(() => {
+    if (!auctionSession) {
+      fetchAuctionSessionById(auctionId)
+        .then((res) => {
+          dispatch(setCurrentAuctionSession(res));
+          setItemDTO(res?.auctionItems[0].itemDTO);
+          setAllow(res?.hasDeposited);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+      fetchBidsByAuctionId(auctionId)
+        .then((res) => {
+          console.log(res);
+          setBids(res);
+          bids.sort((a, b) => {
+            return a.price - b.price;
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    console.log(allow);
+  }, [auctionSession]);
+
+  useEffect(() => {
+    if (auctionSession?.status === AuctionSessionStatus.FINISHED) {
+      setShowCofetti(true);
+    }
+  }, [auctionSession]);
+
+  useEffect(() => {
+    // if (!getCookie('user')) {
+    //   setAllow(false);
+    //   return;
+    // }
     if (accountId === null && getCookie('user')) {
       setAccountId(JSON.parse(getCookie('user'))?.id);
     }
@@ -66,31 +139,27 @@ export default function AuctionJoin() {
       client?.deactivate();
     };
     window.scrollTo(0, 0);
-    if (getCookie('user') && JSON.parse(getCookie('user')) && allow !== false) {
-      setAllow(true);
-    } else {
-      setAllow(false);
-    }
+    // if (getCookie('user') && JSON.parse(getCookie('user')) && allow !== false) {
+    //   setAllow(true);
+    // } else {
+    //   setAllow(false);
+    // }
   }, [itemDTO]);
 
   useEffect(() => {
-    if (allow === false || !getCookie('user')) {
-      setIsJoin(false);
-      setClient(null);
-      toast.dismiss();
-      return;
-    }
     const newClient = new Client({
       brokerURL:
         `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
-
       onConnect: () => {
         newClient.subscribe('/topic/public/' + auctionId, onMessageReceived);
         setTimeout(() => {
           newClient.publish({
-            destination: '/app/chat.addUser/' + auctionId + '/' + itemDTO.itemId,
+            destination: '/app/chat.addUser/' + auctionId + '/' + itemDTO?.itemId,
             body: JSON.stringify({
-              auctionItemId: location.state.id,
+              auctionItemId: {
+                auctionSessionId: auctionSession?.auctionSessionId,
+                itemId: itemDTO?.itemId,
+              },
               payment: {
                 accountId: JSON.parse(getCookie('user')).id,
               },
@@ -107,9 +176,9 @@ export default function AuctionJoin() {
         console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
       },
     });
+    newClient.activate();
 
     setClient(newClient);
-    newClient.activate();
 
     return () => {
       if (newClient.connected) {
@@ -117,7 +186,7 @@ export default function AuctionJoin() {
         newClient.unsubscribe('/topic/public/' + auctionId);
       }
     };
-  }, [allow]);
+  }, []);
 
   const onMessageReceived = (payload: IMessage) => {
     setIsJoin(false);
@@ -158,16 +227,16 @@ export default function AuctionJoin() {
         toast.error('Please enter a valid number', {});
         return;
       }
-      client.publish({
-        destination: '/app/chat.sendMessage/' + auctionId + '/' + itemId,
-        body: JSON.stringify({
-          auctionItemId: location.state.id,
-          payment: {
-            accountId: JSON.parse(getCookie('user')).id,
-            paymentAmount: paymentAmount,
-          },
-        }),
-      });
+      // client.publish({
+      //   destination: '/app/chat.sendMessage/' + auctionId + '/' + itemDTO?.itemId,
+      //   body: JSON.stringify({
+      //     auctionItemId: location.state.id,
+      //     payment: {
+      //       accountId: JSON.parse(getCookie('user')).id,
+      //       paymentAmount: paymentAmount,
+      //     },
+      //   }),
+      // });
       (document.getElementById('price') as HTMLInputElement).value = '';
     }
   };
@@ -176,7 +245,7 @@ export default function AuctionJoin() {
     fetchBidsByAuctionId(auctionId)
       .then((res) => {
         console.log(res);
-        setBids(res.data);
+        setBids(res);
         bids.sort((a, b) => {
           return a.price - b.price;
         });
@@ -185,102 +254,26 @@ export default function AuctionJoin() {
         console.log(err);
       });
   }, [price]);
-  useEffect(() => {
-    if (!auctionSession) {
-      fetchAuctionSessionById(auctionId)
-        .then((res) => {
-          dispatch(setCurrentAuctionSession(res?.data));
-          console.log('reload in ', new Date(res?.data?.endDate).getTime() - new Date().getTime());
-          if (new Date(res?.data?.endDate) > new Date()) {
-            console.log('reload in ', new Date(res?.data?.endDate).getTime() - new Date().getTime());
-            timer = setTimeout(
-              () => {
-                console.log('Reloading...');
-                window.location.reload();
-              },
-              new Date(res?.data?.endDate).getTime() - new Date().getTime() - 500
-            );
-          } else {
-            setAllow(false);
-            setShowCofetti(true);
-            setTimeout(() => {
-              setShowCofetti(false);
-            }, 5000);
-          }
-          if (new Date(res?.data?.startDate) > new Date()) {
-            console.log('reload in ', new Date(res?.data?.startDate).getTime() - new Date().getTime());
-            setTimeout(
-              () => {
-                if (
-                  res?.data?.deposits?.filter(
-                    (deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id
-                  ).length > 0
-                ) {
-                  window.location.reload();
-                }
-              },
-              new Date(res?.data?.startDate).getTime() - new Date().getTime() - 100
-            );
-          } else if (new Date(res?.data?.endDate) > new Date()) {
-            setAllow(
-              res?.data?.deposits?.filter((deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id)
-                .length > 0
-            );
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.log('reload in ', new Date(auctionSession?.endDate).getTime() - new Date().getTime());
-      if (new Date(auctionSession?.endDate) > new Date()) {
-        console.log('reload in ', new Date(auctionSession?.endDate).getTime() - new Date().getTime());
-        timer = setTimeout(
-          () => {
-            console.log('Reloading...');
-            window.location.reload();
-          },
-          new Date(auctionSession?.endDate).getTime() - new Date().getTime() - 500
-        );
-      } else {
-        setAllow(false);
-        setShowCofetti(true);
-        setTimeout(() => {
-          setShowCofetti(false);
-        }, 5000);
-      }
-      if (new Date(auctionSession?.startDate) > new Date()) {
-        console.log('reload in ', new Date(auctionSession?.startDate).getTime() - new Date().getTime());
-        setTimeout(
-          () => {
-            if (
-              auctionSession?.deposits?.filter(
-                (deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id
-              ).length > 0
-            ) {
-              window.location.reload();
-            }
-          },
-          new Date(auctionSession?.startDate).getTime() - new Date().getTime() - 100
-        );
-      } else if (new Date(auctionSession?.endDate) > new Date()) {
-        setAllow(
-          auctionSession?.deposits?.filter((deposit) => deposit?.payment.accountId == JSON.parse(getCookie('user')).id)
-            .length > 0
-        );
-      }
-    }
-  }, []);
+
   const handleViewItemDetailsClick = async (item: AuctionItem) => {
     // console.log(item, auctionId, bidders.includes(userId));
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
-    if (itemDTO.itemId !== item.itemDTO.itemId) {
+    if (itemDTO?.itemId !== item.itemDTO.itemId) {
       setItemDTO(item.itemDTO);
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: 'smooth',
       });
+
+      // nav(location.pathname, {
+      //   state: {
+      //     id: item,
+      //     itemDTO: item.itemDTO,
+      //     endDate: endDate,
+      //     allow: allow,
+      //   },
+      // });
     } else {
       window.scrollTo({
         top: 0,
@@ -292,6 +285,127 @@ export default function AuctionJoin() {
 
   return (
     <>
+      {!isJoin ? (
+        <div className="grid p-5  items-center container ">
+          <div className="grid grid-cols-12 gap-4 h-full">
+            <div className="  col-span-12 h-1/5  w-full grid ">
+              <div className="grid grid-cols-12 gap-4 h-full">
+                <div className="col-span-6 md:col-span-6 w-full">
+                  <div className="w-full">
+                    <h1 className=" text-2xl font-bold  text-center mb-2 ">{itemDTO?.name}</h1>
+                    <div className="w-auto h-full m-auto">
+                      <div className="h-full">
+                        <div className="mx-auto w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 ">
+                          <ImageGallery itemDTO={itemDTO} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-span-6 md:col-span-6 flex flex-col w-full">
+                  {/* <h2 className="text-lg font-semibold">Bids</h2> */}
+
+                  {!bids ? (
+                    <div className="m-auto w-full h-full">no bidder </div>
+                  ) : (
+                    <div className="relative">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-background z-10">
+                          <TableRow>
+                            <TableHead>Bidder</TableHead>
+                            <TableHead className="text-right">Date</TableHead>
+                            <TableHead className="text-right">Price</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                      </Table>
+                      <ScrollArea className="h-48 overflow-hidden w-full">
+                        <Table>
+                          <TableBody>
+                            {bids
+                              ?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)
+                              .map((bid) => (
+                                <TableRow key={bid?.bidId}>
+                                  <TableCell>
+                                    <div className="flex items-center gap-2 w-full">
+                                      <Avatar className="w-8 h-8 border">
+                                        <AvatarImage src={bid?.account.avatar?.link} alt={bid?.account.nickname} />
+                                        <AvatarFallback>{bid?.account.nickname.charAt(0).toUpperCase()}</AvatarFallback>
+                                      </Avatar>
+                                      <span>{bid?.account.nickname}</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-center">{formatDate(bid?.createDate)}</TableCell>
+                                  <TableCell className="text-right">${bid?.price}</TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </ScrollArea>
+                    </div>
+                  )}
+
+                  {allow == true && (
+                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
+                      <BidsInformation
+                        auctionSession={auctionSession}
+                        price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0}
+                        bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
+                      />
+                      <div className="mx-auto">
+                        <PlaceBid
+                          auctionId={auctionId}
+                          itemId={itemDTO?.itemId}
+                          setIsSending={setIsSending}
+                          isSending={isSending}
+                          sendMessage={sendMessage}
+                          onMessageReceived={onMessageReceived}
+                          endDate={auctionSession?.endDate} // Added optional chaining for safety
+                          name={itemDTO?.name}
+                          image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                          client={client}
+                          currentBid={
+                            bids.filter((bid) => bid.auctionItemId?.itemId === itemDTO?.itemId)[0]?.price ||
+                            itemDTO?.reservePrice // Check if bids is defined and not empty
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className=" col-span-12  ">
+              <Carousel orientation="horizontal">
+                <CarouselContent className="-mt-1 w-full">
+                  {auctionSession?.auctionItems.map((item) => (
+                    <CarouselItem key={item.itemDTO.itemId} className="  md:basis-1/4">
+                      <div
+                        onClick={() => handleViewItemDetailsClick(item)}
+                        className="hover:cursor-pointer border w-1/2 rounded-2xl mx-auto"
+                      >
+                        <img
+                          src={item.itemDTO.attachments[0]?.link}
+                          alt=""
+                          className="aspect-square h-30  object-cover rounded-2xl"
+                        />
+                        <p className="text-lg font-semibold mb-2 truncate">{item.itemDTO?.name}</p>
+                        <p>CurrentPrice:{currency.format(item.currentPrice)}</p>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CardFooter>
+                  {/* <CarouselPrevious />
+                <CarouselNext /> */}
+                </CardFooter>
+              </Carousel>
+            </div>
+          </div>
+          {/* end layoout */}
+        </div>
+      ) : (
+        <LoadingAnimation />
+      )}
       {showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] && (
         <div className="fixed z-10 bg-red-200/15 w-full h-full">
           <Confetti mode="fall" colors={['#ff577f', '#ff884b']} />
@@ -307,130 +421,6 @@ export default function AuctionJoin() {
             </CardContent>
           </Card>
         </div>
-      )}
-      {isJoin ? (
-        <LoadingAnimation message="Please wait, Joining auction..." />
-      ) : auctionSession != undefined ? (
-        <div className="flex flex-col min-h-screen container p-3 gap-10">
-          <section className="justify-center items-center  w-full h-fit ">
-            <h1 className=" text-2lg font-bold   ">{itemDTO.name}</h1>
-            <div className="flex flex-wrap justify-between items-center drop-shadow-xl">
-              <div className=" w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 ">
-                <ImageGallery itemDTO={itemDTO} />
-              </div>
-              <div className=" w-full h-full  basis-full md:basis-2/5 p-2 flex flex-col items-start justify-start">
-                <h2 className="text-lg font-semibold">Bids</h2>
-                <ScrollArea className="h-48 overflow-hidden p-4 w-full">
-                  {!bids ? (
-                    <div className="m-auto w-full h-full">no bidder </div>
-                  ) : (
-                    bids
-                      ?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)
-                      .map((bid) => (
-                        <div className="flex items-center justify-between" key={bid?.bidId}>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="w-8 h-8 border">
-                              <img src={bid?.account.avatar?.link} alt="@username" />
-                              <AvatarFallback>N/A</AvatarFallback>
-                            </Avatar>
-                            <p>{bid?.account.nickname}</p>
-                          </div>
-                          <p className="text-gray-500 dark:text-gray-400">${bid?.price}</p>
-                        </div>
-                      ))
-                  )}
-                </ScrollArea>
-                {allow ? (
-                  <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
-                    <BidsInformation
-                      auctionSession={auctionSession}
-                      price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0}
-                      bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
-                    />
-                    <div className="mx-auto">
-                      <PlaceBid
-                        auctionId={auctionId}
-                        itemId={itemDTO?.itemId}
-                        setIsSending={setIsSending}
-                        isSending={isSending}
-                        sendMessage={sendMessage}
-                        onMessageReceived={onMessageReceived}
-                        endDate={auctionSession?.endDate} // Added optional chaining for safety
-                        name={itemDTO?.name}
-                        image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
-                        client={client}
-                        currentBid={
-                          bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price ||
-                          itemDTO?.reservePrice // Check if bids is defined and not empty
-                        }
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-12 md:mt-16 lg:mt-20 container">
-                    <div className="drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700 mb-5">
-                      <BidsInformation auctionSession={auctionSession} price={price} bids={bids} />
-                    </div>
-                    <div className="grid gap-4 ">
-                      <Link to={`/auctions/${auctionId}`}>
-                        <Button type="submit" className="w-full">
-                          Go to Auction
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-          <section className=" justify-center items-center  w-full h-full mt-11 ">
-            <div className="flex gap-2 flex-wrap ">
-              <div className="basis-full md:basis-4/6 gap-1/6 h-fit">
-                <h1 className=" text-2lg font-bold  mb-9  ">Item Description</h1>
-                <div className="  " dangerouslySetInnerHTML={{ __html: itemDTO?.description }} />
-              </div>
-              <div className="basis-full md:basis-1/6 fixed left-0 top-0">
-                <h1 className=" text-2lg font-bold  mb-9  text-center ">Other Item in this Auction</h1>
-                <div className="flex gap-2 flex-col items-center">
-                  <ScrollArea className="h-screen overflow-hidden p-4 w-full">
-                    {auctionSession.auctionItems.map((item) => (
-                      <Card className="w-80 h-fit max-w-[360px]">
-                        <CardHeader>
-                          <img
-                            src={
-                              item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
-                                ? item.itemDTO.attachments[0].link
-                                : ''
-                            }
-                            alt="item"
-                            className="w-[360px]"
-                          />
-                        </CardHeader>
-                        <CardContent>
-                          <h1 className="text-lg font-semibold">{item.itemDTO.name}</h1>
-                          <BidsInformation
-                            auctionSession={auctionSession ?? {}} // Provide a default empty object if auctionSession is undefined
-                            price={
-                              bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)[0]?.price || 0
-                            } // Use optional chaining and provide a default value of 0 if highestBid is undefined
-                            bids={bids.filter((bid) => bid.auctionItemId.itemId === item?.itemDTO?.itemId)} // Use optional chaining for numberOfBids
-                          />
-                          <CardFooter>
-                            <Button type="submit" className="w-full" onClick={() => handleViewItemDetailsClick(item)}>
-                              Join
-                            </Button>
-                          </CardFooter>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </ScrollArea>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-      ) : (
-        <LoadingAnimation message="Please wait, Joining auction..." />
       )}
     </>
   );

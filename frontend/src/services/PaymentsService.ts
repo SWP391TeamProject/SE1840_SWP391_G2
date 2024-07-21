@@ -2,7 +2,7 @@ import { API_SERVER } from '@/constants/domain';
 import { PaymentType } from '@/constants/enums';
 import { getCookie, removeCookie } from '@/utils/cookies';
 import axios from 'axios';
-import {formatDateToISO} from "@/lib/utils.ts";
+import { formatDateToISO } from '@/lib/utils.ts';
 
 interface GetPaymentsSchema {
   page: number;
@@ -36,8 +36,7 @@ export const createPayment = (dto: { type?: 'DEPOSIT' | 'WITHDRAW'; amount?: num
 
 export const getPayments = async (input: GetPaymentsSchema) => {
   try {
-    const { page, size, sort,
-      status, type, from, to, search, user } = input;
+    const { page, size, sort, status, type, from, to, search, user } = input;
 
     // Prepare query parameters
     const params: Record<string, any> = {
@@ -49,7 +48,7 @@ export const getPayments = async (input: GetPaymentsSchema) => {
       from: formatDateToISO(from),
       to: formatDateToISO(to),
       search,
-      user
+      user,
     };
 
     const response = await axios.get(API_SERVER + '/payments', {

@@ -15,60 +15,6 @@ export default function ImageGallery({ ...props }) {
 
   return (
     <div className="hover:cursor-pointer">
-      {/* <Lightbox
-            index={index}
-            slides={
-                props.itemDTO?.attachments.map((image) => ({
-                    src: image.link,
-                    caption: props.itemDTO?.name,
-                }))
-            }
-            plugins={[Inline, Thumbnails]}
-            on={{
-                view: updateIndex,
-                click: toggleOpen(true),
-            }}
-            carousel={{
-                padding: 0,
-                spacing: 0,
-                imageFit: "cover",
-            }}
-            inline={{
-                style: {
-                    width: "100%",
-                    maxWidth: "900px",
-                    aspectRatio: "3 / 2",
-                    margin: "auto",
-                },
-            }}
-
-        />
-        <Lightbox
-            plugins={[Zoom, Download, Thumbnails]}
-            open={open}
-            close={toggleOpen(false)}
-            index={index}
-            slides={
-                props.itemDTO?.attachments.map((image) => ({
-                    src: image.link,
-                    caption: props.itemDTO?.name,
-                    download: `${image.link}?download`,
-                }))
-            }
-            zoom={{
-                ref: zoomRef,
-                maxZoomPixelRatio: 3,
-                zoomInMultiplier: 1.5,
-                doubleClickDelay: 300,
-                doubleTapDelay: 300,
-                doubleClickMaxStops: 2,
-                keyboardMoveDistance: 120,
-            }}
-
-            on={{ view: updateIndex }}
-            animation={{ fade: 0 }}
-            controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
-        /> */}
       <Lightbox
         index={index}
         slides={props.itemDTO?.attachments.map((image) => ({

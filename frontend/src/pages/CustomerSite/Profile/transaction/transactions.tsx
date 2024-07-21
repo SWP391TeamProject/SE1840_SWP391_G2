@@ -3,19 +3,13 @@
  * @see https://v0.dev/t/NbbWRyWAWx3
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import {useEffect, useState} from 'react';
-import {fetchPaymentsHistory} from '@/services/PaymentsService';
-import {toast} from 'sonner';
-import {DataTable} from './data-tables';
-import {columns} from './data-table-column';
-import {getErrorMessage} from '@/lib/handle-error';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { fetchPaymentsHistory } from '@/services/PaymentsService';
+import { toast } from 'sonner';
+import { DataTable } from './data-tables';
+import { columns } from './data-table-column';
+import { getErrorMessage } from '@/lib/handle-error';
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -42,7 +36,7 @@ export default function Transactions() {
       </CardHeader>
       <CardContent>
         <div className="w-full">
-          <DataTable columns={columns} data={transactions}/>
+          <DataTable columns={columns} data={transactions} />
         </div>
       </CardContent>
     </Card>

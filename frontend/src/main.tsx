@@ -139,7 +139,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                       <Route path="Auctions/upcoming" element={<UpcomingAuctionSessionsList />}></Route>
                       <Route path="Auctions/details" element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id" element={<AuctionSession />}></Route>
-                      <Route path="Auctions/:id/*" element={<AuctionJoin />} />
+                      <Route path="Auctions/:id/join" element={<AuctionJoin />} />
                       <Route path="items" element={<ItemList />} />
                       <Route path="item/:id/*" element={<PublicItemDetail />} />
 

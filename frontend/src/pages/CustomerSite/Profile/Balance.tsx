@@ -17,8 +17,8 @@ import { PayPalButtons, PayPalScriptProvider, ReactPayPalScriptOptions } from '@
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import {createSearchParams, useNavigate} from 'react-router-dom';
-import WithdrawForm from "@/pages/CustomerSite/Profile/WithdrawForm.tsx";
+import { createSearchParams, useNavigate } from 'react-router-dom';
+import WithdrawForm from '@/pages/CustomerSite/Profile/WithdrawForm.tsx';
 
 const amountSuggestions: { [key in CurrencyType]: number[] } = {
   [CurrencyType.USD]: [50, 100, 500, 1000, 5000, 10_000],

@@ -1,40 +1,26 @@
-import {Button} from '@/components/ui/button';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {z} from 'zod';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Button } from '@/components/ui/button';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-import {useAuth} from '@/AuthProvider.tsx';
-import {useCurrency} from '@/CurrencyProvider.tsx';
-import axios from "@/config/axiosConfig.ts";
-import {API_SERVER} from "@/constants/domain.ts";
-import {toast} from "sonner";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {Textarea} from "@/components/ui/textarea.tsx";
-import {Payment} from "@/models/payment.ts";
-import {PaymentStatus} from "@/constants/enums.tsx";
+import { useAuth } from '@/AuthProvider.tsx';
+import { useCurrency } from '@/CurrencyProvider.tsx';
+import axios from '@/config/axiosConfig.ts';
+import { API_SERVER } from '@/constants/domain.ts';
+import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { Payment } from '@/models/payment.ts';
+import { PaymentStatus } from '@/constants/enums.tsx';
 
 const formSchema = z.object({
   reason: z.string().optional(),
-  accepted: z.boolean()
+  accepted: z.boolean(),
 });
 
-export default function WithdrawFormHandle({payment}: { payment: Payment }) {
+export default function WithdrawFormHandle({ payment }: { payment: Payment }) {
   const auth = useAuth();
   const currency = useCurrency();
 
@@ -42,8 +28,8 @@ export default function WithdrawFormHandle({payment}: { payment: Payment }) {
     resolver: zodResolver(formSchema),
     mode: 'all',
     defaultValues: {
-      reason: "",
-      accepted: false
+      reason: '',
+      accepted: false,
     },
   });
 
@@ -64,7 +50,7 @@ export default function WithdrawFormHandle({payment}: { payment: Payment }) {
         }
       )
       .then(() => {
-        toast.success("Payment updated successfully", {
+        toast.success('Payment updated successfully', {
           position: 'top-right',
         });
         window.location.reload();
@@ -87,7 +73,9 @@ export default function WithdrawFormHandle({payment}: { payment: Payment }) {
           <DialogHeader>
             <DialogTitle className="text-2xl">Withdraw Request</DialogTitle>
           </DialogHeader>
-          <p>{payment.account.nickname} requested to withdraw {currency.format(payment.paymentAmount)}</p>
+          <p>
+            {payment.account.nickname} requested to withdraw {currency.format(payment.paymentAmount)}
+          </p>
           <Form {...form}>
             <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
@@ -96,10 +84,7 @@ export default function WithdrawFormHandle({payment}: { payment: Payment }) {
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>I accept this request</FormLabel>
@@ -110,16 +95,17 @@ export default function WithdrawFormHandle({payment}: { payment: Payment }) {
               <FormField
                 control={form.control}
                 name="reason"
-                render={({field}) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Reason for rejection</FormLabel>
                     <FormControl>
                       <Textarea {...field} disabled={form.getValues().accepted} />
                     </FormControl>
                     <FormDescription>Enter your reason for rejecting this request.</FormDescription>
-                    <FormMessage/>
+                    <FormMessage />
                   </FormItem>
-                )}/>
+                )}
+              />
               <Button className="w-full">Submit</Button>
             </form>
           </Form>

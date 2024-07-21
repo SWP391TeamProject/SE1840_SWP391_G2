@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useCurrency } from '@/CurrencyProvider';
 import { showErrorToast } from '@/lib/handle-error';
-import { Item } from '@/models/newModel/item';
+import { formatDate } from '@/lib/utils';
+import { Item } from '@/models/Item';
 import { exportBids, fetchBidsByAccount } from '@/services/BidsService';
 import { getItemById } from '@/services/ItemService';
 import { getCookie } from '@/utils/cookies';
@@ -11,6 +13,7 @@ import { toast } from 'sonner';
 
 export const Bids = () => {
   const [bids, setBids] = useState([]);
+  const currency = useCurrency();
   var nav = useNavigate();
   useEffect(() => {
     console.log('abc ' + bids);
@@ -26,21 +29,7 @@ export const Bids = () => {
     window.scrollTo(0, 0);
   }, []);
   const handleViewItemDetailsClick = async (bid: any) => {
-    let itemDTO: Item;
-    if (bid.auctionItemId.auctionSessionId == null || bid.auctionItemId.itemId == null) {
-      return;
-    } else {
-      await getItemById(bid.auctionItemId.itemId)
-        .then((res) => {
-          itemDTO = res.data;
-          nav(`/auctions/${bid.auctionItemId.auctionSessionId}/${itemDTO.name}`, {
-            state: { id: bid.auctionItemId, itemDTO: itemDTO },
-          });
-        })
-        .catch((err) => {
-          showErrorToast(err);
-        });
-    }
+    nav('/Item/' + bid.auctionItemId.itemId);
   };
   const handleViewAuctionDetailsClick = (id: any) => {
     nav('/Auctions/' + id);
@@ -73,8 +62,8 @@ export const Bids = () => {
                 {bids.map((bid: any) => (
                   <TableRow key={bid.bidId}>
                     <TableCell>{bid.bidId}</TableCell>
-                    <TableCell>{bid.amount}</TableCell>
-                    <TableCell>{bid.createdDate}</TableCell>
+                    <TableCell>{currency.format(bid.amount)}</TableCell>
+                    <TableCell>{formatDate(bid.createdDate)}</TableCell>
                     {/* <TableCell>{bid.auctionItemId.auctionId}</TableCell>
                             <TableCell>{bid.auctionItemId.itemId}</TableCell> */}
                     <TableCell className="text-center">

@@ -18,6 +18,7 @@ import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
 
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
+import { Account } from '@/models/AccountModel';
 
 const formSchema = z.object({
   accountId: z.number(),
@@ -45,14 +46,7 @@ export default function AccountEdit() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [showTrigger, setShowTrigger] = useState(false);
-  const [editedAccount, setEditedAccount] = useState({
-    accountId: 0,
-    nickname: '',
-    email: '',
-    phone: '',
-    balance: 0,
-    role: Roles.MEMBER,
-  });
+  const [editedAccount, setEditedAccount] = useState<Account | undefined>(undefined);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -188,17 +182,17 @@ export default function AccountEdit() {
       toast.promise(setCurrentAccountPromise, {
         loading: 'Fetching account...',
         success: (res) => {
-          setCurrentAccount(res?.data);
+          setCurrentAccount(res);
           form.reset({
-            accountId: res?.data?.accountId,
-            nickname: res?.data?.nickname ?? '',
-            email: res?.data?.email,
-            phone: res?.data?.phone ?? '',
-            dummy: res?.data?.dummy ?? false,
-            balance: res?.data?.balance ?? 0,
-            role: res.data ? res?.data.role : Roles.MEMBER,
+            accountId: res?.accountId,
+            nickname: res?.nickname ?? '',
+            email: res?.email,
+            phone: res?.phone ?? '',
+            dummy: res?.dummy ?? false,
+            balance: res?.balance ?? 0,
+            role: res ? res?.role : Roles.MEMBER,
           });
-          setEditedAccount(res.data);
+          setEditedAccount(res);
           return 'Account fetched successfully';
         },
         error: (err) => {

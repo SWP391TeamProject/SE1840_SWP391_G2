@@ -87,13 +87,13 @@ export default function AuctionSessionDetail() {
       console.log(auctionSession);
       fetchAuctionSessionById(parseInt(id)).then((res) => {
         console.log(res);
-        setCurrentAuctionSession(res?.data);
+        setCurrentAuctionSession(res);
         form.reset({
-          auctionSessionId: res?.data.auctionSessionId,
-          title: res?.data.title,
-          startDate: res?.data.startDate,
-          endDate: res?.data.endDate,
-          status: res?.data.status,
+          auctionSessionId: res?.auctionSessionId,
+          title: res?.title,
+          startDate: res?.startDate,
+          endDate: res?.endDate,
+          status: res?.status,
         });
       });
     } else {

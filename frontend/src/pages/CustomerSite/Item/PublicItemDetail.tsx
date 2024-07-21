@@ -38,14 +38,14 @@ export function PublicItemDetail() {
 
   useEffect(() => {
     getItemById(itemId)
-      .then((res: AxiosResponse<Item, any>) => {
+      .then((res) => {
         setLoading(false);
-        setItem(res.data);
+        setItem(res);
 
-        if (res.data.attachments && res.data.attachments.length > 0) setSelectedImageUrl(res.data.attachments[0].link);
+        if (res.attachments && res.attachments.length > 0) setSelectedImageUrl(res.attachments[0].link);
 
-        if (res.data.status != ItemStatus.QUEUE) {
-          fetchAuctionSessionHistoryOfItem(res.data.itemId)
+        if (res.status != ItemStatus.QUEUE) {
+          fetchAuctionSessionHistoryOfItem(res.itemId)
             .then((res: AxiosResponse<Page<AuctionSession>, any>) => {
               setPastAuction(res.data.content);
             })

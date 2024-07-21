@@ -7,8 +7,11 @@ export interface AuctionSession {
   endDate?: string;
   status?: string;
   auctionItems?: AuctionItem[];
+  deposits?: [];
   createDate?: string;
   updateDate?: string;
   attachments?: [];
   hasDeposited?: boolean;
+  participantCount?: number;
+  description?: string;
 }

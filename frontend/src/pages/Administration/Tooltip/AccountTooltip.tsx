@@ -1,11 +1,6 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import {Account} from "@/constants/interfaces.ts";
-import {Separator} from "@/components/ui/separator.tsx";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Account } from '@/constants/interfaces.ts';
+import { Separator } from '@/components/ui/separator.tsx';
 
 interface AccountTooltipProps {
   account: Account;

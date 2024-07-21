@@ -48,6 +48,7 @@ export default function AuctionSession() {
     currency: 'USD',
   });
   const currency = useCurrency();
+
   const param = useParams();
   const [bidders, setBidders] = useState<number[]>([]);
   const user = JSON.parse(getCookie('user') || 'null');
@@ -55,50 +56,40 @@ export default function AuctionSession() {
   const [alertBalance, setAlertBalance] = useState(null);
   const [registerFee, setRegisterFee] = useState(0);
   const auth = useAuth();
-  const [auciton, setAuction] = useState(auctionSession);
+  // const [auciton, setAuction] = useState(auctionSession);
+
+  // useEffect(() => {
+  //   const fetchAuctionSession = async () => {
+  //     let sessionId = auctionSession?.auctionSessionId || param.id || '1';
+  //     try {
+  //       const res = await axios.get(`${SERVER_DOMAIN_URL}/api/auction-sessions/${sessionId}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${JSON.parse(getCookie('user'))?.accessToken}`,
+  //         },
+  //       });
+  //       console.log(res.data);
+  //       dispatch({ type: 'auctionSessions/setCurrentAuctionSession', payload: res.data });
+  //       setAuction(res.data);
+  //       setSessionAttachments(res.data.attachments);
+  //     } catch (err) {
+  //       showErrorToast(err);
+  //       console.log(err);
+  //     }
+  //   };
+
+  //   if (
+  //     (auctionSession != null && auctionSession.status === AuctionSessionStatus.PROGRESSING) ||
+  //     auctionSession == null ||
+  //     !param.id
+  //   ) {
+  //     fetchAuctionSession();
+  //   }
+  // }, []);
 
   useEffect(() => {
-    if (auctionSession != null && auctionSession.status === AuctionSessionStatus.PROGRESSING) {
-      axios
-        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + auctionSession.auctionSessionId)
-        .then((res) => {
-          console.log(res.data);
-          dispatch({ type: 'auctionSessions/setCurrentAuctionSession', payload: res.data });
-          setAuction(res.data);
-          setSessionAttachments(res.data.attachments);
-        })
-        .catch((err) => {
-          showErrorToast(err);
-          console.log(err);
-        });
-    } else if (auctionSession == null && param.id) {
-      axios
-        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/` + param.id)
-        .then((res) => {
-          console.log(res.data);
-          dispatch({ type: 'auctionSessions/setCurrentAuctionSession', payload: res.data });
-          setAuction(res.data);
-          setSessionAttachments(res.data.attachments);
-        })
-        .catch((err) => {
-          showErrorToast(err);
-          console.log(err);
-        });
-    } else if (!param.id) {
-      axios
-        .get(`${SERVER_DOMAIN_URL}/api/auction-sessions/1`)
-        .then((res) => {
-          dispatch({ type: 'auctionSessions/setCurrentAuctionSession', payload: res.data });
-          setSessionAttachments(res.data.attachments);
-          setAuction(res.data);
-        })
-        .catch((err) => {
-          showErrorToast(err);
+    console.log(auctionSession);
 
-          console.log(err);
-        });
-    }
-
+    // if (!auctionSession) {
     getAllItemCategories(0, 50)
       .then((res) => {
         console.log(res.data.content);
@@ -109,20 +100,25 @@ export default function AuctionSession() {
       });
 
     window.scrollTo(0, 0);
+    fetchAuctionSessionById(parseInt(param.id))
+      .then((res) => {
+        dispatch(setCurrentAuctionSession(res));
+        setSessionAttachments(res.attachments);
+        setItems(res.auctionItems);
+        // if (auctionSession.deposits) {
+        //   // auctionSession?.hasDeposited.forEach((deposit: any) => {
+        //   //   setBidders((prevBidders) => [...prevBidders, deposit?.payment.accountId]);
+        //   // });
+        // }
+      })
+      .catch((err) => {
+        showErrorToast(err);
+      });
+    // } else {
+    //   setSessionAttachments(auctionSession.attachments);
+    //   setItems(auctionSession.auctionItems);
+    // }
   }, []);
-
-  useEffect(() => {
-    console.log(auctionSession);
-    if (auctionSession && auctionSession.attachments) {
-      setSessionAttachments(auctionSession.attachments);
-      if (auctionSession.deposits) {
-        auctionSession?.deposits.forEach((deposit: any) => {
-          setBidders((prevBidders) => [...prevBidders, deposit?.payment.accountId]);
-        });
-      }
-      setItems(auctionSession.auctionItems);
-    }
-  }, [auctionSession]);
 
   function deposit() {
     navigate('/profile/balance');
@@ -162,7 +158,7 @@ export default function AuctionSession() {
           }
         });
         fetchAuctionSessionById(auctionSession?.auctionSessionId).then((res) => {
-          dispatch(setCurrentAuctionSession(res.data));
+          dispatch(setCurrentAuctionSession(res));
         });
         toast.success('Registered Successfully', {});
       })
@@ -272,6 +268,7 @@ export default function AuctionSession() {
       </AlertDialog>
     );
   };
+
   const RegisterAlert = () => {
     if (userId == -1) {
       return (
@@ -349,14 +346,14 @@ export default function AuctionSession() {
   };
 
   const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-    navigate(`/auctions/${auctionId}/${item.name}`, {
+    navigate(`/auctions/${auctionId}/join`, {
       state: {
         id: {
           auctionSessionId: auctionId,
           itemId: item.itemId,
         },
         itemDTO: item,
-        endDate: auciton?.endDate,
+        endDate: auctionSession?.endDate,
         allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING,
       },
     });
@@ -506,16 +503,16 @@ export default function AuctionSession() {
                           <SoldFor item={item} currency={currency} />
                         ) : (
                           <>
-                            {bidders.includes(userId) ? (
+                            {auctionSession.hasDeposited ? (
                               <Button
                                 className="space-y-2"
                                 onClick={() => {
-                                  let name = item?.itemDTO.name;
-                                  navigate(`${name}`, {
+                                  // dispatch(setCurrentAuctionSession(auctionSession));
+                                  navigate(`join`, {
                                     state: {
                                       id: item?.id,
                                       itemDTO: item?.itemDTO,
-                                      allow: auctionSession?.status === AuctionSessionStatus.PROGRESSING,
+                                      allow: auctionSession.hasDeposited,
                                     },
                                   });
                                 }}
