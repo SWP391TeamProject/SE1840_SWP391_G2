@@ -100,7 +100,8 @@ export default function AuctionSession() {
       });
 
     window.scrollTo(0, 0);
-    fetchAuctionSessionById(parseInt(param.id))
+    if(!auctionSession){
+      fetchAuctionSessionById(parseInt(param.id))
       .then((res) => {
         dispatch(setCurrentAuctionSession(res));
         setSessionAttachments(res.attachments);
@@ -114,10 +115,11 @@ export default function AuctionSession() {
       .catch((err) => {
         showErrorToast(err);
       });
-    // } else {
-    //   setSessionAttachments(auctionSession.attachments);
-    //   setItems(auctionSession.auctionItems);
-    // }
+    }
+     else {
+      setSessionAttachments(auctionSession.attachments);
+      setItems(auctionSession.auctionItems);
+    }
   }, []);
 
   function deposit() {
@@ -153,7 +155,7 @@ export default function AuctionSession() {
     registerAuctionSession(auctionSession?.auctionSessionId ?? -1)
       .then((res) => {
         res.data.deposits.forEach((deposit: any) => {
-          if (!bidders.includes(deposit.payment.accountId)) {
+          if (!auctionSession?.hasDeposited) {
             setBidders((prevBidders) => [...prevBidders, deposit.payment.accountId]);
           }
         });
@@ -354,7 +356,7 @@ export default function AuctionSession() {
         },
         itemDTO: item,
         endDate: auctionSession?.endDate,
-        allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING,
+        allow: auctionSession?.hasDeposited && auctionSession?.status === AuctionSessionStatus.PROGRESSING,
       },
     });
   };
@@ -415,7 +417,7 @@ export default function AuctionSession() {
                 </div>
                 {alertBalance}
 
-                {bidders.includes(userId)
+                {auctionSession?.hasDeposited
                   ? auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
                       <Button
                         onClick={() =>
