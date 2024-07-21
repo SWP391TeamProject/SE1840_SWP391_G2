@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exporter.BidExporter;
 import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
+import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AuctionItemService;
@@ -42,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Controller
@@ -110,6 +112,14 @@ public class BidController {
                                                    @DestinationVariable int itemId,
                                                    SimpMessageHeaderAccessor headerAccessor) {
         try {
+            AuctionSessionDTO as = auctionSessionService.getAuctionSessionById(auctionSessionId, null);
+            if (as == null) {
+                throw new InvalidInputException("Auction session not found");
+            } else if (as.getStatus() == AuctionSession.Status.FINISHED || as.getStatus() == AuctionSession.Status.TERMINATED) {
+                throw new InvalidInputException("Auction session ended");
+            } else if (as.getStatus() == AuctionSession.Status.SCHEDULED) {
+                throw new InvalidInputException("Auction session not started");
+            }
             AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
             bidDTO.setAuctionItemId(auctionItemId);
 
