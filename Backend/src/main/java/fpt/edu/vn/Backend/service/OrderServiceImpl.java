@@ -62,7 +62,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId) {
         Account account = accountRepos.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
@@ -253,7 +252,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public OrderDTO payOrder(int accountId, int orderId, OrderPayRequestDTO dto) {
         Account account = accountRepos.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "accountId", accountId));
@@ -330,7 +328,7 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderDTO.detailed(order);
     }
-    @Transactional
+    
     @Override
     public void cancelOrder(Order order) {
         Payment payment = order.getPayment();
@@ -389,7 +387,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    @Transactional
+    
     @Override
     public OrderDTO updateOrder(int id, OrderUpdateDTO dto) {
         final Map<Order.ShippingStatus, Set<Order.ShippingStatus>> statusMatrix = Map.of(
@@ -432,7 +430,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)
-    @Transactional
+    
     public void scheduleFixedRateTask() {
         LocalDateTime deadline = LocalDateTime.now().minusDays(7);
         for (Order order : orderRepository.findAllPendingOrdersWithPaymentCreatedBefore(deadline)) {

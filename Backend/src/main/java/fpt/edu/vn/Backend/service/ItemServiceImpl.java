@@ -61,7 +61,7 @@ public class ItemServiceImpl implements ItemService {
         this.itemCategoryRepos = itemCategoryRepos;
         this.attachmentService = attachmentService;
     }
-    @Transactional
+    
     @Override
     public @NotNull Item mapDTOToEntity(@NotNull ItemUpdateDTO itemDTO, @NotNull Item item) {
         item.setItemId(itemDTO.getItemId());
@@ -106,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
 //            item.setOrder(itemDTO.getOrderId());
         return item;
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
     public @NotNull ItemDTO createItem(@NotNull ItemUpdateDTO requestDTO) throws IOException {
@@ -133,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO getItemById(int id) {
         return itemRepos.findById(id).map(ItemDTO::new).orElse(null);
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "item", allEntries = true, beforeInvocation = true)
     public @NotNull ItemDTO updateItem(@NotNull ItemUpdateDTO item) {
@@ -151,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
         Preconditions.checkState(item.getOwnerId() == null, "Cannot change owner");
         return new ItemDTO(itemRepos.save(mapDTOToEntity(item, it)));
     }
-    @Transactional
+    
     @Override
     public List<AttachmentDTO> uploadAttachment(int id, AttachmentUploadDTO dto) throws IOException {
         if (dto.getFiles() == null || dto.getFiles().isEmpty()) return Collections.emptyList();
@@ -164,7 +164,7 @@ public class ItemServiceImpl implements ItemService {
         }
         return attachments;
     }
-    @Transactional
+    
     @Override
     public void deleteAttachment(int attachmentId, int itemId) {
         attachmentService.deleteItemAttachment(attachmentId, itemId);
