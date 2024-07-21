@@ -13,17 +13,7 @@ export interface AuctionSession {
   createDate?: string;
   updateDate?: string;
   attachments?: [];
-}
-
-export interface auctionSessionSchema {
-  auctionSessionId: Number;
-  title: String;
-  description: String;
-  startDate: Date;
-  endDate: Date;
-  status: String;
-  createDate: Date;
-  updateDate: Date;
-  attachments: Attachment[];
-  auctionItems: AuctionItem[];
+  hasDeposited?: boolean;
+  participantCount?: number;
+  description?: string;
 }

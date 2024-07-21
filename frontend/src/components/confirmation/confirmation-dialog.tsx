@@ -5,17 +5,18 @@ import { type Row } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  AlertDialog,
+  AlertDialogCancel,
+  // AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
-interface ConfirmationDialogProps extends React.ComponentPropsWithoutRef<typeof Dialog> {
+interface ConfirmationAlertDialogProps extends React.ComponentPropsWithoutRef<typeof AlertDialog> {
   showTrigger?: boolean;
   onSuccess: () => void;
   message: string;
@@ -32,22 +33,22 @@ export function ConfirmationDialog({
   label,
   onSuccess,
   ...props
-}: ConfirmationDialogProps) {
+}: ConfirmationAlertDialogProps) {
   // const [open, setOpen] = React.useState(false);
 
   return (
     <>
-      <Dialog {...props}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
+      <AlertDialog {...props}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          </AlertDialogHeader>
           <div className="w grid gap-4 py-4">{message}</div>
-          <DialogFooter className="gap-2 sm:space-x-0">
-            <DialogClose asChild>
+          <AlertDialogFooter className="gap-2 sm:space-x-0">
+            <AlertDialogCancel asChild>
               <Button variant="outline">Cancel</Button>
-            </DialogClose>
+            </AlertDialogCancel>
             <Button
               // aria-label="Delete selected rows"
               // variant="destructive"
@@ -56,9 +57,9 @@ export function ConfirmationDialog({
             >
               {label}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {/* // : <Button onClick={() => {setOpen(true)}}>
           //   {label}
           // </Button> */}

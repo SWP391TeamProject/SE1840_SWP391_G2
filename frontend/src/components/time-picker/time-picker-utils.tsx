@@ -21,10 +21,7 @@ export function isValidMinuteOrSecond(value: string) {
 
 type GetValidNumberConfig = { max: number; min?: number; loop?: boolean };
 
-export function getValidNumber(
-  value: string,
-  { max, min = 0, loop = false }: GetValidNumberConfig
-) {
+export function getValidNumber(value: string, { max, min = 0, loop = false }: GetValidNumberConfig) {
   let numericValue = parseInt(value, 10);
 
   if (!isNaN(numericValue)) {
@@ -35,10 +32,10 @@ export function getValidNumber(
       if (numericValue > max) numericValue = min;
       if (numericValue < min) numericValue = max;
     }
-    return numericValue.toString().padStart(2, "0");
+    return numericValue.toString().padStart(2, '0');
   }
 
-  return "00";
+  return '00';
 }
 
 export function getValidHour(value: string) {
@@ -62,16 +59,13 @@ type GetValidArrowNumberConfig = {
   step: number;
 };
 
-export function getValidArrowNumber(
-  value: string,
-  { min, max, step }: GetValidArrowNumberConfig
-) {
+export function getValidArrowNumber(value: string, { min, max, step }: GetValidArrowNumberConfig) {
   let numericValue = parseInt(value, 10);
   if (!isNaN(numericValue)) {
     numericValue += step;
     return getValidNumber(String(numericValue), { min, max, loop: true });
   }
-  return "00";
+  return '00';
 }
 
 export function getValidArrowHour(value: string, step: number) {
@@ -111,23 +105,18 @@ export function set12Hours(date: Date, value: string, period: Period) {
   return date;
 }
 
-export type TimePickerType = "minutes" | "seconds" | "hours" | "12hours";
-export type Period = "AM" | "PM";
+export type TimePickerType = 'minutes' | 'seconds' | 'hours' | '12hours';
+export type Period = 'AM' | 'PM';
 
-export function setDateByType(
-  date: Date,
-  value: string,
-  type: TimePickerType,
-  period?: Period
-) {
+export function setDateByType(date: Date, value: string, type: TimePickerType, period?: Period) {
   switch (type) {
-    case "minutes":
+    case 'minutes':
       return setMinutes(date, value);
-    case "seconds":
+    case 'seconds':
       return setSeconds(date, value);
-    case "hours":
+    case 'hours':
       return setHours(date, value);
-    case "12hours": {
+    case '12hours': {
       if (!period) return date;
       return set12Hours(date, value, period);
     }
@@ -138,36 +127,32 @@ export function setDateByType(
 
 export function getDateByType(date: Date, type: TimePickerType) {
   switch (type) {
-    case "minutes":
+    case 'minutes':
       return getValidMinuteOrSecond(String(date.getMinutes()));
-    case "seconds":
+    case 'seconds':
       return getValidMinuteOrSecond(String(date.getSeconds()));
-    case "hours":
+    case 'hours':
       return getValidHour(String(date.getHours()));
-    case "12hours":
+    case '12hours':
       const hours = display12HourValue(date.getHours());
       return getValid12Hour(String(hours));
     default:
-      return "00";
+      return '00';
   }
 }
 
-export function getArrowByType(
-  value: string,
-  step: number,
-  type: TimePickerType
-) {
+export function getArrowByType(value: string, step: number, type: TimePickerType) {
   switch (type) {
-    case "minutes":
+    case 'minutes':
       return getValidArrowMinuteOrSecond(value, step);
-    case "seconds":
+    case 'seconds':
       return getValidArrowMinuteOrSecond(value, step);
-    case "hours":
+    case 'hours':
       return getValidArrowHour(value, step);
-    case "12hours":
+    case '12hours':
       return getValidArrow12Hour(value, step);
     default:
-      return "00";
+      return '00';
   }
 }
 
@@ -177,13 +162,13 @@ export function getArrowByType(
  * 12:00 AM is 00:00
  */
 export function convert12HourTo24Hour(hour: number, period: Period) {
-  if (period === "PM") {
+  if (period === 'PM') {
     if (hour <= 11) {
       return hour + 12;
     } else {
       return hour;
     }
-  } else if (period === "AM") {
+  } else if (period === 'AM') {
     if (hour === 12) return 0;
     return hour;
   }
@@ -196,7 +181,7 @@ export function convert12HourTo24Hour(hour: number, period: Period) {
  * in its 12-hour representation
  */
 export function display12HourValue(hours: number) {
-  if (hours === 0 || hours === 12) return "12";
+  if (hours === 0 || hours === 12) return '12';
   if (hours >= 22) return `${hours - 12}`;
   if (hours % 12 > 9) return `${hours}`;
   return `0${hours % 12}`;

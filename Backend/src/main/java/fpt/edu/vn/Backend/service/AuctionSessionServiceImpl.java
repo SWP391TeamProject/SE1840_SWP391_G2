@@ -116,9 +116,9 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 () -> new ResourceNotFoundException("Account not found:" + accountId));
         AuctionSession auctionSession = auctionSessionRepos.findById(auctionSessionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction session not found:" + auctionSessionId));
-        Preconditions.checkState(
-                LocalDateTime.now().isAfter(auctionSession.getStartDate()),
-                "Auction session has not yet started");
+//        Preconditions.checkState(
+//                LocalDateTime.now().isAfter(auctionSession.getStartDate()),
+//                "Auction session has not yet started");
         Preconditions.checkState(
                 auctionSession.getStatus() != AuctionSession.Status.FINISHED &&
                         auctionSession.getStatus() != AuctionSession.Status.TERMINATED,

@@ -6,6 +6,7 @@ import { showErrorToast } from '@/lib/handle-error';
 import { AuctionSession } from '@/models/AuctionSessionModel.tsx';
 import { Page } from '@/models/Page.ts';
 import { createSearchParams } from 'react-router-dom';
+import { AxiosResponse } from 'axios';
 
 const controller = 'auction-sessions';
 
@@ -287,19 +288,14 @@ export const getUpcomingAuction = async (input: getAuctionsSchema) => {
   }
 };
 
-export const fetchAuctionSessionById = async (id: number) => {
-  return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .catch((err) => {
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
-    });
+export const fetchAuctionSessionById = async (id: number): Promise<AuctionSession> => {
+  const res = await axios.get<AuctionSession>(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+  });
+  return res.data;
 };
 
 export const fetchAuctionSessionByTitle = async (page?: number, size?: number, title?: string) => {

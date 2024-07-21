@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -21,28 +21,28 @@ import { CurrencyType, useCurrency } from '@/CurrencyProvider';
 import { useAuth } from '@/AuthProvider';
 import { useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { set } from 'date-fns';
 
 export default function PlaceBid({ ...props }) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showBidDialog, setShowBidDialog] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const loc = useLocation();
   const currency = useCurrency();
   const auth = useAuth();
   const location = useLocation();
   const [bidIncrement, setBidIncrement] = useState(500);
+  const [preparedBid, setPreparedBid] = useState([]);
   const formSchema = z.object({
     bidAmount: z.coerce
       .number({
         message: 'Bid amount must be a number',
       })
-      .min(parseFloat(props.currentBid) ? parseFloat(props.currentBid) + bidIncrement : bidIncrement, {
+      .min(parseFloat(props?.currentBid) ? parseFloat(props?.currentBid) + bidIncrement : bidIncrement, {
         message: `Bid must be greater than the current bid amount + ${bidIncrement} `,
       })
       .refine(
         (data) => {
-          return data < (parseFloat(props.currentBid) < 100 ? 100 : parseFloat(props.currentBid) * 2);
+          return data < (parseFloat(props?.currentBid) < 100 ? 100 : parseFloat(props?.currentBid) * 2);
         },
         {
           message: 'Bid amount must be smaller than twice the current bid amount',
@@ -50,28 +50,31 @@ export default function PlaceBid({ ...props }) {
       ),
   });
   useEffect(() => {
-    let currentBid = parseFloat(props.currentBid);
-    if (currentBid < 15000) {
-      setBidIncrement(100);
-    } else if (currentBid >= 15000 && currentBid < 50000) {
-      setBidIncrement(250);
-    } else if (currentBid >= 50000 && currentBid < 200000) {
-      setBidIncrement(500);
-    } else {
-      setBidIncrement(1000);
+    if (!loc?.state) {
+      let currentBid = Number(props.currentBid);
+      if (currentBid < 15000) {
+        setBidIncrement(100);
+      } else if (currentBid >= 15000 && currentBid < 50000) {
+        setBidIncrement(250);
+      } else if (currentBid >= 50000 && currentBid < 200000) {
+        setBidIncrement(500);
+      } else {
+        setBidIncrement(1000);
+      }
     }
-  }, [props.currentBid]);
+    form.setValue('bidAmount', Number(props.currentBid) + bidIncrement + 1);
+  }, [loc?.state, props.currentBid]);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: { bidAmount: Number(props?.currentBid) + bidIncrement + 1 },
   });
   useEffect(() => {
     if (!props.isSending) {
       setOpen(false);
       setShowBidDialog(false);
       // setShowBidDialog(false);
-      // setShowConfirmDialog(false);
+      setShowConfirmDialog(false);
     }
   }, [props.isSending]);
   // 2. Define a submit handler.
@@ -83,13 +86,16 @@ export default function PlaceBid({ ...props }) {
     // console.log(values);
 
     if (!showConfirmDialog) return;
-
+    // console.log(values);
     if (props.client != null) {
       props.setIsSending(true);
       props.client.publish({
-        destination: '/app/chat.sendMessage/' + props.auctionId + '/' + props.itemId,
+        destination: '/app/chat.sendMessage/' + props?.auctionId + '/' + props?.itemId,
         body: JSON.stringify({
-          auctionItemId: location.state.id,
+          auctionItemId: {
+            auctionSessionId: props?.auctionId,
+            itemId: props?.itemId,
+          },
           accountId: auth.user.accountId,
           amount: values.bidAmount,
         }),
@@ -155,7 +161,7 @@ export default function PlaceBid({ ...props }) {
                       </p>
                       <p>
                         <strong>Bids are binding and cannot be retracted.</strong> You are responsible for completing
-                        all due diligence prior to bidding. By placing this bid, you agree to the Cars &amp; Bids{' '}
+                        all due diligence prior to bidding. By placing this bid, you agree to the Biddify
                         <a href="/terms-of-use" target="_blank" rel="noopener noreferrer">
                           Terms of Use
                         </a>
@@ -217,6 +223,7 @@ export default function PlaceBid({ ...props }) {
                               <FormControl>
                                 <Input
                                   className="w-full text-foreground"
+                                  // defaultValue={2}
                                   placeholder={`amount equal or greater than ${currency.format(parseFloat(props?.currentBid) + bidIncrement)}`}
                                   {...field}
                                 />
@@ -226,12 +233,13 @@ export default function PlaceBid({ ...props }) {
                           )}
                         />
                       </div>
+
                       <Button
                         className="mx-auto "
                         variant="default"
                         type="submit"
                         onClick={() => {
-                          if (isDirty && isValid) {
+                          if (isValid) {
                             setShowConfirmDialog(true);
                           }
                         }}
@@ -239,18 +247,19 @@ export default function PlaceBid({ ...props }) {
                         Place Bid
                       </Button>
                     </div>
+
                     <DialogFooter>
                       <div className="flex justify-center items-center flex-col text-foreground">
-                        <h6>
+                        <p>
                           Bid increment is <span className="font-semibold">{currency.format(bidIncrement)} </span>
-                        </h6>
-                        <h5 className="text-red-600 font-semibold">
-                          Disclaimer:{' '}
+                        </p>
+                        <span className="text-red-600 font-semibold">
+                          Disclaimer:
                           <span>
                             All bid amounts are in USD. Currency conversions provided are for reference only and the
                             final amount may vary slightly.
                           </span>
-                        </h5>{' '}
+                        </span>
                       </div>
                     </DialogFooter>
                   </div>

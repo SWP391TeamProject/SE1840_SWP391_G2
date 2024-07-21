@@ -108,12 +108,13 @@ export const getItemsByOwnerId = async (ownerId: number, page: number, size: num
   });
 };
 
-export const getItemById = async (id: number) => {
-  return await axios.get<Item>(`${baseUrl}/detail/${id}`, {
+export const getItemById = async (id: number): Promise<Item | undefined> => {
+  const response = await axios.get<Item>(`${baseUrl}/detail/${id}`, {
     headers: {
       'Content-Type': 'application/json',
     },
   });
+  return response.data;
 };
 
 export const createItem = async (itemDTO: ItemUpdateDTO) => {

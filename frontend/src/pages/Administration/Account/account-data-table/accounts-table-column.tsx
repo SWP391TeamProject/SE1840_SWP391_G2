@@ -17,8 +17,9 @@ import { AccountStatus } from '@/constants/enums';
 import { DeleteAccountsDialog } from './delete-accounts-dialog';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { activateAccountService, deleteAccountService } from '@/services/AccountsServices';
-import { showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
+import { set } from 'zod';
 
 // Define the JewelryItem type based on the provided JSON structure
 type Account = {
@@ -137,29 +138,42 @@ export const getColumns = (): ColumnDef<Account>[] => [
       };
 
       const suspendAccount = (id: string) => {
-        deleteAccountService(id)
-          .then((res) => {
-            if (res) {
-              toast.success('Account suspended');
-            }
+        toast.promise(deleteAccountService(id), {
+          loading: 'Suspending account...',
+          success: (res) => {
             setShowDeleteItemDialog(false);
-          })
-          .catch((err) => {
-            showErrorToast(err);
-          });
+            return 'Account suspended';
+          },
+          error: (err) => {
+            setShowDeleteItemDialog(false);
+            return getErrorMessage(err);
+          },
+        });
       };
 
       const activateAccount = (id: string) => {
-        activateAccountService(id)
-          .then((res) => {
-            if (res) {
-              toast.success('Account activated');
-            }
+        toast.promise(activateAccountService(id), {
+          loading: 'Activating account...',
+          success: (res) => {
             setShowDeleteItemDialog(false);
-          })
-          .catch((err) => {
-            showErrorToast(err);
-          });
+            return 'Account activated';
+          },
+          error: (err) => {
+            setShowDeleteItemDialog(false);
+            return getErrorMessage(err);
+          },
+        });
+
+        // activateAccountService(id)
+        //   .then((res) => {
+        //     if (res) {
+        //       toast.success('Account activated');
+        //     }
+        //     setShowDeleteItemDialog(false);
+        //   })
+        //   .catch((err) => {
+        //     showErrorToast(err);
+        //   });
       };
 
       return (

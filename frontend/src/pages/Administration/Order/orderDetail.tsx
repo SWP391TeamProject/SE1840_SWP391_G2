@@ -33,7 +33,7 @@ export function OrderDetail() {
         setSubtotal(res.data.orderDetails.reduce((acc, cur) => acc + cur.soldPrice, 0));
         fetchAccountById(res.data.payment.accountId)
           .then((res) => {
-            setCustomer(res.data as Account);
+            setCustomer(res);
           })
           .catch((e) => {
             console.error(e);

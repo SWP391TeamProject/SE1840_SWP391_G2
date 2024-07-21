@@ -21,7 +21,7 @@ export default function CustomerLayout() {
   }, []);
 
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="bg-background text-foreground ">
       <div className="sticky top-0 z-20 w-full ">
         <NavBar />
       </div>

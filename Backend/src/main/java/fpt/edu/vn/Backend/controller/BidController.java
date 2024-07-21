@@ -4,6 +4,7 @@ import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.response.BidResponse;
 import fpt.edu.vn.Backend.exception.InvalidInputException;
 import fpt.edu.vn.Backend.exporter.BidExporter;
+import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.AuctionItemId;
 import fpt.edu.vn.Backend.pojo.Bid;
 import fpt.edu.vn.Backend.service.AccountService;
@@ -117,7 +118,7 @@ public class BidController {
                     .getItemDTO().getReservePrice()
                     : highestBid.getAmount();
 
-            AccountDTO account = (AccountDTO) headerAccessor.getSessionAttributes().get("user");
+            AccountDTO account = new AccountDTO((Account) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("user"));
             log.info(bidDTO.getAccountId() + " bid " + bidDTO.getAmount() + " on " + auctionItemId.getItemId() + "," + auctionItemId.getAuctionSessionId());
 
             if (highestBid != null && Objects.equals(bidDTO.getAccountId(), highestBid.getAccountId())) {
@@ -148,7 +149,7 @@ public class BidController {
             auctionItemService.updateAuctionItem(a);
             return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getAmount(), bidDTO.getAmount(), BidReplyDTO.Status.BID));
         } catch (Exception e) {
-            throw new InvalidInputException(e);
+            throw new InvalidInputException(e.getMessage());
         }
     }
 

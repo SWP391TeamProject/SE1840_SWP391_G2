@@ -127,7 +127,7 @@ export default function ItemDetail() {
     toast.promise(getItemById(itemId), {
       loading: 'loading item detail...',
       success: (res) => {
-        const i = res.data;
+        const i = res;
         dispatch(setCurrentItem(i));
         form.reset({
           itemId: i.itemId,

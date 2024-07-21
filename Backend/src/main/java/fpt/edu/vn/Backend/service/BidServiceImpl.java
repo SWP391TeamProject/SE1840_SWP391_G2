@@ -127,6 +127,7 @@ public class BidServiceImpl implements BidService {
         List<BidResponse> responses = new ArrayList<>();
         for (BidDTO bid : bids) {
             BidResponse response = new BidResponse();
+            response.setCreateDate(bid.getCreatedDate());
             response.setBidId(bid.getBidId());
             response.setAuctionItemId(bid.getAuctionItemId());
             response.setAccount(AccountDTO.redacted(accountRepos.findById(bid.getAccountId()).orElseThrow(

@@ -237,12 +237,29 @@ export function OrderCheckout() {
                   </AlertDescription>
                 </Alert>
               )}
-              <Button
-                onClick={() => setShowTrigger(true)}
-                disabled={order.payment.paymentAmount - auth.user?.balance > 0}
-              >
-                Buy now
-              </Button>
+
+              {
+                order.payment.paymentAmount - auth.user?.balance > 0 ? (
+                  <Button
+                    onClick={() => {
+                      nav('/profile/balance');
+                    }}
+                  >
+                    Deposit
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setShowTrigger(true)}
+                    disabled={order.payment.paymentAmount - auth.user?.balance > 0}
+                  >
+                    Buy now
+                  </Button>
+                )
+                // <Button variant="outline" onClick={() => setShowTrigger(true)}>
+                //   Pay with another method
+                // </Button>
+              }
+
               <ConfirmationDialog
                 description="This action cannot be undone."
                 label="Ok"

@@ -64,40 +64,32 @@ export const fetchAccountsByName = async (pageNumber: number, pageSize: number, 
     });
 };
 
-export const fetchAccountById = async (id: number) => {
-  return await axios
-    .get(API_SERVER + '/accounts/' + id, {
+export const fetchAccountById = async (id: number): Promise<Account | undefined> => {
+  try {
+    const response = await axios.get(`${API_SERVER}/accounts/${id}`, {
       headers: {
         'Content-Type': 'application/json',
-
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: `Bearer ${JSON.parse(getCookie('user')).accessToken || ''}`,
       },
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
     });
+    return response.data as Account;
+  } catch (err) {
+    console.log(err);
+    if (err?.response?.status === 401) {
+      removeCookie('user');
+      removeCookie('token');
+    }
+    return undefined;
+  }
 };
-
 export const createAccountService = async (data: any) => {
-  return await axios
-    .post(API_SERVER + '/accounts/', data, {
-      headers: {
-        'Content-Type': 'application/json',
+  return await axios.post(API_SERVER + '/accounts/', data, {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
-    });
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+  });
 };
 
 export const updateAccountService = async (data: any, id: number) => {
@@ -111,29 +103,25 @@ export const updateAccountService = async (data: any, id: number) => {
 
 export const deleteAccountService = async (id: string) => {
   console.log(id);
-  return await axios
-    .post(
-      API_SERVER + '/accounts/' + id,
-      {},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-        },
-      }
-    )
-    .catch((err) => console.log(err));
-};
-
-export const activateAccountService = async (id: string) => {
-  return await axios
-    .put(API_SERVER + '/accounts/activate/' + id, null, {
+  return await axios.post(
+    API_SERVER + '/accounts/' + id,
+    {},
+    {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .catch((err) => console.log(err));
+    }
+  );
+};
+
+export const activateAccountService = async (id: string) => {
+  return await axios.put(API_SERVER + '/accounts/activate/' + id, null, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+    },
+  });
 };
 
 export const exportAccounts = async () => {
@@ -154,8 +142,5 @@ export const exportAccounts = async () => {
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(blobUrl);
-    })
-    .catch((error) => {
-      console.error('Error fetching Excel file:', error);
     });
 };
