@@ -27,7 +27,7 @@ export const getAuctions = async (input: getAuctionsSchema) => {
     }
 
     let params = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort: sort ? sort : 'auctionSessionId,desc',
       status: statusSet ? String(statusSet).toUpperCase() : undefined,
@@ -75,7 +75,7 @@ export const getActiveAuction = async (input: getAuctionsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort,
       status: status ? status.toUpperCase() : undefined,
@@ -141,7 +141,7 @@ export const getPastAuction = async (input: getAuctionsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort,
       status: status ? status.toUpperCase() : undefined,
@@ -189,7 +189,7 @@ export const getUpcomingAuction = async (input: getAuctionsSchema) => {
 
     // Prepare query parameters
     const params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort,
       status: status ? status.toUpperCase() : undefined,

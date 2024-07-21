@@ -49,7 +49,7 @@ export function UserOrderDetail() {
     getOrderById(orderId)
       .then((res) => {
         if (res.data.payment.status === PaymentStatus.PENDING) {
-          nav('/dashboard/order/checkout/' + orderId);
+          nav('/dashboard/orders/checkout/' + orderId);
           return;
         }
         dispatch(setCurrentOrder(res.data));
