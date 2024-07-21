@@ -5,10 +5,12 @@ import fpt.edu.vn.Backend.DTO.request.OrderPayRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.OrderUpdateDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateOrderStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Order;
 import fpt.edu.vn.Backend.pojo.Payment;
 import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.security.JwtUser;
 import fpt.edu.vn.Backend.service.OrderService;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -29,24 +32,20 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
-    public ResponseEntity<Page<OrderDTO>> getAllOrders(@PageableDefault(size = 50, sort = "payment.paymentAmount") Pageable pageable,
-                                                       @RequestParam(required = false) String order,
-                                                       @RequestParam(required = false) String search,
-                                                       @RequestParam(required = false) String status) {
-        if (order != null) {
-            if (order.equals("desc")) {
-                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
-            }
+    public ResponseEntity<Page<OrderDTO>> getAllOrders(
+            Principal principal,
+            @PageableDefault(size = 50) Pageable pageable,
+            @RequestParam(required = false) Payment.Status status,
+            @RequestParam(required = false) Order.ShippingStatus shippingStatus,
+            @RequestParam(required = false) LocalDateTime from,
+            @RequestParam(required = false) LocalDateTime to,
+            @RequestParam(required = false) Integer user,
+            @RequestParam(required = false) String search) {
+        JwtUser requester = Authorizer.requireUser(principal);
+        if (!Authorizer.MANAGER.contains(requester.getRole())) {
+            user = requester.getUserId(); // only get payments of current user
         }
-        if(search != null){
-            return ResponseEntity.ok(orderService.searchOrders(search,pageable));
-        }
-        if (status != null) {
-            Payment.Status filter = Payment.Status.valueOf(status.toUpperCase());
-            return ResponseEntity.ok(orderService.getAllOrdersByStatus(filter, pageable));
-        }
-        return ResponseEntity.ok(orderService.getAllOrders(pageable));
+        return ResponseEntity.ok(orderService.getAllOrders(pageable, status, shippingStatus, from, to, user, search));
     }
 
     @GetMapping("/user/{userId}")

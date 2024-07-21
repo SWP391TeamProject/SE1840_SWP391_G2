@@ -21,7 +21,7 @@ public class BlogCategory {
     @Column(name = "blog_category_id")
     private int blogCategoryId;
 
-    @Column(length = 100,name = "name")
+    @Column(length = 100,name = "name" ,columnDefinition = "NVARCHAR(100)")
     private String name;
 
     @CreationTimestamp

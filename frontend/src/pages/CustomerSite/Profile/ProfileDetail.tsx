@@ -113,7 +113,7 @@ const ProfileDetail = () => {
   const onSubmitProfileDetails: SubmitHandler<z.infer<typeof profileDetailsSchema>> = (data) => {
     setIsLoading(true);
 
-    const submitDetailsPromise = axios.put<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
+    const submitDetailsPromise = axios.post<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + auth.user.accessToken,

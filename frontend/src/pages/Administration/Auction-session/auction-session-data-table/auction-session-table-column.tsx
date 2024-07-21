@@ -153,28 +153,6 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
       };
       return (
         <>
-          {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="Open menu"
-                variant="ghost"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-              >
-                <DotsHorizontalIcon className="h-4 w-4" aria-hidden="true" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onSelect={() => handleEditClick(
-                row.original.auctionSessionId
-              )}>
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setShowDeleteItemDialog(true)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -191,13 +169,14 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
               >
                 Detail
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  handleAssignAuctionItemClick(row.original);
-                }}
-              >
-                Assign Items
-              </DropdownMenuItem>
+              {row.original.status === AuctionSessionStatus.SCHEDULED &&
+                <DropdownMenuItem
+                  onClick={() => {
+                    handleAssignAuctionItemClick(row.original);
+                  }}
+                >
+                  Assign Items
+                </DropdownMenuItem>}
             </DropdownMenuContent>
           </DropdownMenu>
         </>

@@ -1,37 +1,13 @@
-import * as React from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/redux/hooks';
+import {Link, useNavigate} from 'react-router-dom';
 import { ConsignmentStatus } from '@/constants/enums';
 import { formatDate } from '@/lib/utils';
-import { Consignment } from '@/models/newModel/consignment';
-
-// Define the JewelryItem type based on the provided JSON structure
-// type Consignment = {
-//   consignmentId: number
-//   preferContact: string
-//   staff: {
-//     accountId: number
-//     email: string
-//     nickname: string
-//     phone: string
-//     role: string
-//   }
-//   createDate: string
-//   status: string
-//   updateDate: Date
-// }
+import Consignment from "@/models/consignment.ts";
+import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
 
 export const getColumns = (): ColumnDef<Consignment>[] => [
   {
@@ -63,29 +39,30 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
     enableHiding: false,
   },
   {
-    accessorKey: 'preferContact',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Prefer Contact" />,
-    cell: ({ row }) => <div className="w-20">{row.getValue('preferContact')}</div>,
+    accessorKey: 'user.nickname',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Requester Name" />,
+    cell: ({row}) => {
+      return (
+        <AccountTooltip account={row.original.user}>
+          <Link
+            to={`/account/${row.original.user.accountId}`}>{row.original.user.nickname}</Link>
+        </AccountTooltip>
+      );
+    },
     enableSorting: true,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'createDate',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
-    cell: ({ row }) => formatDate(new Date(row.getValue('createDate'))),
   },
   {
     accessorKey: 'staff.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Assigned Staff" />,
-    cell: ({ row }) => (row.original.staff?.nickname ? row.original.staff.nickname : ''),
-  },
-  {
-    accessorKey: 'user.nickname',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Requester Name" />,
-    cell: ({ row }) => (
-      <div className="font-medium max-w-[20rem]">{row.original.user.nickname ? row.original.user.nickname : ''}</div>
-    ),
-    enableSorting: true,
+    cell: ({row}) => {
+      return(
+        row.original.staff ?
+          <AccountTooltip account={row.original.staff}>
+            <Link
+              to={`/account/${row.original.staff.accountId}`}>{row.original.staff.nickname}</Link>
+          </AccountTooltip> : <></>
+      );
+    },
   },
   {
     accessorKey: 'status',
@@ -152,32 +129,22 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
       return value.includes(row.getValue(id));
     },
   },
-  //   {
-  //     accessorKey: "createDate",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Created At" />
-  //     ),
-  //     cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
-  //   },
-  //   {
-  //     accessorKey: "owner.nickname",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Owner" />
-  //     ),
-  //     cell: ({ row }) => row.original.owner.nickname,
-  //   },
+  {
+    accessorKey: 'createDate',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+    cell: ({ row }) => formatDate(new Date(row.getValue('createDate'))),
+  },
+  {
+    accessorKey: 'preferContact',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Prefer Contact" />,
+    cell: ({ row }) => <div className="w-20">{row.getValue('preferContact')}</div>,
+    enableSorting: true,
+    enableHiding: false,
+  },
   {
     id: 'actions',
     cell: ({ row }) => {
-      const [showUpdateItemSheet, setShowUpdateItemSheet] = React.useState(false);
-      const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
       const nav = useNavigate();
-      const dispatch = useAppDispatch();
-
-      const handleEditClick = (accountId: number) => {
-        // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
-        nav(`/admin/accounts/${accountId}`);
-      };
 
       const handleDetailClick = (consignmentId: number) => {
         nav(`/admin/consignments/${consignmentId}`);
@@ -185,9 +152,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
 
       return (
         <>
-          {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
           <Button
-            variant="outline"
             size="sm"
             onClick={() => {
               handleDetailClick(row.original.consignmentId);

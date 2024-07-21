@@ -11,37 +11,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@/redux/hooks';
+import {Link, useNavigate} from 'react-router-dom';
 import { AccountStatus } from '@/constants/enums';
-import { DeleteAccountsDialog } from './delete-accounts-dialog';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { activateAccountService, deleteAccountService } from '@/services/AccountsServices';
-import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
+import { showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
-import { set } from 'zod';
-
-// Define the JewelryItem type based on the provided JSON structure
-type Account = {
-  accountId: number;
-  avatar: {
-    attachmentId: number;
-    createDate: Date;
-    link: string;
-    updateDate: Date;
-  };
-  balance: number;
-  createDate: string;
-  email: string;
-  kyc: boolean;
-  nickname: string;
-  password: string;
-  phone: string;
-  require2fa: boolean;
-  role: string;
-  status: string;
-  updateDate: Date;
-};
+import {Account} from "@/models/AccountModel.tsx";
+import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip.tsx";
+import {BadgeCheck} from "lucide-react";
 
 export const getColumns = (): ColumnDef<Account>[] => [
   {
@@ -73,23 +56,66 @@ export const getColumns = (): ColumnDef<Account>[] => [
     enableHiding: false,
   },
   {
+    accessorKey: 'nickname',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Nickname" />,
+    cell: ({row}) => {
+      return (
+        <AccountTooltip account={row.original}>
+          <Link
+            to={`/account/${row.original.accountId}`} className="flex justify-center items-center gap-2">
+            {row.original.kyc && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <BadgeCheck className="size-5" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>KYC Verified</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {row.original.nickname}
+          </Link>
+        </AccountTooltip>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: 'email',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Email" className="w-20" />,
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[20rem] truncate font-medium">{row.getValue('email')}</span>
+        <span className="max-w-[20rem] truncate">{row.getValue('email')}</span>
       </div>
     ),
   },
   {
     accessorKey: 'phone',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Phone" />,
-    cell: ({ row }) => <div className="font-medium">{row.getValue('phone')}</div>,
+    cell: ({ row }) => <div>{row.getValue('phone')}</div>,
+    enableSorting: false,
+    enableHiding: true,
   },
   {
     accessorKey: 'role',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
-    cell: ({ row }) => <div className="font-medium">{row.getValue('role')}</div>,
+    cell: ({ row }) => {
+      const roleColor = {
+        ADMIN: 'bg-red-500',
+        STAFF: 'bg-yellow-500',
+        MANAGER: 'bg-purple-500',
+        MEMBER: 'bg-gray-500',
+      };
+
+      return (
+        <>
+          <Badge className={`font-medium capitalize ${roleColor[row.original.role]} hover:${roleColor[row.original.role]}`}>
+            {row.original.role}
+          </Badge>
+        </>
+      );
+    },
   },
   {
     accessorKey: 'status',
@@ -127,10 +153,8 @@ export const getColumns = (): ColumnDef<Account>[] => [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const [showUpdateItemSheet, setShowUpdateItemSheet] = React.useState(false);
       const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
       const nav = useNavigate();
-      const dispatch = useAppDispatch();
 
       const handleEditClick = (accountId: number) => {
         // return (<EditAcc item={item!} key={item!.itemId} hidden={false} />);
@@ -138,54 +162,33 @@ export const getColumns = (): ColumnDef<Account>[] => [
       };
 
       const suspendAccount = (id: string) => {
-        toast.promise(deleteAccountService(id), {
-          loading: 'Suspending account...',
-          success: (res) => {
-            setShowDeleteItemDialog(false);
-            return 'Account suspended';
-          },
-          error: (err) => {
-            setShowDeleteItemDialog(false);
-            return getErrorMessage(err);
-          },
-        });
+        setShowDeleteItemDialog(false);
+        deleteAccountService(id)
+          .then((res) => {
+            if (res) {
+              toast.success('Account suspended');
+            }
+          })
+          .catch((err) => {
+            showErrorToast(err);
+          });
       };
 
       const activateAccount = (id: string) => {
-        toast.promise(activateAccountService(id), {
-          loading: 'Activating account...',
-          success: (res) => {
-            setShowDeleteItemDialog(false);
-            return 'Account activated';
-          },
-          error: (err) => {
-            setShowDeleteItemDialog(false);
-            return getErrorMessage(err);
-          },
-        });
-
-        // activateAccountService(id)
-        //   .then((res) => {
-        //     if (res) {
-        //       toast.success('Account activated');
-        //     }
-        //     setShowDeleteItemDialog(false);
-        //   })
-        //   .catch((err) => {
-        //     showErrorToast(err);
-        //   });
+        setShowDeleteItemDialog(false);
+        activateAccountService(id)
+          .then((res) => {
+            if (res) {
+              toast.success('Account activated');
+            }
+          })
+          .catch((err) => {
+            showErrorToast(err);
+          });
       };
 
       return (
         <>
-          {/* Placeholder for UpdateItemSheet and DeleteItemDialog components */}
-          {/* <DeleteAccountsDialog
-              open={showDeleteItemDialog}
-              onOpenChange={setShowDeleteItemDialog}
-              items={[row.original]}
-              showTrigger={false}
-              onSuccess={() => row.toggleSelected(false)}
-            /> */}
           {row.original.status == AccountStatus.ACTIVE ? (
             <ConfirmationDialog
               open={showDeleteItemDialog}
@@ -207,7 +210,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
               onSuccess={() => activateAccount(row.original.accountId.toString())}
             />
           )}
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button aria-label="Open menu" variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
                 <DotsHorizontalIcon className="h-4 w-4" aria-hidden="true" />

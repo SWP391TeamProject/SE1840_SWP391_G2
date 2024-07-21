@@ -1,6 +1,4 @@
 import { AuctionItem } from './auctionItem';
-import { Item } from './newModel/item';
-import { Attachment } from '@/models/Attachment.ts';
 
 export interface AuctionSession {
   auctionSessionId?: number;

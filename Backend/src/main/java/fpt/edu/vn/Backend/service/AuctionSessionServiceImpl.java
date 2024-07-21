@@ -90,7 +90,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         this.mailSender = mailSender;
         this.itemServiceImpl = itemServiceImpl;
     }
-    @Transactional
+
     public AuctionSessionDTO mapAuctionSessionToDTO(AuctionSession pojo, @Nullable Integer accountId) {
         AuctionSessionDTO dto = new AuctionSessionDTO();
         dto.setAuctionSessionId(pojo.getAuctionSessionId());

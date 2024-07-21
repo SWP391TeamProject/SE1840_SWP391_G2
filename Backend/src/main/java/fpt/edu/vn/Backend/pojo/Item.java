@@ -29,7 +29,7 @@ public class Item {
     @JoinColumn(name = "jewelry_category_id") // This matches the column in the database
     private ItemCategory itemCategory;
 
-    @Column(length = 500,columnDefinition = "NVARCHAR(100)")
+    @Column(length = 300,columnDefinition = "NVARCHAR(300)")
     private String name;
 
     @Column(length = 10000,columnDefinition = "NVARCHAR(max)")

@@ -65,13 +65,13 @@ public class Consignment {
     @Column(length = 2000, columnDefinition = "NVARCHAR(max)")
     private String description;
 
-    @Column(length = 30)
+    @Column(length = 30, columnDefinition = "NVARCHAR(30)")
     private String color;
 
     @Column(name = "weight", nullable = true)
     private Double weight;
 
-    @Column(length = 30)
+    @Column(length = 30, columnDefinition = "NVARCHAR(30)")
     private String metal;
 
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")

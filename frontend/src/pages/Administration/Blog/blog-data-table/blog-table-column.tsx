@@ -1,7 +1,5 @@
-import * as React from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -11,38 +9,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { formatDate } from '@/lib/utils';
 import { setCurrentBlogPost } from '@/redux/reducers/Blogs';
 import BlogService from '@/services/BlogService';
+import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
+import {BlogPost} from "@/models/newModel/blogPost.ts";
 
-// Define the JewelryItem type based on the provided JSON structure
-type Blog = {
-  postId: number;
-  author: {
-    accountId: number;
-    email: string;
-    kyc: boolean;
-    nickname: string;
-    phone: string;
-    role: string;
-    status: string;
-    updateDate: Date;
-  };
-  category: {
-    blogCategoryId: number;
-    name: string;
-    createDate: Date;
-    updateDate: Date;
-  };
-  content: string;
-  createDate: Date;
-  title: string;
-  updateDate: Date;
-};
-
-export const getColumns = (): ColumnDef<Blog>[] => [
+export const getColumns = (): ColumnDef<BlogPost>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -76,7 +51,7 @@ export const getColumns = (): ColumnDef<Blog>[] => [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Title" className="w-" />,
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[20rem] truncate font-medium">{row.getValue('title')}</span>
+        <span className="max-w-[20rem] truncate">{row.getValue('title')}</span>
       </div>
     ),
   },
@@ -88,50 +63,23 @@ export const getColumns = (): ColumnDef<Blog>[] => [
   {
     accessorKey: 'author.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Author" />,
-    cell: ({ row }) => <div className="font-medium">{row.original.author.nickname}</div>,
+    cell: ({row}) => {
+      return (
+        <AccountTooltip account={row.original.author}>
+          <Link
+            to={`/account/${row.original.author.accountId}`}>{row.original.author.nickname}</Link>
+        </AccountTooltip>
+      );
+    },
   },
   {
     accessorKey: 'category.name',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
-    cell: ({ row }) => <div className="font-medium">{row.original.category.name}</div>,
+    cell: ({ row }) => <div>{row.original.category.name}</div>,
   },
-  // {
-  //   accessorKey: "status",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Status" />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Badge variant={row.getValue("status") === AccountStatus.DISABLED ? "destructive" : "default"} className={row.getValue("status") === AccountStatus.ACTIVE ? "bg-green-500" : ""}>
-  //       {row.getValue("status")}
-  //     </Badge>
-
-  //   //   {row.getValue("status") == AccountStatus.ACTIVE ?
-  //   //     <Badge variant="default" className="bg-green-500">{AccountStatus[row.status]}</Badge> :
-  //   //     <Badge variant="destructive">{AccountStatus[row.status]}</Badge>}
-  //   ),
-  //   filterFn: (row, id, value) => {
-  //     return value.includes(row.getValue(id))
-  //   },
-  // },
-  //   {
-  //     accessorKey: "createDate",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Created At" />
-  //     ),
-  //     cell: ({ row }) => formatDate(new Date(row.getValue("createDate"))),
-  //   },
-  //   {
-  //     accessorKey: "owner.nickname",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Owner" />
-  //     ),
-  //     cell: ({ row }) => row.original.owner.nickname,
-  //   },
   {
     id: 'actions',
     cell: ({ row }) => {
-      const [showUpdateItemSheet, setShowUpdateItemSheet] = React.useState(false);
-      const [showDeleteItemDialog, setShowDeleteItemDialog] = React.useState(false);
       const nav = useNavigate();
       const dispatch = useAppDispatch();
 

@@ -156,19 +156,6 @@ export function PublicItemDetail() {
                         <AlertDescription>This item has been sold.</AlertDescription>
                       </Alert>
                     )}
-                    {item.status == ItemStatus.UNSOLD && (
-                      <Alert variant="default">
-                        <AlertCircle className="h-5 w-5" />
-                        <AlertTitle>
-                          <h3 className="text-lg">Status</h3>
-                        </AlertTitle>
-                        <AlertDescription>
-                          This item has not been sold successfully before.
-                          <br />
-                          It might come back in the future. Stay stunned!
-                        </AlertDescription>
-                      </Alert>
-                    )}
                   </div>
                 </div>
 

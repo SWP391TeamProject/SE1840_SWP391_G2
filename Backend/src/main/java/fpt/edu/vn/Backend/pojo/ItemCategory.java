@@ -20,7 +20,7 @@ public class ItemCategory {
     @Column(name = "jewelry_category_id")
     private int itemCategoryId;
 
-    @Column(length = 100)
+    @Column(length = 100, columnDefinition = "NVARCHAR(100)")
     private String name;
 
     @CreationTimestamp

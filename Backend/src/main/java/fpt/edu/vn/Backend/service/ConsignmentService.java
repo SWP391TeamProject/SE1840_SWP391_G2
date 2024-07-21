@@ -6,11 +6,14 @@ import fpt.edu.vn.Backend.DTO.request.ConsignmentRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateConsignmentStatusRequestDTO;
 import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.Consignment;
+import jakarta.validation.constraints.Null;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public interface ConsignmentService {
     // Create
@@ -34,7 +37,9 @@ public interface ConsignmentService {
     // Reads
     ConsignmentDTO getConsignmentById(int id);
 
-    Page<ConsignmentDTO> getAllConsignments(String keyword,Pageable pageable);
+    default Page<ConsignmentDTO> getAllConsignments(String keyword,Pageable pageable) {
+        return getAllConsignments(pageable, null, null, null, null, keyword);
+    }
 
     Page<ConsignmentDTO> getAllStaffConsignments(int staffId, Pageable pageable);
 
@@ -43,6 +48,11 @@ public interface ConsignmentService {
     Page<ConsignmentDTO> getConsignmentsByUserId(int userId, Pageable pageable);
 
     Page<ConsignmentDetailDTO> getConsignmentDetail(int consignmentId);
+
+    Page<ConsignmentDTO> getAllConsignments(Pageable pageable,
+                                            @Nullable Consignment.Status status,
+                                            @Nullable LocalDateTime from, @Nullable LocalDateTime to,
+                                            @Nullable Integer customer, @Nullable String search);
 
     //Customer
     ConsignmentDTO custAcceptInitialEvaluation(int consignmentId);

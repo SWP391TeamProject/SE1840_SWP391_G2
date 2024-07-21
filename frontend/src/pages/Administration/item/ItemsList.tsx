@@ -1,230 +1,56 @@
-import { Badge } from '@/components/ui/badge';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import {
-  PaginationPrevious,
-  PaginationItem,
-  PaginationLink,
-  PaginationEllipsis,
-  PaginationNext,
-  PaginationContent,
-  Pagination,
-} from '@/components/ui/pagination';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import {
-  Home,
-  LineChart,
-  ListFilter,
-  Package,
-  Package2,
-  PanelLeft,
-  Search,
-  Settings,
-  ShoppingCart,
-  Users2,
-  File,
-  PlusCircle,
-  MoreHorizontal,
-} from 'lucide-react';
-import { Suspense, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { EditAcc } from '../popup/EditAcc';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { setCurrentItem, setCurrentPageList, setCurrentPageNumber, setItems } from '@/redux/reducers/Items';
-import { getItemsByName, getItemsByStatus } from '@/services/ItemService';
-import { ItemStatus } from '@/constants/enums';
-import PagingIndexes from '@/components/pagination/PagingIndexes';
-import { useCurrency } from '@/CurrencyProvider.tsx';
-import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
-import ItemsTable from './testserversideTable/item-table';
-import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
-import { getItems } from './testserversideTable/item-apis';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
+import {useEffect, useState } from 'react';
+import {useSearchParams} from 'react-router-dom';
+import {useDebouncedCallback} from "use-debounce";
+import {getEnumValue, parseIntOrUndefined} from "@/lib/utils.ts";
+import ItemsTable
+  from "@/pages/Administration/item/testserversideTable/item-table.tsx";
+import {ItemStatus} from "@/models/Item.ts";
+import {getItems} from "@/services/ItemService.ts";
 
 export default function ItemsList() {
-  const itemsList = useAppSelector((state) => state.items);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const [statusFilter, setStatusFilter] = useState('');
-  const [seletedStatus, setSelectedStatus] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const url = new URL(window.location.href);
-  const [search, setSearch] = useState('');
-  let pageNumber = url.searchParams.get('page');
-  let sort = url.searchParams.get('sort') || 'createDate,desc';
-  let pageSize = url.searchParams.get('per_page');
-  const [itemPromise, setItemPromise] = useState<Promise<any>>();
-  const nav = useNavigate();
-  const location = useLocation(); // Use location correctly
+  const [searchParams] = useSearchParams();
+  const [itemPromise, setItemPromise] = useState<any>();
 
-  const handleFilterClick = (status: string) => {
-    console.log(status);
-    if (status === '') {
-      setItemPromise(
-        getItems({
-          page: Number.parseInt(pageNumber),
-          size: Number.parseInt(pageSize),
-          sort: sort,
-          status: status,
-          search: search,
-        })
-      );
-      setSelectedStatus('');
-    } else {
-      setItemPromise(
-        getItems({
-          page: Number.parseInt(pageNumber),
-          size: Number.parseInt(pageSize),
-          sort: sort,
-          status: status,
-          search: search,
-        })
-      );
-      setSelectedStatus(status);
-    }
-  };
-  useEffect(() => {
-    console.log('Location changed:', location); // Debugging the location object
-    const urlParams = new URLSearchParams(location.search);
-    const searchParam = urlParams.get('search') || '';
-    console.log('Search parameter:', searchParam); // Debugging the search parameter
-    setSearch(searchParam);
-  }, [location]);
+  const fetchItems = useDebouncedCallback(
+    () => {
+      const query = {
+        status: getEnumValue(ItemStatus, searchParams.get('status')) as ItemStatus,
+        categoryId: parseIntOrUndefined(searchParams.get('categoryId')),
+        search: searchParams.get('search'),
+        minPrice: parseIntOrUndefined(searchParams.get('minPrice')),
+        maxPrice: parseIntOrUndefined(searchParams.get('maxPrice')),
+        page: parseIntOrUndefined(searchParams.get('page')),
+        size: parseIntOrUndefined(searchParams.get('per_page')),
+        sort: searchParams.get('sort') || 'itemId,desc',
+      };
+      setItemPromise(getItems(query));
+    }, 1000
+  );
 
   useEffect(() => {
-    if (Number.parseInt(pageNumber) >= 1)
-      setItemPromise(
-        getItems({
-          page: Number.parseInt(pageNumber),
-          size: Number.parseInt(pageSize),
-          sort: sort,
-          search: search,
-          status: seletedStatus,
-        })
-      );
-  }, [pageSize, pageNumber, sort, search]);
-
-  useEffect(() => {
-    // fetchItems(itemsList.currentPageNumber);
-    setStatusFilter('all');
-  }, []);
+    fetchItems();
+  }, [searchParams]);
 
   return (
-    <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+    <main className="grid flex-1 orders-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Tabs defaultValue="all">
-        <div className="flex items-center justify-center"></div>
-        <TabsContent value="all" className="max-w-screen">
-          <Card className="max-w-screen-2xl">
+        <TabsContent value="all">
+          <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle className="flex justify-between items-center">Items</CardTitle>
-              <CardDescription>Manage items and view their details.</CardDescription>
+              <CardTitle className="flex justify-between items-center">
+                Items
+              </CardTitle>
+              <CardDescription>Manage items and view
+                details.</CardDescription>
             </CardHeader>
             <CardContent>
-              <Suspense
-                fallback={
-                  <DataTableSkeleton
-                    columnCount={5}
-                    searchableColumnCount={1}
-                    filterableColumnCount={2}
-                    cellWidths={['10rem', '40rem', '12rem', '12rem', '8rem']}
-                    shrinkZero
-                  />
-                }
-              >
-                {/**
-                 * Passing promises and consuming them using React.use for triggering the suspense fallback.
-                 * @see https://react.dev/reference/react/use
-                 */}
-                {/* <Select onValueChange={handleStatusFilterSelect} >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
-                        <SelectItem value="All" key={0}>All</SelectItem>
-                        {Object.values(ItemStatus).map((status) => (
-                          <SelectItem value={status}>{status}</SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select> */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-8 gap-1">
-                      <ListFilter className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    <DropdownMenuLabel>Status</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem
-                      className="w-9/12"
-                      checked={seletedStatus == ''}
-                      onClick={() => handleFilterClick('')}
-                    >
-                      All
-                    </DropdownMenuCheckboxItem>
-                    {Object.values(ItemStatus).map((state) => (
-                      <div className="flex m-1 items-center justify-between" key={state}>
-                        <DropdownMenuCheckboxItem
-                          className="w-9/12"
-                          checked={seletedStatus == state}
-                          onClick={() => handleFilterClick(state)}
-                        >
-                          {state}
-                        </DropdownMenuCheckboxItem>
-                      </div>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <ItemsTable itemPromise={itemPromise} />
-              </Suspense>
+              <ItemsTable itemPromise={itemPromise} />
             </CardContent>
-            <CardFooter>
-              {/* <div className="text-xs text-muted-foreground">
-                                        Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                                        products
-                                    </div> */}
-            </CardFooter>
           </Card>
-          {/* } */}
         </TabsContent>
       </Tabs>
-      {/* {itemsList.value.map((item) => (
-        <EditAcc item={item} key={item.itemId} hidden={true} />
-      ))} */}
     </main>
   );
-}
+};

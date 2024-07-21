@@ -107,23 +107,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public @NotNull Page<AccountDTO> getAccounts(String keyword,@NotNull Pageable pageable) {
-        AccountSpecification spec = new AccountSpecification(keyword);
+    public @NotNull Page<AccountDTO> getAccounts(@NotNull Pageable pageable,
+                                                 @Nullable Account.Role role,
+                                                 @Nullable Account.Status status,
+                                                 @Nullable String search) {
+        AccountSpecification spec = new AccountSpecification(role, status, search);
         return accountRepos.findAll(spec,pageable).map(this::mapEntityToDTO);
-    }
-
-    @Override
-    public @NotNull Page<AccountDTO> getAccountsByRoles(@NotNull Pageable pageable, Set<Account.Role> roles) {
-        var a = accountRepos.findByRoleIn(roles, pageable);
-        a = a == null ? Page.empty(pageable) : a;
-        return a.map(this::mapEntityToDTO);
-    }
-
-    @Override
-    public @NotNull Page<AccountDTO> getAccountsByNameOrEmail(@NotNull Pageable pageable, String name) {
-        var a = accountRepos.findByNicknameContainingOrEmailContaining(name, pageable);
-        a = a == null ? Page.empty(pageable) : a;
-        return a.map(this::mapEntityToDTO);
     }
 
     @Override
@@ -166,10 +155,16 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
         Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
-        Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
-        Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
-        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
-        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
+        if (account.getNickname() != null) {
+            Preconditions.checkState(account.getNickname().length() >= 5,
+                    "Nickname must be at least 5 characters");
+            Preconditions.checkState(account.getNickname().length() <= 20,
+                    "Nickname must not be longer than 20 characters");
+        }
+        Preconditions.checkState(account.getPhone() == null || account.getPhone().length() <= 15,
+                "Phone must not be longer than 15 characters");
+        Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0,
+                "Balance must not be negative");
         Account acc = accountRepos.findById(account.getAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", account.getAccountId()));
         if(!acc.getEmail().equals(account.getEmail()) && accountRepos.findByEmail(account.getEmail()).isPresent())

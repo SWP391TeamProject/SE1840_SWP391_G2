@@ -22,7 +22,12 @@ public interface ItemService {
     List<AttachmentDTO> uploadAttachment(int id, AttachmentUploadDTO dto) throws IOException;
     void deleteAttachment(int attachmentId, int itemId);
 
-    @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable);
+    @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable,
+                                    @Nullable Integer minPrice,
+                                    @Nullable Integer maxPrice,
+                                    @Nullable Item.Status status,
+                                    @Nullable Integer categoryId,
+                                    @Nullable String search);
 
     @NotNull Page<ItemDTO> getItemsByPrice(@NotNull Pageable pageable, int minPrice, int maxPrice);
     @NotNull Page<ItemDTO> getItemsByStatus(@NotNull Pageable pageable, @NotNull Item.Status status);
@@ -33,5 +38,4 @@ public interface ItemService {
     @NotNull Page<ItemDTO> getItemsByCategoryIdByPrice(@NotNull Pageable pageable, int categoryId, int minPrice, int maxPrice);
     @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name);
     @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name,Item.Status status);
-    Page<ItemDTO> searchItems(String keyword,Pageable pageable);
 }

@@ -30,22 +30,14 @@ public class BlogController {
     @Autowired
     private BlogService blogService;
     @Autowired
-    private AttachmentService attachmentService;
-    @Autowired
-    private AccountService accountService;
-    @Autowired
     private BlogCategoryService blogCategoryService;
 
     @GetMapping("/")
     public ResponseEntity<Page<BlogPostDTO>> getAllBlogs(@PageableDefault Pageable pageable,
+                                                         @RequestParam(required = false) Integer categoryId,
                                                          @RequestParam(required = false) String search
     ) {
-        return new ResponseEntity<>(blogService.getAllBlogs(search,pageable), HttpStatus.OK);
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<Page<BlogPostDTO>> searchBlog(@RequestParam String keyword, @PageableDefault(size = 50) Pageable pageable) {
-        return new ResponseEntity<>(blogService.searchBlog(keyword, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(blogService.getAllBlogs(search,categoryId,pageable), HttpStatus.OK);
     }
 
     @GetMapping("/category")

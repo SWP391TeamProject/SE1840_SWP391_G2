@@ -4,35 +4,41 @@ import { showErrorToast } from '@/lib/handle-error';
 import { getCookie, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import { toast } from 'sonner';
-import { Search } from 'lucide-react';
+import {Page} from "@/models/Page.ts";
+import {formatDateToISO} from "@/lib/utils.ts";
+import Consignment from "@/models/consignment.ts";
 
-export const fetchAllConsignmentsService = async (pageNumber: number, pageSize: number) => {
+interface GetConsignmentSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  status?: string;
+  from?: Date;
+  to?: Date;
+  customer?: number;
+  search?: string;
+}
+
+export const fetchAllConsignmentsService = async (input: GetConsignmentSchema) => {
+  const { page, size, sort, status, from, to, customer, search } = input;
+
   let params = {
-    page: pageNumber || 0,
-    size: pageSize || 50,
+    page: page - 1, // Spring Boot uses 0-based page index
+    size: size ? size : 10,
+    sort: sort ? sort : 'itemId,desc',
+    status: status ? status.toUpperCase() : undefined,
+    customer,
+    search,
+    from: formatDateToISO(from),
+    to: formatDateToISO(to),
   };
-  console.log(params);
-  return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
-      headers: {
-        'Content-Type': 'application/json',
-
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-      },
-      params: params,
-    })
-    .then((res) => {
-      console.log(res.data.content);
-      return res;
-    }) // return the data here
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
-      throw err; // make sure to throw the error so it can be caught by the query
-    });
+  return await axios.get<Page<Consignment>>(`${SERVER_DOMAIN_URL}/api/consignments/`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
+    },
+    params: params,
+  });
 };
 
 interface GetConsignmentsSchema {

@@ -19,7 +19,7 @@ interface acutionSessionsTableFloatingBarProps {
   table: Table<ReturnType<typeof fetchAccountsService>>;
 }
 
-export function AcutionSessionsTableFloatingBar({ table }: acutionSessionsTableFloatingBarProps) {
+export function AuctionSessionsTableFloatingBar({ table }: acutionSessionsTableFloatingBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
 
   const [isPending, startTransition] = React.useTransition();

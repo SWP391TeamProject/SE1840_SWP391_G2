@@ -2,7 +2,8 @@ import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
 import { getCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-import { toast } from 'sonner';
+import {Page} from "@/models/Page.ts";
+import {BlogCategory} from "@/models/newModel/blogCategory.ts";
 
 class BlogCategoryService {
   private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;
@@ -13,7 +14,7 @@ class BlogCategoryService {
       size: size || 50,
     };
     return axios
-      .get(`${this.BASE_URL}/`, {
+      .get<Page<BlogCategory>>(`${this.BASE_URL}/`, {
         headers: {
           'Content-Type': 'application/json',
         },

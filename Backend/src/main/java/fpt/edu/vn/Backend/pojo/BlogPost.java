@@ -31,7 +31,7 @@ public class BlogPost {
     @JoinColumn(name = "author_id")
     private Account author;
 
-    @Column(length = 300)
+    @Column(columnDefinition = "NVARCHAR(255)")
     private String title;
 
     @Column(length = 10000,columnDefinition = "NVARCHAR(max)")

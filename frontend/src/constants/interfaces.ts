@@ -64,26 +64,6 @@ export interface Bid {
   auction_item_id?: number;
 }
 
-// ... (interfaces for BlogCategory, BlogPost, CitizenCard, Consignment, etc.)
-// interfaces.ts (continued)
-
-export interface BlogCategory {
-  blog_category_id?: number;
-  create_date?: Date;
-  name?: string;
-  update_date?: Date;
-}
-
-export interface BlogPost {
-  post_id?: number;
-  content?: string;
-  create_date?: Date;
-  title?: string;
-  update_date?: Date;
-  author_id?: number;
-  blog_category_id?: number;
-}
-
 export interface CitizenCard {
   account_id: number;
   address?: string;

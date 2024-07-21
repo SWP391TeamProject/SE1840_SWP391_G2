@@ -9,27 +9,36 @@ import { ItemUpdateDTO } from '@/models/ItemUpdateDTO.ts';
 // Service methods
 const baseUrl = API_SERVER + '/items';
 
-export const getItems = async (
-  pageNumber: number,
-  pageSize?: number,
-  minPrice?: number,
-  maxPrice?: number,
-  sort?: string,
-  order?: string,
-  status?: ItemStatus
-) => {
+interface GetItemsSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  status?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  search?: string;
+  categoryId?: number;
+}
+
+export const getItems = async (input: GetItemsSchema) => {
+  const { page, size, sort,
+    status, minPrice, maxPrice, search, categoryId } = input;
+
   let params = {
-    page: pageNumber,
-    size: pageSize,
-    minPrice: minPrice,
-    maxPrice: maxPrice,
-    sort: sort,
-    order: order,
-    status: status,
+    page: page - 1, // Spring Boot uses 0-based page index
+    size: size ? size : 10,
+    sort: sort ? sort : 'itemId,desc',
+    status: status ? status.toUpperCase() : undefined,
+    categoryId,
+    search,
+    minPrice,
+    maxPrice
   };
   return await axios.get<Page<Item>>(`${baseUrl}/`, {
     headers: {
       'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
     },
     params: params,
   });

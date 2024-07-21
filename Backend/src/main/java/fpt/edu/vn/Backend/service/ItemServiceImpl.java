@@ -12,6 +12,7 @@ import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.ItemCategoryRepos;
 import fpt.edu.vn.Backend.repository.ItemRepos;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -171,8 +172,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
    //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "item")
-    public @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable) {
-        return itemRepos.findAll(pageable).map(ItemDTO::new);
+    public @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable,
+                                           @Nullable Integer minPrice,
+                                           @Nullable Integer maxPrice,
+                                           @Nullable Item.Status status,
+                                           @Nullable Integer categoryId,
+                                           @Nullable String search) {
+        ItemSpecification spec = new ItemSpecification(minPrice, maxPrice, status, categoryId, search);
+        return itemRepos.findAll(spec,pageable).map(ItemDTO::new);
     }
 
     @Override
@@ -212,15 +219,6 @@ public class ItemServiceImpl implements ItemService {
     public @NotNull Page<ItemDTO> getItemsByName(@NotNull Pageable pageable, String name, Item.Status status) {
         return itemRepos.findItemByNameContainingAndStatus(name,status, pageable).map(ItemDTO::new);
     }
-
-    @Transactional
-    @Override
-    public Page<ItemDTO> searchItems(String keyword, Pageable pageable) {
-        ItemSpecification spec = new ItemSpecification(keyword);
-        Page<Item> result = itemRepos.findAll(spec,pageable);
-        return result.map(ItemDTO::new);
-    }
-
    
    //@Cacheable(key = "'itemsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort + #categoryId", value = "item")
     @Override

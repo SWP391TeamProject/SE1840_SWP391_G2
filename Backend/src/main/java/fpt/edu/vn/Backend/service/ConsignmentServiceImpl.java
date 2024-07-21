@@ -18,6 +18,7 @@ import fpt.edu.vn.Backend.repository.ConsignmentRepos;
 import fpt.edu.vn.Backend.repository.NotificationRepos;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -451,14 +452,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return consignmentRepos.findById(id).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
     }
 
-    @Override
-    //@Cacheable(key = "'consignmentsPage:' + #pageable.pageNumber + 'size:' + #pageable.pageSize + 'sort:' + #pageable.sort", value = "consignments")
-    public Page<ConsignmentDTO> getAllConsignments(String keyword,Pageable pageable) {
-        ConsignmentSpecification spec = new ConsignmentSpecification(keyword);
-        Page<Consignment> consignmentPage = consignmentRepos.findAll(spec,pageable);
-        return getConsignmentDTOS(pageable, consignmentPage);
-    }
-
     //TODO : redesing the logic for get all staff consignment this need refactor
     @Override
     public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
@@ -528,6 +521,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         }
         return new PageImpl<>(consignmentDetailDTOs);
     }
+
+    @Override
+    public Page<ConsignmentDTO> getAllConsignments(Pageable pageable,
+                                                   @Nullable Consignment.Status status,
+                                                   @Nullable LocalDateTime from, @Nullable LocalDateTime to,
+                                                   @Nullable Integer customer, @Nullable String search) {
+        ConsignmentSpecification spec = new ConsignmentSpecification(status, from, to, customer, search);
+        Page<Consignment> consignmentPage = consignmentRepos.findAll(spec,pageable);
+        return getConsignmentDTOS(pageable, consignmentPage);
+    }
+
     @Transactional
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)

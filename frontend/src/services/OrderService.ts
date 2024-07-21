@@ -4,23 +4,38 @@ import { Page } from '@/models/Page';
 import { Order, ShippingStatus } from '@/models/newModel/order';
 import { getCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
+import {formatDateToISO} from "@/lib/utils.ts";
 
 // Service methods
 const baseUrl = API_SERVER + '/orders';
 
-export const getOrders = async (
-  pageNumber: number,
-  pageSize?: number,
-  sort?: string,
-  order?: string,
-  status?: PaymentStatus
-) => {
+interface GetOrdersSchema {
+  page: number;
+  size: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  status?: string;
+  shippingStatus?: string;
+  from?: Date;
+  to?: Date;
+  search?: string;
+  user?: number;
+}
+
+export const getOrders = async (input: GetOrdersSchema) => {
+  const { page, size, sort,
+    status, shippingStatus, from, to, search, user } = input;
+
   let params = {
-    page: pageNumber,
-    size: pageSize | 10,
-    sort: sort,
-    order: order,
-    status: status,
+    page: page - 1, // Spring Boot uses 0-based page index
+    size: size ? size : 10,
+    sort: sort ? sort : 'orderId,desc',
+    status: status ? status.toUpperCase() : undefined,
+    shippingStatus: shippingStatus ? shippingStatus.toUpperCase() : undefined,
+    from: formatDateToISO(from),
+    to: formatDateToISO(to),
+    search,
+    user
   };
   return await axios.get<Page<Order>>(`${baseUrl}`, {
     headers: {

@@ -22,6 +22,7 @@ public class OrderDTO implements Serializable {
     private Order.ShippingStatus shippingStatus;
     private PaymentDTO payment;
     private LocalDateTime createDate;
+    private LocalDateTime updateDate;
     private List<OrderDetailDTO> orderDetails = new ArrayList<>();
     private BigDecimal subtotal;
 
@@ -39,6 +40,8 @@ public class OrderDTO implements Serializable {
                     .reduce(BigDecimal.ZERO, (a, b) -> a.add(b.getSoldPrice()), BigDecimal::add);
         }
         dto.createDate = order.getPayment().getCreateDate();
+        dto.updateDate = order.getUpdateDate();
+        if (dto.updateDate == null) dto.updateDate = dto.createDate;
         return dto;
     }
 
@@ -55,5 +58,7 @@ public class OrderDTO implements Serializable {
                     .reduce(BigDecimal.ZERO, (a, b) -> a.add(b.getSoldPrice()), BigDecimal::add);
         }
         this.createDate = order.getPayment().getCreateDate();
+        this.updateDate = order.getUpdateDate();
+        if (this.updateDate == null) this.updateDate = this.createDate;
     }
 }

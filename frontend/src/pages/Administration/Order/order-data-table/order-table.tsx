@@ -3,11 +3,14 @@ import * as React from 'react';
 import { useDataTable } from '@/hooks/use-data-table';
 import { DataTable } from '@/components/data-tables/data-table';
 import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
-import { DataTableFilterField } from '@/types';
 import getColumns from './order-table-column';
 import { OrdersTableFloatingBar } from './order-table-floating-bar';
 import { OrdersTableToolbarActions } from './order-table-toolbar-actions';
 import { getOrders } from '@/services/OrderService';
+import {
+  DataTableSkeleton
+} from "@/components/data-tables/data-tables-skeleton.tsx";
+
 interface OrderTableProps {
   orderPromise: ReturnType<typeof getOrders>;
 }
@@ -15,6 +18,7 @@ interface OrderTableProps {
 export function OrdersTable({ orderPromise }: OrderTableProps) {
   const [data, setData] = React.useState([]);
   const [pageCount, setPageCount] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   // Memoize the columns so they don't re-render on every render
   const columns = React.useMemo(() => getColumns(), []);
@@ -22,12 +26,12 @@ export function OrdersTable({ orderPromise }: OrderTableProps) {
   React.useEffect(() => {
     const fetchData = async () => {
       if (orderPromise) {
+        setIsLoading(true);
         const content = (await orderPromise).data.content;
         const totalPages = (await orderPromise).data.totalPages;
         setData(content);
         setPageCount(totalPages);
-        console.log(content);
-        console.log(totalPages);
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -41,10 +45,16 @@ export function OrdersTable({ orderPromise }: OrderTableProps) {
   });
 
   return (
-    <DataTable table={table} floatingBar={<OrdersTableFloatingBar table={table} />}>
+    <DataTable isLoading={isLoading} table={table} floatingBar={<OrdersTableFloatingBar table={table} />}>
       <DataTableToolbar table={table}>
         <OrdersTableToolbarActions table={table} />
       </DataTableToolbar>
+      {isLoading && <DataTableSkeleton
+        columnCount={7}
+        cellWidths={['10rem', '10rem', '10rem', '10rem', '10rem', '8rem']}
+        shrinkZero
+        showViewOptions={false}
+      />}
     </DataTable>
   );
 }
