@@ -37,7 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
         this.accountRepos = accountRepos;
         this.auctionSessionRepos = auctionSessionRepos;
     }
-    @Transactional
+    
     @Override
     public Notification mapDTOToEntity(NotificationDTO dto) {
         Account acc = accountRepos.findById(dto.getUserId())
@@ -48,7 +48,7 @@ public class NotificationServiceImpl implements NotificationService {
         noti.setMessage(dto.getMessage());
         return noti;
     }
-    @Transactional
+    
     @Override
     public boolean markNotificationRead(int notificationId, String userEmail) throws IllegalAccessException {
         Notification notification = notificationRepos.findById(notificationId)
@@ -61,17 +61,17 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepos.save(notification);
         return true;
     }
-    @Transactional
+    
     @Override
     public @NotNull NotificationDTO sendNotification(@NotNull NotificationDTO dto) {
         return new NotificationDTO(notificationRepos.save(mapDTOToEntity(dto)));
     }
-    @Transactional
+    
     @Override
     public void sendBulkNotification(@NotNull List<NotificationDTO> notifications) {
         notificationRepos.saveAll(notifications.stream().map(this::mapDTOToEntity).collect(Collectors.toList()));
     }
-    @Transactional
+    
     @Override
     public void sendNotificationToMultiUsers(@NotNull NotificationDTO dto, Account... accounts) {
         notificationRepos.saveAll(Arrays.stream(accounts).map(account -> {
@@ -82,7 +82,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Transactional
     public void sendNotificationToUserGroup(@NotNull NotificationDTO dto, @NotNull Account.Role... roles) {
         notificationRepos.saveAll(Arrays.stream(roles)
                 .map(accountRepos::findByRole)
@@ -94,18 +93,18 @@ public class NotificationServiceImpl implements NotificationService {
                     return notification;
                 }).collect(Collectors.toList()));
     }
-    @Transactional
+    
     @Override
     public @NotNull Page<NotificationDTO> getNotifications(@NotNull Pageable pageable, String userEmail) {
         return notificationRepos.findNotificationByAccount_EmailOrderByCreateDateDesc(userEmail, pageable)
                 .map(NotificationDTO::new);
     }
-    @Transactional
+    
     @Override
     public int countUnreadNotifications(String userEmail) {
         return notificationRepos.countAllByAccount_EmailAndReadIsFalse(userEmail);
     }
-    @Transactional
+    
     @Override
     public void sendInvitationToAllMembers(int auctionSessionId) {
         List<Account> members = accountRepos.findAll();

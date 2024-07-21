@@ -42,7 +42,6 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     }
 
     @Override
-    @Transactional
     public AuctionItemDTO createAuctionItem(AuctionItemDTO auctionItemDTO) {
         AuctionItem newAuctionItem = new AuctionItem();
         newAuctionItem.setAuctionSession(auctionSessionRepos.findById(auctionItemDTO.getId().getAuctionSessionId()).orElseThrow(
@@ -56,7 +55,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return new AuctionItemDTO(newAuctionItem);
 
     }
-    @Transactional
+    
     @Override
     public AuctionItemDTO updateAuctionItem(AuctionItemDTO auctionItemDTO) {
         AuctionItem newAuctionItem = auctionItemRepos.findById(auctionItemDTO.getId()).orElseThrow(
@@ -66,7 +65,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return new AuctionItemDTO(newAuctionItem);
 
     }
-    @Transactional
+    
     @Override
     public void deleteById(AuctionItemId id) {
         if (!auctionItemRepos.existsById(id)) {

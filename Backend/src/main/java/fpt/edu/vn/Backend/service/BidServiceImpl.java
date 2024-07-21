@@ -82,7 +82,6 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    @Transactional
     public BidDTO createBid(BidDTO bid) {
         Account acc = accountRepos.findById(bid.getAccountId()).orElseThrow(
                 () -> new IllegalArgumentException("Invalid account id: " + bid.getAccountId())
@@ -122,7 +121,6 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    @Transactional
     public List<BidResponse> toBidResponse(List<BidDTO> bids) {
         List<BidResponse> responses = new ArrayList<>();
         for (BidDTO bid : bids) {
@@ -141,7 +139,6 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    @Transactional
     public BidReplyDTO addUser(BidDTO bidDTO, int auctionSessionId, int itemId, Authentication authentication, SimpMessageHeaderAccessor headerAccessor) {
         AuctionItemId auctionItemId = new AuctionItemId(auctionSessionId, itemId);
         Account persistedAccount = accountRepos.findByEmail(authentication.getName()).orElse(null);

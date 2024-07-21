@@ -43,7 +43,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     public void initialize() {
         fetchExchangeRates();
     }
-    @Transactional
+    
     @Override
     public Map<CurrencyType, BigDecimal> getExchangeRates() {
         fetchExchangeRates();
@@ -56,7 +56,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         }
         return Collections.unmodifiableMap(rates);
     }
-    @Transactional
+    
     @Override
     public BigDecimal getExchangeRate(CurrencyType currency) {
         fetchExchangeRates();
@@ -67,7 +67,7 @@ public class CurrencyServiceImpl implements CurrencyService {
             return BigDecimal.valueOf((Double) v);
         return null;
     }
-    @Transactional
+    
     @Override
     public long getLastUpdate() {
         Object v = redisTemplate.opsForValue().get(LAST_FETCH_KEY);

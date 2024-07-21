@@ -60,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.notificationService = notificationService;
         this.paypalService = paypalService;
     }
-    @Transactional
+    
     @Override
     public String createPayment(PaymentRequest paymentRequest) {
         Preconditions.checkState(paymentRequest.getType() == Payment.Type.DEPOSIT ||
@@ -136,7 +136,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new InvalidInputException("Failed to create payment", e);
         }
     }
-    @Transactional
+    
     @Override
     public PaymentDTO getPaymentById(int id) {
         try {
@@ -149,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    @Transactional
+    
     @Override
     public PaymentDTO createPayment(PaymentDTO paymentDTO) {
         Preconditions.checkNotNull(paymentDTO.getPaymentAmount());
@@ -195,7 +195,7 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepos.findAll(spec, pageable).map(PaymentDTO::new);
     }
 
-    @Transactional
+    
     @Override
     public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
         Payment payment = paymentRepos.findById(paymentDTO.getId())
@@ -217,7 +217,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment updatedPayment = paymentRepos.save(payment);
         return new PaymentDTO(updatedPayment);
     }
-    @Transactional
+    
     @Override
     public void updatePaymentByStatus(UpdatePaymentStatusRequestDTO request) {
         for (Integer paymentId : request.getPaymentId()) {
@@ -237,7 +237,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
     }
-    @Transactional
+    
     @Override
     public String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr) throws UnsupportedEncodingException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -372,7 +372,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)
-    @Transactional
+    
     public void scheduleFixedRateTask() {
         List<Payment> list = paymentRepos.findAllPendingPaymentWithPaymentCreatedBefore(
                 LocalDateTime.now().minusDays(7),

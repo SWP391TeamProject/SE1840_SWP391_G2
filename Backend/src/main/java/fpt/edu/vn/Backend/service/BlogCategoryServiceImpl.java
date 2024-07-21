@@ -64,7 +64,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
         }
         return null;
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "blogCategory", allEntries = true)
     public BlogCategoryDTO updateBlogCategory(int id, BlogCategory blogCategory) {
@@ -74,7 +74,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
         blogCategory.setBlogCategoryId(id);
         return new BlogCategoryDTO(blogCategoryRepos.save(blogCategory));
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "blogCategory", allEntries = true)
 

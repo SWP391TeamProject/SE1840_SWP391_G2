@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface RefreshTokenRepos extends JpaRepository<RefreshToken, String> {
-    @Transactional
+    
     void deleteByExpiryTimeBefore(Date now);
     boolean existsByRefreshToken(String token);
 

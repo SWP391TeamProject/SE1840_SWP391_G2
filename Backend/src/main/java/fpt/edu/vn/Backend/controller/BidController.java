@@ -106,7 +106,7 @@ public class BidController {
 
     @MessageMapping("/chat.sendMessage/{auctionSessionId}/{itemId}")
     @SendTo("/topic/public/{auctionSessionId}")
-    @Transactional
+    
     public ResponseEntity<BidReplyDTO> sendMessage(@Payload BidDTO bidDTO,
                                                    @DestinationVariable int auctionSessionId,
                                                    @DestinationVariable int itemId,
@@ -165,7 +165,7 @@ public class BidController {
 
     @MessageMapping("/chat.addUser/{auctionSessionId}/{itemId}")
     @SendTo("/topic/public/{auctionSessionId}")
-    @Transactional
+    
     public ResponseEntity<BidReplyDTO> addUser(@Payload BidDTO bidDTO,
                                                @DestinationVariable int auctionSessionId,
                                                @DestinationVariable int itemId, Authentication authentication,

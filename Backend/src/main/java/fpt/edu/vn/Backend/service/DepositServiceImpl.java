@@ -47,7 +47,7 @@ public class DepositServiceImpl implements DepositService{
             throw new InvalidInputException("Failed to retrieve deposits: " + ex.getMessage());
         }
     }
-    @Transactional
+    
     @Override
     public DepositDTO updateDeposit(DepositRequest depositRequest) {
        try {
@@ -74,7 +74,7 @@ public class DepositServiceImpl implements DepositService{
             throw new InvalidInputException("Failed to update deposit: " + ex.getMessage());
         }
     }
-    @Transactional
+    
     @Override
     public void deleteDeposit(int depositId) {
         try {

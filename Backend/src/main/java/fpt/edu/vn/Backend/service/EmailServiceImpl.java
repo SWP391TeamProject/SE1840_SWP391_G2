@@ -14,8 +14,8 @@ public class EmailServiceImpl extends JavaMailSenderImpl implements EmailService
     public EmailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
+
     @Override
-    @Transactional
     public void sendAuctionCancellationEmail(String to, String depositAmount) throws MessagingException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);

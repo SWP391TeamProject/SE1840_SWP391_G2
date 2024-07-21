@@ -108,7 +108,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             dto.setHasDeposited(depositRepos.hasDeposited(pojo.getAuctionSessionId(), accountId));
         return dto;
     }
-    @Transactional
+
     @Override
     //@CacheEvict(key = "#auctionSessionId",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public AuctionSessionDTO registerAuctionSession(int auctionSessionId, int accountId) {
@@ -168,7 +168,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new ResourceNotFoundException("Account balance is not enough to register for auction session");
         }
     }
-    @Transactional
+
     @Override
     //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
 //    @Caching(evict = {
@@ -230,7 +230,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new InvalidInputException(e.getMessage());
         }
     }
-    @Transactional
+
     //@CacheEvict(key = "#auctionDTO.getAuctionSessionId()",cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public AuctionSessionDTO createAuctionSession(AuctionCreateDTO auctionDTO) {
@@ -273,7 +273,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new InvalidInputException("Error creating auction session", e);
         }
     }
-    @Transactional
+
     @Override
     //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void finishAuction(int auctionSessionId) {
@@ -285,6 +285,10 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return;
         }
         if (auction.getStatus() == AuctionSession.Status.SCHEDULED) {
+            if (auction.getEndDate().isBefore(LocalDateTime.now())) {
+                terminateAuction(auctionSessionId);
+                return;
+            }
             logger.warn("Auction session " + auctionSessionId + " not started yet");
             return;
         }
@@ -459,7 +463,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         logger.info("Auction session " + auctionSessionId + " finished");
         auctionHandlingLock.remove(auctionSessionId);
     }
-    @Transactional
+
     //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     @Override
     public void terminateAuction(int auctionSessionId) {
@@ -554,7 +558,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         logger.info("Auction session " + auctionSessionId + " terminated");
         auctionHandlingLock.remove(auctionSessionId);
     }
-    @Transactional
+
     @Override
     //@CacheEvict(cacheNames = "auctionSession",value = "auctionSession", allEntries = true, beforeInvocation = true)
     public void startAuction(int auctionSessionId) {
@@ -594,7 +598,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         logger.info("Auction session " + auctionSessionId + " started");
         auctionHandlingLock.remove(auctionSessionId);
     }
-    @Transactional
+
     @Override
     public Page<AuctionSessionDTO> getFeaturedAuctionSessions(Pageable pageable, @Nullable Integer accountId) {
         if (pageable == null) {
@@ -604,12 +608,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 Set.of(AuctionSession.Status.SCHEDULED), null, LocalDateTime.now(),
                 null, pageable).map(a -> mapAuctionSessionToDTO(a, accountId));
     }
-    @Transactional
+
     @Override
     public Page<AuctionSessionDTO> getPastAuctionOfItem(Pageable pageable, int itemId) {
         return auctionSessionRepos.findAuctionSessionsHasItem(itemId, pageable).map(AuctionSessionDTO::minimal);
     }
-    @Transactional
+
     @Override
     //@CacheEvict(key = "#auctionDTO.getAuctionSessionId()", cacheNames = "auctionSession",value = "auctionSession",allEntries = true)
     public AuctionSessionDTO updateAuctionSession(AuctionSessionDTO auctionDTO) {
