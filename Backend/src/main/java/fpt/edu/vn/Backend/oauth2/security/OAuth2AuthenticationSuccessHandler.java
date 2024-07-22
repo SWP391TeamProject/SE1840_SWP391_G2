@@ -37,9 +37,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 
     @Autowired
-    private UserActivityService userActivityService;
-
-    @Autowired
     OAuth2AuthenticationSuccessHandler(RefreshTokenProvider refreshTokenProvider, AppProperties appProperties,
                                        HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
         this.refreshTokenProvider = refreshTokenProvider;
@@ -72,7 +69,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String token = jwtGenerator.generateToken(authentication);
         String email = jwtGenerator.getEmailFromToken(token);
         Optional<Account> userOptional = accountRepos.findByEmail(email);
-        userActivityService.updateUserActivity(email);
         Account user = userOptional.get();
         String loginMethod;
         if(user.getProvider().equals(Account.AuthProvider.GOOGLE)){
