@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useAuth } from '@/AuthProvider';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { setCookie } from '@/utils/cookies';
 import { AccountStatus, Roles } from '@/constants/enums';
 import { toast } from 'sonner';
@@ -124,9 +124,9 @@ function LoginForm() {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <a href="/auth/forgot-password" className="ml-auto inline-block text-sm underline">
+                <Link to="/auth/forgot-password" className="ml-auto inline-block text-sm underline">
                   Forgot your password?
-                </a>
+                </Link>
               </div>
               <PasswordInput
                 id="password"
@@ -151,9 +151,9 @@ function LoginForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             Don't have an account?&nbsp;
-            <a href="/auth/register" className="underline hover:text-blue-700">
+            <Link to="/auth/register" className="underline hover:text-blue-700">
               Sign up
-            </a>
+            </Link>
           </div>
           <Button
             type="button"

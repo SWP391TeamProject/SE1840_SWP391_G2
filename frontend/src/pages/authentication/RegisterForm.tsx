@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { register } from '@/services/AuthService';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { setCookie } from '@/utils/cookies.ts';
 import { Loader2 } from 'lucide-react';
@@ -190,9 +190,9 @@ function RegisterForm() {
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?&nbsp;
-              <a href="/auth/login" className="underline hover:text-blue-700">
+              <Link to="/auth/login" className="underline hover:text-blue-700">
                 Sign in
-              </a>
+              </Link>
             </div>
           </CardContent>
         </form>
