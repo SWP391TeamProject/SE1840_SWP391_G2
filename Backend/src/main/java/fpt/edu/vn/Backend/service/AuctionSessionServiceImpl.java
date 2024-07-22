@@ -283,8 +283,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid auction session id: " + auctionSessionId));
         if (auction.getStatus() == AuctionSession.Status.FINISHED ||
                 auction.getStatus() == AuctionSession.Status.TERMINATED) {
-            logger.warn("Auction session " + auctionSessionId + " already ended");
-            return;
+            throw new InvalidInputException("Auction session ended");
+
         }
         if (auction.getStatus() == AuctionSession.Status.SCHEDULED) {
             if (auction.getEndDate().isBefore(LocalDateTime.now())) {
@@ -296,9 +296,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             return;
         }
         if (auctionHandlingLock.putIfAbsent(auctionSessionId, AuctionSession.Status.FINISHED) != null) {
-            logger.info("Auction session {} is already in progress of {}",
-                    auctionSessionId, auctionHandlingLock.get(auctionSessionId));
-            return;
+
+            throw new InvalidInputException("Auction session " + auctionSessionId + " already in progress");
         }
         logger.info("Finishing auction session " + auctionSessionId);
 

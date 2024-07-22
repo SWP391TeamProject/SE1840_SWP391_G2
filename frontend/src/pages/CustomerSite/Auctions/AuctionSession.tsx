@@ -124,17 +124,11 @@ export default function AuctionSession() {
   const handleRegister = () => {
     registerAuctionSession(auctionSession?.auctionSessionId ?? -1)
       .then((res) => {
-        res.data.deposits.forEach((deposit: any) => {
-          if (!bidders.includes(deposit.payment.accountId)) {
-            setBidders((prevBidders) => [...prevBidders, deposit.payment.accountId]);
-          }
-        });
-        fetchAuctionSessionById(auctionSession?.auctionSessionId).then((res) => {
-          dispatch(setCurrentAuctionSession(res));
-        });
+          dispatch(setCurrentAuctionSession(res.data));
         toast.success('Registered Successfully', {});
       })
       .catch((err) => {
+        console.log(err);
         if (err.response.data.message === 'Account balance is not enough to register for auction session') {
           setAlertBalance(
             <div>

@@ -157,7 +157,7 @@ public class BidController {
             AuctionItemDTO a = auctionItemService.getAuctionItemById(auctionItemId);
             a.setCurrentPrice(bidDTO.getAmount());
             auctionItemService.updateAuctionItem(a);
-            return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getAmount(), bidDTO.getAmount(), BidReplyDTO.Status.BID));
+            return ResponseEntity.ok(new BidReplyDTO(account.getNickname() + " bid " + bidDTO.getAmount() +" on" +a.getItemDTO().getName(), auctionItemId, bidDTO.getAmount(), BidReplyDTO.Status.BID));
         } catch (Exception e) {
             throw new InvalidInputException(e.getMessage());
         }

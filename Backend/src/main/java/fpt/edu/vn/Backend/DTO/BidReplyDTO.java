@@ -22,6 +22,13 @@ public class BidReplyDTO implements Serializable {
     private BigDecimal currentPrice;
     private Status status;
 
+    public BidReplyDTO(String message,AuctionItemId auctionItemId, BigDecimal amount, Status status) {
+        this.message = message;
+        this.currentPrice = amount;
+        this.status = status;
+        this.auctionItemId = auctionItemId;
+    }
+
     public BidReplyDTO(String message, BigDecimal amount, Status status) {
         this.message = message;
         this.currentPrice = amount;

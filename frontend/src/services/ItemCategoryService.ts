@@ -12,31 +12,49 @@ export interface ItemCategoryRequestDTO {
 
 // Service methods
 const baseUrl = API_SERVER + '/item-categories';
-const authHeader = {
+
+
+export const createItemCategory = async (itemCategory: ItemCategoryRequestDTO) => {
+  return await axios.post<ItemCategory>(`${baseUrl}/create`, itemCategory,  {
   headers: {
     'Content-Type': 'application/json',
 
     Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}').accessToken || '',
   },
-};
-
-export const createItemCategory = async (itemCategory: ItemCategoryRequestDTO) => {
-  return await axios.post<ItemCategory>(`${baseUrl}/create`, itemCategory, authHeader);
+});
 };
 
 export const updateItemCategory = async (itemCategory: ItemCategoryRequestDTO) => {
   if (!itemCategory.itemCategoryId) {
     throw new Error('ItemCategory id cannot be null');
   }
-  return await axios.post<ItemCategory>(`${baseUrl}/update`, itemCategory, authHeader);
+  return await axios.post<ItemCategory>(`${baseUrl}/update`, itemCategory,  {
+  headers: {
+    'Content-Type': 'application/json',
+
+    Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}').accessToken || '',
+  },
+});
 };
 
 export const deleteItemCategory = async (id: number) => {
-  return await axios.post<void>(`${baseUrl}/delete/${id}`, null, authHeader);
+  return await axios.post<void>(`${baseUrl}/delete/${id}`, null,  {
+  headers: {
+    'Content-Type': 'application/json',
+
+    Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}').accessToken || '',
+  },
+});
 };
 
 export const getItemCategoryById = async (id: number) => {
-  return await axios.get<ItemCategory>(`${baseUrl}/${id}`, authHeader);
+  return await axios.get<ItemCategory>(`${baseUrl}/${id}`,  {
+  headers: {
+    'Content-Type': 'application/json',
+
+    Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}').accessToken || '',
+  },
+});
 };
 
 export const getAllItemCategories = async (page: number, size: number) => {
