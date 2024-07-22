@@ -100,7 +100,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 try {
                     for (String topic : WebSocketEventListener.topicSessions.keySet()) {
                         log.info("Topic: " + topic);
-                        if (topic.contains("/topic/public/"+id+"/")) {
+                        if (topic.contains("/topic/public/"+id)) {
                             for (String session : WebSocketEventListener.topicSessions.get(topic)) {
                                 try {
                                     for (WebSocketSession s : sessions) {

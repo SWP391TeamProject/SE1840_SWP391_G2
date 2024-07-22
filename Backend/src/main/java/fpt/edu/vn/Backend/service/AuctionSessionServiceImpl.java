@@ -459,7 +459,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             paymentRepos.save(p);
             logger.info("Refunded deposit id {} for account {}", deposit.getDepositId(), account.getAccountId());
         }
-
+        auction.setEndDate(LocalDateTime.now());
         auction.setStatus(AuctionSession.Status.FINISHED);
         auctionSessionRepos.save(auction);
         notificationService.sendBulkNotification(scheduledNotifications);
