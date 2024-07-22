@@ -29,6 +29,9 @@ export default function AssignAuctionItem() {
   });
 
   useEffect(() => {
+
+    
+
     getItemsByStatus(ItemStatus.QUEUE, 0, 10)
       .then((res) => {
         setAvailableItems(res?.data?.content);
@@ -100,7 +103,7 @@ export default function AssignAuctionItem() {
     tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
     setAvailableItems(tempList);
     toast.success('Item Unassigned', {
-      position: 'bottom-right',
+      
     });
     // }
   };

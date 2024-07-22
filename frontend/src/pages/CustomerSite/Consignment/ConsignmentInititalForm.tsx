@@ -88,7 +88,7 @@ export default function ConsignmentInititalForm() {
           form.resetField('files');
           form.resetField('description');
           toast.success('Consignment created successfully', {
-            position: 'bottom-right',
+            
           });
           nav('/dashboard/consignments');
         }
@@ -97,11 +97,11 @@ export default function ConsignmentInititalForm() {
       .catch((err) => {
         if (err.response.status === 413) {
           toast.error('File measurement is too large', {
-            position: 'bottom-right',
+            
           });
         } else {
           toast.error('Failed to create consignment', {
-            position: 'bottom-right',
+            
           });
         }
         setIsLoading(false);

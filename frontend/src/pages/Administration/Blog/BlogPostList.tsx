@@ -21,7 +21,7 @@ export function BlogPostList() {
         sort: searchParams.get('sort') || 'postId,desc',
       };
       setBlogPromise(BlogService.getBlogs(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

@@ -33,7 +33,7 @@ export default function Transactions() {
       user: auth.user.accountId
     };
     setPaymentPromise(getPayments(query));
-  }, 1000);
+  }, 500);
 
   useEffect(() => {
     fetchPayments();

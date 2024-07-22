@@ -16,7 +16,7 @@ instance.interceptors.response.use(
     if (token && token !== getCookie('token')) {
       console.log('Token updated');
       // Ensure token is a string; if it can be null/undefined, handle appropriately
-      setCookie('token', token, 1);
+      setCookie('token', token, 30000);
     }
     return response;
   },

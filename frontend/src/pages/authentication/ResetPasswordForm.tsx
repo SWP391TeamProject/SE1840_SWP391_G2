@@ -69,13 +69,13 @@ function ResetPasswordForm() {
         setLocked(false);
         navigate('/auth/login');
         toast.success('Password reset successfully', {
-          position: 'bottom-right',
+          
         });
       })
       .catch((err) => {
         if (err.response.status == 406) {
           toast.error('Invalid reset code!', {
-            position: 'bottom-right',
+            
           });
         } else {
           showErrorToast(err);

@@ -29,7 +29,7 @@ function ForgotPasswordForm() {
         setLocked(false);
         setSent(true);
         toast.success('Sent reset password link to your email', {
-          position: 'bottom-right',
+          
         });
       })
       .catch((err) => {

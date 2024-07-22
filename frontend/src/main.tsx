@@ -83,6 +83,7 @@ import Transactions from './pages/CustomerSite/Profile/transaction/transactions.
 import CustomerList from '@/pages/Administration/Customer/CustomerList.tsx';
 import { CustomerDetail } from '@/pages/Administration/Customer/CustomerDetail.tsx';
 import { AccountDetail } from '@/pages/Administration/Account/AccountDetail.tsx';
+import { getCookie } from './utils/cookies.ts';
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -259,6 +260,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   // closeButton
                   pauseWhenPageIsHidden
                   invert
+                  // theme={getCookie('themeMode') as "light" | "dark" | "system" ?? "light"}
                 />
               </TooltipProvider>
             </CurrencyProvider>

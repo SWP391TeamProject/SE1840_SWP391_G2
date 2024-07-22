@@ -10,6 +10,8 @@ import { getOrders } from '@/services/OrderService';
 import {
   DataTableSkeleton
 } from "@/components/data-tables/data-tables-skeleton.tsx";
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/handle-error';
 
 interface OrderTableProps {
   orderPromise: ReturnType<typeof getOrders>;
@@ -27,11 +29,17 @@ export function OrdersTable({ orderPromise }: OrderTableProps) {
     const fetchData = async () => {
       if (orderPromise) {
         setIsLoading(true);
-        const content = (await orderPromise).data.content;
-        const totalPages = (await orderPromise).data.totalPages;
-        setData(content);
-        setPageCount(totalPages);
-        setIsLoading(false);
+        toast.promise(orderPromise, {
+          loading: 'Loading...',
+          success: (res) => {
+            setData(res.data.content), setPageCount(res.data.totalPages), setIsLoading(false);
+            return 'Orders loaded successfully';
+          },
+          error: (err) => {
+            setIsLoading(false);
+            return getErrorMessage (err);
+          },
+        });
       }
     };
     fetchData();

@@ -27,7 +27,7 @@ export default function ProfilePreferences() {
     setCookie('themeMode', JSON.stringify(data.themeMode), 2147483647);
     setTheme(data.themeMode);
     toast.success('Update preferences successfully!', {
-      position: 'bottom-right',
+      
     });
   };
 

@@ -25,7 +25,7 @@ export default function PaymentsList() {
       sort: searchParams.get('sort') || 'paymentId,desc',
     };
     setPaymentPromise(getPayments(query));
-  }, 1000);
+  }, 500);
 
   useEffect(() => {
     fetchPayments();

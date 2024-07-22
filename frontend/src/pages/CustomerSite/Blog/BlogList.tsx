@@ -74,7 +74,7 @@ export const BlogList = () => {
       })
       .catch((error) => {
         toast.error(error.message, {
-          position: 'bottom-right',
+          
         });
       });
     dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }));

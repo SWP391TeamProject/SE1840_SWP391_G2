@@ -28,7 +28,7 @@ export const OrderList = () => {
         sort: searchParams.get('sort') || 'orderId,desc',
       };
       setOrderPromise(getOrders(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

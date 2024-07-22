@@ -8,6 +8,8 @@ import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
 import { PaymentsTableToolbarActions } from './payments-table-toolbar-actions';
 import { getPayments } from '@/services/PaymentsService';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/handle-error';
 
 interface PaymentTableProps {
   paymentPromise: ReturnType<typeof getPayments>;
@@ -24,6 +26,17 @@ export function PaymentsTable({ paymentPromise }: PaymentTableProps) {
     const fetchData = async () => {
       if (paymentPromise) {
         setIsLoading(true);
+        toast.promise(paymentPromise, {
+          loading: 'Loading...',
+          success: (res) => {
+            setData(res.content), setPageCount(res.totalPages), setIsLoading(false);
+            return 'Payments loaded successfully';
+          },
+          error: (err) => {
+            setIsLoading(false);
+            return getErrorMessage(err);
+          },
+        });
         const content = (await paymentPromise).content;
         const totalPages = (await paymentPromise).totalPages;
         setData(content);

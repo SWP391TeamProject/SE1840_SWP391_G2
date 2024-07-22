@@ -33,7 +33,7 @@ export default function ConsignmentList() {
         sort: searchParams.get('sort') || 'consignmentId,desc',
       };
       setConsignmentPromise(fetchAllConsignmentsService(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

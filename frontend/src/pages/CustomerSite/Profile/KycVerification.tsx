@@ -237,7 +237,7 @@ export default function KycVerification() {
                                   rotationSlider
                                   modalWidth={800}
                                   aspect={4 / 3}
-                                  quality={0.1}
+                                  quality={0.5}
                                   minZoom={0.1}
                                 >
                                   <Upload
@@ -294,7 +294,7 @@ export default function KycVerification() {
                                     rotationSlider
                                     modalWidth={800}
                                     aspect={4 / 3}
-                                    quality={0.1}
+                                    quality={0.5}
                                     minZoom={0.1}
                                   >
                                     <Upload

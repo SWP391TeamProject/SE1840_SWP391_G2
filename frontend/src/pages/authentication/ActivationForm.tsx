@@ -44,13 +44,13 @@ function ActivationForm() {
         setLocked(false);
         navigate('/auth/login');
         toast.success('Account activated successfully', {
-          position: 'bottom-right',
+          
         });
       })
       .catch((err) => {
         if (err.response.status == 406) {
           toast.error('Invalid activation code!', {
-            position: 'bottom-right',
+            
           });
         } else {
           showErrorToast(err);

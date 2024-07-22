@@ -8,6 +8,8 @@ import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
 import { ItemsTableToolbarActions } from './items-table-toolbar-actions';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
 import {getItems} from "@/services/ItemService.ts";
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/handle-error';
 
 interface ItemTableProps {
   itemPromise: ReturnType<typeof getItems>;
@@ -23,11 +25,20 @@ export default function ItemsTable({ itemPromise }: ItemTableProps) {
     const fetchData = async () => {
       if (itemPromise) {
         setIsLoading(true);
-        const content = (await itemPromise).data.content;
-        const totalPages = (await itemPromise).data.totalPages;
-        setData(content);
-        setPageCount(totalPages);
-        setIsLoading(false);
+        toast.promise(itemPromise, {
+          loading: 'Loading...',
+          success: (res) => {
+            setData(res.data.content), setPageCount(res.data.totalPages), setIsLoading(false);
+            return 'Items loaded successfully';
+          },
+          error: (err) => {
+            setIsLoading(false);
+            return getErrorMessage(err);
+          },
+        });
+
+
+
       }
     };
     fetchData();

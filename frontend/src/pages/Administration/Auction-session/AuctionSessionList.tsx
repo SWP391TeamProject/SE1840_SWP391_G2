@@ -31,7 +31,7 @@ export default function AuctionSessionList() {
         sort: searchParams.get('sort') || 'auctionSessionId,desc',
       };
       setAuctionSessionPromise(getAuctions(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

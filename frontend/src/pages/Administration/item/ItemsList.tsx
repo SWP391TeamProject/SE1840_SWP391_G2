@@ -26,7 +26,7 @@ export default function ItemsList() {
         sort: searchParams.get('sort') || 'itemId,desc',
       };
       setItemPromise(getItems(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

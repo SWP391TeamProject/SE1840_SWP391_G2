@@ -31,7 +31,7 @@ export default function CustomerList() {
         sort: searchParams.get('sort') || 'accountId,desc',
       };
       setCustomerPromise(fetchAccountsService(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {
