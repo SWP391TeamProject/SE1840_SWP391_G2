@@ -350,15 +350,15 @@ export default function ConsignmentDetail() {
               <div className="flex flex-col w-full">
                 <p className="text-gray-700 mb-2">
                   <strong>Name:</strong>{' '}
-                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.nickname : 'Not provided'}
+                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.contactName : 'Not provided'}
                 </p>
                 <p className="text-gray-700 mb-2">
                   <strong>Email:</strong>{' '}
-                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.email : 'Not provided'}
+                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.contactEmail : 'Not provided'}
                 </p>
                 <p className="text-gray-700">
                   <strong>Phone:</strong>{' '}
-                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.user.phone : 'Not provided'}
+                  {Array.isArray(consignment?.consignmentDetails) ? consignment?.contactPhone : 'Not provided'}
                 </p>
               </div>
             </div>

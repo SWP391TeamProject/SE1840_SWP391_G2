@@ -5,7 +5,7 @@ import ProductStatus from './ProductStatus';
 import ProductCategory from './ProductCategory';
 import ProductImageGallery from './ProductImageGallery';
 import { Link, useParams } from 'react-router-dom';
-import { getItemById, updateItem } from '@/services/ItemService';
+import { deleteItemAttachment, getItemById, updateItem, uploadItemAttachment } from '@/services/ItemService';
 import { Loader2 } from 'lucide-react';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import ProductPrice from './ProductPrice';
@@ -95,6 +95,8 @@ const formSchema = z.object({
     })
     .optional(),
   status: z.nativeEnum(ItemStatus),
+  deletedFiles: z.any(),
+  files: z.array(z.any())
 });
 
 export default function ItemDetail() {
@@ -120,6 +122,8 @@ export default function ItemDetail() {
       gemstone: '',
       stamped: '',
       status: ItemStatus.QUEUE,
+      deletedFiles: [],
+      files: []
     },
   });
 
@@ -144,6 +148,8 @@ export default function ItemDetail() {
           stamped: i.stamped,
           condition: i.condition,
           status: i.status,
+          deletedFiles: [],
+          files: []
         });
         setIsLoading(false);
         return 'Item loaded successfully!';
@@ -154,6 +160,16 @@ export default function ItemDetail() {
       },
     });
   }, []);
+
+  async function deleteFiles(itemId, deletedFiles: []) {
+    let results = [];
+
+    await Promise.all(deletedFiles.map(async (attachmentId) => {
+      const res = await deleteItemAttachment(itemId, attachmentId)
+      results.push(res.data);
+    }));
+    return results;
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -176,8 +192,40 @@ export default function ItemDetail() {
     updateItem(dto)
       .then((res) => {
         console.log(res);
-        toast.success('Item updated successfully!', {});
-        dispatch(setCurrentItem(res.data));
+        let deleted;
+        let uploaded;
+        let actions = [];
+        let item = res.data
+        if (dto.deletedFiles.length > 0){
+          // dto.deletedFiles.forEach(attachmentId => {
+          //   deleteItemAttachment(dto.itemId, attachmentId)
+          // });
+          // deleted = await deleteFiles(dto.itemId, dto.deletedFiles);
+          actions.push(deleteFiles(dto.itemId, dto.deletedFiles))
+          // console.log(deleted);
+        }
+
+        if (dto.files.length > 0){
+          actions.push(uploadItemAttachment(dto.itemId, {files: dto.files}));
+          // uploaded = await uploadItemAttachment(dto.itemId, {files: dto.files})
+          // console.log(uploaded.data);
+        }
+
+        if (actions.length > 0) {
+          console.log(actions);
+          Promise.all(actions).then((result) => {
+            console.log(result)
+            toast.success('Item updated successfully!', {});
+            dispatch(setCurrentItem(item));
+            window.location.reload();
+          }).catch((err) => {
+            console.error(err);
+            showErrorToast(err);
+          })
+        } else {
+          toast.success('Item updated successfully!', {});
+          dispatch(setCurrentItem(item));
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -199,7 +247,7 @@ export default function ItemDetail() {
               <div className="container flex flex-row flex-nowrap">
                 <div className="basis-8/12 p-3 flex flex-col gap-3">
                   <ProductDetail item={item} form={form} />
-                  <ProductImageGallery item={item} />
+                  <ProductImageGallery item={item} form={form}/>
                 </div>
                 <div className="basis-4/12 p-3 flex flex-col gap-3">
                   <div className="grid grid-cols-2 gap-5">
