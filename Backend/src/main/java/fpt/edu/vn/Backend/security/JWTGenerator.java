@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class JWTGenerator {
 
-    private Key getSigningKey() {
+    public Key getSigningKey() {
         byte[] keyBytes = SecurityConstants.JWT_SECRET.getBytes(
                 StandardCharsets.UTF_8
         );

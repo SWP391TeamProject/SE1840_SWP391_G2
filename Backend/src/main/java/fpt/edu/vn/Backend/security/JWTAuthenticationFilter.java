@@ -53,7 +53,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                Claims claims = Jwts.parserBuilder().setSigningKey(SecurityConstants.JWT_SECRET).build().parseClaimsJws(token).getBody();
+                Claims claims = Jwts.parserBuilder().setSigningKey(jwtGenerator.getSigningKey()).build().parseClaimsJws(token).getBody();
                 Date expirationDate = claims.getExpiration();
                 long currentTimeMillis = System.currentTimeMillis();
                 long expirationTimeMillis = expirationDate.getTime();
