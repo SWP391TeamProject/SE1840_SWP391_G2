@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 //@PreAuthorize("hasAuthority('ADMIN')")
 @RestController
@@ -22,6 +23,9 @@ import java.util.List;
 public class StatisticController {
     @Autowired
     private StatisticService statisticService;
+
+    @Autowired
+    private UserActivityService userActivityService;
 
 //    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("payments/filter-by-status")
@@ -74,6 +78,12 @@ public class StatisticController {
        return new ResponseEntity<>(statisticService.getTotalSale(), HttpStatus.OK);
     }
 
+    @GetMapping("/user-online")
+    public ResponseEntity<Map<String, Long>> getOnlineUsers(
+            @RequestParam(name = "thresholdMillis", defaultValue = "60000") long thresholdMillis) {
+        Map<String, Long> onlineUsers = userActivityService.getOnlineUsers(thresholdMillis);
+        return ResponseEntity.ok(onlineUsers);
+    }
 
 }
 

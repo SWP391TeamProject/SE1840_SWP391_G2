@@ -61,8 +61,8 @@ public class AuthController {
     }
 
     @PostMapping("/login-with-google")
-    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestBody RefreshRequest request) {
-        AuthResponseDTO authResponseDTO = authService.loginWithGoogle(request.getToken());
+    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@RequestParam(required = false) String token) {
+        AuthResponseDTO authResponseDTO = authService.loginWithGoogle(token);
         return ResponseEntity.ok(authResponseDTO);
     }
 

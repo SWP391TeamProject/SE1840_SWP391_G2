@@ -41,6 +41,25 @@ export const getUserThisMonth = async () => {
     });
 };
 
+export const getUserOnline = async () => {
+  return await axios
+    .get(API_SERVER + '/statistics/user-online', {
+      headers: {
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+      params : { thresholdMillis: 60000 }
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie('user');
+        removeCookie('token');
+      }
+    });
+};
+
 export const getTotalOrder = async () => {
   return await axios
     .get(API_SERVER + '/statistics/totals/order', {
