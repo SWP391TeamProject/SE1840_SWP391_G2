@@ -34,6 +34,9 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {DateTimePicker} from "@/components/time-picker/date-time-picker.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import Consignment from "@/models/consignment.ts";
+import {
+  ConsignmentsSecretCodeFinder
+} from "@/pages/Administration/consignments/consignments-data-table/consignments-secret-code-finder.tsx";
 
 interface TasksTableToolbarActionsProps {
   table: Table<Consignment>;
@@ -168,6 +171,7 @@ export function ConsignmentsTableToolbarActions({table}: TasksTableToolbarAction
         </Form>
       </div>
       <div className="flex gap-2">
+        <ConsignmentsSecretCodeFinder/>
         <Button
           variant="outline"
           size="sm"

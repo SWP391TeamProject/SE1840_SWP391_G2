@@ -84,7 +84,7 @@ export default function CustomerConsignmentList() {
           return 'Failed to load consignments';
         },
       });
-    }, 100
+    }, 500
   );
 
   useEffect(() => {

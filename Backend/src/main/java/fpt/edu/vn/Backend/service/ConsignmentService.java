@@ -71,4 +71,6 @@ public interface ConsignmentService {
     ConsignmentDTO receivedConsignment(int consignmentId);
 
     void finishItem(Integer consignmentId, Integer itemId);
+
+    ConsignmentDTO getConsignmentBySecretCode(String code);
 }

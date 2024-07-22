@@ -450,6 +450,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return consignmentRepos.findById(id).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
     }
 
+    @Override
+    public ConsignmentDTO getConsignmentBySecretCode(String code) {
+        return consignmentRepos.findBySecretCodeIgnoreCase(code).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
+    }
+
     //TODO : redesing the logic for get all staff consignment this need refactor
     @Override
     public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
