@@ -19,4 +19,8 @@ public interface ConsignmentRepos extends JpaRepository<Consignment, Integer>, J
     Page<Consignment> findAllByUser_AccountId(int userId, Pageable pageable);
 
     Page<Consignment> findByStatusOrStaff_AccountId(Consignment.Status status, int staffId, Pageable pageable);
+
+    Consignment findBySecretCodeIgnoreCase(String code);
+
+    boolean existsBySecretCodeIgnoreCase(String code);
 }

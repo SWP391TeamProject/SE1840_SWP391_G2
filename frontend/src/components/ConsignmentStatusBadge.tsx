@@ -74,6 +74,15 @@ const ConsignmentStatusBadge: React.FC<ConsignmentStatusBadgeProps> = ({
           To Item
         </Badge>
       );
+    case ConsignmentStatus.FINISHED:
+      return (
+        <Badge
+          variant="default"
+          className={`bg-green-400 w-[150px] text-center flex justify-center items-center ${className}`}
+        >
+          Finished
+        </Badge>
+      );
     default:
       return <Badge variant="destructive">Unknown Status</Badge>;
   }

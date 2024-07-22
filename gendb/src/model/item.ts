@@ -17,7 +17,8 @@ export interface Item {
     createDate: Date,
     updateDate: Date,
     ownerId?: number,
-    orderId?: number
+    orderId?: number,
+    consignmentId?: number
 }
 
 export enum ItemStatus {

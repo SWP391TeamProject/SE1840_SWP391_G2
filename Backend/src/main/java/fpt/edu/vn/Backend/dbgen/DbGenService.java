@@ -439,6 +439,11 @@ public class DbGenService {
             item.setStatus(Item.Status.valueOf(obj.get("status").getAsString()));
             item.setOwner(accountRepos.getReferenceById(obj.get("ownerId").getAsInt()));
             item = itemRepos.save(item);
+            if (obj.has("consignmentId")) {
+                Consignment c = consignmentRepos.findById(obj.get("consignmentId").getAsInt()).orElseThrow();
+                c.setCreatedItem(item);
+                consignmentRepos.save(c);
+            }
             {
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));

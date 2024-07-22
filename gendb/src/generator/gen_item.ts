@@ -46,7 +46,7 @@ export async function prepareItemAndCategory(baseDate: Date): Promise<[ItemCateg
 
 export function genItems(consignments: Consignment[]): Item[] {
     const availableConsignments = consignments
-        .filter(d => d.status == ConsignmentStatus.TO_ITEM);
+        .filter(d => d.status == ConsignmentStatus.FINISHED);
     const items: Item[] = [];
 
     for (let i = 0; i < availableConsignments.length; i++){
@@ -55,6 +55,7 @@ export function genItems(consignments: Consignment[]): Item[] {
 
         items.push({
             id: i + 1,
+            consignmentId: cd.id,
             categoryId: cd.__categoryId,
             name: cd.__name,
             weight: cd.weight,

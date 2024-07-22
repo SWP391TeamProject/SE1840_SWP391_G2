@@ -55,8 +55,8 @@ export default function CustomerConsignmentList() {
     () => {
       setIsLoading(true);
       const query = {
-        page: parseIntOrUndefined(searchParams.get('page')),
-        size: 16,
+        page: (parseIntOrUndefined(searchParams.get('page')) || 1) - 1,
+        size: 6,
         sort: searchParams.get('sort') || 'consignmentId,desc',
       };
       toast.promise(axios.get<Page<Consignment>>(`${SERVER_DOMAIN_URL}/api/consignments/user/${auth.user.accountId}`, {

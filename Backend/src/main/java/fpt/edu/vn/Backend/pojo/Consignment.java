@@ -34,13 +34,13 @@ public class Consignment {
     private String contactPhone;
 
 
-
     @Column(length = 25)
     @Enumerated(EnumType.STRING)
     private Status status; // WAITING_STAFF, IN_INITIAL_VALUATION, etc.
 
     public enum Status {
-        WAITING_STAFF, IN_INITIAL_EVALUATION, SENDING, IN_FINAL_EVALUATION, WAITING_SELLER, TO_ITEM, TERMINATED
+        WAITING_STAFF, IN_INITIAL_EVALUATION, SENDING,
+        IN_FINAL_EVALUATION, WAITING_SELLER, TO_ITEM, FINISHED, TERMINATED
     }
 
     public enum preferContact {
@@ -89,7 +89,9 @@ public class Consignment {
     @Column(length = 10,columnDefinition = "VARCHAR(30)")
     private String secretCode;
 
-
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "created_item_id", nullable = true)
+    private Item createdItem;
 
     @CreationTimestamp
     @Column(name = "create_date")

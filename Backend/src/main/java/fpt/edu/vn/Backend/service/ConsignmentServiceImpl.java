@@ -12,29 +12,22 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Notification;
-import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
-import fpt.edu.vn.Backend.repository.ConsignmentRepos;
-import fpt.edu.vn.Backend.repository.NotificationRepos;
+import fpt.edu.vn.Backend.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,23 +38,25 @@ import java.util.stream.Collectors;
 //@CacheConfig(cacheNames = "consignments")
 public class ConsignmentServiceImpl implements ConsignmentService {
 
-    AccountService accountService;
-    ConsignmentRepos consignmentRepos;
-    AccountRepos accountRepos;
-    ConsignmentDetailRepos consignmentDetailRepos;
-    NotificationRepos notificationRepos;
     private static final Logger logger = LoggerFactory.getLogger(ConsignmentServiceImpl.class);
+    private final ConsignmentRepos consignmentRepos;
+    private final AccountRepos accountRepos;
+    private final ItemRepos itemRepos;
+    private final ConsignmentDetailRepos consignmentDetailRepos;
+    private final NotificationRepos notificationRepos;
+    private final AttachmentService attachmentService;
 
     @Autowired
-    AttachmentService attachmentService;
-
-    @Autowired
-    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos) {
+    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos,
+                                  ConsignmentDetailRepos consignmentDetailRepos,
+                                  NotificationRepos notificationRepos, ItemRepos itemRepos,
+                                  AttachmentService attachmentService) {
         this.consignmentRepos = consignmentRepos;
         this.accountRepos = accountRepos;
-        this.accountService = accountService;
         this.consignmentDetailRepos = consignmentDetailRepos;
         this.notificationRepos = notificationRepos;
+        this.itemRepos = itemRepos;
+        this.attachmentService = attachmentService;
     }
 
     @NotNull
@@ -78,9 +73,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         if (consignment.getConsignmentDetails() == null) {
             consignment.setConsignmentDetails(new ArrayList<>());
         }
-        return new ConsignmentDTO(
-                consignment
-        );
+        return new ConsignmentDTO(consignment);
     }
 
     
@@ -309,12 +302,22 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    
     public ConsignmentDTO custAcceptInitialEvaluation(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.IN_INITIAL_EVALUATION)) {
                 consignment.setStatus(Consignment.Status.SENDING);
+                SecureRandom random = new SecureRandom();
+                String code;
+                do {
+                    byte[] bytes = new byte[5];
+                    random.nextBytes(bytes);
+                    StringBuilder hexString = new StringBuilder();
+                    for (byte b : bytes)
+                        hexString.append(String.format("%02x", b));
+                    code = hexString.substring(0, 9);
+                } while (consignmentRepos.existsBySecretCodeIgnoreCase(code));
+                consignment.setSecretCode(code);
                 consignmentRepos.save(consignment);
             } else {
                 throw new ConsignmentServiceException("Consignment is not in IN_INITIAL_EVALUATION status");
@@ -569,6 +572,21 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             return getConsignmentDTO(consignment);
         } else {
             throw new ConsignmentServiceException("Consignment is not in SENDING status");
+        }
+    }
+
+    @Override
+    public void finishItem(Integer consignmentId, Integer itemId) {
+        Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
+                () -> new ConsignmentServiceException("Consignment not found : " + consignmentId));
+        if (consignment.getStatus().equals(Consignment.Status.TO_ITEM)) {
+            consignment.setStatus(Consignment.Status.FINISHED);
+            consignment.setCreatedItem(itemRepos.findById(itemId).orElseThrow(
+                    () -> new ResourceNotFoundException("Item not found : " + itemId))
+            );
+            consignmentRepos.save(consignment);
+        } else {
+            throw new ConsignmentServiceException("Consignment is not in TO_ITEM status");
         }
     }
 

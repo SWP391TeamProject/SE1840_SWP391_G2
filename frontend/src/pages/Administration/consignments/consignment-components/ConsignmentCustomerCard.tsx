@@ -54,7 +54,7 @@ const ConsignmentCustomerCard: React.FC<ConsignmentCustomerCardProps> = ({
           <div className="space-y-2">
             {consignment.contactName &&
               <div className="flex justify-between">
-                <span>Contact name</span>
+                <span>Contact Name</span>
                 <span>{consignment.contactName}</span>
               </div>}
             {consignment.contactEmail &&

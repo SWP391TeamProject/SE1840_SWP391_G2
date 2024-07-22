@@ -69,4 +69,6 @@ public interface ConsignmentService {
     ConsignmentDTO takeConsignment(int consignmentId, int accountId);
 
     ConsignmentDTO receivedConsignment(int consignmentId);
+
+    void finishItem(Integer consignmentId, Integer itemId);
 }

@@ -20,6 +20,8 @@ interface Consignment {
   measurement: string;
   condition: string;
   stamped: string;
+  createdItemId?: number;
+  secretCode?: string;
   createDate: string;
   updateDate: string;
   consignmentDetails: ConsignmentDetail[];

@@ -1,6 +1,6 @@
 import { AuctionStatus } from "./model/auction_session";
 
-export const NUMBER_OF_ACCOUNT = 50;
+export const NUMBER_OF_ACCOUNT = 100;
 export const NUMBER_OF_ADMIN = 1;
 export const NUMBER_OF_MANAGER = 3;
 export const NUMBER_OF_STAFF = 5;
@@ -11,8 +11,8 @@ export const ACCOUNT_AGE_MIN = 20;
 export const NUMBER_OF_CONSIGNMENT = 500;
 export const NUMBER_OF_AUCTION: Map<AuctionStatus, number> = new Map(
   Object.entries({
-    SCHEDULED: 5,
-    PROGRESSING: 1,
+    SCHEDULED: 10,
+    PROGRESSING: 2,
     FINISHED: 5,
   }).map(([key, value]) => [key as AuctionStatus, value])
 );
