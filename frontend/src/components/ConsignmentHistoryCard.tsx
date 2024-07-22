@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card.tsx";
 import Consignment from "@/models/consignment.ts";
 import {formatDateTime} from "@/lib/utils.ts";
-import {ConsignmentDetail} from "@/models/newModel/consignmentDetail.ts";
+import {ConsignmentDetail} from "@/models/newModel/ConsignmentDetail.ts";
 import {useCurrency} from "@/CurrencyProvider.tsx";
 import {
   Accordion,

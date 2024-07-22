@@ -4,9 +4,10 @@ import { Account, Attachment } from '@/constants/interfaces';
 export interface ConsignmentDetail {
   consignmentDetailId?: number;
   description?: string;
-  status?: ConsignmentDetailType;
+  type?: ConsignmentDetailType;
   price?: number;
-  conisgnmentId?: number;
+  consignmentId?: number;
   account?: Account;
-  attachments?: [Attachment];
+  attachments?: Attachment[];
+  createDate?: Date;
 }

@@ -1,6 +1,6 @@
 import { ConsignmentStatus } from '@/constants/enums';
 import { Account } from '@/constants/interfaces';
-import { ConsignmentDetail } from './newModel/consignmentDetail';
+import { ConsignmentDetail } from './newModel/ConsignmentDetail';
 import { Attachment } from './Attachment';
 
 interface Consignment {

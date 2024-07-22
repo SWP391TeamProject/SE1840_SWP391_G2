@@ -1,5 +1,5 @@
 import { Account } from '@/constants/interfaces';
-import { ConsignmentDetail } from './consignmentDetail';
+import { ConsignmentDetail } from './ConsignmentDetail';
 import { Attachment } from './attachment';
 
 export interface Consignment {
