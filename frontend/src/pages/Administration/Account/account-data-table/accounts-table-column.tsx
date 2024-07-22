@@ -62,7 +62,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
       return (
         <AccountTooltip account={row.original}>
           <Link
-            to={`/account/${row.original.accountId}`} className="flex justify-center items-center gap-2">
+            to={`/admin/account/${row.original.accountId}`} className="flex justify-center items-center gap-2">
             {row.original.kyc && (
               <Tooltip>
                 <TooltipTrigger asChild>

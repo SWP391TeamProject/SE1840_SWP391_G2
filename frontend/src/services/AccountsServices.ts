@@ -67,13 +67,6 @@ export const fetchAccountById = async (id: number) => {
 
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
     });
 };
 

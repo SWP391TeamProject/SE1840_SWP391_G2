@@ -88,7 +88,7 @@ export const getColumns = (): ColumnDef<Item>[] => [
       return (
         <AccountTooltip account={row.original.owner}>
           <Link
-            to={`/account/${row.original.owner.accountId}`}>{row.original.owner.nickname}</Link>
+            to={`/admin/account/${row.original.owner.accountId}`}>{row.original.owner.nickname}</Link>
         </AccountTooltip>
       );
     },

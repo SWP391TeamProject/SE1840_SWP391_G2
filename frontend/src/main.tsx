@@ -80,6 +80,11 @@ import { OrderCheckout } from '@/pages/CustomerSite/dashboard/orders/OrderChecko
 import { Toaster } from '@/components/ui/sonner';
 import PaymentCreate from '@/pages/Administration/payment/PaymentCreate.tsx';
 import Transactions from './pages/CustomerSite/Profile/transaction/transactions.tsx';
+import CustomerList from "@/pages/Administration/Customer/CustomerList.tsx";
+import {
+  CustomerDetail
+} from "@/pages/Administration/Customer/CustomerDetail.tsx";
+import {AccountDetail} from "@/pages/Administration/Account/AccountDetail.tsx";
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -113,7 +118,7 @@ const options = {
   appearance: appearance,
 };
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+  <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
     <GoogleOAuthProvider clientId="456982582712-hhilqsfqccnkfvrc8mnqkcf0klchmesm.apps.googleusercontent.com">
       {/* <Elements stripe={stripePromise} options={options}> */}
 
@@ -181,8 +186,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route path="dashboard" element={<AdminDashboard />}></Route>
                         <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN]} />}>
                           <Route path="accounts" element={<AccountsList />}></Route>
+                          <Route path="account" element={<Navigate to="/admin/accounts" replace />} />
                           <Route path="accounts/:id" element={<AccountEdit />}></Route>
                           <Route path="accounts/create" element={<AccountCreate />}></Route>
+                          <Route path="account/:id" element={<AccountDetail />}></Route>
+                        </Route>
+                        <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]} />}>
+                          <Route path="customers" element={<CustomerList />}></Route>
+                          <Route path="customers/:id" element={<CustomerDetail />}></Route>
                         </Route>
                         <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
                           <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
