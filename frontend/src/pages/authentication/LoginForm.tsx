@@ -85,7 +85,7 @@ function LoginForm() {
     console.log(token);
     if (token !== null) {
       axios
-        .get(AUTH_SERVER + '/login-with-google?token=' + token)
+        .post(AUTH_SERVER + '/login-with-google?token=' + token)
         .then((res) => {
           setIsLogin(false);
           console.log(res.data);
