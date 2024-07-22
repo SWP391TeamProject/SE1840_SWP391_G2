@@ -91,11 +91,12 @@ public class OrderServiceImpl implements OrderService {
         payment.setStatus(Payment.Status.PENDING);
         payment.setAccount(account);
         payment.setPaymentAmount(totalPay.add(fee));
-        payment = paymentRepository.save(payment);
 
         order.setPayment(payment);
         order.setFee(fee);
         order = orderRepository.save(order);
+        payment = paymentRepository.save(payment);
+
         order.setOrderDetails(orderDetailRepos.saveAll(orderDetails));
 
         log.info("Order {} account {} must pay {} with fee {}", order.getOrderId(), accountId, payment.getPaymentAmount(), fee);

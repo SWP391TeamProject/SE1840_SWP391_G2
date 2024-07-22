@@ -321,7 +321,7 @@ export default function AuctionSession() {
   const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
     const startDate = new Date(auctionSession.startDate);
     const endDate = new Date(auctionSession.endDate);
-    if (!(startDate < new Date()) || !auctionSession.hasDeposited || endDate < new Date()) {
+    if (!(startDate < new Date())  || endDate < new Date()) {
       navigate(`/item/${item.itemId}`);
       return;
     } else {
@@ -333,7 +333,7 @@ export default function AuctionSession() {
           },
           itemDTO: item,
           endDate: auctionSession?.endDate,
-          allow: bidders.includes(userId) && auctionSession?.status === AuctionSessionStatus.PROGRESSING,
+          allow: auctionSession?.hasDeposited && auctionSession?.status === AuctionSessionStatus.PROGRESSING,
         },
       });
     }
@@ -396,7 +396,7 @@ export default function AuctionSession() {
                 </div>
                 {alertBalance}
 
-                {bidders.includes(userId)
+                {auctionSession?.hasDeposited
                   ? auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
                     <Button
                       onClick={() =>
@@ -455,7 +455,7 @@ export default function AuctionSession() {
                         src={
                           item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
                             ? item.itemDTO.attachments[0].link
-                            : ''
+                            : 'https://placehold.co/400'
                         }
                         width={300}
                         height={200}
