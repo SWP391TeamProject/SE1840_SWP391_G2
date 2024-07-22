@@ -1,6 +1,11 @@
 package fpt.edu.vn.Backend.security;
 
+import com.nimbusds.jwt.SignedJWT;
+import fpt.edu.vn.Backend.DTO.request.RefreshRequest;
+import fpt.edu.vn.Backend.DTO.response.AuthenticationResponse;
 import fpt.edu.vn.Backend.oauth2.security.RefreshTokenProvider;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
@@ -26,7 +32,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private CustomUserDetailsService customUserDetailService;
     @Autowired
     private RefreshTokenProvider refreshTokenProvider;
-
+    private static final long REFRESH_THRESHOLD = 5 * 60 * 1000;
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -47,11 +53,26 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                Claims claims = Jwts.parserBuilder().setSigningKey(SecurityConstants.JWT_SECRET).build().parseClaimsJws(token).getBody();
+                Date expirationDate = claims.getExpiration();
+                long currentTimeMillis = System.currentTimeMillis();
+                long expirationTimeMillis = expirationDate.getTime();
+                if(expirationTimeMillis - currentTimeMillis <= REFRESH_THRESHOLD){
+                    RefreshRequest refresh = new RefreshRequest();
+                    refresh.setToken(token);
+                    AuthenticationResponse refreshToken = refreshTokenProvider.refreshToken(refresh);
+                    sendJWTFromResponse(response,refreshToken.getAccessToken());
+                }
+
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void sendJWTFromResponse(HttpServletResponse response,String refreshToken){
+        response.setHeader("Authorization", "Bearer " + refreshToken);
     }
 
     private String getJWTFromRequest(HttpServletRequest request) {
