@@ -7,41 +7,10 @@ import Box from '@mui/material/Box';
 // third-party
 import ReactApexChart from 'react-apexcharts';
 import { getPaymentByStatus } from '@/services/StatisticServices';
+import { useCurrency } from '@/CurrencyProvider';
 
 // chart options
-const barChartOptions = {
-  chart: {
-    type: 'bar',
-    height: 365,
-    toolbar: {
-      show: false,
-    },
-  },
-  plotOptions: {
-    bar: {
-      columnWidth: '45%',
-      borderRadius: 4,
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  xaxis: {
-    categories: [],
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-  },
-  yaxis: {
-    show: false,
-  },
-  grid: {
-    show: false,
-  },
-};
+
 
 // ==============================|| MONTHLY BAR CHART ||============================== //
 
@@ -50,9 +19,48 @@ export default function PaymentsBarChart({ selectedLabel }) {
 
   const { primary, secondary } = theme.palette.text;
   const info = theme.palette.info.light;
-
+  const currency = useCurrency();
+  const barChartOptions = {
+    chart: {
+      type: 'bar',
+      height: 365,
+      toolbar: {
+        show: false,
+      },
+    },
+    plotOptions: {
+      bar: {
+        columnWidth: '45%',
+        borderRadius: 4,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      categories: [],
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+    },
+    tooltip: {
+      y: {
+        formatter(val) {
+          return `${currency.format(val)}`;
+        },
+      },
+    },
+    yaxis: {
+      show: false,
+    },
+    grid: {
+      show: false,
+    },
+  };
   const [option, setOptions] = useState(barChartOptions);
-
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
@@ -100,7 +108,8 @@ export default function PaymentsBarChart({ selectedLabel }) {
           });
 
           setSeries([
-            {
+            { 
+              name: 'Total Amount',
               data: formattedData.map((item) => item.totalAmount),
             },
           ]);

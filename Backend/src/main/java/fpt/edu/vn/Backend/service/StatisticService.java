@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface StatisticService {
-    List<RevenueDTO> getPaymentByStatus(String startDate, String endDate, String type);
+    List<RevenueDTO> getPaymentByStatus(int year, String type);
 
     List<MonthlyUserDTO> getNewUsersByYear(int year);
 
@@ -14,9 +14,9 @@ public interface StatisticService {
     long getThisMonthNewUser();
     long getTotalOrders();
     long getTotalItemSold();
+    long getTotalAuctionProgressing();
     BigDecimal getTotalSale();
     List<RevenueDTO> getTotalRevenueByPastAuction(int year);
 
     List<PaymentsByDateDTO> getPaymentsByDateRange(String startDate, String endDate);
-
 }

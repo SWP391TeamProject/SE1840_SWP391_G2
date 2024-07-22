@@ -87,18 +87,16 @@ const formatDate = (date) => {
 
 export const getPaymentByStatus = async (type?: string) => {
   const today = new Date();
-  const startOfYear = new Date(today.getFullYear(), 0, 1); // Start of current year
-  const endOfYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999); // End of current year
-
+  const endOfYear = new Date(); 
+  const year = endOfYear.getUTCFullYear();
   // Default parameters if not provided
   type = type;
 
   // Format the dates to yyyy/MM/dd
-  const formattedStartDate = formatDate(startOfYear);
   const formattedEndDate = formatDate(endOfYear);
 
   // Adjust the URL to include query parameters for GET request
-  const url = `${API_SERVER}/statistics/payments/filter-by-status?startDate=${formattedStartDate}&endDate=${formattedEndDate}&type=${type}`;
+  const url = `${API_SERVER}/statistics/payments/filter-by-status?year=${year}&type=${type}`;
 
   try {
     const response = await axios.get(url, {
@@ -139,6 +137,24 @@ export const getTotalItemSold = async () => {
 export const getTotalSale = async () => {
   return await axios
     .get(API_SERVER + '/statistics/total/sales', {
+      headers: {
+        'Content-Type': 'application/json',
+
+        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+      if (err?.response.status == 401) {
+        removeCookie('user');
+        removeCookie('token');
+      }
+    });
+};
+
+export const getTotalAuctionProgressing = async () => {
+  return await axios
+    .get(API_SERVER + '/statistics/count-auction', {
       headers: {
         'Content-Type': 'application/json',
 

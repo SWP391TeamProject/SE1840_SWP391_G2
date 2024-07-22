@@ -26,7 +26,7 @@ export default function AnalyticEcommerce({ color = 'primary', title, count, per
     <div className="bg-backgoundcolor p-5">
       <MainCard contentSX={{ p: 2.25 }}>
         <Stack spacing={0.5}>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h7" color="text.secondary">
             {title}
           </Typography>
           <Grid container alignItems="center">

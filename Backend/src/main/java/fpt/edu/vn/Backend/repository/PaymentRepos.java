@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -15,11 +16,13 @@ import java.util.List;
 @Repository
 public interface PaymentRepos extends JpaRepository<Payment, Integer>, JpaSpecificationExecutor<Payment> {
 
-    @Query("SELECT p.createDate AS createDate, SUM(p.paymentAmount) AS totalAmount " +
-            "FROM Payment p WHERE p.createDate BETWEEN :start AND :end AND p.type = :type " +
-            "AND p.status = 'SUCCESS'" +
-            "GROUP BY p.createDate ORDER BY p.createDate")
-    List<Object[]> findTotalRevenueByDateRange(LocalDateTime start, LocalDateTime end, Payment.Type type);
+
+    @Query("SELECT FUNCTION('YEAR', p.createDate) AS year, FUNCTION('MONTH', p.createDate) AS month, SUM(p.paymentAmount) AS totalAmount " +
+            "FROM Payment p WHERE FUNCTION('YEAR', p.createDate) = :year AND p.type = :type " +
+            "AND p.status = 'SUCCESS' " +
+            "GROUP BY FUNCTION('YEAR', p.createDate), FUNCTION('MONTH', p.createDate) " +
+            "ORDER BY FUNCTION('YEAR', p.createDate), FUNCTION('MONTH', p.createDate)")
+    List<Object[]> findTotalRevenueByYearAndMonth(@Param("year") int year, @Param("type") Payment.Type type);
 
     List<Payment> findAllByCreateDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 

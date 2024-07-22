@@ -40,8 +40,8 @@ public interface AccountRepos extends JpaRepository<Account, Integer>, JpaSpecif
     @Query("SELECT MONTH(a.createDate), COUNT(a) FROM Account a WHERE YEAR(a.createDate) = :year AND a.status = 'ACTIVE' AND a.role = 'MEMBER' GROUP BY MONTH(a.createDate)")
     List<Object[]> findNewUsersByMonth(int year);
 
-    @Query("SELECT COUNT(a) FROM Account a WHERE YEAR(a.createDate) = :year AND MONTH(a.createDate) = :month")
-    long findNewUsersCountForMonth(@Param("year") int year, @Param("month") int month);
+    @Query("SELECT COUNT(a) FROM Account a WHERE YEAR(a.createDate) <= :year")
+    long findNewUsersCount(@Param("year") int year);
 
 
 }
