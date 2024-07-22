@@ -285,12 +285,37 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public  void deleteItemAttachment(int attachmentId, int itemId) {
+    @Transactional
+    public void deleteItemAttachment(int itemId, int attachmentId) {
         Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
         );
         if (a.getItem() == null || a.getItem().getItemId() != itemId) {
             throw new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist for item with id " + itemId);
+        }
+        attachmentRepository.delete(a);
+    }
+
+    @Override
+    @Transactional
+    public void deleteBlogAttachment(int blogId, int attachmentId) {
+        Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
+        );
+        if (a.getBlogPost() == null || a.getBlogPost().getPostId() != blogId) {
+            throw new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist for blog post with id " + blogId);
+        }
+        attachmentRepository.delete(a);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAuctionAttachment(int auctionId, int attachmentId) {
+        Attachment a = attachmentRepository.findById(attachmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist")
+        );
+        if (a.getAuctionSession() == null || a.getAuctionSession().getAuctionSessionId() != auctionId) {
+            throw new ResourceNotFoundException("Attachment with id " + attachmentId + " does not exist for auction with id " + auctionId);
         }
         attachmentRepository.delete(a);
     }

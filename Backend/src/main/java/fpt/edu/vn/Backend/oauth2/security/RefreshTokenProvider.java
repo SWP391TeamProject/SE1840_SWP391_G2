@@ -136,7 +136,7 @@ public class RefreshTokenProvider {
     }
 
     @Scheduled(fixedRate = 8000000) //every 80 minute will auto clean
-    
+    @Transactional
     public void cleanupExpiredTokens() {
         Date now = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
         refreshTokenRepos.deleteByExpiryTimeBefore(now);

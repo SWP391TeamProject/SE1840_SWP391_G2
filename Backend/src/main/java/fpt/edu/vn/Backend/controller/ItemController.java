@@ -171,7 +171,7 @@ public class ItemController {
     @DeleteMapping("/attachment/{item}/{attachment}")
     public ResponseEntity<ItemDTO> deleteItemAttachment(@PathVariable int item,
                                                         @PathVariable int attachment) {
-        itemService.deleteAttachment(attachment, item);
+        itemService.deleteAttachment(item, attachment);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

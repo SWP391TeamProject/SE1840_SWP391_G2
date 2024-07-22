@@ -1,13 +1,13 @@
 package fpt.edu.vn.Backend.service;
 
+import com.google.common.base.Preconditions;
 import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.BlogCreateDTO;
 import fpt.edu.vn.Backend.DTO.BlogPostDTO;
 import fpt.edu.vn.Backend.DTO.BlogUpdateDTO;
-import fpt.edu.vn.Backend.exception.InvalidInputException;
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
-import fpt.edu.vn.Backend.pojo.Attachment;
 import fpt.edu.vn.Backend.pojo.BlogPost;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.repository.AttachmentRepos;
@@ -17,19 +17,15 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -144,53 +140,53 @@ public class BlogServiceImpl implements BlogService {
         blogPostDTO.setContent(blogUpdateDTO.getContent());
         blogPostDTO.setUpdateDate(blogUpdateDTO.getUpdateDate());
         blogPostDTO.setCategory(blogCategoryService.getBlogCategoryById(blogUpdateDTO.getCategoryId()));
-        if (blogUpdateDTO.getDeletedFiles() != null && !blogUpdateDTO.getDeletedFiles().isEmpty()) {
-            List<AttachmentDTO> attachments = blogPostDTO.getAttachments().stream().toList();
-            for (AttachmentDTO attachmentDTO : attachments) {
-                if (blogUpdateDTO.getDeletedFiles().contains(attachmentDTO.getAttachmentId())) {
-                    int attachmentId = attachmentDTO.getAttachmentId();
-                    ArrayList<AttachmentDTO> newAttachments = new ArrayList<>(blogPostDTO.getAttachments().stream().toList());
-                    newAttachments.remove(attachmentDTO);
-                    blogPostDTO.setAttachments(newAttachments);
-                    blogPostDTO = deleteAttachment(blogPostDTO.getPostId(), attachmentId);
-                    attachmentService.deleteAttachment(attachmentId);
-                }
-            }
-        }
+//        if (blogUpdateDTO.getDeletedFiles() != null && !blogUpdateDTO.getDeletedFiles().isEmpty()) {
+//            List<AttachmentDTO> attachments = blogPostDTO.getAttachments().stream().toList();
+//            for (AttachmentDTO attachmentDTO : attachments) {
+//                if (blogUpdateDTO.getDeletedFiles().contains(attachmentDTO.getAttachmentId())) {
+//                    int attachmentId = attachmentDTO.getAttachmentId();
+//                    ArrayList<AttachmentDTO> newAttachments = new ArrayList<>(blogPostDTO.getAttachments().stream().toList());
+//                    newAttachments.remove(attachmentDTO);
+//                    blogPostDTO.setAttachments(newAttachments);
+//                    blogPostDTO = deleteAttachment(blogPostDTO.getPostId(), attachmentId);
+//                    attachmentService.deleteAttachment(attachmentId);
+//                }
+//            }
+//        }
         blogPostDTO = updateBlog(blogPostDTO);
-
-        if (blogUpdateDTO.getFiles() != null && !blogUpdateDTO.getFiles().isEmpty()) {
-            try {
-                for (MultipartFile image : blogUpdateDTO.getFiles()) {
-                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
-                }
-            } catch (Exception e) {
-                throw new InvalidInputException("Error uploading attachments");
-            }
-        }
+//
+//        if (blogUpdateDTO.getFiles() != null && !blogUpdateDTO.getFiles().isEmpty()) {
+//            try {
+//                for (MultipartFile image : blogUpdateDTO.getFiles()) {
+//                    attachmentService.uploadBlogAttachment(image, blogPostDTO.getPostId());
+//                }
+//            } catch (Exception e) {
+//                throw new InvalidInputException("Error uploading attachments");
+//            }
+//        }
 
         return blogPostDTO;
     }
     
     @Override
     //@CacheEvict(allEntries = true, value = "blog")
-    public BlogPostDTO deleteAttachment(int postId, int attachmentId) {
-        BlogPost blogPost = blogPostRepos.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Invalid blog id: " + postId));
-        List<AttachmentDTO> attachmentDTOS = blogPost.getAttachments().stream().map(AttachmentDTO::new).toList();
-        List<Attachment> attachments = new ArrayList<>();
-        for (AttachmentDTO attachmentDTO : attachmentDTOS) {
-            if (attachmentDTO.getAttachmentId() != attachmentId) {
-                attachments.add(
-                        attachmentRepos.findById(attachmentDTO.getAttachmentId())
-                                .orElseThrow(
-                                        () -> new ResourceNotFoundException("Invalid attachment id: " + attachmentDTO.getAttachmentId())
-                                ));
-            }
-        }
-        blogPost.setAttachments(attachments);
-        return new BlogPostDTO(blogPostRepos.save(blogPost));
+    public void deleteAttachment(int postId, int attachmentId) {
+        attachmentService.deleteBlogAttachment(postId, attachmentId);
     }
-    
+
+    @Override
+    public List<AttachmentDTO> uploadAttachment(int id, AttachmentUploadDTO dto) throws IOException {
+        if (dto.getFiles() == null || dto.getFiles().isEmpty()) return Collections.emptyList();
+        for (MultipartFile f : dto.getFiles()) {
+            Preconditions.checkState(f.getSize() <= 10000000, "File size must be less than 10MB");
+        }
+        List<AttachmentDTO> attachments = new ArrayList<>();
+        for(MultipartFile file : dto.getFiles()) {
+            attachments.add(attachmentService.uploadBlogAttachment(file, id));
+        }
+        return attachments;
+    }
+
     @Override
     //@CacheEvict(allEntries = true, value = "blog")
     public void deleteBlog(int id) {

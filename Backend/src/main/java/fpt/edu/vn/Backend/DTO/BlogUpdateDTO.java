@@ -20,7 +20,7 @@ public class BlogUpdateDTO implements Serializable {
     private int userId;
     private String title;
     private String content;
-    private List<MultipartFile> files;
+//    private List<MultipartFile> files;
     private List<Integer> deletedFiles;
     private LocalDateTime updateDate;
 }

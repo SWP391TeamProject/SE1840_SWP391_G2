@@ -6,76 +6,118 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { Roles } from '@/constants/enums';
+import { useAppDispatch } from '@/redux/hooks';
+import {AccountStatus, Roles} from '@/constants/enums';
 import { fetchAccountById, updateAccountService } from '@/services/AccountsServices.ts';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { setCurrentAccount } from '@/redux/reducers/Accounts';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.tsx';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
+import { getErrorMessage } from '@/lib/handle-error';
 import { toast } from 'sonner';
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { Account } from '@/models/AccountModel';
+import {AxiosResponse} from "axios";
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 const formSchema = z.object({
   accountId: z.number(),
   nickname: z
     .string()
     .min(5, 'Nickname must be at least 5 characters')
-    .max(40, 'Nickname must not be longer than 40 characters'),
+    .max(20, 'Nickname must not be longer than 20 characters'),
   email: z.string().email({
     message: 'Invalid email address.',
   }),
-  phone: z.string().max(15, 'Phone must not be longer than 15 characters').optional(),
+  phone: z.string().max(12, 'Phone must not be longer than 12 characters').optional(),
   role: z.nativeEnum(Roles),
   balance: z.coerce
     .number()
     .min(0, 'Balance must not be negative')
     .max(1000000000, 'Balance must not exceed 1,000,000,000'),
   dummy: z.boolean(),
+  status: z.nativeEnum(AccountStatus),
 });
 
 export default function AccountEdit() {
-  const account = useAppSelector((state) => state.accounts.currentAccount);
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
+  const currency = useCurrency();
+  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
   const [showTrigger, setShowTrigger] = useState(false);
-  const [editedAccount, setEditedAccount] = useState<Account | undefined>(undefined);
+  const [currentRole, setCurrentRole] = useState(Roles.MEMBER);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      accountId: account?.accountId,
-      nickname: account?.nickname ?? '',
-      email: account?.email,
-      phone: account?.phone ?? '',
-      balance: account?.balance ?? 0,
-      role: account ? account.role : Roles.MEMBER,
+      accountId: 0,
+      nickname: '',
+      email: '',
+      phone: '',
+      balance: 0,
+      role: Roles.MEMBER,
+      status: AccountStatus.ACTIVE,
       dummy: false,
     },
   });
 
-  const handleConfirmed = (data: z.infer<typeof formSchema>) => {
-    setIsConfirmed(true);
+  useEffect(() => {
+    setIsLoading(true);
+    const setCurrentAccountPromise = fetchAccountById(parseInt(id));
+
+    toast.promise(setCurrentAccountPromise, {
+      loading: 'Fetching account...',
+      success: (res: AxiosResponse<Account>) => {
+        setIsLoading(false);
+        setCurrentAccount(res);
+        form.reset({
+          accountId: res.data.accountId,
+          nickname: res.data.nickname,
+          email: res.data.email,
+          phone: res.data.phone,
+          balance: res.data.balance,
+          role: res.data.role,
+          dummy: res.data.dummy,
+          status: res.data.status
+        });
+        setCurrentRole(res.data.role);
+        return 'Account fetched successfully';
+      },
+      error: (err) => {
+        return getErrorMessage(err);
+      },
+    });
+  }, []);
+
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    setShowTrigger(true);
+  };
+
+  const confirm = () => {
     setShowTrigger(false);
+    setIsSubmitting(true);
+    const data = form.getValues();
     let updatedAccount = {
       accountId: data.accountId,
-      email: data.email,
       nickname: data.nickname,
       phone: data.phone,
-      avatar: null,
       balance: data.balance,
       role: data.role,
       dummy: data.dummy,
-      status: account?.status,
+      status: data.status
     };
-    const updateAccountServicePromise = updateAccountService(updatedAccount, updatedAccount.accountId);
+    const updateAccountServicePromise = updateAccountService(updatedAccount,
+      updatedAccount.accountId);
 
     toast.promise(updateAccountServicePromise, {
       loading: 'Updating account...',
@@ -89,132 +131,7 @@ export default function AccountEdit() {
         return getErrorMessage(err);
       },
     });
-    // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
-    //     console.log(res);
-    //     toast.success("Account updated successfully.");
-    //     setIsSubmitting(false);
-    //     dispatch(setCurrentAccount(res?.data))
-    // }).catch((err) => {
-    //     console.log(err);
-    //     showErrorToast(err);
-    // })
   };
-  useEffect(() => {
-    if (isConfirmed) {
-      if (form.getValues) {
-        const values = form.getValues();
-        handleConfirmed(values);
-        setIsConfirmed(false);
-      } else {
-        setIsSubmitting(false);
-      }
-    }
-  }, [isConfirmed, form.getValues]);
-
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    // Remove FormData creation and file handling
-    setShowTrigger(true);
-    // let updatedAccount = {
-    //     accountId: data.accountId,
-    //     email: data.email,
-    //     nickname: data.nickname,
-    //     phone: data.phone,
-    //     avatar: null,
-    //     balance: data.balance,
-    //     role: data.role,
-    //     dummy: data.dummy,
-    //     status: account?.status
-    // }
-    // updateAccountService(updatedAccount, updatedAccount.accountId).then((res) => {
-    //     console.log(res);
-    //     // dispatch(setCurrentAccount(res))
-    //     if(res){
-    //         toast.success("Account Updated Successfully")
-    //         navigate("/admin/accounts/");
-    //     }
-    // })
-
-    // console.log(updatedAccount);
-  };
-
-  const confirm = () => {
-    setIsConfirmed(true);
-    setShowTrigger(false);
-    setIsSubmitting(true);
-  };
-
-  useEffect(() => {
-    if (isConfirmed) {
-      if (form.getValues) {
-        const values = form.getValues();
-        handleConfirmed(values);
-        setIsConfirmed(false);
-      } else {
-        setIsSubmitting(false);
-      }
-    }
-  }, [isConfirmed, form.getValues]);
-
-  // useEffect(() => {
-  //     if (!account || account.accountId != parseInt(id)) {
-  //         fetchAccountById(parseInt(id)).then((res) => {
-  //             console.log(res);
-  //             setCurrentAccount(res?.data);
-  //             form.reset({
-  //                 accountId: res?.data?.accountId,
-  //                 nickname: res?.data?.nickname ?? "",
-  //                 email: res?.data?.email,
-  //                 phone: res?.data?.phone ?? "",
-  //                 balance: res?.data?.balance ?? 0,
-  //                 role: res.data ? res?.data.role : Roles.MEMBER,
-  //             });
-  //             console.log(form.formState);
-  //             console.log(form.control._formValues);
-  //         });
-  //     }
-  // }, [account]);
-
-  useEffect(() => {
-    console.log(form.formState.defaultValues);
-    if (!account || account.accountId != parseInt(id)) {
-      const setCurrentAccountPromise = fetchAccountById(parseInt(id));
-
-      toast.promise(setCurrentAccountPromise, {
-        loading: 'Fetching account...',
-        success: (res) => {
-          setCurrentAccount(res);
-          form.reset({
-            accountId: res?.accountId,
-            nickname: res?.nickname ?? '',
-            email: res?.email,
-            phone: res?.phone ?? '',
-            dummy: res?.dummy ?? false,
-            balance: res?.balance ?? 0,
-            role: res ? res?.role : Roles.MEMBER,
-          });
-          setEditedAccount(res);
-          return 'Account fetched successfully';
-        },
-        error: (err) => {
-          return getErrorMessage(err);
-        },
-      });
-
-      // fetchAccountById(parseInt(id)).then((res) => {
-      //     setCurrentAccount(res?.data);
-      //     form.reset({
-      //         accountId: res?.data?.accountId,
-      //         nickname: res?.data?.nickname ?? "",
-      //         email: res?.data?.email,
-      //         phone: res?.data?.phone ?? "",
-      //         dummy: res?.data?.dummy ?? false,
-      //         balance: res?.data?.balance ?? 0,
-      //         role: res.data ? res?.data.role : Roles.MEMBER,
-      //     });
-      //     setEditedAccount(res.data);
-      // });
-    }
-  }, []);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8" style={{ float: 'left' }}>
@@ -232,9 +149,22 @@ export default function AccountEdit() {
               name="accountId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>accountId</FormLabel>
+                  <FormLabel>Account ID</FormLabel>
                   <FormControl>
-                    <Input disabled placeholder="account id" {...field} />
+                    <Input disabled placeholder="Account id" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input disabled placeholder="Email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -248,19 +178,6 @@ export default function AccountEdit() {
                   <FormLabel>Nickname</FormLabel>
                   <FormControl>
                     <Input placeholder="Nickname" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -284,7 +201,7 @@ export default function AccountEdit() {
               name="balance"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Balance (in USD)</FormLabel>
+                  <FormLabel>Balance: {currency.format(field.value)}</FormLabel>
                   <FormControl>
                     <Input {...field} type="number" />
                   </FormControl>
@@ -304,7 +221,7 @@ export default function AccountEdit() {
                       // defaultValue={field.value}
                       value={field.value}
                       className="flex flex-col space-y-1"
-                      disabled={editedAccount?.role === Roles.ADMIN}
+                      disabled={currentRole === Roles.ADMIN} // cannot change role of another ADMIN
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
@@ -332,6 +249,30 @@ export default function AccountEdit() {
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.keys(AccountStatus).map(v =>
+                        <SelectItem value={v}>{v}</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -364,7 +305,7 @@ export default function AccountEdit() {
                 </FormItem>
               )}
             />
-            {isSubmitting ? (
+            {isSubmitting || isLoading ? (
               <Button disabled>
                 <Loader2 className="animate-spin" size={24} />
               </Button>
@@ -385,15 +326,6 @@ export default function AccountEdit() {
           title="Confirmation"
         />
       </div>
-      <ConfirmationDialog
-        open={showTrigger}
-        description="this will update the account"
-        onOpenChange={setShowTrigger}
-        title="Update Account"
-        message={'Are you sure to update this account?'}
-        label="Confirm"
-        onSuccess={confirm}
-      />
     </main>
   );
 }

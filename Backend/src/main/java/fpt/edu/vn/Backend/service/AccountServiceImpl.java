@@ -92,8 +92,6 @@ public class AccountServiceImpl implements AccountService {
             account.setPhone(accountDTO.getPhone().strip());
 
         if (editorRole == Account.Role.ADMIN) { // only admin can update these properties
-            if (accountDTO.getEmail() != null)
-                account.setEmail(accountDTO.getEmail());
             if (accountDTO.getRole() != null)
                 account.setRole(accountDTO.getRole());
             if (accountDTO.getStatus() != null)
@@ -130,21 +128,21 @@ public class AccountServiceImpl implements AccountService {
 
         Preconditions.checkState(account.getNickname().length() >= 5, "Nickname must be at least 5 characters");
         Preconditions.checkState(account.getNickname().length() <= 20, "Nickname must not be longer than 20 characters");
-        Preconditions.checkState(account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
+        Preconditions.checkState(account.getPhone() == null || account.getPhone().length() <= 15, "Phone must not be longer than 15 characters");
         Preconditions.checkState(account.getBalance() == null || account.getBalance().signum() >= 0, "Balance must not be negative");
         Preconditions.checkState(account.getPassword().strip().equals(account.getPassword()), "Password must not contain spaces");
         Preconditions.checkState(account.getPassword().length() >= 8, "Password must be at least 8 characters long");
         Preconditions.checkState(account.getPassword().length() <= 30, "Password must not be longer than 30 characters");
         Account a = new Account();
         // avatar dùng method riêng
-        // không set trực tiếp từ DTO tránh exploit
         a.setNickname(account.getNickname().strip());
         a.setRole(account.getRole());
         a.setEmail(account.getEmail().strip());
-        a.setPhone(account.getPhone().strip());
-        a.setStatus(Account.Status.ACTIVE);
+        a.setPhone(account.getPhone() != null ? account.getPhone().strip() : "");
+        a.setStatus(account.getStatus() != null ? account.getStatus() : Account.Status.ACTIVE);
         a.setPassword(passwordEncoder.bcryptEncoder().encode(account.getPassword()));
         a.setDummy(account.getDummy() == null || account.getDummy());
+        a.setBalance(account.getBalance() != null ? account.getBalance() : BigDecimal.ZERO);
         return mapEntityToDTO(accountRepos.save(a));
     }
 

@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -94,6 +95,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+    ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),ex.getMessage(),new Date());
+    return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.UNAUTHORIZED, request);
+  }
+
+  @ExceptionHandler(AuthenticationServiceException.class)
+  public ResponseEntity<Object> handleAuthenticationServiceException(AuthenticationServiceException ex, WebRequest request) {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),ex.getMessage(),new Date());
     return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.UNAUTHORIZED, request);
   }
