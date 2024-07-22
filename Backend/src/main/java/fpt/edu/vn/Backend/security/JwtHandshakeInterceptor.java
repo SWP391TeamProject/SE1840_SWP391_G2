@@ -1,5 +1,6 @@
 package fpt.edu.vn.Backend.security;
 
+import fpt.edu.vn.Backend.oauth2.security.RefreshTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
@@ -21,6 +22,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     private final JWTGenerator jwtGenerator;
     private CustomUserDetailsService customUserDetailService;
 
+    private RefreshTokenProvider refreshTokenProvider;
+
     public JwtHandshakeInterceptor(JWTGenerator jwtGenerator, CustomUserDetailsService customUserDetailService) {
         this.jwtGenerator = jwtGenerator;
         this.customUserDetailService = customUserDetailService;
@@ -30,6 +33,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         // Extract the JWT from the request URL
         String jwt = extractJwtFromRequest(request);
+
+
 
         // Validate the JWT and perform authentication
         if (jwtGenerator.validateToken(jwt)) {

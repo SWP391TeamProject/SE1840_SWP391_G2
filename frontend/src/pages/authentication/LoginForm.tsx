@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -70,6 +70,12 @@ function LoginForm() {
       });
   };
 
+
+  useLayoutEffect(()=>{
+    
+  },[])
+
+
   useGSAP(
     () => {
       gsap.from(loginForm.current, {
@@ -85,7 +91,7 @@ function LoginForm() {
     console.log(token);
     if (token !== null) {
       axios
-        .get(AUTH_SERVER + '/login-with-google?token=' + token)
+        .post(AUTH_SERVER + '/login-with-google?token=' + token)
         .then((res) => {
           setIsLogin(false);
           console.log(res.data);

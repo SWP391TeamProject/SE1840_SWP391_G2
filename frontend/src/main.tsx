@@ -80,11 +80,9 @@ import { OrderCheckout } from '@/pages/CustomerSite/dashboard/orders/OrderChecko
 import { Toaster } from '@/components/ui/sonner';
 import PaymentCreate from '@/pages/Administration/payment/PaymentCreate.tsx';
 import Transactions from './pages/CustomerSite/Profile/transaction/transactions.tsx';
-import CustomerList from "@/pages/Administration/Customer/CustomerList.tsx";
-import {
-  CustomerDetail
-} from "@/pages/Administration/Customer/CustomerDetail.tsx";
-import {AccountDetail} from "@/pages/Administration/Account/AccountDetail.tsx";
+import CustomerList from '@/pages/Administration/Customer/CustomerList.tsx';
+import { CustomerDetail } from '@/pages/Administration/Customer/CustomerDetail.tsx';
+import { AccountDetail } from '@/pages/Administration/Account/AccountDetail.tsx';
 // import { Elements } from "@stripe/react-stripe-js";
 // import { loadStripe } from "@stripe/stripe-js";
 
@@ -254,7 +252,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   </Routes>
                 </BrowserRouter>
                 {/* <RouterProvider router={router} /> */}
-                <Toaster position="bottom-right" richColors closeButton />
+                <Toaster
+                  position="bottom-center"
+                  visibleToasts={1}
+                  richColors
+                  // closeButton
+                  pauseWhenPageIsHidden
+                  invert
+                />
               </TooltipProvider>
             </CurrencyProvider>
           </AuthProvider>

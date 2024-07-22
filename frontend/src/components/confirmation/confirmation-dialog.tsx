@@ -41,8 +41,8 @@ export function ConfirmationDialog({
       <AlertDialog {...props}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{title}</AlertDialogTitle>
-            <AlertDialogDescription>{description}</AlertDialogDescription>
+            <AlertDialogTitle className='text-foreground'>{title}</AlertDialogTitle>
+            <AlertDialogDescription className='text-foreground'>{description}</AlertDialogDescription>
           </AlertDialogHeader>
           <div className="w grid gap-4 py-4">{message}</div>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
@@ -52,9 +52,10 @@ export function ConfirmationDialog({
             <Button
               // aria-label="Delete selected rows"
               // variant="destructive"
-              className="w-20"
+              className="w-20 text-foreground"
               onClick={() => onSuccess()}
             >
+              
               {label}
             </Button>
           </AlertDialogFooter>

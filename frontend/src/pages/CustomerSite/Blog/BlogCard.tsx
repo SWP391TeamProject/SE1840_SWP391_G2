@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { BlogPost } from "@/models/newModel/blogPost";
 import { useAppDispatch } from "@/redux/hooks";
 import { setCurrentBlogPost } from "@/redux/reducers/Blogs";
@@ -15,10 +15,11 @@ gsap.registerPlugin(useGSAP,);
 
 interface BlogCardProps {
     blog: BlogPost;
+    className: string;
 
 }
 
-export default function BlogCard({ blog }: BlogCardProps) {
+export default function BlogCard({ blog ,className}: BlogCardProps) {
     const cardRef = useRef(null);
     const dispatch = useAppDispatch();
     useGSAP(() => {
@@ -74,7 +75,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
         };
     }, [cardRef]);
     return (
-        <Card ref={cardRef} className="w-[500px] ">
+        <Card ref={cardRef} className={`w-[500px] ${cn(className)}`}>
             <CardHeader className="h-[300px]">
                 <img
                     src={blog.attachments[0]?.link ?? 'https://fsilverman.com/wp-content/uploads/2021/07/iStock-494833184-gold-jewelry.jpg'}
@@ -83,7 +84,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
                 />
             </CardHeader>
             <CardContent >
-                <div className="h-36 overflow-hidden">
+                <div className={"h-36 overflow-hidden"}>
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                         {blog.title}
                     </h3>
@@ -101,7 +102,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
                             className="inline-flex items-center gap-2 font-medium text-primary hover:underline"
                         >
                         Read More
-                        <ArrowRightIcon className="w-4 h-4" />
+                        {/* <ArrowRightIcon className="w-4 h-4" /> */}
                         </Link>
                     </Button>
                     <div className="col-span-5 text-right">

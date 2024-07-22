@@ -17,6 +17,7 @@ import { showErrorToast } from '@/lib/handle-error';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 import { useAppDispatch } from '@/redux/hooks';
+import { Textarea } from '@/components/ui/textarea';
 
 const FormSchema = z.object({
   title: z.string().min(2, {
@@ -24,6 +25,11 @@ const FormSchema = z.object({
   }),
   startDate: z.string(),
   endDate: z.string(),
+  description: z.string({ message: 'description is required    ' }).min(10, {
+    message: 'description must be at least 10 characters long',
+  }).max(1000,{
+    message:'description cannot exceeed 1000 characters long'
+  }),
   files: z.any(),
 });
 
@@ -131,6 +137,20 @@ export default function AuctionSessionCreate() {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea placeholder="description of the session" {...field} />
+              </FormControl>
+              <FormDescription>This is the title of the auction session.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* This is the attachments for the auction session. */}
         <ScrollArea className="w-full h-64 overflow-hidden">

@@ -105,7 +105,7 @@ export function ItemList() {
           return 'Failed to load items';
         },
       });
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

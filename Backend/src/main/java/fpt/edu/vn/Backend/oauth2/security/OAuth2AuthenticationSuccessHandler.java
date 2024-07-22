@@ -82,7 +82,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         return UriComponentsBuilder.fromUriString(targetUrl)
 //                .path(loginMethod)
-
                 .queryParam("token", token)
                 .build().toUriString();
     }

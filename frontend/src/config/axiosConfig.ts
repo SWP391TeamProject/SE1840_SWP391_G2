@@ -2,7 +2,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import axios from 'axios';
 import { redirect, useNavigate } from 'react-router-dom';
-import { removeCookie } from '@/utils/cookies.ts';
+import { getCookie, removeCookie, setCookie } from '@/utils/cookies.ts';
 
 const instance = axios.create({
   // You can put your base URL here
@@ -12,6 +12,12 @@ const instance = axios.create({
 instance.interceptors.response.use(
   function (response) {
     // If the response was successful, just return it
+    const token = response.headers['Authorization'] || response.headers.authorization;
+    if (token && token !== getCookie('token')) {
+      console.log('Token updated');
+      // Ensure token is a string; if it can be null/undefined, handle appropriately
+      setCookie('token', token, 1);
+    }
     return response;
   },
   function (error) {

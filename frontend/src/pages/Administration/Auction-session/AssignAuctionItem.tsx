@@ -144,7 +144,7 @@ export default function AssignAuctionItem() {
             <ConfirmationButton
               message={`New selected items will be assigned to this auction session.`}
               title={'Are you sure to save selected items?'}
-              label={'Remove'}
+              label={'Save Selected'}
               description={''}
               onSuccess={() => handleSave()}
               variant="outline"
