@@ -286,8 +286,8 @@ export default function AuctionJoin() {
   return (
     <>
       {!isJoin ? (
-        <div className="grid p-5  items-center container ">
-          <div className="grid grid-cols-12 gap-4 h-full">
+        <div className="grid p-5  items-center container  ">
+          <div className="grid grid-cols-12 gap-4">
             <div className="  col-span-12 h-1/5  w-full grid ">
               <div className="grid grid-cols-12 gap-4 h-full">
                 <div className="col-span-6 md:col-span-6 w-full">

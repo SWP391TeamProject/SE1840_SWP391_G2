@@ -142,7 +142,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Scheduled(fixedRate = 30000 ,initialDelay = 0)
-    @Transactional
+    
     public void scheduleFixedRateTask() {
         for (AuctionSession session : auctionSessionRepos.findAll()) {
             if(session.getStatus().equals(AuctionSession.Status.FINISHED) ||

@@ -41,7 +41,7 @@ public class PaypalServiceImpl implements PaypalService {
     public PaypalServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
-    @Transactional
+    
     @Override
     public String getAccessToken() {
         String accessToken = (String) redisTemplate.opsForValue().get(PAYPAL_ACCESS_TOKEN_KEY);
@@ -81,7 +81,7 @@ public class PaypalServiceImpl implements PaypalService {
 
         return accessToken;
     }
-    @Transactional
+    
     @Override
     public String createOrder(PayPalPaymentRequestDTO dto) throws PaypalRequestException {
         JsonObject payload = new JsonObject();
@@ -131,7 +131,7 @@ public class PaypalServiceImpl implements PaypalService {
 
         return id;
     }
-    @Transactional
+    
     @Override
     public PaypalCaptureResponseDTO captureOrder(String orderId) {
         HttpHeaders headers = new HttpHeaders();

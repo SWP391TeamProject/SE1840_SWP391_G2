@@ -64,7 +64,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
                 .orElseThrow(() -> new ResourceNotFoundException("Consignment detail not found with id " + consignmentDetailId));
         return new ConsignmentDetailDTO(consignmentDetail);
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO createConsignmentDetail(ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
@@ -99,7 +99,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
         }
     }
 
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "consignmentDetail", allEntries = true)
     public ConsignmentDetailDTO updateConsignmentDetail(int consignmentDetailId, ConsignmentDetailRequestDTO consignmentRequestDetailDTO) {
@@ -131,7 +131,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
             return new ConsignmentDetailDTO(savedConsignmentDetail);
 
     }
-    @Transactional
+    
     public ConsignmentDetailDTO mapToDTO(ConsignmentDetail consignmentDetail) {
         List<AttachmentDTO> attachmentIds = null;
         if (consignmentDetail.getAttachments() != null) {

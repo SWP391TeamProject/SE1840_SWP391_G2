@@ -5,6 +5,10 @@ import axios from '@/config/axiosConfig.ts';
 import {Page} from "@/models/Page.ts";
 import {BlogCategory} from "@/models/newModel/blogCategory.ts";
 
+
+
+
+
 class BlogCategoryService {
   private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;
 

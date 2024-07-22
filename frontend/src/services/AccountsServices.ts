@@ -18,7 +18,7 @@ export const fetchAccountsService = async (input: GetAccountsSchema) => {
   const { page, size, sort, order, status, role, search } = input;
 
   const params: Record<string, any> = {
-    page: page - 1, // Spring Boot uses 0-based page index
+    page: page && page - 1, // Spring Boot uses 0-based page index
     size: size ? size : 10,
     sort: sort ? sort : 'accountId,desc',
     status: status ? status.toUpperCase() : undefined,

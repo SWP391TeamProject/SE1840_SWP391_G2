@@ -83,7 +83,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         );
     }
 
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
     //todo thís need to be migrated to new schema defintion no more detail
@@ -128,7 +128,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         }
     }
 
-    @Transactional
+    
     //todo: this need to be migrated to the new entity definition this one neeed a neww detail
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
@@ -167,7 +167,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         }
     }
 
-    @Transactional
+    
     //todo: this need to be migrated to the new entity definition
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
@@ -219,7 +219,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public void confirmJewelryReceived(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId)
@@ -238,7 +238,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public void approveFinalEvaluation(int consignmentId, int accountId, String description) {
         try {
             // Retrieve consignment by ID
@@ -277,7 +277,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public void rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason) {
         try {
             // Retrieve consignment by ID
@@ -314,7 +314,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public ConsignmentDTO custAcceptInitialEvaluation(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -333,7 +333,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public ConsignmentDTO custRejectInitialEvaluation(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -352,7 +352,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public ConsignmentDTO custAcceptFinaltialEvaluation(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -371,7 +371,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public ConsignmentDTO custRejectFinaltialEvaluation(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -391,7 +391,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    @Transactional
+    
     public void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
@@ -427,7 +427,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             throw new ConsignmentServiceException("Error updating consignment", e);
         }
     }
-    @Transactional
+    
     @Override
     public void updateConsignmentByStatus(UpdateConsignmentStatusRequestDTO consignmentDTO) {
         for (Integer consignmentId : consignmentDTO.getConsignmentId()) {
@@ -532,7 +532,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return getConsignmentDTOS(pageable, consignmentPage);
     }
 
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
     public ResponseEntity<ConsignmentDTO> deleteConsignment(int id) {
@@ -544,7 +544,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return null;
     }
 
-    @Transactional
+    
     //Todo: refactor this to be the first consignment detail of the consignment
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
@@ -562,7 +562,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             throw new ConsignmentServiceException("Consignment just available for staff");
         }
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
     public ConsignmentDTO receivedConsignment(int consignmentId) {

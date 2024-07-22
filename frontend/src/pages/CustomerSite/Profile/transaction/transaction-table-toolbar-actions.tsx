@@ -3,8 +3,9 @@ import {type Table} from '@tanstack/react-table';
 
 import {exportTableToCSV} from '@/lib/export';
 import {Button} from '@/components/ui/button';
-import {CircleDollarSign, ListFilter, PlusIcon, SearchIcon} from 'lucide-react';
+import {CalendarClock, ListFilter, PlusIcon, SearchIcon} from 'lucide-react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {Payment} from '@/models/payment';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -13,59 +14,50 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {getEnumValue, parseIntOrUndefined} from "@/lib/utils.ts";
-import {useEffect, useState} from "react";
-import {Input} from "@/components/ui/input.tsx";
-import {useForm} from "react-hook-form";
+import {PaymentStatus, PaymentType} from "@/constants/enums.tsx";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel
-} from "@/components/ui/form.tsx";
-import {Order} from "@/constants/interfaces.ts";
-import {ItemStatus} from "@/models/Item.ts";
-import {getAllItemCategories} from "@/services/ItemCategoryService.ts";
-import {showErrorToast} from "@/lib/handle-error.ts";
-import {ItemCategory} from "@/models/newModel/itemCategory.ts";
+  formatDateToISO,
+  getEnumValue,
+  parseDate,
+  parseIntOrUndefined
+} from "@/lib/utils.ts";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover.tsx";
+import {useEffect} from "react";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {useForm} from "react-hook-form";
+import {DateTimePicker} from "@/components/time-picker/date-time-picker.tsx";
+import {Form, FormField} from "@/components/ui/form.tsx";
 
-interface TasksTableToolbarActionsProps {
-  table: Table<Order>;
+interface TransactionsTableToolbarActionsProps {
+  table: Table<Payment>;
 }
 
 type FormData = {
-  minPrice?: number;
-  maxPrice?: number;
+  from?: Date;
+  to?: Date;
+  useFrom: boolean;
+  useTo: boolean;
   search?: string;
+  user?: number;
 };
 
-export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps) {
+export function TransactionsTableToolbarActions({table}: TransactionsTableToolbarActionsProps) {
   const nav = useNavigate();
-  const [categories, setCategories] = useState<ItemCategory[]>([]);
-  useEffect(() => {
-    getAllItemCategories(0, 50)
-      .then((res) => {
-        setCategories(res.data.content);
-      })
-      .catch((e) => {
-        console.error(e);
-        showErrorToast(e);
-      });
-  }, []);
-
   const [searchParams, setSearchParams] = useSearchParams();
-  const status = getEnumValue(ItemStatus, searchParams.get('status')) as ItemStatus;
-  const categoryId = searchParams.get('categoryId');
+  const type = getEnumValue(PaymentType, searchParams.get('type')) as PaymentType;
+  const status = getEnumValue(PaymentStatus, searchParams.get('status')) as PaymentStatus;
   const form = useForm<FormData>({
     defaultValues: {
-      minPrice: parseIntOrUndefined(searchParams.get('minPrice')),
-      maxPrice: parseIntOrUndefined(searchParams.get('maxPrice')),
+      useFrom: parseDate(searchParams.get('from')) !== undefined,
+      useTo: parseDate(searchParams.get('to')) !== undefined,
+      from: parseDate(searchParams.get('from')),
+      to: parseDate(searchParams.get('to')),
+      user: parseIntOrUndefined(searchParams.get('user')),
       search: searchParams.get('search'),
     },
   });
@@ -87,8 +79,8 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
 
   useEffect(() => {
     const handleFieldChange = () => {
-      setParam('minPrice', formValues.minPrice > 0 ? formValues.minPrice.toString() : undefined);
-      setParam('maxPrice', formValues.maxPrice > 0 ? formValues.maxPrice.toString() : undefined);
+      setParam('from', formValues.useFrom && formValues.from ? formatDateToISO(formValues.from) : undefined);
+      setParam('to', formValues.useTo && formValues.to ? formatDateToISO(formValues.to) : undefined);
       setParam('search', formValues.search);
     };
     handleFieldChange();
@@ -113,7 +105,7 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
                 checked={status === undefined}
                 onClick={() => setParam('status', undefined)}
               >All</DropdownMenuCheckboxItem>
-              {Object.keys(ItemStatus).map((s) => (
+              {Object.keys(PaymentStatus).map((s) => (
                 <DropdownMenuCheckboxItem
                   checked={status === s}
                   onClick={() => setParam('status', s)}
@@ -126,61 +118,65 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
               <Button variant="outline" size="sm">
                 <ListFilter className="mr-2 size-4"/>
                 <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Category</span>
+                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Type</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuLabel>Category</DropdownMenuLabel>
+              <DropdownMenuLabel>Type</DropdownMenuLabel>
               <DropdownMenuSeparator/>
               <DropdownMenuCheckboxItem
-                checked={categoryId === undefined}
-                onClick={() => setParam('categoryId', undefined)}
+                className="w-9/12"
+                checked={type === undefined}
+                onClick={() => setParam('type', undefined)}
               >All</DropdownMenuCheckboxItem>
-              {categories.map((ctg) => (
-                <DropdownMenuCheckboxItem
-                  checked={categoryId === ctg.itemCategoryId.toString()}
-                  onClick={() => setParam('categoryId', ctg.itemCategoryId)}
-                >{ctg.name}</DropdownMenuCheckboxItem>
+              {Object.keys(PaymentType).map((t) => (
+                <div className="flex m-1 items-center justify-between" key={t}>
+                  <DropdownMenuCheckboxItem
+                    className="w-9/12"
+                    checked={type === t}
+                    onClick={() => setParam('type', t)}
+                  >{t}</DropdownMenuCheckboxItem>
+                </div>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm">
-                <CircleDollarSign className="mr-2 size-4"/>
+                <CalendarClock className="mr-2 size-4"/>
                 <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Reserve Price</span>
+                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Date</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent>
               <div className="space-y-2">
-                <h4 className="font-medium leading-none">Price Range</h4>
+                <h4 className="font-medium leading-none">Date Range</h4>
               </div>
               <div className="flex flex-col gap-2 mt-3">
-                <FormField
-                  control={form.control}
-                  name="minPrice"
-                  render={({field}) => (
-                    <FormItem className="flex justify-center items-center gap-2">
-                      <FormLabel>Min</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} className="h-9 focus-visible:[box-shadow:none]" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="maxPrice"
-                  render={({field}) => (
-                    <FormItem className="flex justify-center items-center gap-2">
-                      <FormLabel>Max</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} className="h-9 focus-visible:[box-shadow:none]" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                <div className="flex justify-center items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="useFrom"
+                    render={({field}) => (
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}/>
+                    )}
+                  />
+                  <DateTimePicker {...form.register("from")} />
+                </div>
+                <div className="flex justify-center items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="useTo"
+                    render={({field}) => (
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}/>
+                    )}
+                  />
+                  <DateTimePicker {...form.register("to")} />
+                </div>
               </div>
             </PopoverContent>
           </Popover>
@@ -211,10 +207,6 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
         >
           <DownloadIcon className="mr-2 size-4" aria-hidden="true"/>
           Export
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => nav('create')}>
-          <PlusIcon className="mr-2 size-4" aria-hidden="true" />
-          Create
         </Button>
       </div>
     </div>

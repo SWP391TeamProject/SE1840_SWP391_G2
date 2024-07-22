@@ -22,7 +22,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     @Autowired
     private ItemCategoryRepos itemCategoryRepos;
 
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "itemCategory",allEntries = true)
     public ItemCategoryDTO createItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
@@ -36,7 +36,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         ItemCategory savedItemCategory = itemCategoryRepos.save(itemCategory);
         return new ItemCategoryDTO(savedItemCategory);
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(value = "itemCategory",allEntries = true)
     public ItemCategoryDTO updateItemCategory(ItemCategoryRequestDTO itemCategoryRequestDTO) {
@@ -53,7 +53,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
             throw new ResourceNotFoundException("ItemCategory not found with id " + itemCategoryRequestDTO.getItemCategoryId());
         }
     }
-    @Transactional
+    
     @Override
     //@CacheEvict(key = "#id", value = "itemCategory")
     public ResponseEntity<ItemCategoryDTO> deleteItemCategory(int id) {

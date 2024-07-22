@@ -55,13 +55,20 @@ public class ItemController {
 
 
     @GetMapping("/")
-    public Page<ItemDTO> getItems( @PageableDefault Pageable pageable,
-                                  @RequestParam(required = false) Integer minPrice,
-                                   @RequestParam(required = false) Integer maxPrice,
-                                   @RequestParam(required = false) Item.Status status,
-                                   @RequestParam(required = false) Integer categoryId,
-                                   @RequestParam(required = false) String search
+    public Page<ItemDTO> getItems(
+            Principal principal,
+            @PageableDefault Pageable pageable,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Item.Status status,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) String search
     ) {
+        JwtUser jwtUser = Authorizer.getUser(principal);
+        if (jwtUser == null || !Authorizer.MANAGER.contains(jwtUser.getRole())) {
+            if (status == Item.Status.REMOVED)
+                status = null;
+        }
         return itemService.getItems(pageable, minPrice, maxPrice, status, categoryId, search);
     }
 

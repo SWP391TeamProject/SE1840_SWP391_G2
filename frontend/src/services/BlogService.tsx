@@ -20,10 +20,10 @@ class BlogService {
     let response;
 
     let params: Record<string, any> = {
-      page: page - 1, // Spring Boot uses 0-based page index
+      page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort: sort ? sort : 'postId,desc',
-      categoryId,
+      categoryId: categoryId?? '',
       search
     };
 

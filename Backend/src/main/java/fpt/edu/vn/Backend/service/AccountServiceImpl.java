@@ -59,7 +59,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public @NotNull AccountDTO mapEntityToDTO(@NotNull Account account, @NotNull AccountDTO accountDTO) {
         accountDTO.setAccountId(account.getAccountId());
         accountDTO.setNickname(account.getNickname());
@@ -82,7 +81,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public @NotNull Account mapDTOToEntity(@NotNull AccountDTO accountDTO, @NotNull Account account, @NotNull Account.Role editorRole) {
         // avatar dùng method riêng
         account.setAccountId(accountDTO.getAccountId());
@@ -126,7 +124,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public @NotNull AccountDTO createAccount(@NotNull AccountDTO account) {
         if(accountRepos.findByEmail(account.getEmail()).isPresent())
             throw new InvalidInputException("Email already exists");
@@ -152,7 +149,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public @NotNull AccountDTO updateAccount(@NotNull AccountDTO account, @NotNull Account.Role editorRole) {
         Preconditions.checkNotNull(account.getAccountId(), "Account is not identifiable");
         if (account.getNickname() != null) {
@@ -173,7 +169,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public @NotNull AttachmentDTO setAvatar(int accountId, @NotNull MultipartFile file) {
         try {
             return attachmentServiceImpl.uploadAccountAttachment(file, accountId);
@@ -183,7 +178,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public void change2fa(int id, @NotNull TwoFactorAuthChangeDTO dto) throws IllegalAccessException {
         Account a = accountRepos.findByAccountId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "accountId", id));
