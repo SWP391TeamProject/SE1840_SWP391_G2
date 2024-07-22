@@ -33,6 +33,8 @@ import Confetti from 'react-confetti-boom';
 import { BidReply } from '@/models/bidReply';
 import { formatDate } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import ResultDialog from './result-dialog';
+import { it } from 'node:test';
 
 export default function AuctionJoin() {
   const currency = useCurrency();
@@ -43,11 +45,12 @@ export default function AuctionJoin() {
   const [price, setPrice] = useState<String | null>(null);
   const auth = useAuth();
 
-  const [itemDTO, setItemDTO] = useState<Item | undefined>(location.state.itemDTO);
   console.log(location.state);
   const [bids, setBids] = useState<BidReply[]>([]);
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
+  const [itemDTO, setItemDTO] = useState<Item | undefined>(location?.state?.itemDTO || auctionSession?.auctionItems[0].itemDTO);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isSending, setIsSending] = useState(false);
@@ -57,73 +60,131 @@ export default function AuctionJoin() {
   const nav = useNavigate();
   const params = useParams();
   const auctionId: number = Number(params.id);
-
+  const [ping, setPing] = useState([]);
+  const [winningBids, setWinningBids] = useState<BidReply[]>([]);
+  let timeout;
+  const [openWinningDialog, setOpenWinningDialog] = useState(false);
   // const auctionId = auctionSession.auctionSessionId;
   // const itemId = location.state.id.itemId;
 
   const [allow, setAllow] = useState<boolean | undefined>(false);
+  useEffect(() => {
+    if (winningBids.length > 0) {
+      setOpenWinningDialog(true);
+    }
 
+  }, [winningBids]);
   useEffect(() => {
     if (!auctionSession) {
       fetchAuctionSessionById(auctionId)
-        .then((res) => {
-          dispatch(setCurrentAuctionSession(res));
-          console.log(res);
-          setItemDTO(res?.auctionItems[0].itemDTO);
+        .then((response) => {
+          dispatch(setCurrentAuctionSession(response));
+          console.log(response);
+          setItemDTO(response?.auctionItems[0].itemDTO);
           setAllow(auctionSession?.hasDeposited);
+          if (response.status === AuctionSessionStatus.FINISHED) {
+            setShowCofetti(true);
+            setTimeout(() => {
+              setShowCofetti(false);
+            }, 3000);
+          }
+          if (response.status !== AuctionSessionStatus.SCHEDULED) {
+            fetchBidsByAuctionId(auctionId)
+              .then((res) => {
+                console.log(res);
+                setBids(res);
+                bids.sort((a, b) => {
+                  return a.price - b.price;
+                });
+
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
         })
         .catch((err) => {
           console.error(err);
         });
 
-      fetchBidsByAuctionId(auctionId)
-        .then((res) => {
-          console.log(res);
-          setBids(res);
-          bids.sort((a, b) => {
-            return a.price - b.price;
+
+    } else {
+      setAllow(auctionSession?.hasDeposited);
+      setItemDTO(auctionSession?.auctionItems[0].itemDTO);
+      if (auctionSession.status === AuctionSessionStatus.FINISHED) {
+        setShowCofetti(true);
+        setTimeout(() => {
+          setShowCofetti(false);
+        }, 3000);
+      }
+      if (auctionSession.status !== AuctionSessionStatus.SCHEDULED) {
+        fetchBidsByAuctionId(auctionId)
+          .then((res) => {
+            console.log(res);
+            setBids(res);
+            bids.sort((a, b) => {
+              return a.price - b.price;
+            });
+
+          })
+          .catch((err) => {
+            console.log(err);
           });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      }
+
     }
   }, []);
+  useEffect(() => {
+    if (bids.length > 0 && new Date(auctionSession?.endDate) <= new Date()) {
+      for (const item of auctionSession.auctionItems) {
+        for (const element of bids) {
+          if (item?.itemDTO?.itemId === element?.auctionItemId?.itemId) {
+            console.log(element, true);
+            setWinningBids((prev) => [...prev, element]);
+            break;
+          }
+        }
+      }
+    }
+  }, [bids]);
   useEffect(() => {
     console.log('isallow', allow);
     // console.log("calling", auctionSession);
     setAllow(auctionSession?.hasDeposited);
   }, [allow]);
 
-  useEffect(() => {
-    if (!auctionSession) {
-      fetchAuctionSessionById(auctionId)
-        .then((res) => {
-          dispatch(setCurrentAuctionSession(res));
-          setItemDTO(res?.auctionItems[0].itemDTO);
-          setAllow(res?.hasDeposited);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-      fetchBidsByAuctionId(auctionId)
-        .then((res) => {
-          console.log(res);
-          setBids(res);
-          bids.sort((a, b) => {
-            return a.price - b.price;
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    console.log(allow);
-  }, [auctionSession]);
+  // useEffect(() => {
+  //   if (!auctionSession) {
+  //     fetchAuctionSessionById(auctionId)
+  //       .then((res) => {
+  //         dispatch(setCurrentAuctionSession(res));
+  //         setItemDTO(res?.auctionItems[0].itemDTO);
+  //         setAllow(res?.hasDeposited);
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //       });
+  //     fetchBidsByAuctionId(auctionId)
+  //       .then((res) => {
+  //         console.log(res);
+  //         setBids(res);
+  //         bids.sort((a, b) => {
+  //           return a.price - b.price;
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  //   console.log(allow);
+  // }, [auctionSession]);
 
   useEffect(() => {
     if (auctionSession?.status === AuctionSessionStatus.FINISHED) {
       setShowCofetti(true);
+      setTimeout(() => {
+        setShowCofetti(false);
+      }, 3000);
     }
   }, [auctionSession]);
 
@@ -147,45 +208,50 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    const newClient = new Client({
-      brokerURL:
-        `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
-      onConnect: () => {
-        newClient.subscribe('/topic/public/' + auctionId, onMessageReceived);
-        setTimeout(() => {
-          newClient.publish({
-            destination: '/app/chat.addUser/' + auctionId + '/' + itemDTO?.itemId,
-            body: JSON.stringify({
-              auctionItemId: {
-                auctionSessionId: auctionSession?.auctionSessionId,
-                itemId: itemDTO?.itemId,
-              },
-              payment: {
-                accountId: JSON.parse(getCookie('user')).id,
-              },
-            }),
-          });
-          setIsJoin(false);
-        }, 10);
-      },
-      onDisconnect: () => {
-        console.log('Disconnected');
-        clearTimeout(timer);
-      },
-      onStompError: (error) => {
-        console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
-      },
-    });
-    newClient.activate();
+    if (auctionSession && auctionSession.status === AuctionSessionStatus.PROGRESSING && auctionSession.hasDeposited) {
 
-    setClient(newClient);
+      const newClient = new Client({
+        brokerURL:
+          `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
+        onConnect: () => {
+          newClient.subscribe('/topic/public/' + auctionId, onMessageReceived);
+          setTimeout(() => {
+            newClient.publish({
+              destination: '/app/chat.addUser/' + auctionId + '/' + itemDTO?.itemId,
+              body: JSON.stringify({
+                auctionItemId: {
+                  auctionSessionId: auctionSession?.auctionSessionId,
+                  itemId: itemDTO?.itemId,
+                },
+                payment: {
+                  accountId: JSON.parse(getCookie('user')).id,
+                },
+              }),
+            });
+            setIsJoin(false);
+          }, 10);
+        },
+        onDisconnect: () => {
+          console.log('Disconnected');
+          clearTimeout(timer);
+        },
+        onStompError: (error) => {
+          console.error('Could not connect to WebSocket server. Please refresh this page to try again!', error);
+        },
+      });
+      newClient.activate();
 
-    return () => {
-      if (newClient.connected) {
-        newClient.deactivate();
-        newClient.unsubscribe('/topic/public/' + auctionId);
-      }
-    };
+      setClient(newClient);
+
+      return () => {
+        if (newClient.connected) {
+          newClient.deactivate();
+          newClient.unsubscribe('/topic/public/' + auctionId);
+        }
+      };
+    } else {
+      setIsJoin(false);
+    }
   }, []);
 
   const onMessageReceived = (payload: IMessage) => {
@@ -211,7 +277,11 @@ export default function AuctionJoin() {
     const message = JSON.parse(payload.body).body;
     console.log(message);
     if (message?.status == 'JOIN' || message?.status == 'BID') {
-      if (message?.status == 'BID') toast.info(message?.message, {});
+      if (message?.status == 'BID')
+        toast.info(message?.message, {
+          action: <Button variant='outline' onClick={() => handleViewItemDetailsClick(message?.auctionItemId)} >View</Button>
+        }
+        );
       setIsSending(false);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
@@ -242,17 +312,33 @@ export default function AuctionJoin() {
   };
 
   useEffect(() => {
-    fetchBidsByAuctionId(auctionId)
-      .then((res) => {
-        console.log(res);
-        setBids(res);
-        bids.sort((a, b) => {
-          return a.price - b.price;
+    if (auctionSession?.status !== AuctionSessionStatus.SCHEDULED) {
+      fetchBidsByAuctionId(auctionId)
+        .then((res) => {
+          console.log(res);
+          setBids(res);
+          if (res.length > 0) {
+            setPing((prev) => [...prev, res?.sort((a, b) => - new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]?.auctionItemId?.itemId]);
+          }
+          console.log(res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]?.auctionItemId?.itemId);
+          bids.sort((a, b) => {
+            return a.price - b.price;
+          });
+
+
+          timeout = setTimeout(() => {
+            setPing((prev) => [...prev.filter((item) => item !== res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]?.auctionItemId?.itemId)]);
+          }, 2000);
+
+          return () => {
+            clearTimeout(timeout);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    }
+
   }, [price]);
 
   const handleViewItemDetailsClick = async (item: AuctionItem) => {
@@ -260,6 +346,12 @@ export default function AuctionJoin() {
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
     if (itemDTO?.itemId !== item.itemDTO.itemId) {
       setItemDTO(item.itemDTO);
+      if (auctionSession.status === AuctionSessionStatus.FINISHED) {
+        setShowCofetti(true);
+        setTimeout(() => {
+          setShowCofetti(false);
+        }, 3000);
+      }
       window.scrollTo({
         top: 0,
         left: 0,
@@ -344,7 +436,7 @@ export default function AuctionJoin() {
                     </div>
                   )}
 
-                  {allow == true && (
+                  {auctionSession?.hasDeposited && auctionSession.status === AuctionSessionStatus.PROGRESSING && (
                     <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
                       <BidsInformation
                         auctionSession={auctionSession}
@@ -379,12 +471,15 @@ export default function AuctionJoin() {
                 <CarouselContent className="-mt-1 w-full">
                   {auctionSession?.auctionItems.map((item) => (
                     <CarouselItem key={item.itemDTO.itemId} className="  md:basis-1/4">
+
                       <div
                         onClick={() => handleViewItemDetailsClick(item)}
-                        className="hover:cursor-pointer border w-1/2 rounded-2xl mx-auto"
+                        className="hover:cursor-pointer border w-1/2 rounded-2xl mx-auto mt-10"
                       >
+                        {ping?.filter((p) => p === item.itemDTO.itemId).length > 0 && <div className="w-4 h-4 rounded-full bg-red-500 animate-ping absolute z-50 " />}
+
                         <img
-                          src={item.itemDTO.attachments[0]?.link}
+                          src={item.itemDTO.attachments[0]?.link || 'https://placehold.co/400'}
                           alt=""
                           className="aspect-square h-30  object-cover rounded-2xl"
                         />
@@ -406,22 +501,28 @@ export default function AuctionJoin() {
       ) : (
         <LoadingAnimation />
       )}
-      {showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] && (
-        <div className="fixed z-10 bg-red-200/15 w-full h-full">
-          <Confetti mode="fall" colors={['#ff577f', '#ff884b']} />
-          <Card className="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <CardHeader>
-              <CardTitle>Congratulations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.nickname} won the auction
-              <p className="text-foreground font-semibold">
-                {currency.format(bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price)}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]
+        && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId !== auth.user.accountId && (
+          <div className="fixed top-0 z-10 bg-red-200/15 w-full h-full">
+            <Confetti mode="fall" colors={['#ff577f', '#ff884b']} />
+            <Card className="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <CardHeader>
+                <CardTitle>Congratulations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.nickname} won this item
+                <p className="text-foreground font-semibold">
+                  {currency.format(bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price)}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      {winningBids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId === auth.user.accountId &&
+        <ResultDialog open={openWinningDialog} onOpenChange={setOpenWinningDialog} message='Congratulations' title=' Congratulations' items={auctionSession?.auctionItems.filter((item) => winningBids?.filter((bid) => bid.auctionItemId.itemId === item.itemDTO.itemId)[0]?.account.accountId === auth.user.accountId)} />
+      }
+
+
     </>
   );
 }
