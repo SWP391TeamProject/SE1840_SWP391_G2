@@ -22,7 +22,7 @@ import AuthenticationLayout from './layout/AuthenticationLayout/AuthenticationLa
 import RegisterForm from './pages/authentication/RegisterForm.tsx';
 import LoginForm from './pages/authentication/LoginForm.tsx';
 import ConsignmentList from './pages/Administration/consignments/ConsignmentList.tsx';
-import ConsignmentDetail from './pages/Administration/consignments/ConsignmentDetail.tsx';
+import ConsignmentView from './pages/Administration/consignments/ConsignmentView.tsx';
 import ItemsList from './pages/Administration/item/ItemsList.tsx';
 import ProfileLayout from './pages/CustomerSite/Profile/Profile.tsx';
 import ProfilePreferences from './pages/CustomerSite/Profile/ProfilePreferences.tsx';
@@ -43,7 +43,7 @@ import CustomerDashBoard from './layout/CustomerSite/CustomerDashBoard.tsx';
 import { ErrorPage } from './components/component/error-page.tsx';
 import AuctionJoin from './pages/CustomerSite/Auctions/AuctionJoin.tsx';
 import CustomerDashboard from './pages/CustomerSite/dashboard/CustomerDashboard.tsx';
-import CustomerConsignmentList from './pages/CustomerSite/dashboard/CustomerConsignmentList.tsx';
+import CustomerConsignmentList from '@/pages/CustomerSite/dashboard/consignment/CustomerConsignmentList.tsx';
 import { Bids } from './pages/CustomerSite/dashboard/bids/Bids.tsx';
 import NotificationsList from '@/pages/CustomerSite/Profile/Notification.tsx';
 import ItemCreate from './pages/Administration/item/ItemCreate.tsx';
@@ -65,7 +65,7 @@ import { BlogDetail } from './pages/CustomerSite/Blog/BlogDetail.tsx';
 import TwoFactorAuthForm from '@/pages/authentication/TwoFactorAuthForm.tsx';
 import { ItemList } from './pages/CustomerSite/Item/ItemList.tsx';
 import { CurrencyProvider } from '@/CurrencyProvider.tsx';
-import CustomerConsignmentDetail from './pages/CustomerSite/dashboard/CustomerConsignmentDetail.tsx';
+import CustomerConsignmentDetail from '@/pages/CustomerSite/dashboard/consignment/CustomerConsignmentDetail.tsx';
 import BlogEdit from './pages/Administration/Blog/BlogPostEdit/BlogEdit.tsx';
 import StripePayment from './StripePayment.tsx';
 import PaymentsList from './pages/Administration/payment/PaymentsList.tsx';
@@ -189,6 +189,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                           <Route path="account" element={<Navigate to="/admin/accounts" replace />} />
                           <Route path="accounts/:id" element={<AccountEdit />}></Route>
                           <Route path="accounts/create" element={<AccountCreate />}></Route>
+                        </Route>
+                        <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]} />}>
                           <Route path="account/:id" element={<AccountDetail />}></Route>
                         </Route>
                         <Route element={<PrivateRoute allowedRoles={[Roles.ADMIN, Roles.STAFF, Roles.MANAGER]} />}>
@@ -205,7 +207,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         </Route>
                         <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />}>
                           <Route path="consignments" element={<ConsignmentList />}></Route>
-                          <Route path="consignments/:id" element={<ConsignmentDetail />}></Route>
+                          <Route path="consignments/:id" element={<ConsignmentView />}></Route>
                           {/* <Route path="consignments/:id/sendEvaluation" element={<SendEvaluationForm />}></Route> */}
                           {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
                         </Route>

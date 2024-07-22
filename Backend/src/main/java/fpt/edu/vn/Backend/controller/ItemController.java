@@ -142,8 +142,7 @@ public class ItemController {
             ConsignmentDTO consignmentDTO = consignmentService.getConsignmentById(itemDTO.getConsignmentId());
             BigDecimal reservePrice = consignmentDTO.getConsignmentDetails().stream()
                     .filter(
-                            consignmentDetailDTO -> consignmentDetailDTO.getStatus()
-                                    .equalsIgnoreCase(String.valueOf(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED))
+                            dto -> dto.getType() == ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED
                     ).findFirst().map(ConsignmentDetailDTO::getPrice).orElse(null);
             if (reservePrice == null) {
                 throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");

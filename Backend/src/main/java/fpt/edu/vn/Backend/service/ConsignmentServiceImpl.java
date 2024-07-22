@@ -238,10 +238,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    
-    public void approveFinalEvaluation(int consignmentId, int accountId, String description) {
+    public ConsignmentDTO approveFinalEvaluation(int consignmentId, int accountId, String description) {
         try {
-            // Retrieve consignment by ID
             Consignment consignment = consignmentRepos.findById(consignmentId).orElse(null);
             if (consignment == null) {
                 throw new ConsignmentServiceException("Consignment not found");
@@ -250,20 +248,19 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             if (!account.getRole().equals(Account.Role.MANAGER)) {
                 throw new ConsignmentServiceException("Account is not manager");
             }
-            // Check if the consignment is in final evaluation status
             if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION)
                     && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION))) {
 
-                // Create and set consignment detail
-                ConsignmentDetail consignmentDetail = consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId).get(
-                        consignmentDetailRepos.findDistinctByConsignment_ConsignmentId(consignmentId).toArray().length - 1
-                );
-                consignment.setStatus(Consignment.Status.WAITING_SELLER); // Set status consignment when completed
+                ConsignmentDetail consignmentDetail = new ConsignmentDetail();
+                consignmentDetail.setAccount(account);
+                consignmentDetail.setConsignment(consignment);
+                consignmentDetail.setPrice(null);
+                consignmentDetail.setDescription(null);
                 consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED);
                 consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
                 consignment.getConsignmentDetails().add(consignmentDetail);
-
-                consignmentRepos.save(consignment);
+                consignment.setStatus(Consignment.Status.WAITING_SELLER);
+                return new ConsignmentDTO(consignmentRepos.save(consignment));
             } else {
                 throw new ConsignmentServiceException("Consignment is not in final evaluation status");
             }
@@ -277,8 +274,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    
-    public void rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason) {
+    public ConsignmentDTO rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason) {
         try {
             // Retrieve consignment by ID
             Consignment consignment = consignmentRepos.findById(consignmentId).orElse(null);
@@ -289,7 +285,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             if (!account.getRole().equals(Account.Role.MANAGER)) {
                 throw new ConsignmentServiceException("Account is not manager");
             }
-            // Check if the consignment is in final evaluation status
             if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId) {
                 // Create and set consignment detail
                 ConsignmentDetail consignmentDetail = new ConsignmentDetail();
@@ -301,7 +296,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                 consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
                 consignment.getConsignmentDetails().add(consignmentDetail);
 
-                consignmentRepos.save(consignment);
+                return new ConsignmentDTO(consignmentRepos.save(consignment));
             } else {
                 throw new ConsignmentServiceException("Consignment is not in final evaluation status");
             }
@@ -511,7 +506,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             consignmentDetailDTOs.add(ConsignmentDetailDTO.builder()
                     .consignmentDetailId(detail.getConsignmentDetailId())
                     .description(detail.getDescription())
-                    .status(detail.getType().toString())
+                    .type(detail.getType())
                     .price(detail.getPrice())
                     .consignmentId(detail.getConsignment().getConsignmentId())
                     .account(AccountDTO.redacted(detail.getAccount()))

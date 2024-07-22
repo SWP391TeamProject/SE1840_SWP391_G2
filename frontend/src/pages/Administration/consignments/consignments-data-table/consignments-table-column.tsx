@@ -75,12 +75,6 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
               Waiting for Staff
             </Badge>
           );
-        case ConsignmentStatus.FINISHED:
-          return (
-            <Badge variant="default" className="bg-green-500 w-[150px] text-center flex justify-center items-center">
-              Finished
-            </Badge>
-          );
         case ConsignmentStatus.IN_INITIAL_EVALUATION:
           return (
             <Badge variant="default" className="bg-blue-500 w-[150px] text-center flex justify-center items-center">

@@ -74,22 +74,6 @@ public class ConsignmentExporter {
             int columnCount = 0;
 
             createCell(row, columnCount++, consignment.getConsignmentId(), style);
-            createCell(row, columnCount++, consignment.getConsignmentDetails().stream().filter(
-                    consignmentDetailDTO -> consignmentDetailDTO.getStatus().equals("REQUEST"))
-                    .findFirst().orElseThrow(()->new ResourceNotFoundException("No Consignment Detail type Request"))
-                    .getDescription(), style);
-            createCell(row, columnCount++, consignment.getConsignmentDetails().stream().filter(
-                            consignmentDetailDTO -> consignmentDetailDTO.getStatus().equals("REQUEST"))
-                    .findFirst().orElseThrow(()->new ResourceNotFoundException("No Consignment Detail type Request"))
-                    .getAccount().getNickname(), style);
-            createCell(row, columnCount++, consignment.getConsignmentDetails().stream().filter(
-                            consignmentDetailDTO -> consignmentDetailDTO.getStatus().equals("REQUEST"))
-                    .findFirst().orElseThrow(()->new ResourceNotFoundException("No Consignment Detail type Request"))
-                    .getAccount().getPhone(), style);
-            createCell(row, columnCount++, consignment.getConsignmentDetails().stream().filter(
-                            consignmentDetailDTO -> consignmentDetailDTO.getStatus().equals("REQUEST"))
-                    .findFirst().orElseThrow(()->new ResourceNotFoundException("No Consignment Detail type Request"))
-                    .getAccount().getEmail(), style);
             createCell(row, columnCount++, consignment.getPreferContact(), style);
             createCell(row, columnCount++, consignment.getUser().getNickname()+"-"+consignment.getUser().getAccountId(), style);
             createCell(row, columnCount++, consignment.getStatus(), style);

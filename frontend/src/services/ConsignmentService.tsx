@@ -137,20 +137,12 @@ export const fetchConsignmentsByStatusService = async (
 
 export const fetchConsignmentByConsignmentId = async (id: number) => {
   return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
+    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
       headers: {
         'Content-Type': 'application/json',
 
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .then((res) => {
-      console.log(res.data);
-      return res;
-    }) // return the data here
-    .catch((err) => {
-      console.log(err);
-      throw err; // make sure to throw the error so it can be caught by the query
     });
 };
 
@@ -188,33 +180,30 @@ export const deleteConsignmentService = async (id: string) => {
 };
 
 //staff
-export const takeConsignment = async (id: string) => {
+export const takeConsignment = async (id: number) => {
   const data = JSON.parse(getCookie('user'))?.id;
 
   return await axios
-    .put(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data, {
+    .put<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data, {
       headers: {
         'Content-Type': 'application/json',
-
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .catch((err) => toast.error(err.response.data.message + ': you are not allow to take this consignment', {}));
+    });
 };
-export const receivedConsignment = async (id: string) => {
+export const receivedConsignment = async (id: number) => {
   return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/consignments/received/${id}`, {
+    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/received/${id}`, {
       headers: {
         'Content-Type': 'application/json',
 
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .catch((err) => toast.error(err.response.data.message + ': you are not allow to take this consignment', {}));
+    });
 };
 
 //manager
-export const rejectEvaluation = async (id: string, accountId: number, reason: any) => {
+export const rejectStaffEvaluation = async (id: number, accountId: number, reason: any) => {
   console.log({ accountId: accountId, reason: reason });
   return await axios
     .post(
@@ -223,15 +212,13 @@ export const rejectEvaluation = async (id: string, accountId: number, reason: an
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-
           Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
         },
       }
-    )
-    .catch((err) => toast.error(err.response.data.message, {}));
+    );
 };
-export const acceptEvaluation = async (id: string, accountId: number) => {
-  console.log({ accountId: accountId });
+
+export const acceptStaffEvaluation = async (id: number, accountId: number) => {
   return await axios
     .post(
       `${SERVER_DOMAIN_URL}/api/consignments/approve/${id}`,
@@ -243,8 +230,7 @@ export const acceptEvaluation = async (id: string, accountId: number) => {
           Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
         },
       }
-    )
-    .catch((err) => toast.error(err.response.data.message, {}));
+    );
 };
 
 //customer

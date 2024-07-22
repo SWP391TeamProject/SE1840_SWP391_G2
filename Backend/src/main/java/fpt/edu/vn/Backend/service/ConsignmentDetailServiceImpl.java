@@ -143,7 +143,7 @@ public class ConsignmentDetailServiceImpl implements ConsignmentDetailService {
         return new ConsignmentDetailDTO(
                 consignmentDetail.getConsignmentDetailId(),
                 consignmentDetail.getDescription(),
-                consignmentDetail.getType().toString(), // Convert enum to string
+                consignmentDetail.getType(),
                 consignmentDetail.getPrice(),
                 consignmentDetail.getConsignment().getConsignmentId(),
                 AccountDTO.redacted(consignmentDetail.getAccount()),
