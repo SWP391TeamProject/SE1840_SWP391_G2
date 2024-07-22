@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import {
   Bell,
   PanelLeft,
-  Search,
   AreaChartIcon,
   FolderClosed,
   User2,
@@ -24,7 +23,6 @@ import {
 } from '@/components/ui/breadcrumb';
 
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Input } from '@/components/ui/input';
 import { useLocation } from 'react-router-dom';
 import ProfileDropdownMenu from '@/components/NavBar/ProfileDropdownMenu.tsx';
 import logo from '@/assets/icon.png';
@@ -68,16 +66,6 @@ export default function Administration() {
     console.log(breadcrumbs);
   }, [location]);
 
-  const handleSearch = (e) => {
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set('search', e.currentTarget.value);
-    const newSearch = searchParams.toString();
-    const newUrl = `${window.location.pathname}?${newSearch}`;
-    window.history.replaceState({ path: newUrl }, '', newUrl);
-    nav(newUrl);
-    console.log('New URL:', newUrl); // Debugging the new URL
-  };
-
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] bg-background text-foreground">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -104,7 +92,7 @@ export default function Administration() {
                 Dashboard
               </Link>
 
-              {auth.user.role === 'ADMIN' && (
+              {auth.user.role === Roles.ADMIN && (
                 <Link
                   to="accounts?page=1"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -113,7 +101,17 @@ export default function Administration() {
                   Manage Accounts
                 </Link>
               )}
-              {(auth.user.role === 'ADMIN' || auth.user.role === 'MANAGER' || auth.user.role === 'STAFF') && (
+
+              {auth.user.role !== Roles.ADMIN && (
+                <Link
+                  to="customers?page=1"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                >
+                  <User2 />
+                  View Customers
+                </Link>
+              )}
+              {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER || auth.user.role === Roles.STAFF) && (
                 <Link
                   to="consignments"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -122,7 +120,7 @@ export default function Administration() {
                   Manage Consignments
                 </Link>
               )}
-              {(auth.user.role === 'ADMIN' || auth.user.role === 'MANAGER') && (
+              {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                 <Link
                   to="auction-sessions"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -131,7 +129,7 @@ export default function Administration() {
                   Manage Auction Session
                 </Link>
               )}
-              {(auth.user.role === 'ADMIN' || auth.user.role === 'MANAGER') && (
+              {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                 <Link
                   to="items"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -147,7 +145,7 @@ export default function Administration() {
                 <Newspaper />
                 Manage Blogs
               </Link>
-              {(auth.user.role === 'ADMIN' || auth.user.role === 'MANAGER') && (
+              {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                 <Link
                   to="orders"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -156,7 +154,7 @@ export default function Administration() {
                   Manage Orders
                 </Link>
               )}
-              {(auth.user.role === 'ADMIN' || auth.user.role === 'MANAGER') && (
+              {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                 <Link
                   to="payments"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -195,34 +193,52 @@ export default function Administration() {
                     Dashboard
                   </Link>
 
-                  <Link
-                    to="accounts"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                  >
-                    <User2 />
-                    Manage Accounts
-                  </Link>
-                  <Link
-                    to="consignments"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                  >
-                    <FolderClosed />
-                    Manage Consignments
-                  </Link>
-                  <Link
-                    to="auction-sessions"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                  >
-                    <AreaChartIcon />
-                    Manage Auction Session
-                  </Link>
-                  <Link
-                    to="items"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                  >
-                    <ShoppingBag />
-                    Manage Items
-                  </Link>
+                  {auth.user.role === Roles.ADMIN && (
+                    <Link
+                      to="accounts?page=1"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <User2 />
+                      Manage Accounts
+                    </Link>
+                  )}
+
+                  {auth.user.role !== Roles.ADMIN && (
+                    <Link
+                      to="customers?page=1"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <User2 />
+                      View Customers
+                    </Link>
+                  )}
+                  {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER || auth.user.role === Roles.STAFF) && (
+                    <Link
+                      to="consignments"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <FolderClosed />
+                      Manage Consignments
+                    </Link>
+                  )}
+                  {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
+                    <Link
+                      to="auction-sessions"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <AreaChartIcon />
+                      Manage Auction Session
+                    </Link>
+                  )}
+                  {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
+                    <Link
+                      to="items"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <ShoppingBag />
+                      Manage Items
+                    </Link>
+                  )}
                   <Link
                     to="blogs"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -230,13 +246,24 @@ export default function Administration() {
                     <Newspaper />
                     Manage Blogs
                   </Link>
-                  <Link
-                    to="notifications"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
-                  >
-                    <Bell />
-                    Manage Notifications
-                  </Link>
+                  {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
+                    <Link
+                      to="orders"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <Package />
+                      Manage Orders
+                    </Link>
+                  )}
+                  {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
+                    <Link
+                      to="payments"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
+                    >
+                      <CircleDollarSign />
+                      Manage Payments
+                    </Link>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>

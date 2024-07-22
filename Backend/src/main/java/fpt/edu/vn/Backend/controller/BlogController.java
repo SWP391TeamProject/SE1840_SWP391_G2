@@ -1,9 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AttachmentDTO;
-import fpt.edu.vn.Backend.DTO.BlogCreateDTO;
-import fpt.edu.vn.Backend.DTO.BlogPostDTO;
-import fpt.edu.vn.Backend.DTO.BlogUpdateDTO;
+import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
 import fpt.edu.vn.Backend.service.AccountService;
 import fpt.edu.vn.Backend.service.AttachmentService;
 import fpt.edu.vn.Backend.service.BlogCategoryService;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,5 +74,20 @@ public class BlogController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PutMapping("/attachment/{id}")
+    public ResponseEntity<List<AttachmentDTO>> uploadAttachment(@PathVariable int id,
+                                                                @ModelAttribute AttachmentUploadDTO dto) {
+        try {
+            return new ResponseEntity<>(blogService.uploadAttachment(id, dto), HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload attachment", e);
+        }
+    }
 
+    @DeleteMapping("/attachment/{post}/{attachment}")
+    public ResponseEntity<BlogPostDTO> deleteAttachment(@PathVariable int post,
+                                                    @PathVariable int attachment) {
+        blogService.deleteAttachment(post, attachment);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -132,8 +132,6 @@ function LoginForm() {
                 id="password"
                 {...register('password')}
                 required
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
               />
               {/* <Input id="password" type="password" {...register('password')} required /> */}
             </div>

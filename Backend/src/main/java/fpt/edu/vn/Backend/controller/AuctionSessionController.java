@@ -1,8 +1,7 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
-import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
-import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
+import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.service.AuctionSessionService;
@@ -20,9 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -163,6 +164,23 @@ public class AuctionSessionController {
     @PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<String> terminateAuctionSession(@PathVariable int id) {
         auctionSessionService.terminateAuction(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/attachment/{id}")
+    public ResponseEntity<List<AttachmentDTO>> uploadAttachment(@PathVariable int id,
+                                                                @ModelAttribute AttachmentUploadDTO dto) {
+        try {
+            return new ResponseEntity<>(auctionSessionService.uploadAttachment(id, dto), HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload attachment", e);
+        }
+    }
+
+    @DeleteMapping("/attachment/{auction}/{attachment}")
+    public ResponseEntity<AuctionSessionDTO> deleteAttachment(@PathVariable int auction,
+                                                        @PathVariable int attachment) {
+        auctionSessionService.deleteAttachment(auction, attachment);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

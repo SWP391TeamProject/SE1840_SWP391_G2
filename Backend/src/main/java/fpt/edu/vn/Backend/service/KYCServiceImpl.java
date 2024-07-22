@@ -144,11 +144,16 @@ public class KYCServiceImpl implements KYCService {
     
     @Override
     public CitizenCardDTO kycDetail(Authentication authentication)  {
-        Optional<Account> account = accountRepos.findByEmail(authentication.getName());
-        return new CitizenCardDTO(account.get().getCitizenCard());
-
+        Account account = accountRepos.findByEmail(authentication.getName()).orElseThrow();
+        return new CitizenCardDTO(account.getCitizenCard());
     }
-    
+
+    @Override
+    public CitizenCardDTO getCitizenCardById(Integer id) {
+        Account account = accountRepos.findById(id).orElseThrow();
+        return new CitizenCardDTO(account.getCitizenCard());
+    }
+
     @Override
     public CitizenCardDTO verifyKyc(KycRequestDTO kycRequestDTO, Authentication authentication) throws IOException {
 

@@ -46,7 +46,7 @@ export const getColumns = (): ColumnDef<Order>[] => [
       return (
         <AccountTooltip account={row.original.payment.account}>
           <Link
-            to={`/account/${row.original.payment.account.accountId}`}>{row.original.payment.account.nickname}</Link>
+            to={`/admin/account/${row.original.payment.account.accountId}`}>{row.original.payment.account.nickname}</Link>
         </AccountTooltip>
       );
     },

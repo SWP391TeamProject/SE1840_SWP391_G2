@@ -166,8 +166,8 @@ public class ItemServiceImpl implements ItemService {
     }
     
     @Override
-    public void deleteAttachment(int attachmentId, int itemId) {
-        attachmentService.deleteItemAttachment(attachmentId, itemId);
+    public void deleteAttachment(int itemId, int attachmentId) {
+        attachmentService.deleteItemAttachment(itemId, attachmentId);
     }
 
     @Override

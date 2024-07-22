@@ -37,7 +37,7 @@ const twoFactorAuthSchema = z.object({
       message: 'Current password is required',
     })
     .min(8, 'Current password must contain at least 8 characters')
-    .max(50, 'Current password must contain at most 50 characters'),
+    .max(30, 'Current password must contain at most 30 characters'),
 });
 
 const ProfileDetail = () => {

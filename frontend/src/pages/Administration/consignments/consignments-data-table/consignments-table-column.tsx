@@ -45,7 +45,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
       return (
         <AccountTooltip account={row.original.user}>
           <Link
-            to={`/account/${row.original.user.accountId}`}>{row.original.user.nickname}</Link>
+            to={`/admin/account/${row.original.user.accountId}`}>{row.original.user.nickname}</Link>
         </AccountTooltip>
       );
     },
@@ -59,7 +59,7 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
         row.original.staff ?
           <AccountTooltip account={row.original.staff}>
             <Link
-              to={`/account/${row.original.staff.accountId}`}>{row.original.staff.nickname}</Link>
+              to={`/admin/account/${row.original.staff.accountId}`}>{row.original.staff.nickname}</Link>
           </AccountTooltip> : <></>
       );
     },

@@ -1,16 +1,20 @@
 package fpt.edu.vn.Backend.service;
 
 import fpt.edu.vn.Backend.DTO.AssignAuctionItemDTO;
+import fpt.edu.vn.Backend.DTO.AttachmentDTO;
 import fpt.edu.vn.Backend.DTO.AuctionCreateDTO;
 import fpt.edu.vn.Backend.DTO.AuctionSessionDTO;
 
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
 import fpt.edu.vn.Backend.pojo.AuctionSession;
 import org.jetbrains.annotations.Nullable;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 
@@ -46,4 +50,6 @@ public interface AuctionSessionService {
 
     void startAuction(int auctionSessionId);
 
+    void deleteAttachment(int auctionId, int attachmentId);
+    List<AttachmentDTO> uploadAttachment(int auctionId, AttachmentUploadDTO dto) throws IOException;
 }

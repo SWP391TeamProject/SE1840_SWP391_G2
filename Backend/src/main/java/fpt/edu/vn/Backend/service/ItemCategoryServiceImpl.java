@@ -56,6 +56,7 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
     
     @Override
     //@CacheEvict(key = "#id", value = "itemCategory")
+    @Transactional
     public ResponseEntity<ItemCategoryDTO> deleteItemCategory(int id) {
         if (itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems() != null
                 && !itemCategoryRepos.findItemCategoryByItemCategoryId(id).getItems().isEmpty()) {

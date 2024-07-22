@@ -20,7 +20,7 @@ public interface ItemService {
     @Nullable ItemDTO getItemById(int id);
     ItemDTO updateItem(@NotNull ItemUpdateDTO itemDTO);
     List<AttachmentDTO> uploadAttachment(int id, AttachmentUploadDTO dto) throws IOException;
-    void deleteAttachment(int attachmentId, int itemId);
+    void deleteAttachment(int itemId, int attachmentId);
 
     @NotNull Page<ItemDTO> getItems(@NotNull Pageable pageable,
                                     @Nullable Integer minPrice,

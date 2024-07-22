@@ -10,6 +10,7 @@ import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.exporter.AccountExporter;
 import fpt.edu.vn.Backend.oauth2.security.OAuth2BiddifyUser;
 import fpt.edu.vn.Backend.pojo.Account;
+import fpt.edu.vn.Backend.pojo.Item;
 import fpt.edu.vn.Backend.repository.AccountRepos;
 import fpt.edu.vn.Backend.security.Authorizer;
 import fpt.edu.vn.Backend.security.CurrentUser;
@@ -53,11 +54,16 @@ public class AccountController {
     }
 
     @GetMapping("/")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Page<AccountDTO>> getAccounts(@PageableDefault(size = 50) Pageable pageable,
-                                                        @Nullable Account.Role role,
-                                                        @Nullable Account.Status status,
-                                                        @Nullable String search) {
+    public ResponseEntity<Page<AccountDTO>> getAccounts(
+            Principal principal,
+            @PageableDefault(size = 50) Pageable pageable,
+            @Nullable Account.Role role,
+            @Nullable Account.Status status,
+            @Nullable String search) {
+        JwtUser jwtUser = Authorizer.requireUser(principal);
+        if (!Authorizer.ADMIN.contains(jwtUser.getRole())) {
+            role = Account.Role.MEMBER; // staff and manager can only view members
+        }
         return new ResponseEntity<>(accountService.getAccounts(pageable, role, status, search), HttpStatus.OK);
     }
     @GetMapping("/monthly")
@@ -66,9 +72,23 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER') or authentication.token.claims['userId'] == #id")
-    public ResponseEntity<AccountDTO> getAccountById(@PathVariable int id) {
-        return new ResponseEntity<>(accountService.getAccountById(id), HttpStatus.OK);
+    public ResponseEntity<AccountDTO> getAccountById(
+            Principal principal,
+            @PathVariable int id) {
+        JwtUser jwtUser = Authorizer.requireUser(principal);
+        AccountDTO a = accountService.getAccountById(id);
+        if (a == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (a.getAccountId() != jwtUser.getUserId()) {
+            if (jwtUser.getRole() == Account.Role.MEMBER) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+            if ((jwtUser.getRole() == Account.Role.STAFF || jwtUser.getRole() == Account.Role.MANAGER) &&
+                    a.getRole() != Account.Role.MEMBER) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+        return new ResponseEntity<>(a, HttpStatus.OK);
     }
 
     @GetMapping("/user/me")

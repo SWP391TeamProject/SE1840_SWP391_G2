@@ -77,7 +77,7 @@ public class BlogCategoryServiceImpl implements BlogCategoryService{
     
     @Override
     //@CacheEvict(value = "blogCategory", allEntries = true)
-
+    @Transactional
     public void deleteBlogCategory(int id) {
         blogCategoryRepos.deleteById(id);
     }

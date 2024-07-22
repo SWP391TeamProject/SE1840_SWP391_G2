@@ -13,5 +13,5 @@ public interface KYCService {
 
     CitizenCardDTO kycDetail(Authentication authentication) ;
 
-
+    CitizenCardDTO getCitizenCardById(Integer id);
 }

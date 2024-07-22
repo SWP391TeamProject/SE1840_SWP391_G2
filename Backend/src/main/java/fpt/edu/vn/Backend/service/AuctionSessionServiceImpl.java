@@ -3,6 +3,7 @@ package fpt.edu.vn.Backend.service;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import fpt.edu.vn.Backend.DTO.*;
+import fpt.edu.vn.Backend.DTO.request.AttachmentUploadDTO;
 import fpt.edu.vn.Backend.DTO.request.ItemUpdateDTO;
 import fpt.edu.vn.Backend.DTO.request.UpdateStatusAuctionSessionRequestDTO;
 import fpt.edu.vn.Backend.exception.ConsignmentServiceException;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -598,6 +600,24 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " started");
         auctionHandlingLock.remove(auctionSessionId);
+    }
+
+    @Override
+    public void deleteAttachment(int auctionId, int attachmentId) {
+        attachmentService.deleteAuctionAttachment(auctionId, attachmentId);
+    }
+
+    @Override
+    public List<AttachmentDTO> uploadAttachment(int auctionId, AttachmentUploadDTO dto) throws IOException {
+        if (dto.getFiles() == null || dto.getFiles().isEmpty()) return Collections.emptyList();
+        for (MultipartFile f : dto.getFiles()) {
+            Preconditions.checkState(f.getSize() <= 10000000, "File size must be less than 10MB");
+        }
+        List<AttachmentDTO> attachments = new ArrayList<>();
+        for(MultipartFile file : dto.getFiles()) {
+            attachments.add(attachmentService.uploadAuctionAttachment(file, auctionId));
+        }
+        return attachments;
     }
 
     @Override

@@ -61,19 +61,12 @@ export const fetchAccountsByName = async (pageNumber: number, pageSize: number, 
 
 export const fetchAccountById = async (id: number) => {
   return await axios
-    .get(API_SERVER + '/accounts/' + id, {
+    .get<Account>(API_SERVER + '/accounts/' + id, {
       headers: {
         'Content-Type': 'application/json',
 
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
     });
 };
 
@@ -85,13 +78,6 @@ export const createAccountService = async (data: any) => {
 
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
     });
 };
 
