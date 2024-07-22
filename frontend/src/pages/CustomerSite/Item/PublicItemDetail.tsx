@@ -148,7 +148,7 @@ export function PublicItemDetail() {
                   <CardContent>
                     <Table>
                       <TableBody>
-                        {['color', 'measurement', 'weight', 'stamped', 'age', 'metal']
+                        {["color", "weight", "metal", "gemstone", "measurement", "condition", "stamped"]
                           .filter((key) => item.hasOwnProperty(key) && item[key])
                           .map((key) => {
                             return (

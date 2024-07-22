@@ -1,9 +1,6 @@
 package fpt.edu.vn.Backend.controller;
 
-import fpt.edu.vn.Backend.DTO.AccountDTO;
-import fpt.edu.vn.Backend.DTO.ConsignmentDTO;
-import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
-import fpt.edu.vn.Backend.DTO.EvaluationDTO;
+import fpt.edu.vn.Backend.DTO.*;
 import fpt.edu.vn.Backend.DTO.request.ConsignmentDetailRequestDTO;
 import fpt.edu.vn.Backend.exporter.ConsignmentDetailExporter;
 import fpt.edu.vn.Backend.exporter.ConsignmentExporter;
@@ -23,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -77,11 +75,13 @@ public class ConsignmentDetailController {
     @PostMapping("/createFinalEvaluation")
     public ResponseEntity<ConsignmentDetailDTO> createFinalEvaluation(@ModelAttribute EvaluationDTO evaluationDTO) {
         ConsignmentDetailDTO consignmentDetailDTO = consignmentService.submitFinalEvaluationUpdate(evaluationDTO.getConsignmentId(), evaluationDTO.getEvaluation(), evaluationDTO.getPrice(), evaluationDTO.getAccountId());
+        List<AttachmentDTO> list = new ArrayList<>();
         if (evaluationDTO.getFiles() != null) {
             for (MultipartFile f : evaluationDTO.getFiles()) {
-                attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId());
+                list.add(attachmentService.uploadConsignmentDetailAttachment(f, consignmentDetailDTO.getConsignmentDetailId()));
             }
         }
+        consignmentDetailDTO.setAttachments(list);
         return new ResponseEntity<>(consignmentDetailDTO, HttpStatus.OK);
     }
 

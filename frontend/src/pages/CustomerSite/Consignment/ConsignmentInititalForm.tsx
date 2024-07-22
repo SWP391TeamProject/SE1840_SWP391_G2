@@ -25,6 +25,7 @@ const formSchema = z.object({
   phone: z.string().regex(phoneRegex, { message: 'Invalid phone number. Must be a 10 to 12 digits phone number.' }),
   contactName: z.string().min(1, { message: 'Contact name cannot be empty' }),
   // age: z.coerce.number().min(0, { message: "Age must be a positive number" }),
+  color: z.string().optional(),
   metal: z.string().optional(),
   condition: z.string().optional(),
   gemstone: z.string().optional(),
@@ -62,6 +63,7 @@ export default function ConsignmentInititalForm() {
       preferContact: 'any',
       description: '',
       metal: '',
+      color: '',
       condition: '',
       gemstone: '',
       measurement: '',
@@ -332,6 +334,20 @@ export default function ConsignmentInititalForm() {
                         </FormControl>
                         <FormDescription>Enter any stamp details on the item (e.g. 925, 14k, etc.)</FormDescription>
 
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="Enter color" {...field} />
+                        </FormControl>
+                        <FormDescription>Enter the color of the item</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

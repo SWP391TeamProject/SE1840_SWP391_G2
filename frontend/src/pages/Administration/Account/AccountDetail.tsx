@@ -1,5 +1,5 @@
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
-import {useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {useEffect, useState} from 'react';
 import {toast} from 'sonner';
 import {fetchAccountById} from '@/services/AccountsServices.ts';
@@ -11,11 +11,20 @@ import {CitizenCard} from "@/models/newModel/citizenCard.ts";
 import {fetchCitizenCardById} from "@/services/KycService.ts";
 import {formatDate} from "@/lib/utils.ts";
 import {useCurrency} from "@/CurrencyProvider.tsx";
-import {AccountStatus} from "@/constants/enums.tsx";
+import {AccountStatus, Roles} from "@/constants/enums.tsx";
+import {useAuth} from "@/AuthProvider.tsx";
 
 export function AccountDetail() {
-  const currency = useCurrency();
+  const auth = useAuth();
   const accountId = parseInt(useParams().id);
+  if (auth.user.role !== Roles.ADMIN) {
+    const nav = useNavigate();
+    nav('/admin/customers/' + accountId, {
+      replace: true
+    });
+  }
+
+  const currency = useCurrency();
   const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState({} as Account);
   const [citizenCard, setCitizenCard] = useState<CitizenCard>(undefined);

@@ -2,8 +2,6 @@ package fpt.edu.vn.Backend.exporter;
 
 import fpt.edu.vn.Backend.DTO.ConsignmentDetailDTO;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -72,7 +70,7 @@ public class ConsignmentDetailExporter {
             int columnCount = 0;
 
             createCell(row, columnCount++, detail.getConsignmentDetailId(), style);
-            createCell(row, columnCount++, detail.getStatus(), style);
+            createCell(row, columnCount++, detail.getType(), style);
             createCell(row, columnCount++, detail.getDescription(), style);
             createCell(row, columnCount++, detail.getPrice().toString(), style);
             createCell(row, columnCount++, detail.getConsignmentId(), style);

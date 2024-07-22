@@ -27,9 +27,9 @@ public interface ConsignmentService {
     // Status Updates
     void confirmJewelryReceived(int consignmentId);
 
-    void approveFinalEvaluation(int consignmentId, int accountId, String description);
+    ConsignmentDTO approveFinalEvaluation(int consignmentId, int accountId, String description);
 
-    void rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason);
+    ConsignmentDTO rejectFinalEvaluation(int consignmentId, int accountId, String rejectionReason);
 
     // General Updates
     void updateConsignment(int consignmentId, ConsignmentDTO updatedConsignment);

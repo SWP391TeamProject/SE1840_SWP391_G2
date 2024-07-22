@@ -19,20 +19,21 @@ import java.util.stream.Collectors;
 public class ConsignmentDetailDTO implements Serializable {
     private int consignmentDetailId;
     private String description;
-    private String status; // Use String for the enum representation in DTO
+    private ConsignmentDetail.ConsignmentType type; // Use String for the enum representation in DTO
     private BigDecimal price;
     private int consignmentId; // Use int for the Consignment reference in DTO
     private AccountDTO account; // Use int for the Account reference in DTO
     private List<AttachmentDTO> attachments; // Use List of Integer for the Attachment references in DTO
     private LocalDateTime createDate;
 
-    public ConsignmentDetailDTO(int consignmentDetailId, String description, String type, BigDecimal price, int consignmentId, AccountDTO accountId, List<AttachmentDTO> attachmentIds, LocalDateTime createDate) {
+    public ConsignmentDetailDTO(int consignmentDetailId, String description, ConsignmentDetail.ConsignmentType type,
+                                BigDecimal price, int consignmentId, AccountDTO dto, List<AttachmentDTO> attachmentIds, LocalDateTime createDate) {
         this.consignmentDetailId = consignmentDetailId;
         this.description = description;
-        this.status = type;
+        this.type = type;
         this.price = price;
         this.consignmentId = consignmentId;
-        this.account = accountId;
+        this.account = dto;
         this.attachments = attachmentIds;
         if(account!=null) account.setPassword("");
         this.createDate = createDate;
@@ -41,7 +42,7 @@ public class ConsignmentDetailDTO implements Serializable {
     public ConsignmentDetailDTO(ConsignmentDetail consignmentDetail) {
         this.consignmentDetailId = consignmentDetail.getConsignmentDetailId();
         this.description = consignmentDetail.getDescription();
-        this.status = String.valueOf(consignmentDetail.getType());
+        this.type = consignmentDetail.getType();
         this.price = consignmentDetail.getPrice();
         this.consignmentId = consignmentDetail.getConsignment().getConsignmentId();
         this.account = AccountDTO.redacted(consignmentDetail.getAccount());

@@ -5,7 +5,7 @@ import {Input} from '@/components/ui/input';
 import {getItems} from '@/services/ItemService';
 import PagingIndexes from '@/components/pagination/PagingIndexes';
 import {useAppDispatch, useAppSelector} from '@/redux/hooks';
-import {Link, useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {ItemCategory} from '@/models/newModel/itemCategory';
 import {setCurrentPageList, setCurrentPageNumber} from '@/redux/reducers/Items';
 import {getAllItemCategories} from '@/services/ItemCategoryService';
@@ -15,7 +15,7 @@ import {
   ListFilter,
   SearchIcon
 } from 'lucide-react';
-import {Item, ItemStatus} from '@/models/Item';
+import {ItemStatus} from '@/models/Item';
 import {toast} from 'sonner';
 import {useCurrency} from '@/CurrencyProvider';
 import {Card, CardContent, CardHeader} from '@/components/ui/card';
@@ -72,7 +72,6 @@ export function ItemList() {
   const [isLoading, setIsLoading] = useState(false);
   const itemsList: any = useAppSelector((state) => state.items);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const currency = useCurrency();
 
   const fetchItems = useDebouncedCallback(
@@ -88,7 +87,6 @@ export function ItemList() {
         size: 16,
         sort: searchParams.get('sort') || 'itemId,desc',
       };
-      console.log(query);
       toast.promise(getItems(query), {
         loading: 'Loading items...',
         success: (res) => {

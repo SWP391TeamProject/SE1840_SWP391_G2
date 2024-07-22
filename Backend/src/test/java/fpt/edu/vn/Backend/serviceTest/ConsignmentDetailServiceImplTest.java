@@ -124,12 +124,12 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(consignmentDetail1.getConsignmentDetailId(), dto1.getConsignmentDetailId());
         assertEquals(consignmentDetail1.getDescription(), dto1.getDescription());
         assertEquals(consignmentDetail1.getPrice(), dto1.getPrice());
-        assertEquals(consignmentDetail1.getType().name(), dto1.getStatus());
+        assertEquals(consignmentDetail1.getType().name(), dto1.getType());
 
         assertEquals(consignmentDetail2.getConsignmentDetailId(), dto2.getConsignmentDetailId());
         assertEquals(consignmentDetail2.getDescription(), dto2.getDescription());
         assertEquals(consignmentDetail2.getPrice(), dto2.getPrice());
-        assertEquals(consignmentDetail2.getType().name(), dto2.getStatus());
+        assertEquals(consignmentDetail2.getType().name(), dto2.getType());
     }
 
     @Test
@@ -148,12 +148,12 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(consignmentDetail1.getConsignmentDetailId(), dto1.getConsignmentDetailId());
         assertEquals(consignmentDetail1.getDescription(), dto1.getDescription());
         assertEquals(consignmentDetail1.getPrice(), dto1.getPrice());
-        assertEquals(consignmentDetail1.getType().name(), dto1.getStatus());
+        assertEquals(consignmentDetail1.getType().name(), dto1.getType());
 
         assertEquals(consignmentDetail2.getConsignmentDetailId(), dto2.getConsignmentDetailId());
         assertEquals(consignmentDetail2.getDescription(), dto2.getDescription());
         assertEquals(consignmentDetail2.getPrice(), dto2.getPrice());
-        assertEquals(consignmentDetail2.getType().name(), dto2.getStatus());
+        assertEquals(consignmentDetail2.getType().name(), dto2.getType());
     }
     @Test
     void testGetConsignmentDetailById() {
@@ -165,7 +165,7 @@ public class ConsignmentDetailServiceImplTest {
         assertEquals(consignmentDetail1.getConsignmentDetailId(), result.getConsignmentDetailId());
         assertEquals(consignmentDetail1.getDescription(), result.getDescription());
         assertEquals(consignmentDetail1.getPrice(), result.getPrice());
-        assertEquals(consignmentDetail1.getType().name(), result.getStatus());
+        assertEquals(consignmentDetail1.getType().name(), result.getType());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class ConsignmentDetailServiceImplTest {
         assertNotNull(result);
         assertEquals(consignmentRequestDetailDTO.getDescription(), result.getDescription());
         assertEquals(consignmentRequestDetailDTO.getPrice(), result.getPrice());
-        assertEquals(consignmentRequestDetailDTO.getStatus(), result.getStatus());
+        assertEquals(consignmentRequestDetailDTO.getStatus(), result.getType());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class ConsignmentDetailServiceImplTest {
         assertNotNull(result);
         assertEquals(updatedConsignmentDetailDTO.getDescription(), result.getDescription());
         assertEquals(updatedConsignmentDetailDTO.getPrice(), result.getPrice());
-        assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getStatus());
+        assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getType());
     }
     @Test
     void createConsignmentDetail_HappyPath() {
@@ -228,7 +228,7 @@ public class ConsignmentDetailServiceImplTest {
         assertNotNull(result);
         assertEquals(consignmentRequestDetailDTO.getDescription(), result.getDescription());
         assertEquals(consignmentRequestDetailDTO.getPrice(), result.getPrice());
-        assertEquals(consignmentRequestDetailDTO.getStatus(), result.getStatus());
+        assertEquals(consignmentRequestDetailDTO.getStatus(), result.getType());
     }
 
     @Test
@@ -257,7 +257,7 @@ public class ConsignmentDetailServiceImplTest {
         assertNotNull(result);
         assertEquals(updatedConsignmentDetailDTO.getDescription(), result.getDescription());
         assertEquals(updatedConsignmentDetailDTO.getPrice(), result.getPrice());
-        assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getStatus());
+        assertEquals(updatedConsignmentDetailDTO.getStatus(), result.getType());
     }
 
     @Test

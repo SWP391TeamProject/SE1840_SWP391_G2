@@ -1,7 +1,6 @@
 import { useAuth } from '@/AuthProvider';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
-import { Cross1Icon, Cross2Icon } from '@radix-ui/react-icons';
+import { Cross1Icon } from '@radix-ui/react-icons';
 import { CheckIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

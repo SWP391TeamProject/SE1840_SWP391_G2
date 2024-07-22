@@ -5,11 +5,25 @@ import dayjs from 'dayjs';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
 export function formatDate(date: Date | string | number, opts: Intl.DateTimeFormatOptions = {}) {
   return new Intl.DateTimeFormat('en-US', {
     month: opts.month ?? 'long',
     day: opts.day ?? 'numeric',
     year: opts.year ?? 'numeric',
+    ...opts,
+  }).format(new Date(date));
+}
+
+export function formatDateTime(date: Date | string | number, opts: Intl.DateTimeFormatOptions = {}) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: opts.month ?? 'long',
+    day: opts.day ?? 'numeric',
+    year: opts.year ?? 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
     ...opts,
   }).format(new Date(date));
 }
