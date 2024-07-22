@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
-import { getNewUsersByYear } from '@/services/StatisticServices';
+import { getUserOnline } from '@/services/StatisticServices';
 import { AxiosResponse } from '@/config/axiosConfig.ts';
 
 // chart options
@@ -47,7 +47,7 @@ export default function NewUserAreaChart({ slot }) {
 
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
-
+  const [onlineUsers, setOnlineUsers] = useState<Map<string, number> | null>(null);
   const [options, setOptions] = useState(areaChartOptions);
   const [series, setSeries] = useState([]);
   const getMonthName = (monthNumber) => {
@@ -69,23 +69,24 @@ export default function NewUserAreaChart({ slot }) {
   };
 
   useEffect(() => {
-    getNewUsersByYear(new Date().getUTCFullYear()).then((response: AxiosResponse<GetMonthlyUserResponse>) => {
-      const data: MonthlyUserData[] = response.data;
+    getUserOnline().then((response: AxiosResponse<Map<string, number>>) => {
+      const data = response.data;
+      setOnlineUsers(data);
       setOptions((prevState) => ({
         ...prevState,
         colors: [theme.palette.primary.main, theme.palette.primary[700]],
         xaxis: {
-          categories: slot === 'month' ? data.map((item) => getMonthName(item.month)) : [],
+          categories: Object.keys(data),
           labels: {
             style: {
-              colors: new Array(12).fill(secondary),
+              colors: new Array(Object.keys(data).length).fill(secondary),
             },
           },
           axisBorder: {
             show: true,
             color: line,
           },
-          tickAmount: slot === 'month' ? 11 : 7,
+          tickAmount: Object.keys(data).length - 1,
         },
         yaxis: {
           labels: {
@@ -99,20 +100,14 @@ export default function NewUserAreaChart({ slot }) {
           strokeDashArray: 4,
         },
       }));
-    });
-  }, [primary, secondary, line, theme, slot]);
-
-  useEffect(() => {
-    getNewUsersByYear(new Date().getUTCFullYear()).then((response: AxiosResponse<GetMonthlyUserResponse>) => {
-      const data: MonthlyUserData[] = response.data;
       setSeries([
         {
-          name: 'Page Views',
-          data: slot === 'month' ? data.map((item) => item?.totalUser) : [],
+          name: 'Online Users',
+          data: Object.values(data),
         },
       ]);
     });
-  }, [slot]);
+  }, [primary, secondary, line, theme]);
 
   return <ReactApexChart options={options} series={series} type="area" height={450} />;
 }
