@@ -49,7 +49,9 @@ export default function AuctionJoin() {
   const [bids, setBids] = useState<BidReply[]>([]);
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
-  const [itemDTO, setItemDTO] = useState<Item | undefined>(location?.state?.itemDTO || auctionSession?.auctionItems[0].itemDTO);
+  const [itemDTO, setItemDTO] = useState<Item | undefined>(
+    location?.state?.itemDTO || auctionSession?.auctionItems[0].itemDTO
+  );
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -72,7 +74,6 @@ export default function AuctionJoin() {
     if (winningBids.length > 0) {
       setOpenWinningDialog(true);
     }
-
   }, [winningBids]);
   useEffect(() => {
     if (!auctionSession) {
@@ -96,7 +97,6 @@ export default function AuctionJoin() {
                 bids.sort((a, b) => {
                   return a.price - b.price;
                 });
-
               })
               .catch((err) => {
                 console.log(err);
@@ -106,8 +106,6 @@ export default function AuctionJoin() {
         .catch((err) => {
           console.error(err);
         });
-
-
     } else {
       setAllow(auctionSession?.hasDeposited);
       setItemDTO(auctionSession?.auctionItems[0].itemDTO);
@@ -125,13 +123,11 @@ export default function AuctionJoin() {
             bids.sort((a, b) => {
               return a.price - b.price;
             });
-
           })
           .catch((err) => {
             console.log(err);
           });
       }
-
     }
   }, []);
   useEffect(() => {
@@ -186,6 +182,9 @@ export default function AuctionJoin() {
         setShowCofetti(false);
       }, 3000);
     }
+    if (!(auctionSession?.status === AuctionSessionStatus.PROGRESSING)) {
+      navigate(`/auctions/${auctionId}`);
+    }
   }, [auctionSession]);
 
   useEffect(() => {
@@ -209,7 +208,6 @@ export default function AuctionJoin() {
 
   useEffect(() => {
     if (auctionSession && auctionSession.status === AuctionSessionStatus.PROGRESSING && auctionSession.hasDeposited) {
-
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -279,9 +277,12 @@ export default function AuctionJoin() {
     if (message?.status == 'JOIN' || message?.status == 'BID') {
       if (message?.status == 'BID')
         toast.info(message?.message, {
-          action: <Button variant='outline' onClick={() => handleViewItemDetailsClick(message?.auctionItemId)} >View</Button>
-        }
-        );
+          action: (
+            <Button variant="outline" onClick={() => handleViewItemDetailsClick(message?.auctionItemId)}>
+              View
+            </Button>
+          ),
+        });
       setIsSending(false);
       setPrice(parseFloat(message?.currentPrice).toFixed(2));
     }
@@ -318,27 +319,39 @@ export default function AuctionJoin() {
           console.log(res);
           setBids(res);
           if (res.length > 0) {
-            setPing((prev) => [...prev, res?.sort((a, b) => - new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]?.auctionItemId?.itemId]);
+            setPing((prev) => [
+              ...prev,
+              res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]
+                ?.auctionItemId?.itemId,
+            ]);
           }
-          console.log(res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]?.auctionItemId?.itemId);
+          console.log(
+            res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]
+              ?.auctionItemId?.itemId
+          );
           bids.sort((a, b) => {
             return a.price - b.price;
           });
 
-
           timeout = setTimeout(() => {
-            setPing((prev) => [...prev.filter((item) => item !== res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]?.auctionItemId?.itemId)]);
+            setPing((prev) => [
+              ...prev.filter(
+                (item) =>
+                  item !==
+                  res?.sort((a, b) => -new Date(a?.createDate).getTime() + new Date(b?.createDate).getTime())[0]
+                    ?.auctionItemId?.itemId
+              ),
+            ]);
           }, 2000);
 
           return () => {
             clearTimeout(timeout);
-          }
+          };
         })
         .catch((err) => {
           console.log(err);
         });
     }
-
   }, [price]);
 
   const handleViewItemDetailsClick = async (item: AuctionItem) => {
@@ -471,12 +484,13 @@ export default function AuctionJoin() {
                 <CarouselContent className="-mt-1 w-full">
                   {auctionSession?.auctionItems.map((item) => (
                     <CarouselItem key={item.itemDTO.itemId} className="  md:basis-1/4">
-
                       <div
                         onClick={() => handleViewItemDetailsClick(item)}
                         className="hover:cursor-pointer border w-1/2 rounded-2xl mx-auto mt-10"
                       >
-                        {ping?.filter((p) => p === item.itemDTO.itemId).length > 0 && <div className="w-4 h-4 rounded-full bg-red-500 animate-ping absolute z-50 " />}
+                        {ping?.filter((p) => p === item.itemDTO.itemId).length > 0 && (
+                          <div className="w-4 h-4 rounded-full bg-red-500 animate-ping absolute z-50 " />
+                        )}
 
                         <img
                           src={item.itemDTO.attachments[0]?.link || 'https://placehold.co/400'}
@@ -501,8 +515,10 @@ export default function AuctionJoin() {
       ) : (
         <LoadingAnimation />
       )}
-      {showCofetti && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]
-        && bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId !== auth.user.accountId && (
+      {showCofetti &&
+        bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] &&
+        bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId !==
+          auth.user.accountId && (
           <div className="fixed top-0 z-10 bg-red-200/15 w-full h-full">
             <Confetti mode="fall" colors={['#ff577f', '#ff884b']} />
             <Card className="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -518,11 +534,20 @@ export default function AuctionJoin() {
             </Card>
           </div>
         )}
-      {winningBids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId === auth.user.accountId &&
-        <ResultDialog open={openWinningDialog} onOpenChange={setOpenWinningDialog} message='Congratulations' title=' Congratulations' items={auctionSession?.auctionItems.filter((item) => winningBids?.filter((bid) => bid.auctionItemId.itemId === item.itemDTO.itemId)[0]?.account.accountId === auth.user.accountId)} />
-      }
-
-
+      {winningBids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId ===
+        auth.user.accountId && (
+        <ResultDialog
+          open={openWinningDialog}
+          onOpenChange={setOpenWinningDialog}
+          message="Congratulations"
+          title=" Congratulations"
+          items={auctionSession?.auctionItems.filter(
+            (item) =>
+              winningBids?.filter((bid) => bid.auctionItemId.itemId === item.itemDTO.itemId)[0]?.account.accountId ===
+              auth.user.accountId
+          )}
+        />
+      )}
     </>
   );
 }

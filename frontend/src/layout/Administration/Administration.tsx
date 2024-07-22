@@ -28,6 +28,7 @@ import ProfileDropdownMenu from '@/components/NavBar/ProfileDropdownMenu.tsx';
 import logo from '@/assets/icon.png';
 import { useAuth } from '@/AuthProvider';
 import { Roles } from '@/constants/enums';
+import { checkScrollPositionAndReset } from '../layoutUtils/layout-utils';
 
 export const ConsignmentsContext = createContext([]);
 
@@ -58,6 +59,12 @@ export default function Administration() {
     }
     return <BreadcrumbList>{breadcrumbs}</BreadcrumbList>;
   };
+  useEffect(() => {
+    // Call the function on component mount and path change
+    checkScrollPositionAndReset();
+
+    // Optional: If you want to check the scroll position continuously or on a specific event, you can add more logic here
+  }, [location.pathname]);
 
   useEffect(() => {
     // console.log(location);
@@ -111,7 +118,9 @@ export default function Administration() {
                   View Customers
                 </Link>
               )}
-              {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER || auth.user.role === Roles.STAFF) && (
+              {(auth.user.role === Roles.ADMIN ||
+                auth.user.role === Roles.MANAGER ||
+                auth.user.role === Roles.STAFF) && (
                 <Link
                   to="consignments"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
@@ -212,7 +221,9 @@ export default function Administration() {
                       View Customers
                     </Link>
                   )}
-                  {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER || auth.user.role === Roles.STAFF) && (
+                  {(auth.user.role === Roles.ADMIN ||
+                    auth.user.role === Roles.MANAGER ||
+                    auth.user.role === Roles.STAFF) && (
                     <Link
                       to="consignments"
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"

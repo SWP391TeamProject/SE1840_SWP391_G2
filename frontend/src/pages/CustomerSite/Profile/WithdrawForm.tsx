@@ -79,7 +79,7 @@ export default function WithdrawForm() {
                   <FormItem>
                     <FormLabel>Amount</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input type="text" {...field} />
                     </FormControl>
                     <FormDescription>Enter the amount of balance to deposit.</FormDescription>
                     <FormMessage />

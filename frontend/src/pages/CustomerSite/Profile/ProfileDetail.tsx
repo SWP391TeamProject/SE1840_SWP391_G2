@@ -16,7 +16,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form.tsx';
 import { getErrorMessage, showErrorToast } from '@/lib/handle-error';
-import { phoneRegex } from '@/constants/regex.ts';
 
 type ProfileAvatar = {
   files?: FileList;
@@ -26,8 +25,10 @@ const profileDetailsSchema = z.object({
   nickname: z
     .string()
     .min(5, 'Nickname must be at least 5 characters')
-    .max(20, 'Nickname must not be longer than 20 characters'),
-  phone: z.string().regex(phoneRegex, 'Invalid phone number. Must be a 10 to 12 digits phone number.').optional(),
+    .max(40, 'Nickname must not be longer than 40 characters'),
+  phone: z.string().length(10, 'Phone number must be 10 digits')
+    .regex(/^\d+$/, 'Phone number must contain only digits')
+    .optional(),
 });
 
 const twoFactorAuthSchema = z.object({
@@ -37,7 +38,7 @@ const twoFactorAuthSchema = z.object({
       message: 'Current password is required',
     })
     .min(8, 'Current password must contain at least 8 characters')
-    .max(30, 'Current password must contain at most 30 characters'),
+    .max(50, 'Current password must contain at most 50 characters'),
 });
 
 const ProfileDetail = () => {
@@ -64,6 +65,7 @@ const ProfileDetail = () => {
     },
   });
 
+  
   useEffect(() => {
     if (auth.user.avatar) setAvatarPreview(auth.user.avatar.link);
   }, []);
@@ -85,12 +87,13 @@ const ProfileDetail = () => {
     setIsLoading(true);
     const formData = new FormData();
     formData.append('file', data.files[0]);
-    const submitAvatarPromise = axios.post<any>(API_SERVER + '/accounts/avatar/' + auth.user.accountId, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        Authorization: 'Bearer ' + auth.user.accessToken,
-      },
-    });
+    const submitAvatarPromise = axios
+      .post<any>(API_SERVER + '/accounts/avatar/' + auth.user.accountId, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: 'Bearer ' + auth.user.accessToken,
+        },
+      })
 
     toast.promise(submitAvatarPromise, {
       loading: 'Updating avatar...',
@@ -100,7 +103,7 @@ const ProfileDetail = () => {
           avatar: res.data,
         });
         setIsLoading(false);
-        return 'Update avatar successfully!';
+        return 'Update avatar successfully!'
       },
       error: (err) => {
         console.log(err);
@@ -113,12 +116,13 @@ const ProfileDetail = () => {
   const onSubmitProfileDetails: SubmitHandler<z.infer<typeof profileDetailsSchema>> = (data) => {
     setIsLoading(true);
 
-    const submitDetailsPromise = axios.post<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + auth.user.accessToken,
-      },
-    });
+    const submitDetailsPromise = axios
+      .put<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + auth.user.accessToken,
+        },
+      });
 
     toast.promise(submitDetailsPromise, {
       loading: 'Updating details...',
@@ -128,7 +132,7 @@ const ProfileDetail = () => {
           ...data,
         });
         setIsLoading(false);
-        return 'Update details successfully!';
+        return 'Update details successfully!'
       },
       error: (err) => {
         console.log(err);
@@ -136,6 +140,9 @@ const ProfileDetail = () => {
         return getErrorMessage(err);
       },
     });
+
+
+
 
     // axios
     //   .put<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
@@ -167,16 +174,13 @@ const ProfileDetail = () => {
     }
     setIsLoading(true);
 
-    const submitTwoFactorAuthPromise = axios.post<any>(
-      API_SERVER + '/accounts/change-2fa/' + auth.user.accountId,
-      data,
-      {
+    const submitTwoFactorAuthPromise = axios
+      .post<any>(API_SERVER + '/accounts/change-2fa/' + auth.user.accountId, data, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + auth.user.accessToken,
         },
-      }
-    );
+      })
 
     toast.promise(submitTwoFactorAuthPromise, {
       loading: 'Changing 2FA settings...',
@@ -187,7 +191,7 @@ const ProfileDetail = () => {
           enable2fa: data.enable2fa,
           currentPassword: '',
         });
-        return 'Changed 2FA settings successfully!';
+        return 'Changed 2FA settings successfully!'
       },
       error: (err) => {
         console.log(err);
@@ -230,7 +234,7 @@ const ProfileDetail = () => {
 
   return (
     <>
-      <div className="w-full lg:w-3/4 xl:w-1/2 flex flex-col gap-6">
+      <div className="flex flex-col gap-12">
         <Card>
           <form onSubmit={handleProfileAvatarForm(onSubmitProfileAvatar)}>
             <CardHeader>
