@@ -14,7 +14,7 @@ export default function PastAuctionReportCard() {
     <>
       <Grid container alignItems="center" justifyContent="space-between">
         <Grid item>
-          <Typography variant="h5">Sales Report</Typography>
+          <Typography variant="h6">Sales Report</Typography>
         </Grid>
       </Grid>
       <TotalRevenuePastAuctionBarChart />

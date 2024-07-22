@@ -11,60 +11,7 @@ import MainCard from './MainCard';
 import ReactApexChart from 'react-apexcharts';
 import { getTotalRevenueByPastAuction } from '@/services/StatisticServices';
 import { AxiosResponse } from '@/config/axiosConfig.ts';
-
-// chart options
-const columnChartOptions = {
-  chart: {
-    type: 'bar',
-    height: 430,
-    toolbar: {
-      show: false,
-    },
-  },
-  plotOptions: {
-    bar: {
-      columnWidth: '30%',
-      borderRadius: 4,
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  stroke: {
-    show: true,
-    width: 8,
-    colors: ['transparent'],
-  },
-  xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-  },
-  yaxis: {
-    title: {},
-  },
-  fill: {
-    opacity: 1,
-  },
-  tooltip: {
-    y: {
-      formatter(val) {
-        return `$ ${val} thousands`;
-      },
-    },
-  },
-  legend: {
-    show: false,
-  },
-  responsive: [
-    {
-      breakpoint: 600,
-      options: {
-        yaxis: {
-          show: false,
-        },
-      },
-    },
-  ],
-};
+import { useCurrency } from '@/CurrencyProvider';
 
 // const initialSeries = [
 //   {
@@ -81,7 +28,69 @@ const columnChartOptions = {
 
 export default function TotalRevenuePastAuctionBarChart() {
   const [series, setSeries] = useState([]);
-
+  const currency = useCurrency();
+  // chart options
+  const columnChartOptions = {
+    chart: {
+      type: 'bar',
+      height: 430,
+      toolbar: {
+        show: false,
+      },
+    },
+    plotOptions: {
+      bar: {
+        columnWidth: '30%',
+        borderRadius: 4,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      show: true,
+      width: 8,
+      colors: ['transparent'],
+    },
+    xaxis: {
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    },
+    yaxis: {
+      labels: {
+        formatter: (value) => {
+          return currency.format(value);
+        },
+      },
+      title: {
+        formatter(val) {
+          return `${currency.format(val)}`;
+        },
+      },
+    },
+    fill: {
+      opacity: 1,
+    },
+    tooltip: {
+      y: {
+        formatter(val) {
+          return `${currency.format(val)}`;
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+    responsive: [
+      {
+        breakpoint: 600,
+        options: {
+          yaxis: {
+            show: false,
+          },
+        },
+      },
+    ],
+  };
   const [options, setOptions] = useState(columnChartOptions);
   const [totalProfit, setTotalProfit] = useState(0);
 
@@ -111,11 +120,16 @@ export default function TotalRevenuePastAuctionBarChart() {
             return { ...item, monthName };
           });
           const totalProfit = response.data.reduce((sum, item) => sum + item.totalAmount, 0);
-          setTotalProfit(totalProfit);
+          setTotalProfit(currency.format(totalProfit));
           setSeries([
             {
+              name: 'Total Fee',
               data: formattedData.map((item) => item.totalAmount),
             },
+            // {
+            //       name: 'Cost Of Sales',
+            //       data: [120, 45, 78, 150, 168, 99]
+            //     }
           ]);
 
           setOptions((prevState) => ({
@@ -149,11 +163,6 @@ export default function TotalRevenuePastAuctionBarChart() {
       },
       yaxis: {
         ...prevState.yaxis,
-        labels: {
-          style: {
-            colors: ['secondary'],
-          },
-        },
       },
       grid: {
         borderColor: 'line',
@@ -183,10 +192,10 @@ export default function TotalRevenuePastAuctionBarChart() {
       <Box sx={{ p: 2.5, pb: 0 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           <Stack spacing={1.5}>
-            <Typography variant="h6" color="secondary">
+            <Typography variant="h7" color="secondary">
               Net Profit
             </Typography>
-            <Typography variant="h4">${totalProfit}</Typography>
+            <Typography variant="h4">{totalProfit}</Typography>
           </Stack>
           {/* <FormControl component="fieldset">
             <FormGroup row>

@@ -48,7 +48,7 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
             @Nullable @Param("toDate") LocalDateTime toDate,
             Pageable pageable);
 
-    @Query("SELECT a FROM AuctionSession a WHERE a.status = 'FINISHED'")
+    @Query("SELECT a FROM AuctionSession a WHERE a.status = 'FINISHED' AND YEAR(a.endDate) <= :year")
     List<AuctionSession> findFinishedAuctionSessionsByYear(int year);
 
     @Query("SELECT aj.auctionSession FROM AuctionItem aj WHERE aj.auctionItemId.itemId = :itemId ORDER BY aj.auctionSession.startDate DESC, aj.auctionSession.endDate DESC")
@@ -64,4 +64,7 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
     """)
     AuctionSession getConflictingSession(@Param("startDate") LocalDateTime startDate,
                                       @Param("endDate") LocalDateTime endDate);
+    @Query("SELECT COUNT(a) FROM AuctionSession a WHERE a.status = 'PROGRESSING'")
+    Long countAuctionSessionPast();
+
 }

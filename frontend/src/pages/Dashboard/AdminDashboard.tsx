@@ -22,11 +22,15 @@ import PastAuctionReportCard from './PastAuctionReportCard';
 import { useEffect, useState } from 'react';
 import {
   getPaymentByStatus,
+  getTotalAuctionProgressing,
   getTotalItemSold,
   getTotalOrder,
   getTotalSale,
   getUserThisMonth,
 } from '@/services/StatisticServices';
+import PaymentsPieChart from './PaymentsBarChart';
+import PieChart from './PaymentsPieChart';
+
 
 const avatarSX = {
   width: 36,
@@ -46,31 +50,15 @@ const actionSX = {
 const status = [
   {
     value: 'WITHDRAW',
-    label: 'WITHDRAW',
+    label: 'Withdraw',
   },
   {
     value: 'DEPOSIT',
-    label: 'DEPOSIT',
+    label: 'Deposit',
   },
   {
     value: 'AUCTION_DEPOSIT',
-    label: 'AUCTION_DEPOSIT',
-  },
-  {
-    value: 'AUCTION_BID',
-    label: 'AUCTION_BID',
-  },
-  {
-    value: 'AUCTION_ORDER',
-    label: 'AUCTION_ORDER',
-  },
-  {
-    value: 'AUCTION_DEPOSIT_REFUND',
-    label: 'AUCTION_DEPOSIT_REFUND',
-  },
-  {
-    value: 'CONSIGNMENT_REWARD',
-    label: 'CONSIGNMENT_REWARD',
+    label: 'Auction_Deposit',
   },
 ];
 
@@ -79,7 +67,7 @@ const AdminDashboard = () => {
   const [totalOrder, setTotalOrder] = useState<number>(0);
   const [totalItem, setTotalItem] = useState<number>(0);
   const [totalPayment, setTotalPayment] = useState<number>(0);
-  const [totalSale, setTotalSale] = useState<number>(0);
+  const [totalAuction, setTotalAuction] = useState<number>(0);
 
   const [selectedLabel, setSelectedLabel] = useState(status[0].value);
 
@@ -111,10 +99,10 @@ const AdminDashboard = () => {
           setTotalPayment(totalPayment);
         }
 
-        const totalSaleResponse = await getTotalSale();
-        if (totalSaleResponse && totalSaleResponse.data) {
-          console.log(totalSaleResponse.data);
-          setTotalSale(totalSaleResponse.data);
+        const totalAuctionResponse = await getTotalAuctionProgressing();
+        if (totalAuctionResponse && totalAuctionResponse.data) {
+          console.log(totalAuctionResponse.data);
+          setTotalAuction(totalAuctionResponse.data);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -133,14 +121,14 @@ const AdminDashboard = () => {
       </Grid> */}
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <AnalyticEcommerce
-            title="Total Item Sold"
+            title="Total Jewellry Sold"
             count={totalItem.toLocaleString()}
             // percentage={59.3}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <AnalyticEcommerce
-            title="This Month New Users"
+            title="Registered Users"
             count={newUsersThisMonth.toLocaleString()}
             // percentage={20.5}
           />
@@ -156,8 +144,8 @@ const AdminDashboard = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <AnalyticEcommerce
-            title="Total Sales"
-            count={totalSale.toLocaleString()}
+            title="Auction Progressing"
+            count={totalAuction.toLocaleString()}
             // percentage={27.4}
             isLoss
             color="warning"
@@ -165,16 +153,14 @@ const AdminDashboard = () => {
         </Grid>
 
         <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
-
-        {/* row 2 */}
+        
         <Grid item xs={12} md={7} lg={8}>
-          <UniqueVisitorCard />
-          {/* <LineChart/> */}
+          <PastAuctionReportCard />
         </Grid>
         <Grid item xs={12} md={5} lg={4}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Typography variant="h5">Payments Overview</Typography>
+              <Typography variant="h6">Payments Overview</Typography>
             </Grid>
             <Grid item />
             <Grid item>
@@ -205,14 +191,19 @@ const AdminDashboard = () => {
                 <Typography variant="h3">${totalPayment.toLocaleString()}</Typography>
               </Stack>
             </Box>
-            <PaymentsBarChart selectedLabel={selectedLabel} />
+            <PaymentsBarChart selectedLabel={selectedLabel}/>
           </MainCard>
         </Grid>
 
-        {/* row 3 */}
+        {/* row 2 */}
         <Grid item xs={12} md={7} lg={8}>
-          <PastAuctionReportCard />
+          <UniqueVisitorCard />
+          {/* <LineChart/> */}
         </Grid>
+        
+
+        {/* row 3 */}
+        
         {/* <Grid item xs={12} md={5} lg={4}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
@@ -243,7 +234,7 @@ const AdminDashboard = () => {
         <Grid item xs={12} md={5} lg={4}>
           <Grid container alignItems="center" justifyContent="space-between">
             <Grid item>
-              <Typography variant="h5">Transaction History</Typography>
+              <Typography variant="h6">Transaction History</Typography>
             </Grid>
             <Grid item />
           </Grid>

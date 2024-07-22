@@ -47,25 +47,18 @@ public class StatisticServiceImpl implements StatisticService {
 
 
     @Override
-    public List<RevenueDTO> getPaymentByStatus(String startDate, String endDate, String type) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        LocalDateTime start;
-        LocalDateTime end;
-        try {
-            start = LocalDate.parse(startDate, formatter).atStartOfDay();
-            end = LocalDate.parse(endDate, formatter).atTime(23, 59, 59);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format. Expected format is yyyy/MM/dd.", e);
-        }
-
+    public List<RevenueDTO> getPaymentByStatus(int year, String type) {
         Payment.Type paymentType = Payment.Type.valueOf(type.toUpperCase());
 
-        List<Object[]> resultList = paymentRepos.findTotalRevenueByDateRange(start, end, paymentType);
+        List<Object[]> resultList = paymentRepos.findTotalRevenueByYearAndMonth(year, paymentType);
 
         List<RevenueDTO> revenueDTOList = new ArrayList<>();
         for (Object[] result : resultList) {
-            LocalDateTime createDate = (LocalDateTime) result[0];
-            BigDecimal totalAmount = (BigDecimal) result[1];
+            int resultYear = (int) result[0];
+            int month = (int) result[1];
+            BigDecimal totalAmount = (BigDecimal) result[2];
+
+            LocalDateTime createDate = LocalDateTime.of(resultYear, month, 1, 0, 0);
 
             RevenueDTO revenueDTO = new RevenueDTO(createDate, totalAmount);
             revenueDTOList.add(revenueDTO);
@@ -73,6 +66,7 @@ public class StatisticServiceImpl implements StatisticService {
 
         return revenueDTOList;
     }
+
 
     @Override
     public List<MonthlyUserDTO> getNewUsersByYear(int year) {
@@ -96,7 +90,7 @@ public class StatisticServiceImpl implements StatisticService {
         int currentYear = currentDate.getYear();
         int currentMonth = currentDate.getMonthValue();
 
-        return accountRepos.findNewUsersCountForMonth(currentYear, currentMonth);
+        return accountRepos.findNewUsersCount(currentYear);
     }
 
 
@@ -187,6 +181,11 @@ public class StatisticServiceImpl implements StatisticService {
         }
 
         return result;
+    }
+
+    @Override
+    public long getTotalAuctionProgressing(){
+        return auctionSessionRepos.countAuctionSessionPast();
     }
 
 

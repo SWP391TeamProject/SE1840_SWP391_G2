@@ -29,8 +29,8 @@ public class StatisticController {
 
 //    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("payments/filter-by-status")
-    public ResponseEntity<List<RevenueDTO>> getPaymentByStatus(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate, @RequestParam("type") String type) {
-        return new ResponseEntity<>(statisticService.getPaymentByStatus(startDate,endDate,type), HttpStatus.OK);
+    public ResponseEntity<List<RevenueDTO>> getPaymentByStatus(@RequestParam int year, @RequestParam("type") String type) {
+        return new ResponseEntity<>(statisticService.getPaymentByStatus(year,type), HttpStatus.OK);
     }
 
 //    @PreAuthorize("hasRole('ADMIN')")
@@ -83,6 +83,11 @@ public class StatisticController {
             @RequestParam(name = "thresholdMillis", defaultValue = "60000") long thresholdMillis) {
         Map<String, Long> onlineUsers = userActivityService.getOnlineUsers(thresholdMillis);
         return ResponseEntity.ok(onlineUsers);
+    }
+
+    @GetMapping("/count-auction")
+    public ResponseEntity<Long> getTotalAuction(){
+        return new ResponseEntity<>(statisticService.getTotalAuctionProgressing(),HttpStatus.OK);
     }
 
 }
