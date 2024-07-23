@@ -91,13 +91,12 @@ export const getItemsByName = async (
 };
 
 export const getItemsByStatus = async (status: ItemStatus, page: number, size: number) => {
-  return await axios
-    .get<Page<Item>>(`${baseUrl}/status/${status}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      params: { page, size },
-    });
+  return await axios.get<Page<Item>>(`${baseUrl}/status/${status}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: { page, size },
+  });
 };
 
 export const getItemsByOwnerId = async (ownerId: number, page: number, size: number) => {

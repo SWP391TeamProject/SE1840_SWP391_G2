@@ -144,7 +144,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                       <Route path="Auctions/details" element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id" element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id/join" element={<AuctionJoin />} />
-                      <Route path="/jewelries" element={<ItemList />} />  
+                      <Route path="/jewelries" element={<ItemList />} />
                       <Route path="jewelries/:id/*" element={<PublicItemDetail />} />
 
                       <Route

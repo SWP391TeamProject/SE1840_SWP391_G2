@@ -48,15 +48,19 @@ function SoldFor({ item, currency }: propsType) {
   return (
     <Card ref={elementRef} className="bg-white shadow-md border border-gray-200">
       <CardHeader className="flex items-center space-x-2 p-4">
-        <Button onClick={() => [nav(`/auctions/${item.id.auctionSessionId}/join`,
-          {
-            state: {
-              id: item?.id,
-              itemDTO: item?.itemDTO,
-              allow: false,
-            },
-          }
-        )]}>view bid history</Button>
+        <Button
+          onClick={() => [
+            nav(`/auctions/${item.id.auctionSessionId}/join`, {
+              state: {
+                id: item?.id,
+                itemDTO: item?.itemDTO,
+                allow: false,
+              },
+            }),
+          ]}
+        >
+          view bid history
+        </Button>
       </CardHeader>
       <CardContent className="p-4">
         <div className="m-auto">

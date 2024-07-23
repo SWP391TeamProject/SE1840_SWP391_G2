@@ -18,13 +18,12 @@ export default function UpcomingAuctionSessionsList() {
 
   const { isLoading, isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
-    queryFn: () => getAuctions(
-      {
+    queryFn: () =>
+      getAuctions({
         page: 0,
         size: 20,
         status: AuctionSessionStatus.PROGRESSING,
-      }
-    ),
+      }),
   });
 
   const [timeLeft, setTimeLeft] = useState({
@@ -73,7 +72,7 @@ export default function UpcomingAuctionSessionsList() {
           <div className="grid gap-2">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">Live Auction Sessions</h1>
             <p className="text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Explore our currently live auction sessions and find your treasure. 
+              Explore our currently live auction sessions and find your treasure.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

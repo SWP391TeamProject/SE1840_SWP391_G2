@@ -70,11 +70,10 @@ export function ItemList() {
       size: 16,
       sort: searchParams.get('sort') || 'itemId,desc',
     };
-    if(searchParams.get('search')){
+    if (searchParams.get('search')) {
       query.page = 1;
       query.size = 16;
     }
-
 
     toast.promise(getItems(query), {
       loading: 'Loading items...',
@@ -247,7 +246,11 @@ export function ItemList() {
                   name="search"
                   render={({ field }) => (
                     <div className="w-full relative">
-                      <Input {...field} className="px-8 h-9 focus-visible:[box-shadow:none]" placeholder='search anything...'/>
+                      <Input
+                        {...field}
+                        className="px-8 h-9 focus-visible:[box-shadow:none]"
+                        placeholder="search anything..."
+                      />
                       <SearchIcon className="absolute left-1.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 peer-focus:text-gray-900" />
                     </div>
                   )}
