@@ -62,7 +62,7 @@ public interface AuctionSessionRepos extends JpaRepository<AuctionSession, Integ
         (auction.startDate BETWEEN :startDate AND :endDate) OR 
         (auction.endDate BETWEEN :startDate AND :endDate))
     """)
-    AuctionSession getConflictingSession(@Param("startDate") LocalDateTime startDate,
+    List<AuctionSession> getConflictingSession(@Param("startDate") LocalDateTime startDate,
                                       @Param("endDate") LocalDateTime endDate);
     @Query("SELECT COUNT(a) FROM AuctionSession a WHERE a.status = 'PROGRESSING'")
     Long countAuctionSessionPast();

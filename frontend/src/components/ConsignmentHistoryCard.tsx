@@ -63,7 +63,7 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
               <div className="flex flex-row justify-between gap-2">
                 <p className="font-semibold text-lg flex flex-row gap-3">
                   <AccountRoleBadge role={cd.account.role}/>
-                  {cd.account.nickname}
+                  <p>{cd.account.nickname}</p>
                 </p>
                 <p>{formatDateTime(cd.createDate)}</p>
               </div>
@@ -83,14 +83,21 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
               </Accordion>
             </div>)}
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col flex-row">
           <div className="flex flex-row justify-between gap-2">
-            <p className="font-semibold text-lg">{consignment.user.nickname}</p>
-            <p>{formatDateTime(consignment.createDate)}</p>
+            <p className="font-semibold text-lg flex flex-row gap-3">
+              <AccountRoleBadge role={consignment.user.role}/>
+              <p>{consignment.user.nickname}</p>
+            </p>
+            <p className="ml-auto">{formatDateTime(consignment.createDate)}</p>
           </div>
-          <div className="">
-            requested item consignment.
-          </div>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                <p className="font-normal">requested item consignment.</p>
+              </AccordionTrigger>
+            </AccordionItem>
+          </Accordion>
         </div>
       </CardContent>
     </Card>

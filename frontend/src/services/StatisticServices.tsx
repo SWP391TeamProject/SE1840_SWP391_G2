@@ -1,5 +1,5 @@
 import { API_SERVER } from '@/constants/domain';
-import { getCookie, removeCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 export const getNewUsersByYear = async (year: number) => {
@@ -11,7 +11,7 @@ export const getNewUsersByYear = async (year: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     })
@@ -29,7 +29,7 @@ export const getUserThisMonth = async () => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -47,7 +47,7 @@ export const getUserOnline = async () => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params : { thresholdMillis: 60000 }
     })
@@ -66,7 +66,7 @@ export const getTotalOrder = async () => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -102,7 +102,7 @@ export const getPaymentByStatus = async (type?: string) => {
     const response = await axios.get(url, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
     return response.data; // Return response data
@@ -122,7 +122,7 @@ export const getTotalItemSold = async () => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -140,7 +140,7 @@ export const getTotalSale = async () => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -158,7 +158,7 @@ export const getTotalAuctionProgressing = async () => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -179,7 +179,7 @@ export const getTotalRevenueByPastAuction = async (year: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     })

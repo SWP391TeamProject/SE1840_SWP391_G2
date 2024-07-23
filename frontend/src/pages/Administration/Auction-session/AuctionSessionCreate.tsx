@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
-import { formatDate } from '@/lib/utils';
+import {formatDate, formatDateTime} from '@/lib/utils';
 import { showErrorToast } from '@/lib/handle-error';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
@@ -25,10 +25,11 @@ const FormSchema = z.object({
   }),
   startDate: z.string(),
   endDate: z.string(),
-  description: z.string({ message: 'description is required    ' }).min(10, {
-    message: 'description must be at least 10 characters long',
+  description: z.string({ message: 'description must be at least 10 characters long' })
+    .min(10, {
+    message: 'Description must be at least 10 characters long',
   }).max(1000,{
-    message:'description cannot exceeed 1000 characters long'
+    message:'description cannot exceed 1000 characters long'
   }),
   files: z.any(),
 });
@@ -146,7 +147,7 @@ export default function AuctionSessionCreate() {
               <FormControl>
                 <Textarea placeholder="description of the session" {...field} />
               </FormControl>
-              <FormDescription>This is the title of the auction session.</FormDescription>
+              <FormDescription>This is the description of the auction session.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -178,7 +179,7 @@ export default function AuctionSessionCreate() {
         title="Are you sure to create this auction session?"
         message={
           form.formState.isDirty
-            ? `Auction Session ${form.getValues()?.title || ''} will be created. Start Date: ${form.getValues()?.startDate ? formatDate(form.getValues()?.startDate) : 'N/A'} End Date: ${form.getValues()?.endDate ? formatDate(form.getValues().endDate) : 'N/A'}`
+            ? `Auction Session ${form.getValues()?.title || ''} will be created.\n Start Date: ${form.getValues()?.startDate ? formatDateTime(form.getValues()?.startDate) : 'N/A'} \n End Date: ${form.getValues()?.endDate ? formatDateTime(form.getValues().endDate) : 'N/A'}`
             : ''
         }
         label="Confirm"

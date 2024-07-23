@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { showErrorToast } from '@/lib/handle-error';
-import { getCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken} from '@/utils/cookies';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from '@/config/axiosConfig.ts';
 import { Loader2 } from 'lucide-react';
@@ -77,7 +77,7 @@ export default function KycVerification() {
       const kycPromise = axios.get(`${import.meta.env.VITE_API_SERVER}/kyc/detail`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + getCookie('token'),
+          Authorization: getBearerToken(),
         },
       });
 
@@ -124,7 +124,7 @@ export default function KycVerification() {
       .post(`${import.meta.env.VITE_API_SERVER}/kyc/verify`, param, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: 'Bearer ' + getCookie('token'),
+          Authorization: getBearerToken(),
         },
       })
       .then((res) => {

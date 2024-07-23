@@ -1,5 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import { getCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import { BidReply } from '@/models/newModel/bidReply';
 
@@ -9,7 +9,7 @@ export const fetchBidsByAccount = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .then((res) => {
@@ -26,7 +26,7 @@ export const exportBids = async () => {
   return await fetch(`${SERVER_DOMAIN_URL}/api/bids/export`, {
     method: 'GET',
     headers: {
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   })
     .then((response) => response.blob())

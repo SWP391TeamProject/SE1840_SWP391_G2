@@ -1,6 +1,6 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
-import { getCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import {Page} from "@/models/Page.ts";
 import {BlogCategory} from "@/models/newModel/blogCategory.ts";
@@ -41,7 +41,7 @@ class BlogCategoryService {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+            Authorization: getBearerToken(),
           },
         }
       )
@@ -59,7 +59,7 @@ class BlogCategoryService {
       .post(`${this.BASE_URL}/delete/${id}`, {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+          Authorization: getBearerToken(),
         },
       })
       .catch((error) => {

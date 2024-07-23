@@ -15,23 +15,19 @@ import { ItemStatus } from '@/models/Item';
 import { toast } from 'sonner';
 import { showErrorToast } from '@/lib/handle-error';
 import { ConfirmationButton } from '@/components/confirmation/confirmation-button';
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 export default function AssignAuctionItem() {
   const auction = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const [availableItems, setAvailableItems] = useState([]);
   const param = useParams<{ id: string }>();
+  const auctionId = parseInt(param.id);
   const dispatch = useAppDispatch();
   const [selectedItems, setSelectedItems] = useState([]);
   const [existingItems, setExistingItems] = useState([]);
-  const currencyFormatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
+  const currency = useCurrency();
 
   useEffect(() => {
-
-    
-
     getItemsByStatus(ItemStatus.QUEUE, 0, 10)
       .then((res) => {
         setAvailableItems(res?.data?.content);
@@ -41,8 +37,8 @@ export default function AssignAuctionItem() {
         console.error(err);
       });
 
-    if (!auction || auction.auctionSessionId != param.id) {
-      fetchAuctionSessionById(param.id).then((res) => {
+    if (!auction || auction.auctionSessionId != auctionId) {
+      fetchAuctionSessionById(auctionId).then((res) => {
         console.log(res);
         dispatch(setCurrentAuctionSession(res?.data));
         let tempArr = res.data.auctionItems.map((item) => {
@@ -73,10 +69,6 @@ export default function AssignAuctionItem() {
     }
   };
 
-  // useEffect(() => {
-  //   console.log("here");
-  // }, [selectedItems, availableItems])
-
   const handleUnassign = (item: any) => {
     let existingItem = existingItems.find((i) => i.itemId == item.itemId);
     if (existingItem) {
@@ -84,13 +76,6 @@ export default function AssignAuctionItem() {
       console.log(auctionItem);
       removeAuctionItem(auctionItem?.id)
         .then((res) => {
-          // toast.success('Item Unassigned', {
-          //   position: "bottom-right",
-          // });
-          // let tempList = [...availableItems, item];
-          // tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
-          // setAvailableItems(tempList);
-          // setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
           setExistingItems(existingItems.filter((i) => i.itemId !== item.itemId));
         })
         .catch((err) => {
@@ -138,12 +123,6 @@ export default function AssignAuctionItem() {
         <div className="flex justify-between items-center md:col-span-2">
           <h2 className="text-2xl font-bold">Assign Items</h2>
           <div className="flex space-x-2">
-            {/* <Button variant="outline" disabled={selectedItems.length == 0} onClick={handleClear}>
-              Clear Selected
-            </Button> */}
-            {/* <Button disabled={selectedItems.length == 0} onClick={handleSave}>
-              Save Selected
-            </Button> */}
             <ConfirmationButton
               message={`New selected items will be assigned to this auction session.`}
               title={'Are you sure to save selected items?'}
@@ -168,7 +147,6 @@ export default function AssignAuctionItem() {
                   <TableHead>Id</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Price</TableHead>
-                  {/* <TableHead>Description</TableHead> */}
                   <TableHead className="w-[100px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
@@ -178,8 +156,7 @@ export default function AssignAuctionItem() {
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.itemId}</TableCell>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
-                      {/* <TableCell>{item.description}</TableCell> */}
+                      <TableCell className="font-medium">{currency.format(item.reservePrice)}</TableCell>
                       <TableCell>
                         <Button size="sm" variant="outline" onClick={() => handleAssign(item)}>
                           Select
@@ -212,12 +189,8 @@ export default function AssignAuctionItem() {
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item?.itemId}</TableCell>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-medium">{currencyFormatter.format(item.reservePrice)}</TableCell>
-                      {/* <TableCell>{item.description}</TableCell> */}
+                      <TableCell className="font-medium">{currency.format(item.reservePrice)}</TableCell>
                       <TableCell>
-                        {/* <Button size="sm" variant="outline" onClick={() => handleUnassign(item)}>
-                        Remove
-                      </Button> */}
                         <ConfirmationButton
                           message={`Item ${item.itemId} will be removed from this auction session.`}
                           title={'Are you sure to unassign this item?'}
