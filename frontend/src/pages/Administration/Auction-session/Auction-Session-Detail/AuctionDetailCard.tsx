@@ -29,6 +29,7 @@ import {DateTimePicker} from "@/components/time-picker/date-time-picker.tsx";
 import {AuctionSessionStatus} from "@/constants/enums.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
+import {formatDateToISO} from "@/lib/utils.ts";
 
 const formSchema = z.object({
   auctionSessionId: z.number(),
@@ -67,7 +68,14 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
     if (isLoading) return;
     setShowTrigger(false);
     setIsLoading(true);
-    toast.promise(updateAuctionSession(form.getValues()), {
+    const what = form.getValues();
+    toast.promise(updateAuctionSession({
+      auctionSessionId: what.auctionSessionId,
+      title: what.title,
+      startDate: formatDateToISO(what.startDate),
+      endDate: formatDateToISO(what.endDate),
+      description: what.description
+    }), {
       loading: 'Updating Auction Session...',
       success: () => {
         setIsLoading(false);
