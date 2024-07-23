@@ -247,7 +247,7 @@ export default function AuctionSession() {
       return (
         <AlertDialog>
           <AlertDialogTrigger>
-            <Button variant="default">Place bid</Button>
+            <Button variant="default">Join Now</Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="text-foreground">
             <AlertDialogHeader>
