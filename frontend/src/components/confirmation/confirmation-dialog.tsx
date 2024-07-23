@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { type Row } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +12,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+
 } from '@/components/ui/alert-dialog';
 
 interface ConfirmationAlertDialogProps extends React.ComponentPropsWithoutRef<typeof AlertDialog> {
@@ -44,7 +43,8 @@ export function ConfirmationDialog({
             <AlertDialogTitle className='text-foreground'>{title}</AlertDialogTitle>
             <AlertDialogDescription className='text-foreground'>{description}</AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="w grid gap-4 py-4">{message}</div>
+          <div className="w grid gap-4 py-4"
+               dangerouslySetInnerHTML={{__html: message.replace(/\n/g, "<br/>")}}></div>
           <AlertDialogFooter className="gap-2 sm:space-x-0">
             <AlertDialogCancel asChild>
               <Button variant="outline">Cancel</Button>

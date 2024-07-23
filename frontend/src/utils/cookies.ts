@@ -39,3 +39,14 @@ export function setCookie(cookieName: string, cookieValue: string, cookieExp: nu
 export const removeCookie = (cookieName: string) => {
   document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 };
+
+export const getBearerToken = () => {
+  const user = getCookie("user");
+  if (user && user.length > 0) {
+    const token = JSON.parse(user).accessToken;
+    if (token) {
+      return 'Bearer ' + token;
+    }
+  }
+  return undefined;
+}

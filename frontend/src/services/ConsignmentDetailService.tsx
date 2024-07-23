@@ -1,5 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import { getCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 const URL = `${SERVER_DOMAIN_URL}/api/consignmentDetails/`;
@@ -10,7 +10,7 @@ export const fetchConsigntmentDetailByConsignmentId = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .then((res) => {
@@ -28,7 +28,7 @@ export const fetchConsigntmentDetailByConsignmentDetailId = async (id: number) =
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .then((res) => {
@@ -45,7 +45,7 @@ export const updateConsignmentDetailService = async (data: any, id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => console.log(err));
@@ -56,7 +56,7 @@ export const createInitialEvaluation = async (data: any) => {
     headers: {
       'Content-Type': 'multipart/form-data',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -65,7 +65,7 @@ export const createFinalEvaluation = async (data: any) => {
     headers: {
       'Content-Type': 'multipart/form-data',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -74,7 +74,7 @@ export const exportConsignmentDetails = async () => {
   return await fetch(`${SERVER_DOMAIN_URL}/api/consignmentDetails/export`, {
     method: 'GET',
     headers: {
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   })
     .then((response) => response.blob())

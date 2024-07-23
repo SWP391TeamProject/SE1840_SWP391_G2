@@ -1,6 +1,6 @@
 import axios from "@/config/axiosConfig.ts";
 import {API_SERVER} from "@/constants/domain.ts";
-import {getCookie} from "@/utils/cookies.ts";
+import {getCookie, getBearerToken} from "@/utils/cookies.ts";
 import {CitizenCard} from "@/models/newModel/citizenCard.ts";
 
 export const fetchCitizenCardById = async (id: number) => {
@@ -9,7 +9,7 @@ export const fetchCitizenCardById = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };

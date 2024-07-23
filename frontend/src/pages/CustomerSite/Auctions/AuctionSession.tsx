@@ -109,7 +109,7 @@ export default function AuctionSession() {
     //       headers: {
     //         'Content-Type': 'application/json',
 
-    //         Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
+    //         Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}')?.accessToken,
     //       },
     //     }
     //   )

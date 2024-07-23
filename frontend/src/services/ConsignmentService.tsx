@@ -1,6 +1,6 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
-import { getCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import {Page} from "@/models/Page.ts";
 import {formatDateToISO} from "@/lib/utils.ts";
@@ -33,7 +33,7 @@ export const fetchAllConsignmentsService = async (input: GetConsignmentSchema) =
   return await axios.get<Page<Consignment>>(`${SERVER_DOMAIN_URL}/api/consignments/`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
+      Authorization: getBearerToken(),
     },
     params: params,
   });
@@ -45,7 +45,7 @@ export const fetchConsignmentByConsignmentId = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };
@@ -56,7 +56,7 @@ export const fetchConsignmentBySecretCode = async (code: string) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };
@@ -67,7 +67,7 @@ export const updateConsignmentService = async (data: any) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => console.log(err));
@@ -78,7 +78,7 @@ export const createConsignmentService = async (data: any) => {
     headers: {
       'Content-Type': 'multipart/form-data',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -88,7 +88,7 @@ export const deleteConsignmentService = async (id: string) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => showErrorToast(err));
@@ -102,7 +102,7 @@ export const takeConsignment = async (id: number) => {
     .put<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };
@@ -112,7 +112,7 @@ export const receivedConsignment = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };
@@ -127,7 +127,7 @@ export const rejectStaffEvaluation = async (id: number, accountId: number, reaso
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+          Authorization: getBearerToken(),
         },
       }
     );
@@ -142,7 +142,7 @@ export const acceptStaffEvaluation = async (id: number, accountId: number) => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
 
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+          Authorization: getBearerToken(),
         },
       }
     );
@@ -154,7 +154,7 @@ export const acceptInitialEva = async (id: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -163,7 +163,7 @@ export const rejectInitialEva = async (id: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -173,7 +173,7 @@ export const acceptFinalEva = async (id: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -182,7 +182,7 @@ export const rejectFinalEva = async (id: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -191,7 +191,7 @@ export const exportConsignments = async () => {
   return await fetch(`${SERVER_DOMAIN_URL}/api/consignments/export`, {
     method: 'GET',
     headers: {
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   })
     .then((response) => response.blob())

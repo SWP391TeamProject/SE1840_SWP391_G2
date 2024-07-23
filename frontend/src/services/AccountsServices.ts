@@ -1,7 +1,7 @@
 import {API_SERVER, SERVER_DOMAIN_URL} from '@/constants/domain';
 import {Account} from '@/models/AccountModel';
 import {Page} from '@/models/Page';
-import {getCookie, removeCookie} from '@/utils/cookies';
+import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 interface GetAccountsSchema {
@@ -30,7 +30,7 @@ export const fetchAccountsService = async (input: GetAccountsSchema) => {
   return await axios.get<Page<Account>>(API_SERVER + '/accounts/', {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
     params: params,
   });
@@ -46,7 +46,7 @@ export const fetchAccountsByName = async (pageNumber: number, pageSize: number, 
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     })
@@ -65,7 +65,7 @@ export const fetchAccountById = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };
@@ -76,7 +76,7 @@ export const createAccountService = async (data: any) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
 };
@@ -85,7 +85,7 @@ export const updateAccountService = async (data: any, id: number) => {
   return await axios.post(API_SERVER + '/accounts/' + id, data, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -99,7 +99,7 @@ export const deleteAccountService = async (id: string) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+          Authorization: getBearerToken(),
         },
       }
     )
@@ -111,7 +111,7 @@ export const activateAccountService = async (id: string) => {
     .put(API_SERVER + '/accounts/activate/' + id, null, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => console.log(err));
@@ -121,7 +121,7 @@ export const exportAccounts = async () => {
   return await fetch(`${SERVER_DOMAIN_URL}/api/accounts/export`, {
     method: 'GET',
     headers: {
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   })
     .then((response) => response.blob())

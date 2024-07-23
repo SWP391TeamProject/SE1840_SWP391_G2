@@ -2,7 +2,7 @@ import { API_SERVER } from '@/constants/domain';
 import { PaymentStatus } from '@/constants/enums';
 import { Page } from '@/models/Page';
 import { Order, ShippingStatus } from '@/models/newModel/order';
-import { getCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import {formatDateToISO} from "@/lib/utils.ts";
 
@@ -41,7 +41,7 @@ export const getOrders = async (input: GetOrdersSchema) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
+      Authorization: getBearerToken(),
     },
     params: params,
   });
@@ -65,7 +65,7 @@ export const getOrdersByUserId = async (
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
+      Authorization: getBearerToken(),
     },
     params: params,
   });
@@ -76,7 +76,7 @@ export const getOrderById = async (id: number) => {
     headers: {
       'Content-Type': 'application/json',
 
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user'))?.accessToken,
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -88,11 +88,10 @@ export const payOrder = async (
     shippingNote?: string;
   }
 ) => {
-  console.log(JSON.parse(getCookie('user') || '{}').accessToken || '');
   return await axios.post<Order>(`${baseUrl}/pay/${id}`, dto, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}').accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -107,7 +106,7 @@ export const updateOrder = async (
   return await axios.post<Order>(`${baseUrl}/${id}`, dto, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user') || '{}').accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };

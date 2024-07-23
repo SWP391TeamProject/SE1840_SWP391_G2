@@ -1,5 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import { getCookie, removeCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 interface GetBlogsSchema {
@@ -30,7 +30,7 @@ class BlogService {
     response = await axios.get(`${this.BASE_URL}/`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     });
@@ -88,7 +88,7 @@ class BlogService {
     return axios.post(this.BASE_URL + '/', blog, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
   }
@@ -98,7 +98,7 @@ class BlogService {
       headers: {
         'Content-Type': 'multipart/form-data',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     });
   }

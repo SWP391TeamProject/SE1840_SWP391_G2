@@ -1,6 +1,6 @@
 import { API_SERVER } from '@/constants/domain';
 import { PaymentType } from '@/constants/enums';
-import { getCookie, removeCookie } from '@/utils/cookies';
+import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
 import axios from 'axios';
 import { formatDateToISO } from '@/lib/utils.ts';
 
@@ -28,7 +28,7 @@ export const createPayment = (dto: { type?: 'DEPOSIT' | 'WITHDRAW'; amount?: num
     {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     }
   );
@@ -55,7 +55,7 @@ export const getPayments = async (input: GetPaymentsSchema) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     });
@@ -87,7 +87,7 @@ export const fetchPaymentssService = async (
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     })
@@ -109,7 +109,7 @@ export const fetchPaymentssByName = async (pageNumber: number, pageSize: number,
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
       params: params,
     })
@@ -126,7 +126,7 @@ export const fetchPaymentsHistory = async () => {
   return await axios.get(API_SERVER + '/payments/history', {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+      Authorization: getBearerToken(),
     },
   });
 };
@@ -137,7 +137,7 @@ export const fetchPaymentsById = async (id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -155,7 +155,7 @@ export const createPaymentsService = async (data: any) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -173,7 +173,7 @@ export const updatePaymentsService = async (data: any, id: number) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => {
@@ -191,7 +191,7 @@ export const deletePaymentsService = async (id: string) => {
       headers: {
         'Content-Type': 'application/json',
 
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => console.log(err));
@@ -203,7 +203,7 @@ export const activatePaymentsService = async (id: string) => {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     })
     .catch((err) => console.log(err));
@@ -225,7 +225,7 @@ export const createPaymentWithVNPAY = async (values: any) => {
     {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     }
   );
@@ -247,7 +247,7 @@ export const createPaymentWithPAYPAL = (values: any) => {
     {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
+        Authorization: getBearerToken(),
       },
     }
   );
