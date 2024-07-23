@@ -504,6 +504,7 @@ export default function AuctionJoin() {
                       />
                       <div className="mx-auto">
                         {isProgress() ? (
+
                           <PlaceBid
                             auctionId={auctionId}
                             itemId={itemDTO?.itemId}
@@ -525,9 +526,9 @@ export default function AuctionJoin() {
                             More Detail
                           </Button>
                         )}
+
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             </div>

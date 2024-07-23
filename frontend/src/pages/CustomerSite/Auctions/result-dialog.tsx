@@ -37,6 +37,7 @@ export default function ResultDialog({ message, items, title, ...props }: Result
 
   const revealItem = (index: number) => {
     document.getElementById('mystery-box')?.classList.add('hidden', 'animate-pulse');
+
     setRevealedItems([...revealedItems, index]);
     if (revealedItems.length + 1 === items?.length) {
       setTotalRevealed(true);
@@ -68,6 +69,7 @@ export default function ResultDialog({ message, items, title, ...props }: Result
               <p className="col-span-1 text-center">Current Price</p>
               <Separator className="col-span-1" />
             </motion.div>
+
             {items?.map((item, index) => (
               <motion.div
                 className="grid grid-cols-3 w-full border"
