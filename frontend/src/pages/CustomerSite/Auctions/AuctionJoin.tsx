@@ -83,7 +83,7 @@ export default function AuctionJoin() {
           console.log(response);
           setItemDTO(response?.auctionItems[0].itemDTO);
           setAllow(auctionSession?.hasDeposited);
-          if (response.status === AuctionSessionStatus.FINISHED) {
+          if (response.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
             setShowCofetti(true);
             setTimeout(() => {
               setShowCofetti(false);
@@ -109,7 +109,7 @@ export default function AuctionJoin() {
     } else {
       setAllow(auctionSession?.hasDeposited);
       setItemDTO(auctionSession?.auctionItems[0].itemDTO);
-      if (auctionSession.status === AuctionSessionStatus.FINISHED) {
+      if (auctionSession.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);
@@ -176,13 +176,13 @@ export default function AuctionJoin() {
   // }, [auctionSession]);
 
   useEffect(() => {
-    if (auctionSession?.status === AuctionSessionStatus.FINISHED) {
+    if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
       setShowCofetti(true);
       setTimeout(() => {
         setShowCofetti(false);
       }, 3000);
     }
-    if (!(auctionSession?.status === AuctionSessionStatus.PROGRESSING)) {
+    if ((auctionSession?.status === AuctionSessionStatus.SCHEDULED)) {
       navigate(`/auctions/${auctionId}`);
     }
   }, [auctionSession]);
@@ -278,7 +278,7 @@ export default function AuctionJoin() {
       if (message?.status == 'BID')
         toast.info(message?.message, {
           action: (
-            <Button variant="outline" onClick={() => handleViewItemDetailsClick(message?.auctionItemId)}>
+            <Button variant="outline" onClick={() => handleViewItemDetailsClick(auctionSession?.auctionItems?.filter((item) => item.itemDTO.itemId == message?.auctionItemId.itemId)[0])}>
               View
             </Button>
           ),
@@ -359,7 +359,7 @@ export default function AuctionJoin() {
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
     if (itemDTO?.itemId !== item.itemDTO.itemId) {
       setItemDTO(item.itemDTO);
-      if (auctionSession.status === AuctionSessionStatus.FINISHED) {
+      if (auctionSession.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);

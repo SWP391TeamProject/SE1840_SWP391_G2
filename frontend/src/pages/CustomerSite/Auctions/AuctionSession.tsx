@@ -375,7 +375,7 @@ export default function AuctionSession() {
                     <></>
                   )}
 
-                  {auctionSession?.status === AuctionSessionStatus.FINISHED ||
+                  {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date() ||
                     new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
                     <div className="text-pink-500 dark:text-pink-400 font-semibold">Auction Ended</div>
                   ) : (
@@ -480,7 +480,7 @@ export default function AuctionSession() {
                         Current Price: {currency.format(item?.currentPrice)}
                       </div>
                       {/* </div> */}
-                      {auctionSession?.status === AuctionSessionStatus.FINISHED &&
+                      {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date() &&
                         new Date(auctionSession?.endDate) < new Date() ? (
                         <SoldFor item={item} currency={currency} />
                       ) : (
