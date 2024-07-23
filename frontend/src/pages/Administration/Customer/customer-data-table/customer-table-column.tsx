@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {DotsHorizontalIcon} from "@radix-ui/react-icons";
+import AccountRoleBadge from "@/components/AccountRoleBadge.tsx";
+import * as React from "react";
 
 export const getColumns = (): ColumnDef<Account>[] => [
   {
@@ -80,21 +82,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
     accessorKey: 'role',
     header: ({column}) => <DataTableColumnHeader column={column} title="Role"/>,
     cell: ({row}) => {
-      const roleColor = {
-        ADMIN: 'bg-red-500',
-        STAFF: 'bg-yellow-500',
-        MANAGER: 'bg-purple-500',
-        MEMBER: 'bg-gray-500',
-      };
-
-      return (
-        <>
-          <Badge
-            className={`font-medium capitalize ${roleColor[row.original.role]} hover:${roleColor[row.original.role]}`}>
-            {row.original.role}
-          </Badge>
-        </>
-      );
+      return (<AccountRoleBadge role={row.original.role}/>);
     },
   },
   {

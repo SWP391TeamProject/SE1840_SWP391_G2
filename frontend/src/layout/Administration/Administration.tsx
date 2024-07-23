@@ -29,6 +29,8 @@ import logo from '@/assets/icon.png';
 import { useAuth } from '@/AuthProvider';
 import { Roles } from '@/constants/enums';
 import { checkScrollPositionAndReset } from '../layoutUtils/layout-utils';
+import AccountRoleBadge from "@/components/AccountRoleBadge.tsx";
+import * as React from "react";
 
 export const ConsignmentsContext = createContext([]);
 
@@ -84,10 +86,7 @@ export default function Administration() {
                 <span className="font-semibold text-lg text-orange-700 text-center">Biddify</span>
               </div>
             </Link>
-            <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
-              <Bell className="h-4 w-4" />
-              <span className="sr-only">Toggle notifications</span>
-            </Button>
+            <AccountRoleBadge className="ml-auto" role={auth.user.role}/>
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">

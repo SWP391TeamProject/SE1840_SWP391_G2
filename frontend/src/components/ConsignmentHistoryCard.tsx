@@ -19,6 +19,7 @@ import ConsignmentAttachmentGallery
   from "@/pages/Administration/consignments/consignment-components/ConsignmentAttachmentGallery.tsx";
 import {useAuth} from "@/AuthProvider.tsx";
 import {ConsignmentDetailType, Roles} from "@/constants/enums.tsx";
+import AccountRoleBadge from "@/components/AccountRoleBadge.tsx";
 
 interface ConsignmentHistoryCardProps {
   consignment: Consignment;
@@ -53,12 +54,17 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
       <CardContent className="overflow-hidden flex flex-col gap-6">
 
         {consignment.consignmentDetails
-          .filter(cd => auth.user.role !== Roles.MEMBER || cd.type !== ConsignmentDetailType.FINAL_EVALUATION)
+          .filter(cd => auth.user.role !== Roles.MEMBER ||
+            (cd.type === ConsignmentDetailType.INITIAL_EVALUATION ||
+              cd.type === ConsignmentDetailType.MANAGER_ACCEPTED))
           .sort((a, b) => b.consignmentDetailId - a.consignmentDetailId)
           .map(cd =>
             <div className="flex flex-col" key={cd.consignmentDetailId}>
               <div className="flex flex-row justify-between gap-2">
-                <p className="font-semibold text-lg">{cd.account.nickname}</p>
+                <p className="font-semibold text-lg flex flex-row gap-3">
+                  <AccountRoleBadge role={cd.account.role}/>
+                  {cd.account.nickname}
+                </p>
                 <p>{formatDateTime(cd.createDate)}</p>
               </div>
               <Accordion type="single" collapsible className="w-full">
