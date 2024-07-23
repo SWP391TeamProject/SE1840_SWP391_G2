@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId) {
+    public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds) {
         Account account = accountRepos.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
         BigDecimal totalPay = BigDecimal.ZERO;
@@ -270,12 +270,43 @@ public class OrderServiceImpl implements OrderService {
                     "Insufficient balance");
             orderPayment.setStatus(Payment.Status.SUCCESS);
             paymentRepository.save(orderPayment);
+
+            // refund deposit for buyer
+            {
+                Payment deposit = order.getAuctionSession().getDeposits().stream()
+                        .map(Deposit::getPayment)
+                        .filter(p -> p.getStatus() == Payment.Status.PENDING)
+                        .filter(p -> p.getAccount().getAccountId() == accountId)
+                        .findFirst().orElse(null);
+                if (deposit != null) {
+                    deposit.setStatus(Payment.Status.SUCCESS);
+                    paymentRepository.save(deposit);
+
+                    account.setBalance(account.getBalance().add(deposit.getPaymentAmount()));
+
+                    notificationService.sendNotification(
+                            NotificationDTO.builder()
+                                    .message(String.format(
+                                            "Your deposit has been refunded from auction %s",
+                                            order.getAuctionSession().getTitle()
+                                    ))
+                                    .userId(account.getAccountId())
+                                    .build()
+                    );
+                    log.info("Refunded deposit id {} for account {}", deposit.getPaymentId(),
+                            account.getAccountId());
+                }
+            }
+
             account.setBalance(account.getBalance().subtract(orderPayment.getPaymentAmount()));
             accountRepos.save(account);
+
+
             order.setShippingStatus(Order.ShippingStatus.PACKAGING);
             order.setShippingAddress(dto.getShippingAddress());
             order.setShippingNote(dto.getShippingNote());
             orderRepository.save(order);
+
             notificationService.sendNotification(
                     NotificationDTO.builder()
                             .message(String.format(
@@ -346,6 +377,23 @@ public class OrderServiceImpl implements OrderService {
         payment.setFailedReason("Order cancelled due to not paying within the deadline");
         paymentRepository.save(payment);
 
+        Account account = payment.getAccount();
+
+        // refund deposit for buyer
+        {
+            Payment deposit = order.getAuctionSession().getDeposits().stream()
+                    .map(Deposit::getPayment)
+                    .filter(p -> p.getStatus() == Payment.Status.PENDING)
+                    .filter(p -> p.getAccount().getAccountId() == account.getAccountId())
+                    .findFirst().orElse(null);
+            if (deposit != null) {
+                deposit.setStatus(Payment.Status.FAILED);
+                paymentRepository.save(deposit);
+                log.info("Cancel deposit id {} for account {} due to not paying order {}", deposit.getPaymentId(),
+                        account.getAccountId(), order.getOrderId());
+            }
+        }
+
         itemRepos.saveAll(order.getOrderDetails().stream()
                 .map(OrderDetail::getItem)
                 .peek(d -> d.setStatus(Item.Status.QUEUE))
@@ -363,7 +411,7 @@ public class OrderServiceImpl implements OrderService {
                                 "Your order #%d was cancelled due to not paying within the deadline.",
                                 order.getOrderId()
                         ))
-                        .userId(payment.getAccount().getAccountId())
+                        .userId(account.getAccountId())
                         .build());
     }
 
@@ -435,6 +483,13 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return OrderDTO.detailed(orderRepository.save(order));
+    }
+
+    @Override
+    public void linkAuctionToOrders(AuctionSession auction, List<OrderDTO> orderList) {
+        orderRepository.saveAll(orderList.stream()
+                .map(order -> orderRepository.findById(order.getOrderId()).orElseThrow())
+                .peek(order -> order.setAuctionSession(auction)).collect(Collectors.toList()));
     }
 
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)

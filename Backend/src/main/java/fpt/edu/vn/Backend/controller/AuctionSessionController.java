@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @CrossOrigin("*")
@@ -153,17 +154,16 @@ public class AuctionSessionController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/finish/{id}")
-    @PreAuthorize("hasAuthority('MANAGER')")
-    public ResponseEntity<String> finishAuctionSession(@PathVariable int id) {
-        auctionSessionService.finishAuction(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @GetMapping("/terminate/{id}")
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<String> terminateAuctionSession(@PathVariable int id) {
-        auctionSessionService.terminateAuction(id);
+        CompletableFuture.runAsync(() -> {
+            try {
+                auctionSessionService.terminateAuction(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

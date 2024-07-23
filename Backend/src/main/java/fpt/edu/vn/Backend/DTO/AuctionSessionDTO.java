@@ -24,6 +24,7 @@ public class AuctionSessionDTO implements Serializable {
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private LocalDateTime suspendDate;
     private AuctionSession.Status status;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
@@ -39,6 +40,7 @@ public class AuctionSessionDTO implements Serializable {
                 .description(auctionSession.getDescription())
                 .startDate(auctionSession.getStartDate())
                 .endDate(auctionSession.getEndDate())
+                .suspendDate(auctionSession.getSuspendDate())
                 .status(auctionSession.getStatus())
                 .participantCount(auctionSession.getParticipantCount())
                 .build();

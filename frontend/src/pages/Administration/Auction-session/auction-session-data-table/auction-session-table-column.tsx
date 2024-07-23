@@ -15,7 +15,7 @@ import { DataTableColumnHeader } from '@/components/data-tables/data-table-colum
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { AccountStatus, AuctionSessionStatus } from '@/constants/enums';
-import { formatDate } from '@/lib/utils';
+import {formatDate, formatDateTime} from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 
@@ -75,13 +75,13 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
   {
     accessorKey: 'startDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Start Date" />,
-    cell: ({ row }) => formatDate(new Date(row.getValue('startDate'))),
+    cell: ({ row }) => formatDateTime(new Date(row.getValue('startDate'))),
     enableSorting: true,
   },
   {
     accessorKey: 'endDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title="End Date" />,
-    cell: ({ row }) => formatDate(new Date(row.getValue('endDate'))),
+    cell: ({ row }) => formatDateTime(new Date(row.getValue('endDate'))),
     enableSorting: true,
   },
   {
@@ -92,7 +92,7 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
   },
   {
     accessorKey: 'auctionItems',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Number Of Lots" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Lots" />,
     cell: ({ row }) => <div className="font-medium">{row.getValue('auctionItems')?.length}</div>,
     enableSorting: true,
   },

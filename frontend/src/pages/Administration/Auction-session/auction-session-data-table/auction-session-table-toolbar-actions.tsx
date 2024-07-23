@@ -23,7 +23,6 @@ import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { DateTimePicker } from '@/components/time-picker/date-time-picker.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { AuctionSession } from '@/models/AuctionSessionModel.ts';
-import { Label } from '@/components/ui/label';
 
 interface TasksTableToolbarActionsProps {
   table: Table<AuctionSession>;
@@ -127,7 +126,7 @@ export function AuctionSessionsTableToolbarActions({ table }: TasksTableToolbarA
                     name="useTo"
                     render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
                   />
-                  <DateTimePicker {...form.register('to')} placeholder="to" placeholder="to" />
+                  <DateTimePicker {...form.register('to')} placeholder="to" />
                 </div>
               </div>
             </PopoverContent>

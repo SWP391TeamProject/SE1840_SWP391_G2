@@ -5,6 +5,7 @@ import { showErrorToast } from '@/lib/handle-error';
 import { AuctionSession } from '@/models/AuctionSessionModel.tsx';
 import { Page } from '@/models/Page.ts';
 import { formatDateToISO } from '@/lib/utils.ts';
+import {AxiosResponse} from "axios";
 
 const controller = 'auction-sessions';
 
@@ -222,6 +223,15 @@ export const fetchAuctionSessionById = async (id: number): Promise<AuctionSessio
     },
   });
   return res.data;
+};
+
+export const getAuctionSessionById = async (id: number): Promise<AxiosResponse<AuctionSession>> => {
+  return axios.get<AuctionSession>(`${SERVER_DOMAIN_URL}/api/${controller}/${id}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: getBearerToken(),
+    },
+  });
 };
 
 export const fetchAuctionSessionByTitle = async (page?: number, size?: number, title?: string) => {
