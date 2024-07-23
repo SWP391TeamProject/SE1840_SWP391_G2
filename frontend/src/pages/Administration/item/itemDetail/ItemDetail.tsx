@@ -270,7 +270,7 @@ export default function ItemDetail() {
                       </Button>
                     )}
                     <Button type="submit" variant="outline" asChild>
-                      <Link to={`/item/${item.itemId}`}>Public view</Link>
+                      <Link to={`/jewelries/${item.itemId}`}>Public view</Link>
                     </Button>
                   </div>
                   <ProductStatus item={item} form={form} />

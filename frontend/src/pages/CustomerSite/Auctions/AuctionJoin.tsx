@@ -520,7 +520,7 @@ export default function AuctionJoin() {
                             }
                           />
                         ) : (
-                          <Button className="w-full" variant="outline" onClick={() => nav(`/item/${itemDTO?.itemId}`)}>
+                          <Button className="w-full" variant="outline" onClick={() => nav(`/jewelries/${itemDTO?.itemId}`)}>
                             More Detail
                           </Button>
                         )}
