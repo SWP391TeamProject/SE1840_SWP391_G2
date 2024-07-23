@@ -101,16 +101,22 @@ export default function AuctionSessionCreate() {
   }, [isConfirmed, form.getValues]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    if (multipleDateRangeOverlaps(events)) {
-      form.setError('startDate', { type: "custom", message: "New Session time range is overlapping another Scheduled Session." });
-      form.setError('endDate', { type: "custom", message: "" })
+    let start = form.control._formValues['startDate'];
+    let end = form.control._formValues['endDate'];
+    if ((start && end) && end > start ){
+      if (multipleDateRangeOverlaps(events)) {
+        form.setError('startDate', { type: "custom", message: "New Session time range is overlapping another Scheduled Session." });
+        form.setError('endDate', { type: "custom", message: "" })
+      } else {
+        form.clearErrors('startDate');
+        form.clearErrors('endDate');
+        console.log(data);
+        console.log('validated');
+        setScheduleTrigger(false);
+        setShowTrigger(true);
+      }
     } else {
-      form.clearErrors('startDate');
-      form.clearErrors('endDate');
-      console.log(data);
-      console.log('validated');
-      setScheduleTrigger(false);
-      setShowTrigger(true);
+      form.setError('endDate', {type: "custom", message:"End time must be after start time"})
     }
   }
 
@@ -131,7 +137,7 @@ export default function AuctionSessionCreate() {
     let end = form.control._formValues['endDate'];
     console.log(start);
     console.log(end);
-    if (start && end) {
+    if ((start && end) && end > start ) {
       let newSession = {
         event_id: null,
         title: form.control._formValues['title'] || "New Auction Session",
@@ -151,6 +157,10 @@ export default function AuctionSessionCreate() {
         form.clearErrors('startDate');
         form.clearErrors('endDate');
       }      
+    } else {
+      {
+        form.setError('endDate', {type: "custom", message:"End time must be after start time"})
+      }
     }
   }
 
@@ -173,7 +183,10 @@ export default function AuctionSessionCreate() {
               timeIntervals[i].start, timeIntervals[i].end,
               timeIntervals[j].start, timeIntervals[j].end
             )
-          ) return true;
+          ) {
+            console.log(timeIntervals[j].title, timeIntervals[i].title)
+            return true
+          };
         }
       }
     return false;
@@ -202,10 +215,9 @@ export default function AuctionSessionCreate() {
   }, [])
 
   return (
-    <>
-
+    <div className='p-10'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6 p-3">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
           <h1 className='font-bold text-xl'>Step {step}</h1>
           {/* this is the title of the auction session. */}
           {step == 1 && <>
@@ -352,6 +364,6 @@ export default function AuctionSessionCreate() {
           onSuccess={confirm}
         />
       </Form>
-    </>
+    </div>
   );
 }
