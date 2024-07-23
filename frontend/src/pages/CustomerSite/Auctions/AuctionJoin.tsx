@@ -50,7 +50,7 @@ export default function AuctionJoin() {
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const [itemDTO, setItemDTO] = useState<Item | undefined>(
-    location?.state?.itemDTO || auctionSession?.auctionItems[0].itemDTO
+    location?.state?.itemDTO || auctionSession?.auctionItems[0]?.itemDTO
   );
 
   const dispatch = useAppDispatch();
@@ -207,7 +207,8 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    if (auctionSession && auctionSession?.status === AuctionSessionStatus.PROGRESSING && auctionSession?.hasDeposited) {
+    console.log( auctionSession);
+    if ( new Date(auctionSession?.endDate) > new Date() && new Date(auctionSession?.startDate) < new Date() && auctionSession?.hasDeposited) {
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -449,7 +450,7 @@ export default function AuctionJoin() {
                     </div>
                   )}
 
-                  {auctionSession?.hasDeposited && auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
+                  {auctionSession?.hasDeposited && new Date(auctionSession?.endDate) > new Date() && new Date() < new Date(auctionSession?.startDate) && (
                     <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
                       <BidsInformation
                         auctionSession={auctionSession}
