@@ -26,10 +26,12 @@ import {
   getTotalItemSold,
   getTotalOrder,
   getTotalSale,
+  getUserOnline,
   getUserThisMonth,
 } from '@/services/StatisticServices';
 import PaymentsPieChart from './PaymentsBarChart';
 import PieChart from './PaymentsPieChart';
+import VectorMapComponent from './JvetorMap';
 
 
 const avatarSX = {
@@ -68,7 +70,7 @@ const AdminDashboard = () => {
   const [totalItem, setTotalItem] = useState<number>(0);
   const [totalPayment, setTotalPayment] = useState<number>(0);
   const [totalAuction, setTotalAuction] = useState<number>(0);
-
+  const [totalUser, setTotalUser] = useState<number>(0);
   const [selectedLabel, setSelectedLabel] = useState(status[0].value);
 
   const handleChange = (event) => {
@@ -101,9 +103,13 @@ const AdminDashboard = () => {
 
         const totalAuctionResponse = await getTotalAuctionProgressing();
         if (totalAuctionResponse && totalAuctionResponse.data) {
-          console.log(totalAuctionResponse.data);
           setTotalAuction(totalAuctionResponse.data);
         }
+        const userOnlineResponse = await getUserOnline();
+        if(userOnlineResponse && userOnlineResponse.data){
+          setTotalUser(userOnlineResponse.data);
+        }
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -130,7 +136,7 @@ const AdminDashboard = () => {
           <AnalyticEcommerce
             title="Registered Users"
             count={newUsersThisMonth.toLocaleString()}
-            // percentage={20.5}
+            //  percentage={totalUser}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -316,7 +322,7 @@ const AdminDashboard = () => {
             </List>
           </MainCard>
         </Grid>
-
+        
         {/* grid bracket */}
       </Grid>
     </div>

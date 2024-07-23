@@ -35,24 +35,7 @@ export default function AnalyticEcommerce({ color = 'primary', title, count, per
                 {count}
               </Typography>
             </Grid>
-            {percentage && (
-              <Grid item>
-                {/* <Chip
-                  variant="combined"
-                  color={color}
-                  icon={
-                    isLoss ? (
-                      <FallOutlined style={iconSX} />
-                    ) : (
-                      <RiseOutlined style={iconSX} />
-                    )
-                  }
-                  label={`${percentage}%`}
-                  sx={{ ml: 1.25, pl: 1 }}
-                  size="small"
-                /> */}
-              </Grid>
-            )}
+            {percentage}
           </Grid>
         </Stack>
         <Box sx={{ pt: 2.25 }}>

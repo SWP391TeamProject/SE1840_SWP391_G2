@@ -9,28 +9,7 @@ import { getUserOnline } from '@/services/StatisticServices';
 import { AxiosResponse } from '@/config/axiosConfig.ts';
 
 // chart options
-const areaChartOptions = {
-  chart: {
-    height: 450,
-    type: 'area',
-    toolbar: {
-      show: false,
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  stroke: {
-    curve: 'smooth',
-    width: 2,
-  },
-  grid: {
-    strokeDashArray: 4,
-  },
-  xaxis: {
-    categories: [], // Populate with actual categories if needed
-  },
-};
+
 
 interface MonthlyUserData {
   month: number;
@@ -44,7 +23,36 @@ interface GetMonthlyUserResponse {
 
 export default function NewUserAreaChart({ slot }) {
   const theme = useTheme();
-
+  const formatTimestampToDateTime = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString(); // You can adjust the format as needed
+  };
+  const areaChartOptions = {
+    chart: {
+      height: 450,
+      type: 'line',
+      toolbar: {
+        show: false,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2,
+    },
+    xaxis: {
+      categories: [], // Populate with actual categories if needed
+    },
+    yaxis: {
+      labels: {
+        formatter: (value) => {
+          return formatTimestampToDateTime(value);
+        },
+      },
+  },
+  };
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
   const [onlineUsers, setOnlineUsers] = useState<Map<string, number> | null>(null);
@@ -71,12 +79,13 @@ export default function NewUserAreaChart({ slot }) {
   useEffect(() => {
     getUserOnline().then((response: AxiosResponse<Map<string, number>>) => {
       const data = response.data;
+      const categories = Object.keys(data).map((email) => formatTimestampToDateTime(data[email]));
       setOnlineUsers(data);
       setOptions((prevState) => ({
         ...prevState,
         colors: [theme.palette.primary.main, theme.palette.primary[700]],
         xaxis: {
-          categories: Object.keys(data),
+          categories: categories,
           labels: {
             style: {
               colors: new Array(Object.keys(data).length).fill(secondary),
@@ -89,15 +98,14 @@ export default function NewUserAreaChart({ slot }) {
           tickAmount: Object.keys(data).length - 1,
         },
         yaxis: {
-          labels: {
-            style: {
-              colors: [secondary],
+            labels: {
+              formatter: (value) => {
+                return formatTimestampToDateTime(value);
+              },
             },
-          },
         },
         grid: {
-          borderColor: line,
-          strokeDashArray: 4,
+          borderColor: line
         },
       }));
       setSeries([
@@ -105,11 +113,12 @@ export default function NewUserAreaChart({ slot }) {
           name: 'Online Users',
           data: Object.values(data),
         },
+        
       ]);
     });
   }, [primary, secondary, line, theme]);
 
-  return <ReactApexChart options={options} series={series} type="area" height={450} />;
+  return <ReactApexChart options={options} series={series} type="line" height={450} />;
 }
 
 NewUserAreaChart.propTypes = { slot: PropTypes.string };
