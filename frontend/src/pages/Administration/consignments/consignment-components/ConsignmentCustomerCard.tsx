@@ -28,7 +28,7 @@ const ConsignmentCustomerCard: React.FC<ConsignmentCustomerCardProps> = ({
         <h2 className="mb-4 flex flex-row gap-3 items-center">
           <Avatar className="hover:cursor-pointer w-16 h-16">
             <AvatarImage src={customer.avatar?.link} alt="avatar"/>
-            <AvatarFallback> {customer.nickname[0]}</AvatarFallback>
+            <AvatarFallback>{customer.nickname[0]}</AvatarFallback>
           </Avatar>
           <span>
         <AccountTooltip account={customer}>
@@ -54,7 +54,7 @@ const ConsignmentCustomerCard: React.FC<ConsignmentCustomerCardProps> = ({
           <div className="space-y-2">
             {consignment.contactName &&
               <div className="flex justify-between">
-                <span>Contact name</span>
+                <span>Contact Name</span>
                 <span>{consignment.contactName}</span>
               </div>}
             {consignment.contactEmail &&

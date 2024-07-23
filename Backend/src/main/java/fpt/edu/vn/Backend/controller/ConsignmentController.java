@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +54,7 @@ public class ConsignmentController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<Page<ConsignmentDTO>> getAllConsignment(
             Principal principal,
             @PageableDefault(size = 50) Pageable pageable,
@@ -65,16 +67,22 @@ public class ConsignmentController {
         if (!Authorizer.STAFF.contains(requester.getRole())) {
             customer = requester.getUserId(); // only get consignment of current user
         }
-        return ResponseEntity.ok(consignmentService.getAllConsignments(pageable, status, from, to, customer, search));
+        if (requester.getRole() == Account.Role.STAFF) {
+            return ResponseEntity.ok(consignmentService.getAllConsignments(
+                    pageable, status, from, to, customer, requester.getUserId(), search));
+        }
+        return ResponseEntity.ok(consignmentService.getAllConsignments(
+                pageable, status, from, to, customer, null, search));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ConsignmentDTO> getConsignmentByID(@PathVariable int id) {
+    public ResponseEntity<ConsignmentDTO> getConsignmentByID(Principal principal, @PathVariable int id) {
         try {
             ConsignmentDTO consignment = consignmentService.getConsignmentById(id);
             if (consignment == null) {
                 throw new ConsignmentServiceException("No consignments found for acc ID: " + id);
             }
+            Authorizer.expectStaffOrUserId(principal, consignment.getUser().getAccountId());
             return new ResponseEntity<>(consignment, HttpStatus.OK);
         } catch (ConsignmentServiceException e) {
             logger.error("Error retrieving consignments by ID", e);
@@ -83,6 +91,16 @@ public class ConsignmentController {
             logger.error("Unexpected error retrieving consignments by ID", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/secret/{code}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    public ResponseEntity<ConsignmentDTO> getConsignmentBySecretCode(@PathVariable String code) {
+        ConsignmentDTO consignment = consignmentService.getConsignmentBySecretCode(code);
+        if (consignment == null) {
+            throw new ConsignmentServiceException("No consignments found for code: " + code);
+        }
+        return new ResponseEntity<>(consignment, HttpStatus.OK);
     }
 
 

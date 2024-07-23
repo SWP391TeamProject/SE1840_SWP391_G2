@@ -17,6 +17,7 @@ public class ConsignmentSpecification implements Specification<Consignment> {
     private final @Nullable LocalDateTime from;
     private final @Nullable LocalDateTime to;
     private final @Nullable Integer customer;
+    private final @Nullable Integer staff;
     private final @Nullable String search;
 
     @Override
@@ -37,6 +38,13 @@ public class ConsignmentSpecification implements Specification<Consignment> {
 
         if (customer != null) {
             predicates.add(builder.equal(root.get("user").get("accountId"), customer));
+        }
+
+        if (staff != null) {
+            predicates.add(builder.or(
+                    builder.equal(root.get("staff").get("accountId"), staff),
+                    builder.isNull(root.get("staff"))
+            ));
         }
 
         if (search != null && !search.isEmpty()) {

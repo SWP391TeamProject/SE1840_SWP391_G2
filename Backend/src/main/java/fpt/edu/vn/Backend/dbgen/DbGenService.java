@@ -241,7 +241,8 @@ public class DbGenService {
             Consignment consignment = new Consignment();
             consignment.setConsignmentId(obj.get("id").getAsInt());
             consignment.setUser(accountRepos.getReferenceById(obj.get("userId").getAsInt()));
-            consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
+            if (obj.has("staffId"))
+                consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
             consignment.setStatus(Consignment.Status.valueOf(obj.get("status").getAsString()));
             consignment.setPreferContact(Consignment.preferContact.valueOf(obj.get("preferContact").getAsString()));
             consignment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
@@ -439,6 +440,11 @@ public class DbGenService {
             item.setStatus(Item.Status.valueOf(obj.get("status").getAsString()));
             item.setOwner(accountRepos.getReferenceById(obj.get("ownerId").getAsInt()));
             item = itemRepos.save(item);
+            if (obj.has("consignmentId")) {
+                Consignment c = consignmentRepos.findById(obj.get("consignmentId").getAsInt()).orElseThrow();
+                c.setCreatedItem(item);
+                consignmentRepos.save(c);
+            }
             {
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("createDate", parseDate(obj.get("createDate").getAsString()));

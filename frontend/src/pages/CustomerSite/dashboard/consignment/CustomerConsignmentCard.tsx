@@ -45,7 +45,11 @@ const CustomerConsignmentCard: React.FC<CustomerConsignmentCardProps> = ({ consi
         break;
       }
       case ConsignmentStatus.TO_ITEM: {
-        setMessage('Your jewelry will be listed for auction soon!');
+        setMessage('Your jewelry will be listed for public soon!');
+        break;
+      }
+      case ConsignmentStatus.FINISHED: {
+        setMessage('This consignment is completed. Check out your jewelry page!');
         break;
       }
       case ConsignmentStatus.TERMINATED: {

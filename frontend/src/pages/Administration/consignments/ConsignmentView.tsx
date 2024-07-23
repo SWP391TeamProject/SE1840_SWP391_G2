@@ -16,6 +16,8 @@ import ConsignmentHistoryCard
   from "@/components/ConsignmentHistoryCard.tsx";
 import ConsignmentIntroCard
   from "@/pages/Administration/consignments/consignment-components/ConsignmentIntroCard.tsx";
+import ConsignmentSecretCodeCard
+  from "@/components/ConsignmentSecretCodeCard.tsx";
 
 export default function ConsignmentView() {
   const consignmentId = parseInt(useParams().id);
@@ -56,6 +58,10 @@ export default function ConsignmentView() {
           </div>
           <div className="col-span-2 flex flex-col gap-6 flex-wrap">
             {customer != null && <ConsignmentCustomerCard customer={customer} consignment={consignment} />}
+            {consignment.secretCode &&
+              <ConsignmentSecretCodeCard consignment={consignment}
+                                         message="This is the secret code to identify the customer.
+                                         Remember to keep it secret. The code will never be changed."/>}
             <ConsignmentHistoryCard consignment={consignment} />
           </div>
         </div>

@@ -15,6 +15,8 @@ import CustomerInitialEvaluationForm
 import React from "react";
 import CustomerFinalEvaluationForm
   from "@/pages/CustomerSite/dashboard/consignment/action-buttons/CustomerFinalEvaluationForm.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {Link} from "react-router-dom";
 
 interface CustomerConsignmentIntroCardProps {
   consignment: Consignment;
@@ -54,12 +56,19 @@ const CustomerConsignmentIntroCard: React.FC<CustomerConsignmentIntroCardProps> 
         return (
           <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 w-full">
             <h2 className="text-2xl font-bold mb-4">Information</h2>
-            <p>Your jewelry will be listed for auction soon</p>
+            <p>Your jewelry will be listed for public soon</p>
+          </div>)
+      }
+      case ConsignmentStatus.FINISHED: {
+        return (
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 w-full">
+            <h2 className="text-2xl font-bold mb-4">Information</h2>
+            <p>A dedicated page has been made for your jewelry. You might check everything about it there.</p>
           </div>)
       }
       case ConsignmentStatus.TERMINATED: {
         return (
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 w-full">
+          <div className="bg-red-100 dark:bg-gray-800 rounded-lg p-6 w-full">
             <h2 className="text-2xl font-bold mb-4">Information</h2>
             <p>This consignment has been terminated</p>
           </div>)
@@ -70,8 +79,14 @@ const CustomerConsignmentIntroCard: React.FC<CustomerConsignmentIntroCardProps> 
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-3xl">Consignment
-          #{consignment?.consignmentId}</CardTitle>
+        <CardTitle className="flex justify-between">
+          <h2 className="text-3xl">Consignment #{consignment?.consignmentId}</h2>
+          {consignment.createdItemId &&
+            <Button size="sm" asChild>
+              <Link
+                to={`/item/${consignment.createdItemId}`}>View item</Link>
+            </Button>}
+        </CardTitle>
         <CardDescription className="flex gap-3">
           Status:
           <ConsignmentStatusBadge status={consignment.status}/>

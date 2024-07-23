@@ -1,9 +1,7 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import { ConsignmentStatus } from '@/constants/enums';
 import { showErrorToast } from '@/lib/handle-error';
-import { getCookie, removeCookie } from '@/utils/cookies';
+import { getCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-import { toast } from 'sonner';
 import {Page} from "@/models/Page.ts";
 import {formatDateToISO} from "@/lib/utils.ts";
 import Consignment from "@/models/consignment.ts";
@@ -41,103 +39,20 @@ export const fetchAllConsignmentsService = async (input: GetConsignmentSchema) =
   });
 };
 
-interface GetConsignmentsSchema {
-  page: number;
-  size: number;
-  sort?: string;
-  order?: 'asc' | 'desc';
-  status?: string;
-  role?: string;
-  search?: string;
-}
-
-export const getConsignments = async (input: GetConsignmentsSchema) => {
-  try {
-    const { page, size, sort, order, status } = input;
-
-    // Prepare query parameters
-    if (status === '') {
-      const params: Record<string, any> = {
-        page: page && page - 1, // Spring Boot uses 0-based page index
-        size: size ? size : 10,
-        sort,
-        order,
-        search: input.search,
-      };
-
-      return await axios.get(`${SERVER_DOMAIN_URL}/api/consignments/`, {
-        headers: {
-          'Content-Type': 'application/json',
-
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-        },
-        params: params,
-      });
-    } else {
-      let params = {
-        status: status,
-        page: page && page - 1, // Spring Boot uses 0-based page index
-        size: size ? size : 10,
-        sort,
-        order: order,
-      };
-      console.log(params);
-      return await axios.get(`${SERVER_DOMAIN_URL}/api/consignments/filter-by-status`, {
-        headers: {
-          'Content-Type': 'application/json',
-
-          Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
-        },
-        params: params,
-      });
-    }
-    // return response.data;
-  } catch (err) {
-    console.log(err);
-    if (err?.response.status == 401) {
-      removeCookie('user');
-      removeCookie('token');
-    }
-  }
-};
-
-export const fetchConsignmentsByStatusService = async (
-  pageNumber: number,
-  pageSize: number,
-  status: ConsignmentStatus
-) => {
-  let params = {
-    status: status,
-    pageNumb: pageNumber,
-    pageSize: pageSize,
-  };
-  console.log(params);
+export const fetchConsignmentByConsignmentId = async (id: number) => {
   return await axios
-    .get(`${SERVER_DOMAIN_URL}/api/consignments/filter-by-status`, {
+    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
       headers: {
         'Content-Type': 'application/json',
 
         Authorization: 'Bearer ' + JSON.parse(getCookie('user')).accessToken || '',
       },
-      params: params,
-    })
-    .then((res) => {
-      console.log(res.data.content);
-      return res;
-    }) // return the data here
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
-      throw err; // make sure to throw the error so it can be caught by the query
     });
 };
 
-export const fetchConsignmentByConsignmentId = async (id: number) => {
+export const fetchConsignmentBySecretCode = async (code: string) => {
   return await axios
-    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
+    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/secret/${code}`, {
       headers: {
         'Content-Type': 'application/json',
 

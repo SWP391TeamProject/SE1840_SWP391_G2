@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ConsignmentRepos extends JpaRepository<Consignment, Integer>, JpaSpecificationExecutor<Consignment> {
     Page<Consignment> findByConsignmentId(int id, Pageable pageable);
@@ -19,4 +21,8 @@ public interface ConsignmentRepos extends JpaRepository<Consignment, Integer>, J
     Page<Consignment> findAllByUser_AccountId(int userId, Pageable pageable);
 
     Page<Consignment> findByStatusOrStaff_AccountId(Consignment.Status status, int staffId, Pageable pageable);
+
+    Optional<Consignment> findBySecretCodeIgnoreCase(String code);
+
+    boolean existsBySecretCodeIgnoreCase(String code);
 }

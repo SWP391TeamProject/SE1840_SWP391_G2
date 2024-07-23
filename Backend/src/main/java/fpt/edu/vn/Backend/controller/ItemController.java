@@ -147,9 +147,12 @@ public class ItemController {
             if (reservePrice == null) {
                 throw new ResourceNotFoundException("This consignment doesn't have manager accepted evaluation!");
             }
-            consignmentService.updateConsignment(consignmentDTO.getConsignmentId(), consignmentDTO);
         }
-        return new ResponseEntity<>(itemService.createItem(itemDTO), HttpStatus.CREATED);
+        ItemDTO item = itemService.createItem(itemDTO);
+        if (itemDTO.getConsignmentId() != null) {
+            consignmentService.finishItem(itemDTO.getConsignmentId(), item.getItemId());
+        }
+        return new ResponseEntity<>(item, HttpStatus.CREATED);
     }
 
     @PostMapping("/update")

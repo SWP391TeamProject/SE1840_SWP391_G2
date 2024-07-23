@@ -1,7 +1,7 @@
 import { ConsignmentStatus } from '@/constants/enums';
-import { Account } from '@/constants/interfaces';
 import { ConsignmentDetail } from './newModel/ConsignmentDetail';
 import { Attachment } from './Attachment';
+import {Account} from "@/models/AccountModel.tsx";
 
 interface Consignment {
   consignmentId: number;
@@ -20,6 +20,8 @@ interface Consignment {
   measurement: string;
   condition: string;
   stamped: string;
+  createdItemId?: number;
+  secretCode?: string;
   createDate: string;
   updateDate: string;
   consignmentDetails: ConsignmentDetail[];

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -27,6 +28,8 @@ public class ConsignmentDTO implements Serializable {
     private String measurement;
     private String condition;
     private String stamped;
+    private Integer createdItemId;
+    private String secretCode;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     List<ConsignmentDetailDTO> consignmentDetails;
@@ -50,9 +53,12 @@ public class ConsignmentDTO implements Serializable {
         this.measurement = consignment.getMeasurement();
         this.condition = consignment.getCondition();
         this.stamped = consignment.getStamped();
+        this.secretCode = consignment.getSecretCode();
+        if (consignment.getStatus() == Consignment.Status.FINISHED && consignment.getCreatedItem() != null)
+            this.createdItemId = consignment.getCreatedItem().getItemId();
         this.createDate = consignment.getCreateDate();
         this.updateDate = consignment.getUpdateDate();
-        this.consignmentDetails = consignment.getConsignmentDetails() == null ? null : consignment.getConsignmentDetails().stream()
+        this.consignmentDetails = consignment.getConsignmentDetails() == null ? new ArrayList<>() : consignment.getConsignmentDetails().stream()
                 .map(ConsignmentDetailDTO::new)
                 .toList();
         this.attachments = consignment.getAttachments() == null ? null : consignment.getAttachments().stream().map(AttachmentDTO::new).toList();

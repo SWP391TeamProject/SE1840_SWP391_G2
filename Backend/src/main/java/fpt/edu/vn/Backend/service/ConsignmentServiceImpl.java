@@ -12,31 +12,25 @@ import fpt.edu.vn.Backend.pojo.Account;
 import fpt.edu.vn.Backend.pojo.Consignment;
 import fpt.edu.vn.Backend.pojo.ConsignmentDetail;
 import fpt.edu.vn.Backend.pojo.Notification;
-import fpt.edu.vn.Backend.repository.AccountRepos;
-import fpt.edu.vn.Backend.repository.ConsignmentDetailRepos;
-import fpt.edu.vn.Backend.repository.ConsignmentRepos;
-import fpt.edu.vn.Backend.repository.NotificationRepos;
+import fpt.edu.vn.Backend.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,23 +39,25 @@ import java.util.stream.Collectors;
 //@CacheConfig(cacheNames = "consignments")
 public class ConsignmentServiceImpl implements ConsignmentService {
 
-    AccountService accountService;
-    ConsignmentRepos consignmentRepos;
-    AccountRepos accountRepos;
-    ConsignmentDetailRepos consignmentDetailRepos;
-    NotificationRepos notificationRepos;
     private static final Logger logger = LoggerFactory.getLogger(ConsignmentServiceImpl.class);
+    private final ConsignmentRepos consignmentRepos;
+    private final AccountRepos accountRepos;
+    private final ItemRepos itemRepos;
+    private final ConsignmentDetailRepos consignmentDetailRepos;
+    private final NotificationRepos notificationRepos;
+    private final AttachmentService attachmentService;
 
     @Autowired
-    AttachmentService attachmentService;
-
-    @Autowired
-    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos, AccountService accountService, ConsignmentDetailRepos consignmentDetailRepos, NotificationRepos notificationRepos) {
+    public ConsignmentServiceImpl(ConsignmentRepos consignmentRepos, AccountRepos accountRepos,
+                                  ConsignmentDetailRepos consignmentDetailRepos,
+                                  NotificationRepos notificationRepos, ItemRepos itemRepos,
+                                  AttachmentService attachmentService) {
         this.consignmentRepos = consignmentRepos;
         this.accountRepos = accountRepos;
-        this.accountService = accountService;
         this.consignmentDetailRepos = consignmentDetailRepos;
         this.notificationRepos = notificationRepos;
+        this.itemRepos = itemRepos;
+        this.attachmentService = attachmentService;
     }
 
     @NotNull
@@ -78,9 +74,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         if (consignment.getConsignmentDetails() == null) {
             consignment.setConsignmentDetails(new ArrayList<>());
         }
-        return new ConsignmentDTO(
-                consignment
-        );
+        return new ConsignmentDTO(consignment);
     }
 
     
@@ -248,19 +242,26 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             if (!account.getRole().equals(Account.Role.MANAGER)) {
                 throw new ConsignmentServiceException("Account is not manager");
             }
-            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION)
-                    && consignment.getConsignmentDetails().stream().anyMatch(detail -> detail.getType().equals(ConsignmentDetail.ConsignmentType.FINAL_EVALUATION))) {
-
-                ConsignmentDetail consignmentDetail = new ConsignmentDetail();
-                consignmentDetail.setAccount(account);
-                consignmentDetail.setConsignment(consignment);
-                consignmentDetail.setPrice(null);
-                consignmentDetail.setDescription(null);
-                consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED);
-                consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
-                consignment.getConsignmentDetails().add(consignmentDetail);
-                consignment.setStatus(Consignment.Status.WAITING_SELLER);
-                return new ConsignmentDTO(consignmentRepos.save(consignment));
+            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION)) {
+                BigDecimal price = consignment.getConsignmentDetails().stream()
+                        .filter(detail -> detail.getType() == ConsignmentDetail.ConsignmentType.FINAL_EVALUATION)
+                        .sorted((o1, o2) -> o2.getConsignmentDetailId() - o1.getConsignmentDetailId())
+                        .map(ConsignmentDetail::getPrice)
+                        .findFirst().orElse(null);
+                if (price != null) {
+                    ConsignmentDetail consignmentDetail = new ConsignmentDetail();
+                    consignmentDetail.setAccount(account);
+                    consignmentDetail.setConsignment(consignment);
+                    consignmentDetail.setPrice(price);
+                    consignmentDetail.setDescription(null);
+                    consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_ACCEPTED);
+                    consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
+                    consignment.getConsignmentDetails().add(consignmentDetail);
+                    consignment.setStatus(Consignment.Status.WAITING_SELLER);
+                    return new ConsignmentDTO(consignmentRepos.save(consignment));
+                } else {
+                    throw new ConsignmentServiceException("Staff has not sent final evaluation yet");
+                }
             } else {
                 throw new ConsignmentServiceException("Consignment is not in final evaluation status");
             }
@@ -285,18 +286,27 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             if (!account.getRole().equals(Account.Role.MANAGER)) {
                 throw new ConsignmentServiceException("Account is not manager");
             }
-            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) && consignment.getConsignmentId() == consignmentId) {
-                // Create and set consignment detail
-                ConsignmentDetail consignmentDetail = new ConsignmentDetail();
-                consignmentDetail.setAccount(account);
-                consignmentDetail.setConsignment(consignment);
-                consignmentDetail.setPrice(null);
-                consignmentDetail.setDescription(rejectionReason);
-                consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_REJECTED);
-                consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
-                consignment.getConsignmentDetails().add(consignmentDetail);
-
-                return new ConsignmentDTO(consignmentRepos.save(consignment));
+            if (consignment.getStatus().equals(Consignment.Status.IN_FINAL_EVALUATION) &&
+                    consignment.getConsignmentId() == consignmentId) {
+                BigDecimal price = consignment.getConsignmentDetails().stream()
+                        .filter(detail -> detail.getType() == ConsignmentDetail.ConsignmentType.FINAL_EVALUATION)
+                        .sorted((o1, o2) -> o2.getConsignmentDetailId() - o1.getConsignmentDetailId())
+                        .map(ConsignmentDetail::getPrice)
+                        .findFirst().orElse(null);
+                if (price != null) {
+                    // Create and set consignment detail
+                    ConsignmentDetail consignmentDetail = new ConsignmentDetail();
+                    consignmentDetail.setAccount(account);
+                    consignmentDetail.setConsignment(consignment);
+                    consignmentDetail.setPrice(null);
+                    consignmentDetail.setDescription(rejectionReason);
+                    consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_REJECTED);
+                    consignmentDetail = consignmentDetailRepos.save(consignmentDetail);
+                    consignment.getConsignmentDetails().add(consignmentDetail);
+                    return new ConsignmentDTO(consignmentRepos.save(consignment));
+                } else {
+                    throw new ConsignmentServiceException("Staff has not sent final evaluation yet");
+                }
             } else {
                 throw new ConsignmentServiceException("Consignment is not in final evaluation status");
             }
@@ -309,12 +319,22 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
     @Override
     //@CacheEvict(value = "consignments", allEntries = true)
-    
     public ConsignmentDTO custAcceptInitialEvaluation(int consignmentId) {
         try {
             Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
             if (consignment.getStatus().equals(Consignment.Status.IN_INITIAL_EVALUATION)) {
                 consignment.setStatus(Consignment.Status.SENDING);
+                SecureRandom random = new SecureRandom();
+                String code;
+                do {
+                    byte[] bytes = new byte[5];
+                    random.nextBytes(bytes);
+                    StringBuilder hexString = new StringBuilder();
+                    for (byte b : bytes)
+                        hexString.append(String.format("%02x", b));
+                    code = hexString.substring(0, 9);
+                } while (consignmentRepos.existsBySecretCodeIgnoreCase(code));
+                consignment.setSecretCode(code);
                 consignmentRepos.save(consignment);
             } else {
                 throw new ConsignmentServiceException("Consignment is not in IN_INITIAL_EVALUATION status");
@@ -447,6 +467,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         return consignmentRepos.findById(id).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
     }
 
+    @Override
+    public ConsignmentDTO getConsignmentBySecretCode(String code) {
+        return consignmentRepos.findBySecretCodeIgnoreCase(code).map(this::getConsignmentDTO).orElseThrow(() -> new ConsignmentServiceException("Consignment not found"));
+    }
+
     //TODO : redesing the logic for get all staff consignment this need refactor
     @Override
     public Page<ConsignmentDTO> getAllStaffConsignments(int staffId,Pageable pageable) {
@@ -521,8 +546,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public Page<ConsignmentDTO> getAllConsignments(Pageable pageable,
                                                    @Nullable Consignment.Status status,
                                                    @Nullable LocalDateTime from, @Nullable LocalDateTime to,
-                                                   @Nullable Integer customer, @Nullable String search) {
-        ConsignmentSpecification spec = new ConsignmentSpecification(status, from, to, customer, search);
+                                                   @Nullable Integer customer,
+                                                   @Nullable Integer staff, @Nullable String search) {
+        ConsignmentSpecification spec = new ConsignmentSpecification(status, from, to, customer, staff, search);
         Page<Consignment> consignmentPage = consignmentRepos.findAll(spec,pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
     }
@@ -569,6 +595,21 @@ public class ConsignmentServiceImpl implements ConsignmentService {
             return getConsignmentDTO(consignment);
         } else {
             throw new ConsignmentServiceException("Consignment is not in SENDING status");
+        }
+    }
+
+    @Override
+    public void finishItem(Integer consignmentId, Integer itemId) {
+        Consignment consignment = consignmentRepos.findById(consignmentId).orElseThrow(
+                () -> new ConsignmentServiceException("Consignment not found : " + consignmentId));
+        if (consignment.getStatus().equals(Consignment.Status.TO_ITEM)) {
+            consignment.setStatus(Consignment.Status.FINISHED);
+            consignment.setCreatedItem(itemRepos.findById(itemId).orElseThrow(
+                    () -> new ResourceNotFoundException("Item not found : " + itemId))
+            );
+            consignmentRepos.save(consignment);
+        } else {
+            throw new ConsignmentServiceException("Consignment is not in TO_ITEM status");
         }
     }
 

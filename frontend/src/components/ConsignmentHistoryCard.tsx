@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/accordion"
 import ConsignmentAttachmentGallery
   from "@/pages/Administration/consignments/consignment-components/ConsignmentAttachmentGallery.tsx";
+import {useAuth} from "@/AuthProvider.tsx";
+import {ConsignmentDetailType, Roles} from "@/constants/enums.tsx";
+import AccountRoleBadge from "@/components/AccountRoleBadge.tsx";
 
 interface ConsignmentHistoryCardProps {
   consignment: Consignment;
@@ -28,14 +31,17 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
                                                                          className
                                                                        }) => {
   const currency = useCurrency();
+  const auth = useAuth();
 
   const messages = {
     INITIAL_EVALUATION: (cd: ConsignmentDetail) =>
       `sent an initial evaluation of ${currency.format(cd.price)}`,
     FINAL_EVALUATION: (cd: ConsignmentDetail) =>
       `sent a final evaluation of ${currency.format(cd.price)}`,
-    MANAGER_REJECTED: (_: ConsignmentDetail) => 'has rejected the evaluation',
-    MANAGER_ACCEPTED: (_: ConsignmentDetail) => 'has accepted the evaluation'
+    MANAGER_REJECTED: (cd: ConsignmentDetail) =>
+      `has rejected the evaluation of ${currency.format(cd.price)}`,
+    MANAGER_ACCEPTED: (cd: ConsignmentDetail) =>
+      `has accepted the evaluation of ${currency.format(cd.price)}`
   };
 
   return (
@@ -48,11 +54,17 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
       <CardContent className="overflow-hidden flex flex-col gap-6">
 
         {consignment.consignmentDetails
+          .filter(cd => auth.user.role !== Roles.MEMBER ||
+            (cd.type === ConsignmentDetailType.INITIAL_EVALUATION ||
+              cd.type === ConsignmentDetailType.MANAGER_ACCEPTED))
           .sort((a, b) => b.consignmentDetailId - a.consignmentDetailId)
           .map(cd =>
             <div className="flex flex-col" key={cd.consignmentDetailId}>
               <div className="flex flex-row justify-between gap-2">
-                <p className="font-semibold text-lg">{cd.account.nickname}</p>
+                <p className="font-semibold text-lg flex flex-row gap-3">
+                  <AccountRoleBadge role={cd.account.role}/>
+                  {cd.account.nickname}
+                </p>
                 <p>{formatDateTime(cd.createDate)}</p>
               </div>
               <Accordion type="single" collapsible className="w-full">

@@ -95,6 +95,9 @@ public class Item {
     @JoinColumn(name = "consignment_reward_payment_id")
     private Payment consignmentRewardPayment;
 
+    @OneToOne(mappedBy = "createdItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Consignment consignment;
+
     @Override
     public int hashCode() {
         return itemId;

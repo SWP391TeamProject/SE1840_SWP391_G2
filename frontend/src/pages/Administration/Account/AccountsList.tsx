@@ -23,7 +23,7 @@ export default function AccountsList() {
         sort: searchParams.get('sort') || 'accountId,desc',
       };
       setAccountPromise(fetchAccountsService(query));
-    }, 1000
+    }, 500
   );
 
   useEffect(() => {

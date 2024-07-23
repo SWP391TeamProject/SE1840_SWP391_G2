@@ -83,10 +83,6 @@ public class AccountController {
             if (jwtUser.getRole() == Account.Role.MEMBER) {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
-            if ((jwtUser.getRole() == Account.Role.STAFF || jwtUser.getRole() == Account.Role.MANAGER) &&
-                    a.getRole() != Account.Role.MEMBER) {
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-            }
         }
         return new ResponseEntity<>(a, HttpStatus.OK);
     }

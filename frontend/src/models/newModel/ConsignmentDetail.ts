@@ -1,5 +1,6 @@
 import { ConsignmentDetailType } from '@/constants/enums';
-import { Account, Attachment } from '@/constants/interfaces';
+import { Attachment } from '@/constants/interfaces';
+import {Account} from "@/models/AccountModel.tsx";
 
 export interface ConsignmentDetail {
   consignmentDetailId?: number;
