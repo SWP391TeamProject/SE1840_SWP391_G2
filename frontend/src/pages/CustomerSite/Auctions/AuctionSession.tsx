@@ -35,12 +35,13 @@ import { showErrorToast } from '@/lib/handle-error';
 import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup';
 import SoldFor from './components/sold-for';
 import { formatDateToISO } from '@/lib/utils';
+import { AuctionItem } from '@/models/auctionItem';
 
 export default function AuctionSession() {
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const dispatch = useAppDispatch();
   const [sessionAttachments, setSessionAttachments] = useState([]);
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<AuctionItem[]|[]> ();
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const [showKycPopup, setShowKycPopup] = useState(false);
@@ -471,7 +472,8 @@ export default function AuctionSession() {
                       </div>
 
                       <CardContent className="space-y-2 p-4">
-                        <h3 className="text-sm font-semibold">{item.itemDTO.name}</h3>
+                        
+                        <h4 className="text-sm font-semibold">{item.itemDTO.name}</h4>
                       </CardContent>
                       <div className="mt-auto space-y-2 p-4">
                         {/* <div className="flex items-center justify-between mt-5"> */}

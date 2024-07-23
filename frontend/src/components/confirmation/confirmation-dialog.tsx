@@ -53,7 +53,7 @@ export function ConfirmationDialog({
             <Button
               // aria-label="Delete selected rows"
               // variant="destructive"
-              className="w-20 text-foreground"
+              className="min-w-28"
               onClick={() => onSuccess()}
             >
               {label}

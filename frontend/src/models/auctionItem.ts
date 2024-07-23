@@ -1,4 +1,4 @@
-import { Item } from './newModel/item';
+import { Item } from "./Item";
 
 export interface AuctionItemId {
   auctionSessionId?: number;

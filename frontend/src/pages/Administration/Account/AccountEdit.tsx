@@ -35,7 +35,9 @@ const formSchema = z.object({
   phone: z.string().max(12, 'Phone must not be longer than 12 characters').optional(),
   role: z.nativeEnum(Roles),
   balance: z.coerce
-    .number()
+    .number({
+      message: 'Balance must be a number',
+    })
     .min(0, 'Balance must not be negative')
     .max(1000000000, 'Balance must not exceed 1,000,000,000'),
   dummy: z.boolean(),
@@ -196,7 +198,7 @@ export default function AccountEdit() {
                 <FormItem>
                   <FormLabel>Balance: {currency.format(field.value)}</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input {...field}  />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
