@@ -28,6 +28,7 @@ public class ItemDTO implements Serializable {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private AccountDTO owner;
+    private AccountDTO buyer;
     private String color;
     private double weight;
     private String metal;
@@ -54,6 +55,9 @@ public class ItemDTO implements Serializable {
         this.updateDate = item.getUpdateDate();
         if (item.getOwner() != null) {
             this.owner = AccountDTO.redacted(item.getOwner());
+        }
+        if (item.getBuyer() != null) {
+            this.buyer = AccountDTO.redacted(item.getBuyer());
         }
         this.color = item.getColor();
         this.weight = item.getWeight();

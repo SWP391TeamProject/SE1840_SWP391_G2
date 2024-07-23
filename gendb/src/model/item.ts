@@ -24,5 +24,6 @@ export interface Item {
 export enum ItemStatus {
     QUEUE = "QUEUE",
     IN_AUCTION = "IN_AUCTION",
+    IN_ORDER = "IN_ORDER",
     SOLD = "SOLD"
 }

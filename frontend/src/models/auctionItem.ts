@@ -9,4 +9,5 @@ export interface AuctionItem {
   id?: AuctionItemId;
   itemDTO?: Item;
   currentPrice?: number;
+  sold?: boolean;
 }
