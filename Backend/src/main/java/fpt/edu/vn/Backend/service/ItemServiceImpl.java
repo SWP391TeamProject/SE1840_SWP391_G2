@@ -118,12 +118,6 @@ public class ItemServiceImpl implements ItemService {
         Preconditions.checkNotNull(requestDTO.getDescription(), "Description must not be null");
         Preconditions.checkNotNull(requestDTO.getCategoryId(), "CategoryId must not be null");
         Preconditions.checkNotNull(requestDTO.getOwnerId(), "OwnerId must not be null");
-        Preconditions.checkNotNull(requestDTO.getGemstone(), "Gemstone must not be null");
-        Preconditions.checkNotNull(requestDTO.getCondition(), "Condition must not be null");
-        Preconditions.checkNotNull(requestDTO.getMeasurement(), "Measurement must not be null");
-        Preconditions.checkNotNull(requestDTO.getStamped(), "Stamped must not be null");
-        Preconditions.checkNotNull(requestDTO.getMetal(), "Metal must not be null");
-        Preconditions.checkNotNull(requestDTO.getWeight(), "Weight must not be null");
         Item savedItem = itemRepos.save(mapDTOToEntity(requestDTO, new Item()));
         return new ItemDTO(savedItem);
     }
