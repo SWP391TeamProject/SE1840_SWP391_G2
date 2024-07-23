@@ -1,4 +1,4 @@
-import {AuctionSessionStatus} from '@/constants/enums.tsx';
+import { AuctionSessionStatus } from '@/constants/enums.tsx';
 import { Badge } from '@/components/ui/badge.tsx';
 
 interface AuctionStatusBadgeProps {

@@ -33,24 +33,29 @@ export function DateTimePicker({ name, placeholder, className, disabled }: DateT
     setValue(name, newDateFull);
   };
 
-  return (
-    disabled ? (
-      <>
-        <Button
-          disabled
-          variant={'outline'}
-          className={cn('w-[280px] justify-start text-left font-normal ' + (className || ''), !date && 'text-muted-foreground')}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, 'PPP HH:mm:ss') : <span>{placeholder}</span>}
-        </Button>
-      </>
-    ) :
+  return disabled ? (
+    <>
+      <Button
+        disabled
+        variant={'outline'}
+        className={cn(
+          'w-[280px] justify-start text-left font-normal ' + (className || ''),
+          !date && 'text-muted-foreground'
+        )}
+      >
+        <CalendarIcon className="mr-2 h-4 w-4" />
+        {date ? format(date, 'PPP HH:mm:ss') : <span>{placeholder}</span>}
+      </Button>
+    </>
+  ) : (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant={'outline'}
-          className={cn('w-[280px] justify-start text-left font-normal ' + (className || ''), !date && 'text-muted-foreground')}
+          className={cn(
+            'w-[280px] justify-start text-left font-normal ' + (className || ''),
+            !date && 'text-muted-foreground'
+          )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? format(date, 'PPP HH:mm:ss') : <span>{placeholder}</span>}

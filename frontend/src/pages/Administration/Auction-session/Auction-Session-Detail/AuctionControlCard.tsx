@@ -1,25 +1,15 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import {AuctionSession} from "@/models/AuctionSessionModel.ts";
-import {AuctionSessionStatus} from "@/models/newModel/auctionSession.ts";
-import {
-  ConfirmationButton
-} from "@/components/confirmation/confirmation-button.tsx";
-import {useState} from "react";
-import {
-  terminateAuctionSession
-} from "@/services/AuctionSessionService.tsx";
-import {toast} from "sonner";
-import {getErrorMessage} from "@/lib/handle-error.ts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AuctionSession } from '@/models/AuctionSessionModel.ts';
+import { AuctionSessionStatus } from '@/models/newModel/auctionSession.ts';
+import { ConfirmationButton } from '@/components/confirmation/confirmation-button.tsx';
+import { useState } from 'react';
+import { terminateAuctionSession } from '@/services/AuctionSessionService.tsx';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/handle-error.ts';
 
 export const AuctionControlCard: React.FC<{
-  auction: AuctionSession
-}> = ({auction}) => {
+  auction: AuctionSession;
+}> = ({ auction }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleTerminateSession = () => {
@@ -40,17 +30,14 @@ export const AuctionControlCard: React.FC<{
     });
   };
 
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Actions</CardTitle>
-        <CardDescription>Actions that can be performed on the auction
-          session</CardDescription>
+        <CardDescription>Actions that can be performed on the auction session</CardDescription>
       </CardHeader>
       <CardContent className="flex">
-        {(auction?.status !== AuctionSessionStatus.FINISHED &&
-          auction?.status !== AuctionSessionStatus.TERMINATED) && (
+        {auction?.status !== AuctionSessionStatus.FINISHED && auction?.status !== AuctionSessionStatus.TERMINATED && (
           <>
             <ConfirmationButton
               onSuccess={handleTerminateSession}
@@ -67,4 +54,4 @@ export const AuctionControlCard: React.FC<{
       </CardContent>
     </Card>
   );
-}
+};

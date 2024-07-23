@@ -1,12 +1,9 @@
 import Consignment from '@/models/consignment.ts';
-import {ConsignmentDetailType} from '@/constants/enums.tsx';
-import React, {useState} from 'react';
-import {Button} from '@/components/ui/button.tsx';
-import {toast} from 'sonner';
-import {
-  acceptInitialEva,
-  rejectInitialEva
-} from '@/services/ConsignmentService.tsx';
+import { ConsignmentDetailType } from '@/constants/enums.tsx';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button.tsx';
+import { toast } from 'sonner';
+import { acceptInitialEva, rejectInitialEva } from '@/services/ConsignmentService.tsx';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog.tsx';
-import {useCurrency} from "@/CurrencyProvider.tsx";
+import { useCurrency } from '@/CurrencyProvider.tsx';
 
 interface CustomerInitialEvaluationFormProps {
   consignment: Consignment;
@@ -26,9 +23,9 @@ interface CustomerInitialEvaluationFormProps {
 }
 
 const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps> = ({
-                                                                                       consignment,
-                                                                                       setConsignment,
-                                                                                     }) => {
+  consignment,
+  setConsignment,
+}) => {
   const [loading, setLoading] = useState(false);
   const currency = useCurrency();
 
@@ -71,13 +68,15 @@ const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps
     <div className="flex flex-col gap-6 w-full">
       <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 w-full">
         <h2 className="text-2xl font-bold mb-4">Information</h2>
-        <p>The staff has evaluated that your jewelry is worth {currency.format(
-          consignment.consignmentDetails.filter(detail =>
-            detail.type === ConsignmentDetailType.INITIAL_EVALUATION)
-            .sort((a, b) =>
-              (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0))
-            .map(cd => cd.price)[0]
-        )}</p>
+        <p>
+          The staff has evaluated that your jewelry is worth{' '}
+          {currency.format(
+            consignment.consignmentDetails
+              .filter((detail) => detail.type === ConsignmentDetailType.INITIAL_EVALUATION)
+              .sort((a, b) => (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0))
+              .map((cd) => cd.price)[0]
+          )}
+        </p>
       </div>
       <div className="flex flex-row gap-6">
         <AlertDialog>
@@ -90,15 +89,13 @@ const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                One you have accepted, please send the jewelry to our office for
-                comprehensive evaluation from our
+                One you have accepted, please send the jewelry to our office for comprehensive evaluation from our
                 experts. The worth of your item might subject to change.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction disabled={loading}
-                                 onClick={() => acceptEvaluation()}>
+              <AlertDialogAction disabled={loading} onClick={() => acceptEvaluation()}>
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -114,13 +111,11 @@ const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>This will cancel this
-                consignment.</AlertDialogDescription>
+              <AlertDialogDescription>This will cancel this consignment.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction disabled={loading}
-                                 onClick={() => rejectEvaluation()}>
+              <AlertDialogAction disabled={loading} onClick={() => rejectEvaluation()}>
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>

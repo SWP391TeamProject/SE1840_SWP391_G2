@@ -5,7 +5,7 @@ import { showErrorToast } from '@/lib/handle-error';
 import { AuctionSession } from '@/models/AuctionSessionModel.tsx';
 import { Page } from '@/models/Page.ts';
 import { formatDateToISO } from '@/lib/utils.ts';
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from 'axios';
 
 const controller = 'auction-sessions';
 

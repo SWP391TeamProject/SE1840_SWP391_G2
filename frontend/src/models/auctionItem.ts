@@ -1,4 +1,4 @@
-import {Item} from "@/models/Item.ts";
+import { Item } from '@/models/Item.ts';
 
 export interface AuctionItemId {
   auctionSessionId?: number;
@@ -8,8 +8,8 @@ export interface AuctionItemId {
 export interface AuctionItem {
   id?: AuctionItemId;
   itemDTO?: Item;
-  currentPrice: number,
-  numberOfBids: number,
-  participantCount: number,
+  currentPrice: number;
+  numberOfBids: number;
+  participantCount: number;
   sold: boolean;
 }

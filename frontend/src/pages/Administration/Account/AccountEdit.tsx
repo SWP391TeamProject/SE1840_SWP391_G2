@@ -198,7 +198,7 @@ export default function AccountEdit() {
                 <FormItem>
                   <FormLabel>Balance: {currency.format(field.value)}</FormLabel>
                   <FormControl>
-                    <Input {...field}  />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -2,7 +2,6 @@ import { API_SERVER } from '@/constants/domain';
 import { PaymentType } from '@/constants/enums';
 import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-;
 import { formatDateToISO } from '@/lib/utils.ts';
 
 interface GetPaymentsSchema {

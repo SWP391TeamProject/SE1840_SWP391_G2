@@ -12,8 +12,6 @@ const instance = axios.create({
 // Set a timeout of 10000 milliseconds (10 seconds) for all requests
 instance.defaults.timeout = 10000;
 
-
-
 instance.interceptors.response.use(
   function (response) {
     // If the response was successful, just return it
