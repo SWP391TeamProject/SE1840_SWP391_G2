@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 @Service
 //@CacheConfig(cacheNames = "auctionSession")
 public class AuctionSessionServiceImpl implements AuctionSessionService {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' HH:mm:ss", Locale.ENGLISH);
     private final AuctionSessionRepos auctionSessionRepos;
     private static final Logger logger = LoggerFactory.getLogger(AuctionSessionServiceImpl.class);
     private final AccountRepos accountRepos;
@@ -71,8 +73,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private String systemEmail;
 
     private final Map<Integer, AuctionSession.Status> auctionHandlingLock = Collections.synchronizedMap(new HashMap<>());
-    @Autowired
-    private OrderDetailRepos orderDetailRepos;
 
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos,
@@ -258,8 +258,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new InvalidInputException(String.format(
                     "There is an already scheduled auction session %d between %s and %s",
                     as.getAuctionSessionId(),
-                    as.getStartDate(),
-                    as.getEndDate()
+                    as.getStartDate().format(FORMATTER),
+                    as.getEndDate().format(FORMATTER)
             ));
         }
         try {
@@ -322,6 +322,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
         Map<Integer, Participant> participants = new HashMap<>();
         List<NotificationDTO> scheduledNotifications = new ArrayList<>();
+        List<OrderDTO> orderList = new ArrayList<>();
         int bidCount = 0;
 
         //////////////
@@ -424,13 +425,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
             if (!participant.wonItems.isEmpty()) {
                 logger.info("Creating order for winner {} ", participant.account.getAccountId());
-                orderServiceImpl.createOrder(
+                orderList.add(orderServiceImpl.createOrder(
                         account.getAccountId(),
                         participant.wonItems.stream()
                                 .map(AuctionItem::getAuctionItemId)
-                                .collect(Collectors.toUnmodifiableSet()),
-                        auctionSessionId
-                );
+                                .collect(Collectors.toUnmodifiableSet())
+                ));
             }
 
             scheduledNotifications.add(
@@ -454,6 +454,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (p.getStatus() != Payment.Status.PENDING)
                 continue;
             Account account = p.getAccount();
+            Participant participant = participants.get(account.getAccountId());
+            if (!participant.wonItems.isEmpty()) {
+                logger.info("Skipped refunding deposit id {} for account {} because being winner",
+                        deposit.getDepositId(), account.getAccountId());
+                continue;
+            }
             account.setBalance(account.getBalance().add(p.getPaymentAmount()));
             accountRepos.save(account);
             scheduledNotifications.add(
@@ -471,7 +477,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         auction.setEndDate(LocalDateTime.now());
         auction.setStatus(AuctionSession.Status.FINISHED);
-        auctionSessionRepos.save(auction);
+        orderServiceImpl.linkAuctionToOrders(auctionSessionRepos.save(auction), orderList);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " finished");
         auctionHandlingLock.remove(auctionSessionId);
@@ -673,8 +679,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new InvalidInputException(String.format(
                     "There is an already scheduled auction session %d between %s and %s",
                     as.getAuctionSessionId(),
-                    as.getStartDate(),
-                    as.getEndDate()
+                    as.getStartDate().format(FORMATTER),
+                    as.getEndDate().format(FORMATTER)
             ));
         }
         try {

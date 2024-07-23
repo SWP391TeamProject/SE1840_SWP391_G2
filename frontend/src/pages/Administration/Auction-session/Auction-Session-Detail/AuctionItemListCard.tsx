@@ -17,8 +17,11 @@ import {useCurrency} from '@/CurrencyProvider.tsx';
 import {AuctionSession} from "@/models/AuctionSessionModel.ts";
 import {UsersIcon} from "lucide-react";
 import {Link} from "react-router-dom";
+import {AuctionSessionStatus} from "@/constants/enums.tsx";
 
-export const AuctionItemListCard: React.FC<{ auction: AuctionSession }> = ({ auction }) => {
+export const AuctionItemListCard: React.FC<{
+  auction: AuctionSession
+}> = ({auction}) => {
   const currency = useCurrency();
 
   return (
@@ -33,26 +36,34 @@ export const AuctionItemListCard: React.FC<{ auction: AuctionSession }> = ({ auc
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Reserve Price</TableHead>
-              <TableHead>Top Bid</TableHead>
-              <TableHead>Bids</TableHead>
-              <TableHead>Participants</TableHead>
+              {auction.status !== AuctionSessionStatus.SCHEDULED &&
+                <TableHead>Top Bid</TableHead>}
+              {auction.status !== AuctionSessionStatus.SCHEDULED &&
+                <TableHead>Bids</TableHead>}
+              {auction.status !== AuctionSessionStatus.SCHEDULED &&
+                <TableHead>Participants</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {auction.auctionItems?.map((item): any => (
               <TableRow className="bg-accent" key={item?.id.itemId}>
                 <TableCell>
-                  <Link to={`/admin/items/${item.itemDTO.itemId}`} target="_blank">
+                  <Link to={`/admin/items/${item.itemDTO.itemId}`}
+                        target="_blank">
                     {item.itemDTO.name}
                   </Link>
                 </TableCell>
                 <TableCell>{currency.format(item.itemDTO.reservePrice)}</TableCell>
-                <TableCell>{currency.format(item.currentPrice)}</TableCell>
-                <TableCell>{item.numberOfBids}</TableCell>
-                <TableCell className="flex flex-row justify-center items-center gap-3">
-                  <UsersIcon className="w-5 h-5" />
-                  {item.participantCount}
-                </TableCell>
+                {auction.status !== AuctionSessionStatus.SCHEDULED &&
+                  <TableCell>{currency.format(item.currentPrice)}</TableCell>}
+                {auction.status !== AuctionSessionStatus.SCHEDULED &&
+                  <TableCell>{item.numberOfBids}</TableCell>}
+                {auction.status !== AuctionSessionStatus.SCHEDULED &&
+                  <TableCell
+                    className="flex flex-row justify-center items-center gap-3">
+                    <UsersIcon className="w-5 h-5"/>
+                    {item.participantCount}
+                  </TableCell>}
               </TableRow>
             ))}
           </TableBody>

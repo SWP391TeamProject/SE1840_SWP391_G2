@@ -19,6 +19,7 @@ public class OrderDTO implements Serializable {
     private BigDecimal fee;
     private String shippingAddress;
     private String shippingNote;
+    private Integer auctionId;
     private Order.ShippingStatus shippingStatus;
     private PaymentDTO payment;
     private LocalDateTime createDate;
@@ -34,6 +35,8 @@ public class OrderDTO implements Serializable {
         dto.shippingAddress = order.getShippingAddress();
         dto.shippingNote = order.getShippingNote();
         dto.shippingStatus = order.getShippingStatus();
+        if (order.getAuctionSession() != null)
+            dto.auctionId = order.getAuctionSession().getAuctionSessionId();
         if (order.getOrderDetails() != null) {
             dto.orderDetails = order.getOrderDetails().stream().map(OrderDetailDTO::full).collect(Collectors.toList());
             dto.subtotal = order.getOrderDetails().stream()
@@ -52,6 +55,8 @@ public class OrderDTO implements Serializable {
         this.shippingAddress = order.getShippingAddress();
         this.shippingNote = order.getShippingNote();
         this.shippingStatus = order.getShippingStatus();
+        if (order.getAuctionSession() != null)
+            this.auctionId = order.getAuctionSession().getAuctionSessionId();
         if (order.getOrderDetails() != null) {
             this.orderDetails = order.getOrderDetails().stream().map(OrderDetailDTO::minimal).collect(Collectors.toList());
             this.subtotal = order.getOrderDetails().stream()

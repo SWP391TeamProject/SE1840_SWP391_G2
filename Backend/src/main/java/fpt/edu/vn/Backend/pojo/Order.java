@@ -59,6 +59,10 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderDetail> orderDetails;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "auction_session_id")
+    private AuctionSession auctionSession;
+
     @Override
     public int hashCode() {
         return orderId;

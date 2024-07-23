@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds, int auctionId) {
+    public OrderDTO createOrder(int accountId, Set<AuctionItemId> itemIds) {
         Account account = accountRepos.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account not found", "id", accountId));
         BigDecimal totalPay = BigDecimal.ZERO;
@@ -435,6 +435,13 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return OrderDTO.detailed(orderRepository.save(order));
+    }
+
+    @Override
+    public void linkAuctionToOrders(AuctionSession auction, List<OrderDTO> orderList) {
+        orderRepository.saveAll(orderList.stream()
+                .map(order -> orderRepository.findById(order.getOrderId()).orElseThrow())
+                .peek(order -> order.setAuctionSession(auction)).collect(Collectors.toList()));
     }
 
     @Scheduled(timeUnit = TimeUnit.HOURS, fixedRate = 1, initialDelay = 0)
