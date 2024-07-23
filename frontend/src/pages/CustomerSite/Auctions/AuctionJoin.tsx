@@ -534,8 +534,7 @@ export default function AuctionJoin() {
             </Card>
           </div>
         )}
-      {winningBids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId ===
-        auth.user.accountId && (
+      {winningBids?.filter((bid) => bid.account.accountId === auth.user.accountId).length > 0 && (
         <ResultDialog
           open={openWinningDialog}
           onOpenChange={setOpenWinningDialog}
