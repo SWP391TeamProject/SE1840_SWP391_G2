@@ -265,6 +265,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         try {
             AuctionSession auctionSession = new AuctionSession();
             auctionSession.setTitle(auctionDTO.getTitle());
+            auctionSession.setDescription(auctionDTO.getDescription());
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
             auctionSession.setCreateDate(LocalDateTime.now());

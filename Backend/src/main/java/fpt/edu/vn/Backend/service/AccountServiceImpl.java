@@ -152,8 +152,8 @@ public class AccountServiceImpl implements AccountService {
         if (account.getNickname() != null) {
             Preconditions.checkState(account.getNickname().length() >= 5,
                     "Nickname must be at least 5 characters");
-            Preconditions.checkState(account.getNickname().length() <= 20,
-                    "Nickname must not be longer than 20 characters");
+            Preconditions.checkState(account.getNickname().length() <= 40,
+                    "Nickname must not be longer than 40 characters");
         }
         Preconditions.checkState(account.getPhone() == null || account.getPhone().length() <= 15,
                 "Phone must not be longer than 15 characters");
