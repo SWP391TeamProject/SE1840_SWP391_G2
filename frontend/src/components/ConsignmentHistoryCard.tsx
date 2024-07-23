@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/accordion"
 import ConsignmentAttachmentGallery
   from "@/pages/Administration/consignments/consignment-components/ConsignmentAttachmentGallery.tsx";
+import {useAuth} from "@/AuthProvider.tsx";
+import {ConsignmentDetailType, Roles} from "@/constants/enums.tsx";
 
 interface ConsignmentHistoryCardProps {
   consignment: Consignment;
@@ -28,14 +30,17 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
                                                                          className
                                                                        }) => {
   const currency = useCurrency();
+  const auth = useAuth();
 
   const messages = {
     INITIAL_EVALUATION: (cd: ConsignmentDetail) =>
       `sent an initial evaluation of ${currency.format(cd.price)}`,
     FINAL_EVALUATION: (cd: ConsignmentDetail) =>
       `sent a final evaluation of ${currency.format(cd.price)}`,
-    MANAGER_REJECTED: (_: ConsignmentDetail) => 'has rejected the evaluation',
-    MANAGER_ACCEPTED: (_: ConsignmentDetail) => 'has accepted the evaluation'
+    MANAGER_REJECTED: (cd: ConsignmentDetail) =>
+      `has rejected the evaluation of ${currency.format(cd.price)}`,
+    MANAGER_ACCEPTED: (cd: ConsignmentDetail) =>
+      `has accepted the evaluation of ${currency.format(cd.price)}`
   };
 
   return (
@@ -48,6 +53,7 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({
       <CardContent className="overflow-hidden flex flex-col gap-6">
 
         {consignment.consignmentDetails
+          .filter(cd => auth.user.role !== Roles.MEMBER || cd.type !== ConsignmentDetailType.FINAL_EVALUATION)
           .sort((a, b) => b.consignmentDetailId - a.consignmentDetailId)
           .map(cd =>
             <div className="flex flex-col" key={cd.consignmentDetailId}>

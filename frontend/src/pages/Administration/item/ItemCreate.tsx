@@ -75,6 +75,7 @@ function getManagerAcceptedPrice(consignment: Consignment): number | undefined {
   const managerAcceptedDetails = consignment.consignmentDetails
     .filter(detail => detail.type === ConsignmentDetailType.MANAGER_ACCEPTED)
     .sort((a, b) => (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
+  console.log(managerAcceptedDetails);
 
   return managerAcceptedDetails.length > 0 ? managerAcceptedDetails[0].price : undefined;
 }
@@ -98,7 +99,7 @@ export default function ItemCreate() {
       buyInPrice: consignment ? getManagerAcceptedPrice(consignment) * 10 : 0,
       ownerId: consignment ? consignment.user.accountId : auth.user.accountId,
       color: consignment ? consignment.color :'',
-      weight: consignment ? consignment.weight.toString() :'',
+      weight: consignment && consignment.weight ? consignment.weight.toString() :'',
       metal: consignment ? consignment.metal :'',
       gemstone: consignment ? consignment.gemstone :'',
       measurement: consignment ? consignment.measurement :'',
@@ -185,7 +186,7 @@ export default function ItemCreate() {
                     <FormItem>
                       <FormLabel>Owner ID</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={consignment} />
+                        <Input type="number" {...field} disabled={consignment !=== undefined} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
