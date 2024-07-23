@@ -98,7 +98,7 @@ export const getColumns = (): ColumnDef<Item>[] => [
       const nav = useNavigate();
 
       const handleEditClick = (itemId: number) => {
-        nav(`/admin/items/${itemId}`);
+        nav(`/admin/jewelry/${itemId}`);
       };
 
       return (
@@ -112,7 +112,7 @@ export const getColumns = (): ColumnDef<Item>[] => [
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => handleEditClick(row.original.itemId)}>Edit</DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to={`/item/${row.original.itemId}`} target="_blank">
+                <Link to={`/jewelries/${row.original.itemId}`} target="_blank">
                   Public View
                 </Link>
               </DropdownMenuItem>

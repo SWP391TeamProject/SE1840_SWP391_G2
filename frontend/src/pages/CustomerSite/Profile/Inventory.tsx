@@ -43,7 +43,7 @@ const Inventory = () => {
       <Card className="w-full lg:w-3/4">
         <CardHeader>
           <CardTitle>Inventory</CardTitle>
-          <CardDescription>View all items you have owned</CardDescription>
+          <CardDescription>View all jewelries you have owned</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 grid-cols-2 xl:grid-cols-3">

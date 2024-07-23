@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from '@/redux/reducers/AuctionSession';
 import { fetchUpcomingAuctionSessions } from '@/services/AuctionSessionService';
 import { useQuery } from '@tanstack/react-query';
+import { User2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -63,9 +64,9 @@ export default function UpcomingAuctionSessionsList() {
       <div className="container px-4 md:px-6">
         <div className="grid gap-8">
           <div className="grid gap-2">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">Upcoming Auction Sessions</h1>
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl">Live Auction Sessions</h1>
             <p className="text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Explore our upcoming auction sessions and find your next treasure.
+              Explore our currently live auction sessions and find your treasure. 
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -74,7 +75,7 @@ export default function UpcomingAuctionSessionsList() {
                 <CardContent className="grid gap-4">
                   <div className="grid gap-2 mt-3">
                     <h3 className="font-semibold text-lg">{session.title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{session.title}</p>
+                    {/* <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{session.title}</p> */}
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center gap-2">
@@ -87,7 +88,13 @@ export default function UpcomingAuctionSessionsList() {
                     <div className="flex items-center gap-2">
                       <PackageIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.auctionItems ? session.auctionItems.length : 0} Items
+                        {session.auctionItems ? session.auctionItems.length : 0} Lots
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <User2 className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <div className="text-sm font-medium">
+                        {session.auctionItems ? session.participantCount : 0} bidders
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

@@ -139,11 +139,11 @@ export default function Administration() {
               )}
               {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                 <Link
-                  to="items"
+                  to="jewelry"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                 >
                   <ShoppingBag />
-                  Manage Items
+                  Manage Jewelries
                 </Link>
               )}
               <Link
@@ -242,11 +242,11 @@ export default function Administration() {
                   )}
                   {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                     <Link
-                      to="items"
+                      to="jewelry"
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                     >
                       <ShoppingBag />
-                      Manage Items
+                      Manage Jewelries
                     </Link>
                   )}
                   <Link

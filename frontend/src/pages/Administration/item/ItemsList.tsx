@@ -36,8 +36,8 @@ export default function ItemsList() {
         <TabsContent value="all">
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle className="flex justify-between items-center">Items</CardTitle>
-              <CardDescription>Manage items and view details.</CardDescription>
+              <CardTitle className="flex justify-between items-center">Jewelries</CardTitle>
+              <CardDescription>Manage Jewelries and view details.</CardDescription>
             </CardHeader>
             <CardContent>
               <ItemsTable itemPromise={itemPromise} />

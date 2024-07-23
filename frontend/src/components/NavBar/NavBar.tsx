@@ -86,7 +86,7 @@ export default function NavBar() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                  <Link to="/items">Item</Link>
+                  <Link to="/jewelries">Jewelry</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
