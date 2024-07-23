@@ -77,7 +77,7 @@ export default function AuctionSession() {
         dispatch(setCurrentAuctionSession(res));
         setSessionAttachments(res.attachments);
         setItems(res.auctionItems);
-        // if (auctionSession.deposits) {
+        // if (auctionSession?.deposits) {
         //   // auctionSession?.hasDeposited.forEach((deposit: any) => {
         //   //   setBidders((prevBidders) => [...prevBidders, deposit?.payment.accountId]);
         //   // });
@@ -87,8 +87,8 @@ export default function AuctionSession() {
         showErrorToast(err);
       });
     // } else {
-    //   setSessionAttachments(auctionSession.attachments);
-    //   setItems(auctionSession.auctionItems);
+    //   setSessionAttachments(auctionSession?.attachments);
+    //   setItems(auctionSession?.auctionItems);
     // }
   }, []);
 
@@ -194,7 +194,7 @@ export default function AuctionSession() {
     }
     let fee = Number.MAX_VALUE;
     if (auctionSession?.auctionItems) {
-      auctionSession.auctionItems.forEach((item: any) => {
+      auctionSession?.auctionItems.forEach((item: any) => {
         if (item.itemDTO.reservePrice < fee) {
           fee = item.itemDTO.reservePrice;
         }
@@ -267,7 +267,7 @@ export default function AuctionSession() {
     }
     let fee = Number.MAX_VALUE;
     if (auctionSession?.auctionItems) {
-      auctionSession.auctionItems.forEach((item: any) => {
+      auctionSession?.auctionItems.forEach((item: any) => {
         if (item.itemDTO.reservePrice < fee) {
           fee = item.itemDTO.reservePrice;
         }
@@ -320,8 +320,8 @@ export default function AuctionSession() {
   };
 
   const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
-    const startDate = new Date(auctionSession.startDate);
-    const endDate = new Date(auctionSession.endDate);
+    const startDate = new Date(auctionSession?.startDate);
+    const endDate = new Date(auctionSession?.endDate);
     if (!(startDate < new Date())  || endDate < new Date()) {
       navigate(`/item/${item.itemId}`);
       return;
@@ -343,10 +343,10 @@ export default function AuctionSession() {
 
   const handleCategoryFilter = (...event: any) => {
     if (event[0] === 'All') {
-      setItems(auctionSession.auctionItems);
+      setItems(auctionSession?.auctionItems);
       return;
     }
-    setItems(auctionSession.auctionItems.filter((item) => item.itemDTO.category.name == event[0]));
+    setItems(auctionSession?.auctionItems.filter((item) => item.itemDTO.category.name == event[0]));
   };
 
   return (
@@ -369,13 +369,13 @@ export default function AuctionSession() {
                   {auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
                     new Date(auctionSession?.endDate).getTime() > new Date().getTime() ? (
                     <span>
-                      Ends in <CountDownTime end={new Date(auctionSession.endDate)}></CountDownTime>
+                      Ends in <CountDownTime end={new Date(auctionSession?.endDate)}></CountDownTime>
                     </span>
                   ) : (
                     <></>
                   )}
 
-                  {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date() ||
+                  {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date() ||
                     new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
                     <div className="text-pink-500 dark:text-pink-400 font-semibold">Auction Ended</div>
                   ) : (
@@ -389,7 +389,7 @@ export default function AuctionSession() {
                   {auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
                     new Date(auctionSession?.startDate).getTime() > new Date().getTime() ? (
                     <span>
-                      Starts in <CountDownTime end={new Date(auctionSession.startDate)}></CountDownTime>
+                      Starts in <CountDownTime end={new Date(auctionSession?.startDate)}></CountDownTime>
                     </span>
                   ) : (
                     <></>
@@ -447,7 +447,7 @@ export default function AuctionSession() {
               </div>
             </div>
             <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
-              {/* {auctionSession?.auctionItems ? auctionSession.auctionItems.map((item) => ( */}
+              {/* {auctionSession?.auctionItems ? auctionSession?.auctionItems.map((item) => ( */}
               {items
                 ? items.map((item) => (
                   <Card key={item.id.itemId} className="min-w-52 flex flex-col items-stretch">
@@ -465,7 +465,7 @@ export default function AuctionSession() {
                       />
                       <div
                         className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                        onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession.auctionSessionId)}
+                        onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession?.auctionSessionId)}
                       >
                         <Button>Detail</Button>
                       </div>
@@ -480,17 +480,17 @@ export default function AuctionSession() {
                         Current Price: {currency.format(item?.currentPrice)}
                       </div>
                       {/* </div> */}
-                      {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date() &&
+                      {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date() &&
                         new Date(auctionSession?.endDate) < new Date() ? (
                         <SoldFor item={item} currency={currency} />
                       ) : (
                         <>
-                          {auctionSession.hasDeposited ? (
+                          {auctionSession?.hasDeposited ? (
                             <Button
                               className="space-y-2"
                               onClick={() => {
                                 // dispatch(setCurrentAuctionSession(auctionSession));
-                                if (new Date(auctionSession.startDate) > new Date() || new Date(auctionSession.endDate) < new Date()) {
+                                if (new Date(auctionSession?.startDate) > new Date() || new Date(auctionSession?.endDate) < new Date()) {
                                   navigate(`/item/${item.itemDTO.itemId}`);
                                   return;
                                 } else {
@@ -498,7 +498,7 @@ export default function AuctionSession() {
                                     state: {
                                       id: item?.id,
                                       itemDTO: item?.itemDTO,
-                                      allow: auctionSession.hasDeposited,
+                                      allow: auctionSession?.hasDeposited,
                                     },
                                   });
                                 }
@@ -526,11 +526,11 @@ export default function AuctionSession() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="text-gray-500 dark:text-gray-400">Start Time</div>
-                  <div>{auctionSession?.startDate ? new Date(auctionSession.startDate).toLocaleString() : ''}</div>
+                  <div>{auctionSession?.startDate ? new Date(auctionSession?.startDate).toLocaleString() : ''}</div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="text-gray-500 dark:text-gray-400">End Time</div>
-                  <div>{auctionSession?.endDate ? new Date(auctionSession.endDate).toLocaleString() : ''}</div>
+                  <div>{auctionSession?.endDate ? new Date(auctionSession?.endDate).toLocaleString() : ''}</div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="text-gray-500 dark:text-gray-400">Number of Lots:</div>

@@ -66,7 +66,7 @@ export default function AuctionJoin() {
   const [winningBids, setWinningBids] = useState<BidReply[]>([]);
   let timeout;
   const [openWinningDialog, setOpenWinningDialog] = useState(false);
-  // const auctionId = auctionSession.auctionSessionId;
+  // const auctionId = auctionSession?.auctionSessionId;
   // const itemId = location.state.id.itemId;
 
   const [allow, setAllow] = useState<boolean | undefined>(false);
@@ -83,7 +83,7 @@ export default function AuctionJoin() {
           console.log(response);
           setItemDTO(response?.auctionItems[0].itemDTO);
           setAllow(auctionSession?.hasDeposited);
-          if (response.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
+          if (response.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
             setShowCofetti(true);
             setTimeout(() => {
               setShowCofetti(false);
@@ -109,13 +109,13 @@ export default function AuctionJoin() {
     } else {
       setAllow(auctionSession?.hasDeposited);
       setItemDTO(auctionSession?.auctionItems[0].itemDTO);
-      if (auctionSession.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
+      if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);
         }, 3000);
       }
-      if (auctionSession.status !== AuctionSessionStatus.SCHEDULED) {
+      if (auctionSession?.status !== AuctionSessionStatus.SCHEDULED) {
         fetchBidsByAuctionId(auctionId)
           .then((res) => {
             console.log(res);
@@ -132,7 +132,7 @@ export default function AuctionJoin() {
   }, []);
   useEffect(() => {
     if (bids.length > 0 && new Date(auctionSession?.endDate) <= new Date()) {
-      for (const item of auctionSession.auctionItems) {
+      for (const item of auctionSession?.auctionItems) {
         for (const element of bids) {
           if (item?.itemDTO?.itemId === element?.auctionItemId?.itemId) {
             console.log(element, true);
@@ -176,7 +176,7 @@ export default function AuctionJoin() {
   // }, [auctionSession]);
 
   useEffect(() => {
-    if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
+    if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
       setShowCofetti(true);
       setTimeout(() => {
         setShowCofetti(false);
@@ -207,7 +207,7 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    if (auctionSession && auctionSession.status === AuctionSessionStatus.PROGRESSING && auctionSession.hasDeposited) {
+    if (auctionSession && auctionSession?.status === AuctionSessionStatus.PROGRESSING && auctionSession?.hasDeposited) {
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -359,7 +359,7 @@ export default function AuctionJoin() {
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
     if (itemDTO?.itemId !== item.itemDTO.itemId) {
       setItemDTO(item.itemDTO);
-      if (auctionSession.status === AuctionSessionStatus.FINISHED || new Date(auctionSession.endDate) < new Date()) {
+      if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);
@@ -449,7 +449,7 @@ export default function AuctionJoin() {
                     </div>
                   )}
 
-                  {auctionSession?.hasDeposited && auctionSession.status === AuctionSessionStatus.PROGRESSING && (
+                  {auctionSession?.hasDeposited && auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
                     <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
                       <BidsInformation
                         auctionSession={auctionSession}
