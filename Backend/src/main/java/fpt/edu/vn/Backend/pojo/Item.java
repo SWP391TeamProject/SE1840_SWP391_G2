@@ -42,7 +42,7 @@ public class Item {
     private BigDecimal buyInPrice;
 
     public enum Status {
-        QUEUE, IN_AUCTION, SOLD, REMOVED
+        QUEUE, IN_AUCTION, IN_ORDER, SOLD, REMOVED
     }
 
     @Column(length = 30)

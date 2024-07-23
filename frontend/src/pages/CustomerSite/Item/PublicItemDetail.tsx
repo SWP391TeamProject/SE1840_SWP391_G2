@@ -129,6 +129,15 @@ export function PublicItemDetail() {
                         </AlertDescription>
                       </Alert>
                     )}
+                    {item.status == ItemStatus.IN_ORDER && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle>
+                          <h3 className="text-lg">Status</h3>
+                        </AlertTitle>
+                        <AlertDescription>Someone has won this jewelry.</AlertDescription>
+                      </Alert>
+                    )}
                     {item.status == ItemStatus.SOLD && (
                       <Alert variant="destructive">
                         <AlertCircle className="h-5 w-5" />

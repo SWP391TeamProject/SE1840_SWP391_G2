@@ -170,7 +170,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                           console.log(`> Final bid: ${currentPrice}/${item.reservePrice}`);
 
                           if (currentPrice >= item.reservePrice && lastBidder !== undefined) {
-                              item.status = ItemStatus.SOLD;
+                              item.status = ItemStatus.IN_ORDER;
 
                               // order
                               const orderDate = virtualDate.add(faker.number.int({

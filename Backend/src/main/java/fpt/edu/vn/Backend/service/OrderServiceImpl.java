@@ -307,9 +307,15 @@ public class OrderServiceImpl implements OrderService {
                 paymentRepository.save(rewardPayment);
 
                 Preconditions.checkState(item.getConsignmentRewardPayment() == null);
-                Preconditions.checkState(item.getStatus() == Item.Status.SOLD);
+                Preconditions.checkState(item.getStatus() == Item.Status.IN_ORDER);
+                item.setStatus(Item.Status.SOLD);
                 item.setConsignmentRewardPayment(rewardPayment);
                 itemRepos.save(item);
+
+                AuctionItem ai = auctionItemRepos.findLatestAuctionItemByItemId(item.getItemId());
+                Preconditions.checkNotNull(ai, "No auction item found for item " + item.getItemId());
+                ai.setSold(true);
+                auctionItemRepos.save(ai);
 
                 notificationService.sendNotification(
                         NotificationDTO.builder()
