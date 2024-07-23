@@ -7,14 +7,14 @@ export interface ItemUpdateDTO {
   description?: string;
   reservePrice?: number;
   buyInPrice?: number;
-  soldPrice?: number;
   status?: ItemStatus;
   ownerId?: number;
   color?: string;
-  size?: string;
-  weight?: string;
-  brand?: string;
-  age?: number;
-  material?: string;
+  weight?: number;
+  metal?: string;
+  gemstone?: string;
+  measurement?: string;
+  condition?: string;
+  stamped?: string;
   consignmentId?: number;
 }

@@ -1,5 +1,4 @@
 import Consignment from "@/models/consignment.ts";
-import {useState} from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,44 +11,45 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {takeConsignment} from "@/services/ConsignmentService.tsx";
-import {toast} from "sonner";
 import {useAuth} from "@/AuthProvider.tsx";
 import {Roles} from "@/constants/enums.tsx";
+import {useNavigate} from "react-router-dom";
 
 interface ConsignmentManagerItemCreateButtonProps {
   consignment: Consignment;
-  setConsignment: (v: Consignment) => void;
 }
 
 const ConsignmentManagerItemCreateButton: React.FC<ConsignmentManagerItemCreateButtonProps> = ({
-                                                                                 consignment,
-                                                                                 setConsignment
-                                                                               }) => {
+                                                                                                 consignment
+                                                                                               }) => {
   const auth = useAuth();
-  const [loading, setLoading] = useState(false);
+  const nav = useNavigate();
 
   const handleTake = () => {
-    setLoading(true);
-
+    nav(`/admin/items/create`, {
+      state: {
+        consignment: consignment
+      }
+    });
   };
 
   return (
     auth.user.role === Roles.MANAGER ?
       <AlertDialog>
         <AlertDialogTrigger>
-          <Button variant="default" disabled={loading}>Create item?</Button>
+          <Button variant="default">Create item?</Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will link the item with this consignment. You might edit the item later.
+              This will link the item with this consignment. You might edit the
+              item later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction disabled={loading}
+            <AlertDialogAction
               onClick={() => handleTake()}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

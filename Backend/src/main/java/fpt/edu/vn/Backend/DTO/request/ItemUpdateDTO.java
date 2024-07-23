@@ -21,11 +21,10 @@ public class ItemUpdateDTO implements Serializable {
     private String description;
     private BigDecimal reservePrice;
     private BigDecimal buyInPrice;
-    private BigDecimal soldPrice;
     private Item.Status status;
     private Integer ownerId;
     private String color;
-    private String weight;
+    private Double weight;
     private String metal;
     private String gemstone;
     private String measurement;

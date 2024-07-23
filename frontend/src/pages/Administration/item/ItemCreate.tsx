@@ -17,6 +17,12 @@ import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation.tsx
 import ItemCategorySelector from '@/pages/Administration/item/ItemCategorySelector.tsx';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { showErrorToast } from '@/lib/handle-error';
+import Consignment from "@/models/consignment.ts";
+import {ConsignmentDetailType} from "@/constants/enums.tsx";
+import ItemCreateCustomerCard
+  from "@/pages/Administration/item/ItemCreateCustomerCard.tsx";
+import ItemConsignmentInfoCard
+  from "@/pages/Administration/item/ItemConsignmentInfoCard.tsx";
 
 const FormSchema = z.object({
   categoryId: z.string().regex(/\d+/, {
@@ -56,15 +62,22 @@ const FormSchema = z.object({
     message: 'Owner must be specified.',
   }),
   color: z.string().optional(),
-  size: z.string().optional(),
   weight: z.string().optional(),
-  brand: z.string().optional(),
-  age: z.string().regex(/^\d*$/, {
-    message: 'Age must be a number.',
-  }),
-  material: z.string().optional(),
+  metal: z.string().optional(),
+  gemstone: z.string().optional(),
+  measurement: z.string().optional(),
+  condition: z.string().optional(),
+  stamped: z.string().optional(),
   files: z.any(),
 });
+
+function getManagerAcceptedPrice(consignment: Consignment): number | undefined {
+  const managerAcceptedDetails = consignment.consignmentDetails
+    .filter(detail => detail.type === ConsignmentDetailType.MANAGER_ACCEPTED)
+    .sort((a, b) => (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
+
+  return managerAcceptedDetails.length > 0 ? managerAcceptedDetails[0].price : undefined;
+}
 
 export default function ItemCreate() {
   const auth = useAuth();
@@ -73,7 +86,7 @@ export default function ItemCreate() {
   const [showTrigger, setShowTrigger] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const location = useLocation();
-  const consignmentId = location?.state?.consignmentId;
+  const consignment = location?.state?.consignment as Consignment;
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -81,75 +94,37 @@ export default function ItemCreate() {
       categoryId: '1',
       name: '',
       description: '',
-      reservePrice: location?.state?.price || 0,
-      buyInPrice: 0,
-      ownerId: location?.state?.ownerId || auth.user.accountId,
-      color: '',
-      size: '',
-      weight: '',
-      brand: '',
-      age: '',
-      material: '',
+      reservePrice: consignment ? getManagerAcceptedPrice(consignment) : 0,
+      buyInPrice: consignment ? getManagerAcceptedPrice(consignment) * 10 : 0,
+      ownerId: consignment ? consignment.user.accountId : auth.user.accountId,
+      color: consignment ? consignment.color :'',
+      weight: consignment ? consignment.weight.toString() :'',
+      metal: consignment ? consignment.metal :'',
+      gemstone: consignment ? consignment.gemstone :'',
+      measurement: consignment ? consignment.measurement :'',
+      condition: consignment ? consignment.condition :'',
+      stamped: consignment ? consignment.stamped :'',
       files: [],
     },
   });
+  const watchForm = form.watch();
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    // setLoading(true);
-
-    // interface DTO extends Omit<z.infer<typeof FormSchema>, 'categoryId' | 'age' | 'files'> {
-    //   categoryId?: number;
-    //   age?: number;
-    //   consignmentId?: number;
-    // }
-
-    // const dto: DTO = {
-    //   ...data,
-    //   categoryId: parseInt(data.categoryId),
-    //   age: data.age.length == 0 ? undefined : parseInt(data.age),
-    //   consignmentId
-    // };
-
-    // createItem(dto).then(async (res) => {
-    //   console.log(res);
-    //   if (data.files.length > 0) {
-    //     await uploadItemAttachment(res.data.itemId, {files: data.files}).then(() => {
-    //       toast.success('Attachment uploaded successfully!', {
-    //         position: "bottom-right",
-    //       });
-    //     }).catch(error => {
-    //       console.error(error);
-    //       toast.error("Failed to upload attachments", {
-    //         position: "bottom-right",
-    //       });
-    //     });
-    //   }
-    //   toast.success('Item created successfully!', {
-    //     position: "bottom-right",
-    //   });
-    //   nav("/admin/items");
-    // }).catch(error => {
-    //   console.error(error);
-    //   toast.error("Failed to create item!", {
-    //     position: "bottom-right",
-    //   });
-    //   setLoading(false);
-    // });
+  function onSubmit(_: z.infer<typeof FormSchema>) {
     setShowTrigger(true);
   }
 
-  const handleConfirmed = (data: z.infer<typeof formSchema>) => {
-    interface DTO extends Omit<z.infer<typeof FormSchema>, 'categoryId' | 'age' | 'files'> {
+  const handleConfirmed = (data: z.infer<typeof FormSchema>) => {
+    interface DTO extends Omit<z.infer<typeof FormSchema>, 'categoryId' | 'weight' | 'files'> {
       categoryId?: number;
-      age?: number;
+      weight?: number;
       consignmentId?: number;
     }
 
     const dto: DTO = {
       ...data,
       categoryId: parseInt(data.categoryId),
-      age: data.age.length == 0 ? undefined : parseInt(data.age),
-      consignmentId,
+      weight: data.weight.length == 0 ? undefined : parseInt(data.weight),
+      consignmentId: consignment && consignment.consignmentId,
     };
 
     createItem(dto)
@@ -201,118 +176,103 @@ export default function ItemCreate() {
       ) : (
         <div className="p-10">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-              <FormField
-                control={form.control}
-                name="ownerId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Owner ID</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Item name</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="categoryId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <ItemCategorySelector defaultValue={field.value} onValueChange={field.onChange} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="flex flex-row gap-20">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="basis-3/5 flex flex-col gap-6">
+                <FormField
+                  control={form.control}
+                  name="ownerId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Owner ID</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} disabled={consignment} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Item name</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <ItemCategorySelector defaultValue={field.value} onValueChange={field.onChange} />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <TextEditor {...field} placeholder="description..." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <TextEditor {...field} placeholder="description..." />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="reservePrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reserve Price</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormDescription>Reserve Price is the initial price of the item.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="reservePrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Reserve Price</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormDescription>Reserve Price is the initial price of the item.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="buyInPrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Buy In Price</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormDescription>Buy in price is the price to purchase item straight away.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="buyInPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Buy In Price</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormDescription>Buy in price is the price to purchase item straight away.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Size</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /><FormField
                 control={form.control}
                 name="weight"
                 render={({ field }) => (
@@ -326,66 +286,99 @@ export default function ItemCreate() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Brand</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="age"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="material"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Material</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <ScrollArea className="h-[200px]">
                 <FormField
                   control={form.control}
-                  name="files"
+                  name="metal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Attachments</FormLabel>
+                      <FormLabel>Metal</FormLabel>
                       <FormControl>
-                        <DropzoneComponent {...field} control={form.control} />
+                        <Input type="text" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </ScrollArea>
 
-              <Button type="submit">Submit</Button>
-            </form>
+                <FormField
+                  control={form.control}
+                  name="gemstone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gemstone</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="measurement"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Measurement</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="condition"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Condition</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="stamped"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stamped</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <ScrollArea className="h-[200px]">
+                  <FormField
+                    control={form.control}
+                    name="files"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Attachments</FormLabel>
+                        <FormControl>
+                          <DropzoneComponent {...field} control={form.control} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </ScrollArea>
+
+                <Button type="submit">Submit</Button>
+              </form>
+              <div className="grow flex flex-col gap-6">
+                <ItemCreateCustomerCard userId={watchForm.ownerId} />
+                {consignment && <ItemConsignmentInfoCard consignment={consignment} />}
+              </div>
+            </div>
           </Form>
           <ConfirmationDialog
             description="This action cannot be undone."

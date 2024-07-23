@@ -90,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDTO.getColor() != null)
             item.setColor(itemDTO.getColor());
         if (itemDTO.getWeight() != null)
-            item.setWeight(Double.parseDouble(itemDTO.getWeight()));
+            item.setWeight(itemDTO.getWeight());
         if (itemDTO.getMeasurement() != null)
             item.setMeasurement(itemDTO.getMeasurement());
         if(itemDTO.getMetal() != null)

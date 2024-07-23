@@ -74,8 +74,7 @@ const ConsignmentIntroCard: React.FC<ConsignmentIntroCardProps> = ({
           </div>)
       }
       case ConsignmentStatus.TO_ITEM: {
-        return (<ConsignmentManagerItemCreateButton consignment={consignment}
-                                                    setConsignment={setConsignment}/>)
+        return (<ConsignmentManagerItemCreateButton consignment={consignment}/>)
       }
       case ConsignmentStatus.FINISHED: {
         return (
