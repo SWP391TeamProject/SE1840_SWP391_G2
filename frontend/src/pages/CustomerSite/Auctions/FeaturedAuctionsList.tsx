@@ -80,7 +80,7 @@ export default function FeaturedAuctionsList() {
                     <div className="flex items-center gap-2">
                       <PackageIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.auctionItems ? session.auctionItems.length : 0} Items
+                        {session.auctionItems ? session.auctionItems.length : 0} Lots
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

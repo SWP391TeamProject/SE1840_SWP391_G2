@@ -9,8 +9,8 @@ export default function ProductDetail(props: { item: Item; form: UseFormReturn }
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Product Details</CardTitle>
-        <CardDescription>Fill in the details of the product you want to add.</CardDescription>
+        <CardTitle>Jewelry Details</CardTitle>
+        <CardDescription>Details of the Jewelry.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">

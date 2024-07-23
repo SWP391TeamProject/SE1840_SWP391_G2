@@ -185,13 +185,6 @@ export default function ConsignmentInititalForm() {
                   )}
                 />
 
-                <h3 className="text-md font-semibold text-red-600">
-                  If you want to modify this information, please navigate to your&nbsp;
-                  <span className="underline">
-                    <Link to={'/profile/overview'}>profile</Link>
-                  </span>
-                </h3>
-
                 <FormField
                   control={form.control}
                   name="preferContact"

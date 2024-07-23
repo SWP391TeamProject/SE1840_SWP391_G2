@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from '@/redux/reducers/AuctionSession';
 import { fetchActiveAuctionSessions } from '@/services/AuctionSessionService';
 import { useQuery } from '@tanstack/react-query';
+import { User2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -81,7 +82,13 @@ export default function AuctionList() {
                     <div className="flex items-center gap-2">
                       <PackageIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.auctionItems ? session.auctionItems.length : 0} Items
+                        {session.auctionItems ? session.auctionItems.length : 0} Lots
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <User2 className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <div className="text-sm font-medium">
+                        {session.auctionItems ? session.participantCount : 0} bidders
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

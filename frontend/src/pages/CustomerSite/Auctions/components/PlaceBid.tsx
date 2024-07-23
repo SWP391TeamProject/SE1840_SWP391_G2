@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Separator } from '@/components/ui/separator';
 import CountDownTime from '@/components/countdownTimer/CountDownTime';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CurrencyType, useCurrency } from '@/CurrencyProvider';
 
 import { useAuth } from '@/AuthProvider';
@@ -49,6 +49,11 @@ export default function PlaceBid({ ...props }) {
         }
       ),
   });
+
+  const getNextBidAmount = useCallback(() => {
+    return Math.ceil(Number(props?.currentBid) + bidIncrement + 1);
+  }, [bidIncrement, props?.currentBid]);
+
   useEffect(() => {
     if (!loc?.state) {
       let currentBid = Number(props.currentBid);
@@ -62,12 +67,12 @@ export default function PlaceBid({ ...props }) {
         setBidIncrement(1000);
       }
     }
-    form.setValue('bidAmount', Number(props.currentBid) + bidIncrement + 1);
+    form.setValue('bidAmount', getNextBidAmount());
   }, [loc?.state, props.currentBid]);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { bidAmount: Number(props?.currentBid) + bidIncrement + 1 },
+    defaultValues: { bidAmount: getNextBidAmount() },
   });
   useEffect(() => {
     if (!props.isSending) {
@@ -224,7 +229,7 @@ export default function PlaceBid({ ...props }) {
                                 <Input
                                   className="w-full text-foreground"
                                   // defaultValue={2}
-                                  placeholder={`amount equal or greater than ${currency.format(parseFloat(props?.currentBid) + bidIncrement)}`}
+                                  placeholder={`amount equal or greater than ${currency.format(getNextBidAmount())}`}
                                   {...field}
                                 />
                               </FormControl>

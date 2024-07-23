@@ -70,6 +70,12 @@ export function ItemList() {
       size: 16,
       sort: searchParams.get('sort') || 'itemId,desc',
     };
+    if(searchParams.get('search')){
+      query.page = 1;
+      query.size = 16;
+    }
+
+
     toast.promise(getItems(query), {
       loading: 'Loading items...',
       success: (res) => {
@@ -241,7 +247,7 @@ export function ItemList() {
                   name="search"
                   render={({ field }) => (
                     <div className="w-full relative">
-                      <Input {...field} className="px-8 h-9 focus-visible:[box-shadow:none]" />
+                      <Input {...field} className="px-8 h-9 focus-visible:[box-shadow:none]" placeholder='search anything...'/>
                       <SearchIcon className="absolute left-1.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 peer-focus:text-gray-900" />
                     </div>
                   )}
@@ -310,7 +316,7 @@ export function ItemList() {
                     </CardHeader>
                     <div className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
                       <Button size="sm" asChild>
-                        <Link to={`/item/${item.itemId}`} target="_blank">
+                        <Link to={`/jewelries/${item.itemId}`} target="_blank">
                           View item
                         </Link>
                       </Button>

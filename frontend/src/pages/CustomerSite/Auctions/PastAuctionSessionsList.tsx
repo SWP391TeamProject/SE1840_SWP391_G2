@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from '@/redux/reducers/AuctionSession';
 import { fetchPastAuctionSessions } from '@/services/AuctionSessionService';
 import { useQuery } from '@tanstack/react-query';
+import { User2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -68,7 +69,6 @@ export default function PastAuctionSessionsList() {
                 <CardContent className="grid gap-4">
                   <div className="grid gap-2 mt-3">
                     <h3 className="font-semibold text-lg">{session.title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{session.title}</p>
                   </div>
                   <div className="grid gap-2">
                     <div className="flex items-center gap-2">
@@ -81,7 +81,13 @@ export default function PastAuctionSessionsList() {
                     <div className="flex items-center gap-2">
                       <PackageIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.auctionItems ? session.auctionItems.length : 0} Items
+                        {session.auctionItems ? session.auctionItems.length : 0} lots
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <User2 className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                      <div className="text-sm font-medium">
+                        {session.auctionItems ? session.participantCount : 0} bidders
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

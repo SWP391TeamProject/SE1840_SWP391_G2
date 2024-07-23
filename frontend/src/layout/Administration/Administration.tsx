@@ -64,9 +64,12 @@ export default function Administration() {
   useEffect(() => {
     // Call the function on component mount and path change
     checkScrollPositionAndReset();
-
+    if(!auth.user) {
+      nav('/auth/login');
+    } 
     // Optional: If you want to check the scroll position continuously or on a specific event, you can add more logic here
   }, [location.pathname]);
+  
 
   useEffect(() => {
     // console.log(location);
@@ -139,11 +142,11 @@ export default function Administration() {
               )}
               {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                 <Link
-                  to="items"
+                  to="jewelry"
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                 >
                   <ShoppingBag />
-                  Manage Items
+                  Manage Jewelries
                 </Link>
               )}
               <Link
@@ -242,11 +245,11 @@ export default function Administration() {
                   )}
                   {(auth.user.role === Roles.ADMIN || auth.user.role === Roles.MANAGER) && (
                     <Link
-                      to="items"
+                      to="jewelry"
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-foreground transition-all hover:text-primary"
                     >
                       <ShoppingBag />
-                      Manage Items
+                      Manage Jewelries
                     </Link>
                   )}
                   <Link

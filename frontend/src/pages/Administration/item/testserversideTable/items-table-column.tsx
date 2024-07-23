@@ -77,8 +77,8 @@ export const getColumns = (): ColumnDef<Item>[] => [
   },
   {
     accessorKey: 'createDate',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
-    cell: ({ row }) => formatDate(new Date(row.getValue('createDate'))),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Create Date" />,
+    cell: ({ row }) => new Date(row.getValue('createDate')).getDate() === new Date().getDate() ? 'Today' : formatDate(row.getValue('createDate')),
     enableHiding: true,
   },
   {
@@ -98,7 +98,7 @@ export const getColumns = (): ColumnDef<Item>[] => [
       const nav = useNavigate();
 
       const handleEditClick = (itemId: number) => {
-        nav(`/admin/items/${itemId}`);
+        nav(`/admin/jewelry/${itemId}`);
       };
 
       return (
@@ -112,7 +112,7 @@ export const getColumns = (): ColumnDef<Item>[] => [
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => handleEditClick(row.original.itemId)}>Edit</DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to={`/item/${row.original.itemId}`} target="_blank">
+                <Link to={`/jewelries/${row.original.itemId}`} target="_blank">
                   Public View
                 </Link>
               </DropdownMenuItem>

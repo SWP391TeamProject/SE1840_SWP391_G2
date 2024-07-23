@@ -140,7 +140,7 @@ export default function ItemCreate() {
             });
         }
         toast.success('Item created successfully!', {});
-        nav('/admin/items');
+        nav('/admin/jewelry');
       })
       .catch((error) => {
         console.error(error);

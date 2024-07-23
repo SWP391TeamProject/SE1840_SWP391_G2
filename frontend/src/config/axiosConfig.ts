@@ -1,13 +1,18 @@
 // axiosConfig.js
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import axios from 'axios';
+
 import { redirect, useNavigate } from 'react-router-dom';
 import { getCookie, removeCookie, setCookie } from '@/utils/cookies.ts';
+import axios from 'axios';
 
 const instance = axios.create({
   // You can put your base URL here
   baseURL: SERVER_DOMAIN_URL,
 });
+// Set a timeout of 10000 milliseconds (10 seconds) for all requests
+instance.defaults.timeout = 10000;
+
+
 
 instance.interceptors.response.use(
   function (response) {

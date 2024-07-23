@@ -144,8 +144,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                       <Route path="Auctions/details" element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id" element={<AuctionSession />}></Route>
                       <Route path="Auctions/:id/join" element={<AuctionJoin />} />
-                      <Route path="items" element={<ItemList />} />
-                      <Route path="item/:id/*" element={<PublicItemDetail />} />
+                      <Route path="/jewelries" element={<ItemList />} />  
+                      <Route path="jewelries/:id/*" element={<PublicItemDetail />} />
 
                       <Route
                         element={
@@ -216,9 +216,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                           <Route path="payments/create" element={<PaymentCreate />}></Route>
                         </Route>
                         <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
-                          <Route path="items" element={<ItemsList />}></Route>
-                          <Route path="items/:id" element={<ItemDetail />}></Route>
-                          <Route path="items/create" element={<ItemCreate />}></Route>
+                          <Route path="jewelry" element={<ItemsList />}></Route>
+                          <Route path="jewelry/:id" element={<ItemDetail />}></Route>
+                          <Route path="jewelry/create" element={<ItemCreate />}></Route>
                         </Route>
                         <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN, Roles.STAFF]} />}>
                           <Route path="blogs" element={<BlogPostList />}></Route>
