@@ -12,6 +12,7 @@ import ReactApexChart from 'react-apexcharts';
 import { getTotalRevenueByPastAuction } from '@/services/StatisticServices';
 import { AxiosResponse } from '@/config/axiosConfig.ts';
 import { useCurrency } from '@/CurrencyProvider';
+import { useTheme } from '@mui/material/styles';
 
 // const initialSeries = [
 //   {
@@ -29,10 +30,12 @@ import { useCurrency } from '@/CurrencyProvider';
 export default function TotalRevenuePastAuctionBarChart() {
   const [series, setSeries] = useState([]);
   const currency = useCurrency();
+  const theme = useTheme();
+  const line = theme.palette.divider;
   // chart options
   const columnChartOptions = {
     chart: {
-      type: 'bar',
+      type: 'area',
       height: 430,
       toolbar: {
         show: false,
@@ -48,10 +51,10 @@ export default function TotalRevenuePastAuctionBarChart() {
       enabled: false,
     },
     stroke: {
-      show: true,
-      width: 8,
-      colors: ['transparent'],
+      curve: 'smooth',
+      width: 2
     },
+    
     xaxis: {
       categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     },
@@ -134,6 +137,7 @@ export default function TotalRevenuePastAuctionBarChart() {
 
           setOptions((prevState) => ({
             ...prevState,
+            colors: [theme.palette.primary.main, theme.palette.primary[700]],
             xaxis: {
               ...prevState.xaxis,
               categories: formattedData.map((item) => item.monthName),
@@ -165,7 +169,7 @@ export default function TotalRevenuePastAuctionBarChart() {
         ...prevState.yaxis,
       },
       grid: {
-        borderColor: 'line',
+        borderColor: line
       },
       plotOptions: {
         bar: {
@@ -179,12 +183,7 @@ export default function TotalRevenuePastAuctionBarChart() {
     'primary',
     'secondary',
     'line',
-    'warning',
-    'primaryMain',
-    'successDark',
-    'income',
-    'cos',
-    'xsDown',
+    'theme'
   ]);
 
   return (
@@ -224,7 +223,7 @@ export default function TotalRevenuePastAuctionBarChart() {
           </FormControl> */}
         </Stack>
         <Box id="chart" sx={{ bgcolor: 'transparent' }}>
-          <ReactApexChart options={options} series={series} type="bar" height={360} />
+          <ReactApexChart options={options} series={series} type="area" height={360} />
         </Box>
       </Box>
     </MainCard>
