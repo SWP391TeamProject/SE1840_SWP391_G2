@@ -344,10 +344,12 @@ public class OrderServiceImpl implements OrderService {
                 item.setBuyer(account);
                 itemRepos.save(item);
 
-                AuctionItem ai = auctionItemRepos.findLatestAuctionItemByItemId(item.getItemId());
-                Preconditions.checkNotNull(ai, "No auction item found for item " + item.getItemId());
-                ai.setSold(true);
-                auctionItemRepos.save(ai);
+                List<AuctionItem> ais = auctionItemRepos.getLatestByItemId(item.getItemId());
+                if (!ais.isEmpty()) {
+                    AuctionItem ai = ais.get(0);
+                    ai.setSold(true);
+                    auctionItemRepos.save(ai);
+                }
 
                 notificationService.sendNotification(
                         NotificationDTO.builder()
