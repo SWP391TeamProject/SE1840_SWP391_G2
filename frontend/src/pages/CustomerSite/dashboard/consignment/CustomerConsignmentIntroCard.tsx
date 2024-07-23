@@ -29,8 +29,10 @@ const CustomerConsignmentIntroCard: React.FC<CustomerConsignmentIntroCardProps> 
         return (
           <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 w-full">
             <h2 className="text-2xl font-bold mb-4">Your action</h2>
-            <p>Please send the jewelry to our office for further evaluation.
-              Give the secret code in the top right corner to the staff to prove your identity.</p>
+            <p>
+              Please send the jewelry to our office for further evaluation. Give the secret code in the top right corner
+              to the staff to prove your identity.
+            </p>
           </div>
         );
       }

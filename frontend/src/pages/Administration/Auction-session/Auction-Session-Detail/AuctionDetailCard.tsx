@@ -1,35 +1,20 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {updateAuctionSession} from "@/services/AuctionSessionService.tsx";
-import {toast} from "sonner";
-import {getErrorMessage} from "@/lib/handle-error.ts";
-import {
-  ConfirmationDialog
-} from "@/components/confirmation/confirmation-dialog.tsx";
-import {AuctionSession} from "@/models/AuctionSessionModel.ts";
-import {useState} from "react";
-import {DateTimePicker} from "@/components/time-picker/date-time-picker.tsx";
-import {AuctionSessionStatus} from "@/constants/enums.tsx";
-import {Button} from "@/components/ui/button.tsx";
-import {Textarea} from "@/components/ui/textarea.tsx";
-import {formatDateToISO} from "@/lib/utils.ts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { updateAuctionSession } from '@/services/AuctionSessionService.tsx';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/handle-error.ts';
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog.tsx';
+import { AuctionSession } from '@/models/AuctionSessionModel.ts';
+import { useState } from 'react';
+import { DateTimePicker } from '@/components/time-picker/date-time-picker.tsx';
+import { AuctionSessionStatus } from '@/constants/enums.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Textarea } from '@/components/ui/textarea.tsx';
+import { formatDateToISO } from '@/lib/utils.ts';
 
 const formSchema = z.object({
   auctionSessionId: z.number(),
@@ -58,7 +43,7 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
       startDate: new Date(auction.startDate),
       endDate: new Date(auction.endDate),
       suspendDate: auction.suspendDate && new Date(auction.suspendDate),
-      description: auction.description
+      description: auction.description,
     },
   });
 
@@ -71,23 +56,26 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
     setShowTrigger(false);
     setIsLoading(true);
     const what = form.getValues();
-    toast.promise(updateAuctionSession({
-      auctionSessionId: what.auctionSessionId,
-      title: what.title,
-      startDate: formatDateToISO(what.startDate),
-      endDate: formatDateToISO(what.endDate),
-      description: what.description
-    }), {
-      loading: 'Updating Auction Session...',
-      success: () => {
-        setIsLoading(false);
-        return 'Auction Session Updated Successfully';
-      },
-      error: (error) => {
-        setIsLoading(false);
-        return getErrorMessage(error);
-      },
-    });
+    toast.promise(
+      updateAuctionSession({
+        auctionSessionId: what.auctionSessionId,
+        title: what.title,
+        startDate: formatDateToISO(what.startDate),
+        endDate: formatDateToISO(what.endDate),
+        description: what.description,
+      }),
+      {
+        loading: 'Updating Auction Session...',
+        success: () => {
+          setIsLoading(false);
+          return 'Auction Session Updated Successfully';
+        },
+        error: (error) => {
+          setIsLoading(false);
+          return getErrorMessage(error);
+        },
+      }
+    );
   };
 
   return (
@@ -107,8 +95,7 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
                   <FormItem className="flex flex-col">
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input {...field}
-                             disabled={auction.status !== AuctionSessionStatus.SCHEDULED} />
+                      <Input {...field} disabled={auction.status !== AuctionSessionStatus.SCHEDULED} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -121,8 +108,12 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
                   <FormItem className="flex flex-col">
                     <FormLabel>Start Date</FormLabel>
                     <FormControl>
-                      <DateTimePicker {...field} placeholder="from" className="w-full"
-                                      disabled={auction.status !== AuctionSessionStatus.SCHEDULED} />
+                      <DateTimePicker
+                        {...field}
+                        placeholder="from"
+                        className="w-full"
+                        disabled={auction.status !== AuctionSessionStatus.SCHEDULED}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -135,14 +126,18 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
                   <FormItem className="flex flex-col">
                     <FormLabel>End Date</FormLabel>
                     <FormControl>
-                      <DateTimePicker {...field} placeholder="to" className="w-full"
-                                      disabled={auction.status !== AuctionSessionStatus.SCHEDULED} />
+                      <DateTimePicker
+                        {...field}
+                        placeholder="to"
+                        className="w-full"
+                        disabled={auction.status !== AuctionSessionStatus.SCHEDULED}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {auction.status === AuctionSessionStatus.TERMINATED &&
+              {auction.status === AuctionSessionStatus.TERMINATED && (
                 <FormField
                   control={form.control}
                   name="suspendDate"
@@ -155,7 +150,8 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
                       <FormMessage />
                     </FormItem>
                   )}
-                />}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="description"
@@ -163,16 +159,22 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
                   <FormItem className="flex flex-col">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea {...field} className="w-full min-h-[150px]"
-                                disabled={auction.status !== AuctionSessionStatus.SCHEDULED} />
+                      <Textarea
+                        {...field}
+                        className="w-full min-h-[150px]"
+                        disabled={auction.status !== AuctionSessionStatus.SCHEDULED}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            {auction.status === AuctionSessionStatus.SCHEDULED &&
-              <Button variant="default" size="sm" onClick={() => onSubmit()} disabled={isLoading}>Update</Button>}
+            {auction.status === AuctionSessionStatus.SCHEDULED && (
+              <Button variant="default" size="sm" onClick={() => onSubmit()} disabled={isLoading}>
+                Update
+              </Button>
+            )}
           </form>
         </Form>
         <ConfirmationDialog
@@ -187,4 +189,4 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
       </CardContent>
     </Card>
   );
-}
+};

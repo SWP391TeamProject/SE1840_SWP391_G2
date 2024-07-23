@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import {Link, useParams} from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getItemsByStatus } from '@/services/ItemService';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
@@ -120,7 +120,7 @@ export default function AssignAuctionItem() {
       },
       error: (err) => {
         console.error(err);
-     
+
         return getErrorMessage(err);
       },
     });

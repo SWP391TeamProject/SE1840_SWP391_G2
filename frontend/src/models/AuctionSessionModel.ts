@@ -1,6 +1,5 @@
-
-import {AuctionSessionStatus} from "@/constants/enums.tsx";
-import {AuctionItem} from "@/models/auctionItem.ts";
+import { AuctionSessionStatus } from '@/constants/enums.tsx';
+import { AuctionItem } from '@/models/auctionItem.ts';
 
 export interface AuctionSession {
   auctionSessionId?: number;

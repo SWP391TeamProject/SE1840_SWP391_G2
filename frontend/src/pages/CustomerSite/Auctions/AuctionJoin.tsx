@@ -502,7 +502,6 @@ export default function AuctionJoin() {
                       />
                       <div className="mx-auto">
                         {isProgress() ? (
-
                           <PlaceBid
                             auctionId={auctionId}
                             itemId={itemDTO?.itemId}
@@ -520,7 +519,11 @@ export default function AuctionJoin() {
                             }
                           />
                         ) : (
-                          <Button className="w-full" variant="outline" onClick={() => nav(`/jewelries/${itemDTO?.itemId}`)}>
+                          <Button
+                            className="w-full"
+                            variant="outline"
+                            onClick={() => nav(`/jewelries/${itemDTO?.itemId}`)}
+                          >
                             More Detail
                           </Button>
                         )}

@@ -15,7 +15,7 @@ import { DataTableColumnHeader } from '@/components/data-tables/data-table-colum
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { AccountStatus, AuctionSessionStatus } from '@/constants/enums';
-import {formatDate, formatDateTime} from '@/lib/utils';
+import { formatDate, formatDateTime } from '@/lib/utils';
 import { MoreHorizontal } from 'lucide-react';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 

@@ -78,7 +78,10 @@ export const getColumns = (): ColumnDef<Item>[] => [
   {
     accessorKey: 'createDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Create Date" />,
-    cell: ({ row }) => new Date(row.getValue('createDate')).getDate() === new Date().getDate() ? 'Today' : formatDate(row.getValue('createDate')),
+    cell: ({ row }) =>
+      new Date(row.getValue('createDate')).getDate() === new Date().getDate()
+        ? 'Today'
+        : formatDate(row.getValue('createDate')),
     enableHiding: true,
   },
   {
