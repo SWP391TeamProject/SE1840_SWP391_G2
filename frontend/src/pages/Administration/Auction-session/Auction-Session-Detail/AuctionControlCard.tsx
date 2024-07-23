@@ -12,7 +12,6 @@ import {
 } from "@/components/confirmation/confirmation-button.tsx";
 import {useState} from "react";
 import {
-  finishAuctionSession,
   terminateAuctionSession
 } from "@/services/AuctionSessionService.tsx";
 import {toast} from "sonner";
@@ -22,24 +21,6 @@ export const AuctionControlCard: React.FC<{
   auction: AuctionSession
 }> = ({auction}) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleFinishSession = () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    const finishAuctionSessionPromise = finishAuctionSession(auction.auctionSessionId);
-    toast.promise(finishAuctionSessionPromise, {
-      loading: 'Finishing Auction Session...',
-      success: () => {
-        window.location.reload();
-        setIsLoading(false);
-        return 'Auction Session Finished Successfully';
-      },
-      error: (error) => {
-        setIsLoading(false);
-        return getErrorMessage(error);
-      },
-    });
-  };
 
   const handleTerminateSession = () => {
     if (isLoading) return;
@@ -68,19 +49,6 @@ export const AuctionControlCard: React.FC<{
           session</CardDescription>
       </CardHeader>
       <CardContent className="flex">
-        {auction?.status === AuctionSessionStatus.PROGRESSING && (
-          <ConfirmationButton
-            onSuccess={handleFinishSession}
-            message={'Are you sure to Finish this session?'}
-            title={'Confirmation'}
-            label={'Ok'}
-            description={'This action cannot be undone.'}
-            className="m-2"
-          >
-            Finish Session
-          </ConfirmationButton>
-        )}
-
         {(auction?.status !== AuctionSessionStatus.FINISHED &&
           auction?.status !== AuctionSessionStatus.TERMINATED) && (
           <>

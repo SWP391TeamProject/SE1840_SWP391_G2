@@ -11,6 +11,7 @@ export interface AuctionSession {
   auctionItems?: AuctionItem[];
   createDate?: string;
   updateDate?: string;
+  suspendDate?: string;
   attachments?: [];
   hasDeposited?: boolean;
   participantCount?: number;

@@ -33,6 +33,8 @@ public class AuctionSession {
 
     private LocalDateTime endDate;
 
+    private LocalDateTime suspendDate;
+
     @Column(length = 30)
     @Enumerated(EnumType.STRING)
     private Status status; // SCHEDULED, PROGRESSING, FINISHED, TERMINATED

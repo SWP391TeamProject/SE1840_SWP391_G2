@@ -98,6 +98,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         dto.setAuctionSessionId(pojo.getAuctionSessionId());
         dto.setStartDate(pojo.getStartDate());
         dto.setEndDate(pojo.getEndDate());
+        dto.setSuspendDate(pojo.getSuspendDate());
         dto.setStatus(pojo.getStatus());
         dto.setCreateDate(pojo.getCreateDate());
         dto.setUpdateDate(pojo.getUpdateDate());
@@ -565,6 +566,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
 
         auction.setStatus(AuctionSession.Status.TERMINATED);
+        if (LocalDateTime.now().isBefore(auction.getEndDate()))
+            auction.setSuspendDate(LocalDateTime.now());
         auctionSessionRepos.save(auction);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " terminated");

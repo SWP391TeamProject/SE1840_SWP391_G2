@@ -36,6 +36,7 @@ const formSchema = z.object({
   title: z.string(),
   startDate: z.date(),
   endDate: z.date(),
+  suspendDate: z.date(),
   description: z
     .string({ message: 'Description must be at least 10 characters long' })
     .min(10, {
@@ -56,6 +57,7 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
       title: auction.title,
       startDate: new Date(auction.startDate),
       endDate: new Date(auction.endDate),
+      suspendDate: auction.suspendDate && new Date(auction.suspendDate),
       description: auction.description
     },
   });
@@ -140,6 +142,20 @@ export const AuctionDetailCard: React.FC<{ auction: AuctionSession }> = ({ aucti
                   </FormItem>
                 )}
               />
+              {auction.status === AuctionSessionStatus.TERMINATED &&
+                <FormField
+                  control={form.control}
+                  name="suspendDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Suspension Date</FormLabel>
+                      <FormControl>
+                        <DateTimePicker {...field} className="w-full" disabled />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />}
               <FormField
                 control={form.control}
                 name="description"
