@@ -190,6 +190,7 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                                   accountId: lastBidder.id,
                                   createDate: orderDate,
                                   auctionItem: {
+                                      auctionId: auctionId,
                                       itemId: item.id,
                                       soldPrice: currentPrice
                                   },

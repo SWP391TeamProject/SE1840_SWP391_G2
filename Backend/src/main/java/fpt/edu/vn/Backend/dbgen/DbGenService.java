@@ -622,6 +622,9 @@ public class DbGenService {
                     if (auctionItem.has("soldPrice")) {
                         soldPrice = auctionItem.get("soldPrice").getAsBigDecimal();
                         ((Order) meta).setFee(payment.getPaymentAmount().subtract(soldPrice));
+                        if (auctionItem.has("auctionId"))
+                            ((Order) meta).setAuctionSession(auctionSessionRepos
+                                .findById(auctionItem.get("auctionId").getAsInt()).orElseThrow());
                     }
                 }
             }

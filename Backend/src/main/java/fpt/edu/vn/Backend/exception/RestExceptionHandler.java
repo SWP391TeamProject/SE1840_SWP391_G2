@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Date;
@@ -99,10 +100,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.UNAUTHORIZED, request);
   }
 
+
+
   @ExceptionHandler(AuthenticationServiceException.class)
   public ResponseEntity<Object> handleAuthenticationServiceException(AuthenticationServiceException ex, WebRequest request) {
     ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),ex.getMessage(),new Date());
     return handleExceptionInternal(ex, errorResponse, HEADERS, HttpStatus.UNAUTHORIZED, request);
+  }
+
+  @ExceptionHandler(ResponseStatusException.class)
+  public ResponseEntity<Object> handleResponseStatusException(ResponseStatusException ex, WebRequest request) {
+    ErrorResponse errorResponse = new ErrorResponse(ex.getStatusCode().value(),ex.getMessage(),new Date());
+    return handleExceptionInternal(ex, errorResponse, HEADERS, ex.getStatusCode(), request);
   }
 
 }
