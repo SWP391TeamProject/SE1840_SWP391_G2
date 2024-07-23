@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { useParams } from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import { getItemsByStatus } from '@/services/ItemService';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
@@ -179,7 +179,11 @@ export default function AssignAuctionItem() {
                   availableItems?.map((item: any) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.itemId}</TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link to={`/admin/items/${item.itemId}`} target="_blank">
+                          {item.name}
+                        </Link>
+                      </TableCell>
                       <TableCell className="font-medium">{currency.format(item.reservePrice)}</TableCell>
                       <TableCell>
                         <Button size="sm" variant="outline" onClick={() => handleAssign(item)}>
@@ -212,7 +216,11 @@ export default function AssignAuctionItem() {
                   selectedItems.map((item: any) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item?.itemId}</TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link to={`/admin/items/${item.itemId}`} target="_blank">
+                          {item.name}
+                        </Link>
+                      </TableCell>
                       <TableCell className="font-medium">{currency.format(item.reservePrice)}</TableCell>
                       <TableCell>
                         {auction.participantCount === 0 && (

@@ -80,7 +80,7 @@ export default function AccountEdit() {
           accountId: res.data.accountId,
           nickname: res.data.nickname,
           email: res.data.email,
-          phone: res.data.phone,
+          phone: res.data.phone || '',
           balance: res.data.balance,
           role: res.data.role,
           dummy: res.data.dummy,

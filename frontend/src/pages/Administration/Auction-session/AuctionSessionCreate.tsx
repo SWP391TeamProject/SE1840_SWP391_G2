@@ -4,15 +4,12 @@ import { custom, z } from 'zod';
 
 import DropzoneComponent from '@/components/drop-zone/DropZoneComponent';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { createAuctionSession, getAuctions } from '@/services/AuctionSessionService';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
-import { formatDate, formatDateTime } from '@/lib/utils';
 import { showErrorToast } from '@/lib/handle-error';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
@@ -20,6 +17,19 @@ import { useAppDispatch } from '@/redux/hooks';
 import { Textarea } from '@/components/ui/textarea';
 import { AuctionSessionStatus } from '@/constants/enums';
 import { Scheduler } from "@aldabil/react-scheduler";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form';
+import {
+  ConfirmationDialog
+} from '@/components/confirmation/confirmation-dialog';
+import {formatDateTime} from '@/lib/utils';
 
 const FormSchema = z.object({
   title: z.string().min(2, {
@@ -28,12 +38,12 @@ const FormSchema = z.object({
   startDate: z.string(),
   endDate: z.string(),
   description: z
-    .string({ message: 'description must be at least 10 characters long' })
+    .string({message: 'Description must be at least 10 characters long'})
     .min(10, {
       message: 'Description must be at least 10 characters long',
     })
     .max(1000, {
-      message: 'description cannot exceed 1000 characters long',
+      message: 'Description cannot exceed 1000 characters long',
     }),
   files: z.any(),
 });

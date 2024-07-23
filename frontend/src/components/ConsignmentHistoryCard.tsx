@@ -37,7 +37,7 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consign
             (cd) =>
               auth.user.role !== Roles.MEMBER ||
               cd.type === ConsignmentDetailType.INITIAL_EVALUATION ||
-              cd.type === ConsignmentDetailType.MANAGER_ACCEPTED
+              cd.type === ConsignmentDetailType.FINAL_EVALUATION
           )
           .sort((a, b) => b.consignmentDetailId - a.consignmentDetailId)
           .map((cd) => (

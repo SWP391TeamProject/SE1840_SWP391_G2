@@ -97,13 +97,6 @@ export const getItemsByStatus = async (status: ItemStatus, page: number, size: n
         'Content-Type': 'application/json',
       },
       params: { page, size },
-    })
-    .catch((err) => {
-      console.log(err);
-      if (err?.response.status == 401) {
-        removeCookie('user');
-        removeCookie('token');
-      }
     });
 };
 

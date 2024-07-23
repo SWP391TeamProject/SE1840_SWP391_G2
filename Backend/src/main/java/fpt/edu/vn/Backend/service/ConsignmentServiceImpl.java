@@ -298,7 +298,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
                     ConsignmentDetail consignmentDetail = new ConsignmentDetail();
                     consignmentDetail.setAccount(account);
                     consignmentDetail.setConsignment(consignment);
-                    consignmentDetail.setPrice(null);
+                    consignmentDetail.setPrice(price);
                     consignmentDetail.setDescription(rejectionReason);
                     consignmentDetail.setType(ConsignmentDetail.ConsignmentType.MANAGER_REJECTED);
                     consignmentDetail = consignmentDetailRepos.save(consignmentDetail);

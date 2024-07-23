@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 @Service
 //@CacheConfig(cacheNames = "auctionSession")
 public class AuctionSessionServiceImpl implements AuctionSessionService {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' HH:mm:ss", Locale.ENGLISH);
     private final AuctionSessionRepos auctionSessionRepos;
     private static final Logger logger = LoggerFactory.getLogger(AuctionSessionServiceImpl.class);
     private final AccountRepos accountRepos;
@@ -71,8 +73,6 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
     private String systemEmail;
 
     private final Map<Integer, AuctionSession.Status> auctionHandlingLock = Collections.synchronizedMap(new HashMap<>());
-    @Autowired
-    private OrderDetailRepos orderDetailRepos;
 
     @Autowired
     public AuctionSessionServiceImpl(AuctionSessionRepos auctionSessionRepos, AccountRepos accountRepos,
@@ -98,6 +98,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         dto.setAuctionSessionId(pojo.getAuctionSessionId());
         dto.setStartDate(pojo.getStartDate());
         dto.setEndDate(pojo.getEndDate());
+        dto.setSuspendDate(pojo.getSuspendDate());
         dto.setStatus(pojo.getStatus());
         dto.setCreateDate(pojo.getCreateDate());
         dto.setUpdateDate(pojo.getUpdateDate());
@@ -190,16 +191,24 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             for (Integer itemIds : assign.getItem()) {
                 Item item = itemRepos.findById(itemIds)
                         .orElseThrow(() -> new ResourceNotFoundException("Item not found: " + itemIds));
+                if (item.getStatus() == Item.Status.IN_AUCTION) {
+                    List<AuctionItem> ai = auctionItemRepos.getLatestByItemId(item.getItemId());
+                    if (ai != null && !ai.isEmpty() &&
+                            ai.get(0).getAuctionSession().getAuctionSessionId() == assign.getAuctionSessionId()) {
+                        logger.info("Item {} already in current auction, skipped", item.getItemId());
+                        continue;
+                    }
+                }
                 if (item.getStatus() != Item.Status.QUEUE) {
-                    logger.info("Item {} is not in queue or unsold", item.getItemId());
-                    throw new InvalidInputException("Item is not in queue or unsold: " + item.getItemId());
+                    logger.info("Item {} is not in queue", item.getItemId());
+                    throw new InvalidInputException("Item is not in queue: " + item.getItemId());
                 }
 
                 AuctionItem auctionItem = new AuctionItem();
                 auctionItem.setAuctionItemId(new AuctionItemId(auctionSession.getAuctionSessionId(), item.getItemId()));
                 auctionItem.setAuctionSession(auctionSession);
                 auctionItem.setItem(item);
-                auctionItem.setCurrentPrice(item.getReservePrice()); // Buy in price
+                auctionItem.setCurrentPrice(item.getReservePrice());
                 auctionItemRepos.save(auctionItem);
 
                 item.setStatus(Item.Status.IN_AUCTION);
@@ -249,13 +258,14 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             throw new InvalidInputException(String.format(
                     "There is an already scheduled auction session %d between %s and %s",
                     as.getAuctionSessionId(),
-                    as.getStartDate(),
-                    as.getEndDate()
+                    as.getStartDate().format(FORMATTER),
+                    as.getEndDate().format(FORMATTER)
             ));
         }
         try {
             AuctionSession auctionSession = new AuctionSession();
             auctionSession.setTitle(auctionDTO.getTitle());
+            auctionSession.setDescription(auctionDTO.getDescription());
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
             auctionSession.setCreateDate(LocalDateTime.now());
@@ -313,6 +323,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
         Map<Integer, Participant> participants = new HashMap<>();
         List<NotificationDTO> scheduledNotifications = new ArrayList<>();
+        List<OrderDTO> orderList = new ArrayList<>();
         int bidCount = 0;
 
         //////////////
@@ -415,13 +426,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
             if (!participant.wonItems.isEmpty()) {
                 logger.info("Creating order for winner {} ", participant.account.getAccountId());
-                orderServiceImpl.createOrder(
+                orderList.add(orderServiceImpl.createOrder(
                         account.getAccountId(),
                         participant.wonItems.stream()
                                 .map(AuctionItem::getAuctionItemId)
-                                .collect(Collectors.toUnmodifiableSet()),
-                        auctionSessionId
-                );
+                                .collect(Collectors.toUnmodifiableSet())
+                ));
             }
 
             scheduledNotifications.add(
@@ -445,6 +455,12 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             if (p.getStatus() != Payment.Status.PENDING)
                 continue;
             Account account = p.getAccount();
+            Participant participant = participants.get(account.getAccountId());
+            if (!participant.wonItems.isEmpty()) {
+                logger.info("Skipped refunding deposit id {} for account {} because being winner",
+                        deposit.getDepositId(), account.getAccountId());
+                continue;
+            }
             account.setBalance(account.getBalance().add(p.getPaymentAmount()));
             accountRepos.save(account);
             scheduledNotifications.add(
@@ -462,7 +478,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
         auction.setEndDate(LocalDateTime.now());
         auction.setStatus(AuctionSession.Status.FINISHED);
-        auctionSessionRepos.save(auction);
+        orderServiceImpl.linkAuctionToOrders(auctionSessionRepos.save(auction), orderList);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " finished");
         auctionHandlingLock.remove(auctionSessionId);
@@ -536,8 +552,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
 
             if (p.getStatus() != Payment.Status.PENDING)
                 continue;
-            p.setStatus(Payment.Status.FAILED);
-            p.setFailedReason("Auction has been terminated");
+            p.setStatus(Payment.Status.SUCCESS);
             p = paymentRepos.save(p);
 
             Account account = p.getAccount();
@@ -557,6 +572,8 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         }
 
         auction.setStatus(AuctionSession.Status.TERMINATED);
+        if (LocalDateTime.now().isBefore(auction.getEndDate()))
+            auction.setSuspendDate(LocalDateTime.now());
         auctionSessionRepos.save(auction);
         notificationService.sendBulkNotification(scheduledNotifications);
         logger.info("Auction session " + auctionSessionId + " terminated");
@@ -652,12 +669,27 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
         if (auctionDTO.getStatus() == AuctionSession.Status.PROGRESSING) {
             throw new InvalidInputException("Auction session already started");
         }
+        List<AuctionSession> conflictingSession = auctionSessionRepos.getConflictingSession(
+                auctionDTO.getStartDate(), auctionDTO.getEndDate())
+                .stream()
+                .filter(a -> a.getAuctionSessionId() != auctionDTO.getAuctionSessionId())
+                .toList();
+        if (!conflictingSession.isEmpty()) {
+            AuctionSession as = conflictingSession.get(0);
+            throw new InvalidInputException(String.format(
+                    "There is an already scheduled auction session %d between %s and %s",
+                    as.getAuctionSessionId(),
+                    as.getStartDate().format(FORMATTER),
+                    as.getEndDate().format(FORMATTER)
+            ));
+        }
         try {
             AuctionSession auctionSession = auctionSessionRepos.findById(auctionDTO.getAuctionSessionId()).
                     orElseThrow(() -> new ResourceNotFoundException("Auction session not found", "id", auctionDTO.getAuctionSessionId()));
             auctionSession.setStartDate(auctionDTO.getStartDate());
             auctionSession.setEndDate(auctionDTO.getEndDate());
-            auctionSession.setUpdateDate(LocalDateTime.now());
+            auctionSession.setTitle(auctionDTO.getTitle());
+            auctionSession.setDescription(auctionDTO.getDescription());
             // use terminate or finish button, thanks :D
             //auctionSession.setStatus(AuctionSession.Status.valueOf(auctionDTO.getStatus()));
             auctionSessionRepos.save(auctionSession);
