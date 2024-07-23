@@ -121,7 +121,10 @@ export default function AuctionSessionCreate() {
   }
 
   const goNextStep = () => {
-    setStep(step + 1);
+    Promise.all([form.trigger("description"), form.trigger("title")]).then((res) => {
+      if(!res.includes(false))
+        setStep(step + 1);
+    })
   }
 
   const goPreviousStep = () => {
