@@ -186,7 +186,7 @@ export default function ItemCreate() {
                     <FormItem>
                       <FormLabel>Owner ID</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} disabled={consignment !=== undefined} />
+                        <Input type="number" {...field} disabled={consignment !== undefined} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
