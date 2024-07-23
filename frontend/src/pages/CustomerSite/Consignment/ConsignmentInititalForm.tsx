@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react';
+import thumbnail1 from '@/assets/thumnail1.jpg';
+import { useAuth } from '@/AuthProvider';
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Textarea } from '@/components/ui/textarea';
-import DropzoneComponent from '../../../components/drop-zone/DropZoneComponent';
-import { getCookie } from '@/utils/cookies';
-import { createConsignmentService } from '@/services/ConsignmentService';
-import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { mailRegex, phoneRegex } from '@/constants/regex';
-import thumbnail1 from '@/assets/thumnail1.jpg';
-import { useAuth } from '@/AuthProvider';
-import { Link, useNavigate } from 'react-router-dom';
+import { createConsignmentService } from '@/services/ConsignmentService';
+import { getCookie } from '@/utils/cookies';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import DropzoneComponent from '../../../components/drop-zone/DropZoneComponent';
 
 const formSchema = z.object({
   accountId: z.number(),

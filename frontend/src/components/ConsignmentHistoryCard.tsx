@@ -8,7 +8,7 @@ import ConsignmentAttachmentGallery from '@/pages/Administration/consignments/co
 import { useAuth } from '@/AuthProvider.tsx';
 import { ConsignmentDetailType, Roles } from '@/constants/enums.tsx';
 import AccountRoleBadge from '@/components/AccountRoleBadge.tsx';
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react';
 
 interface ConsignmentHistoryCardProps {
   consignment: Consignment;
@@ -17,29 +17,26 @@ interface ConsignmentHistoryCardProps {
 
 function filterConsignmentDetails(consignmentDetails: ConsignmentDetail[], isMember: boolean): ConsignmentDetail[] {
   if (!isMember) {
-    return consignmentDetails.sort((a, b) =>
-      (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
+    return consignmentDetails.sort((a, b) => (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
   }
 
-  const initialEvaluations = consignmentDetails.filter(detail =>
-    detail.type === ConsignmentDetailType.INITIAL_EVALUATION);
-  const managerAccepted = consignmentDetails.some(detail =>
-    detail.type === ConsignmentDetailType.MANAGER_ACCEPTED);
+  const initialEvaluations = consignmentDetails.filter(
+    (detail) => detail.type === ConsignmentDetailType.INITIAL_EVALUATION
+  );
+  const managerAccepted = consignmentDetails.some((detail) => detail.type === ConsignmentDetailType.MANAGER_ACCEPTED);
 
   if (managerAccepted) {
-    const fe = consignmentDetails.filter(detail =>
-      detail.type === ConsignmentDetailType.FINAL_EVALUATION);
+    const fe = consignmentDetails.filter((detail) => detail.type === ConsignmentDetailType.FINAL_EVALUATION);
     if (fe.length > 0) {
       const lfe = fe.reduce((prev, curr) =>
-        (curr.consignmentDetailId ?? 0) > (prev.consignmentDetailId ?? 0) ? curr : prev);
+        (curr.consignmentDetailId ?? 0) > (prev.consignmentDetailId ?? 0) ? curr : prev
+      );
       initialEvaluations.push(lfe);
     }
   }
 
-  return initialEvaluations.sort((a, b) =>
-    (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
+  return initialEvaluations.sort((a, b) => (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
 }
-
 
 const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consignment, className }) => {
   const currency = useCurrency();
