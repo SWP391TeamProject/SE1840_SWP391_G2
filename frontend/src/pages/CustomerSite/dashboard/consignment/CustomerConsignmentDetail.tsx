@@ -8,6 +8,8 @@ import ConsignmentDetailCard from '@/components/ConsignmentDetailCard.tsx';
 import ConsignmentHistoryCard from '@/components/ConsignmentHistoryCard.tsx';
 import CustomerConsignmentIntroCard from '@/pages/CustomerSite/dashboard/consignment/CustomerConsignmentIntroCard.tsx';
 import ConsignmentSecretCodeCard from '@/components/ConsignmentSecretCodeCard.tsx';
+import CustomerConsignmentStaffInfoCard
+  from "@/pages/CustomerSite/dashboard/consignment/CustomerConsignmentStaffInfoCard.tsx";
 
 export default function CustomerConsignmentDetail() {
   const consignmentId = parseInt(useParams().id);
@@ -37,6 +39,7 @@ export default function CustomerConsignmentDetail() {
           <ConsignmentDetailCard consignment={consignment} />
         </div>
         <div className="col-span-2 flex flex-col gap-6 flex-wrap">
+          {consignment.staff && <CustomerConsignmentStaffInfoCard staff={consignment.staff} />}
           {consignment.secretCode && (
             <ConsignmentSecretCodeCard
               consignment={consignment}

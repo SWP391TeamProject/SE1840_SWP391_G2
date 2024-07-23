@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate, useParams } from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import CountDownTime from '@/components/countdownTimer/CountDownTime';
-import axios from '@/config/axiosConfig.ts';
 import { toast } from 'sonner';
 import { getCookie } from '@/utils/cookies';
 import { fetchAuctionSessionById, registerAuctionSession } from '@/services/AuctionSessionService';
@@ -22,20 +21,19 @@ import {
 
 import { AuctionSessionStatus } from '@/constants/enums';
 
-import { API_SERVER, SERVER_DOMAIN_URL } from '@/constants/domain';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CurrencyType, useCurrency } from '@/CurrencyProvider';
+import { useCurrency } from '@/CurrencyProvider';
 import { Item } from '@/models/Item';
 import { getAllItemCategories } from '@/services/ItemCategoryService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { set } from 'date-fns';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 import { useAuth } from '@/AuthProvider';
 import { showErrorToast } from '@/lib/handle-error';
 import KycVerificationPopup from '@/pages/global_popup/KycVerificationPopup';
 import SoldFor from './components/sold-for';
-import { formatDateToISO } from '@/lib/utils';
+import { formatDateTime} from '@/lib/utils';
 import { AuctionItem } from '@/models/auctionItem';
+import {BadgeDollarSign, UsersIcon} from "lucide-react";
 
 export default function AuctionSession() {
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
@@ -45,10 +43,6 @@ export default function AuctionSession() {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const [showKycPopup, setShowKycPopup] = useState(false);
-  const currencyFormatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  });
   const currency = useCurrency();
 
   const param = useParams();
@@ -58,6 +52,7 @@ export default function AuctionSession() {
   const [alertBalance, setAlertBalance] = useState(null);
   const [registerFee, setRegisterFee] = useState(0);
   const auth = useAuth();
+
   // const [auciton, setAuction] = useState(auctionSession);
   useEffect(() => {
     console.log(auctionSession);
@@ -359,9 +354,9 @@ export default function AuctionSession() {
                     <></>
                   )}
 
-                  {auctionSession?.status === AuctionSessionStatus.FINISHED ||
+                  {(auctionSession?.status === AuctionSessionStatus.FINISHED ||
                   new Date(auctionSession?.endDate) < new Date() ||
-                  new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
+                  new Date(auctionSession?.endDate).getTime() <= new Date().getTime()) ? (
                     <div className="text-pink-500 dark:text-pink-400 font-semibold">Auction Ended</div>
                   ) : (
                     <></>
@@ -371,8 +366,8 @@ export default function AuctionSession() {
                     <div className="text-red-500 dark:text-red-400 font-semibold">Auction has been terminated</div>
                   )}
 
-                  {auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
-                  new Date(auctionSession?.startDate).getTime() > new Date().getTime() ? (
+                  {(auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
+                  new Date(auctionSession?.startDate).getTime() > new Date().getTime()) ? (
                     <span>
                       Starts in <CountDownTime end={new Date(auctionSession?.startDate)}></CountDownTime>
                     </span>
@@ -383,7 +378,7 @@ export default function AuctionSession() {
                 {alertBalance}
 
                 {auctionSession?.hasDeposited
-                  ? auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
+                  ? (auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
                       <Button
                         onClick={() =>
                           scrollTo({ top: document.getElementById('auction-items')?.offsetTop, behavior: 'smooth' })
@@ -391,8 +386,8 @@ export default function AuctionSession() {
                       >
                         Join Now
                       </Button>
-                    )
-                  : auctionSession?.status === AuctionSessionStatus.SCHEDULED && <ConfirmRegister></ConfirmRegister>}
+                    ))
+                  : (auctionSession?.status === AuctionSessionStatus.SCHEDULED && <ConfirmRegister></ConfirmRegister>)}
               </div>
             </div>
             {!sessionAttachments[0]?.link ? (
@@ -457,13 +452,20 @@ export default function AuctionSession() {
                       </div>
 
                       <CardContent className="space-y-2 p-4">
-                        <h4 className="text-sm font-semibold">{item.itemDTO.name}</h4>
+                        <h4 className="text-sm font-semibold">
+                          <Link to={`/jewelries/${item.itemDTO.itemId}`}>{item.itemDTO.name}</Link>
+                        </h4>
                       </CardContent>
                       <div className="mt-auto space-y-2 p-4">
                         {/* <div className="flex items-center justify-between mt-5"> */}
                         {auctionSession.status === AuctionSessionStatus.PROGRESSING && (
-                          <div className="text-primary-500 font-medium space-y-3">
-                            Current Price: {currency.format(item?.currentPrice)}
+                          <div>
+                            <div className="text-primary-500 font-medium space-y-3 flex flex-row items-center gap-3">
+                              <BadgeDollarSign className="w-5 h-5" /> Current Price: {currency.format(item?.currentPrice)}
+                            </div>
+                            <div className="text-primary-500 font-medium space-y-3 flex flex-row items-center gap-3">
+                              <UsersIcon className="w-5 h-5" /> Bidders: {item?.participantCount}
+                            </div>
                           </div>
                         )}
                         {/* </div> */}
@@ -519,15 +521,19 @@ export default function AuctionSession() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="text-gray-500 dark:text-gray-400">Start Time</div>
-                  <div>{auctionSession?.startDate ? new Date(auctionSession?.startDate).toLocaleString() : ''}</div>
+                  <div>{auctionSession?.startDate ? formatDateTime(auctionSession?.startDate) : ''}</div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="text-gray-500 dark:text-gray-400">End Time</div>
-                  <div>{auctionSession?.endDate ? new Date(auctionSession?.endDate).toLocaleString() : ''}</div>
+                  <div>{auctionSession?.endDate ? formatDateTime(auctionSession?.endDate) : ''}</div>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="text-gray-500 dark:text-gray-400">Number of Lots:</div>
                   <div>{auctionSession?.auctionItems?.length}</div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="text-gray-500 dark:text-gray-400">Number of Participants:</div>
+                  <div>{auctionSession?.participantCount}</div>
                 </div>
                 {/* <Link
                                     to="#"

@@ -59,40 +59,26 @@ const formSchema = z.object({
     }),
   color: z
     .string()
-    .min(3, {
-      message: 'Color must be at least 3 characters long.',
-    })
     .optional(),
   measurement: z
     .string()
-    .min(1, {
-      message: 'Measurement must not be empty.',
-    })
     .optional(),
-  weight: z.coerce.number().optional(),
+  weight: z.string()
+    .optional()
+    .refine((value) => value === '' || value === undefined || (Number(value) > 0 && Number(value) < 10000), {
+      message: 'Weight must be positive and below 10000. Leave blank if you do not know.',
+    }),
   metal: z
     .string()
-    .min(1, {
-      message: 'Metal must not be empty.',
-    })
     .optional(),
   gemstone: z
     .string()
-    .min(1, {
-      message: 'Gemstone must not be empty.',
-    })
     .optional(),
   condition: z
     .string()
-    .min(1, {
-      message: 'Condition must not be empty.',
-    })
     .optional(),
   stamped: z
     .string()
-    .min(1, {
-      message: 'Brand/Stamped must not be empty.',
-    })
     .optional(),
   status: z.nativeEnum(ItemStatus),
   deletedFiles: z.any(),
@@ -117,7 +103,7 @@ export default function ItemDetail() {
       buyInPrice: 0,
       color: '',
       measurement: '',
-      weight: 0,
+      weight: '',
       metal: '',
       gemstone: '',
       stamped: '',
@@ -142,9 +128,9 @@ export default function ItemDetail() {
           buyInPrice: i.buyInPrice,
           color: i.color,
           measurement: i.measurement,
-          weight: i.weight,
+          weight: typeof i.weight === 'number' ? i.weight.toString() : '',
           metal: i.metal,
-          gemstone: (i.gemstone || 0).toString(),
+          gemstone: i.gemstone,
           stamped: i.stamped,
           condition: i.condition,
           status: i.status,
@@ -178,12 +164,13 @@ export default function ItemDetail() {
 
     interface DTO extends Omit<z.infer<typeof formSchema>, 'categoryId' | 'age'> {
       categoryId?: number;
-      age?: number;
+      weight?: number;
     }
 
     const dto: DTO = {
       ...values,
       categoryId: parseInt(values.categoryId),
+      weight: values.weight.length > 0 ? parseInt(values.weight) : undefined
     };
 
     if (item.status != ItemStatus.QUEUE) {
@@ -261,6 +248,7 @@ export default function ItemDetail() {
                       </Button>
                     ) : (
                       <Button
+                        disabled={item.status == ItemStatus.REMOVED}
                         type="button"
                         onClick={() => {
                           setShowTrigger(true);

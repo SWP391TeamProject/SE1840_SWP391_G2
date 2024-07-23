@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Item } from '@/models/Item.ts';
+import {Item, ItemStatus} from '@/models/Item.ts';
 import { UseFormReturn } from 'react-hook-form';
 
 export default function ProductProperties(props: { item: Item; form: UseFormReturn }) {
@@ -20,8 +20,9 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
                 <FormItem>
                   <FormLabel>Color</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
+                  <FormDescription>The color of the item</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -34,7 +35,7 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
                 <FormItem>
                   <FormLabel>Weight</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
                   <FormDescription>
                     <span>Weight in grams</span>
@@ -49,11 +50,11 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
               name="metal"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>metal</FormLabel>
+                  <FormLabel>Metal</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
-                  <FormDescription>the type of metal used in the item</FormDescription>
+                  <FormDescription>The type of metal used in the item</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -64,11 +65,11 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
               name="gemstone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>gemstone</FormLabel>
+                  <FormLabel>Gemstone</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
-                  <FormDescription>the type of gemstone used in the item</FormDescription>
+                  <FormDescription>The type of gemstone used in the item</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -81,7 +82,7 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
                 <FormItem>
                   <FormLabel>Measurement</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
                   <FormDescription>
                     <span>Measurement in millimeters (mm)</span>
@@ -95,9 +96,9 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
               name="stamped"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>stamped</FormLabel>
+                  <FormLabel>Stamped</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
                   <FormDescription>
                     <span>Brand/Stamped of the item</span>
@@ -113,7 +114,7 @@ export default function ProductProperties(props: { item: Item; form: UseFormRetu
                 <FormItem>
                   <FormLabel>Condition</FormLabel>
                   <FormControl>
-                    <Input type="text" {...field} />
+                    <Input type="text" {...field} disabled={props.item.status == ItemStatus.REMOVED} />
                   </FormControl>
                   <FormDescription>
                     <span>Condition of the item</span>

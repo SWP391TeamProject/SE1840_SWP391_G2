@@ -149,6 +149,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
         deleteAccountService(id)
           .then((res) => {
             if (res) {
+              window.location.reload();
               toast.success('Account suspended');
             }
           })
@@ -162,6 +163,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
         activateAccountService(id)
           .then((res) => {
             if (res) {
+              window.location.reload();
               toast.success('Account activated');
             }
           })

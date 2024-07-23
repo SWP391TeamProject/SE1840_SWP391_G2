@@ -288,7 +288,7 @@ export default function AuctionSessionCreate() {
                 )}
               />
 
-              <Button variant='outline' className='mr-3' type="button" onClick={handleViewSchedule}>Togle Schedule</Button>
+              <Button variant='outline' className='mr-3' type="button" onClick={handleViewSchedule}>Toggle Schedule</Button>
 
             </div>
 

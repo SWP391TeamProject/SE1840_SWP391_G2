@@ -41,7 +41,7 @@ public class ConsignmentDTO implements Serializable {
         this.status = String.valueOf(consignment.getStatus());
         this.preferContact = String.valueOf(consignment.getPreferContact());
         this.user = AccountDTO.redacted(consignment.getUser());
-        this.staff = consignment.getStaff() == null ? null : AccountDTO.redacted(consignment.getStaff());
+        this.staff = consignment.getStaff() == null ? null : AccountDTO.redactedWithContact(consignment.getStaff());
         this.contactEmail = consignment.getContactEmail();
         this.contactPhone = consignment.getContactPhone();
         this.contactName = consignment.getContactName();

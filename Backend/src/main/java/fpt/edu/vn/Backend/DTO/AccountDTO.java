@@ -46,6 +46,19 @@ public class AccountDTO implements Serializable {
                 .build();
     }
 
+    public static AccountDTO redactedWithContact(Account account) {
+        return AccountDTO.builder()
+                .accountId(account.getAccountId())
+                .nickname(account.getNickname())
+                .status(account.getStatus())
+                .role(account.getRole())
+                .dummy(account.isDummy())
+                .email(account.getEmail())
+                .phone(account.getPhone())
+                .avatar(account.getAvatarUrl() == null ? null : new AttachmentDTO(account.getAvatarUrl()))
+                .build();
+    }
+
     public AccountDTO(Account account) {
         this.accountId = account.getAccountId();
         this.nickname = account.getNickname();

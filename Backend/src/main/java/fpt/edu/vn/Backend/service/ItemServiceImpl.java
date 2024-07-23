@@ -141,9 +141,9 @@ public class ItemServiceImpl implements ItemService {
         Preconditions.checkState(item.getStatus() == null ||
                 VALID_TRANSITIONS.get(it.getStatus()).contains(item.getStatus()),
                 "Invalid status transition");
-        Preconditions.checkState(item.getStatus() == Item.Status.QUEUE || item.getReservePrice() == null,
+        Preconditions.checkState(it.getStatus() == Item.Status.QUEUE || item.getReservePrice() == null,
                 "Cannot change reserve price at this time");
-        Preconditions.checkState(item.getStatus() == Item.Status.QUEUE || item.getBuyInPrice() == null,
+        Preconditions.checkState(it.getStatus() == Item.Status.QUEUE || item.getBuyInPrice() == null,
                 "Cannot change buy in price at this time");
         Preconditions.checkState(item.getOwnerId() == null, "Cannot change owner");
         return new ItemDTO(itemRepos.save(mapDTOToEntity(item, it)));

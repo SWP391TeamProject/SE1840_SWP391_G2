@@ -95,7 +95,11 @@ export const getItemsByStatus = async (status: ItemStatus, page: number, size: n
     headers: {
       'Content-Type': 'application/json',
     },
-    params: { page, size },
+    params: {
+      page,
+      size,
+      sort: 'itemId,desc'
+    },
   });
 };
 

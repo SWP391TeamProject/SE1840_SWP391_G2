@@ -599,7 +599,7 @@ public class DbGenService {
             payment.setType(Payment.Type.valueOf(obj.get("type").getAsString()));
             payment.setAccount(accountRepos.getReferenceById(obj.get("accountId").getAsInt()));
             payment.setCreateDate(parseDate(obj.get("createDate").getAsString()));
-            if (payment.getType() == Payment.Type.DEPOSIT || payment.getType() == Payment.Type.WITHDRAW)
+            if (payment.getType() == Payment.Type.WITHDRAW)
                 payment.setMethod(Payment.Method.MANUAL);
 
             Object meta = null;
@@ -622,6 +622,9 @@ public class DbGenService {
                     if (auctionItem.has("soldPrice")) {
                         soldPrice = auctionItem.get("soldPrice").getAsBigDecimal();
                         ((Order) meta).setFee(payment.getPaymentAmount().subtract(soldPrice));
+                        if (auctionItem.has("auctionId"))
+                            ((Order) meta).setAuctionSession(auctionSessionRepos
+                                .findById(auctionItem.get("auctionId").getAsInt()).orElseThrow());
                     }
                 }
             }

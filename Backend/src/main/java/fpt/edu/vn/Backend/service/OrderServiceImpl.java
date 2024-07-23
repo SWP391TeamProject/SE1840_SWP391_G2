@@ -382,7 +382,7 @@ public class OrderServiceImpl implements OrderService {
         Account account = payment.getAccount();
 
         // refund deposit for buyer
-        {
+        if (order.getAuctionSession() != null){
             Payment deposit = order.getAuctionSession().getDeposits().stream()
                     .map(Deposit::getPayment)
                     .filter(p -> p.getStatus() == Payment.Status.PENDING)
