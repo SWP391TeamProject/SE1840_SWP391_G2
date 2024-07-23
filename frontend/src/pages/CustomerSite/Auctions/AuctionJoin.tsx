@@ -526,9 +526,9 @@ export default function AuctionJoin() {
                             More Detail
                           </Button>
                         )}
-
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
