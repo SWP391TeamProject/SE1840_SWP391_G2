@@ -36,6 +36,8 @@ export default function ResultDialog({ message, items, title, ...props }: Result
   const currency = useCurrency();
 
   const revealItem = (index: number) => {
+    document.getElementById('mystery-box')?.classList.add('hidden', 'animate-pulse');
+
     setRevealedItems([...revealedItems, index]);
     if (revealedItems.length + 1 === items?.length) {
       setTotalRevealed(true);
@@ -49,8 +51,25 @@ export default function ResultDialog({ message, items, title, ...props }: Result
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{message}</DialogDescription>
                 </DialogHeader> */}
-        <DialogContent className="w-full">
-          <div className="w-full border">
+        <DialogContent className="w-full p-8">
+          <div className="w-full h-[300px]">
+            <img
+              className=" absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2"
+              src="https://cdn-icons-png.flaticon.com/128/6688/6688579.png"
+              alt="placeholder"
+              id="mystery-box"
+            />
+            <motion.div
+              className="grid grid-cols-3 w-full border"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: revealedItems.includes(0) ? 1 : 0, y: revealedItems.includes(0) ? 0 : 20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="col-span-2">Jewelry Name</p>
+              <p className="col-span-1 text-center">Current Price</p>
+              <Separator className="col-span-1" />
+            </motion.div>
+
             {items?.map((item, index) => (
               <motion.div
                 className="grid grid-cols-3 w-full border"
