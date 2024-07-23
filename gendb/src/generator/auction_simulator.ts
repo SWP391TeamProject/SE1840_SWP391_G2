@@ -37,12 +37,15 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
               auctionId++;
               const status = auctionSessionTimes[0];
 
+              let lastScheduledEndDate: Date = new Date();
+              let lastFinishedStartDate: Date = new Date();
               let startDate, endDate: Date;
 
               switch (status) {
                   case AuctionStatus.SCHEDULED: {
-                      startDate = addRandomDays(1, 14);
+                      startDate = addRandomDays(1, 14, lastScheduledEndDate);
                       endDate = addRandomMinute(MIN_AUCTION_MINUTES, MAX_AUCTION_MINUTES, startDate);
+                      lastScheduledEndDate = endDate;
                       break;
                   }
                   case AuctionStatus.PROGRESSING: {
@@ -51,8 +54,9 @@ export function simulateAuction(members: Account[], items: Item[]): [Transaction
                       break;
                   }
                   case AuctionStatus.FINISHED: {
-                      endDate = addRandomDays(-180, -1);
+                      endDate = addRandomDays(-180, -1, lastFinishedStartDate);
                       startDate = addRandomMinute(-MAX_AUCTION_MINUTES, -MIN_AUCTION_MINUTES, endDate);
+                      lastFinishedStartDate = startDate;
                       break;
                   }
               }

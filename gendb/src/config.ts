@@ -12,7 +12,7 @@ export const NUMBER_OF_CONSIGNMENT = 500;
 export const NUMBER_OF_AUCTION: Map<AuctionStatus, number> = new Map(
   Object.entries({
     SCHEDULED: 10,
-    PROGRESSING: 2,
+    PROGRESSING: 0,
     FINISHED: 5,
   }).map(([key, value]) => [key as AuctionStatus, value])
 );
