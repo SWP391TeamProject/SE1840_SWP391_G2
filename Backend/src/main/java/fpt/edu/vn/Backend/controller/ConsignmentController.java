@@ -67,7 +67,12 @@ public class ConsignmentController {
         if (!Authorizer.STAFF.contains(requester.getRole())) {
             customer = requester.getUserId(); // only get consignment of current user
         }
-        return ResponseEntity.ok(consignmentService.getAllConsignments(pageable, status, from, to, customer, search));
+        if (requester.getRole() == Account.Role.STAFF) {
+            return ResponseEntity.ok(consignmentService.getAllConsignments(
+                    pageable, status, from, to, customer, requester.getUserId(), search));
+        }
+        return ResponseEntity.ok(consignmentService.getAllConsignments(
+                pageable, status, from, to, customer, null, search));
     }
 
     @GetMapping("/{id}")

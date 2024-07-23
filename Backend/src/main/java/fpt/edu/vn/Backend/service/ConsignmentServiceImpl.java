@@ -546,8 +546,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     public Page<ConsignmentDTO> getAllConsignments(Pageable pageable,
                                                    @Nullable Consignment.Status status,
                                                    @Nullable LocalDateTime from, @Nullable LocalDateTime to,
-                                                   @Nullable Integer customer, @Nullable String search) {
-        ConsignmentSpecification spec = new ConsignmentSpecification(status, from, to, customer, search);
+                                                   @Nullable Integer customer,
+                                                   @Nullable Integer staff, @Nullable String search) {
+        ConsignmentSpecification spec = new ConsignmentSpecification(status, from, to, customer, staff, search);
         Page<Consignment> consignmentPage = consignmentRepos.findAll(spec,pageable);
         return getConsignmentDTOS(pageable, consignmentPage);
     }

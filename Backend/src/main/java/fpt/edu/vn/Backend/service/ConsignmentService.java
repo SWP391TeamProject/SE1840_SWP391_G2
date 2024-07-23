@@ -38,7 +38,7 @@ public interface ConsignmentService {
     ConsignmentDTO getConsignmentById(int id);
 
     default Page<ConsignmentDTO> getAllConsignments(String keyword,Pageable pageable) {
-        return getAllConsignments(pageable, null, null, null, null, keyword);
+        return getAllConsignments(pageable, null, null, null, null, null, keyword);
     }
 
     Page<ConsignmentDTO> getAllStaffConsignments(int staffId, Pageable pageable);
@@ -52,7 +52,8 @@ public interface ConsignmentService {
     Page<ConsignmentDTO> getAllConsignments(Pageable pageable,
                                             @Nullable Consignment.Status status,
                                             @Nullable LocalDateTime from, @Nullable LocalDateTime to,
-                                            @Nullable Integer customer, @Nullable String search);
+                                            @Nullable Integer customer,
+                                            @Nullable Integer staff, @Nullable String search);
 
     //Customer
     ConsignmentDTO custAcceptInitialEvaluation(int consignmentId);
