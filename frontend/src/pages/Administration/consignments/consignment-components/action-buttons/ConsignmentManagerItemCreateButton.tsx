@@ -24,7 +24,7 @@ const ConsignmentManagerItemCreateButton: React.FC<ConsignmentManagerItemCreateB
   const nav = useNavigate();
 
   const handleTake = () => {
-    nav(`/admin/items/create`, {
+    nav(`/admin/jewelry/create`, {
       state: {
         consignment: consignment,
       },

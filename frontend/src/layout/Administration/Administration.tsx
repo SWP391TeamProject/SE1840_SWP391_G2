@@ -64,9 +64,12 @@ export default function Administration() {
   useEffect(() => {
     // Call the function on component mount and path change
     checkScrollPositionAndReset();
-
+    if(!auth.user) {
+      nav('/auth/login');
+    } 
     // Optional: If you want to check the scroll position continuously or on a specific event, you can add more logic here
   }, [location.pathname]);
+  
 
   useEffect(() => {
     // console.log(location);
