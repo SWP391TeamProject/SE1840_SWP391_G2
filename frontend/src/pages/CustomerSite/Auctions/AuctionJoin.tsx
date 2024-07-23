@@ -50,7 +50,7 @@ export default function AuctionJoin() {
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const [itemDTO, setItemDTO] = useState<Item | undefined>(
-    location?.state?.itemDTO || auctionSession?.auctionItems[0].itemDTO
+    location?.state?.itemDTO || auctionSession?.auctionItems[0]?.itemDTO
   );
 
   const dispatch = useAppDispatch();
@@ -66,7 +66,7 @@ export default function AuctionJoin() {
   const [winningBids, setWinningBids] = useState<BidReply[]>([]);
   let timeout;
   const [openWinningDialog, setOpenWinningDialog] = useState(false);
-  // const auctionId = auctionSession.auctionSessionId;
+  // const auctionId = auctionSession?.auctionSessionId;
   // const itemId = location.state.id.itemId;
 
   const [allow, setAllow] = useState<boolean | undefined>(false);
@@ -83,7 +83,7 @@ export default function AuctionJoin() {
           console.log(response);
           setItemDTO(response?.auctionItems[0].itemDTO);
           setAllow(auctionSession?.hasDeposited);
-          if (response.status === AuctionSessionStatus.FINISHED) {
+          if (response.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
             setShowCofetti(true);
             setTimeout(() => {
               setShowCofetti(false);
@@ -109,13 +109,13 @@ export default function AuctionJoin() {
     } else {
       setAllow(auctionSession?.hasDeposited);
       setItemDTO(auctionSession?.auctionItems[0].itemDTO);
-      if (auctionSession.status === AuctionSessionStatus.FINISHED) {
+      if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);
         }, 3000);
       }
-      if (auctionSession.status !== AuctionSessionStatus.SCHEDULED) {
+      if (auctionSession?.status !== AuctionSessionStatus.SCHEDULED) {
         fetchBidsByAuctionId(auctionId)
           .then((res) => {
             console.log(res);
@@ -132,7 +132,7 @@ export default function AuctionJoin() {
   }, []);
   useEffect(() => {
     if (bids.length > 0 && new Date(auctionSession?.endDate) <= new Date()) {
-      for (const item of auctionSession.auctionItems) {
+      for (const item of auctionSession?.auctionItems) {
         for (const element of bids) {
           if (item?.itemDTO?.itemId === element?.auctionItemId?.itemId) {
             console.log(element, true);
@@ -176,13 +176,13 @@ export default function AuctionJoin() {
   // }, [auctionSession]);
 
   useEffect(() => {
-    if (auctionSession?.status === AuctionSessionStatus.FINISHED) {
+    if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
       setShowCofetti(true);
       setTimeout(() => {
         setShowCofetti(false);
       }, 3000);
     }
-    if (!(auctionSession?.status === AuctionSessionStatus.PROGRESSING)) {
+    if ((auctionSession?.status === AuctionSessionStatus.SCHEDULED)) {
       navigate(`/auctions/${auctionId}`);
     }
   }, [auctionSession]);
@@ -207,7 +207,8 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    if (auctionSession && auctionSession.status === AuctionSessionStatus.PROGRESSING && auctionSession.hasDeposited) {
+    console.log( auctionSession);
+    if ( new Date(auctionSession?.endDate) > new Date() && new Date(auctionSession?.startDate) < new Date() && auctionSession?.hasDeposited) {
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -278,7 +279,7 @@ export default function AuctionJoin() {
       if (message?.status == 'BID')
         toast.info(message?.message, {
           action: (
-            <Button variant="outline" onClick={() => handleViewItemDetailsClick(message?.auctionItemId)}>
+            <Button variant="outline" onClick={() => handleViewItemDetailsClick(auctionSession?.auctionItems?.filter((item) => item.itemDTO.itemId == message?.auctionItemId.itemId)[0])}>
               View
             </Button>
           ),
@@ -359,7 +360,7 @@ export default function AuctionJoin() {
     // window.location.href = `/auctions/${auctionId}/${item.itemDTO.name}`;
     if (itemDTO?.itemId !== item.itemDTO.itemId) {
       setItemDTO(item.itemDTO);
-      if (auctionSession.status === AuctionSessionStatus.FINISHED) {
+      if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
           setShowCofetti(false);
@@ -449,7 +450,7 @@ export default function AuctionJoin() {
                     </div>
                   )}
 
-                  {auctionSession?.hasDeposited && auctionSession.status === AuctionSessionStatus.PROGRESSING && (
+                  {auctionSession?.hasDeposited && new Date(auctionSession?.endDate) > new Date() && new Date() < new Date(auctionSession?.startDate) && (
                     <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
                       <BidsInformation
                         auctionSession={auctionSession}
@@ -534,8 +535,7 @@ export default function AuctionJoin() {
             </Card>
           </div>
         )}
-      {winningBids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId ===
-        auth.user.accountId && (
+      {winningBids?.filter((bid) => bid.account.accountId === auth.user.accountId).length > 0 && (
         <ResultDialog
           open={openWinningDialog}
           onOpenChange={setOpenWinningDialog}
