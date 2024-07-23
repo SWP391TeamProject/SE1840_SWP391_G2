@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { createAuctionSession } from '@/services/AuctionSessionService';
+import { createAuctionSession, getAuctions } from '@/services/AuctionSessionService';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -18,7 +18,8 @@ import { useNavigate } from 'react-router-dom';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
 import { useAppDispatch } from '@/redux/hooks';
 import { Textarea } from '@/components/ui/textarea';
-
+import { AuctionSessionStatus } from '@/constants/enums';
+import { Scheduler } from "@aldabil/react-scheduler";
 const FormSchema = z.object({
   title: z.string().min(2, {
     message: 'Title must be at least 2 characters.',
