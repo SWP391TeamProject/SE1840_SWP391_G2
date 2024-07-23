@@ -568,7 +568,7 @@ export default function AuctionJoin() {
       ) : (
         <LoadingAnimation />
       )}
-      {!isWinner() && auctionSession?.hasDeposited && (
+      {!isWinner() && auctionSession?.hasDeposited && !isScheduled() && !isProgress() && (
         <Dialog defaultOpen>
           <DialogContent>
             <DialogHeader>So sorry you didn't win this time</DialogHeader>
