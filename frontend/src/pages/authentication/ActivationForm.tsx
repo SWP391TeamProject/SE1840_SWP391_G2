@@ -43,15 +43,11 @@ function ActivationForm() {
       .then(() => {
         setLocked(false);
         navigate('/auth/login');
-        toast.success('Account activated successfully', {
-          
-        });
+        toast.success('Account activated successfully', {});
       })
       .catch((err) => {
         if (err.response.status == 406) {
-          toast.error('Invalid activation code!', {
-            
-          });
+          toast.error('Invalid activation code!', {});
         } else {
           showErrorToast(err);
         }

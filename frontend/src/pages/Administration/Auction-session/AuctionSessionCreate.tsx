@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
-import {formatDate, formatDateTime} from '@/lib/utils';
+import { formatDate, formatDateTime } from '@/lib/utils';
 import { showErrorToast } from '@/lib/handle-error';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
@@ -25,12 +25,14 @@ const FormSchema = z.object({
   }),
   startDate: z.string(),
   endDate: z.string(),
-  description: z.string({ message: 'description must be at least 10 characters long' })
+  description: z
+    .string({ message: 'description must be at least 10 characters long' })
     .min(10, {
-    message: 'Description must be at least 10 characters long',
-  }).max(1000,{
-    message:'description cannot exceed 1000 characters long'
-  }),
+      message: 'Description must be at least 10 characters long',
+    })
+    .max(1000, {
+      message: 'description cannot exceed 1000 characters long',
+    }),
   files: z.any(),
 });
 

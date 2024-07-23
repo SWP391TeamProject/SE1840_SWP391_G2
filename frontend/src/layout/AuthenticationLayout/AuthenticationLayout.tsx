@@ -17,8 +17,8 @@ export default function AuthenticationLayout() {
         case Roles.MEMBER:
           nav('/dashboard');
           break;
-        
-        case Roles.STAFF,Roles.STAFF:
+
+        case (Roles.STAFF, Roles.STAFF):
           nav('/admin/consignments');
           break;
         default:

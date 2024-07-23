@@ -35,9 +35,7 @@ function UnactivatedWarning() {
       .then(() => {
         setLocked(false);
         navigate('/auth/login');
-        toast.success('Sent activation code', {
-          
-        });
+        toast.success('Sent activation code', {});
       })
       .catch((err) => {
         showErrorToast(err);

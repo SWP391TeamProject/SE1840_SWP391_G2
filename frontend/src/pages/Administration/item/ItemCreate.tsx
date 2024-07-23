@@ -17,12 +17,10 @@ import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation.tsx
 import ItemCategorySelector from '@/pages/Administration/item/ItemCategorySelector.tsx';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { showErrorToast } from '@/lib/handle-error';
-import Consignment from "@/models/consignment.ts";
-import {ConsignmentDetailType} from "@/constants/enums.tsx";
-import ItemCreateCustomerCard
-  from "@/pages/Administration/item/ItemCreateCustomerCard.tsx";
-import ItemConsignmentInfoCard
-  from "@/pages/Administration/item/ItemConsignmentInfoCard.tsx";
+import Consignment from '@/models/consignment.ts';
+import { ConsignmentDetailType } from '@/constants/enums.tsx';
+import ItemCreateCustomerCard from '@/pages/Administration/item/ItemCreateCustomerCard.tsx';
+import ItemConsignmentInfoCard from '@/pages/Administration/item/ItemConsignmentInfoCard.tsx';
 
 const FormSchema = z.object({
   categoryId: z.string().regex(/\d+/, {
@@ -73,7 +71,7 @@ const FormSchema = z.object({
 
 function getManagerAcceptedPrice(consignment: Consignment): number | undefined {
   const managerAcceptedDetails = consignment.consignmentDetails
-    .filter(detail => detail.type === ConsignmentDetailType.MANAGER_ACCEPTED)
+    .filter((detail) => detail.type === ConsignmentDetailType.MANAGER_ACCEPTED)
     .sort((a, b) => (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
   console.log(managerAcceptedDetails);
 
@@ -98,13 +96,13 @@ export default function ItemCreate() {
       reservePrice: consignment ? getManagerAcceptedPrice(consignment) : 0,
       buyInPrice: consignment ? getManagerAcceptedPrice(consignment) * 10 : 0,
       ownerId: consignment ? consignment.user.accountId : auth.user.accountId,
-      color: consignment ? consignment.color :'',
-      weight: consignment && consignment.weight ? consignment.weight.toString() :'',
-      metal: consignment ? consignment.metal :'',
-      gemstone: consignment ? consignment.gemstone :'',
-      measurement: consignment ? consignment.measurement :'',
-      condition: consignment ? consignment.condition :'',
-      stamped: consignment ? consignment.stamped :'',
+      color: consignment ? consignment.color : '',
+      weight: consignment && consignment.weight ? consignment.weight.toString() : '',
+      metal: consignment ? consignment.metal : '',
+      gemstone: consignment ? consignment.gemstone : '',
+      measurement: consignment ? consignment.measurement : '',
+      condition: consignment ? consignment.condition : '',
+      stamped: consignment ? consignment.stamped : '',
       files: [],
     },
   });
@@ -273,19 +271,20 @@ export default function ItemCreate() {
                       <FormMessage />
                     </FormItem>
                   )}
-                /><FormField
-                control={form.control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Weight</FormLabel>
-                    <FormControl>
-                      <Input type="text" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                />
+                <FormField
+                  control={form.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Weight</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}

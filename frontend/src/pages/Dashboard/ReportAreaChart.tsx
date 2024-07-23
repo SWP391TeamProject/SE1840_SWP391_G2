@@ -10,7 +10,6 @@ import { useCurrency } from '@/CurrencyProvider';
 
 // chart options
 
-
 // ==============================|| REPORT AREA CHART ||============================== //
 
 export default function ReportAreaChart() {
@@ -19,7 +18,6 @@ export default function ReportAreaChart() {
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
 
-  
   const currency = useCurrency();
 
   const areaChartOptions = {

@@ -1,21 +1,18 @@
 import * as React from 'react';
 
-import {useDataTable} from '@/hooks/use-data-table';
-import {DataTable} from '@/components/data-tables/data-table';
-import {DataTableToolbar} from '@/components/data-tables/data-table-toolbar';
-import {fetchAccountsService} from '@/services/AccountsServices';
-import {DataTableSkeleton} from '@/components/data-tables/data-tables-skeleton';
-import {
-  CustomersTableToolbarActions
-} from "@/pages/Administration/Customer/customer-data-table/customer-table-toolbar-actions.tsx";
-import getColumns
-  from "@/pages/Administration/Customer/customer-data-table/customer-table-column.tsx";
+import { useDataTable } from '@/hooks/use-data-table';
+import { DataTable } from '@/components/data-tables/data-table';
+import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
+import { fetchAccountsService } from '@/services/AccountsServices';
+import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
+import { CustomersTableToolbarActions } from '@/pages/Administration/Customer/customer-data-table/customer-table-toolbar-actions.tsx';
+import getColumns from '@/pages/Administration/Customer/customer-data-table/customer-table-column.tsx';
 
 interface CustomersTableProps {
   customerPromise: ReturnType<typeof fetchAccountsService>;
 }
 
-export function CustomersTable({customerPromise}: CustomersTableProps) {
+export function CustomersTable({ customerPromise }: CustomersTableProps) {
   const [data, setData] = React.useState([]);
   const [pageCount, setPageCount] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -35,8 +32,7 @@ export function CustomersTable({customerPromise}: CustomersTableProps) {
     fetchData();
   }, [customerPromise]);
 
-
-  const {table} = useDataTable({
+  const { table } = useDataTable({
     data,
     columns,
     pageCount,
@@ -47,16 +43,18 @@ export function CustomersTable({customerPromise}: CustomersTableProps) {
     <>
       <DataTable isLoading={isLoading} table={table}>
         <DataTableToolbar table={table}>
-          <CustomersTableToolbarActions table={table}/>
+          <CustomersTableToolbarActions table={table} />
         </DataTableToolbar>
-        {isLoading && <DataTableSkeleton
-          columnCount={6}
-          searchableColumnCount={0}
-          filterableColumnCount={0}
-          cellWidths={['10rem', '10rem', '10rem', '10rem', '10rem', '8rem']}
-          shrinkZero
-          showViewOptions={false}
-        />}
+        {isLoading && (
+          <DataTableSkeleton
+            columnCount={6}
+            searchableColumnCount={0}
+            filterableColumnCount={0}
+            cellWidths={['10rem', '10rem', '10rem', '10rem', '10rem', '8rem']}
+            shrinkZero
+            showViewOptions={false}
+          />
+        )}
       </DataTable>
     </>
   );

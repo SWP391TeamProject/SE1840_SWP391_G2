@@ -1,5 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import { BidReply } from '@/models/newModel/bidReply';
 

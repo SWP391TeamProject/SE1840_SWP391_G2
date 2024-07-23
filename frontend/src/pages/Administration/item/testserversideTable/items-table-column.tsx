@@ -12,9 +12,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import {Link, useNavigate} from 'react-router-dom';
-import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
-import {Item} from "@/models/Item.ts";
+import { Link, useNavigate } from 'react-router-dom';
+import AccountTooltip from '@/pages/Administration/Tooltip/AccountTooltip.tsx';
+import { Item } from '@/models/Item.ts';
 
 export const getColumns = (): ColumnDef<Item>[] => [
   {
@@ -84,11 +84,10 @@ export const getColumns = (): ColumnDef<Item>[] => [
   {
     accessorKey: 'owner.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Owner" />,
-    cell: ({row}) => {
+    cell: ({ row }) => {
       return (
         <AccountTooltip account={row.original.owner}>
-          <Link
-            to={`/admin/account/${row.original.owner.accountId}`}>{row.original.owner.nickname}</Link>
+          <Link to={`/admin/account/${row.original.owner.accountId}`}>{row.original.owner.nickname}</Link>
         </AccountTooltip>
       );
     },
@@ -113,7 +112,9 @@ export const getColumns = (): ColumnDef<Item>[] => [
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem onSelect={() => handleEditClick(row.original.itemId)}>Edit</DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to={`/item/${row.original.itemId}`} target="_blank">Public View</Link>
+                <Link to={`/item/${row.original.itemId}`} target="_blank">
+                  Public View
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

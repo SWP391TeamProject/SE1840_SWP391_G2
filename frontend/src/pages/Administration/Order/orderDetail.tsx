@@ -16,9 +16,7 @@ import { Account } from '@/models/AccountModel.tsx';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.tsx';
 import dayjs from 'dayjs';
 import CountDownTime from '@/components/countdownTimer/CountDownTime.tsx';
-import {
-  ConfirmationDialog
-} from "@/components/confirmation/confirmation-dialog.tsx";
+import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog.tsx';
 
 export function OrderDetail() {
   const orderId = parseInt(useParams().id);

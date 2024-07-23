@@ -12,14 +12,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { showErrorToast } from '@/lib/handle-error';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from '@/config/axiosConfig.ts';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import {  GetProp, Upload, UploadFile, UploadProps  } from 'antd';
+import { GetProp, Upload, UploadFile, UploadProps } from 'antd';
 
 import { z } from 'zod';
 import { Input } from '@/components/ui/input';
@@ -33,7 +33,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/web
 const formSchema = z.object({
   frontImage: z
     .any()
-    .refine((files) => files?.fileList?.length > 0 , `Front Image is required`)
+    .refine((files) => files?.fileList?.length > 0, `Front Image is required`)
     .refine((files) => files?.fileList[0]?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
     .refine(
       (files) => ACCEPTED_IMAGE_TYPES.includes(files?.fileList[0]?.type),
@@ -63,11 +63,11 @@ export default function KycVerification() {
     defaultValues: {
       frontImage: {
         file: null,
-        fileList: []
+        fileList: [],
       },
       backImage: {
         file: null,
-        fileList: []
+        fileList: [],
       },
     },
   });
@@ -112,7 +112,7 @@ export default function KycVerification() {
     let params = {
       frontImage: values.frontImage.file,
       backImage: values.backImage.file,
-    }
+    };
 
     let param = new FormData();
     param.append('frontImage', values.frontImage.fileList[0].originFileObj);
@@ -152,11 +152,11 @@ export default function KycVerification() {
 
   const onChange = (event: any) => {
     console.log(event);
-  }
+  };
 
   const dummyRequest = ({ file, onSuccess }) => {
     setTimeout(() => {
-      onSuccess("ok");
+      onSuccess('ok');
     }, 0);
   };
 
@@ -199,7 +199,7 @@ export default function KycVerification() {
     // this.setState({ fileList: fileList.filter(item => item.uid !== fileId) });
 
     // const filterList = form.control._formValues[field].fileList.filter((item) => item.uid !== fileId);
-    form.setValue(field, {file: null, fileList: []});
+    form.setValue(field, { file: null, fileList: [] });
   };
 
   return (
@@ -225,33 +225,33 @@ export default function KycVerification() {
                               <FormLabel>Front Image</FormLabel>
                               <FormControl>
                                 <div>
-                                <ImgCrop
-                                  cropShape="rect"
-                                  cropperProps={{
-                                    cropSize: { width: 300, height: 160 },
-                                    style: {},
-                                    zoomSpeed: 0.1,
-                                    restrictPosition: false,
-                                    mediaProps: {},
-                                  }}
-                                  rotationSlider
-                                  modalWidth={800}
-                                  aspect={4 / 3}
-                                  quality={0.5}
-                                  minZoom={0.1}
-                                >
-                                  <Upload
-                                    customRequest={({ file, onSuccess }) => {
-                                      dummyRequest({ file, onSuccess });
+                                  <ImgCrop
+                                    cropShape="rect"
+                                    cropperProps={{
+                                      cropSize: { width: 300, height: 160 },
+                                      style: {},
+                                      zoomSpeed: 0.1,
+                                      restrictPosition: false,
+                                      mediaProps: {},
                                     }}
-                                    listType="picture-card"
-                                    onPreview={handlePreview}
-                                    {...field}
+                                    rotationSlider
+                                    modalWidth={800}
+                                    aspect={4 / 3}
+                                    quality={0.5}
+                                    minZoom={0.1}
                                   >
-                                    {(!field.value.file || field.value.fileList.length < 1) && '+ Upload'}
-                                  </Upload>
-                                </ImgCrop>
-                                {previewImage && (
+                                    <Upload
+                                      customRequest={({ file, onSuccess }) => {
+                                        dummyRequest({ file, onSuccess });
+                                      }}
+                                      listType="picture-card"
+                                      onPreview={handlePreview}
+                                      {...field}
+                                    >
+                                      {(!field.value.file || field.value.fileList.length < 1) && '+ Upload'}
+                                    </Upload>
+                                  </ImgCrop>
+                                  {previewImage && (
                                     <Image
                                       wrapperStyle={{ display: 'none' }}
                                       preview={{
@@ -328,7 +328,6 @@ export default function KycVerification() {
                                       //   );
                                       // }}
                                       {...field}
-                                      
                                     >
                                       {(!field.value.file || field.value.fileList.length < 1) && '+ Upload'}
                                     </Upload>

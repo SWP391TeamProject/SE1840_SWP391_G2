@@ -26,7 +26,9 @@ const profileDetailsSchema = z.object({
     .string()
     .min(5, 'Nickname must be at least 5 characters')
     .max(40, 'Nickname must not be longer than 40 characters'),
-  phone: z.string().length(10, 'Phone number must be 10 digits')
+  phone: z
+    .string()
+    .length(10, 'Phone number must be 10 digits')
     .regex(/^\d+$/, 'Phone number must contain only digits')
     .optional(),
 });
@@ -65,7 +67,6 @@ const ProfileDetail = () => {
     },
   });
 
-  
   useEffect(() => {
     if (auth.user.avatar) setAvatarPreview(auth.user.avatar.link);
   }, []);
@@ -87,13 +88,12 @@ const ProfileDetail = () => {
     setIsLoading(true);
     const formData = new FormData();
     formData.append('file', data.files[0]);
-    const submitAvatarPromise = axios
-      .post<any>(API_SERVER + '/accounts/avatar/' + auth.user.accountId, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: 'Bearer ' + auth.user.accessToken,
-        },
-      })
+    const submitAvatarPromise = axios.post<any>(API_SERVER + '/accounts/avatar/' + auth.user.accountId, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: 'Bearer ' + auth.user.accessToken,
+      },
+    });
 
     toast.promise(submitAvatarPromise, {
       loading: 'Updating avatar...',
@@ -103,7 +103,7 @@ const ProfileDetail = () => {
           avatar: res.data,
         });
         setIsLoading(false);
-        return 'Update avatar successfully!'
+        return 'Update avatar successfully!';
       },
       error: (err) => {
         console.log(err);
@@ -116,13 +116,12 @@ const ProfileDetail = () => {
   const onSubmitProfileDetails: SubmitHandler<z.infer<typeof profileDetailsSchema>> = (data) => {
     setIsLoading(true);
 
-    const submitDetailsPromise = axios
-      .put<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + auth.user.accessToken,
-        },
-      });
+    const submitDetailsPromise = axios.put<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + auth.user.accessToken,
+      },
+    });
 
     toast.promise(submitDetailsPromise, {
       loading: 'Updating details...',
@@ -132,7 +131,7 @@ const ProfileDetail = () => {
           ...data,
         });
         setIsLoading(false);
-        return 'Update details successfully!'
+        return 'Update details successfully!';
       },
       error: (err) => {
         console.log(err);
@@ -140,9 +139,6 @@ const ProfileDetail = () => {
         return getErrorMessage(err);
       },
     });
-
-
-
 
     // axios
     //   .put<any>(API_SERVER + '/accounts/' + auth.user.accountId, data, {
@@ -174,13 +170,16 @@ const ProfileDetail = () => {
     }
     setIsLoading(true);
 
-    const submitTwoFactorAuthPromise = axios
-      .post<any>(API_SERVER + '/accounts/change-2fa/' + auth.user.accountId, data, {
+    const submitTwoFactorAuthPromise = axios.post<any>(
+      API_SERVER + '/accounts/change-2fa/' + auth.user.accountId,
+      data,
+      {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + auth.user.accessToken,
         },
-      })
+      }
+    );
 
     toast.promise(submitTwoFactorAuthPromise, {
       loading: 'Changing 2FA settings...',
@@ -191,7 +190,7 @@ const ProfileDetail = () => {
           enable2fa: data.enable2fa,
           currentPassword: '',
         });
-        return 'Changed 2FA settings successfully!'
+        return 'Changed 2FA settings successfully!';
       },
       error: (err) => {
         console.log(err);

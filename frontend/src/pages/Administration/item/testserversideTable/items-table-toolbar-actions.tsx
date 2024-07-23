@@ -1,39 +1,29 @@
-import {DownloadIcon} from '@radix-ui/react-icons';
-import {type Table} from '@tanstack/react-table';
+import { DownloadIcon } from '@radix-ui/react-icons';
+import { type Table } from '@tanstack/react-table';
 
-import {exportTableToCSV} from '@/lib/export';
-import {Button} from '@/components/ui/button';
-import {CircleDollarSign, ListFilter, PlusIcon, SearchIcon} from 'lucide-react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import { exportTableToCSV } from '@/lib/export';
+import { Button } from '@/components/ui/button';
+import { CircleDollarSign, ListFilter, PlusIcon, SearchIcon } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu.tsx";
-import {getEnumValue, parseIntOrUndefined} from "@/lib/utils.ts";
-import {useEffect, useState} from "react";
-import {Input} from "@/components/ui/input.tsx";
-import {useForm} from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel
-} from "@/components/ui/form.tsx";
-import {Order} from "@/constants/interfaces.ts";
-import {ItemStatus} from "@/models/Item.ts";
-import {getAllItemCategories} from "@/services/ItemCategoryService.ts";
-import {showErrorToast} from "@/lib/handle-error.ts";
-import {ItemCategory} from "@/models/newModel/itemCategory.ts";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover.tsx";
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx';
+import { getEnumValue, parseIntOrUndefined } from '@/lib/utils.ts';
+import { useEffect, useState } from 'react';
+import { Input } from '@/components/ui/input.tsx';
+import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form.tsx';
+import { Order } from '@/constants/interfaces.ts';
+import { ItemStatus } from '@/models/Item.ts';
+import { getAllItemCategories } from '@/services/ItemCategoryService.ts';
+import { showErrorToast } from '@/lib/handle-error.ts';
+import { ItemCategory } from '@/models/newModel/itemCategory.ts';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
 
 interface TasksTableToolbarActionsProps {
   table: Table<Order>;
@@ -45,7 +35,7 @@ type FormData = {
   search?: string;
 };
 
-export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps) {
+export function ItemsTableToolbarActions({ table }: TasksTableToolbarActionsProps) {
   const nav = useNavigate();
   const [categories, setCategories] = useState<ItemCategory[]>([]);
   useEffect(() => {
@@ -73,8 +63,10 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
 
   function setParam(key: string, value: any | undefined | null) {
     if (String(value).length === 0) value = undefined;
-    if ((!searchParams.has(key) && (value === undefined || value === null)) ||
-      (searchParams.has(key) && value === searchParams.get(key))) {
+    if (
+      (!searchParams.has(key) && (value === undefined || value === null)) ||
+      (searchParams.has(key) && value === searchParams.get(key))
+    ) {
       return;
     }
     if (value) {
@@ -82,7 +74,7 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
     } else {
       searchParams.delete(key);
     }
-    setSearchParams(searchParams, {replace: true});
+    setSearchParams(searchParams, { replace: true });
   }
 
   useEffect(() => {
@@ -101,55 +93,54 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <ListFilter className="mr-2 size-4"/>
-                <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
+                <ListFilter className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Status</DropdownMenuLabel>
-              <DropdownMenuSeparator/>
-              <DropdownMenuCheckboxItem
-                checked={status === undefined}
-                onClick={() => setParam('status', undefined)}
-              >All</DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem checked={status === undefined} onClick={() => setParam('status', undefined)}>
+                All
+              </DropdownMenuCheckboxItem>
               {Object.keys(ItemStatus).map((s) => (
-                <DropdownMenuCheckboxItem
-                  checked={status === s}
-                  onClick={() => setParam('status', s)}
-                >{s}</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked={status === s} onClick={() => setParam('status', s)}>
+                  {s}
+                </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <ListFilter className="mr-2 size-4"/>
-                <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Category</span>
+                <ListFilter className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Category</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Category</DropdownMenuLabel>
-              <DropdownMenuSeparator/>
+              <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 checked={categoryId === undefined}
                 onClick={() => setParam('categoryId', undefined)}
-              >All</DropdownMenuCheckboxItem>
+              >
+                All
+              </DropdownMenuCheckboxItem>
               {categories.map((ctg) => (
                 <DropdownMenuCheckboxItem
                   checked={categoryId === ctg.itemCategoryId.toString()}
                   onClick={() => setParam('categoryId', ctg.itemCategoryId)}
-                >{ctg.name}</DropdownMenuCheckboxItem>
+                >
+                  {ctg.name}
+                </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm">
-                <CircleDollarSign className="mr-2 size-4"/>
-                <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Reserve Price</span>
+                <CircleDollarSign className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Reserve Price</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent>
@@ -160,7 +151,7 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
                 <FormField
                   control={form.control}
                   name="minPrice"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem className="flex justify-center items-center gap-2">
                       <FormLabel>Min</FormLabel>
                       <FormControl>
@@ -172,7 +163,7 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
                 <FormField
                   control={form.control}
                   name="maxPrice"
-                  render={({field}) => (
+                  render={({ field }) => (
                     <FormItem className="flex justify-center items-center gap-2">
                       <FormLabel>Max</FormLabel>
                       <FormControl>
@@ -187,12 +178,10 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
           <FormField
             control={form.control}
             name="search"
-            render={({field}) => (
+            render={({ field }) => (
               <div className="w-full relative">
-                <Input {...field}
-                       className="px-8 h-9 focus-visible:[box-shadow:none]"/>
-                <SearchIcon
-                  className="absolute left-1.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 peer-focus:text-gray-900"/>
+                <Input {...field} className="px-8 h-9 focus-visible:[box-shadow:none]" />
+                <SearchIcon className="absolute left-1.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 peer-focus:text-gray-900" />
               </div>
             )}
           />
@@ -209,7 +198,7 @@ export function ItemsTableToolbarActions({table}: TasksTableToolbarActionsProps)
             })
           }
         >
-          <DownloadIcon className="mr-2 size-4" aria-hidden="true"/>
+          <DownloadIcon className="mr-2 size-4" aria-hidden="true" />
           Export
         </Button>
         <Button variant="outline" size="sm" onClick={() => nav('create')}>

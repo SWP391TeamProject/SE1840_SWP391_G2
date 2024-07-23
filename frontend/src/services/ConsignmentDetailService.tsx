@@ -1,5 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 const URL = `${SERVER_DOMAIN_URL}/api/consignmentDetails/`;

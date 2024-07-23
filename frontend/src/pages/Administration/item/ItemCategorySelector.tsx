@@ -39,9 +39,7 @@ export default function ItemCategorySelector(props: SelectProps) {
       .then((res) => {
         setCategories([...categories, res.data]);
         setNewCategory('');
-        toast.success('Item category created', {
-          
-        });
+        toast.success('Item category created', {});
       })
       .catch((e) => {
         console.error(e);
@@ -53,9 +51,7 @@ export default function ItemCategorySelector(props: SelectProps) {
     deleteItemCategory(id)
       .then((res) => {
         setCategories(categories.filter((x) => x.itemCategoryId != id));
-        toast.success('Item category deleted', {
-          
-        });
+        toast.success('Item category deleted', {});
       })
       .catch((e) => {
         console.error(e);

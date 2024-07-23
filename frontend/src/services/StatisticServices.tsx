@@ -1,5 +1,5 @@
 import { API_SERVER } from '@/constants/domain';
-import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
+import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 export const getNewUsersByYear = async (year: number) => {
@@ -49,7 +49,7 @@ export const getUserOnline = async () => {
 
         Authorization: getBearerToken(),
       },
-      params : { thresholdMillis: 60000 }
+      params: { thresholdMillis: 60000 },
     })
     .catch((err) => {
       console.log(err);
@@ -87,7 +87,7 @@ const formatDate = (date) => {
 
 export const getPaymentByStatus = async (type?: string) => {
   const today = new Date();
-  const endOfYear = new Date(); 
+  const endOfYear = new Date();
   const year = endOfYear.getUTCFullYear();
   // Default parameters if not provided
   type = type;

@@ -14,8 +14,8 @@ import { Button } from '@/components/ui/button';
 import { fetchAuctionSessionHistoryOfItem } from '@/services/AuctionSessionService.tsx';
 import { AuctionSession } from '@/models/AuctionSessionModel.tsx';
 import { Page } from '@/models/Page.ts';
-import {formatDate} from "@/lib/utils.ts";
-import {AxiosResponse} from "axios";
+import { formatDate } from '@/lib/utils.ts';
+import { AxiosResponse } from 'axios';
 
 const noImagePlaceholder = 'https://placehold.co/600x400?text=No+image';
 
@@ -148,7 +148,7 @@ export function PublicItemDetail() {
                   <CardContent>
                     <Table>
                       <TableBody>
-                        {["color", "weight", "metal", "gemstone", "measurement", "condition", "stamped"]
+                        {['color', 'weight', 'metal', 'gemstone', 'measurement', 'condition', 'stamped']
                           .filter((key) => item.hasOwnProperty(key) && item[key])
                           .map((key) => {
                             return (

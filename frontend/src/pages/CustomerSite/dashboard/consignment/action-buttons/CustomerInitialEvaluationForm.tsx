@@ -1,12 +1,9 @@
-import Consignment from "@/models/consignment.ts";
-import {ConsignmentDetailType} from "@/constants/enums.tsx";
-import React, {useState} from "react";
-import {Button} from "@/components/ui/button.tsx";
-import {toast} from "sonner";
-import {
-  acceptInitialEva,
-  rejectInitialEva
-} from "@/services/ConsignmentService.tsx";
+import Consignment from '@/models/consignment.ts';
+import { ConsignmentDetailType } from '@/constants/enums.tsx';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button.tsx';
+import { toast } from 'sonner';
+import { acceptInitialEva, rejectInitialEva } from '@/services/ConsignmentService.tsx';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,8 +13,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
-} from "@/components/ui/alert-dialog.tsx";
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog.tsx';
 
 interface CustomerInitialEvaluationFormProps {
   consignment: Consignment;
@@ -25,20 +22,18 @@ interface CustomerInitialEvaluationFormProps {
 }
 
 const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps> = ({
-                                                                                       consignment,
-                                                                                       setConsignment
-                                                                                     }) => {
+  consignment,
+  setConsignment,
+}) => {
   const [loading, setLoading] = useState(false);
 
-
-  if (consignment.consignmentDetails
-    .every((v) => v.type !== ConsignmentDetailType.INITIAL_EVALUATION)) {
+  if (consignment.consignmentDetails.every((v) => v.type !== ConsignmentDetailType.INITIAL_EVALUATION)) {
     return (
       <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 w-full">
         <h2 className="text-2xl font-bold mb-4">Information</h2>
         <p>A staff is evaluating your jewelry for initial evaluation</p>
       </div>
-    )
+    );
   }
 
   const acceptEvaluation = () => {
@@ -79,14 +74,15 @@ const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              One you have accepted, please send the jewelry to our office for comprehensive
-              evaluation from our experts. The worth of your item might subject to change.
+              One you have accepted, please send the jewelry to our office for comprehensive evaluation from our
+              experts. The worth of your item might subject to change.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction disabled={loading}
-                               onClick={() => acceptEvaluation()}>Continue</AlertDialogAction>
+            <AlertDialogAction disabled={loading} onClick={() => acceptEvaluation()}>
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -100,14 +96,13 @@ const CustomerInitialEvaluationForm: React.FC<CustomerInitialEvaluationFormProps
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will cancel this consignment.
-            </AlertDialogDescription>
+            <AlertDialogDescription>This will cancel this consignment.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction disabled={loading}
-                               onClick={() => rejectEvaluation()}>Continue</AlertDialogAction>
+            <AlertDialogAction disabled={loading} onClick={() => rejectEvaluation()}>
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

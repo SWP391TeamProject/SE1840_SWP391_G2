@@ -1,7 +1,7 @@
-import {API_SERVER, SERVER_DOMAIN_URL} from '@/constants/domain';
-import {Account} from '@/models/AccountModel';
-import {Page} from '@/models/Page';
-import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
+import { API_SERVER, SERVER_DOMAIN_URL } from '@/constants/domain';
+import { Account } from '@/models/AccountModel';
+import { Page } from '@/models/Page';
+import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 interface GetAccountsSchema {
@@ -24,7 +24,7 @@ export const fetchAccountsService = async (input: GetAccountsSchema) => {
     status: status ? status.toUpperCase() : undefined,
     role: role ? role.toUpperCase() : undefined,
     order,
-    search
+    search,
   };
 
   return await axios.get<Page<Account>>(API_SERVER + '/accounts/', {
@@ -60,25 +60,23 @@ export const fetchAccountsByName = async (pageNumber: number, pageSize: number, 
 };
 
 export const fetchAccountById = async (id: number) => {
-  return await axios
-    .get<Account>(API_SERVER + '/accounts/' + id, {
-      headers: {
-        'Content-Type': 'application/json',
+  return await axios.get<Account>(API_SERVER + '/accounts/' + id, {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: getBearerToken(),
-      },
-    });
+      Authorization: getBearerToken(),
+    },
+  });
 };
 
 export const createAccountService = async (data: any) => {
-  return await axios
-    .post(API_SERVER + '/accounts/', data, {
-      headers: {
-        'Content-Type': 'application/json',
+  return await axios.post(API_SERVER + '/accounts/', data, {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: getBearerToken(),
-      },
-    });
+      Authorization: getBearerToken(),
+    },
+  });
 };
 
 export const updateAccountService = async (data: any, id: number) => {

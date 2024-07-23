@@ -3,11 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ConsignmentStatus } from '@/constants/enums';
 import { formatDate } from '@/lib/utils';
-import Consignment from "@/models/consignment.ts";
-import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
+import Consignment from '@/models/consignment.ts';
+import AccountTooltip from '@/pages/Administration/Tooltip/AccountTooltip.tsx';
 
 export const getColumns = (): ColumnDef<Consignment>[] => [
   {
@@ -41,11 +41,10 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
   {
     accessorKey: 'user.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Requester Name" />,
-    cell: ({row}) => {
+    cell: ({ row }) => {
       return (
         <AccountTooltip account={row.original.user}>
-          <Link
-            to={`/admin/account/${row.original.user.accountId}`}>{row.original.user.nickname}</Link>
+          <Link to={`/admin/account/${row.original.user.accountId}`}>{row.original.user.nickname}</Link>
         </AccountTooltip>
       );
     },
@@ -54,13 +53,13 @@ export const getColumns = (): ColumnDef<Consignment>[] => [
   {
     accessorKey: 'staff.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Assigned Staff" />,
-    cell: ({row}) => {
-      return(
-        row.original.staff ?
-          <AccountTooltip account={row.original.staff}>
-            <Link
-              to={`/admin/account/${row.original.staff.accountId}`}>{row.original.staff.nickname}</Link>
-          </AccountTooltip> : <></>
+    cell: ({ row }) => {
+      return row.original.staff ? (
+        <AccountTooltip account={row.original.staff}>
+          <Link to={`/admin/account/${row.original.staff.accountId}`}>{row.original.staff.nickname}</Link>
+        </AccountTooltip>
+      ) : (
+        <></>
       );
     },
   },

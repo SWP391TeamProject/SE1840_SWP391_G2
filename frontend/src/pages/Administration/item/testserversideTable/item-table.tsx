@@ -7,7 +7,7 @@ import { ItemsTableFloatingBar } from './items-table-floating-bar';
 import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
 import { ItemsTableToolbarActions } from './items-table-toolbar-actions';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
-import {getItems} from "@/services/ItemService.ts";
+import { getItems } from '@/services/ItemService.ts';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/handle-error';
 
@@ -36,14 +36,10 @@ export default function ItemsTable({ itemPromise }: ItemTableProps) {
             return getErrorMessage(err);
           },
         });
-
-
-
       }
     };
     fetchData();
   }, [itemPromise]);
-
 
   const { table } = useDataTable({
     data,
@@ -58,14 +54,16 @@ export default function ItemsTable({ itemPromise }: ItemTableProps) {
         <DataTableToolbar table={table}>
           <ItemsTableToolbarActions table={table} />
         </DataTableToolbar>
-        {isLoading && <DataTableSkeleton
-          columnCount={6}
-          searchableColumnCount={0}
-          filterableColumnCount={0}
-          cellWidths={['10rem', '20rem', '8rem', '8rem', '8rem', '8rem', '8rem']}
-          shrinkZero
-          showViewOptions={false}
-        />}
+        {isLoading && (
+          <DataTableSkeleton
+            columnCount={6}
+            searchableColumnCount={0}
+            filterableColumnCount={0}
+            cellWidths={['10rem', '20rem', '8rem', '8rem', '8rem', '8rem', '8rem']}
+            shrinkZero
+            showViewOptions={false}
+          />
+        )}
       </DataTable>
     </>
   );

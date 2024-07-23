@@ -28,9 +28,7 @@ function ForgotPasswordForm() {
       .then(() => {
         setLocked(false);
         setSent(true);
-        toast.success('Sent reset password link to your email', {
-          
-        });
+        toast.success('Sent reset password link to your email', {});
       })
       .catch((err) => {
         showErrorToast(err);

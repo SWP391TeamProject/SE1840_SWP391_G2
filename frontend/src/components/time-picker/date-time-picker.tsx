@@ -15,7 +15,7 @@ interface DateTimePickerProps {
   placeholder?: string;
 }
 
-export function DateTimePicker({ name ,placeholder}: DateTimePickerProps) {
+export function DateTimePicker({ name, placeholder }: DateTimePickerProps) {
   const { setValue, watch } = useFormContext();
   const date = watch(name);
 

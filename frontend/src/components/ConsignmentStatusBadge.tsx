@@ -1,15 +1,12 @@
-import {ConsignmentStatus} from "@/constants/enums.tsx";
-import {Badge} from "@/components/ui/badge.tsx";
+import { ConsignmentStatus } from '@/constants/enums.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 
 interface ConsignmentStatusBadgeProps {
   status: ConsignmentStatus;
   className?: string;
 }
 
-const ConsignmentStatusBadge: React.FC<ConsignmentStatusBadgeProps> = ({
-                                                                         status,
-                                                                         className
-                                                                       }) => {
+const ConsignmentStatusBadge: React.FC<ConsignmentStatusBadgeProps> = ({ status, className }) => {
   switch (status) {
     case ConsignmentStatus.WAITING_STAFF:
       return (

@@ -1,6 +1,6 @@
 import axios from '@/config/axiosConfig.ts';
 
-import {getCookie, getBearerToken} from '../utils/cookies';
+import { getCookie, getBearerToken } from '../utils/cookies';
 import { API_SERVER } from '../constants/domain';
 import { ItemCategory } from '@/models/newModel/itemCategory';
 import { Page } from '@/models/Page';

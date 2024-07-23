@@ -1,10 +1,10 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-import {Page} from "@/models/Page.ts";
-import {formatDateToISO} from "@/lib/utils.ts";
-import Consignment from "@/models/consignment.ts";
+import { Page } from '@/models/Page.ts';
+import { formatDateToISO } from '@/lib/utils.ts';
+import Consignment from '@/models/consignment.ts';
 
 interface GetConsignmentSchema {
   page: number;
@@ -40,25 +40,23 @@ export const fetchAllConsignmentsService = async (input: GetConsignmentSchema) =
 };
 
 export const fetchConsignmentByConsignmentId = async (id: number) => {
-  return await axios
-    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
+  return await axios.get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/${id}`, {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: getBearerToken(),
-      },
-    });
+      Authorization: getBearerToken(),
+    },
+  });
 };
 
 export const fetchConsignmentBySecretCode = async (code: string) => {
-  return await axios
-    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/secret/${code}`, {
-      headers: {
-        'Content-Type': 'application/json',
+  return await axios.get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/secret/${code}`, {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: getBearerToken(),
-      },
-    });
+      Authorization: getBearerToken(),
+    },
+  });
 };
 
 export const updateConsignmentService = async (data: any) => {
@@ -98,54 +96,50 @@ export const deleteConsignmentService = async (id: string) => {
 export const takeConsignment = async (id: number) => {
   const data = JSON.parse(getCookie('user'))?.id;
 
-  return await axios
-    .put<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: getBearerToken(),
-      },
-    });
+  return await axios.put<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/take/${id}`, data, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: getBearerToken(),
+    },
+  });
 };
 export const receivedConsignment = async (id: number) => {
-  return await axios
-    .get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/received/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
+  return await axios.get<Consignment>(`${SERVER_DOMAIN_URL}/api/consignments/received/${id}`, {
+    headers: {
+      'Content-Type': 'application/json',
 
-        Authorization: getBearerToken(),
-      },
-    });
+      Authorization: getBearerToken(),
+    },
+  });
 };
 
 //manager
 export const rejectStaffEvaluation = async (id: number, accountId: number, reason: any) => {
   console.log({ accountId: accountId, reason: reason });
-  return await axios
-    .post(
-      `${SERVER_DOMAIN_URL}/api/consignments/reject/${id}`,
-      { accountId: accountId, reason: reason },
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: getBearerToken(),
-        },
-      }
-    );
+  return await axios.post(
+    `${SERVER_DOMAIN_URL}/api/consignments/reject/${id}`,
+    { accountId: accountId, reason: reason },
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: getBearerToken(),
+      },
+    }
+  );
 };
 
 export const acceptStaffEvaluation = async (id: number, accountId: number) => {
-  return await axios
-    .post(
-      `${SERVER_DOMAIN_URL}/api/consignments/approve/${id}`,
-      { accountId: accountId },
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+  return await axios.post(
+    `${SERVER_DOMAIN_URL}/api/consignments/approve/${id}`,
+    { accountId: accountId },
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
 
-          Authorization: getBearerToken(),
-        },
-      }
-    );
+        Authorization: getBearerToken(),
+      },
+    }
+  );
 };
 
 //customer

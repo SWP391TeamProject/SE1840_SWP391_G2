@@ -10,7 +10,6 @@ import { AxiosResponse } from '@/config/axiosConfig.ts';
 
 // chart options
 
-
 interface MonthlyUserData {
   month: number;
   totalUser: number;
@@ -51,7 +50,7 @@ export default function NewUserAreaChart({ slot }) {
           return formatTimestampToDateTime(value);
         },
       },
-  },
+    },
   };
   const { primary, secondary } = theme.palette.text;
   const line = theme.palette.divider;
@@ -98,14 +97,14 @@ export default function NewUserAreaChart({ slot }) {
           tickAmount: Object.keys(data).length - 1,
         },
         yaxis: {
-            labels: {
-              formatter: (value) => {
-                return formatTimestampToDateTime(value);
-              },
+          labels: {
+            formatter: (value) => {
+              return formatTimestampToDateTime(value);
             },
+          },
         },
         grid: {
-          borderColor: line
+          borderColor: line,
         },
       }));
       setSeries([
@@ -113,7 +112,6 @@ export default function NewUserAreaChart({ slot }) {
           name: 'Online Users',
           data: Object.values(data),
         },
-        
       ]);
     });
   }, [primary, secondary, line, theme]);

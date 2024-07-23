@@ -1,6 +1,6 @@
 import { API_SERVER } from '@/constants/domain';
 import { PaymentType } from '@/constants/enums';
-import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
+import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import axios from 'axios';
 import { formatDateToISO } from '@/lib/utils.ts';
 

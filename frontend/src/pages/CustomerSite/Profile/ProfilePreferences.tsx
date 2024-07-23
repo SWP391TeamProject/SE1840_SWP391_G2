@@ -26,9 +26,7 @@ export default function ProfilePreferences() {
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     setCookie('themeMode', JSON.stringify(data.themeMode), 2147483647);
     setTheme(data.themeMode);
-    toast.success('Update preferences successfully!', {
-      
-    });
+    toast.success('Update preferences successfully!', {});
   };
 
   return (

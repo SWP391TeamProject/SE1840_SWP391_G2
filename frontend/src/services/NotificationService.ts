@@ -1,7 +1,7 @@
 import axios from '@/config/axiosConfig.ts';
 import { Page } from '@/models/Page';
 import { Notification } from '@/models/Notification';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import { API_SERVER } from '@/constants/domain';
 
 const baseUrl = `${API_SERVER}/notification`;

@@ -2,13 +2,13 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { formatDate } from '@/lib/utils';
 import { setCurrentOrder } from '@/redux/reducers/Orders';
 import { useCurrency } from '@/CurrencyProvider.tsx';
-import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
-import {Order} from "@/models/newModel/order.ts";
+import AccountTooltip from '@/pages/Administration/Tooltip/AccountTooltip.tsx';
+import { Order } from '@/models/newModel/order.ts';
 
 export const getColumns = (): ColumnDef<Order>[] => [
   {
@@ -42,11 +42,12 @@ export const getColumns = (): ColumnDef<Order>[] => [
   {
     accessorKey: 'payment.account.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Account" className="w-[50px]" />,
-    cell: ({row}) => {
+    cell: ({ row }) => {
       return (
         <AccountTooltip account={row.original.payment.account}>
-          <Link
-            to={`/admin/account/${row.original.payment.account.accountId}`}>{row.original.payment.account.nickname}</Link>
+          <Link to={`/admin/account/${row.original.payment.account.accountId}`}>
+            {row.original.payment.account.nickname}
+          </Link>
         </AccountTooltip>
       );
     },

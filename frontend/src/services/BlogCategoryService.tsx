@@ -1,13 +1,9 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
 import { showErrorToast } from '@/lib/handle-error';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-import {Page} from "@/models/Page.ts";
-import {BlogCategory} from "@/models/newModel/blogCategory.ts";
-
-
-
-
+import { Page } from '@/models/Page.ts';
+import { BlogCategory } from '@/models/newModel/blogCategory.ts';
 
 class BlogCategoryService {
   private static readonly BASE_URL = `${SERVER_DOMAIN_URL}/api/blog-categories`;

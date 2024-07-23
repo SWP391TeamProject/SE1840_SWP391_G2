@@ -1,37 +1,28 @@
-import {DownloadIcon} from '@radix-ui/react-icons';
-import {type Table} from '@tanstack/react-table';
+import { DownloadIcon } from '@radix-ui/react-icons';
+import { type Table } from '@tanstack/react-table';
 
-import {exportTableToCSV} from '@/lib/export';
-import {Button} from '@/components/ui/button';
-import {CalendarClock, ListFilter, PlusIcon, SearchIcon} from 'lucide-react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
-import {Payment} from '@/models/payment';
+import { exportTableToCSV } from '@/lib/export';
+import { Button } from '@/components/ui/button';
+import { CalendarClock, ListFilter, PlusIcon, SearchIcon } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Payment } from '@/models/payment';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu.tsx";
-import {PaymentStatus, PaymentType} from "@/constants/enums.tsx";
-import {
-  formatDateToISO,
-  getEnumValue,
-  parseDate,
-  parseIntOrUndefined
-} from "@/lib/utils.ts";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover.tsx";
-import {useEffect} from "react";
-import {Checkbox} from "@/components/ui/checkbox.tsx";
-import {Input} from "@/components/ui/input.tsx";
-import {useForm} from "react-hook-form";
-import {DateTimePicker} from "@/components/time-picker/date-time-picker.tsx";
-import {Form, FormField} from "@/components/ui/form.tsx";
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu.tsx';
+import { PaymentStatus, PaymentType } from '@/constants/enums.tsx';
+import { formatDateToISO, getEnumValue, parseDate, parseIntOrUndefined } from '@/lib/utils.ts';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { useEffect } from 'react';
+import { Checkbox } from '@/components/ui/checkbox.tsx';
+import { Input } from '@/components/ui/input.tsx';
+import { useForm } from 'react-hook-form';
+import { DateTimePicker } from '@/components/time-picker/date-time-picker.tsx';
+import { Form, FormField } from '@/components/ui/form.tsx';
 
 interface PaymentsTableToolbarActionsProps {
   table: Table<Payment>;
@@ -46,7 +37,7 @@ type FormData = {
   user?: number;
 };
 
-export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActionsProps) {
+export function PaymentsTableToolbarActions({ table }: PaymentsTableToolbarActionsProps) {
   const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const type = getEnumValue(PaymentType, searchParams.get('type')) as PaymentType;
@@ -65,8 +56,10 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
 
   function setParam(key: string, value: any | undefined | null) {
     if (String(value).length === 0) value = undefined;
-    if ((!searchParams.has(key) && (value === undefined || value === null)) ||
-      (searchParams.has(key) && value === searchParams.get(key))) {
+    if (
+      (!searchParams.has(key) && (value === undefined || value === null)) ||
+      (searchParams.has(key) && value === searchParams.get(key))
+    ) {
       return;
     }
     if (value) {
@@ -74,7 +67,7 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
     } else {
       searchParams.delete(key);
     }
-    setSearchParams(searchParams, {replace: true});
+    setSearchParams(searchParams, { replace: true });
   }
 
   useEffect(() => {
@@ -93,49 +86,45 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <ListFilter className="mr-2 size-4"/>
-                <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
+                <ListFilter className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Status</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Status</DropdownMenuLabel>
-              <DropdownMenuSeparator/>
-              <DropdownMenuCheckboxItem
-                checked={status === undefined}
-                onClick={() => setParam('status', undefined)}
-              >All</DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem checked={status === undefined} onClick={() => setParam('status', undefined)}>
+                All
+              </DropdownMenuCheckboxItem>
               {Object.keys(PaymentStatus).map((s) => (
-                <DropdownMenuCheckboxItem
-                  checked={status === s}
-                  onClick={() => setParam('status', s)}
-                >{s}</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem checked={status === s} onClick={() => setParam('status', s)}>
+                  {s}
+                </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <ListFilter className="mr-2 size-4"/>
-                <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Type</span>
+                <ListFilter className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Type</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuLabel>Type</DropdownMenuLabel>
-              <DropdownMenuSeparator/>
+              <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 className="w-9/12"
                 checked={type === undefined}
                 onClick={() => setParam('type', undefined)}
-              >All</DropdownMenuCheckboxItem>
+              >
+                All
+              </DropdownMenuCheckboxItem>
               {Object.keys(PaymentType).map((t) => (
                 <div className="flex m-1 items-center justify-between" key={t}>
-                  <DropdownMenuCheckboxItem
-                    className="w-9/12"
-                    checked={type === t}
-                    onClick={() => setParam('type', t)}
-                  >{t}</DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem className="w-9/12" checked={type === t} onClick={() => setParam('type', t)}>
+                    {t}
+                  </DropdownMenuCheckboxItem>
                 </div>
               ))}
             </DropdownMenuContent>
@@ -143,9 +132,8 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm">
-                <CalendarClock className="mr-2 size-4"/>
-                <span
-                  className="sr-only sm:not-sr-only sm:whitespace-nowrap">Date</span>
+                <CalendarClock className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Date</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent>
@@ -157,25 +145,17 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
                   <FormField
                     control={form.control}
                     name="useFrom"
-                    render={({field}) => (
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}/>
-                    )}
+                    render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
                   />
-                  <DateTimePicker {...form.register("from")}  placeholder='from'/>
+                  <DateTimePicker {...form.register('from')} placeholder="from" />
                 </div>
                 <div className="flex justify-center items-center gap-2">
                   <FormField
                     control={form.control}
                     name="useTo"
-                    render={({field}) => (
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}/>
-                    )}
+                    render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
                   />
-                  <DateTimePicker {...form.register("to")}  placeholder='to'/>
+                  <DateTimePicker {...form.register('to')} placeholder="to" />
                 </div>
               </div>
             </PopoverContent>
@@ -183,12 +163,10 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
           <FormField
             control={form.control}
             name="search"
-            render={({field}) => (
+            render={({ field }) => (
               <div className="w-full relative">
-                <Input {...field}
-                       className="px-8 h-9 focus-visible:[box-shadow:none]"/>
-                <SearchIcon
-                  className="absolute left-1.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 peer-focus:text-gray-900"/>
+                <Input {...field} className="px-8 h-9 focus-visible:[box-shadow:none]" />
+                <SearchIcon className="absolute left-1.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 peer-focus:text-gray-900" />
               </div>
             )}
           />
@@ -205,11 +183,11 @@ export function PaymentsTableToolbarActions({table}: PaymentsTableToolbarActions
             })
           }
         >
-          <DownloadIcon className="mr-2 size-4" aria-hidden="true"/>
+          <DownloadIcon className="mr-2 size-4" aria-hidden="true" />
           Export
         </Button>
         <Button variant="outline" size="sm" onClick={() => nav('create')}>
-          <PlusIcon className="mr-2 size-4" aria-hidden="true"/>
+          <PlusIcon className="mr-2 size-4" aria-hidden="true" />
           Create
         </Button>
       </div>

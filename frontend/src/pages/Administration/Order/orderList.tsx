@@ -1,35 +1,33 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import {PaymentStatus, PaymentType} from '@/constants/enums';
+import { PaymentStatus, PaymentType } from '@/constants/enums';
 import { getOrders } from '@/services/OrderService';
-import {useEffect, useState } from 'react';
-import {useSearchParams} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { OrdersTable } from './order-data-table/order-table';
-import {useDebouncedCallback} from "use-debounce";
-import {getEnumValue, parseDate, parseIntOrUndefined} from "@/lib/utils.ts";
-import {ShippingStatus} from "@/models/newModel/order.ts";
+import { useDebouncedCallback } from 'use-debounce';
+import { getEnumValue, parseDate, parseIntOrUndefined } from '@/lib/utils.ts';
+import { ShippingStatus } from '@/models/newModel/order.ts';
 
 export const OrderList = () => {
   const [searchParams] = useSearchParams();
   const [orderPromise, setOrderPromise] = useState<any>();
 
-  const fetchOrders = useDebouncedCallback(
-    () => {
-      const query = {
-        type: PaymentType.AUCTION_ORDER,
-        status: getEnumValue(PaymentStatus, searchParams.get('status')) as PaymentStatus,
-        shippingStatus: getEnumValue(ShippingStatus, searchParams.get('shippingStatus')) as ShippingStatus,
-        from: parseDate(searchParams.get('from')),
-        to: parseDate(searchParams.get('to')),
-        user: parseIntOrUndefined(searchParams.get('user')),
-        search: searchParams.get('search'),
-        page: parseIntOrUndefined(searchParams.get('page')),
-        size: parseIntOrUndefined(searchParams.get('per_page')),
-        sort: searchParams.get('sort') || 'orderId,desc',
-      };
-      setOrderPromise(getOrders(query));
-    }, 500
-  );
+  const fetchOrders = useDebouncedCallback(() => {
+    const query = {
+      type: PaymentType.AUCTION_ORDER,
+      status: getEnumValue(PaymentStatus, searchParams.get('status')) as PaymentStatus,
+      shippingStatus: getEnumValue(ShippingStatus, searchParams.get('shippingStatus')) as ShippingStatus,
+      from: parseDate(searchParams.get('from')),
+      to: parseDate(searchParams.get('to')),
+      user: parseIntOrUndefined(searchParams.get('user')),
+      search: searchParams.get('search'),
+      page: parseIntOrUndefined(searchParams.get('page')),
+      size: parseIntOrUndefined(searchParams.get('per_page')),
+      sort: searchParams.get('sort') || 'orderId,desc',
+    };
+    setOrderPromise(getOrders(query));
+  }, 500);
 
   useEffect(() => {
     fetchOrders();
@@ -41,11 +39,8 @@ export const OrderList = () => {
         <TabsContent value="all">
           <Card x-chunk="dashboard-06-chunk-0">
             <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                Orders
-              </CardTitle>
-              <CardDescription>Manage orders and view
-                details.</CardDescription>
+              <CardTitle className="flex justify-between items-center">Orders</CardTitle>
+              <CardDescription>Manage orders and view details.</CardDescription>
             </CardHeader>
             <CardContent>
               <OrdersTable orderPromise={orderPromise} />

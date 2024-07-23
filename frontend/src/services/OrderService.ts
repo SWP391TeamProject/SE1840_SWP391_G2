@@ -2,9 +2,9 @@ import { API_SERVER } from '@/constants/domain';
 import { PaymentStatus } from '@/constants/enums';
 import { Page } from '@/models/Page';
 import { Order, ShippingStatus } from '@/models/newModel/order';
-import {getCookie, getBearerToken} from '@/utils/cookies';
+import { getCookie, getBearerToken } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
-import {formatDateToISO} from "@/lib/utils.ts";
+import { formatDateToISO } from '@/lib/utils.ts';
 
 // Service methods
 const baseUrl = API_SERVER + '/orders';
@@ -23,8 +23,7 @@ interface GetOrdersSchema {
 }
 
 export const getOrders = async (input: GetOrdersSchema) => {
-  const { page, size, sort,
-    status, shippingStatus, from, to, search, user } = input;
+  const { page, size, sort, status, shippingStatus, from, to, search, user } = input;
 
   let params = {
     page: page && page - 1, // Spring Boot uses 0-based page index
@@ -35,7 +34,7 @@ export const getOrders = async (input: GetOrdersSchema) => {
     from: formatDateToISO(from),
     to: formatDateToISO(to),
     search,
-    user
+    user,
   };
   return await axios.get<Page<Order>>(`${baseUrl}`, {
     headers: {

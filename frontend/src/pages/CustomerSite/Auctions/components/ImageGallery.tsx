@@ -91,9 +91,7 @@ export default function ImageGallery({ ...props }) {
             thumbnailsTrack: { opacity: '100' },
           }}
         />
-
       </div>
-      
     </>
   );
 }

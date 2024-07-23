@@ -46,9 +46,6 @@ export default function AuctionJoin() {
   const [price, setPrice] = useState<String | null>(null);
   const auth = useAuth();
 
-
-
-
   console.log(location.state);
   const [bids, setBids] = useState<BidReply[]>([]);
   const [isJoin, setIsJoin] = useState(true);
@@ -209,7 +206,7 @@ export default function AuctionJoin() {
         setShowCofetti(false);
       }, 3000);
     }
-    if ((auctionSession?.status === AuctionSessionStatus.SCHEDULED)) {
+    if (auctionSession?.status === AuctionSessionStatus.SCHEDULED) {
       navigate(`/auctions/${auctionId}`);
     }
   }, [auctionSession]);
@@ -235,7 +232,11 @@ export default function AuctionJoin() {
 
   useEffect(() => {
     console.log(auctionSession);
-    if (new Date(auctionSession?.endDate) > new Date() && new Date(auctionSession?.startDate) < new Date() && auctionSession?.hasDeposited) {
+    if (
+      new Date(auctionSession?.endDate) > new Date() &&
+      new Date(auctionSession?.startDate) < new Date() &&
+      auctionSession?.hasDeposited
+    ) {
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -306,7 +307,16 @@ export default function AuctionJoin() {
       if (message?.status == 'BID')
         toast.info(message?.message, {
           action: (
-            <Button variant="outline" onClick={() => handleViewItemDetailsClick(auctionSession?.auctionItems?.filter((item) => item.itemDTO.itemId == message?.auctionItemId.itemId)[0])}>
+            <Button
+              variant="outline"
+              onClick={() =>
+                handleViewItemDetailsClick(
+                  auctionSession?.auctionItems?.filter(
+                    (item) => item.itemDTO.itemId == message?.auctionItemId.itemId
+                  )[0]
+                )
+              }
+            >
               View
             </Button>
           ),
@@ -493,8 +503,7 @@ export default function AuctionJoin() {
                         bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
                       />
                       <div className="mx-auto">
-                        {isProgress() ?
-
+                        {isProgress() ? (
                           <PlaceBid
                             auctionId={auctionId}
                             itemId={itemDTO?.itemId}
@@ -510,11 +519,12 @@ export default function AuctionJoin() {
                               bids.filter((bid) => bid.auctionItemId?.itemId === itemDTO?.itemId)[0]?.price ||
                               itemDTO?.reservePrice // Check if bids is defined and not empty
                             }
-                          /> :
-                          <Button className="w-full" variant='outline' onClick={() => nav(`/item/${itemDTO?.itemId}`)}>
+                          />
+                        ) : (
+                          <Button className="w-full" variant="outline" onClick={() => nav(`/item/${itemDTO?.itemId}`)}>
                             More Detail
                           </Button>
-                        }
+                        )}
                       </div>
                     </div>
                   )}
@@ -557,21 +567,18 @@ export default function AuctionJoin() {
       ) : (
         <LoadingAnimation />
       )}
-      {
-        !isWinner()&& auctionSession?.hasDeposited && (
-          <Dialog defaultOpen >
-            <DialogContent><DialogHeader>
-              So sorry you didn't win this time
-            </DialogHeader>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setShowCofetti(false)}>
-                  Close
-                </Button>
-              </DialogFooter></DialogContent>
-
-          </Dialog>
-        )
-      }
+      {!isWinner() && auctionSession?.hasDeposited && (
+        <Dialog defaultOpen>
+          <DialogContent>
+            <DialogHeader>So sorry you didn't win this time</DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCofetti(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
       {isWinner() && (
         <ResultDialog
           open={openWinningDialog}
