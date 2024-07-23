@@ -293,7 +293,7 @@ export default function AuctionSession() {
               }
             }}
           >
-            Place Bid
+            Join Now
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent className="text-foreground">
@@ -404,7 +404,7 @@ export default function AuctionSession() {
                         scrollTo({ top: document.getElementById('auction-items')?.offsetTop, behavior: 'smooth' })
                       }
                     >
-                      Place Bid
+                      Join Now
                     </Button>
                   )
                   : auctionSession?.status === AuctionSessionStatus.SCHEDULED && <ConfirmRegister></ConfirmRegister>}
@@ -505,7 +505,7 @@ export default function AuctionSession() {
 
                               }}
                             >
-                              Place Bid
+                              { (new Date(auctionSession?.startDate) > new Date() || new Date(auctionSession?.endDate) < new Date()) ? 'View Details': 'Join Now'}
                             </Button>
                           ) : (
                             <RegisterAlert></RegisterAlert>
