@@ -154,14 +154,14 @@ public class AuctionSessionController {
     }
 
     @GetMapping("/finish/{id}")
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<String> finishAuctionSession(@PathVariable int id) {
         auctionSessionService.finishAuction(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/terminate/{id}")
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<String> terminateAuctionSession(@PathVariable int id) {
         auctionSessionService.terminateAuction(id);
         return new ResponseEntity<>(HttpStatus.OK);

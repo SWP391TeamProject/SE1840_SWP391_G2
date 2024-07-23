@@ -3,26 +3,37 @@
  * @see https://v0.dev/t/TMzlSp5CzlB
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { useParams } from 'react-router-dom';
-import { getItemsByStatus } from '@/services/ItemService';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setCurrentAuctionSession } from '@/redux/reducers/AuctionSession';
-import { assignItem, fetchAuctionSessionById, removeAuctionItem } from '@/services/AuctionSessionService';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { ItemStatus } from '@/models/Item';
-import { toast } from 'sonner';
-import { showErrorToast } from '@/lib/handle-error';
-import { ConfirmationButton } from '@/components/confirmation/confirmation-button';
-import { useCurrency } from '@/CurrencyProvider.tsx';
+import {useEffect, useState} from 'react';
+import {Button} from '@/components/ui/button';
+import {Link, useParams} from 'react-router-dom';
+import {getItemsByStatus} from '@/services/ItemService';
+import {
+  assignItem,
+  fetchAuctionSessionById,
+  removeAuctionItem
+} from '@/services/AuctionSessionService';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+import {ItemStatus} from '@/models/Item';
+import {toast} from 'sonner';
+import {showErrorToast} from '@/lib/handle-error';
+import {
+  ConfirmationButton
+} from '@/components/confirmation/confirmation-button';
+import {useCurrency} from '@/CurrencyProvider.tsx';
+import {AuctionSession} from "@/models/AuctionSessionModel.ts";
 
 export default function AssignAuctionItem() {
-  const auction = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
+  const [auction, setAuction] = useState<AuctionSession>();
   const [availableItems, setAvailableItems] = useState([]);
   const param = useParams<{ id: string }>();
   const auctionId = parseInt(param.id);
-  const dispatch = useAppDispatch();
   const [selectedItems, setSelectedItems] = useState([]);
   const [existingItems, setExistingItems] = useState([]);
   const currency = useCurrency();
@@ -31,35 +42,20 @@ export default function AssignAuctionItem() {
     getItemsByStatus(ItemStatus.QUEUE, 0, 10)
       .then((res) => {
         setAvailableItems(res?.data?.content);
-        console.log(res?.data?.content);
       })
       .catch((err) => {
         console.error(err);
       });
 
-    if (!auction || auction.auctionSessionId != auctionId) {
-      fetchAuctionSessionById(auctionId).then((res) => {
-        console.log(res);
-        dispatch(setCurrentAuctionSession(res?.data));
-        let tempArr = res.data.auctionItems.map((item) => {
-          return item.itemDTO;
-        });
-        console.log(tempArr);
-        setSelectedItems(tempArr);
-        setExistingItems(tempArr);
+    fetchAuctionSessionById(auctionId).then((res) => {
+      console.log(res);
+      setAuction(res);
+      let tempArr = res.auctionItems.map((item) => {
+        return item.itemDTO;
       });
-    } else {
-      setSelectedItems(
-        auction.auctionItems.map((item) => {
-          return item?.itemDTO;
-        })
-      );
-      setExistingItems(
-        auction.auctionItems.map((item) => {
-          return item?.itemDTO;
-        })
-      );
-    }
+      setSelectedItems(tempArr);
+      setExistingItems(tempArr);
+    });
   }, []);
 
   const handleAssign = (item: any) => {
@@ -82,20 +78,15 @@ export default function AssignAuctionItem() {
           showErrorToast(err);
         });
     }
-    // else {
     setSelectedItems(selectedItems.filter((i) => i.itemId !== item.itemId));
     let tempList = [...availableItems, item];
     tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
     setAvailableItems(tempList);
     toast.success('Item Unassigned', {});
-    // }
   };
 
   const handleSave = () => {
     var tempList: any[] = [];
-    // selectedItems.forEach((item) => {
-    //   tempList.push(item.itemId);
-    // });
     tempList = selectedItems.concat(
       existingItems.filter((item2) => !selectedItems.some((item1) => item1.itemId == item2.itemId))
     );
@@ -135,7 +126,8 @@ export default function AssignAuctionItem() {
           </div>
         </div>
         <div className="border rounded-lg shadow-sm">
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b rounded-t-lg">
+          <div
+            className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b rounded-t-lg">
             <h2 className="text-lg font-medium">Available Items</h2>
           </div>
           <div className="overflow-auto max-h-[400px]">
@@ -152,11 +144,19 @@ export default function AssignAuctionItem() {
                 {availableItems &&
                   availableItems.map((item: any) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.itemId}</TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-medium">{currency.format(item.reservePrice)}</TableCell>
+                      <TableCell
+                        className="font-medium">{item.itemId}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link to={`/admin/items/${item.itemId}`}
+                              target="_blank">
+                          {item.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell
+                        className="font-medium">{currency.format(item.reservePrice)}</TableCell>
                       <TableCell>
-                        <Button size="sm" variant="outline" onClick={() => handleAssign(item)}>
+                        <Button size="sm" variant="outline"
+                                onClick={() => handleAssign(item)}>
                           Select
                         </Button>
                       </TableCell>
@@ -167,7 +167,8 @@ export default function AssignAuctionItem() {
           </div>
         </div>
         <div className="border rounded-lg shadow-sm">
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b rounded-t-lg">
+          <div
+            className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b rounded-t-lg">
             <h2 className="text-lg font-medium">Selected Items</h2>
           </div>
           <div className="overflow-auto max-h-[400px]">
@@ -185,9 +186,16 @@ export default function AssignAuctionItem() {
                 {selectedItems &&
                   selectedItems.map((item: any) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item?.itemId}</TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-medium">{currency.format(item.reservePrice)}</TableCell>
+                      <TableCell
+                        className="font-medium">{item?.itemId}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link to={`/admin/items/${item.itemId}`}
+                              target="_blank">
+                          {item.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell
+                        className="font-medium">{currency.format(item.reservePrice)}</TableCell>
                       <TableCell>
                         <ConfirmationButton
                           message={`Item ${item.itemId} will be removed from this auction session.`}

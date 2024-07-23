@@ -53,7 +53,7 @@ import PaymentStatus from './pages/CustomerSite/Profile/PaymentStatus.tsx';
 import ThemeProvider from './components/component/ThemeProvider.tsx';
 import AssignAuctionItem from './pages/Administration/Auction-session/AssignAuctionItem.tsx';
 import ToBeImplemented from './pages/ToBeImplemented.tsx';
-import AuctionSessionDetail from './pages/Administration/Auction-session/Auction-Session-Detail/AuctionSessionDetail.tsx';
+import AuctionSessionView from './pages/Administration/Auction-session/Auction-Session-Detail/AuctionSessionView.tsx';
 import FeaturedAuctionsList from './pages/CustomerSite/Auctions/FeaturedAuctionsList.tsx';
 import PastAuctionSessionsList from './pages/CustomerSite/Auctions/PastAuctionSessionsList.tsx';
 import UpcomingAuctionSessionsList from './pages/CustomerSite/Auctions/UpcomingAuctionSessionsList.tsx';
@@ -199,7 +199,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                         <Route element={<PrivateRoute allowedRoles={[Roles.MANAGER, Roles.ADMIN]} />}>
                           <Route path="auction-sessions" element={<AuctionSessionList />}></Route>
                           <Route path="auction-sessions/create" element={<AuctionSessionCreate />}></Route>
-                          <Route path="auction-sessions/:id" element={<AuctionSessionDetail />}></Route>
+                          <Route path="auction-sessions/:id" element={<AuctionSessionView />}></Route>
                           <Route path="auction-sessions/:id/assign-items" element={<AssignAuctionItem />}></Route>
 
                           {/* <Route path="accounts/create" element={<AccountCreate />}></Route> */}
