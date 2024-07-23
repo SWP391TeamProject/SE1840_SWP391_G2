@@ -27,7 +27,7 @@ public class Consignment {
     @Column(length = 50)
     private String contactEmail;
 
-    @Column(length = 30,columnDefinition = "NVARCHAR(30)")
+    @Column(length = 50,columnDefinition = "NVARCHAR(50)")
     private String contactName;
 
     @Column(length = 20)

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { FormField } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Item } from '@/models/Item.ts';
+import {Item, ItemStatus} from '@/models/Item.ts';
 import { XIcon } from 'lucide-react';
 
 export default function ProductImageGallery({ ...props }) {
@@ -51,6 +51,7 @@ export default function ProductImageGallery({ ...props }) {
                     className="aspect-square object-cover"
                     src={image.link}
                   />
+                  {props.item.status !== ItemStatus.REMOVED &&
                   <button
                     type="button"
                     className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black transition-colors"
@@ -60,7 +61,7 @@ export default function ProductImageGallery({ ...props }) {
                   >
                     <XIcon className="w-4 h-4" />
                     <span className="sr-only">Delete image</span>
-                  </button>
+                  </button>}
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -68,13 +69,15 @@ export default function ProductImageGallery({ ...props }) {
           <CarouselNext /> */}
           </Carousel>
         )}
-        <ScrollArea className="h-[200px] mt-8">
-          <FormField
-            control={props.form.control}
-            name="files"
-            render={({ field }) => <DropzoneComponent {...field} />}
-          />
-        </ScrollArea>
+        {props.item.status !== ItemStatus.REMOVED &&
+          <ScrollArea className="h-[200px] mt-8">
+            <FormField
+              control={props.form.control}
+              name="files"
+              render={({ field }) => <DropzoneComponent {...field} />}
+            />
+          </ScrollArea>
+        }
       </CardContent>
     </Card>
   );

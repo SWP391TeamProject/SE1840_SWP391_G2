@@ -65,12 +65,14 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consign
           .sort((a, b) => b.consignmentDetailId - a.consignmentDetailId)
           .map((cd) => (
             <div className="flex flex-col" key={cd.consignmentDetailId}>
-              <div className="flex flex-row justify-between gap-2">
+              <div className="flex flex-row flex-wrap justify-between gap-2">
                 <p className="font-semibold text-lg flex flex-row gap-3">
-                  <AccountRoleBadge role={cd.account.role} />
+                  <div>
+                    <AccountRoleBadge role={cd.account.role} />
+                  </div>
                   <p>{cd.account.nickname}</p>
                 </p>
-                <p>{formatDateTime(cd.createDate)}</p>
+                <p className="ml-auto">{formatDateTime(cd.createDate)}</p>
               </div>
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">

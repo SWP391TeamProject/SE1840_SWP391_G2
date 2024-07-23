@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { User2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {formatDateTime} from "@/lib/utils.ts";
 
 export default function AuctionList() {
   const auctionSessionList = useAppSelector((state) => state.auctionSessions);
@@ -64,19 +65,23 @@ export default function AuctionList() {
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {auctionSessionList.value.map((session) => (
+            {[...auctionSessionList.value]
+              .sort((a, b) => b.auctionSessionId - a.auctionSessionId)
+              .map((session) => (
               <Card key={session.auctionSessionId}>
                 <CardContent className="grid gap-4">
                   <div className="grid gap-2 mt-3">
-                    <h3 className="font-semibold text-lg">{session.title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 line-clamp-2">{session.title}</p>
+                    <h3 className="font-semibold text-xl">{session.title}</h3>
                   </div>
                   <div className="grid gap-2">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <div className="text-sm font-medium">
-                        {session.startDate ? new Date(session.startDate).toLocaleString() : ''} -{' '}
-                        {session.endDate ? new Date(session.endDate).toLocaleString() : ''}
+                    <div className="flex flex-col gap-2">
+                      <div className="text-sm font-medium flex flex-row items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        Starts at {session.startDate ? formatDateTime(session.startDate) : ''}
+                      </div>
+                      <div className="text-sm font-medium flex flex-row items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                        Ends at {session.endDate ? formatDateTime(session.endDate) : ''}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -88,10 +93,10 @@ export default function AuctionList() {
                     <div className="flex items-center gap-2">
                       <User2 className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                       <div className="text-sm font-medium">
-                        {session.auctionItems ? session.participantCount : 0} bidders
+                        {session.participantCount ? session.participantCount : 0} Participants
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-5">
                       <ClockIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
 
                       {session?.status === AuctionSessionStatus.TERMINATED ? (
@@ -112,7 +117,7 @@ export default function AuctionList() {
                         </div>
                       )}
                     </div>
-                    <Button variant={'default'} asChild>
+                    <Button variant={'default'} size='sm' asChild>
                       <Link
                         to={`${session.auctionSessionId}`}
                         onClick={() => {

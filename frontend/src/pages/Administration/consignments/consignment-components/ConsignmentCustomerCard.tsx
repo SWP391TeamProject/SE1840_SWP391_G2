@@ -35,7 +35,7 @@ const ConsignmentCustomerCard: React.FC<ConsignmentCustomerCardProps> = ({ custo
                     </TooltipContent>
                   </Tooltip>
                 )}
-                <span className="text-2xl font-bold">{customer.nickname}</span>
+                <span className="text-2xl font-bold text-left">{customer.nickname}</span>
               </Link>
             </AccountTooltip>
           </span>

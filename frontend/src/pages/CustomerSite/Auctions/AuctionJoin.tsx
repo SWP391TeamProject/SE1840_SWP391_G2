@@ -22,7 +22,13 @@ import 'yet-another-react-lightbox/styles.css';
 
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import ImageGallery from './components/ImageGallery';
-import { ArrowBigUp, HashIcon, Timer } from 'lucide-react';
+import {
+  ArrowBigUp,
+  BadgeDollarSign,
+  HashIcon,
+  Timer,
+  UsersIcon
+} from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import BidsInformation from './components/BidsInformation';
 import { useAuth } from '@/AuthProvider';
@@ -441,7 +447,7 @@ export default function AuctionJoin() {
               <div className="grid grid-cols-12 gap-4 h-full">
                 <div className="col-span-6 md:col-span-6 w-full">
                   <div className="w-full">
-                    <h1 className=" text-2xl font-bold  text-center mb-2 ">{itemDTO?.name}</h1>
+                    <h1 className=" text-2xl font-bold  mb-2 ">{itemDTO?.name}</h1>
                     <div className="w-auto h-full m-auto">
                       <div className="h-full">
                         <div className="mx-auto w-full h-full basis-full md:basis-3/5 border rounded-lg  p-2 ">
@@ -533,14 +539,14 @@ export default function AuctionJoin() {
                 </div>
               </div>
             </div>
-            <div className=" col-span-12  ">
+            <div className="col-span-12">
               <Carousel orientation="horizontal">
-                <CarouselContent className="-mt-1 w-full">
+                <CarouselContent className="mt-1 w-full grid grid-cols-4">
                   {auctionSession?.auctionItems.map((item) => (
-                    <CarouselItem key={item.itemDTO.itemId} className="  md:basis-1/4">
+                    <CarouselItem key={item.itemDTO.itemId} className="">
                       <div
                         onClick={() => handleViewItemDetailsClick(item)}
-                        className="hover:cursor-pointer border w-1/2 rounded-2xl mx-auto mt-10"
+                        className="hover:cursor-pointer border rounded-2xl p-5"
                       >
                         {ping?.filter((p) => p === item.itemDTO.itemId).length > 0 && (
                           <div className="w-4 h-4 rounded-full bg-red-500 animate-ping absolute z-50 " />
@@ -552,7 +558,14 @@ export default function AuctionJoin() {
                           className="aspect-square h-30  object-cover rounded-2xl"
                         />
                         <p className="text-lg font-semibold mb-2 truncate">{item.itemDTO?.name}</p>
-                        <p>CurrentPrice:{currency.format(item.currentPrice)}</p>
+                        <div>
+                          <div className="text-primary-500 font-medium space-y-3 flex flex-row items-center gap-3">
+                            <BadgeDollarSign className="w-5 h-5" /> Current Price: {currency.format(item?.currentPrice)}
+                          </div>
+                          <div className="text-primary-500 font-medium space-y-3 flex flex-row items-center gap-3">
+                            <UsersIcon className="w-5 h-5" /> Bidders: {item?.participantCount}
+                          </div>
+                        </div>
                       </div>
                     </CarouselItem>
                   ))}

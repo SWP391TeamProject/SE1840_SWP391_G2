@@ -21,6 +21,7 @@ import Consignment from '@/models/consignment.ts';
 import { ConsignmentDetailType } from '@/constants/enums.tsx';
 import ItemCreateCustomerCard from '@/pages/Administration/item/ItemCreateCustomerCard.tsx';
 import ItemConsignmentInfoCard from '@/pages/Administration/item/ItemConsignmentInfoCard.tsx';
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 const FormSchema = z.object({
   categoryId: z.string().regex(/\d+/, {
@@ -86,6 +87,7 @@ export default function ItemCreate() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const location = useLocation();
   const consignment = location?.state?.consignment as Consignment;
+  const currency = useCurrency();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -234,7 +236,7 @@ export default function ItemCreate() {
                   name="reservePrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reserve Price</FormLabel>
+                      <FormLabel>Reserve Price: {currency.format(field.value)}</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>
@@ -249,7 +251,7 @@ export default function ItemCreate() {
                   name="buyInPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Buy In Price</FormLabel>
+                      <FormLabel>Buy In Price: {currency.format(field.value)}</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>
