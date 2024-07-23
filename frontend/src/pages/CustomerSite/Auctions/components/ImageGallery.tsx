@@ -93,9 +93,7 @@ export default function ImageGallery({ ...props }) {
         />
 
       </div>
-      <Button className="w-full bg-red-500 text-foreground" onClick={() => nav(`/item/${props.itemDTO?.itemId}`)}>
-        More Detail
-      </Button>
+      
     </>
   );
 }

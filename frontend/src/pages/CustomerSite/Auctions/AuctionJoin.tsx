@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Client, IMessage } from '@stomp/stompjs';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,7 @@ import { formatDate } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ResultDialog from './result-dialog';
 import { it } from 'node:test';
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog';
 
 export default function AuctionJoin() {
   const currency = useCurrency();
@@ -44,6 +45,9 @@ export default function AuctionJoin() {
   const location = useLocation();
   const [price, setPrice] = useState<String | null>(null);
   const auth = useAuth();
+
+
+
 
   console.log(location.state);
   const [bids, setBids] = useState<BidReply[]>([]);
@@ -68,6 +72,26 @@ export default function AuctionJoin() {
   const [openWinningDialog, setOpenWinningDialog] = useState(false);
   // const auctionId = auctionSession?.auctionSessionId;
   // const itemId = location.state.id.itemId;
+
+  const isProgress = useCallback(() => {
+    let now = new Date();
+    let endDate = new Date(auctionSession?.endDate);
+    let startDate = new Date(auctionSession?.startDate);
+    if (endDate > now && startDate < now) {
+      return true;
+    }
+    return false;
+  }, [auctionSession]);
+
+  const isScheduled = useCallback(() => {
+    let now = new Date();
+    let endDate = new Date(auctionSession?.endDate);
+    let startDate = new Date(auctionSession?.startDate);
+    if (startDate < now) {
+      return true;
+    }
+    return false;
+  }, [auctionSession]);
 
   const [allow, setAllow] = useState<boolean | undefined>(false);
   useEffect(() => {
@@ -136,6 +160,9 @@ export default function AuctionJoin() {
         for (const element of bids) {
           if (item?.itemDTO?.itemId === element?.auctionItemId?.itemId) {
             console.log(element, true);
+            if (winningBids.filter((bid) => bid.auctionItemId.itemId === element?.auctionItemId.itemId).length > 0) {
+              continue;
+            }
             setWinningBids((prev) => [...prev, element]);
             break;
           }
@@ -207,8 +234,8 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    console.log( auctionSession);
-    if ( new Date(auctionSession?.endDate) > new Date() && new Date(auctionSession?.startDate) < new Date() && auctionSession?.hasDeposited) {
+    console.log(auctionSession);
+    if (new Date(auctionSession?.endDate) > new Date() && new Date(auctionSession?.startDate) < new Date() && auctionSession?.hasDeposited) {
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -389,6 +416,14 @@ export default function AuctionJoin() {
     }
   };
 
+  const isWinner = useCallback(() => {
+    console.log(winningBids);
+    if (winningBids?.filter((bid) => bid.account.accountId === auth.user.accountId).length > 0) {
+      console.log(winningBids?.filter((bid) => bid.account.accountId === auth.user.accountId));
+      return true;
+    }
+    return false;
+  }, [winningBids]);
   return (
     <>
       {!isJoin ? (
@@ -450,7 +485,7 @@ export default function AuctionJoin() {
                     </div>
                   )}
 
-                  {auctionSession?.hasDeposited && new Date(auctionSession?.endDate) > new Date() && new Date() < new Date(auctionSession?.startDate) && (
+                  {auctionSession?.hasDeposited && (
                     <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
                       <BidsInformation
                         auctionSession={auctionSession}
@@ -458,22 +493,28 @@ export default function AuctionJoin() {
                         bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
                       />
                       <div className="mx-auto">
-                        <PlaceBid
-                          auctionId={auctionId}
-                          itemId={itemDTO?.itemId}
-                          setIsSending={setIsSending}
-                          isSending={isSending}
-                          sendMessage={sendMessage}
-                          onMessageReceived={onMessageReceived}
-                          endDate={auctionSession?.endDate} // Added optional chaining for safety
-                          name={itemDTO?.name}
-                          image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
-                          client={client}
-                          currentBid={
-                            bids.filter((bid) => bid.auctionItemId?.itemId === itemDTO?.itemId)[0]?.price ||
-                            itemDTO?.reservePrice // Check if bids is defined and not empty
-                          }
-                        />
+                        {isProgress() ?
+
+                          <PlaceBid
+                            auctionId={auctionId}
+                            itemId={itemDTO?.itemId}
+                            setIsSending={setIsSending}
+                            isSending={isSending}
+                            sendMessage={sendMessage}
+                            onMessageReceived={onMessageReceived}
+                            endDate={auctionSession?.endDate} // Added optional chaining for safety
+                            name={itemDTO?.name}
+                            image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                            client={client}
+                            currentBid={
+                              bids.filter((bid) => bid.auctionItemId?.itemId === itemDTO?.itemId)[0]?.price ||
+                              itemDTO?.reservePrice // Check if bids is defined and not empty
+                            }
+                          /> :
+                          <Button className="w-full" variant='outline' onClick={() => nav(`/item/${itemDTO?.itemId}`)}>
+                            More Detail
+                          </Button>
+                        }
                       </div>
                     </div>
                   )}
@@ -516,26 +557,22 @@ export default function AuctionJoin() {
       ) : (
         <LoadingAnimation />
       )}
-      {showCofetti &&
-        bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0] &&
-        bids?.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.accountId !==
-          auth.user.accountId && (
-          <div className="fixed top-0 z-10 bg-red-200/15 w-full h-full">
-            <Confetti mode="fall" colors={['#ff577f', '#ff884b']} />
-            <Card className="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <CardHeader>
-                <CardTitle>Congratulations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.account.nickname} won this item
-                <p className="text-foreground font-semibold">
-                  {currency.format(bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price)}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      {winningBids?.filter((bid) => bid.account.accountId === auth.user.accountId).length > 0 && (
+      {
+        !isWinner()&& auctionSession?.hasDeposited && (
+          <Dialog defaultOpen >
+            <DialogContent><DialogHeader>
+              So sorry you didn't win this time
+            </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowCofetti(false)}>
+                  Close
+                </Button>
+              </DialogFooter></DialogContent>
+
+          </Dialog>
+        )
+      }
+      {isWinner() && (
         <ResultDialog
           open={openWinningDialog}
           onOpenChange={setOpenWinningDialog}
