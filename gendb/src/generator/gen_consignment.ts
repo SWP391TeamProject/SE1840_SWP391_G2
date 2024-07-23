@@ -161,6 +161,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
         const managerId = faker.helpers.arrayElement(roleToAccounts.MANAGER).id;
         let status: ConsignmentStatus = ConsignmentStatus.WAITING_STAFF;
         let secretCode: string | undefined = undefined;
+        let lastPrice = 0;
 
         if (status == ConsignmentStatus.WAITING_STAFF && faker.number.float() < 0.95) {
             status = ConsignmentStatus.IN_INITIAL_EVALUATION;
@@ -191,12 +192,13 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
         if (status == ConsignmentStatus.SENDING && faker.number.float() < 0.95) {
             status = ConsignmentStatus.IN_FINAL_EVALUATION;
             updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+            lastPrice = faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE });
             details.push({
                 accountId: staffId,
                 consignmentId: i + 1,
                 type: ConsignmentDetailType.FINAL_EVALUATION,
                 description: faker.helpers.arrayElement(staffToManagerMessages),
-                price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
+                price: lastPrice,
                 imageURLs: [],
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
@@ -212,18 +214,19 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                     consignmentId: i + 1,
                     type: ConsignmentDetailType.MANAGER_REJECTED,
                     description: faker.helpers.arrayElement(rejectedMessages),
-                    price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
+                    price: lastPrice,
                     imageURLs: [],
                     createDate: updateDate.toDate(),
                     updateDate: updateDate.toDate()
                 });
                 updateDate = updateDate.add(faker.number.int({ min: 10, max: 600 }), "minute");
+                lastPrice = faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE });
                 details.push({
                     accountId: staffId,
                     consignmentId: i + 1,
                     type: ConsignmentDetailType.FINAL_EVALUATION,
                     description: faker.helpers.arrayElement(staffToManagerMessages),
-                    price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
+                    price: lastPrice,
                     imageURLs: [],
                     createDate: updateDate.toDate(),
                     updateDate: updateDate.toDate()
@@ -237,7 +240,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
                 consignmentId: i + 1,
                 type: ConsignmentDetailType.MANAGER_ACCEPTED,
                 description: faker.helpers.arrayElement(acceptedMessages),
-                price: faker.number.int({ min: ITEM_MIN_PRICE, max: ITEM_MAX_PRICE }),
+                price: lastPrice,
                 imageURLs: [],
                 createDate: updateDate.toDate(),
                 updateDate: updateDate.toDate()
