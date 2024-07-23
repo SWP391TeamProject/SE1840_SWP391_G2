@@ -1,5 +1,5 @@
 import { SERVER_DOMAIN_URL } from '@/constants/domain';
-import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
+import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 
 interface GetBlogsSchema {
@@ -23,8 +23,8 @@ class BlogService {
       page: page && page - 1, // Spring Boot uses 0-based page index
       size: size ? size : 10,
       sort: sort ? sort : 'postId,desc',
-      categoryId: categoryId?? '',
-      search
+      categoryId: categoryId ?? '',
+      search,
     };
 
     response = await axios.get(`${this.BASE_URL}/`, {

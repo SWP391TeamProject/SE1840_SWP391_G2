@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch } from '@/redux/hooks';
-import {AccountStatus, Roles} from '@/constants/enums';
+import { AccountStatus, Roles } from '@/constants/enums';
 import { fetchAccountById, updateAccountService } from '@/services/AccountsServices.ts';
 import { useParams } from 'react-router-dom';
 import { setCurrentAccount } from '@/redux/reducers/Accounts';
@@ -17,17 +17,11 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import { getErrorMessage } from '@/lib/handle-error';
 import { toast } from 'sonner';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { Account } from '@/models/AccountModel';
-import {AxiosResponse} from "axios";
-import {useCurrency} from "@/CurrencyProvider.tsx";
+import { AxiosResponse } from 'axios';
+import { useCurrency } from '@/CurrencyProvider.tsx';
 
 const formSchema = z.object({
   accountId: z.number(),
@@ -88,7 +82,7 @@ export default function AccountEdit() {
           balance: res.data.balance,
           role: res.data.role,
           dummy: res.data.dummy,
-          status: res.data.status
+          status: res.data.status,
         });
         setCurrentRole(res.data.role);
         return 'Account fetched successfully';
@@ -114,10 +108,9 @@ export default function AccountEdit() {
       balance: data.balance,
       role: data.role,
       dummy: data.dummy,
-      status: data.status
+      status: data.status,
     };
-    const updateAccountServicePromise = updateAccountService(updatedAccount,
-      updatedAccount.accountId);
+    const updateAccountServicePromise = updateAccountService(updatedAccount, updatedAccount.accountId);
 
     toast.promise(updateAccountServicePromise, {
       loading: 'Updating account...',
@@ -252,7 +245,6 @@ export default function AccountEdit() {
                   <FormMessage />
                 </FormItem>
               )}
-
             />
 
             <FormField
@@ -268,9 +260,9 @@ export default function AccountEdit() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.keys(AccountStatus).map(v =>
+                      {Object.keys(AccountStatus).map((v) => (
                         <SelectItem value={v}>{v}</SelectItem>
-                      )}
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

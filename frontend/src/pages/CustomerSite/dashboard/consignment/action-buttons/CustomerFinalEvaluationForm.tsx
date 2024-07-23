@@ -1,11 +1,8 @@
-import Consignment from "@/models/consignment.ts";
-import React, {useState} from "react";
-import {Button} from "@/components/ui/button.tsx";
-import {toast} from "sonner";
-import {
-  acceptFinalEva,
-  rejectFinalEva,
-} from "@/services/ConsignmentService.tsx";
+import Consignment from '@/models/consignment.ts';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button.tsx';
+import { toast } from 'sonner';
+import { acceptFinalEva, rejectFinalEva } from '@/services/ConsignmentService.tsx';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,18 +12,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
-} from "@/components/ui/alert-dialog.tsx";
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog.tsx';
 
 interface CustomerFinalEvaluationFormProps {
   consignment: Consignment;
   setConsignment: (v: Consignment) => void;
 }
 
-const CustomerFinalEvaluationForm: React.FC<CustomerFinalEvaluationFormProps> = ({
-                                                                                   consignment,
-                                                                                   setConsignment
-                                                                                 }) => {
+const CustomerFinalEvaluationForm: React.FC<CustomerFinalEvaluationFormProps> = ({ consignment, setConsignment }) => {
   const [loading, setLoading] = useState(false);
 
   const acceptEvaluation = () => {
@@ -67,17 +61,15 @@ const CustomerFinalEvaluationForm: React.FC<CustomerFinalEvaluationFormProps> = 
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Once you have accepted, we will list the jewelry on an upcoming
-              auction. We will notice
-              you for further updates. Once your item is sold successfully, the
-              revenue will be
-              transferred to your Biddify wallet.
+              Once you have accepted, we will list the jewelry on an upcoming auction. We will notice you for further
+              updates. Once your item is sold successfully, the revenue will be transferred to your Biddify wallet.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction disabled={loading}
-                               onClick={() => acceptEvaluation()}>Continue</AlertDialogAction>
+            <AlertDialogAction disabled={loading} onClick={() => acceptEvaluation()}>
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -91,14 +83,13 @@ const CustomerFinalEvaluationForm: React.FC<CustomerFinalEvaluationFormProps> = 
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will cancel this consignment.
-            </AlertDialogDescription>
+            <AlertDialogDescription>This will cancel this consignment.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction disabled={loading}
-                               onClick={() => rejectEvaluation()}>Continue</AlertDialogAction>
+            <AlertDialogAction disabled={loading} onClick={() => rejectEvaluation()}>
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

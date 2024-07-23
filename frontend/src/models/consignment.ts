@@ -1,7 +1,7 @@
 import { ConsignmentStatus } from '@/constants/enums';
 import { ConsignmentDetail } from './newModel/ConsignmentDetail';
 import { Attachment } from './Attachment';
-import {Account} from "@/models/AccountModel.tsx";
+import { Account } from '@/models/AccountModel.tsx';
 
 interface Consignment {
   consignmentId: number;

@@ -73,9 +73,7 @@ export const BlogList = () => {
         // console.log(response.data.content);
       })
       .catch((error) => {
-        toast.error(error.message, {
-          
-        });
+        toast.error(error.message, {});
       });
     dispatch(setCurrentPageNumber({ currentPageNumber: 0, totalPages: 0 }));
     window.scrollTo(0, 0);

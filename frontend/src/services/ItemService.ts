@@ -1,7 +1,7 @@
 import axios from '@/config/axiosConfig.ts';
 import { Item, ItemStatus } from '@/models/Item.ts';
 import { Page } from '@/models/Page.ts';
-import {getCookie, getBearerToken, removeCookie} from '@/utils/cookies';
+import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import { API_SERVER } from '@/constants/domain';
 import { Attachment } from '@/models/Attachment.ts';
 import { ItemUpdateDTO } from '@/models/ItemUpdateDTO.ts';
@@ -22,8 +22,7 @@ interface GetItemsSchema {
 }
 
 export const getItems = async (input: GetItemsSchema) => {
-  const { page, size, sort,
-    status, minPrice, maxPrice, search, categoryId } = input;
+  const { page, size, sort, status, minPrice, maxPrice, search, categoryId } = input;
 
   let params = {
     page: page && page - 1, // Spring Boot uses 0-based page index
@@ -33,7 +32,7 @@ export const getItems = async (input: GetItemsSchema) => {
     categoryId,
     search,
     minPrice,
-    maxPrice
+    maxPrice,
   };
   return await axios.get<Page<Item>>(`${baseUrl}/`, {
     headers: {

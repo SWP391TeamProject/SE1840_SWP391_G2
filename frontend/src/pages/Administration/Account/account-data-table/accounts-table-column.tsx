@@ -11,21 +11,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AccountStatus } from '@/constants/enums';
 import { ConfirmationDialog } from '@/components/confirmation/confirmation-dialog';
 import { activateAccountService, deleteAccountService } from '@/services/AccountsServices';
 import { showErrorToast } from '@/lib/handle-error';
 import { toast } from 'sonner';
-import {Account} from "@/models/AccountModel.tsx";
-import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from "@/components/ui/tooltip.tsx";
-import {BadgeCheck} from "lucide-react";
-import AccountRoleBadge from "@/components/AccountRoleBadge.tsx";
+import { Account } from '@/models/AccountModel.tsx';
+import AccountTooltip from '@/pages/Administration/Tooltip/AccountTooltip.tsx';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
+import { BadgeCheck } from 'lucide-react';
+import AccountRoleBadge from '@/components/AccountRoleBadge.tsx';
 
 export const getColumns = (): ColumnDef<Account>[] => [
   {
@@ -59,11 +55,10 @@ export const getColumns = (): ColumnDef<Account>[] => [
   {
     accessorKey: 'nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nickname" />,
-    cell: ({row}) => {
+    cell: ({ row }) => {
       return (
         <AccountTooltip account={row.original}>
-          <Link
-            to={`/admin/account/${row.original.accountId}`} className="flex justify-center items-center gap-2">
+          <Link to={`/admin/account/${row.original.accountId}`} className="flex justify-center items-center gap-2">
             {row.original.kyc && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -102,7 +97,7 @@ export const getColumns = (): ColumnDef<Account>[] => [
     accessorKey: 'role',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
     cell: ({ row }) => {
-      return (<AccountRoleBadge role={row.original.role}/>);
+      return <AccountRoleBadge role={row.original.role} />;
     },
   },
   {

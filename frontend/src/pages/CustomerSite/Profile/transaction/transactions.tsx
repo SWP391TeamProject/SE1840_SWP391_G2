@@ -5,15 +5,13 @@
  */
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
-import {getPayments} from '@/services/PaymentsService';
-import {useSearchParams} from "react-router-dom";
-import {useDebouncedCallback} from "use-debounce";
-import {getEnumValue, parseDate, parseIntOrUndefined} from "@/lib/utils.ts";
-import {PaymentStatus, PaymentType} from "@/constants/enums.tsx";
-import {
-  TransactionsTable
-} from "@/pages/CustomerSite/Profile/transaction/transaction-tables.tsx";
-import {useAuth} from "@/AuthProvider.tsx";
+import { getPayments } from '@/services/PaymentsService';
+import { useSearchParams } from 'react-router-dom';
+import { useDebouncedCallback } from 'use-debounce';
+import { getEnumValue, parseDate, parseIntOrUndefined } from '@/lib/utils.ts';
+import { PaymentStatus, PaymentType } from '@/constants/enums.tsx';
+import { TransactionsTable } from '@/pages/CustomerSite/Profile/transaction/transaction-tables.tsx';
+import { useAuth } from '@/AuthProvider.tsx';
 
 export default function Transactions() {
   const auth = useAuth();
@@ -30,7 +28,7 @@ export default function Transactions() {
       page: parseIntOrUndefined(searchParams.get('page')),
       size: parseIntOrUndefined(searchParams.get('per_page')),
       sort: searchParams.get('sort') || 'paymentId,desc',
-      user: auth.user.accountId
+      user: auth.user.accountId,
     };
     setPaymentPromise(getPayments(query));
   }, 500);

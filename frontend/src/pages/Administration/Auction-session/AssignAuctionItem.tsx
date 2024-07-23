@@ -15,7 +15,7 @@ import { ItemStatus } from '@/models/Item';
 import { toast } from 'sonner';
 import { showErrorToast } from '@/lib/handle-error';
 import { ConfirmationButton } from '@/components/confirmation/confirmation-button';
-import {useCurrency} from "@/CurrencyProvider.tsx";
+import { useCurrency } from '@/CurrencyProvider.tsx';
 
 export default function AssignAuctionItem() {
   const auction = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
@@ -87,9 +87,7 @@ export default function AssignAuctionItem() {
     let tempList = [...availableItems, item];
     tempList.sort((a, b) => (a.itemId < b.itemId ? -1 : 1));
     setAvailableItems(tempList);
-    toast.success('Item Unassigned', {
-      
-    });
+    toast.success('Item Unassigned', {});
     // }
   };
 

@@ -14,33 +14,31 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getErrorMessage } from '@/lib/handle-error';
-import {useCurrency} from "@/CurrencyProvider.tsx";
-import {
-  Select,
-  SelectContent, SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select.tsx";
-import {useNavigate} from "react-router-dom";
+import { useCurrency } from '@/CurrencyProvider.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { useNavigate } from 'react-router-dom';
 
 const emailRegex = new RegExp(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
 
 const formSchema = z.object({
   // accountId: z.number(),
-  nickname: z.string()
+  nickname: z
+    .string()
     .min(5, 'Nickname must be at least 5 characters')
     .max(20, 'Nickname must not be longer than 20 characters'),
   email: z.string().regex(emailRegex, 'Invalid email!'),
   phone: z.string().max(12, 'Phone must not be longer than 12 characters').optional(),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Current password must contain at least 8 characters')
     .max(30, 'Current password must contain at most 30 characters'),
   role: z.nativeEnum(Roles),
-  balance: z.coerce.number()
+  balance: z.coerce
+    .number()
     .min(0, 'Balance must not be negative')
     .max(1000000000, 'Balance must not exceed 1,000,000,000'),
   dummy: z.boolean(),
-  status: z.nativeEnum(AccountStatus)
+  status: z.nativeEnum(AccountStatus),
 });
 
 export default function AccountCreate() {
@@ -74,7 +72,7 @@ export default function AccountCreate() {
       balance: data.balance,
       role: data.role,
       dummy: data.dummy,
-      status: data.status
+      status: data.status,
     };
 
     const createAccountServicePromise = createAccountService(createdAccount);
@@ -83,7 +81,7 @@ export default function AccountCreate() {
       loading: 'Creating account...',
       success: () => {
         setIsSubmitting(false);
-        nav("/admin/accounts");
+        nav('/admin/accounts');
         return 'Account created successfully';
       },
       error: (err) => {
@@ -225,9 +223,9 @@ export default function AccountCreate() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.keys(AccountStatus).map(v =>
+                      {Object.keys(AccountStatus).map((v) => (
                         <SelectItem value={v}>{v}</SelectItem>
-                      )}
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

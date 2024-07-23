@@ -169,14 +169,15 @@ export const getColumns = (): ColumnDef<AuctionSession>[] => [
               >
                 Detail
               </DropdownMenuItem>
-              {row.original.status === AuctionSessionStatus.SCHEDULED &&
+              {row.original.status === AuctionSessionStatus.SCHEDULED && (
                 <DropdownMenuItem
                   onClick={() => {
                     handleAssignAuctionItemClick(row.original);
                   }}
                 >
                   Assign Items
-                </DropdownMenuItem>}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </>

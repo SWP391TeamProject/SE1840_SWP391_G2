@@ -52,9 +52,9 @@ export default function TotalRevenuePastAuctionBarChart() {
     },
     stroke: {
       curve: 'smooth',
-      width: 2
+      width: 2,
     },
-    
+
     xaxis: {
       categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     },
@@ -169,7 +169,7 @@ export default function TotalRevenuePastAuctionBarChart() {
         ...prevState.yaxis,
       },
       grid: {
-        borderColor: line
+        borderColor: line,
       },
       plotOptions: {
         bar: {
@@ -183,7 +183,7 @@ export default function TotalRevenuePastAuctionBarChart() {
     'primary',
     'secondary',
     'line',
-    'theme'
+    'theme',
   ]);
 
   return (

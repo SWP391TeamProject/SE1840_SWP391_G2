@@ -11,7 +11,6 @@ import { useCurrency } from '@/CurrencyProvider';
 
 // chart options
 
-
 // ==============================|| MONTHLY BAR CHART ||============================== //
 
 export default function PaymentsBarChart({ selectedLabel }) {
@@ -108,7 +107,7 @@ export default function PaymentsBarChart({ selectedLabel }) {
           });
 
           setSeries([
-            { 
+            {
               name: 'Total Amount',
               data: formattedData.map((item) => item.totalAmount),
             },

@@ -5,11 +5,8 @@ import { DataTable } from '@/components/data-tables/data-table';
 import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
 import { getPayments } from '@/services/PaymentsService';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
-import {
-  TransactionsTableToolbarActions
-} from "@/pages/CustomerSite/Profile/transaction/transaction-table-toolbar-actions.tsx";
-import getColumns
-  from "@/pages/CustomerSite/Profile/transaction/transaction-table-column.tsx";
+import { TransactionsTableToolbarActions } from '@/pages/CustomerSite/Profile/transaction/transaction-table-toolbar-actions.tsx';
+import getColumns from '@/pages/CustomerSite/Profile/transaction/transaction-table-column.tsx';
 
 interface TransactionsTableProps {
   paymentPromise: ReturnType<typeof getPayments>;

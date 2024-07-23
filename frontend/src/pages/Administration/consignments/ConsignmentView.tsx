@@ -1,23 +1,16 @@
-import {
-  fetchConsignmentByConsignmentId
-} from '@/services/ConsignmentService';
+import { fetchConsignmentByConsignmentId } from '@/services/ConsignmentService';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import Consignment from '@/models/consignment';
-import ConsignmentCustomerCard
-  from "@/pages/Administration/consignments/consignment-components/ConsignmentCustomerCard.tsx";
-import {Account} from "@/models/AccountModel.tsx";
-import {fetchAccountById} from "@/services/AccountsServices.ts";
-import LoadingAnimation from "@/components/loadingAnimation/LoadingAnimation.tsx";
-import ConsignmentDetailCard
-  from "@/components/ConsignmentDetailCard.tsx";
-import ConsignmentHistoryCard
-  from "@/components/ConsignmentHistoryCard.tsx";
-import ConsignmentIntroCard
-  from "@/pages/Administration/consignments/consignment-components/ConsignmentIntroCard.tsx";
-import ConsignmentSecretCodeCard
-  from "@/components/ConsignmentSecretCodeCard.tsx";
+import ConsignmentCustomerCard from '@/pages/Administration/consignments/consignment-components/ConsignmentCustomerCard.tsx';
+import { Account } from '@/models/AccountModel.tsx';
+import { fetchAccountById } from '@/services/AccountsServices.ts';
+import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation.tsx';
+import ConsignmentDetailCard from '@/components/ConsignmentDetailCard.tsx';
+import ConsignmentHistoryCard from '@/components/ConsignmentHistoryCard.tsx';
+import ConsignmentIntroCard from '@/pages/Administration/consignments/consignment-components/ConsignmentIntroCard.tsx';
+import ConsignmentSecretCodeCard from '@/components/ConsignmentSecretCodeCard.tsx';
 
 export default function ConsignmentView() {
   const consignmentId = parseInt(useParams().id);
@@ -41,29 +34,35 @@ export default function ConsignmentView() {
             return `Customer loaded successfully!`;
           },
           error: (err) => `An error occurred: ${err.message}`,
-        })
+        });
 
         return `Consignment loaded successfully!`;
       },
       error: (err) => `An error occurred: ${err.message}`,
-    })
+    });
   }, []);
 
-  return (
-    isLoading ? <LoadingAnimation /> : <>
-        <div className="grid grid-cols-5 gap-6 p-10">
-          <div className="col-span-3 flex flex-col gap-6 flex-wrap">
-            <ConsignmentIntroCard consignment={consignment} setConsignment={setConsignment} />
-            <ConsignmentDetailCard consignment={consignment} />
-          </div>
-          <div className="col-span-2 flex flex-col gap-6 flex-wrap">
-            {customer != null && <ConsignmentCustomerCard customer={customer} consignment={consignment} />}
-            {consignment.secretCode &&
-              <ConsignmentSecretCodeCard consignment={consignment}
-                                         message="This is the secret code to identify the customer.
-                                         Remember to keep it secret. The code will never be changed."/>}
-            <ConsignmentHistoryCard consignment={consignment} />
-          </div>
+  return isLoading ? (
+    <LoadingAnimation />
+  ) : (
+    <>
+      <div className="grid grid-cols-5 gap-6 p-10">
+        <div className="col-span-3 flex flex-col gap-6 flex-wrap">
+          <ConsignmentIntroCard consignment={consignment} setConsignment={setConsignment} />
+          <ConsignmentDetailCard consignment={consignment} />
         </div>
-      </>);
+        <div className="col-span-2 flex flex-col gap-6 flex-wrap">
+          {customer != null && <ConsignmentCustomerCard customer={customer} consignment={consignment} />}
+          {consignment.secretCode && (
+            <ConsignmentSecretCodeCard
+              consignment={consignment}
+              message="This is the secret code to identify the customer.
+                                         Remember to keep it secret. The code will never be changed."
+            />
+          )}
+          <ConsignmentHistoryCard consignment={consignment} />
+        </div>
+      </div>
+    </>
+  );
 }

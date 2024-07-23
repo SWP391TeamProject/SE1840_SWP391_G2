@@ -53,11 +53,11 @@ function SoldFor({ item, currency }: propsType) {
       <CardContent className="p-4">
         <div className="m-auto">
           <span className=" text-sm font-semibold text-gray-600">Sold for: </span>
-          {isSold ?
+          {isSold ? (
             <span className=" text-xl font-bold text-gray-900">{currency.format(item?.currentPrice)}</span>
-            :
+          ) : (
             <span className=" text-xl font-bold text-gray-900">Not Sold</span>
-          }
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-end p-4">

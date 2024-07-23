@@ -7,9 +7,7 @@ import getColumns from './order-table-column';
 import { OrdersTableFloatingBar } from './order-table-floating-bar';
 import { OrdersTableToolbarActions } from './order-table-toolbar-actions';
 import { getOrders } from '@/services/OrderService';
-import {
-  DataTableSkeleton
-} from "@/components/data-tables/data-tables-skeleton.tsx";
+import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton.tsx';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/handle-error';
 
@@ -37,7 +35,7 @@ export function OrdersTable({ orderPromise }: OrderTableProps) {
           },
           error: (err) => {
             setIsLoading(false);
-            return getErrorMessage (err);
+            return getErrorMessage(err);
           },
         });
       }
@@ -57,12 +55,14 @@ export function OrdersTable({ orderPromise }: OrderTableProps) {
       <DataTableToolbar table={table}>
         <OrdersTableToolbarActions table={table} />
       </DataTableToolbar>
-      {isLoading && <DataTableSkeleton
-        columnCount={7}
-        cellWidths={['10rem', '10rem', '10rem', '10rem', '10rem', '8rem']}
-        shrinkZero
-        showViewOptions={false}
-      />}
+      {isLoading && (
+        <DataTableSkeleton
+          columnCount={7}
+          cellWidths={['10rem', '10rem', '10rem', '10rem', '10rem', '8rem']}
+          shrinkZero
+          showViewOptions={false}
+        />
+      )}
     </DataTable>
   );
 }

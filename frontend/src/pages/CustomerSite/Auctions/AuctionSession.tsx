@@ -242,7 +242,6 @@ export default function AuctionSession() {
     );
   };
 
-
   const RegisterAlert = () => {
     if (userId == -1) {
       return (
@@ -322,7 +321,7 @@ export default function AuctionSession() {
   const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
     const startDate = new Date(auctionSession?.startDate);
     const endDate = new Date(auctionSession?.endDate);
-    if (!(startDate < new Date())  || endDate < new Date()) {
+    if (!(startDate < new Date()) || endDate < new Date()) {
       navigate(`/item/${item.itemId}`);
       return;
     } else {
@@ -338,7 +337,6 @@ export default function AuctionSession() {
         },
       });
     }
-
   };
 
   const handleCategoryFilter = (...event: any) => {
@@ -367,7 +365,7 @@ export default function AuctionSession() {
                   <ClockIcon className="h-5 w-5" />
 
                   {auctionSession?.status === AuctionSessionStatus.PROGRESSING &&
-                    new Date(auctionSession?.endDate).getTime() > new Date().getTime() ? (
+                  new Date(auctionSession?.endDate).getTime() > new Date().getTime() ? (
                     <span>
                       Ends in <CountDownTime end={new Date(auctionSession?.endDate)}></CountDownTime>
                     </span>
@@ -375,8 +373,9 @@ export default function AuctionSession() {
                     <></>
                   )}
 
-                  {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date() ||
-                    new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
+                  {auctionSession?.status === AuctionSessionStatus.FINISHED ||
+                  new Date(auctionSession?.endDate) < new Date() ||
+                  new Date(auctionSession?.endDate).getTime() <= new Date().getTime() ? (
                     <div className="text-pink-500 dark:text-pink-400 font-semibold">Auction Ended</div>
                   ) : (
                     <></>
@@ -387,7 +386,7 @@ export default function AuctionSession() {
                   )}
 
                   {auctionSession?.status === AuctionSessionStatus.SCHEDULED ||
-                    new Date(auctionSession?.startDate).getTime() > new Date().getTime() ? (
+                  new Date(auctionSession?.startDate).getTime() > new Date().getTime() ? (
                     <span>
                       Starts in <CountDownTime end={new Date(auctionSession?.startDate)}></CountDownTime>
                     </span>
@@ -399,14 +398,14 @@ export default function AuctionSession() {
 
                 {auctionSession?.hasDeposited
                   ? auctionSession?.status === AuctionSessionStatus.PROGRESSING && (
-                    <Button
-                      onClick={() =>
-                        scrollTo({ top: document.getElementById('auction-items')?.offsetTop, behavior: 'smooth' })
-                      }
-                    >
-                      Join Now
-                    </Button>
-                  )
+                      <Button
+                        onClick={() =>
+                          scrollTo({ top: document.getElementById('auction-items')?.offsetTop, behavior: 'smooth' })
+                        }
+                      >
+                        Join Now
+                      </Button>
+                    )
                   : auctionSession?.status === AuctionSessionStatus.SCHEDULED && <ConfirmRegister></ConfirmRegister>}
               </div>
             </div>
@@ -450,72 +449,79 @@ export default function AuctionSession() {
               {/* {auctionSession?.auctionItems ? auctionSession?.auctionItems.map((item) => ( */}
               {items
                 ? items.map((item) => (
-                  <Card key={item.id.itemId} className="min-w-52 flex flex-col items-stretch">
-                    <div className="group relative">
-                      <img
-                        src={
-                          item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
-                            ? item.itemDTO.attachments[0].link
-                            : 'https://placehold.co/400'
-                        }
-                        width={300}
-                        height={200}
-                        alt="Auction Item"
-                        className="rounded-t-lg object-cover w-full "
-                      />
-                      <div
-                        className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                        onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession?.auctionSessionId)}
-                      >
-                        <Button>Detail</Button>
+                    <Card key={item.id.itemId} className="min-w-52 flex flex-col items-stretch">
+                      <div className="group relative">
+                        <img
+                          src={
+                            item.itemDTO.attachments != null && item.itemDTO.attachments.length > 0
+                              ? item.itemDTO.attachments[0].link
+                              : 'https://placehold.co/400'
+                          }
+                          width={300}
+                          height={200}
+                          alt="Auction Item"
+                          className="rounded-t-lg object-cover w-full "
+                        />
+                        <div
+                          className="rounded-t-lg  absolute h-full w-full -bottom-0 bg-black/20 flex items-center justify-center group-hover:bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                          onClick={() => handleViewItemDetailsClick(item.itemDTO, auctionSession?.auctionSessionId)}
+                        >
+                          <Button>Detail</Button>
+                        </div>
                       </div>
-                    </div>
 
-                    <CardContent className="space-y-2 p-4">
-                      <h3 className="text-sm font-semibold">{item.itemDTO.name}</h3>
-                    </CardContent>
-                    <div className="mt-auto space-y-2 p-4">
-                      {/* <div className="flex items-center justify-between mt-5"> */}
-                      { auctionSession.status === AuctionSessionStatus.PROGRESSING &&
-                      <div className="text-primary-500 font-medium space-y-3">
-                        Current Price: {currency.format(item?.currentPrice)}
-                      </div>}
-                      {/* </div> */}
-                      {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date() &&
-                        new Date(auctionSession?.endDate) < new Date() ? (
-                        <SoldFor item={item} currency={currency} />
-                      ) : (
-                        <>
-                          {auctionSession?.hasDeposited ? (
-                            <Button
-                              className="space-y-2"
-                              onClick={() => {
-                                // dispatch(setCurrentAuctionSession(auctionSession));
-                                if (new Date(auctionSession?.startDate) > new Date() || new Date(auctionSession?.endDate) < new Date()) {
-                                  navigate(`/item/${item.itemDTO.itemId}`);
-                                  return;
-                                } else {
-                                  navigate(`join`, {
-                                    state: {
-                                      id: item?.id,
-                                      itemDTO: item?.itemDTO,
-                                      allow: auctionSession?.hasDeposited,
-                                    },
-                                  });
-                                }
-
-                              }}
-                            >
-                              { (new Date(auctionSession?.startDate) > new Date() || new Date(auctionSession?.endDate) < new Date()) ? 'View Details': 'Join Now'}
-                            </Button>
-                          ) : (
-                            <RegisterAlert></RegisterAlert>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                ))
+                      <CardContent className="space-y-2 p-4">
+                        <h3 className="text-sm font-semibold">{item.itemDTO.name}</h3>
+                      </CardContent>
+                      <div className="mt-auto space-y-2 p-4">
+                        {/* <div className="flex items-center justify-between mt-5"> */}
+                        {auctionSession.status === AuctionSessionStatus.PROGRESSING && (
+                          <div className="text-primary-500 font-medium space-y-3">
+                            Current Price: {currency.format(item?.currentPrice)}
+                          </div>
+                        )}
+                        {/* </div> */}
+                        {auctionSession?.status === AuctionSessionStatus.FINISHED ||
+                        (new Date(auctionSession?.endDate) < new Date() &&
+                          new Date(auctionSession?.endDate) < new Date()) ? (
+                          <SoldFor item={item} currency={currency} />
+                        ) : (
+                          <>
+                            {auctionSession?.hasDeposited ? (
+                              <Button
+                                className="space-y-2"
+                                onClick={() => {
+                                  // dispatch(setCurrentAuctionSession(auctionSession));
+                                  if (
+                                    new Date(auctionSession?.startDate) > new Date() ||
+                                    new Date(auctionSession?.endDate) < new Date()
+                                  ) {
+                                    navigate(`/item/${item.itemDTO.itemId}`);
+                                    return;
+                                  } else {
+                                    navigate(`join`, {
+                                      state: {
+                                        id: item?.id,
+                                        itemDTO: item?.itemDTO,
+                                        allow: auctionSession?.hasDeposited,
+                                      },
+                                    });
+                                  }
+                                }}
+                              >
+                                {new Date(auctionSession?.startDate) > new Date() ||
+                                new Date(auctionSession?.endDate) < new Date()
+                                  ? 'View Details'
+                                  : 'Join Now'}
+                              </Button>
+                            ) : (
+                              <RegisterAlert></RegisterAlert>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                  ))
                 : 'No Item'}
             </div>
           </div>

@@ -33,7 +33,6 @@ import PaymentsPieChart from './PaymentsBarChart';
 import PieChart from './PaymentsPieChart';
 import VectorMapComponent from './JvetorMap';
 
-
 const avatarSX = {
   width: 36,
   height: 36,
@@ -106,10 +105,9 @@ const AdminDashboard = () => {
           setTotalAuction(totalAuctionResponse.data);
         }
         const userOnlineResponse = await getUserOnline();
-        if(userOnlineResponse && userOnlineResponse.data){
+        if (userOnlineResponse && userOnlineResponse.data) {
           setTotalUser(userOnlineResponse.data);
         }
-
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -159,7 +157,7 @@ const AdminDashboard = () => {
         </Grid>
 
         <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
-        
+
         <Grid item xs={12} md={7} lg={8}>
           <PastAuctionReportCard />
         </Grid>
@@ -197,7 +195,7 @@ const AdminDashboard = () => {
                 <Typography variant="h3">${totalPayment.toLocaleString()}</Typography>
               </Stack>
             </Box>
-            <PaymentsBarChart selectedLabel={selectedLabel}/>
+            <PaymentsBarChart selectedLabel={selectedLabel} />
           </MainCard>
         </Grid>
 
@@ -206,10 +204,9 @@ const AdminDashboard = () => {
           <UniqueVisitorCard />
           {/* <LineChart/> */}
         </Grid>
-        
 
         {/* row 3 */}
-        
+
         {/* <Grid item xs={12} md={5} lg={4}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
@@ -322,7 +319,7 @@ const AdminDashboard = () => {
             </List>
           </MainCard>
         </Grid>
-        
+
         {/* grid bracket */}
       </Grid>
     </div>

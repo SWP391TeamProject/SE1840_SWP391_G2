@@ -1,16 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
 import Consignment from '@/models/consignment';
-import React, {useEffect} from 'react';
-import {Link} from 'react-router-dom';
-import {ConsignmentDetailType, ConsignmentStatus} from "@/constants/enums.tsx";
-import {Button} from "@/components/ui/button.tsx";
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ConsignmentDetailType, ConsignmentStatus } from '@/constants/enums.tsx';
+import { Button } from '@/components/ui/button.tsx';
 
 interface CustomerConsignmentCardProps {
   consignment: Consignment;
 }
 
-const CustomerConsignmentCard: React.FC<CustomerConsignmentCardProps> = ({ consignment}) => {
+const CustomerConsignmentCard: React.FC<CustomerConsignmentCardProps> = ({ consignment }) => {
   const [message, setMessage] = React.useState<string>('');
   const [ping, setPing] = React.useState<boolean>(false);
 
@@ -21,8 +21,7 @@ const CustomerConsignmentCard: React.FC<CustomerConsignmentCardProps> = ({ consi
         break;
       }
       case ConsignmentStatus.IN_INITIAL_EVALUATION: {
-        if (consignment.consignmentDetails.some((v) =>
-          v.type === ConsignmentDetailType.INITIAL_EVALUATION)) {
+        if (consignment.consignmentDetails.some((v) => v.type === ConsignmentDetailType.INITIAL_EVALUATION)) {
           setMessage('A staff has sent an initial evaluation');
           setPing(true);
         } else {
@@ -60,13 +59,12 @@ const CustomerConsignmentCard: React.FC<CustomerConsignmentCardProps> = ({ consi
         break;
       }
     }
-  }, [])
+  }, []);
 
   return (
     <>
       <Card className="w-[350px] relative">
-        {ping &&
-          <div className="w-4 h-4 rounded-full bg-red-500 animate-ping absolute absolute right-0 top-0" />}
+        {ping && <div className="w-4 h-4 rounded-full bg-red-500 animate-ping absolute absolute right-0 top-0" />}
         <CardHeader className="w-full">
           {consignment ? (
             <img
@@ -93,14 +91,12 @@ const CustomerConsignmentCard: React.FC<CustomerConsignmentCardProps> = ({ consi
         <CardContent className="space-y-2">
           <p className="mb-5">{message}</p>
           <Button size="sm" asChild>
-            <Link
-              to={`/dashboard/consignments/${consignment.consignmentId}`}>View
-              details</Link>
+            <Link to={`/dashboard/consignments/${consignment.consignmentId}`}>View details</Link>
           </Button>
         </CardContent>
       </Card>
     </>
   );
-}
+};
 
 export default CustomerConsignmentCard;

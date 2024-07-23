@@ -4,9 +4,7 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { DataTable } from '@/components/data-tables/data-table';
 import { DataTableToolbar } from '@/components/data-tables/data-table-toolbar';
 import getColumns from './consignments-table-column';
-import {
-  fetchAllConsignmentsService
-} from '@/services/ConsignmentService';
+import { fetchAllConsignmentsService } from '@/services/ConsignmentService';
 import { ConsignmentsTableFloatingBar } from './consignments-table-floating-bar';
 import { ConsignmentsTableToolbarActions } from './consignments-table-toolbar-actions';
 import { DataTableSkeleton } from '@/components/data-tables/data-tables-skeleton';
@@ -38,7 +36,7 @@ export function ConsignmentsTable({ consignmentPromise }: ConsignmentTableProps)
           error: (err) => {
             setIsLoading(false);
             return getErrorMessage(err);
-          },  
+          },
         });
 
         // setData(content);

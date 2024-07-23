@@ -1,20 +1,14 @@
-import {Dialog, DialogContent,} from '@/components/ui/dialog.tsx';
-import {Attachment} from '@/models/Attachment.ts';
+import { Dialog, DialogContent } from '@/components/ui/dialog.tsx';
+import { Attachment } from '@/models/Attachment.ts';
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel.tsx"
-import {useState} from "react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel.tsx';
+import { useState } from 'react';
 
 interface consignmentAttachmentGallery {
   attachments: Attachment[];
 }
 
-export default function ConsignmentAttachmentGallery({attachments}: consignmentAttachmentGallery) {
+export default function ConsignmentAttachmentGallery({ attachments }: consignmentAttachmentGallery) {
   const [open, setOpen] = useState(false);
   const [img, setImg] = useState<Attachment>();
 
@@ -22,14 +16,13 @@ export default function ConsignmentAttachmentGallery({attachments}: consignmentA
     <>
       <Carousel
         opts={{
-          align: "start",
+          align: 'start',
         }}
         className="mx-8"
       >
         <CarouselContent>
           {attachments?.map((attachment) => (
-            <CarouselItem key={attachment.attachmentId}
-                          className="md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={attachment.attachmentId} className="md:basis-1/2 lg:basis-1/3">
               <img
                 key={attachment.attachmentId}
                 alt="Product"
@@ -45,11 +38,11 @@ export default function ConsignmentAttachmentGallery({attachments}: consignmentA
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious/>
-        <CarouselNext/>
+        <CarouselPrevious />
+        <CarouselNext />
       </Carousel>
 
-      {img &&
+      {img && (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-[700px]">
             <img
@@ -59,7 +52,8 @@ export default function ConsignmentAttachmentGallery({attachments}: consignmentA
               src={img.link}
             />
           </DialogContent>
-        </Dialog>}
+        </Dialog>
+      )}
     </>
   );
 }

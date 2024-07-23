@@ -182,7 +182,7 @@ export default function AuctionJoin() {
         setShowCofetti(false);
       }, 3000);
     }
-    if ((auctionSession?.status === AuctionSessionStatus.SCHEDULED)) {
+    if (auctionSession?.status === AuctionSessionStatus.SCHEDULED) {
       navigate(`/auctions/${auctionId}`);
     }
   }, [auctionSession]);
@@ -207,8 +207,12 @@ export default function AuctionJoin() {
   }, [itemDTO]);
 
   useEffect(() => {
-    console.log( auctionSession);
-    if ( new Date(auctionSession?.endDate) > new Date() && new Date(auctionSession?.startDate) < new Date() && auctionSession?.hasDeposited) {
+    console.log(auctionSession);
+    if (
+      new Date(auctionSession?.endDate) > new Date() &&
+      new Date(auctionSession?.startDate) < new Date() &&
+      auctionSession?.hasDeposited
+    ) {
       const newClient = new Client({
         brokerURL:
           `https://${import.meta.env.VITE_BACKEND_DNS}/auction-join?token=` + JSON.parse(getCookie('user')).accessToken,
@@ -279,7 +283,16 @@ export default function AuctionJoin() {
       if (message?.status == 'BID')
         toast.info(message?.message, {
           action: (
-            <Button variant="outline" onClick={() => handleViewItemDetailsClick(auctionSession?.auctionItems?.filter((item) => item.itemDTO.itemId == message?.auctionItemId.itemId)[0])}>
+            <Button
+              variant="outline"
+              onClick={() =>
+                handleViewItemDetailsClick(
+                  auctionSession?.auctionItems?.filter(
+                    (item) => item.itemDTO.itemId == message?.auctionItemId.itemId
+                  )[0]
+                )
+              }
+            >
               View
             </Button>
           ),
@@ -450,33 +463,35 @@ export default function AuctionJoin() {
                     </div>
                   )}
 
-                  {auctionSession?.hasDeposited && new Date(auctionSession?.endDate) > new Date() && new Date() < new Date(auctionSession?.startDate) && (
-                    <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
-                      <BidsInformation
-                        auctionSession={auctionSession}
-                        price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0}
-                        bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
-                      />
-                      <div className="mx-auto">
-                        <PlaceBid
-                          auctionId={auctionId}
-                          itemId={itemDTO?.itemId}
-                          setIsSending={setIsSending}
-                          isSending={isSending}
-                          sendMessage={sendMessage}
-                          onMessageReceived={onMessageReceived}
-                          endDate={auctionSession?.endDate} // Added optional chaining for safety
-                          name={itemDTO?.name}
-                          image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
-                          client={client}
-                          currentBid={
-                            bids.filter((bid) => bid.auctionItemId?.itemId === itemDTO?.itemId)[0]?.price ||
-                            itemDTO?.reservePrice // Check if bids is defined and not empty
-                          }
+                  {auctionSession?.hasDeposited &&
+                    new Date(auctionSession?.endDate) > new Date() &&
+                    new Date() < new Date(auctionSession?.startDate) && (
+                      <div className=" drop-shadow-xl rounded-xl p-3 w-full flex justify-center flex-col gap-3   md:top-10 lg:top-16  bg-background border border-gray-700">
+                        <BidsInformation
+                          auctionSession={auctionSession}
+                          price={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)[0]?.price || 0}
+                          bids={bids.filter((bid) => bid.auctionItemId.itemId === itemDTO?.itemId)}
                         />
+                        <div className="mx-auto">
+                          <PlaceBid
+                            auctionId={auctionId}
+                            itemId={itemDTO?.itemId}
+                            setIsSending={setIsSending}
+                            isSending={isSending}
+                            sendMessage={sendMessage}
+                            onMessageReceived={onMessageReceived}
+                            endDate={auctionSession?.endDate} // Added optional chaining for safety
+                            name={itemDTO?.name}
+                            image={itemDTO?.attachments?.[0]?.link ?? '/src/assets/thumnail1.jpg'} // Ensure attachments is an array before accessing
+                            client={client}
+                            currentBid={
+                              bids.filter((bid) => bid.auctionItemId?.itemId === itemDTO?.itemId)[0]?.price ||
+                              itemDTO?.reservePrice // Check if bids is defined and not empty
+                            }
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             </div>

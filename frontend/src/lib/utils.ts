@@ -47,7 +47,10 @@ export function parseDate(dateString: any, fallback?: Date): Date | undefined {
   return date;
 }
 
-export function parseIntOrUndefined(value: string | null, fallback: number | undefined = undefined): number | undefined {
+export function parseIntOrUndefined(
+  value: string | null,
+  fallback: number | undefined = undefined
+): number | undefined {
   if (value === null) {
     return fallback;
   }
@@ -65,7 +68,7 @@ export const formatDateToISO = (date: Date | undefined | null): string | undefin
   return dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
 };
 
-export function truncateHtml(html:string, maxLength: number): string {
+export function truncateHtml(html: string, maxLength: number): string {
   let count = 0;
   let result = '';
   let openTags = [];
@@ -78,7 +81,8 @@ export function truncateHtml(html:string, maxLength: number): string {
         let tagStart = count + 1;
         let tagEnd = html.indexOf('>', tagStart);
         let tag = html.substring(tagStart, tagEnd);
-        if (tag[tag.length - 1] !== '/') { // Ignore self-closing tags
+        if (tag[tag.length - 1] !== '/') {
+          // Ignore self-closing tags
           openTags.push(tag.split(' ')[0]); // Push tag name, ignoring attributes
         }
       } else {

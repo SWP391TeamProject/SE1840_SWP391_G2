@@ -9,13 +9,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-tables/data-table-column-header';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/redux/hooks';
 import { formatDate } from '@/lib/utils';
 import { setCurrentBlogPost } from '@/redux/reducers/Blogs';
 import BlogService from '@/services/BlogService';
-import AccountTooltip from "@/pages/Administration/Tooltip/AccountTooltip.tsx";
-import {BlogPost} from "@/models/newModel/blogPost.ts";
+import AccountTooltip from '@/pages/Administration/Tooltip/AccountTooltip.tsx';
+import { BlogPost } from '@/models/newModel/blogPost.ts';
 
 export const getColumns = (): ColumnDef<BlogPost>[] => [
   {
@@ -63,11 +63,10 @@ export const getColumns = (): ColumnDef<BlogPost>[] => [
   {
     accessorKey: 'author.nickname',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Author" />,
-    cell: ({row}) => {
+    cell: ({ row }) => {
       return (
         <AccountTooltip account={row.original.author}>
-          <Link
-            to={`/account/${row.original.author.accountId}`}>{row.original.author.nickname}</Link>
+          <Link to={`/account/${row.original.author.accountId}`}>{row.original.author.nickname}</Link>
         </AccountTooltip>
       );
     },

@@ -70,11 +70,7 @@ function LoginForm() {
       });
   };
 
-
-  useLayoutEffect(()=>{
-    
-  },[])
-
+  useLayoutEffect(() => {}, []);
 
   useGSAP(
     () => {
@@ -134,11 +130,7 @@ function LoginForm() {
                   Forgot your password?
                 </Link>
               </div>
-              <PasswordInput
-                id="password"
-                {...register('password')}
-                required
-              />
+              <PasswordInput id="password" {...register('password')} required />
               {/* <Input id="password" type="password" {...register('password')} required /> */}
             </div>
 

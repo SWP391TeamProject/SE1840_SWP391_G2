@@ -41,7 +41,7 @@ export const removeCookie = (cookieName: string) => {
 };
 
 export const getBearerToken = () => {
-  const user = getCookie("user");
+  const user = getCookie('user');
   if (user && user.length > 0) {
     const token = JSON.parse(user).accessToken;
     if (token) {
@@ -49,4 +49,4 @@ export const getBearerToken = () => {
     }
   }
   return undefined;
-}
+};
