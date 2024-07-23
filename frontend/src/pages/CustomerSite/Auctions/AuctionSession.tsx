@@ -322,7 +322,7 @@ export default function AuctionSession() {
   const handleViewItemDetailsClick = async (item: Item, auctionId: number) => {
     const startDate = new Date(auctionSession?.startDate);
     const endDate = new Date(auctionSession?.endDate);
-    navigate(`/item/${item.itemId}`);
+    navigate(`/jewelries/${item.itemId}`);
   };
 
   const handleCategoryFilter = (...event: any) => {
@@ -483,7 +483,7 @@ export default function AuctionSession() {
                                   new Date(auctionSession?.startDate) > new Date() ||
                                   new Date(auctionSession?.endDate) < new Date()
                                 ) {
-                                  navigate(`/item/${item.itemDTO.itemId}`);
+                                  navigate(`/jewelries/${item.itemDTO.itemId}`);
                                   return;
                                 } else {
                                   navigate(`join`, {

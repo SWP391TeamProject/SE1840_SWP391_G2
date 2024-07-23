@@ -180,7 +180,7 @@ export default function AssignAuctionItem() {
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.itemId}</TableCell>
                       <TableCell className="font-medium">
-                        <Link to={`/admin/items/${item.itemId}`} target="_blank">
+                        <Link to={`/admin/jewelry/${item.itemId}`} target="_blank">
                           {item.name}
                         </Link>
                       </TableCell>
@@ -217,7 +217,7 @@ export default function AssignAuctionItem() {
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item?.itemId}</TableCell>
                       <TableCell className="font-medium">
-                        <Link to={`/admin/items/${item.itemId}`} target="_blank">
+                        <Link to={`/admin/jewelry/${item.itemId}`} target="_blank">
                           {item.name}
                         </Link>
                       </TableCell>

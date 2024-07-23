@@ -164,6 +164,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             deposit = depositRepos.save(deposit);
 
             auctionSession.getDeposits().add(deposit);
+            auctionSession.setParticipantCount(auctionSession.getParticipantCount() + 1);
             auctionSession = auctionSessionRepos.save(auctionSession);
 
             return mapAuctionSessionToDTO(auctionSession, accountId);

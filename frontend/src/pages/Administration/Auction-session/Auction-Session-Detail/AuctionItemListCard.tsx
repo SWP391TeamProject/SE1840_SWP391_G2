@@ -48,7 +48,7 @@ export const AuctionItemListCard: React.FC<{
             {auction.auctionItems?.map((item): any => (
               <TableRow className="bg-accent" key={item?.id.itemId}>
                 <TableCell>
-                  <Link to={`/admin/items/${item.itemDTO.itemId}`}
+                  <Link to={`/admin/jewelry/${item.itemDTO.itemId}`}
                         target="_blank">
                     {item.itemDTO.name}
                   </Link>

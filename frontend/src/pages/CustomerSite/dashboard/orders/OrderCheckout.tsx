@@ -181,7 +181,7 @@ export function OrderCheckout() {
                   />
                   <div>
                     <h3 className="font-medium">
-                      <a href={`/item/${detail.item.itemId}`}>{detail.item.name}</a>
+                      <a href={`/jewelries/${detail.item.itemId}`}>{detail.item.name}</a>
                     </h3>
                   </div>
                   <div className="text-right">

@@ -95,10 +95,16 @@ public class ConsignmentController {
 
     @GetMapping("/secret/{code}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
-    public ResponseEntity<ConsignmentDTO> getConsignmentBySecretCode(@PathVariable String code) {
+    public ResponseEntity<ConsignmentDTO> getConsignmentBySecretCode(Principal principal,
+                                                                     @PathVariable String code) {
         ConsignmentDTO consignment = consignmentService.getConsignmentBySecretCode(code);
         if (consignment == null) {
             throw new ConsignmentServiceException("No consignments found for code: " + code);
+        }
+        JwtUser requester = Authorizer.requireUser(principal);
+        if (requester.getRole() == Account.Role.STAFF &&
+                requester.getUserId() != consignment.getStaff().getAccountId()) {
+            throw new ConsignmentServiceException("You have no permission to view this consignment!");
         }
         return new ResponseEntity<>(consignment, HttpStatus.OK);
     }

@@ -8,15 +8,43 @@ import ConsignmentAttachmentGallery from '@/pages/Administration/consignments/co
 import { useAuth } from '@/AuthProvider.tsx';
 import { ConsignmentDetailType, Roles } from '@/constants/enums.tsx';
 import AccountRoleBadge from '@/components/AccountRoleBadge.tsx';
+import {useEffect, useState} from "react";
 
 interface ConsignmentHistoryCardProps {
   consignment: Consignment;
   className?: string;
 }
 
+function filterConsignmentDetails(consignmentDetails: ConsignmentDetail[], isMember: boolean): ConsignmentDetail[] {
+  if (!isMember) {
+    return consignmentDetails.sort((a, b) =>
+      (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
+  }
+
+  const initialEvaluations = consignmentDetails.filter(detail =>
+    detail.type === ConsignmentDetailType.INITIAL_EVALUATION);
+  const managerAccepted = consignmentDetails.some(detail =>
+    detail.type === ConsignmentDetailType.MANAGER_ACCEPTED);
+
+  if (managerAccepted) {
+    const fe = consignmentDetails.filter(detail =>
+      detail.type === ConsignmentDetailType.FINAL_EVALUATION);
+    if (fe.length > 0) {
+      const lfe = fe.reduce((prev, curr) =>
+        (curr.consignmentDetailId ?? 0) > (prev.consignmentDetailId ?? 0) ? curr : prev);
+      initialEvaluations.push(lfe);
+    }
+  }
+
+  return initialEvaluations.sort((a, b) =>
+    (b.consignmentDetailId ?? 0) - (a.consignmentDetailId ?? 0));
+}
+
+
 const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consignment, className }) => {
   const currency = useCurrency();
   const auth = useAuth();
+  const [details, setDetails] = useState<ConsignmentDetail[]>([]);
 
   const messages = {
     INITIAL_EVALUATION: (cd: ConsignmentDetail) => `sent an initial evaluation of ${currency.format(cd.price)}`,
@@ -25,6 +53,10 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consign
     MANAGER_ACCEPTED: (cd: ConsignmentDetail) => `has accepted the evaluation of ${currency.format(cd.price)}`,
   };
 
+  useEffect(() => {
+    setDetails(filterConsignmentDetails(consignment.consignmentDetails, auth.user.role === Roles.MEMBER));
+  }, [consignment]);
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -32,13 +64,7 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consign
         <CardDescription>This is where you can see the history of this consignment</CardDescription>
       </CardHeader>
       <CardContent className="overflow-hidden flex flex-col gap-6">
-        {consignment.consignmentDetails
-          .filter(
-            (cd) =>
-              auth.user.role !== Roles.MEMBER ||
-              cd.type === ConsignmentDetailType.INITIAL_EVALUATION ||
-              cd.type === ConsignmentDetailType.FINAL_EVALUATION
-          )
+        {details
           .sort((a, b) => b.consignmentDetailId - a.consignmentDetailId)
           .map((cd) => (
             <div className="flex flex-col" key={cd.consignmentDetailId}>
@@ -65,10 +91,12 @@ const ConsignmentHistoryCard: React.FC<ConsignmentHistoryCardProps> = ({ consign
             </div>
           ))}
 
-        <div className="flex flex-col flex-row">
-          <div className="flex flex-row justify-between gap-2">
+        <div className="flex flex-col">
+          <div className="flex flex-row flex-wrap justify-between gap-2">
             <p className="font-semibold text-lg flex flex-row gap-3">
-              <AccountRoleBadge role={consignment.user.role} />
+              <div>
+                <AccountRoleBadge role={consignment.user.role} />
+              </div>
               <p>{consignment.user.nickname}</p>
             </p>
             <p className="ml-auto">{formatDateTime(consignment.createDate)}</p>

@@ -141,7 +141,7 @@ export const getColumns = (): ColumnDef<Payment>[] => [
         case PaymentType.CONSIGNMENT_REWARD: {
           return (
             <Button size="sm" asChild>
-              <Link to={`/item/${row.original.consignmentRewardItemId}`} target="_blank">
+              <Link to={`/jewelries/${row.original.consignmentRewardItemId}`} target="_blank">
                 View item
               </Link>
             </Button>

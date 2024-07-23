@@ -50,7 +50,7 @@ export default function CategoriesSection() {
         </div>
         <div className="flex justify-center">
           <Button className="hover:bg-gray-100 dark:hover:bg-gray-800" variant="outline" asChild>
-            <Link to="/items">View More</Link>
+            <Link to="/jewelries">View More</Link>
           </Button>
         </div>
       </section>

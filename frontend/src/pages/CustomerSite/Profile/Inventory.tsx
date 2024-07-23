@@ -59,7 +59,7 @@ const Inventory = () => {
                   />
                 </CardHeader>
                 <CardContent>
-                  <Link to={`/item/${item.itemId}`} className="text-lg font-semibold">
+                  <Link to={`/jewelries/${item.itemId}`} className="text-lg font-semibold">
                     {item.name}
                   </Link>
                 </CardContent>
