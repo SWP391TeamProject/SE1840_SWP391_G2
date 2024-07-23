@@ -241,7 +241,8 @@ public class DbGenService {
             Consignment consignment = new Consignment();
             consignment.setConsignmentId(obj.get("id").getAsInt());
             consignment.setUser(accountRepos.getReferenceById(obj.get("userId").getAsInt()));
-            consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
+            if (obj.has("staffId"))
+                consignment.setStaff(accountRepos.getReferenceById(obj.get("staffId").getAsInt()));
             consignment.setStatus(Consignment.Status.valueOf(obj.get("status").getAsString()));
             consignment.setPreferContact(Consignment.preferContact.valueOf(obj.get("preferContact").getAsString()));
             consignment.setCreateDate(parseDate(obj.get("createDate").getAsString()));

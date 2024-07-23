@@ -4,7 +4,7 @@ export interface Consignment {
   __name: string, // lưu tạm
   __categoryId: number, // lưu tạm
   userId: number,
-  staffId: number,
+  staffId?: number,
   id: number,
   status: ConsignmentStatus,
   preferContact: string,

@@ -259,7 +259,7 @@ export function genConsignment(roleToAccounts: Record<Role, Account[]>, items: C
             __categoryId: crawledItem.categoryId,
             id: i + 1,
             userId: sender.id,
-            staffId: staffId,
+            staffId: status == ConsignmentStatus.WAITING_STAFF ? undefined : staffId,
             status: status,
             stamped: faker.helpers.arrayElement(stampedNames),
             color: faker.helpers.arrayElement(colorNames),
