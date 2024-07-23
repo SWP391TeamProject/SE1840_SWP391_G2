@@ -323,7 +323,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
             bidCount += bids.size();
 
             Item item = auctionItem.getItem();
-            item.setStatus(bids.isEmpty() ? Item.Status.QUEUE : Item.Status.SOLD);
+            item.setStatus(bids.isEmpty() ? Item.Status.QUEUE : Item.Status.IN_ORDER);
             itemRepos.save(item);
 
             for (int i = 0; i < bids.size(); i++) {

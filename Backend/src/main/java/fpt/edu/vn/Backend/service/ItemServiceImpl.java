@@ -38,6 +38,9 @@ public class ItemServiceImpl implements ItemService {
             Item.Status.IN_AUCTION, Set.of(
                     Item.Status.IN_AUCTION
             ),
+            Item.Status.IN_ORDER, Set.of(
+                    Item.Status.IN_ORDER
+            ),
             Item.Status.SOLD, Set.of(
                     Item.Status.SOLD
             ),

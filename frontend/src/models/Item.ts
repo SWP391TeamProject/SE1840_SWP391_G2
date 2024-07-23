@@ -13,6 +13,7 @@ export interface Item {
   createDate: string;
   updateDate: string;
   owner: Account;
+  buyer: Account;
   color: string;
   weight: number;
   metal: string;
@@ -26,6 +27,7 @@ export interface Item {
 export enum ItemStatus {
   QUEUE = 'QUEUE',
   IN_AUCTION = 'IN_AUCTION',
+  IN_ORDER = 'IN_ORDER',
   SOLD = 'SOLD',
   REMOVED = 'REMOVED',
 }
@@ -37,6 +39,7 @@ type StatusMap = {
 const VALID_TRANSITIONS: StatusMap = {
   [ItemStatus.QUEUE]: new Set([ItemStatus.QUEUE, ItemStatus.REMOVED]),
   [ItemStatus.IN_AUCTION]: new Set([ItemStatus.IN_AUCTION]),
+  [ItemStatus.IN_ORDER]: new Set([ItemStatus.IN_ORDER]),
   [ItemStatus.SOLD]: new Set([ItemStatus.SOLD]),
   [ItemStatus.REMOVED]: new Set([ItemStatus.REMOVED]),
 };
