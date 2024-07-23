@@ -79,7 +79,7 @@ const ConsignmentIntroCard: React.FC<ConsignmentIntroCardProps> = ({ consignment
           <h2 className="text-3xl">Consignment #{consignment?.consignmentId}</h2>
           {consignment.createdItemId && (
             <Button size="sm" asChild>
-              <Link to={`/item/${consignment.createdItemId}`}>View item</Link>
+              <Link to={`/jewelries/${consignment.createdItemId}`}>View item</Link>
             </Button>
           )}
         </CardTitle>

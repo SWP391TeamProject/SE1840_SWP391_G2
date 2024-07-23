@@ -29,7 +29,7 @@ export const Bids = () => {
     window.scrollTo(0, 0);
   }, []);
   const handleViewItemDetailsClick = async (bid: any) => {
-    nav('/Item/' + bid.auctionItemId.itemId);
+    nav('/jewelries/' + bid.auctionItemId.itemId);
   };
   const handleViewAuctionDetailsClick = (id: any) => {
     nav('/Auctions/' + id);
