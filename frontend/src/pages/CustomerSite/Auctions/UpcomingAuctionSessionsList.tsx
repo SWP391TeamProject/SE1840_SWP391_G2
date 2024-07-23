@@ -2,9 +2,10 @@ import CountDownTime from '@/components/countdownTimer/CountDownTime';
 import LoadingAnimation from '@/components/loadingAnimation/LoadingAnimation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { AuctionSessionStatus } from '@/models/newModel/auctionSession';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setAuctionSessions, setCurrentAuctionSession, setCurrentPageNumber } from '@/redux/reducers/AuctionSession';
-import { fetchUpcomingAuctionSessions } from '@/services/AuctionSessionService';
+import { fetchUpcomingAuctionSessions, getAuctions } from '@/services/AuctionSessionService';
 import { useQuery } from '@tanstack/react-query';
 import { User2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -17,7 +18,13 @@ export default function UpcomingAuctionSessionsList() {
 
   const { isLoading, isPending, isError, data, error } = useQuery({
     queryKey: ['auctions'],
-    queryFn: () => fetchUpcomingAuctionSessions(auctionSessionList.currentPageNumber, 10),
+    queryFn: () => getAuctions(
+      {
+        page: 0,
+        size: 20,
+        status: AuctionSessionStatus.PROGRESSING,
+      }
+    ),
   });
 
   const [timeLeft, setTimeLeft] = useState({

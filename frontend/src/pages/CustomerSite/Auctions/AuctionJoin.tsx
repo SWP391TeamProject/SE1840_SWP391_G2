@@ -51,7 +51,7 @@ export default function AuctionJoin() {
   const [isJoin, setIsJoin] = useState(true);
   const auctionSession = useAppSelector((state) => state.auctionSessions.currentAuctionSession);
   const [itemDTO, setItemDTO] = useState<Item | undefined>(
-    location?.state?.itemDTO || auctionSession?.auctionItems[0]?.itemDTO
+    location?.state?.itemDTO ?? auctionSession?.auctionItems[0]?.itemDTO
   );
 
   const dispatch = useAppDispatch();
@@ -102,7 +102,6 @@ export default function AuctionJoin() {
         .then((response) => {
           dispatch(setCurrentAuctionSession(response));
           console.log(response);
-          setItemDTO(response?.auctionItems[0].itemDTO);
           setAllow(auctionSession?.hasDeposited);
           if (response.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
             setShowCofetti(true);
@@ -129,7 +128,6 @@ export default function AuctionJoin() {
         });
     } else {
       setAllow(auctionSession?.hasDeposited);
-      setItemDTO(auctionSession?.auctionItems[0].itemDTO);
       if (auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date()) {
         setShowCofetti(true);
         setTimeout(() => {
