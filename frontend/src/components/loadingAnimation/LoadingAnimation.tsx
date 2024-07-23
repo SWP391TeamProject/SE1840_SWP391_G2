@@ -22,7 +22,7 @@ export default function LoadingAnimation({ message = 'Loading...' }) {
   const loadingScreenMessage = messages[Math.floor(Math.random() * messages.length)];
 
   return (
-    <div className="w-full max-w-screen-5xl  h-[80%] bg-transparent flex flex-col justify-center items-center absolute mx-auto my-auto">
+    <div className="w-full max-w-screen-5xl w-full  h-[80%] bg-transparent flex flex-col justify-center items-center absolute mx-auto my-auto">
       <div className="w-auto relative">
         {' '}
         {/* Add relative here */}

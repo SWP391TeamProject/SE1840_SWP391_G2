@@ -34,7 +34,7 @@ const formSchema = z.object({
   nickname: z
     .string()
     .min(5, 'Nickname must be at least 5 characters')
-    .max(20, 'Nickname must not be longer than 20 characters'),
+    .max(40, 'Nickname must not be longer than 40 characters'),
   email: z.string().email({
     message: 'Invalid email address.',
   }),

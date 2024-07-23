@@ -39,7 +39,7 @@ const CountDownTime: React.FC<Props> = ({ end, className, messageOnEnd }) => {
     if (timeLeft > 0) {
       const interval = setInterval(() => {
         setTimeLeft(calculateTimeLeft());
-      }, 1000);
+      }, 300);
 
       return () => clearInterval(interval);
     }
@@ -47,5 +47,4 @@ const CountDownTime: React.FC<Props> = ({ end, className, messageOnEnd }) => {
 
   return <span className={className}>{timeLeft <= 0 ? messageOnEnd || 'Auction Ended' : formatTime(timeLeft)}</span>;
 };
-
 export default CountDownTime;

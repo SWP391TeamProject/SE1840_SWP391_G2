@@ -12,9 +12,10 @@ import { TimePickerDemo } from './time-picker-demo';
 
 interface DateTimePickerProps {
   name: string;
+  placeholder?: string;
 }
 
-export function DateTimePicker({ name }: DateTimePickerProps) {
+export function DateTimePicker({ name ,placeholder}: DateTimePickerProps) {
   const { setValue, watch } = useFormContext();
   const date = watch(name);
 
@@ -38,7 +39,7 @@ export function DateTimePicker({ name }: DateTimePickerProps) {
           className={cn('w-[280px] justify-start text-left font-normal', !date && 'text-muted-foreground')}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, 'PPP HH:mm:ss') : <span>Pick a date</span>}
+          {date ? format(date, 'PPP HH:mm:ss') : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

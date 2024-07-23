@@ -159,7 +159,7 @@ export function OrdersTableToolbarActions({ table }: TasksTableToolbarActionsPro
                         onCheckedChange={field.onChange}/>
                     )}
                   />
-                  <DateTimePicker {...form.register("from")} />
+                  <DateTimePicker {...form.register("from")}  placeholder='from'/>
                 </div>
                 <div className="flex justify-center items-center gap-2">
                   <FormField
@@ -171,7 +171,7 @@ export function OrdersTableToolbarActions({ table }: TasksTableToolbarActionsPro
                         onCheckedChange={field.onChange}/>
                     )}
                   />
-                  <DateTimePicker {...form.register("to")} />
+                  <DateTimePicker {...form.register("to")}  placeholder='to'/>
                 </div>
               </div>
             </PopoverContent>

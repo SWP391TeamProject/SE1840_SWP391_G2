@@ -27,6 +27,7 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {DateTimePicker} from "@/components/time-picker/date-time-picker.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {AuctionSession} from "@/models/AuctionSessionModel.ts";
+import { Label } from '@/components/ui/label';
 
 interface TasksTableToolbarActionsProps {
   table: Table<AuctionSession>;
@@ -123,12 +124,13 @@ export function AuctionSessionsTableToolbarActions({table}: TasksTableToolbarAct
                     control={form.control}
                     name="useFrom"
                     render={({field}) => (
+
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}/>
                     )}
                   />
-                  <DateTimePicker {...form.register("from")} />
+                  <DateTimePicker {...form.register("from")}  placeholder='from' />
                 </div>
                 <div className="flex justify-center items-center gap-2">
                   <FormField
@@ -140,7 +142,7 @@ export function AuctionSessionsTableToolbarActions({table}: TasksTableToolbarAct
                         onCheckedChange={field.onChange}/>
                     )}
                   />
-                  <DateTimePicker {...form.register("to")} />
+                  <DateTimePicker {...form.register("to")}  placeholder='to'placeholder='to' />
                 </div>
               </div>
             </PopoverContent>

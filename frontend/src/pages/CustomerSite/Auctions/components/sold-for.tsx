@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Item } from '@/models/Item';
-import { AuctionItem } from '@/models/newModel/auctionItem';
+import { AuctionItem } from '@/models/auctionItem';
 import { formatDate } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -18,6 +18,14 @@ interface propsType {
 function SoldFor({ item, currency }: propsType) {
   const elementRef = useRef();
   const nav = useNavigate();
+
+  const isSold = useCallback(() => {
+    if (item?.itemDTO?.status === 'SOLD') {
+      return true;
+    }
+    return false;
+  }, [item]);
+
   useGSAP(() => {
     gsap.fromTo(
       elementRef.current,
@@ -45,7 +53,11 @@ function SoldFor({ item, currency }: propsType) {
       <CardContent className="p-4">
         <div className="m-auto">
           <span className=" text-sm font-semibold text-gray-600">Sold for: </span>
-          <span className=" text-xl font-bold text-gray-900">{currency.format(item?.currentPrice)}</span>
+          {isSold ?
+            <span className=" text-xl font-bold text-gray-900">{currency.format(item?.currentPrice)}</span>
+            :
+            <span className=" text-xl font-bold text-gray-900">Not Sold</span>
+          }
         </div>
       </CardContent>
       <CardFooter className="flex justify-end p-4">

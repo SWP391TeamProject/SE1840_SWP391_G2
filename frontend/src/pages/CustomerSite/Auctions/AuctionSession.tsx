@@ -476,9 +476,10 @@ export default function AuctionSession() {
                     </CardContent>
                     <div className="mt-auto space-y-2 p-4">
                       {/* <div className="flex items-center justify-between mt-5"> */}
+                      { auctionSession.status === AuctionSessionStatus.PROGRESSING &&
                       <div className="text-primary-500 font-medium space-y-3">
                         Current Price: {currency.format(item?.currentPrice)}
-                      </div>
+                      </div>}
                       {/* </div> */}
                       {auctionSession?.status === AuctionSessionStatus.FINISHED || new Date(auctionSession?.endDate) < new Date() &&
                         new Date(auctionSession?.endDate) < new Date() ? (
