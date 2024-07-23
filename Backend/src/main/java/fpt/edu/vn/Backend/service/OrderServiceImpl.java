@@ -310,6 +310,7 @@ public class OrderServiceImpl implements OrderService {
                 Preconditions.checkState(item.getStatus() == Item.Status.IN_ORDER);
                 item.setStatus(Item.Status.SOLD);
                 item.setConsignmentRewardPayment(rewardPayment);
+                item.setBuyer(account);
                 itemRepos.save(item);
 
                 AuctionItem ai = auctionItemRepos.findLatestAuctionItemByItemId(item.getItemId());

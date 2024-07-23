@@ -59,8 +59,12 @@ public class Item {
     private LocalDateTime updateDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "seller_id")
     private Account owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id")
+    private Account buyer;
 
     @Column(length = 30,columnDefinition = "NVARCHAR(30)")
     private String color;

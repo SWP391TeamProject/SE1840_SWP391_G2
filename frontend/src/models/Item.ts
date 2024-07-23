@@ -13,6 +13,7 @@ export interface Item {
   createDate: string;
   updateDate: string;
   owner: Account;
+  buyer: Account;
   color: string;
   weight: number;
   metal: string;
