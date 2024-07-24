@@ -24,6 +24,7 @@ export function PublicItemDetail() {
   const itemId = parseInt(useParams().id);
   const [loading, setLoading] = useState(true);
   const [item, setItem] = useState({} as Item);
+  const [removed, setRemoved] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(noImagePlaceholder);
   const [pastAuction, setPastAuction] = useState([] as AuctionSession[]);
 
@@ -32,6 +33,10 @@ export function PublicItemDetail() {
       .then((res) => {
         setLoading(false);
         setItem(res);
+        if (res.status == ItemStatus.REMOVED) {
+          setRemoved(true);
+          return;
+        }
 
         if (res.attachments && res.attachments.length > 0) setSelectedImageUrl(res.attachments[0].link);
 
@@ -57,6 +62,11 @@ export function PublicItemDetail() {
       {loading ? (
         <LoadingAnimation />
       ) : (
+        removed ?
+          <div className="text-center text-4xl absolute h-full w-full flex justify-center items-center">
+            <p>Item not found</p>
+          </div>
+          :
         <div className="container w-full py-12">
           <div className="flex flex-row flex-wrap md:flex-nowrap gap-10">
             <div className="basis-1/12">

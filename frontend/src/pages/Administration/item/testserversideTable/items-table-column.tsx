@@ -86,7 +86,7 @@ export const getColumns = (): ColumnDef<Item>[] => [
   },
   {
     accessorKey: 'owner.nickname',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Owner" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Seller" />,
     cell: ({ row }) => {
       return (
         <AccountTooltip account={row.original.owner}>
@@ -94,6 +94,15 @@ export const getColumns = (): ColumnDef<Item>[] => [
         </AccountTooltip>
       );
     },
+  },
+  {
+    accessorKey: 'buyer.nickname',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Buyer" />,
+    cell: ({ row }) =>
+      (row.original.buyer &&
+        <AccountTooltip account={row.original.buyer}>
+          <Link to={`/admin/account/${row.original.buyer.accountId}`}>{row.original.buyer.nickname}</Link>
+        </AccountTooltip>),
   },
   {
     id: 'actions',

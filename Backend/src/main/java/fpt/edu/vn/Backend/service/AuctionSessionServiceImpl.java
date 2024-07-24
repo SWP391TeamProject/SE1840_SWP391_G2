@@ -457,7 +457,7 @@ public class AuctionSessionServiceImpl implements AuctionSessionService {
                 continue;
             Account account = p.getAccount();
             Participant participant = participants.get(account.getAccountId());
-            if (!participant.wonItems.isEmpty()) {
+            if (participant == null || !participant.wonItems.isEmpty()) {
                 logger.info("Skipped refunding deposit id {} for account {} because being winner",
                         deposit.getDepositId(), account.getAccountId());
                 continue;
