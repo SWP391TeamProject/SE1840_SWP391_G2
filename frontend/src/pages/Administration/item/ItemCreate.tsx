@@ -184,7 +184,7 @@ export default function ItemCreate() {
                   name="ownerId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Owner ID</FormLabel>
+                      <FormLabel>Seller ID</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} disabled={consignment !== undefined} />
                       </FormControl>
