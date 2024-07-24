@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,4 +36,54 @@ public interface PaymentRepos extends JpaRepository<Payment, Integer>, JpaSpecif
 
     @Query("SELECT p FROM Payment p WHERE p.status = 'PENDING' AND p.type = :type AND p.createDate <= :dayAgo")
     List<Payment> findAllPendingPaymentWithPaymentCreatedBefore(LocalDateTime dayAgo, Payment.Type type);
+
+
+    @Query("SELECT SUM(p.paymentAmount) FROM Payment p WHERE (:accountId IS NULL OR p.account.id = :accountId) " +
+            "AND (:startDate IS NULL OR p.createDate >= :startDate) " +
+            "AND (:endDate IS NULL OR p.createDate <= :endDate) " +
+            "AND p.type = 'DEPOSIT' " +
+            "AND p.status = 'SUCCESS'")
+    BigDecimal getInboundFund(@Param("accountId") Integer accountId,
+                              @Param("startDate") LocalDateTime startDate,
+                              @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT SUM(p.paymentAmount) FROM Payment p WHERE (:accountId IS NULL OR p.account.id = :accountId) " +
+            "AND (:startDate IS NULL OR p.createDate >= :startDate) " +
+            "AND (:endDate IS NULL OR p.createDate <= :endDate) " +
+            "AND p.type = 'WITHDRAW' " +
+            "AND p.status = 'SUCCESS'")
+    BigDecimal getOutgoingFund(@Param("accountId") Integer accountId,
+                               @Param("startDate") LocalDateTime startDate,
+                               @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT SUM(p.paymentAmount) FROM Payment p WHERE (:accountId IS NULL OR p.account.id = :accountId) " +
+            "AND (:startDate IS NULL OR p.createDate >= :startDate) " +
+            "AND (:endDate IS NULL OR p.createDate <= :endDate) " +
+            "AND ((p.type = 'WITHDRAW' " +
+            "AND p.status = 'PENDING') " +
+            "OR (p.type = 'AUCTION_DEPOSIT' " +
+            "AND p.status = 'PENDING'))")
+    BigDecimal getFrozenMoney(@Param("accountId") Integer accountId,
+                              @Param("startDate") LocalDateTime startDate,
+                              @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT SUM(p.paymentAmount) FROM Payment p WHERE (:accountId IS NULL OR p.account.id = :accountId) " +
+            "AND (:startDate IS NULL OR p.createDate >= :startDate) " +
+            "AND (:endDate IS NULL OR p.createDate <= :endDate) " +
+            "AND ((p.type = 'DEPOSIT' " +
+            "AND p.status = 'SUCCESS') " +
+            "OR (p.type = 'CONSIGNMENT_REWARD' " +
+            "AND p.status = 'SUCCESS'))")
+    BigDecimal getWalletDeposit(@Param("accountId") Integer accountId,
+                                @Param("startDate") LocalDateTime startDate,
+                                @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT SUM(p.paymentAmount) FROM Payment p WHERE (:accountId IS NULL OR p.account.id = :accountId) " +
+            "AND (:startDate IS NULL OR p.createDate >= :startDate) " +
+            "AND (:endDate IS NULL OR p.createDate <= :endDate) " +
+            "AND p.type = 'AUCTION_ORDER' " +
+            "AND p.status = 'SUCCESS'")
+    BigDecimal getWalletWithdrawal(@Param("accountId") Integer accountId,
+                                   @Param("startDate") LocalDateTime startDate,
+                                   @Param("endDate") LocalDateTime endDate);
 }

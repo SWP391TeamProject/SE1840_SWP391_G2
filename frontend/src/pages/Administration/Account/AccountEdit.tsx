@@ -60,7 +60,6 @@ export default function AccountEdit() {
       nickname: '',
       email: '',
       phone: '',
-      balance: 0,
       role: Roles.MEMBER,
       status: AccountStatus.ACTIVE,
       dummy: false,
@@ -81,7 +80,6 @@ export default function AccountEdit() {
           nickname: res.data.nickname,
           email: res.data.email,
           phone: res.data.phone || '',
-          balance: res.data.balance,
           role: res.data.role,
           dummy: res.data.dummy,
           status: res.data.status,
@@ -107,7 +105,6 @@ export default function AccountEdit() {
       accountId: data.accountId,
       nickname: data.nickname,
       phone: data.phone,
-      balance: data.balance,
       role: data.role,
       dummy: data.dummy,
       status: data.status,
@@ -186,19 +183,6 @@ export default function AccountEdit() {
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
                     <Input placeholder="Phone number" type="phone" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="balance"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Balance: {currency.format(field.value)}</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

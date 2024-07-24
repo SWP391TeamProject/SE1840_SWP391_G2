@@ -6,6 +6,7 @@ import fpt.edu.vn.Backend.DTO.PaymentDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentCaptureRequestDTO;
 import fpt.edu.vn.Backend.DTO.request.PaymentRequest;
 import fpt.edu.vn.Backend.DTO.request.UpdatePaymentStatusRequestDTO;
+import fpt.edu.vn.Backend.DTO.response.PaymentSummaryDTO;
 import fpt.edu.vn.Backend.config.VnPayConfig;
 import fpt.edu.vn.Backend.exception.ResourceNotFoundException;
 import fpt.edu.vn.Backend.pojo.Account;
@@ -20,12 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -59,6 +62,29 @@ public class PaymentController {
             user = requester.getUserId(); // only get payments of current user
         }
         return ResponseEntity.ok(paymentService.getAllPayment(pageable, type, status, from, to, user, search));
+    }
+
+    @GetMapping("/payment-summary")
+    public ResponseEntity<PaymentSummaryDTO> getPaymentSummary(
+            @RequestParam(required = false) Integer accountId,
+            @RequestParam(required = false) LocalDateTime startDate,
+            @RequestParam(required = false) LocalDateTime endDate
+    ) {
+        BigDecimal inboundFund = paymentService.getInboundFund(accountId, startDate, endDate);
+        BigDecimal outgoingFund = paymentService.getOutgoingFund(accountId, startDate, endDate);
+        BigDecimal frozenMoney = paymentService.getFrozenMoney(accountId, startDate, endDate);
+        BigDecimal walletDeposit = paymentService.getWalletDeposit(accountId, startDate, endDate);
+        BigDecimal walletWithdrawal = paymentService.getWalletWithdrawal(accountId, startDate, endDate);
+
+        PaymentSummaryDTO paymentSummary = PaymentSummaryDTO.builder()
+                .inboundFund(inboundFund)
+                .outgoingFund(outgoingFund)
+                .frozenMoney(frozenMoney)
+                .walletDeposit(walletDeposit)
+                .walletWithdrawal(walletWithdrawal)
+                .build();
+
+        return ResponseEntity.ok(paymentSummary);
     }
 
     @GetMapping("/{id}")

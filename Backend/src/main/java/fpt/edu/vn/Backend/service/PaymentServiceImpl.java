@@ -399,4 +399,29 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepos.saveAll(list);
         notificationService.sendBulkNotification(toSend);
     }
+
+    @Override
+    public BigDecimal getInboundFund(Integer accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepos.getInboundFund(accountId, startDate, endDate);
+    }
+
+    @Override
+    public BigDecimal getOutgoingFund(Integer accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepos.getOutgoingFund(accountId, startDate, endDate);
+    }
+
+    @Override
+    public BigDecimal getFrozenMoney(Integer accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepos.getFrozenMoney(accountId, startDate, endDate);
+    }
+
+    @Override
+    public BigDecimal getWalletDeposit(Integer accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepos.getWalletDeposit(accountId, startDate, endDate);
+    }
+
+    @Override
+    public BigDecimal getWalletWithdrawal(Integer accountId, LocalDateTime startDate, LocalDateTime endDate) {
+        return paymentRepos.getWalletWithdrawal(accountId, startDate, endDate);
+    }
 }
