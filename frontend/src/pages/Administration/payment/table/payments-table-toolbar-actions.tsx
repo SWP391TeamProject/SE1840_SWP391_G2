@@ -3,7 +3,13 @@ import { type Table } from '@tanstack/react-table';
 
 import { exportTableToCSV } from '@/lib/export';
 import { Button } from '@/components/ui/button';
-import { CalendarClock, ListFilter, PlusIcon, SearchIcon } from 'lucide-react';
+import {
+  CalendarClock,
+  ListFilter,
+  PlusIcon,
+  SearchIcon,
+  UserIcon
+} from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Payment } from '@/models/payment';
 import {
@@ -74,6 +80,8 @@ export function PaymentsTableToolbarActions({ table }: PaymentsTableToolbarActio
     const handleFieldChange = () => {
       setParam('from', formValues.useFrom && formValues.from ? formatDateToISO(formValues.from) : undefined);
       setParam('to', formValues.useTo && formValues.to ? formatDateToISO(formValues.to) : undefined);
+      setParam('user', formValues.user && formValues.user > 0 ?
+        formValues.user : undefined);
       setParam('search', formValues.search);
     };
     handleFieldChange();
@@ -156,6 +164,29 @@ export function PaymentsTableToolbarActions({ table }: PaymentsTableToolbarActio
                     render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
                   />
                   <DateTimePicker {...form.register('to')} placeholder="to" />
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                <UserIcon className="mr-2 size-4" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">User</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="space-y-2">
+                <h4 className="font-medium leading-none">User ID</h4>
+              </div>
+              <div className="flex flex-col gap-2 mt-3">
+                <div className="flex justify-center items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name="user"
+                    render={({ field }) =>
+                      <Input {...field} type="number" />}
+                  />
                 </div>
               </div>
             </PopoverContent>
