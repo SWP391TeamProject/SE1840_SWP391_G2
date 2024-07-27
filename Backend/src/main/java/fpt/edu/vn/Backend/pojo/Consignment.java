@@ -62,7 +62,7 @@ public class Consignment {
     @OneToMany(mappedBy = "consignment", fetch = FetchType.LAZY)
     private List<ConsignmentDetail> consignmentDetails;
 
-    @Column(length = 2000, columnDefinition = "NVARCHAR(max)")
+    @Column(length = 2000, columnDefinition = "NVAR CHAR(max)")
     private String description;
 
     @Column(length = 30, columnDefinition = "NVARCHAR(30)")
