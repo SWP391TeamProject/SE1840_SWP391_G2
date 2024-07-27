@@ -5,12 +5,24 @@ import { PaymentsTable } from './table/payment-tables';
 import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useSearchParams } from 'react-router-dom';
-import { getEnumValue, parseDate, parseIntOrUndefined } from '@/lib/utils.ts';
-import { getPayments } from '@/services/PaymentsService.ts';
+import {
+  formatDateToISO,
+  getEnumValue,
+  parseDate,
+  parseIntOrUndefined
+} from '@/lib/utils.ts';
+import {
+  getPayments,
+  getPaymentSummary,
+  PaymentSummaryDTO
+} from '@/services/PaymentsService.ts';
+import {useCurrency} from "@/CurrencyProvider.tsx";
 
 export default function PaymentsList() {
   const [searchParams] = useSearchParams();
   const [paymentPromise, setPaymentPromise] = useState<any>();
+  const currency = useCurrency();
+  const [summary, setSummary] = useState<PaymentSummaryDTO>();
 
   const fetchPayments = useDebouncedCallback(() => {
     const query = {
@@ -25,6 +37,12 @@ export default function PaymentsList() {
       sort: searchParams.get('sort') || 'paymentId,desc',
     };
     setPaymentPromise(getPayments(query));
+    getPaymentSummary(parseIntOrUndefined(searchParams.get('user')),
+      formatDateToISO(parseDate(query.from)),
+      formatDateToISO(parseDate(query.to)))
+      .then((dto) => {
+        setSummary(dto);
+      })
   }, 500);
 
   useEffect(() => {
@@ -41,6 +59,29 @@ export default function PaymentsList() {
               <CardDescription>Manage payments and view details.</CardDescription>
             </CardHeader>
             <CardContent>
+              {summary &&
+                <div className="flex flex-row items-start justify-between mb-5">
+                  <div className="flex flex-col justify-start">
+                    <span className="font-semibold">Inbound Fund:</span>
+                    <span>{currency.format(summary.inboundFund)}</span>
+                  </div>
+                  <div className="flex flex-col justify-start">
+                    <span className="font-semibold">Outgoing Fund:</span>
+                    <span>{currency.format(summary.outgoingFund)}</span>
+                  </div>
+                  <div className="flex flex-col justify-start">
+                    <span className="font-semibold">Frozen Money:</span>
+                    <span>{currency.format(summary.frozenMoney)}</span>
+                  </div>
+                  <div className="flex flex-col justify-start">
+                    <span className="font-semibold">Wallet Deposit:</span>
+                    <span>{currency.format(summary.walletDeposit)}</span>
+                  </div>
+                  <div className="flex flex-col justify-start">
+                    <span className="font-semibold">Wallet Withdrawal:</span>
+                    <span>{currency.format(summary.walletWithdrawal)}</span>
+                  </div>
+                </div>}
               <PaymentsTable paymentPromise={paymentPromise} />
             </CardContent>
           </Card>

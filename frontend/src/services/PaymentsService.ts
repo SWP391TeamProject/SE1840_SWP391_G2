@@ -4,6 +4,36 @@ import { getCookie, getBearerToken, removeCookie } from '@/utils/cookies';
 import axios from '@/config/axiosConfig.ts';
 import { formatDateToISO } from '@/lib/utils.ts';
 
+
+export interface PaymentSummaryDTO {
+  inboundFund: number;
+  outgoingFund: number;
+  frozenMoney: number;
+  walletDeposit: number;
+  walletWithdrawal: number;
+}
+
+export async function getPaymentSummary(
+  accountId?: number,
+  startDate?: string,
+  endDate?: string
+): Promise<PaymentSummaryDTO> {
+  try {
+    const response = await axios.get<PaymentSummaryDTO>(
+      API_SERVER + '/payments/payment-summary', {
+      params: {
+        accountId,
+        startDate,
+        endDate
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching payment summary:', error);
+    throw error;
+  }
+}
+
 interface GetPaymentsSchema {
   page: number;
   size: number;

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,5 +33,15 @@ public interface PaymentService {
     String createVNPayPayment(VnPayPaymentRequestDTO paymentRequest, String vnp_IpAddr) throws UnsupportedEncodingException;
 
     String capturePayment(PaymentCaptureRequestDTO dto);
+
+    BigDecimal getInboundFund(Integer accountId, LocalDateTime startDate, LocalDateTime endDate);
+
+    BigDecimal getOutgoingFund(Integer accountId, LocalDateTime startDate, LocalDateTime endDate);
+
+    BigDecimal getFrozenMoney(Integer accountId, LocalDateTime startDate, LocalDateTime endDate);
+
+    BigDecimal getWalletDeposit(Integer accountId, LocalDateTime startDate, LocalDateTime endDate);
+
+    BigDecimal getWalletWithdrawal(Integer accountId, LocalDateTime startDate, LocalDateTime endDate);
 
 }
